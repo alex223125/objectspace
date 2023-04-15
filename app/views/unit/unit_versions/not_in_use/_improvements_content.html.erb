@@ -1,0 +1,112 @@
+<!--for 2 columns-->
+<!--<div class="py-10 lg:w-2/3 w-full md:pr-6 md:border-r border-gray-300">-->
+<!--</div>-->
+
+<div class="improvements-content">
+  <h1 class="text-3xl text-gray-900 font-bold mb-10">Improvements</h1>
+
+
+  <!--  search bar -->
+  <div class="flex flex-col md:flex-row md:items-center">
+    <div class="w-full md:w-1/2 pb-3 md:pb-0 md:pr-3 md:border-r border-gray-300">
+      <h3 class="text-xl text-gray-900 mb-2">
+        Search
+      </h3>
+      <div class="flex flex-col">
+        <label for="search" class="hidden text-gray-800 text-sm font-bold leading-tight tracking-normal mb-2"></label>
+        <div class="relative w-full mb-2">
+          <div class="absolute text-gray-600 flex items-center pl-4 h-full cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="18" height="18" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z"></path>
+              <circle cx="10" cy="10" r="7"></circle>
+              <line x1="21" y1="21" x2="15" y2="15"></line>
+            </svg>
+          </div>
+          <input id="search" class="text-gray-600 focus:outline-none focus:border focus:border-blue-700 font-normal w-full h-10 flex items-center pl-12 text-sm border-gray-300 rounded border bg-gray-100" placeholder="Search">
+        </div>
+      </div>
+      <div class="flex flex-col md:flex-row md:items-center">
+        <div class="w-full md:w-1/2">
+          <div class="relative w-full z-10">
+            <div class="absolute z-0 inset-0 m-auto mr-2 xl:mr-4 z-0 w-5 h-5">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon cursor-pointer icon-tabler icon-tabler-chevron-down" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#a0aec0" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z"></path>
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+            <select aria-label="Selected tab" class="relative z-10 cursor-pointer focus:outline-none focus:border-gray-800 focus:shadow-outline-gray text-sm form-select block w-full py-2 px-2 xl:px-3 border border-gray-300 rounded text-gray-600 appearance-none bg-transparent">
+              <option class="text-sm text-gray-600">
+                Option 1
+              </option>
+              <option class="text-sm text-gray-600">
+                Option 2
+              </option>
+              <option selected="" class="text-sm text-gray-600">
+                Select category
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="w-full md:w-1/2 md:flex justify-end">
+          <button class="bg-gray-800 text-sm  text-white rounded hover:bg-gray-600 transition duration-150 ease-in-out py-2 px-6 sm:mt-0 mt-4">
+            Search
+          </button>
+        </div>
+      </div>
+    </div>
+          <div class="w-full md:w-1/2 pt-3 md:pt-0 md:pl-3">
+            <h3 class="text-xl text-gray-900 mb-2">Ask a question</h3>
+            <div class="flex flex-col">
+              <label for="q_search" class="hidden text-gray-800 text-sm font-bold leading-tight tracking-normal mb-2"></label>
+              <div class="relative w-full mb-2">
+                <input id="q_search" class="text-gray-600 focus:outline-none focus:border focus:border-blue-700 bg-gray-100 font-normal w-full h-10 flex items-center pl-4 text-sm border-gray-300 rounded border" placeholder="Type a question">
+              </div>
+            </div>
+            <div class="flex flex-col md:flex-row md:items-center">
+              <div class="w-full md:w-1/2"></div>
+              <div class="w-full md:w-1/2 md:flex md:mb-0 mb-4 justify-end">
+                <button class="bg-blue-700 text-sm text-white rounded hover:bg-blue-600 transition duration-150 ease-in-out py-2 px-6 sm:mt-0 mt-4">
+                  Ask
+                </button>
+              </div>
+            </div>
+          </div>
+  </div>
+
+  <div class="mt-16 sm:flex items-center">
+    <button class="md:mr-16 bg-blue-100 text-sm text-blue-500 rounded hover:bg-blue-200 transition duration-150 ease-in-out py-2 px-6">
+      New
+    </button>
+    <button class="md:mr-16 bg-blue-100 text-sm text-blue-500 rounded hover:bg-blue-200 transition duration-150 ease-in-out py-2 px-6">
+      Reviewd
+    </button>
+    <button class="md:mr-16 bg-blue-100 text-sm text-blue-500 rounded hover:bg-blue-200 transition duration-150 ease-in-out py-2 px-6">
+      Accepted
+    </button>
+    <button class="md:mr-16 bg-blue-100 text-sm text-blue-500 rounded hover:bg-blue-200 transition duration-150 ease-in-out py-2 px-6">
+      Rejected
+    </button>
+    <br>
+    <%= link_to "Create a new improvement request", new_improvement_path(unit_id: @unit.id), style: "text-decoration: none", class: "no-underline	 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+  </div>
+
+
+
+
+  <div class="improvements-items">
+    <div data-controller="improvements_infinite_scroll">
+      <div data-target="improvements_infinite_scroll.entries">
+        <%#= render "units/partials/improvements_items" %>
+      </div>
+
+      <div data-target="improvements_infinite_scroll.pagination">
+        <!--  nothing -->
+        <%#== pagy_nav @pagy %>
+      </div>
+    </div>
+  </div>
+
+
+<!--  <a style="text-decoration: none" class="no-underline	 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" href="/improvements/new?unit_id=6">Load more</a>-->
+
+</div>

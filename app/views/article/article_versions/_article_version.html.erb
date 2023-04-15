@@ -1,0 +1,32 @@
+<div id="<%= dom_id article_version %>">
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Title:</strong>
+    <%= article_version.title %>
+  </p>
+
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Solves the problem:</strong>
+    <%= article_version.solves_the_problem %>
+  </p>
+
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Content:</strong>
+    <%= article_version.content %>
+  </p>
+
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Sources:</strong>
+    <%= article_version.sources %>
+  </p>
+
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Additional information:</strong>
+    <%= article_version.additional_information %>
+  </p>
+
+  <% if action_name != "show" %>
+    <%= link_to "Show this article version", article_version, class: "rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+    <%= link_to 'Edit this article version', edit_article_version_path(article_version), class: "rounded-lg py-3 ml-2 px-5 bg-gray-100 inline-block font-medium" %>
+    <hr class="mt-6">
+  <% end %>
+</div>

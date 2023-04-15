@@ -1,0 +1,64 @@
+<%= simple_form_for(unit, url: unit_unit_path(id: unit.id)) do |f| %>
+
+  <% if unit.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+      <h2><%= pluralize(unit.errors.count, "error") %> prohibited this improvement from being saved:</h2>
+
+      <ul>
+        <% unit.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-inputs">
+    <div class="col-span-6 sm:col-span-3">
+      <%= f.label "Title", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.hint 'What this method does? What this method changes, modifies? What task this method performs? This title should unite all version of instruction', class: "mt-2 text-sm text-gray-500" %>
+      <%= f.input_field :title,
+                        required: true,
+                        class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
+                        placeholder: "Ex: How to install Ruby on Rails on your Desktop" %>
+    </div>
+    <br>
+
+    <div class="col-span-6 sm:col-span-3">
+      <%= f.label "Visibility", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.hint 'Here you can pick if method publicly visible or not', class: "mt-2 text-sm text-gray-500" %>
+      <div class="flex items-center justify-center w-screen h-screen">
+        <div class="grid grid-cols-3 gap-2 w-full max-w-screen-sm">
+          <%= f.collection_radio_buttons :visibility_status, Units::VisibilityStatusTypes.all.map {|k,v| [k,v]}, :first, :last do |b| %>
+            <div>
+              <!--          <input class="hidden" id="radio_1" type="radio" name="radio" checked>-->
+              <label class="flex flex-col p-4 border-2 border-gray-400 cursor-pointer rounded-lg" for="radio_1">
+
+                <span class="flex items-center text-xs font-semibold uppercase"><%= b.radio_button(class: "flex") %><%= b.label(class: "flex ml-2") %></span>
+                <!--<span class="text-xl font-bold mt-2">$10/mo</span>-->
+                <ul class="text-sm mt-2">
+                  <% if b.text == "public"%>
+                    <li>With 'public' visibility method will be seen for all users from internet</li>
+                  <% else %>
+                    <li>With 'private' visibility method will be accessible only for you</li>
+                  <% end %>
+                </ul>
+              </label>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+  <br>
+
+  <div class="bg-gray-50 px-4 py-3 sm:px-6">
+    <div class="text-end">
+      <%= link_to "Back to dashboard", unit_units_path, class: "py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" %>
+      <%= f.button :submit, "Save changes", class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+    </div>
+  </div>
+
+
+<% end %>

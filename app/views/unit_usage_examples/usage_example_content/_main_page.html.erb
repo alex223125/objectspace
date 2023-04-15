@@ -1,0 +1,32 @@
+<div class="usage-example-content-main-page">
+
+  <!-- Three columns -->
+  <div class="flex mb-4">
+    <div class="w-1/5 h-12">
+      <%= render "unit_usage_examples/usage_example_content/left_bar", unit_usage_example: unit_usage_example %>
+    </div>
+    <div class="w-3/5">
+      <%= render "unit_usage_examples/usage_example_content/middle_bar", unit_usage_example: unit_usage_example %>
+    </div>
+    <div class="w-1/5 h-12">
+      <%= render "unit_usage_examples/usage_example_content/right_bar", unit_usage_example: unit_usage_example %>
+    </div>
+  </div>
+
+
+  <%= link_to 'Edit this unit_usage_example', edit_unit_usage_example_path(@unit_usage_example), class: "mt-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+  <div class="inline-block ml-2">
+    <%= button_to 'Destroy this unit_usage_example', unit_usage_example_path(@unit_usage_example), method: :delete, class: "mt-2 rounded-lg py-3 px-5 bg-gray-100 font-medium" %>
+  </div>
+  <%= link_to 'Back to unit_usage_examples', unit_usage_examples_path, class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+
+
+  <div class="bg-gray-50 px-4 py-3 sm:px-6">
+    <div class="text-end">
+      <%= link_to "Back to dashboard", unit_units_path, class: "py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" %>
+      <%= link_to "Close", unit_units_path, class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+      <%#= button_tag :submit, "Create method", class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+    </div>
+  </div>
+
+</div>

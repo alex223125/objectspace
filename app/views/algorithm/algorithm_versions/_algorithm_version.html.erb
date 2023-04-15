@@ -1,0 +1,27 @@
+<div id="<%= dom_id algorithm_version %>">
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Title:</strong>
+    <%= algorithm_version.title %>
+  </p>
+
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Solves the problem:</strong>
+    <%= algorithm_version.solves_the_problem %>
+  </p>
+
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Sources:</strong>
+    <%= algorithm_version.sources %>
+  </p>
+
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Additional information:</strong>
+    <%= algorithm_version.additional_information %>
+  </p>
+
+  <% if action_name != "show" %>
+    <%= link_to "Show this algorithm version", algorithm_version, class: "rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+    <%= link_to 'Edit this algorithm version', edit_algorithm_version_path(algorithm_version), class: "rounded-lg py-3 ml-2 px-5 bg-gray-100 inline-block font-medium" %>
+    <hr class="mt-6">
+  <% end %>
+</div>

@@ -1,0 +1,2 @@
+module SimpleObjectsHelper
+end

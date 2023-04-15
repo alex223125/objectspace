@@ -1,0 +1,96 @@
+<div class="flex flex-wrap">
+  <div class="border-r border-gray-200 dark:border-gray-700">
+    <ul class="flex flex-col space-y-2" id="myUnitSettingsTab" data-tabs-toggle="#myUnitSettingsTabContent"
+        aria-label="Tabs" role="tablist" data-hs-tabs-vertical="true">
+      <li>
+        <button type="button"
+                id="method-tab-1"
+                data-tabs-target="#method-1"
+                role="tab"
+                aria-controls="method-1"
+                aria-selected="false"
+                data-toggle="method-1-tab"
+                class="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 dark:hs-tab-active:text-blue-600 py-1 pr-4 inline-flex items-center gap-2 border-r-[3px] border-transparent text-sm whitespace-nowrap text-gray-500 hover:text-blue-600 active" id="vertical-tab-with-border-item-1" data-hs-tab="#vertical-tab-with-border-1" aria-controls="vertical-tab-with-border-1" role="tab">
+          General
+        </button>
+      </li>
+
+      <li>
+        <button type="button"
+                id="method-tab-2"
+                data-tabs-target="#method-2"
+                role="tab"
+                aria-controls="method-2"
+                aria-selected="false"
+                data-toggle="method-2-tab"
+                class="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 dark:hs-tab-active:text-blue-600 py-1 pr-4 inline-flex items-center gap-2 border-r-[3px] border-transparent text-sm whitespace-nowrap text-gray-500 hover:text-blue-600 dark:hover:text-gray-300" id="vertical-tab-with-border-item-2" data-hs-tab="#vertical-tab-with-border-2" aria-controls="vertical-tab-with-border-2" role="tab">
+          Tab 2
+        </button>
+      </li>
+
+
+      <li>
+        <button type="button"
+                id="method-tab-3"
+                data-tabs-target="#method-3"
+                role="tab"
+                aria-controls="method-3"
+                aria-selected="false"
+                data-toggle="method-3-tab"
+                class="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 dark:hs-tab-active:text-blue-600 py-1 pr-4 inline-flex items-center gap-2 border-r-[3px] border-transparent text-sm whitespace-nowrap text-gray-500 hover:text-blue-600 dark:hover:text-gray-300" id="vertical-tab-with-border-item-3" data-hs-tab="#vertical-tab-with-border-3" aria-controls="vertical-tab-with-border-3" role="tab">
+          Tab 3
+        </button>
+      </li>
+    </ul>
+  </div>
+
+
+<!--  <div class="mb-4 border-b border-gray-200 dark:border-gray-700">-->
+<!--    <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="myTab" data-tabs-toggle="#myTabContent" role="tablist">-->
+<!--      <li class="mr-2" role="presentation">-->
+<!--        <button class="inline-block p-4 border-b-2 rounded-t-lg" id="method-tab" data-tabs-target="#method" type="button"-->
+<!--                role="tab" aria-controls="method" aria-selected="false" data-toggle="method-tab">Method</button>-->
+<!--      </li>-->
+<!--      <li class="mr-2" role="presentation">-->
+<!--        <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"-->
+<!--                id="improvements-tab" data-tabs-target="#improvements" type="button" role="tab"-->
+<!--                aria-controls="improvements" aria-selected="false" data-toggle="method-tab">Improvements</button>-->
+<!--      </li>-->
+<!--      <li class="mr-2" role="presentation">-->
+<!--        <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"-->
+<!--                id="usage-examples-tab" data-tabs-target="#usage-examples" type="button" role="tab" aria-controls="usage-examples"-->
+<!--                aria-selected="false" data-toggle="method-tab">Usage examples</button>-->
+<!--      </li>-->
+<!--      <li class="mr-2" role="presentation">-->
+<!--        <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"-->
+<!--                id="settings-tab" data-tabs-target="#settings" type="button" role="tab" aria-controls="settings"-->
+<!--                aria-selected="false" data-toggle="method-tab">Settings</button>-->
+<!--      </li>-->
+<!--    </ul>-->
+<!--  </div>-->
+
+
+  <div id="myUnitSettingsTabContent">
+    <div class="ml-3">
+      <div id="method-1" role="tabpanel" aria-labelledby="method-tab-1">
+        <p class="text-gray-500 dark:text-gray-400">
+          <%= render "unit/unit_versions/partials/settings_content/general_settings_tab", unit: @unit_version.unit %>
+        </p>
+      </div>
+      <div id="method-2" class="hidden" role="tabpanel" aria-labelledby="method-tab-2">
+        <p class="text-gray-500 dark:text-gray-400">
+          22222 This is the <em class="font-semibold text-gray-800 dark:text-gray-200">second</em> item's tab body.
+        </p>
+      </div>
+      <div id="method-3" class="hidden" role="tabpanel" aria-labelledby="method-tab-3">
+        <p class="text-gray-500 dark:text-gray-400">
+          33333 This is the <em class="font-semibold text-gray-800 dark:text-gray-200">third</em> item's tab body.
+        </p>
+      </div>
+    </div>
+  </div>
+
+
+
+
+</div>

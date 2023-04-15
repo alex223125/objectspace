@@ -1,0 +1,73 @@
+<div class="col-span-6 sm:col-span-3">
+  <%= f.label "Version title", class: "block text-sm font-medium text-gray-700" %>
+  <div class="bg-yellow-50 border border-yellow-400 rounded text-yellow-800 text-sm p-4 flex items-start">
+    <div>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+      </svg>
+    </div>
+    <div class="w-full">
+      <!--<p>-->
+      <!--  <span class="font-bold">Error:</span>-->
+      <!--  Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto quos-->
+      <!--  exercitationem, voluptate eos reprehenderit fugit assumenda illo error-->
+      <!--  facere consequuntur perferendis asperiores dolor et itaque.-->
+      <!--</p>-->
+
+      <p>Each method can have multiple versions of the same instruction.</p>
+      <p> Use this field if you plan to create multiple versions of same instruction for different contexts.</p>
+      <p>For example you might have in mind tutorial about how to install Ruby on Rails on your Desktop</p>
+      <p>Possible versions of the tutorial will be:</p>
+      <ul class="list-disc">
+        <li>Install Ruby on Rails on Ubuntu 16</li>
+        <li>Install Ruby on Rails on Ubuntu 18</li>
+        <li>Install Ruby on Rails on Ubuntu 20</li>
+        <!-- ... -->
+      </ul>
+      <p>You can also use less specific versions</p>
+      <ul class="list-disc">
+        <li>Install Ruby on Rails on Ubuntu</li>
+        <li>Install Ruby on Rails on macOS</li>
+        <li>Install Ruby on Rails on Windows</li>
+        <!-- ... -->
+      </ul>
+
+      <p>At the moment you can pick one and add only one version of instruction.</p>
+      <p>You will be able modify current and add new versions of instruction after creation of current version.</p>
+    </div>
+    <div>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </div>
+  </div>
+  <%= f.input_field :title, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+</div>
+<br>
+
+<div class="col-span-6 sm:col-span-3" data-controller="unit_solves_the_problem_tinymce">
+  <%= f.label "Problem (optional)", class: "block text-sm font-medium text-gray-700" %>
+  <%= f.hint 'Describe what problem or problems this method solves.', class: "mt-2 text-sm text-gray-500" %>
+  <%= f.input_field :solves_the_problem, data: { target: 'unit_solves_the_problem_tinymce.field' } %>
+</div>
+<br>
+
+<div class="col-span-6 sm:col-span-3" data-controller="unit_instruction_tinymce">
+  <%= f.label "Method", class: "block text-sm font-medium text-gray-700" %>
+  <%= f.hint 'Describe the method by which the problem is solved.', class: "mt-2 text-sm text-gray-500" %>
+  <%= f.input_field :instruction, data: { target: 'unit_instruction_tinymce.field' } %>
+</div>
+<br>
+
+<div class="col-span-6 sm:col-span-3" data-controller="unit_sources_tinymce">
+  <%= f.label "Sources (optional)", class: "block text-sm font-medium text-gray-700" %>
+  <%= f.hint 'If your method based on any credible sources of information you can add it here.', class: "mt-2 text-sm text-gray-500" %>
+  <%= f.input_field :sources, data: { target: 'unit_sources_tinymce.field' } %>
+</div>
+<br>
+
+<div class="col-span-6 sm:col-span-3" data-controller="unit_additional_information_tinymce">
+  <%= f.label "Additional information (optional)", class: "block text-sm font-medium text-gray-700" %>
+  <%= f.hint 'If you have something to add which does not fit in any of the above category you can add it here..', class: "mt-2 text-sm text-gray-500" %>
+  <%= f.input_field :additional_information, data: { target: 'unit_additional_information_tinymce.field' } %>
+</div>

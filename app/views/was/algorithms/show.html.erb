@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @algorithm %>
+
+<div>
+  <%= link_to "Edit this algorithm", edit_algorithm_path(@algorithm) %> |
+  <%= link_to "Back to algorithms", algorithms_path %>
+
+  <%= button_to "Destroy this algorithm", @algorithm, method: :delete %>
+</div>

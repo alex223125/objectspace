@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Algorithms</h1>
+
+<div id="algorithms">
+  <% @algorithms.each do |algorithm| %>
+    <%= render algorithm %>
+    <p>
+      <%= link_to "Show this algorithm", algorithm %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New algorithm", new_algorithm_path %>

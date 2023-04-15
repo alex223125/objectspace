@@ -1,0 +1,205 @@
+<%= simple_form_for(@improvement) do |f| %>
+  <% if improvement.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+      <h2><%= pluralize(improvement.errors.count, "error") %> prohibited this improvement from being saved:</h2>
+
+      <ul>
+        <% improvement.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <br>
+    <%= render "shared/unit_preview", unit: @unit %>
+  <br>
+
+  <div class="col-span-6 sm:col-span-3">
+    <%= f.label "Title", class: "block text-sm font-medium text-gray-700" %>
+    <%= f.hint 'Briefly describe improvement(-s).', class: "mt-2 text-sm text-gray-500" %>
+    <%= f.input_field :title, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+  </div>
+  <br>
+
+<!--  <div data-controller="multiselect_units" data-multiselect-preload-url-value="/cars" data-placeholder="Search for cars...">-->
+<!--    <select multiple="multiple" class="multiselect__hidden" data-multiselect-target="hidden" name="form[test_ids][]" id="form_test_ids"></select>-->
+<!--  </div>-->
+
+  <div class="col-span-6 sm:col-span-3" data-controller="improvement_content_tinymce">
+    <%= f.label "Content", class: "block text-sm font-medium text-gray-700" %>
+    <%= f.hint 'Describe how the solution can be improved.', class: "mt-2 text-sm text-gray-500" %>
+    <%= f.input_field :content, data: { target: 'improvement_content_tinymce.field' } %>
+  </div>
+  <br>
+
+  <div class="col-span-6 sm:col-span-3" data-controller="improvement_sources_tinymce">
+    <%= f.label "Sources", class: "block text-sm font-medium text-gray-700" %>
+    <%= f.hint 'If your improvement(-s) based on any credible sources of information you can add it here.', class: "mt-2 text-sm text-gray-500" %>
+    <%= f.input_field :sources, data: { target: 'improvement_sources_tinymce.field' } %>
+  </div>
+  <br>
+
+  <div class="col-span-6 sm:col-span-3">
+    <%#= f.label "Applies to", class: "block text-sm font-medium text-gray-700" %>
+    <%#= f.association :unit_versions, collection: @unit.unit_versions, input_html: { class: 'block w-full p-2 mb-6 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'} %>
+
+    <%#= f.label "Applies to", class: "block text-sm font-medium text-gray-700" %>
+    <%#= f.association :unit_versions, collection: @unit.unit_versions, prompt: "Choose a Company" %>
+
+
+    <%= f.label "Applies to:", class: "block text-sm font-medium text-gray-700" %>
+    <%= f.hint "If your improvement applies to specific version of method you can pick it there. If it applies to unit in general then use 'Pick all' option", class: "mt-2 text-sm text-gray-500" %>
+<!--    <h3 class="mb-4 font-semibold text-gray-900 dark:text-white">Technology</h3>-->
+    <ul class="w-72 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+
+      <li class="py-4 flex items-top w-full border-b border-gray-200 rounded-t-lg dark:border-gray-600">
+        <div class="flex items-center pl-3">
+          <input id="helper-checkbox-1" aria-describedby="helper-checkbox-text-1" type="checkbox" value=""
+                 class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+        </div>
+        <div class="ml-4 text-sm">
+          <label for="helper-checkbox-1" class="font-medium text-gray-900 dark:text-gray-300">Pick all</label>
+          <p id="helper-checkbox-text-1" class="text-sm	 font-normal text-gray-500 dark:text-gray-300">This option will select all versions of method</p>
+        </div>
+      </li>
+
+      <% @unit.unit_versions.each do |version| %>
+        <li class="py-4 flex items-top w-full border-b border-gray-200 rounded-t-lg dark:border-gray-600">
+          <div class="flex items-center pl-3">
+            <%= f.check_box(:unit_versions,
+                            { :multiple => true,
+                              "aria-describedby": "helper-checkbox-text-#{version.id}",
+                              class: "w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600",
+                            },
+                            version.id,
+                            nil) %>
+          </div>
+          <div class="ml-4 text-base">
+            <label for="improvement_unit_versions_<%=version.id%>" class="font-medium text-gray-900 dark:text-gray-300">Free shipping via Flowbite</label>
+            <p id="helper-checkbox-text-<%=version.id%>" class="text-sm	 font-normal text-gray-500 dark:text-gray-300">For orders shipped from $25 in books or $29 in other categories (Link to open version)</p>
+          </div>
+        </li>
+
+      <% end %>
+
+
+    </ul>
+
+
+
+
+<!--    <h3 class="mb-4 font-semibold text-gray-900 dark:text-white">Technology</h3>-->
+<!--    <ul class="w-48 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">-->
+
+<!--      <li class="w-full border-b border-gray-200 rounded-t-lg dark:border-gray-600">-->
+<!--        <div class="flex items-center pl-3">-->
+<!--          <input id="vue-checkbox" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">-->
+<!--          <label for="vue-checkbox" class="w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Vue JS</label>-->
+<!--        </div>-->
+<!--      </li>-->
+
+<!--      <li class="w-full border-b border-gray-200 rounded-t-lg dark:border-gray-600">-->
+<!--        <div class="flex items-center pl-3">-->
+<!--          <input id="react-checkbox" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">-->
+<!--          <label for="react-checkbox" class="w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">React</label>-->
+<!--        </div>-->
+<!--      </li>-->
+
+<!--      <li class="w-full border-b border-gray-200 rounded-t-lg dark:border-gray-600">-->
+<!--        <div class="flex items-center pl-3">-->
+<!--          <input id="angular-checkbox" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">-->
+<!--          <label for="angular-checkbox" class="w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Angular</label>-->
+<!--        </div>-->
+<!--      </li>-->
+
+<!--      <li class="w-full border-b border-gray-200 rounded-t-lg dark:border-gray-600">-->
+<!--        <div class="flex items-center pl-3">-->
+<!--          <input id="laravel-checkbox" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">-->
+<!--          <label for="laravel-checkbox" class="w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Laravel</label>-->
+<!--        </div>-->
+<!--      </li>-->
+<!--    </ul>-->
+
+
+
+    <!--    <div class="flex">-->
+<!--      <div class="flex items-center h-5">-->
+<!--        <input id="helper-checkbox-1" aria-describedby="helper-checkbox-text-1" type="checkbox" value=""-->
+<!--               class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">-->
+<!--      </div>-->
+<!--      <div class="ml-2 text-sm">-->
+<!--        <label for="helper-checkbox-1" class="font-medium text-gray-900 dark:text-gray-300">To all</label>-->
+<!--        <p id="helper-checkbox-text-1" class="text-xs font-normal text-gray-500 dark:text-gray-300">For orders shipped from $25 in books or $29 in other categories</p>-->
+<!--      </div>-->
+
+<!--      <div class="flex items-center h-5">-->
+<!--        <input id="helper-checkbox-2" aria-describedby="helper-checkbox-text-2" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">-->
+<!--      </div>-->
+<!--      <div class="ml-2 text-sm">-->
+<!--        <label for="helper-checkbox-2" class="font-medium text-gray-900 dark:text-gray-300">Free shipping via Flowbite</label>-->
+<!--        <p id="helper-checkbox-text-2" class="text-xs font-normal text-gray-500 dark:text-gray-300">For orders shipped from $25 in books or $29 in other categories</p>-->
+<!--      </div>-->
+
+<!--      <div class="flex items-center h-5">-->
+<!--        <input id="helper-checkbox-3" aria-describedby="helper-checkbox-text-3" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">-->
+<!--      </div>-->
+<!--      <div class="ml-2 text-sm">-->
+<!--        <label for="helper-checkbox-3" class="font-medium text-gray-900 dark:text-gray-300">Free shipping via Flowbite</label>-->
+<!--        <p id="helper-checkbox-text-3" class="text-xs font-normal text-gray-500 dark:text-gray-300">For orders shipped from $25 in books or $29 in other categories</p>-->
+<!--      </div>-->
+
+<!--      <div class="flex items-center h-5">-->
+<!--        <input id="helper-checkbox-4" aria-describedby="helper-checkbox-text-4" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">-->
+<!--      </div>-->
+<!--      <div class="ml-2 text-sm">-->
+<!--        <label for="helper-checkbox-4" class="font-medium text-gray-900 dark:text-gray-300">Free shipping via Flowbite</label>-->
+<!--        <p id="helper-checkbox-text-4" class="text-xs font-normal text-gray-500 dark:text-gray-300">For orders shipped from $25 in books or $29 in other categories</p>-->
+<!--      </div>-->
+<!--    </div>-->
+
+    <%#= f.hint 'If your improvement(-s) based on any credible sources of information you can add it here.', class: "mt-2 text-sm text-gray-500" %>
+    <%#= f.input_field :sources, data: { target: 'improvement_sources_tinymce.field' } %>
+  </div>
+  <br>
+
+
+
+<!--  <label for="small" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Small select</label>-->
+<!--  <select id="small" class="block w-full p-2 mb-6 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">-->
+<!--    <option selected>Choose a country</option>-->
+<!--    <option value="US">United States</option>-->
+<!--    <option value="CA">Canada</option>-->
+<!--    <option value="FR">France</option>-->
+<!--    <option value="DE">Germany</option>-->
+<!--  </select>-->
+<!--  <label for="default" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Default select</label>-->
+<!--  <select id="default" class="bg-gray-50 border border-gray-300 text-gray-900 mb-6 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">-->
+<!--    <option selected>Choose a country</option>-->
+<!--    <option value="US">United States</option>-->
+<!--    <option value="CA">Canada</option>-->
+<!--    <option value="FR">France</option>-->
+<!--    <option value="DE">Germany</option>-->
+<!--  </select>-->
+<!--  <label for="large" class="block mb-2 text-base font-medium text-gray-900 dark:text-white">Large select</label>-->
+<!--  <select id="large" class="block w-full px-4 py-3 text-base text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">-->
+<!--    <option selected>Choose a country</option>-->
+<!--    <option value="US">United States</option>-->
+<!--    <option value="CA">Canada</option>-->
+<!--    <option value="FR">France</option>-->
+<!--    <option value="DE">Germany</option>-->
+<!--  </select>-->
+
+
+
+  <%= f.hidden_field :unit_id, value: @unit.id %>
+
+
+  <div class="bg-gray-50 px-4 py-3 sm:px-6">
+    <div class="text-end">
+      <%= link_to "Back to method", unit_unit_versions_path(@unit.default_version), class: "py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" %>
+      <%= f.button :submit, "Submit improvement", class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+    </div>
+  </div>
+
+<% end %>

@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  title: MyString
+  default_version_id: 1
+  visibility_status: 1
+  source_page_description: MyText
+
+two:
+  title: MyString
+  default_version_id: 1
+  visibility_status: 1
+  source_page_description: MyText

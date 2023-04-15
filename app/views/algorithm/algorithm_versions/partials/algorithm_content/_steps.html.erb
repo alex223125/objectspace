@@ -1,0 +1,146 @@
+<div class="steps-section" id="steps">
+  <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight text-center">Steps:</h2>
+
+  <% binding.pry %>
+  <% algorithm_version.control_structures.first.steps.each do |step| %>
+
+
+    <!--          <div class="step-title" id="step-title">-->
+    <!--            Step <%#= step.position %>: <%#= step.title.html_safe %>-->
+    <!--          </div>-->
+
+
+    <!--          <span>Step <%#= step.position %>: <%#= step.title.html_safe %></span>-->
+
+    <!--          <div class="flex items-center justify-between w-full p-5 font-medium text-left border border-gray-200 rounded-xl focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400">-->
+    <!--            <span># Step <%#= step.position %>: <%#= step.title.html_safe %></span>-->
+    <!--          </div>-->
+
+    <div class="flex items-center justify-between w-full p-5 font-medium text-left text-gray-500 dark:text-gray-400">
+<!--      <span># Step <%#= step.position %>: <%#= step.title.html_safe %> (step source page)</span>-->
+      <span id="step-<%=step.position%>"># <%= step.title.html_safe %> (source page)</span>
+    </div>
+
+<!--    <div class="mb-4 border-b border-gray-200 dark:border-gray-700">-->
+    <div class="flex items-center justify-between w-fullfont-medium text-left border border-b-0 border-gray-200 rounded-t-xl focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400">
+      <ul class="list-none flex flex-wrap -mb-px text-sm font-medium text-center" id="myTab-<%=step.position%>" data-tabs-toggle="#myTabContent-<%=step.position%>" role="tablist">
+
+        <li class="mr-2" role="presentation">
+          <button class="inline-block p-4 border-b-2 rounded-t-lg"
+                  id="content-tab-<%=step.position%>"
+                  data-tabs-target="#content-<%=step.position%>"
+                  type="button"
+                  role="tab"
+                  aria-controls="content-<%=step.position%>"
+                  aria-selected="false">Content</button>
+        </li>
+
+        <li class="mr-2" role="presentation">
+          <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
+                  id="step-finish-check-tab-<%=step.position%>"
+                  data-tabs-target="#step-finish-check-<%=step.position%>"
+                  type="button"
+                  role="tab"
+                  aria-controls="step-finish-check-<%=step.position%>"
+                  aria-selected="false">Step finish check</button>
+        </li>
+
+<!--        <li class="mr-2" role="presentation">-->
+<!--          Step source page-->
+<!--        </li>-->
+
+        <!--              <li class="mr-2" role="presentation">-->
+        <!--                <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" -->
+        <!--                        id="settings-tab" -->
+        <!--                        data-tabs-target="#settings" -->
+        <!--                        type="button" -->
+        <!--                        role="tab" -->
+        <!--                        aria-controls="settings" -->
+        <!--                        aria-selected="false">Settings</button>-->
+        <!--              </li>-->
+
+        <!--              <li role="presentation">-->
+        <!--                <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" -->
+        <!--                        id="contacts-tab" -->
+        <!--                        data-tabs-target="#contacts" type="button" role="tab" -->
+        <!--                        aria-controls="contacts" aria-selected="false">Contacts</button>-->
+        <!--              </li>-->
+
+      </ul>
+    </div>
+
+    <div id="myTabContent-<%=step.position%>">
+
+      <!--            <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800"-->
+      <div class="hidden p-4 rounded-lg bg-white dark:bg-white"
+           id="content-<%=step.position%>"
+           role="tabpanel"
+           aria-labelledby="content-tab-<%=step.position%>">
+
+        <div class="step-content-<%= step.position %>" id="step-content-<%= step.position %>">
+
+          <% if step.solves_the_problem.present? %>
+            <div class="step-solves-the-problem">
+              <%= step.solves_the_problem.html_safe %>
+            </div>
+          <% end %>
+
+          <div class="step-instruction">
+            <%= step.instruction.html_safe %>
+          </div>
+
+          <% if step.sources.present? %>
+            <div class="step-finish-check">
+              <%= step.sources.html_safe %>
+            </div>
+          <% end %>
+
+          <% if step.sources.present? %>
+            <div class="step-sources">
+              <%= step.sources.html_safe %>
+            </div>
+          <% end %>
+
+          <% if step.additional_information.present? %>
+            <div class="step-additional-information">
+              <%= step.additional_information.html_safe %>
+            </div>
+          <% end %>
+        </div>
+
+
+        <!--              <p class="text-sm text-gray-500 dark:text-gray-400">This is some placeholder content the <strong class="font-medium text-gray-800 dark:text-white">Profile tab's associated content</strong>. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling.</p>-->
+      </div>
+
+      <!--            <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800"-->
+      <div class="hidden p-4 rounded-lg bg-white dark:bg-white"
+           id="step-finish-check-<%=step.position%>"
+           role="tabpanel"
+           aria-labelledby="step-finish-check-tab-<%=step.position%>">
+
+        <% if step.step_finish_check.present? %>
+          <div class="step-finish-check">
+            <%= step.step_finish_check.html_safe %>
+          </div>
+        <% end %>
+
+        <!--              <p class="text-sm text-gray-500 dark:text-gray-400">This is some placeholder content the <strong class="font-medium text-gray-800 dark:text-white">Dashboard tab's associated content</strong>. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling.</p>-->
+      </div>
+
+      <!--            <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="settings" role="tabpanel" aria-labelledby="settings-tab">-->
+      <!--              <p class="text-sm text-gray-500 dark:text-gray-400">This is some placeholder content the <strong class="font-medium text-gray-800 dark:text-white">Settings tab's associated content</strong>. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling.</p>-->
+      <!--            </div>-->
+
+      <!--            <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="contacts" role="tabpanel" aria-labelledby="contacts-tab">-->
+      <!--              <p class="text-sm text-gray-500 dark:text-gray-400">This is some placeholder content the <strong class="font-medium text-gray-800 dark:text-white">Contacts tab's associated content</strong>. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling.</p>-->
+      <!--            </div>-->
+
+    </div>
+
+
+
+    <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+  <% end %>
+
+</div>
+<br>

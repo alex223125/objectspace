@@ -1,0 +1,134 @@
+<!--  items -->
+<% @unit_usage_examples.each do |usage_example| %>
+
+  <hr class="mt-6 mb-8 border-t border-gray-300">
+
+  <%= link_to unit_usage_example_path(usage_example) do %>
+    <div class="md:flex items-center">
+      <div class="w-10 h-10 rounded-full flex-shrink-0">
+        <img class="w-full h-full object-cover object-center flex-shrink-0" src="./assets/images/enrolled-student-8.png" alt="">
+      </div>
+      <div class="md:ml-2 w-full">
+        <div class="md:flex items-center justify-between mt-4 md:mt-0 w-full">
+          <h5 class="text-gray-800 text-base">
+            <%= usage_example.title %>
+          </h5>
+          <div class=" text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-bookmark" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z"></path>
+              <path d="M9 4h6a2 2 0 0 1 2 2v14l-5-3l-5 3v-14a2 2 0 0 1 2 -2"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="md:mt-1 mt-3 flex  items-center text-gray-600">
+          <p class="text-gray-600 text-xs">
+            by <span class="text-blue-500">John Doe</span>
+          </p>
+          <div class="w-1 h-1 bg-gray-500 rounded-full mx-2"></div>
+          <p class="text-gray-600 text-xs">04 hours ago</p>
+          <div class="w-1 h-1 bg-gray-500 rounded-full mx-2"></div>
+          <p class="ml-2 text-gray-600 text-xs">
+            In: <span class="text-blue-500">Marketing</span>
+          </p>
+        </div>
+      </div>
+    </div>
+    <p class="mt-3 text-gray-600 text-sm">
+      <%= truncate(usage_example.description, length: 170, omission: '...', :escape => false)  %>
+    </p>
+    <div class="mt-3 md:flex items-center text-gray-600">
+      <div class="flex items-center md:my-0 my-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-message" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z"></path>
+          <path d="M4 21v-13a3 3 0 0 1 3 -3h10a3 3 0 0 1 3 3v6a3 3 0 0 1 -3 3h-9l-4 4"></path>
+          <line x1="8" y1="9" x2="16" y2="9"></line>
+          <line x1="8" y1="13" x2="14" y2="13"></line>
+        </svg>
+        <p class="ml-2 text-gray-600 text-xs ">20 comments</p>
+      </div>
+      <div class="flex items-center">
+        <div class="w-1 h-1 bg-gray-500 rounded-full mx-2 md:mb-0 mb-2"></div>
+        <p class="ml-2 text-gray-600 text-xs md:mb-0 mb-4">
+          Last comment by
+          <span class="text-blue-500">Oliver Jackson</span>
+        </p>
+      </div>
+      <div class="flex items-center">
+
+        <div class="w-1 h-1 bg-gray-500 rounded-full mx-2 md:mb-0 mb-2"></div>
+        <p class="ml-2 text-gray-600 text-xs">
+          Status: <span class="text-red-500">Unresolved</span>
+        </p>
+      </div>
+    </div>
+  <% end %>
+<% end %>
+
+
+
+
+<!--  items -->
+<%# @unit.improvements.each do |improvement| %>
+
+<!--  <hr class="mt-6 mb-8 border-t border-gray-300">-->
+
+<%#= link_to improvement_path(improvement) do %>
+<!--    <div class="md:flex items-center">-->
+<!--      <div class="w-10 h-10 rounded-full flex-shrink-0">-->
+<!--        <img class="w-full h-full object-cover object-center flex-shrink-0" src="./assets/images/enrolled-student-8.png" alt="">-->
+<!--      </div>-->
+<!--      <div class="md:ml-2 w-full">-->
+<!--        <div class="md:flex items-center justify-between mt-4 md:mt-0 w-full">-->
+<!--          <h5 class="text-gray-800 text-base">-->
+<%#= improvement.title %>
+<!--          </h5>-->
+<!--          <div class=" text-gray-600">-->
+<!--            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-bookmark" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">-->
+<!--              <path stroke="none" d="M0 0h24v24H0z"></path>-->
+<!--              <path d="M9 4h6a2 2 0 0 1 2 2v14l-5-3l-5 3v-14a2 2 0 0 1 2 -2"></path>-->
+<!--            </svg>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="md:mt-1 mt-3 flex  items-center text-gray-600">-->
+<!--          <p class="text-gray-600 text-xs">-->
+<!--            by <span class="text-blue-500">John Doe</span>-->
+<!--          </p>-->
+<!--          <div class="w-1 h-1 bg-gray-500 rounded-full mx-2"></div>-->
+<!--          <p class="text-gray-600 text-xs">04 hours ago</p>-->
+<!--          <div class="w-1 h-1 bg-gray-500 rounded-full mx-2"></div>-->
+<!--          <p class="ml-2 text-gray-600 text-xs">-->
+<!--            In: <span class="text-blue-500">Marketing</span>-->
+<!--          </p>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <p class="mt-3 text-gray-600 text-sm">-->
+<%#= truncate(improvement.content, length: 170, omission: '...', :escape => false)  %>
+<!--    </p>-->
+<!--    <div class="mt-3 md:flex items-center text-gray-600">-->
+<!--      <div class="flex items-center md:my-0 my-2">-->
+<!--        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-message" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">-->
+<!--          <path stroke="none" d="M0 0h24v24H0z"></path>-->
+<!--          <path d="M4 21v-13a3 3 0 0 1 3 -3h10a3 3 0 0 1 3 3v6a3 3 0 0 1 -3 3h-9l-4 4"></path>-->
+<!--          <line x1="8" y1="9" x2="16" y2="9"></line>-->
+<!--          <line x1="8" y1="13" x2="14" y2="13"></line>-->
+<!--        </svg>-->
+<!--        <p class="ml-2 text-gray-600 text-xs ">20 comments</p>-->
+<!--      </div>-->
+<!--      <div class="flex items-center">-->
+<!--        <div class="w-1 h-1 bg-gray-500 rounded-full mx-2 md:mb-0 mb-2"></div>-->
+<!--        <p class="ml-2 text-gray-600 text-xs md:mb-0 mb-4">-->
+<!--          Last comment by-->
+<!--          <span class="text-blue-500">Oliver Jackson</span>-->
+<!--        </p>-->
+<!--      </div>-->
+<!--      <div class="flex items-center">-->
+
+<!--        <div class="w-1 h-1 bg-gray-500 rounded-full mx-2 md:mb-0 mb-2"></div>-->
+<!--        <p class="ml-2 text-gray-600 text-xs">-->
+<!--          Status: <span class="text-red-500">Unresolved</span>-->
+<!--        </p>-->
+<!--      </div>-->
+<!--    </div>-->
+<%# end %>
+<%# end %>
