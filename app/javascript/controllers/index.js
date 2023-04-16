@@ -53,7 +53,9 @@ import StepFinishCheckTinymceController from "./tinymce/step/step_finish_check_t
 application.register("step_finish_check_tinymce", StepFinishCheckTinymceController)
 
 // shared
+
 // modals
+// not in use?
 import ModalController from "./shared/modal_controller"
 application.register("modal", ModalController)
 // tabs
@@ -61,10 +63,26 @@ import TabsController from "./shared/tabs_controller"
 application.register("tabs", TabsController)
 
 
+
+
+
+
+
+// Instructions
+
 // autocomplete
 // import AutocompleteController from "./autocomplete_controller"
 // application.register("autocomplete", AutocompleteController)
 
-// search
-import SearhController from "./search_controller"
-application.register("search", SearhController)
+// search - rename so search instruction
+import SearhInstructionsController from "./instructions/search_instructions_controller"
+application.register("search_instructions", SearhInstructionsController)
+
+import RemoteSelectInstructionController from "./instructions/remote_select_instruction_controller"
+application.register("remote_select_instruction", RemoteSelectInstructionController)
+
+import SelectInstructionModalController from "./instructions/select_instruction_modal_controller"
+application.register("select_instruction_modal", SelectInstructionModalController)
+
+import SelectInstructionTabsController from "./instructions/select_instruction_tabs_controller"
+application.register("select_instruction_tabs", SelectInstructionTabsController)

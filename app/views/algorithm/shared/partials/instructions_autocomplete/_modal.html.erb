@@ -1,17 +1,21 @@
-<div data-controller="modal" data-modal-allow-background-close="false" >
+<div data-controller="select_instruction_modal"
+     data-select_instruction_modal-allow-background-close="false"
+     data-target="remote_select_instruction.instructionModalInstance">
   <!--      <a href="#" data-action="click->modal#open" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded">-->
   <!--        <span>Open Modal</span>-->
   <!--      </a>-->
-
-  <button data-action="click->modal#open" class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+  <button data-action="click->select_instruction_modal#open"
+          class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
     Toggle modal
   </button>
 
   <!-- Modal Container -->
-  <div data-modal-target="container" data-action="click->modal#closeBackground keyup@window->modal#closeWithKeyboard" class="hidden animated fadeIn fixed inset-0 overflow-y-auto flex items-center justify-center" style="z-index: 9999;">
+  <div data-select_instruction_modal-target="container"
+       data-action="click->select_instruction_modal#closeBackground keyup@window->select_instruction_modal#closeWithKeyboard"
+       class="hidden animated fadeIn fixed inset-0 overflow-y-auto flex items-center justify-center" style="z-index: 9999;">
     <!-- Modal Inner Container -->
     <!--    <div id="instructionUnitsAutocompleteModal" class="fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">-->
-    <div id="instructionUnitsAutocompleteModal" class="fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full justify-center items-center flex">
+    <div id="selectInstructionModal" class="fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full justify-center items-center flex">
       <div class="relative w-full max-w-4xl max-h-full">
         <!-- Modal content -->
         <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
@@ -22,7 +26,7 @@
             <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
               Select Unit or Algorithm as Substep
             </h3>
-            <button type="button" data-action="click->modal#close" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
+            <button type="button" data-action="click->select_instruction_modal#close" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
               <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
               <span class="sr-only">Close modal</span>
             </button>
@@ -39,35 +43,35 @@
           </div>
 
 
-          <div data-controller="tabs"
-               data-tabs-active-tab="inline-block p-4 border-b-2 rounded-t-lg text-blue-600 hover:text-blue-600 dark:text-blue-500 dark:hover:text-blue-500 border-blue-600 dark:border-blue-500"
-               data-tabs-inactive-tab="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300">
+          <div data-controller="select_instruction_tabs"
+               data-select_instruction_tabs-active-tab="inline-block p-4 border-b-2 rounded-t-lg text-blue-600 hover:text-blue-600 dark:text-blue-500 dark:hover:text-blue-500 border-blue-600 dark:border-blue-500"
+               data-select_instruction_tabs-inactive-tab="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300">
 
 
               <div class="mb-4 border-b border-gray-200 dark:border-gray-700">
-                <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="myTab" data-tabs-toggle="#myTabContent" role="tablist">
-                  <li class="mr-2" role="presentation" data-tabs-target="tab" data-action="click->tabs#change">
+                <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="myTab" data-select_instruction_tabs-toggle="#myTabContent" role="tablist">
+                  <li class="mr-2" role="presentation" data-select_instruction_tabs-target="tab" data-action="click->select_instruction_tabs#change">
                     <button class="inline-block p-4 border-b-2 rounded-t-lg" id="profile-tab" type="button" role="tab" aria-controls="profile" aria-selected="false">Mixed search</button>
                   </li>
-                  <li class="mr-2" role="presentation" data-tabs-target="tab" data-action="click->tabs#change">
+                  <li class="mr-2" role="presentation" data-select_instruction_tabs-target="tab" data-action="click->select_instruction_tabs#change">
                     <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="dashboard-tab" type="button" role="tab" aria-controls="dashboard" aria-selected="false">Search Units</button>
                   </li>
-                  <li class="mr-2" role="presentation" data-tabs-target="tab" data-action="click->tabs#change">
+                  <li class="mr-2" role="presentation" data-select_instruction_tabs-target="tab" data-action="click->select_instruction_tabs#change">
                     <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="settings-tab" type="button" role="tab" aria-controls="settings" aria-selected="false">Search Algorithms</button>
                   </li>
                 </ul>
               </div>
 
-              <div class="hidden py-4 px-4 border-l border-b border-r" data-tabs-target="panel">
+              <div class="hidden py-4 px-4 border-l border-b border-r" data-select_instruction_tabs-target="panel">
                 Tab panel 1
               </div>
 
-              <div class="hidden py-4 px-4 border-l border-b border-r" data-tabs-target="panel">
+              <div class="hidden py-4 px-4 border-l border-b border-r" data-select_instruction_tabs-target="panel">
 <!--                Tab panel 2-->
                 <%= render "algorithm/shared/partials/instructions_autocomplete/units/search_results", :form => form %>
               </div>
 
-              <div class="hidden py-4 px-4 border-l border-b border-r" data-tabs-target="panel">
+              <div class="hidden py-4 px-4 border-l border-b border-r" data-select_instruction_tabs-target="panel">
                 Tab panel 3
               </div>
 
@@ -75,9 +79,10 @@
 
           <!-- Modal footer -->
           <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
-            <button data-action="click->modal#close" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">Close</button>
+            <button data-action="click->select_instruction_modal#close"
+                    type="button"
+                    class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">Close</button>
           </div>
-
 
         </div>
       </div>

@@ -71,6 +71,15 @@ export default class extends Controller {
 
     }
 
+    clearEntries(){
+        this.entriesTarget.innerHTML = "";
+    }
+
+    resetQueryInputs(){
+        this.textQueryTarget.value = "";
+        this.uuidQueryTarget.value = "";
+    }
+
 
     // generate template for output
     // cocktailTemplate(item) {
