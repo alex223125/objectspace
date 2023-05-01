@@ -3,15 +3,15 @@
 
 <div data-controller="search_instructions" data-target="remote_select_instruction.searchInstructionsInstance">
   <div class="flex justify-center">
-    <%= render partial: "algorithm/shared/partials/instructions_autocomplete/units/search_form", locals: { results: [], type: "units" } %>
+    <%= render partial: "algorithm/shared/partials/instructions_search/shared/search_form", locals: { type: "units" } %>
   </div>
 
 
   <h1 class="text-2xl text-center mt-5 mb-4">Search results</h1>
-  <div id="units"
+  <div id="units_versions_search_results"
        class="mt-4 mx-10"
        data-target="search_instructions.entries">
-    <%= render "algorithm/shared/partials/instructions_autocomplete/units/list", units: [], :form => form %>
+    <%= render "algorithm/shared/partials/instructions_search/units/list", units: [], :form => form %>
   </div>
 
   <div id="loadMoreButton" class="mt-4 mx-10 flex items-center justify-center">
@@ -27,13 +27,13 @@
 <!--  <div class="row justify-content-center" data-controller="search">-->
 <!--    <div class="col-xs-12 col-sm-6">-->
 <!--      <h1>Cocktails</h1>-->
-      <%#= form_with(url: "/", method: :get, data: {action: "submit->search#submit"}) do |f| %>
-        <%#= label_tag(:query, "Search for") %>
-        <%#= text_field_tag :query, params[:query], data: {target: "search.query"} %>
-        <%#= submit_tag("Search", class: "btn btn-primary") %>
-      <%# end %>
+<%#= form_with(url: "/", method: :get, data: {action: "submit->search#submit"}) do |f| %>
+<%#= label_tag(:query, "Search for") %>
+<%#= text_field_tag :query, params[:query], data: {target: "search.query"} %>
+<%#= submit_tag("Search", class: "btn btn-primary") %>
+<%# end %>
 <!--      <div id="cocktails" data-target="search.cocktails">-->
-        <%#= render @cocktails %>
+<%#= render @cocktails %>
 <!--      </div>-->
 <!--    </div>-->
 <!--  </div>-->

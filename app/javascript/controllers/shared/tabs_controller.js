@@ -1,3 +1,6 @@
+
+// NOT IN USE
+
 import { Controller } from '@hotwired/stimulus'
 
 export default class extends Controller {
@@ -34,12 +37,12 @@ export default class extends Controller {
             const panel = this.panelTargets[index]
 
             if (index === this.index) {
-                console.log("Panel case 1")
-                console.log(panel)
+                // console.log("Panel case 1")
+                // console.log(panel)
                 panel.classList.remove('hidden')
 
-                console.log("Tab case 1")
-                console.log(tab)
+                // console.log("Tab case 1")
+                // console.log(tab)
                 tab.firstElementChild.classList.remove(...this.inactiveTabClasses)
                 tab.firstElementChild.classList.add(...this.activeTabClasses)
 
@@ -49,13 +52,13 @@ export default class extends Controller {
                     location.hash = tab.id
                 }
             } else {
-                console.log("Panel case 2")
-                console.log(panel)
+                // console.log("Panel case 2")
+                // console.log(panel)
 
                 panel.classList.add('hidden')
 
-                console.log("Tab case 2")
-                console.log(tab)
+                // console.log("Tab case 2")
+                // console.log(tab)
                 tab.firstElementChild.classList.remove(...this.activeTabClasses)
                 tab.firstElementChild.classList.add(...this.inactiveTabClasses)
             }

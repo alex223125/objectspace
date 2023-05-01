@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
     // static targets = ["query", "cocktails"]
-    static targets = ["textQuery", "uuidQuery", "entries"]
+    static targets = ["textQuery", "uuidQuery", "instructionType", "entries"]
 
     initialize() {
         let options = {
@@ -11,27 +11,64 @@ export default class extends Controller {
         this.page = 1;
         this.lastTextQueryValue = ""
         this.lastUuidQueryValue = ""
+        this.lastInstructionType = ""
     }
 
     connect() {
         console.log("Search controller connected")
     }
 
+    disconnect() {
+        console.log("Search controller disconnected")
+    }
+
+
+
+    // add methond load more
+    // submit only for first tme uniq esarch
+    // load more for loading more record in scope of pagination
+    //
+    // right now bug
+    // when we 2 times seatch same term
+
     submit() {
         console.log("Search submit fired!")
+
+        // 1.set request params
         const textQuery = this.textQueryTarget.value
         const uuidQuery = this.uuidQueryTarget.value
+        const instructionType = this.instructionTypeTarget.value
+        this.page = 1
 
-        // with each new query we make page to number 1 befor request
-        if (textQuery == this.lastTextQueryValue && uuidQuery == this.lastUuidQueryValue) {
-            // do nothing
-        } else {
-            this.page = 1
+        let url = `/search`
+        let postData = {query: textQuery, uuid: uuidQuery,
+                            page: this.page, type: instructionType}
+
+        // 2.check if same form submitted second time
+        if (textQuery == this.lastTextQueryValue &&
+            uuidQuery == this.lastUuidQueryValue &&
+            instructionType == this.lastInstructionType ) {
+
+            console.log("Same search request detected")
+            return;
         }
 
+
+        // 3.clear past results
+        this.clearEntries
+
+
+
+        // // with each new query we make page to number 1 befor request
+        // if (textQuery == this.lastTextQueryValue && uuidQuery == this.lastUuidQueryValue) {
+        //     // do nothing
+        // } else {
+        //     this.page = 1
+        // }
+
         // let url = `/search/?query=${value}`
-        let url = `/search`
-        let postData = {query: textQuery, uuid: uuidQuery, page: this.page}
+
+        // 3.make request
         Rails.ajax({
             type: 'POST',
             url: url,
@@ -41,21 +78,31 @@ export default class extends Controller {
             success: (data) => {
                 console.log("Search submit success!")
 
-                if (textQuery == this.lastTextQueryValue && uuidQuery == this.lastUuidQueryValue) {
-                    // add results to the end
-                    this.entriesTarget.insertAdjacentHTML('beforeend', data.entries)
-                } else {
-                    // clear results
-                    this.entriesTarget.innerHTML = "";
-                    // add new result to the end
-                    this.entriesTarget.insertAdjacentHTML('beforeend', data.entries)
-                }
+                // 4.1 place results in dom
+                this.entriesTarget.insertAdjacentHTML('beforeend', data.entries)
 
-                this.page = this.page + 1
+                // if (textQuery == this.lastTextQueryValue && uuidQuery == this.lastUuidQueryValue) {
+                //     // add results to the end
+                //     this.entriesTarget.insertAdjacentHTML('beforeend', data.entries)
+                // } else {
+                //     // clear results
+                //     this.entriesTarget.innerHTML = "";
+                //     // add new result to the end
+                //     this.entriesTarget.insertAdjacentHTML('beforeend', data.entries)
+                // }
+
+                // this.page = this.page + 1
                 this.totalPages = data.pagination.pages
 
+                // 4.2 save history data
                 this.lastTextQueryValue = textQuery
                 this.lastUuidQueryValue = uuidQuery
+                this.lastInstructionType = instructionType
+
+
+
+
+
 
                 // // create template for each item
                 // var cocktailHTML = "";
@@ -71,6 +118,30 @@ export default class extends Controller {
 
     }
 
+    loadMore(){
+        // 1.set request params
+        this.page = this.page + 1
+        if (this.page > this.totalPages) {
+            return;
+        }
+
+        const textQuery = this.textQueryTarget.value
+        const uuidQuery = this.uuidQueryTarget.value
+        const instructionType = this.instructionTypeTarget.value
+
+    }
+
+
+    resetForm(){
+        console.log("resetForm triggered")
+        this.resetQueryInputs()
+        this.clearEntries()
+        this.clearHistory()
+    }
+
+
+    // PRIVATE
+
     clearEntries(){
         this.entriesTarget.innerHTML = "";
     }
@@ -80,14 +151,11 @@ export default class extends Controller {
         this.uuidQueryTarget.value = "";
     }
 
-
-    // generate template for output
-    // cocktailTemplate(item) {
-    //     return `<div>
-    // <h4>${item.name} <small>${item.glass}</small></h4>
-    // <p>${item.preparation}</p>
-    // </div> `
-    // }
+    clearHistory(){
+        this.lastTextQueryValue = ""
+        this.lastUuidQueryValue = ""
+        this.lastInstructionType = ""
+    }
 
 }
 

@@ -28,6 +28,8 @@
   <div class="bg-white p-6 rounded-xl shadow-lg">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6">
 
+      <%= hidden_field_tag 'type', type, data: {target: "search_instructions.instructionType"}  %>
+
       <div class="flex flex-col">
 <!--        <label for="name" class="font-medium text-sm text-stone-600">Name</label>-->
 <!--        <input-->
@@ -48,7 +50,6 @@
                               placeholder: "Search using unique identifier (question symbol on qa)",
                               autocomplete: "off" %>
         </div>
-
 
       </div>
 
@@ -75,11 +76,15 @@
 
       </div>
 
+
+
+
     </div>
 
     <div class="grid md:flex grid-cols-2 justify-end space-x-4 w-full mt-6">
       <button
-        data-action="click->search_instructions#resetQueryInputs"
+        type="button"
+        data-action="click->search_instructions#resetForm"
         class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
         Reset
       </button>

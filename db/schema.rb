@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_04_14_232824) do
+ActiveRecord::Schema[7.0].define(version: 2023_05_01_032254) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -22,6 +22,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_04_14_232824) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "algorithm_id"
+    t.text "target_audience"
+    t.virtual "searchable", type: :tsvector, as: "(((setweight(to_tsvector('english'::regconfig, (COALESCE(title, ''::character varying))::text), 'A'::\"char\") || setweight(to_tsvector('english'::regconfig, COALESCE(solves_the_problem, ''::text)), 'B'::\"char\")) || setweight(to_tsvector('english'::regconfig, COALESCE(sources, ''::text)), 'C'::\"char\")) || setweight(to_tsvector('english'::regconfig, COALESCE(additional_information, ''::text)), 'D'::\"char\"))", stored: true
+    t.index ["searchable"], name: "index_algorithm_versions_on_searchable", using: :gin
   end
 
   create_table "algorithms", force: :cascade do |t|
@@ -31,6 +34,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_04_14_232824) do
     t.datetime "updated_at", null: false
     t.integer "default_version_id"
     t.integer "visibility_status"
+    t.text "source_page_description"
+    t.virtual "searchable", type: :tsvector, as: "(setweight(to_tsvector('english'::regconfig, (COALESCE(title, ''::character varying))::text), 'A'::\"char\") || setweight(to_tsvector('english'::regconfig, COALESCE(source_page_description, ''::text)), 'B'::\"char\"))", stored: true
+    t.index ["searchable"], name: "index_algorithms_on_searchable", using: :gin
   end
 
   create_table "article_versions", force: :cascade do |t|
@@ -100,13 +106,15 @@ ActiveRecord::Schema[7.0].define(version: 2023_04_14_232824) do
   end
 
   create_table "substeps", force: :cascade do |t|
-    t.string "type"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "unit_id"
-    t.integer "algorithm_id"
+    t.string "title"
+    t.text "note"
     t.integer "position"
     t.integer "step_id"
+    t.string "substepable_type", null: false
+    t.bigint "substepable_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["substepable_type", "substepable_id"], name: "index_substeps_on_substepable"
   end
 
   create_table "unit_usage_examples", force: :cascade do |t|
@@ -146,6 +154,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_04_14_232824) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "unit_id"
+    t.text "target_audience"
+    t.virtual "searchable", type: :tsvector, as: "(((setweight(to_tsvector('english'::regconfig, (COALESCE(title, ''::character varying))::text), 'A'::\"char\") || setweight(to_tsvector('english'::regconfig, COALESCE(instruction, ''::text)), 'B'::\"char\")) || setweight(to_tsvector('english'::regconfig, COALESCE(solves_the_problem, ''::text)), 'C'::\"char\")) || setweight(to_tsvector('english'::regconfig, COALESCE(sources, ''::text)), 'D'::\"char\"))", stored: true
+    t.index ["searchable"], name: "index_unit_versions_on_searchable", using: :gin
   end
 
   create_table "units", force: :cascade do |t|

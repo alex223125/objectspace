@@ -1,8 +1,7 @@
-<%# form = @form  %>
 <div class='items-center justify-center'>
 
-  <% if @units.present? %>
-    <% @units.each do |unit| %>
+  <% if @unit_versions.present? %>
+    <% @unit_versions.each do |unit| %>
       <div class="rounded-xl border p-5 shadow-md bg-white">
         <div class="flex w-full items-center justify-between border-b pb-3">
           <div class="flex items-center space-x-3">
@@ -20,7 +19,7 @@
 <!--          <div data-select_instruction-target="instructionType" style="visibility: hidden;"><%#= unit.class %></div>-->
 
           <div class="mb-3 text-xl font-bold"><%= unit.title %></div>
-          <div class="text-sm text-neutral-600"><%= unit.source_page_description %></div>
+          <div class="text-sm text-neutral-600"><%= truncate(unit.solves_the_problem.html_safe, :length => 500, :omission => "" , :escape => false) %></div>
         </div>
 
         <div>
@@ -47,7 +46,7 @@
 <!--            <div data-select_instruction-target="addSubstepRemoteButtonClick">-->
             <div data-action="click->remote_select_instruction#addSubstepRemoteButtonClick"
                  data-instructionId="<%= unit.id %>"
-                 data-instructionType="<%= unit.class %>">
+                 data-instructionType="unit_version">
               <button type="button"
                       class="flex text-white right-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                 Add to substeps

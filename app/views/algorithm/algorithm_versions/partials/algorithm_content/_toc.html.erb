@@ -5,20 +5,24 @@
   <ul role="list" a="" class="space-y-3 text-base list-none sm:text-lg md:mt-5 md:text-xl">
     <% if algorithm_version.solves_the_problem.present? %>
       <li>
-        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#solves-the-problem">
+        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+           href="#algorithm-solves-the-problem-<%= algorithm_version.id %>">
           ↳ Solves the problem
         </a>
       </li>
     <% end %>
+
     <li>
-      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#steps">
+      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+         href="#steps-for-algorithm-version-<%= algorithm_version.id %>">
         ↳ Steps
       </a>
     </li>
 
     <% if algorithm_version.sources.present? %>
       <li>
-        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#sources">
+        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+           href="#algorithm-sources-<%= algorithm_version.id %>">
           ↳ Sources
         </a>
       </li>
@@ -26,20 +30,23 @@
 
     <% if algorithm_version.additional_information.present? %>
       <li>
-        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#additional-information">
+        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+           href="#algorithm-additional-information-<%= algorithm_version.id %>">
           ↳ Additional information
         </a>
       </li>
     <% end %>
 
     <li>
-      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#contribute">
+      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+         href="#contribute">
         ↳ Contribute
       </a>
     </li>
 
     <li>
-      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#comments">
+      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+         href="#comments">
         ↳ Comments
       </a>
     </li>

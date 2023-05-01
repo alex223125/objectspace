@@ -45,6 +45,16 @@
 </div>
 <br>
 
+
+<div class="col-span-6 sm:col-span-3" data-controller="unit_additional_information_tinymce">
+  <%= f.label "Target audience (optional)", class: "block text-sm font-medium text-gray-700" %>
+  <%= f.hint 'If you have something to add which does not fit in any of the above category you can add it here..',
+             class: "mt-2 text-sm text-gray-500" %>
+  <%= f.input_field :target_audience,
+                    data: { target: 'unit_additional_information_tinymce.field' },
+                    placeholder: "This article is written for novice programmers and for experienced programmers who want to expand their knowledge of creating modern functionality."%>
+</div>
+
 <div class="col-span-6 sm:col-span-3" data-controller="unit_solves_the_problem_tinymce">
   <%= f.label "Problem (optional)", class: "block text-sm font-medium text-gray-700" %>
   <%= f.hint 'Describe what problem or problems this method solves.', class: "mt-2 text-sm text-gray-500" %>

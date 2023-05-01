@@ -78,7 +78,7 @@ class Unit::UnitsController < ApplicationController
     def unit_params
       params.require(:units_unit).permit(:title, :visibility_status, :source_page_description,
                                          unit_versions_attributes: [:title, :solves_the_problem,
-                                                        :instruction, :sources,
+                                                        :instruction, :sources, :target_audience,
                                                         :additional_information],
                                          unit_usage_examples_attributes: [:id, :title, :description,
                                                                           :sources, :_destroy])

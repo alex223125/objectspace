@@ -1,5 +1,5 @@
 class Unit::UnitVersionsController < ApplicationController
-  before_action :set_unit_version, only: %i[ show edit update destroy ]
+  before_action :set_unit_version, only: %i[ show edit update destroy preview ]
 
   # GET /unit_versions or /unit_versions.json
   def index
@@ -15,6 +15,16 @@ class Unit::UnitVersionsController < ApplicationController
     #   set_unit
     #   @unit_version = @unit.default_version
     # end
+  end
+
+  def preview
+    binding.pry
+    respond_to do |format|
+      format.json {
+        render json: { preview: render_to_string(partial: "algorithm/shared/partials/preview/unit/main_page",
+                                                 formats: [:html])}
+      }
+    end
   end
 
   # GET /unit_versions/new
@@ -89,7 +99,7 @@ class Unit::UnitVersionsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def unit_version_params
-      params.require(:units_unit_version).permit(:title, :instruction, :solves_the_problem,
+      params.require(:units_unit_version).permit(:title, :instruction, :solves_the_problem, :target_audience,
                                                  :sources, :additional_information, :unit_id,
                                                  unit_usage_examples_attributes: [:id, :title, :description,
                                                                                   :sources, :_destroy])

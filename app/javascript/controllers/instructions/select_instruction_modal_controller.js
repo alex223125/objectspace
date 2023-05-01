@@ -54,7 +54,6 @@ export default class extends Controller {
     }
 
     close(e) {
-        console.log("close modal fired 2")
         if (e && this.preventDefaultActionClosing) {
             e.preventDefault();
         }

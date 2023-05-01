@@ -8,4 +8,23 @@ class Algorithms::AlgorithmVersion < ApplicationRecord
   # has_many :steps, class_name: "Algorithms::Step"
   # accepts_nested_attributes_for :steps
 
+  has_many :substeps, as: :substepable
+
+  include PgSearch::Model
+  pg_search_scope :english_global_search,
+                  against: {
+                    title: 'A',
+                    solves_the_problem: 'B',
+                    sources: 'C',
+                    additional_information: 'D'
+                  },
+                  using: {
+                    tsearch: {
+                      dictionary: 'english',
+                      tsvector_column: 'searchable',
+                      any_word: true,
+                      prefix: true
+                    }
+                  }
+
 end

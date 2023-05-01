@@ -9,4 +9,22 @@ class Units::UnitVersion < ApplicationRecord
   has_many :unit_version_improvements, class_name: "UnitVersionImprovement"
   has_many :improvement, through: :unit_version_improvements, class_name: "Improvement"
 
+  has_many :substeps, as: :substepable, class_name: "Algorithms::Substep"
+
+  include PgSearch::Model
+  pg_search_scope :english_global_search,
+                  against: {
+                    title: 'A',
+                    instruction: 'B',
+                    solves_the_problem: 'C',
+                    sources: 'D'
+                  },
+                  using: {
+                    tsearch: {
+                      dictionary: 'english',
+                      tsvector_column: 'searchable',
+                      any_word: true,
+                      prefix: true
+                    }
+                  }
 end

@@ -15,12 +15,20 @@ Rails.application.routes.draw do
 
   namespace :unit do
     resources :units
-    resources :unit_versions
+    resources :unit_versions do
+      member do
+        get :preview
+      end
+    end
   end
 
   namespace :algorithm do
     resources :algorithms
-    resources :algorithm_versions
+    resources :algorithm_versions do
+      member do
+        get :preview
+      end
+    end
     resources :control_structures
     resources :steps
     resources :substeps

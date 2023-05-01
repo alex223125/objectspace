@@ -17,8 +17,13 @@ import 'cocoon-js'
 import "flowbite/dist/flowbite.turbo.js";
 import "flowbite"
 
+
+// components
 import "./components/saving_method_tabs_state.js"
 import "./components/saving_algorithm_tabs_state.js"
+
+import "./components/algorithms/scroll_to_top_step_button"
+import "./components/algorithms/scroll_to_top_substep_button"
 
 
 import Alpine from 'alpinejs'

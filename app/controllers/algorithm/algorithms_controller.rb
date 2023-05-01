@@ -75,7 +75,7 @@ class Algorithm::AlgorithmsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def algorithm_params
-      params.require(:algorithms_algorithm).permit(:title, :description,
+      params.require(:algorithms_algorithm).permit(:title, :description, :source_page_description,
 
                                                    algorithm_versions_attributes: [:title, :solves_the_problem,
                                                                                    :sources, :additional_information,
@@ -88,7 +88,9 @@ class Algorithm::AlgorithmsController < ApplicationController
                                                                               :solves_the_problem,
                                                                               :sources,
                                                                               :additional_information,
-                                                                              :_destroy]
+                                                                              :_destroy,
+                                                              substeps_attributes: [ :unit_id, :algorithm_id,
+                                                                                     :title, :note, :position]]
                                                          ]
                                                    ])
 

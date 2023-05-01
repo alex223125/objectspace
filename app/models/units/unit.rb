@@ -1,6 +1,6 @@
 class Units::Unit < ApplicationRecord
 
-  searchkick text_middle: %i[title source_page_description]
+  # searchkick text_middle: %i[title source_page_description]
 
 
   # belongs_to :algorithm, optional: true
@@ -17,11 +17,11 @@ class Units::Unit < ApplicationRecord
   has_many :improvements
 
 
-  has_many :substeps, class_name: "Algorithms::Substep"
+  # has_many :substeps, class_name: "Algorithms::Substep"
 
 
   include PgSearch::Model
-  pg_search_scope :global_search,
+  pg_search_scope :english_unit_search,
                   against: {
                     title: 'A',
                     source_page_description: 'B'

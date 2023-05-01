@@ -42,35 +42,30 @@ application.register("improvement_sources_tinymce", ImprovementSourcesTinymceCon
 import ImprovementsInfiniteScrollController from "./improvements_infinite_scroll_controller.js"
 application.register("improvements_infinite_scroll", ImprovementsInfiniteScrollController)
 
-// Steps
-import StepsDragController from "./steps_drag_controller.js"
+
+// Algorithms
+//// Steps
+import StepsDragController from "./algorithms/steps_drag_controller.js"
 application.register("steps_drag", StepsDragController)
 
-import StepAccordionController from "./step_accordion_controller.js"
+import StepAccordionController from "./algorithms/step_accordion_controller.js"
 application.register("step_accordion", StepAccordionController)
 
 import StepFinishCheckTinymceController from "./tinymce/step/step_finish_check_tinymce_controller"
 application.register("step_finish_check_tinymce", StepFinishCheckTinymceController)
 
-// shared
+import SubstepsDragController from "./algorithms/substeps_drag_controller.js"
+application.register("substeps_drag", SubstepsDragController)
 
-// modals
-// not in use?
-import ModalController from "./shared/modal_controller"
-application.register("modal", ModalController)
-// tabs
-import TabsController from "./shared/tabs_controller"
-application.register("tabs", TabsController)
-
-
-
+// import DroppableController from 'stimulus-droppable';
+// application.register('droppable', DroppableController);
 
 
 
 
 // Instructions
 
-// autocomplete
+// autocomplete (will be added)
 // import AutocompleteController from "./autocomplete_controller"
 // application.register("autocomplete", AutocompleteController)
 
@@ -86,3 +81,20 @@ application.register("select_instruction_modal", SelectInstructionModalControlle
 
 import SelectInstructionTabsController from "./instructions/select_instruction_tabs_controller"
 application.register("select_instruction_tabs", SelectInstructionTabsController)
+
+
+// Substeps
+import SubstepPreviewController from "./algorithms/substep_preview_controller"
+application.register("substep_preview", SubstepPreviewController)
+
+
+
+// shared
+
+// modals
+// not in use?
+import ModalController from "./shared/modal_controller"
+application.register("modal", ModalController)
+// tabs
+import TabsController from "./shared/tabs_controller"
+application.register("tabs", TabsController)
