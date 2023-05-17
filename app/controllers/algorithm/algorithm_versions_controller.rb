@@ -1,5 +1,5 @@
 class Algorithm::AlgorithmVersionsController < ApplicationController
-  before_action :set_algorithm_version, only: %i[ show edit update destroy preview]
+  before_action :set_algorithm_version, only: %i[ show edit update destroy ]
 
   # GET /algorithm_versions or /algorithm_versions.json
   def index
@@ -8,16 +8,6 @@ class Algorithm::AlgorithmVersionsController < ApplicationController
 
   # GET /algorithm_versions/1 or /algorithm_versions/1.json
   def show
-  end
-
-  def preview
-    binding.pry
-    respond_to do |format|
-      format.json {
-        render json: { preview: render_to_string(partial: "algorithm/shared/partials/preview/algorithm/main_page",
-                                                 formats: [:html])}
-      }
-    end
   end
 
   # GET /algorithm_versions/new

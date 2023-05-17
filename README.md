@@ -12,6 +12,8 @@ yarn add flowbite-typography
 # to run elasticsearch
 elasticsearch-8.7.0-linux-x86_64/elasticsearch-8.7.0/bin$ ./elasticsearch
 
+# to reindex model 
+SimpleClasses::SimpleClass.reindex
 
 # README
 

@@ -1,5 +1,8 @@
 Rails.application.routes.draw do
 
+  # resources :container_members
+
+
   devise_for :users, controllers: {
     omniauth_callbacks: 'users/omniauth_callbacks',
     sessions: 'users/sessions',
@@ -14,21 +17,21 @@ Rails.application.routes.draw do
   resources :unit_usage_examples
 
   namespace :unit do
-    resources :units
-    resources :unit_versions do
+    resources :units do
       member do
         get :preview
       end
     end
+    resources :unit_versions
   end
 
   namespace :algorithm do
-    resources :algorithms
-    resources :algorithm_versions do
+    resources :algorithms do
       member do
         get :preview
       end
     end
+    resources :algorithm_versions
     resources :control_structures
     resources :steps
     resources :substeps
@@ -36,14 +39,35 @@ Rails.application.routes.draw do
   end
 
   namespace :article do
+    resources :articles do
+      member do
+        get :preview
+      end
+    end
     resources :article_versions
-    resources :articles
   end
 
-  namespace :simple_object do
-    resources :folders
-    resources :simple_objects
+  namespace :simple_class do
+    resources :simple_classes do
+      member do
+        get :preview
+      end
+    end
+    resources :interface_groups
+    resources :class_containers
+    # resources :interface_members
   end
+
+  namespace :framework do
+    resources :frameworks do
+      member do
+        get :preview
+      end
+    end
+  end
+
+  resources :folders
+
 
 
   # search routes

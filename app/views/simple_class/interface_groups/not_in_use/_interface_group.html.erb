@@ -1,0 +1,17 @@
+<div id="<%= dom_id interface_group %>">
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Title:</strong>
+    <%= interface_group.title %>
+  </p>
+
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Description:</strong>
+    <%= interface_group.description %>
+  </p>
+
+  <%# if action_name != "show" %>
+    <%#= link_to "Show this interface group", interface_group, class: "rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+    <%#= link_to 'Edit this interface group', edit_interface_group_path(interface_group), class: "rounded-lg py-3 ml-2 px-5 bg-gray-100 inline-block font-medium" %>
+<!--    <hr class="mt-6">-->
+  <%# end %>
+</div>

@@ -1,5 +1,5 @@
 class Article::ArticlesController < ApplicationController
-  before_action :set_article, only: %i[ show edit update destroy ]
+  before_action :set_article, only: %i[ show edit update destroy preview ]
 
   # GET /articles or /articles.json
   def index
@@ -8,6 +8,17 @@ class Article::ArticlesController < ApplicationController
 
   # GET /articles/1 or /articles/1.json
   def show
+  end
+
+  def preview
+    binding.pry
+    path = "article/articles/preview"
+    respond_to do |format|
+      format.json {
+        render json: { preview: render_to_string(partial: path,
+                                                 formats: [:html])}
+      }
+    end
   end
 
   # GET /articles/new
@@ -24,7 +35,7 @@ class Article::ArticlesController < ApplicationController
   def create
     binding.pry
     # @article = Articles::Article.new(article_params)
-    service = Services::Articles::Articles::Create.new(article_params)
+    service = Services::Articles::Articles::Create.new(article_params, current_user)
     service.call
 
     respond_to do |format|

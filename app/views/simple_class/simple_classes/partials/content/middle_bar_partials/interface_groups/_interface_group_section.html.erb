@@ -1,0 +1,22 @@
+<!--interface groups section -->
+<div class="interface-groups-section">
+
+  <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/interface_groups/toc",
+             interface_groups: object.root_interface_group.children, interface_groups_root: object.root_interface_group %>
+
+  <!--  uncategorized interface group -->
+  <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/interface_groups/interface_group_preview",
+             interface_group: object.root_interface_group  %>
+
+  <!--  children interface groups -->
+  <% object.root_interface_group.children.each do |interface_group| %>
+    <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/interface_groups/interface_group_preview",
+               interface_group: interface_group %>
+  <% end %>
+
+  <div class="bg-gray-50 px-4 py-3 sm:px-6">
+    <div class="text-end">
+      <%= link_to "+ Add new Actions group", unit_units_path, class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+    </div>
+  </div>
+</div>

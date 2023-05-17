@@ -1,0 +1,11 @@
+<div class='items-center justify-center'>
+
+  <% if @simple_classes.present? %>
+    <% @simple_classes.each do |simple_class| %>
+      <%= render partial: "shared/technologies_search/simple_classes/single_preview", locals: {simple_class: simple_class} %>
+    <% end %>
+  <% end %>
+
+</div>
+<br>
+

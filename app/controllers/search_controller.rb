@@ -1,7 +1,11 @@
 class SearchController < ApplicationController
 
+  ARTICLES_SEARCH_TYPE = 'articles'.freeze
   UNITS_SEARCH_TYPE = 'units'.freeze
   ALGORITHMS_SEARCH_TYPE = 'algorithms'.freeze
+  CLASSES_SEARCH_TYPE = 'simple_class'.freeze
+  FRAMEWORKS_SEARCH_TYPE = 'frameworks'.freeze
+  ALL_TECHNOLOGIES_SEARCH_TYPE = 'all_technologies'.freeze
 
   def instructions_autocomplete
 
@@ -21,41 +25,119 @@ class SearchController < ApplicationController
     # render json: Gitlab::Json.dump(search_autocomplete_opts(term, filter: @filter))
   end
 
+
+
   def index
     binding.pry
-    # case 1. units search
-    if params[:query] && params[:type] == UNITS_SEARCH_TYPE
+    # case 1. articles search
+    if params[:query] && params[:type] == ARTICLES_SEARCH_TYPE
       binding.pry
-      @unit_versions = Units::UnitVersion.english_global_search(params[:query])
-      @pagy, @unit_versions = pagy(@unit_versions, page: params[:page], items: 3 )
+      @articles = Articles::Article.search(params[:query], operator: "or",
+                                           fields: [:title, :source_page_description],
+                                           match: :text_middle)
+      binding.pry
+      @pagy, @articles = pagy(@articles, page: params[:page], items: 3 )
       respond_to do |format|
         format.json {
-          render json: { entries: render_to_string(partial: "algorithm/shared/partials/instructions_search/units/list",
+          render json: { entries: render_to_string(partial: "shared/technologies_search/articles/list",
                                                    formats: [:html]),
                          pagination: @pagy }
         }
       end
+
+    # case 2. units search
+    elsif params[:query] && params[:type] == UNITS_SEARCH_TYPE
+      binding.pry
+      # @unit_versions = Units::UnitVersion.english_global_search(params[:query])
+      # @units = Units::Unit.english_unit_search(params[:query])
+      @units = Units::Unit.search(params[:query], operator: "or",
+                                  fields: [:title, :source_page_description], match: :text_middle)
+
+      binding.pry
+      @pagy, @units = pagy(@units, page: params[:page], items: 3 )
+      respond_to do |format|
+        format.json {
+          render json: { entries: render_to_string(partial: "shared/technologies_search/units/list",
+                                                   formats: [:html]),
+                         pagination: @pagy }
+        }
+      end
+
     # case 2. algorithms search
     elsif params[:query] && params[:type] == ALGORITHMS_SEARCH_TYPE
       binding.pry
-      # @algorithms_groups = Algorithms::Algorithm.english_global_search(params[:query])
-      @algorithms_versions = Algorithms::AlgorithmVersion.english_global_search(params[:query])
+      # @algorithms = Algorithms::Algorithm.english_global_search(params[:query])
+      # @algorithms_versions = Algorithms::AlgorithmVersion.english_global_search(params[:query])
+      @algorithms = Algorithms::Algorithm.search(params[:query], operator: "or",
+                                            fields: [:title, :source_page_description], match: :text_middle)
 
       binding.pry
       # @algorithms = @algorithms_groups + @algorithms_versions
+      @pagy, @algorithms = pagy(@algorithms, page: params[:page], items: 3 )
 
-      @pagy, @algorithms_versions = pagy(@algorithms_versions, page: params[:page], items: 3 )
-
+      binding.pry
       respond_to do |format|
         format.json {
-          render json: { entries: render_to_string(partial: "algorithm/shared/partials/instructions_search/algorithms/list",
+          render json: { entries: render_to_string(partial: "shared/technologies_search/algorithms/list",
                                                    formats: [:html]),
                          pagination: @pagy }
         }
       end
-    else
-      @units = Units::Unit.all
+
+    # case 3. classes search
+    elsif params[:query] && params[:type] == CLASSES_SEARCH_TYPE
+      binding.pry
+      @simple_classes = SimpleClasses::SimpleClass.search(params[:query], operator: "or",
+                                                          fields: [:title, :description], match: :text_middle)
+
+      binding.pry
+      @pagy, @simple_classes = pagy(@simple_classes, page: params[:page], items: 3 )
+      respond_to do |format|
+        format.json {
+          render json: { entries: render_to_string(partial: "shared/technologies_search/simple_classes/list",
+                                                   formats: [:html]),
+                         pagination: @pagy }
+        }
+      end
+
+    # case 4. mixed technology search
+    elsif params[:query] && params[:type] == FRAMEWORKS_SEARCH_TYPE
+      binding.pry
+      @frameworks = Frameworks::Framework.search(params[:query], operator: "or",
+                                                 fields: [:title, :description], match: :text_middle)
+
+      binding.pry
+      @pagy, @frameworks = pagy(@frameworks, page: params[:page], items: 3 )
+      respond_to do |format|
+        format.json {
+          render json: { entries: render_to_string(partial: "shared/technologies_search/frameworks/list",
+                                                   formats: [:html]),
+                         pagination: @pagy }
+        }
+      end
+    elsif params[:query] && params[:type] == ALL_TECHNOLOGIES_SEARCH_TYPE
+      binding.pry
+      query = params[:query]
+      models = [Articles::Article, Units::Unit,
+                Algorithms::Algorithm, SimpleClasses::SimpleClass,
+                Frameworks::Framework]
+      fields = [:title, :description, :source_page_description]
+
+      binding.pry
+      @search_results = Searchkick.search(query, operator: "or", match: :text_middle,
+                                          fields: fields, models: models)
+      binding.pry
+      ###
+      @pagy, @search_results = pagy(@search_results, page: params[:page], items: 3 )
+      respond_to do |format|
+        format.json {
+          render json: { entries: render_to_string(partial: "shared/technologies_search/mixed_tech_select/list",
+                                                   formats: [:html]),
+                         pagination: @pagy }
+        }
+      end
     end
+
 
 
 

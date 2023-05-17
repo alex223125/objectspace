@@ -1,0 +1,2 @@
+class ClassContainersSimpleClassesController < ApplicationController
+end

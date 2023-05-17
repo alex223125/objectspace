@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_05_01_032254) do
+ActiveRecord::Schema[7.0].define(version: 2023_05_17_194211) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -29,13 +29,13 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_01_032254) do
 
   create_table "algorithms", force: :cascade do |t|
     t.string "title"
-    t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "default_version_id"
     t.integer "visibility_status"
     t.text "source_page_description"
     t.virtual "searchable", type: :tsvector, as: "(setweight(to_tsvector('english'::regconfig, (COALESCE(title, ''::character varying))::text), 'A'::\"char\") || setweight(to_tsvector('english'::regconfig, COALESCE(source_page_description, ''::text)), 'B'::\"char\"))", stored: true
+    t.integer "folder_id"
     t.index ["searchable"], name: "index_algorithms_on_searchable", using: :gin
   end
 
@@ -57,6 +57,34 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_01_032254) do
     t.text "source_page_description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "folder_id"
+  end
+
+  create_table "class_container_hierarchies", id: false, force: :cascade do |t|
+    t.integer "ancestor_id", null: false
+    t.integer "descendant_id", null: false
+    t.integer "generations", null: false
+    t.index ["ancestor_id", "descendant_id", "generations"], name: "class_container_anc_desc_idx", unique: true
+    t.index ["descendant_id"], name: "class_container_desc_idx"
+  end
+
+  create_table "class_containers", force: :cascade do |t|
+    t.string "title"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "simple_class_id"
+    t.integer "framework_id"
+    t.integer "parent_id"
+  end
+
+  create_table "container_members", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "memberable_type"
+    t.bigint "memberable_id"
+    t.integer "class_container_id"
+    t.index ["memberable_type", "memberable_id"], name: "index_container_members_on_memberable"
   end
 
   create_table "control_structures", force: :cascade do |t|
@@ -66,11 +94,30 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_01_032254) do
     t.integer "algorithm_version_id"
   end
 
+  create_table "folder_hierarchies", id: false, force: :cascade do |t|
+    t.integer "ancestor_id", null: false
+    t.integer "descendant_id", null: false
+    t.integer "generations", null: false
+    t.index ["ancestor_id", "descendant_id", "generations"], name: "folder_anc_desc_idx", unique: true
+    t.index ["descendant_id"], name: "folder_desc_idx"
+  end
+
   create_table "folders", force: :cascade do |t|
     t.string "title"
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "parent_id"
+    t.integer "user_id"
+    t.integer "responsibility_type"
+  end
+
+  create_table "frameworks", force: :cascade do |t|
+    t.string "title"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "folder_id"
   end
 
   create_table "improvements", force: :cascade do |t|
@@ -85,11 +132,44 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_01_032254) do
     t.index ["searchable"], name: "index_improvements_on_searchable", using: :gin
   end
 
-  create_table "simple_objects", force: :cascade do |t|
+  create_table "interface_group_hierarchies", id: false, force: :cascade do |t|
+    t.integer "ancestor_id", null: false
+    t.integer "descendant_id", null: false
+    t.integer "generations", null: false
+    t.index ["ancestor_id", "descendant_id", "generations"], name: "interface_group_anc_desc_idx", unique: true
+    t.index ["descendant_id"], name: "interface_group_desc_idx"
+  end
+
+  create_table "interface_groups", force: :cascade do |t|
     t.string "title"
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "position"
+    t.integer "simple_class_id"
+    t.integer "framework_id"
+    t.integer "parent_id"
+  end
+
+  create_table "interface_members", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "memberable_type"
+    t.bigint "memberable_id"
+    t.integer "interface_group_id"
+    t.index ["memberable_type", "memberable_id"], name: "index_interface_members_on_memberable"
+  end
+
+  create_table "simple_classes", force: :cascade do |t|
+    t.string "title"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "type"
+    t.string "instructionable_type"
+    t.bigint "instructionable_id"
+    t.integer "folder_id"
+    t.index ["instructionable_type", "instructionable_id"], name: "index_simple_classes_on_instructionable"
   end
 
   create_table "steps", force: :cascade do |t|
@@ -123,8 +203,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_01_032254) do
     t.text "sources"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "is_for_all_unit_versions"
     t.integer "unit_id"
+    t.boolean "is_for_all_unit_versions"
   end
 
   create_table "unit_version_improvements", force: :cascade do |t|
@@ -167,6 +247,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_01_032254) do
     t.integer "default_version_id"
     t.text "source_page_description"
     t.virtual "searchable", type: :tsvector, as: "(setweight(to_tsvector('english'::regconfig, (COALESCE(title, ''::character varying))::text), 'A'::\"char\") || setweight(to_tsvector('english'::regconfig, COALESCE(source_page_description, ''::text)), 'B'::\"char\"))", stored: true
+    t.integer "folder_id"
     t.index ["searchable"], name: "index_units_on_searchable", using: :gin
   end
 

@@ -1,8 +1,8 @@
 class Algorithms::Algorithm < ApplicationRecord
 
-  # searchkick text_middle: %i[title source_page_description]
+  searchkick callbacks: :async, text_middle: [:title, :source_page_description]
 
-  validates :title, presence: true, allow_blank: false
+  belongs_to :folder, class_name: "Folder"
 
   # has_many :units, -> { order(position: :asc) }
   # accepts_nested_attributes_for :units, reject_if: :all_blank, allow_destroy: true
@@ -14,6 +14,12 @@ class Algorithms::Algorithm < ApplicationRecord
   # accepts_nested_attributes_for :steps
 
   # has_many :substeps
+
+  has_many :interface_members, as: :memberable, class_name: "SimpleClasses::InterfaceMember"
+
+
+
+  validates :title, presence: true, allow_blank: false
 
   include PgSearch::Model
   pg_search_scope :english_global_search,

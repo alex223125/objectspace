@@ -5,6 +5,7 @@ class Algorithms::ControlStructure < ApplicationRecord
   has_many :steps, class_name: "Algorithms::Step"
   accepts_nested_attributes_for :steps
 
-
+  validates :steps, presence: true
+  validates_associated :steps
 
 end

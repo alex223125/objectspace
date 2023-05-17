@@ -1,24 +1,24 @@
 <!-- Nested accordion -->
-<div id="accordion-nested-collapse-<%= "#{substep.type}#{substep.id}" %>" data-accordion="open">
+<div id="accordion-nested-collapse-<%= "#{substep.readable_type}#{substep.id}" %>" data-accordion="open">
 
-  <div id="accordion-nested-collapse-heading-<%= "#{substep.type}#{substep.id}" %>">
+  <div id="accordion-nested-collapse-heading-<%= "#{substep.readable_type}#{substep.id}" %>">
     <button type="button"
             class="flex items-center justify-between w-full p-5 rounded-t-xl font-medium text-left border border-b-0 border-gray-200 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white"
-            data-accordion-target="#accordion-nested-collapse-body-<%= "#{substep.type}#{substep.id}" %>"
+            data-accordion-target="#accordion-nested-collapse-body-<%= "#{substep.readable_type}#{substep.id}" %>"
             aria-expanded="true"
-            aria-controls="accordion-nested-collapse-body-<%="#{substep.type}#{substep.id}" %>>">
+            aria-controls="accordion-nested-collapse-body-<%="#{substep.readable_type}#{substep.id}" %>>">
       <span><%="# Substep №#{substep.position}: #{substep.title}" %></span>
       <svg data-accordion-icon class="w-6 h-6 shrink-0 rotate-180" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
     </button>
   </div>
 
-  <div id="accordion-nested-collapse-body-<%= "#{substep.type}#{substep.id}" %>"
+  <div id="accordion-nested-collapse-body-<%= "#{substep.readable_type}#{substep.id}" %>"
        class=""
-       aria-labelledby="accordion-nested-collapse-heading-<%= "#{substep.type}#{substep.id}" %>">
+       aria-labelledby="accordion-nested-collapse-heading-<%= "#{substep.readable_type}#{substep.id}" %>">
 
     <div class="p-5 border border-b-0 border-gray-200 dark:border-gray-700">
 
-      <div class="break-words substep-note-section" id="note-section-<%= "#{substep.type}#{substep.id}" %>">
+      <div class="break-words substep-note-section" id="note-section-<%= "#{substep.readable_type}#{substep.id}" %>">
 
         <!-- Info -->
         <div class="bg-blue-50 border border-blue-400 rounded text-blue-800 text-base p-4 flex items-start">
@@ -41,19 +41,19 @@
       <!--      content example -->
       <!--      <p class="text-gray-500 dark:text-gray-400">The main difference is that the core components from Flowbite are open source under the MIT license, whereas Tailwind UI is a paid product.</p>-->
       <% binding.pry %>
-      <% if substep.entity.class == Units::Unit %>
+      <% if substep.readable_type == "unit" %>
         <!--Unit substep template-->
         <%= render "algorithm/algorithm_versions/partials/algorithm_content/steps/substeps_templates/unit/template",
-                   unit_version: substep.entity.default_version %>
-      <% else %>
+                   unit_version: substep.substepable %>
+      <% elsif substep.readable_type == "algorithm" %>
         <!--Algorithm substep template-->
         <%= render "algorithm/algorithm_versions/partials/algorithm_content/steps/substeps_templates/algorithm/template",
-                   algorithm_version: substep.entity.default_version %>
+                   algorithm_version: substep.substepable %>
       <% end %>
 
       <div class="flex justify-center items-center w-full p-5 rounded-t-xl font-medium text-gray-500 dark:text-gray-400">
         <button type="button"
-                href='#accordion-nested-collapse-<%= "#{substep.type}#{substep.id}" %>'
+                href='#accordion-nested-collapse-<%= "#{substep.readable_type}#{substep.id}" %>'
                 class="scroll-to-top-substep-button text-purple-700 hover:text-white border border-purple-700 hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 dark:border-purple-400 dark:text-purple-400 dark:hover:text-white dark:hover:bg-purple-500 dark:focus:ring-purple-900">Scroll to the substep beginning</button>
       </div>
 

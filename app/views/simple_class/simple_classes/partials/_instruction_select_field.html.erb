@@ -1,0 +1,23 @@
+<div data-controller="remote_select_instruction"
+     data-target="remote_select_instruction.instructionableFieldsArea"
+     data-remote_select_instruction-select-type-value="dpo_instruction_select">
+
+  <div class="col-span-6 sm:col-span-3">
+    <%= f.label "Method or Algorithm", class: "block text-sm font-medium text-gray-700" %>
+    <%= f.hint 'Here you can pick method or algorithm around which you will create methodological toolbox',
+               class: "mt-2 text-sm text-gray-500" %>
+
+    <%= f.hidden_field :instructionable_type, class: "instructionable-type-hidden-field" %>
+    <%= f.hidden_field :instructionable_id, class: "instructionable-id-hidden-field" %>
+
+  </div>
+  <br>
+
+  <div class="instruction-preview">
+    <!--        content of instruction-->
+  </div>
+  <br>
+
+  <%= render "shared/technologies_search/modal", :type => "dpo_instruction_select" %>
+
+</div>

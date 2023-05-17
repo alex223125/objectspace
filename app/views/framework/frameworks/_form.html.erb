@@ -1,0 +1,82 @@
+<%#= form_with(model: framework, class: "contents") do |form| %>
+  <%# if framework.errors.any? %>
+<!--    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">-->
+<!--      <h2><%#= pluralize(framework.errors.count, "error") %> prohibited this framework from being saved:</h2>-->
+
+<!--      <ul>-->
+        <%# framework.errors.each do |error| %>
+<!--          <li><%#= error.full_message %></li>-->
+        <%# end %>
+<!--      </ul>-->
+<!--    </div>-->
+  <%# end %>
+
+<!--  <div class="my-5">-->
+    <%#= form.label :title %>
+    <%#= form.text_field :title, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
+<!--  </div>-->
+
+<!--  <div class="my-5">-->
+    <%#= form.label :description %>
+    <%#= form.text_area :description, rows: 4, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
+<!--  </div>-->
+
+<!--  <div class="inline">-->
+    <%#= form.submit class: "rounded-lg py-3 px-5 bg-blue-600 text-white inline-block font-medium cursor-pointer" %>
+<!--  </div>-->
+<%# end %>
+
+
+<%= simple_form_for(@framework, url: framework_frameworks_path) do |f| %>
+
+
+  <% if @framework.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+      <h2><%= pluralize(@framework.errors.count, "error") %> prohibited this Framework from being saved:</h2>
+
+      <ul>
+        <% @framework.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-inputs">
+    <div class="col-span-6 sm:col-span-3">
+      <%= f.label "Title", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.hint 'Describe responsibility zone of Framework.',
+                 class: "mt-2 text-sm text-gray-500" %>
+      <%= f.input_field :title,
+                        required: true,
+                        class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
+                        placeholder: "Ex: Dota Competition framework" %>
+    </div>
+    <br>
+
+    <div class="col-span-6 sm:col-span-3">
+      <%= f.label "Description", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.hint 'Thats the description which will be shown on the top of the source page',
+                 class: "mt-2 text-sm text-gray-500" %>
+      <%= f.input_field :description,
+                        required: false,
+                        class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
+                        placeholder: "Ex: Unites Classes which used during dota competition" %>
+    </div>
+    <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+
+
+    <%= render "shared/form_partials/containers/root_class_container/form", :form => f %>
+
+    <%= render "shared/form_partials/interfaces/root_interface_group/form", :form => f %>
+
+    <div class="bg-gray-50 px-4 py-3 sm:px-6">
+      <div class="text-end">
+        <%= link_to "Back to dashboard", framework_frameworks_path, class: "py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" %>
+        <%= f.button :submit, "Create Framework", class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+      </div>
+    </div>
+
+  </div>
+
+<% end %>

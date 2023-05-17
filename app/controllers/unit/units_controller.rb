@@ -1,5 +1,5 @@
 class Unit::UnitsController < ApplicationController
-  before_action :set_unit, only: %i[ show edit update destroy ]
+  before_action :set_unit, only: %i[ show edit update destroy preview ]
 
   # GET /units or /units.json
   def index
@@ -11,6 +11,24 @@ class Unit::UnitsController < ApplicationController
   # def show
   #   @pagy, @improvements = pagy(@unit.improvements)
   # end
+
+  def preview
+    binding.pry
+    if params[:type] == "substep_addition"
+      path = "algorithm/shared/partials/preview/unit/main_page"
+    elsif params[:type] == "dpo_instruction_select" || params[:type] == "interface_member_addition"
+      path = "shared/technologies_search/dpo_instruction_select/preview/unit"
+    end
+
+
+
+    respond_to do |format|
+      format.json {
+        render json: { preview: render_to_string(partial: path,
+                                                 formats: [:html])}
+      }
+    end
+  end
 
   # GET /units/new
   # new unit and first unit version

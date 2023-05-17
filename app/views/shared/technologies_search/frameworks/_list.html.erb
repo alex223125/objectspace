@@ -1,0 +1,10 @@
+<div class='items-center justify-center'>
+
+  <% if @frameworks.present? %>
+    <% @frameworks.each do |framework| %>
+      <%= render partial: "shared/technologies_search/frameworks/single_preview", locals: {framework: framework} %>
+    <% end %>
+  <% end %>
+
+</div>
+<br>

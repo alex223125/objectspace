@@ -9,6 +9,11 @@ class Algorithms::AlgorithmVersion < ApplicationRecord
   # accepts_nested_attributes_for :steps
 
   has_many :substeps, as: :substepable
+  has_many :simple_classes, as: :instructionable, class_name: "SimpleClasses::SimpleClass"
+
+
+  validates :control_structures, presence: { message: "Algorithm should have at least 1 step" }
+
 
   include PgSearch::Model
   pg_search_scope :english_global_search,

@@ -17,16 +17,6 @@ class Unit::UnitVersionsController < ApplicationController
     # end
   end
 
-  def preview
-    binding.pry
-    respond_to do |format|
-      format.json {
-        render json: { preview: render_to_string(partial: "algorithm/shared/partials/preview/unit/main_page",
-                                                 formats: [:html])}
-      }
-    end
-  end
-
   # GET /unit_versions/new
   def new
     binding.pry

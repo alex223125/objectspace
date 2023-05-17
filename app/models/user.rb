@@ -9,6 +9,7 @@ class User < ApplicationRecord
          # for Google OmniAuth
         :omniauthable, omniauth_providers: [:google_oauth2]
 
+  has_many :folders
 
   # validates :name, :username, :email, :presence => true
   validates :name, presence: true, allow_blank: false
@@ -22,6 +23,10 @@ class User < ApplicationRecord
     self.tos_agreement == true
   end
 
+  def root_folder
+    self.folders.where(responsibility_type: Folders::ResponsibilityTypeTypes[:user_root]).first
+  end
+
 
   def self.from_omniauth(auth)
     binding.pry
@@ -30,7 +35,7 @@ class User < ApplicationRecord
       user
       # do nothing
     else
-      user = User.where(provider: auth.provider, uid: auth.uid).new do |user|
+      user = Users::User.where(provider: auth.provider, uid: auth.uid).new do |user|
         user.username = "user#{auth.uid}"
         user.email = auth.info.email
         user.password = Devise.friendly_token[0, 20]

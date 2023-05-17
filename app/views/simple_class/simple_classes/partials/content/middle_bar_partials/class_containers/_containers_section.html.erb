@@ -1,0 +1,21 @@
+<!--containers section -->
+<div class="class-containers-section">
+  <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/class_containers/class_containers_toc",
+             class_containers: object.root_class_container.children, class_containers_root: object.root_class_container %>
+
+  <!--  uncategorized containers-->
+  <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/class_containers/class_container_preview",
+             class_container: object.root_class_container %>
+
+  <!--  children containers-->
+  <% object.root_class_container.children.each do |class_container| %>
+    <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/class_containers/class_container_preview",
+               class_container: class_container %>
+  <% end %>
+
+  <div class="bg-gray-50 px-4 py-3 sm:px-6">
+    <div class="text-end">
+      <%= link_to "+ Add new Class container", unit_units_path, class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,27 @@
+<!-- TOC-->
+<% if interface_groups.any? || interface_groups_root.present? %>
+  <div class="interface-groups-toc">
+    <br>
+    Actions groups:
+    <ul role="list" a="" class="space-y-3 text-base list-none sm:text-lg md:mt-5 md:text-xl">
+
+      <li>
+        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+           href="#interface-group-<%= interface_groups_root.id %>">
+          ↳ <%= interface_groups_root.title %>
+        </a>
+      </li>
+
+      <% interface_groups.each do |interface_group| %>
+        <li>
+          <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+             href="#interface-group-<%= interface_group.id %>">
+            ↳ <%= interface_group.title %>
+          </a>
+        </li>
+      <% end %>
+
+    </ul>
+  </div>
+  <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+<% end %>

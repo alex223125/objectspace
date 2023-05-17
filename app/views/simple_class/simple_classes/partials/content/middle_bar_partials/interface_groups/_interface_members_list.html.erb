@@ -1,0 +1,22 @@
+<!--content -->
+<section class="relative py-2 overflow-hidden">
+  <div class="relative container px-4 mx-auto">
+
+    <div class="max-w-5xl mx-auto">
+
+      <!--          // Articles -->
+      <% interface_group.interface_members.last(3).each do |interface_member| %>
+        <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/interface_groups/interface_member_preview",
+                   interface_member: interface_member %>
+      <% end %>
+
+      <!--         See more button -->
+      <div class="pt-12 border-t-2 border-gray-100 text-center">
+        <%= link_to simple_class_interface_group_path(interface_group), :target => "_blank", class: "relative group inline-block py-4 px-7 font-semibold text-orange-900 hover:text-orange-50 rounded-full bg-orange-50 transition duration-300 overflow-hidden" do %>
+          <div class="absolute top-0 right-full w-full h-full bg-gray-900 transform group-hover:translate-x-full group-hover:scale-102 transition duration-500"></div>
+          <span class="relative">See More Actions</span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</section>

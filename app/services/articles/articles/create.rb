@@ -5,8 +5,9 @@ module Services
 
         attr_reader :errors, :article
 
-        def initialize(params)
+        def initialize(params, current_user)
           @params = params
+          @current_user = current_user
         end
 
         def call
@@ -16,6 +17,9 @@ module Services
 
             binding.pry
             set_visibility
+
+            binding.pry
+            put_in_root_folder
 
             binding.pry
             @article.save!
@@ -46,6 +50,10 @@ module Services
           binding.pry
           @article.default_version_id = @article.article_versions.first.id
           @article.save!
+        end
+
+        def put_in_root_folder
+          @article.folder = @current_user.root_folder
         end
 
       end

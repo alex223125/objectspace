@@ -1,0 +1,32 @@
+<!--<div class="mx-auto md:w-2/3 w-full">-->
+<!--  <h1 class="font-bold text-4xl">New simple class</h1>-->
+
+  <%#= render "form", simple_class: @simple_class %>
+
+  <%#= link_to 'Back to simple classes', simple_classes_path, class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+<!--</div>-->
+
+
+<!-- component -->
+<div class="w-full max-w-screen-xl mx-auto px-6">
+  <div class="flex justify-center p-4 px-3 py-10">
+    <div class="w-full">
+      <!--    <div class="w-full max-w-xl	">-->
+      <div class="bg-white shadow-md rounded-lg px-3 py-2 mb-4">
+
+        <% if @class_type ==  SimpleClasses::TypeTypes[:decision_process_object_class] %>
+          <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight text-center">New Class for Decision process object</h2>
+        <% elsif @class_type ==  SimpleClasses::TypeTypes[:decision_object_class]  %>
+          <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight text-center">New Class for Decision object</h2>
+        <% elsif @class_type ==  SimpleClasses::TypeTypes[:decision_object_container_class]  %>
+          <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight text-center">New Class for Decision object container</h2>
+        <% end  %>
+
+        <%= render "form", simple_class: @simple_class %>
+
+        <br>
+
+      </div>
+    </div>
+  </div>
+</div>

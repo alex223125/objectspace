@@ -11,10 +11,7 @@
 
 <div>
 
-  <div data-controller="steps_drag"
-       data-drag-url="/todos/:id/move"
-       data-target="steps_drag.stepsArea"
-  >
+  <div data-controller="steps_drag" data-drag-url="/todos/:id/move" data-target="steps_drag.stepsArea">
 
     <%#= form.fields_for :steps, algorithm_version.steps.order(position: :asc) do |t| %>
     <%= form.fields_for :steps do |t| %>

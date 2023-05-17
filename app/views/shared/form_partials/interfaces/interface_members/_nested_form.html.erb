@@ -1,0 +1,54 @@
+<div class="">
+  <div class="col-span-6 sm:col-span-3">
+    <p class="text-xl font-bold hover:text-gray-700">Actions:</p>
+    <% if type == "root_class" %>
+      <p class="mt-2 text-sm text-gray-500">Here you can add few children Classes to current class.
+        If you have a lot of chldren classes it's recommended to use class containers.
+        You also will be able to add them after current Class creation.</p>
+    <% elsif type == "interface_group"  %>
+      <p class="mt-2 text-sm text-gray-500"><p class="mt-2 text-sm text-gray-500">Here you can add actions which will be part of the group. You also will be able to add them after Class creation.</p></p>
+    <% end %>
+
+
+    <%#= link_to "Add new usage example", units_path, class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+  </div>
+  <br>
+  <br>
+
+  <!--  <div data-controller="substeps_drag" data-drag-url="/todos/:id/move">-->
+  <div data-controller="interface_members_drag remote_select_instruction"
+       data-drag-url="/todos/:id/move"
+       data-target="remote_select_instruction.interfaceMembersArea interface_members_drag.substepsArea"
+       data-remote_select_instruction-select-type-value="interface_member_addition"
+  >
+
+    <!--    <div data-target="substeps_drag.substepsArea">-->
+    <!--      data-target="substeps_drag.substepsArea"-->
+
+    <%#= form.fields_for :steps, algorithm_version.steps.order(position: :asc) do |t| %>
+    <%= form.fields_for :interface_members do |t| %>
+
+      <%= render "shared/form_partials/interfaces/interface_members/interface_member_fields", :f => t %>
+
+    <% end %>
+
+
+    <!--      <div data-target="remote_select_instruction.addSubstepOriginalButton">-->
+    <div>
+      <%= link_to_add_association "Add action", form,
+                                  :interface_members,
+                                  partial: 'shared/form_partials/interfaces/interface_members/interface_member_fields',
+                                  style: "display:none;",
+                                  class: "nodraggablesubsteps flex text-white right-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800",
+                                  data: {target: "remote_select_instruction.addInterfaceMemberOriginalButton"}%>
+    </div>
+
+
+    <%#= render "algorithm/shared/partials/instructions_search/modal", :form => form, :type => "substep_addition" %>
+    <%= render "shared/technologies_search/modal", :form => form, :type => "interface_member_addition" %>
+
+    <!--    </div>-->
+
+  </div>
+
+</div>

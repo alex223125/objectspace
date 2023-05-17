@@ -55,8 +55,8 @@
           </a>
         </span>
         </div>
-        <% if algorithm.description.present? %>
-          <p class="leading-relaxed"><%= algorithm.description.html_safe %></p>
+        <% if algorithm.source_page_description.present? %>
+          <p class="leading-relaxed"><%= algorithm.source_page_description.html_safe %></p>
         <% end %>
         <div class="flex mt-6 items-center pb-5 border-b-2 border-gray-100 mb-5">
           <div class="flex">

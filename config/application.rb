@@ -12,6 +12,7 @@ module Objectspace
     config.load_defaults 7.0
 
     Dir[Rails.root.join('app/services/**/*.rb')].each{|rb| require rb}
+    Dir[Rails.root.join('app/services/simple_classes/simple_classes/*.rb')].each{|rb| require rb}
     Dir[Rails.root.join('app/builders/**/*.rb')].each{|rb| require rb}
     Dir[Rails.root.join('app/enums/**/*.rb')].each{|rb| require rb}
     Dir[Rails.root.join('app/queries/**/*.rb')].each{|rb| require rb}

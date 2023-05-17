@@ -1,0 +1,17 @@
+<div class='items-center justify-center'>
+
+  <% if @technologies.present? %>
+    <% @technologies.each do |technology| %>
+      <% if technology.class == Articles::Article %>
+
+      <% elsif technology.class == Units::Unit %>
+        <%= render partial: "shared/technologies_search/units/single_preview", unit: technology %>
+      <% elsif technology.class == Algorithms::Algorithm %>
+      <% elsif technology.class == SimpleClasses::SimpleClass %>
+      <% elsif technology.class == Frameworks::Framework %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+</div>
+<br>

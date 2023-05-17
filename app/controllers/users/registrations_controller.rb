@@ -17,7 +17,11 @@ class Users::RegistrationsController < Devise::RegistrationsController
     build_resource(sign_up_params)
 
     binding.pry
-    resource.save
+    service = Services::Users::Create.new(resource)
+    service.call
+    resource = service.user
+    binding.pry
+    # resource.save
 
     binding.pry
     yield resource if block_given?

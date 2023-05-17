@@ -1,5 +1,5 @@
 class Algorithm::AlgorithmsController < ApplicationController
-  before_action :set_algorithm, only: %i[ show edit update destroy ]
+  before_action :set_algorithm, only: %i[ show edit update destroy preview ]
 
   # GET /algorithms or /algorithms.json
   def index
@@ -9,6 +9,22 @@ class Algorithm::AlgorithmsController < ApplicationController
   # # GET /algorithms/1 or /algorithms/1.json
   # def show
   # end
+
+  def preview
+    binding.pry
+    if params[:type] == "substep_addition"
+      path = "algorithm/shared/partials/preview/algorithm/main_page"
+    elsif params[:type] == "dpo_instruction_select" || params[:type] == "interface_member_addition"
+      path = "shared/instructions_search/dpo_instruction_select/preview/algorithm"
+    end
+
+    respond_to do |format|
+      format.json {
+        render json: { preview: render_to_string(partial: path,
+                                                 formats: [:html])}
+      }
+    end
+  end
 
   # GET /algorithms/new
   def new
@@ -29,16 +45,22 @@ class Algorithm::AlgorithmsController < ApplicationController
     service = Services::Algorithms::Algorithms::Create.new(algorithm_params)
     service.call
 
+
     respond_to do |format|
 
       binding.pry
       if service.errors.blank?
+
+        binding.pry
         # format.html { redirect_to algorithm_algorithm_url(service.algorithm), notice: "Algorithm was successfully created." }
         format.html { redirect_to algorithm_algorithm_version_path(service.algorithm.default_version), notice: "Algorithm was successfully created." }
-
         format.json { render :show, status: :created, location: @algorithm }
       else
-        format.html { render :new, status: :unprocessable_entity }
+        binding.pry
+        @algorithm = service.algorithm
+        @control_structure = @algorithm.algorithm_versions.first.control_structures.new
+
+        format.html { render :new, status: :unprocessable_entity}
         format.json { render json: @algorithm.errors, status: :unprocessable_entity }
       end
     end
@@ -89,7 +111,7 @@ class Algorithm::AlgorithmsController < ApplicationController
                                                                               :sources,
                                                                               :additional_information,
                                                                               :_destroy,
-                                                              substeps_attributes: [ :unit_id, :algorithm_id,
+                                                              substeps_attributes: [ :substepable_type, :substepable_id,
                                                                                      :title, :note, :position]]
                                                          ]
                                                    ])

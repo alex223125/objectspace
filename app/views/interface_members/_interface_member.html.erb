@@ -1,0 +1,7 @@
+<div id="<%= dom_id interface_member %>">
+  <% if action_name != "show" %>
+    <%= link_to "Show this interface member", interface_member, class: "rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+    <%= link_to 'Edit this interface member', edit_interface_member_path(interface_member), class: "rounded-lg py-3 ml-2 px-5 bg-gray-100 inline-block font-medium" %>
+    <hr class="mt-6">
+  <% end %>
+</div>

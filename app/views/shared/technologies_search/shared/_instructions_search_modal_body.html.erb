@@ -1,0 +1,31 @@
+<div data-controller="select_instruction_tabs"
+     data-select_instruction_tabs-active-tab="inline-block p-4 border-b-2 rounded-t-lg text-blue-600 hover:text-blue-600 dark:text-blue-500 dark:hover:text-blue-500 border-blue-600 dark:border-blue-500"
+     data-select_instruction_tabs-inactive-tab="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300">
+
+  <div class="mb-4 border-b border-gray-200 dark:border-gray-700">
+    <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="myTab" data-select_instruction_tabs-toggle="#myTabContent" role="tablist">
+      <li class="mr-2" role="presentation" data-select_instruction_tabs-target="tab" data-action="click->select_instruction_tabs#change">
+        <button class="inline-block p-4 border-b-2 rounded-t-lg" id="profile-tab" type="button" role="tab" aria-controls="profile" aria-selected="false">Mixed search</button>
+      </li>
+      <li class="mr-2" role="presentation" data-select_instruction_tabs-target="tab" data-action="click->select_instruction_tabs#change">
+        <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="dashboard-tab" type="button" role="tab" aria-controls="dashboard" aria-selected="false">Search Units</button>
+      </li>
+      <li class="mr-2" role="presentation" data-select_instruction_tabs-target="tab" data-action="click->select_instruction_tabs#change">
+        <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="settings-tab" type="button" role="tab" aria-controls="settings" aria-selected="false">Search Algorithms</button>
+      </li>
+    </ul>
+  </div>
+
+  <div class="hidden py-4 px-4 border-l border-b border-r" data-select_instruction_tabs-target="panel">
+    Tab panel 1 (mixed search)
+  </div>
+
+  <div class="hidden py-4 px-4 border-l border-b border-r" data-select_instruction_tabs-target="panel">
+    <%= render "shared/technologies_search/units/search_page" %>
+  </div>
+
+  <div class="hidden py-4 px-4 border-l border-b border-r" data-select_instruction_tabs-target="panel">
+    <%= render "shared/technologies_search/algorithms/search_page" %>
+  </div>
+
+</div>

@@ -1,12 +1,12 @@
 class Units::Unit < ApplicationRecord
 
-  # searchkick text_middle: %i[title source_page_description]
+  searchkick callbacks: :async, text_middle: [:title, :source_page_description]
 
 
   # belongs_to :algorithm, optional: true
   # acts_as_list scope: :algorithm
 
-  validates :title, presence: true, allow_blank: false
+  belongs_to :folder, class_name: "Folder"
 
   has_many :unit_versions, dependent: :destroy, class_name: "Units::UnitVersion"
   accepts_nested_attributes_for :unit_versions
@@ -16,6 +16,12 @@ class Units::Unit < ApplicationRecord
 
   has_many :improvements
 
+  has_many :interface_members, as: :memberable, class_name: "SimpleClasses::InterfaceMember"
+
+
+
+
+  validates :title, presence: true, allow_blank: false
 
   # has_many :substeps, class_name: "Algorithms::Substep"
 

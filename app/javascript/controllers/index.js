@@ -83,11 +83,6 @@ import SelectInstructionTabsController from "./instructions/select_instruction_t
 application.register("select_instruction_tabs", SelectInstructionTabsController)
 
 
-// Substeps
-import SubstepPreviewController from "./algorithms/substep_preview_controller"
-application.register("substep_preview", SubstepPreviewController)
-
-
 
 // shared
 
@@ -98,3 +93,12 @@ application.register("modal", ModalController)
 // tabs
 import TabsController from "./shared/tabs_controller"
 application.register("tabs", TabsController)
+
+
+// Objects
+import ObjectCreationModalController from "./objects/object_creation_options_modal_controller"
+application.register("object_creation_options_modal", ObjectCreationModalController)
+
+
+import InterfaceGroupsDragController from "./interface_groups/interface_groups_drag_controller"
+application.register("interface_groups_drag", InterfaceGroupsDragController)

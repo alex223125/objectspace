@@ -1,0 +1,10 @@
+<div class='items-center justify-center'>
+
+  <% if @algorithms.present? %>
+    <% @algorithms.each do |algorithm| %>
+      <%= render partial: "shared/technologies_search/algorithms/single_preview", locals: {algorithm: algorithm} %>
+    <% end %>
+  <% end %>
+
+</div>
+<br>

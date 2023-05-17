@@ -1,0 +1,10 @@
+<div class='items-center justify-center'>
+
+  <% if @units.present? %>
+    <% @units.each do |unit| %>
+      <%= render partial: "shared/technologies_search/units/single_preview", locals: {unit: unit} %>
+    <% end %>
+  <% end %>
+
+</div>
+<br>

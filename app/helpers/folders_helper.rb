@@ -1,2 +1,6 @@
 module FoldersHelper
+
+  FOLDERS_NESTED_LEVELS_COUNT_BEGINNING = 1.freeze
+  FOLDERS_ALLOWES_NESTED_LEVELS_AMOUNT = 10.freeze
+
 end

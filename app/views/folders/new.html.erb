@@ -1,0 +1,29 @@
+<!--<div class="mx-auto md:w-2/3 w-full">-->
+<!--  <h1 class="font-bold text-4xl">New folder</h1>-->
+
+  <%#= render "form", folder: @folder %>
+
+  <%#= link_to 'Back to folders', folders_path, class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+<!--</div>-->
+
+<!-- component -->
+<div class="w-full max-w-screen-xl mx-auto px-6">
+  <div class="flex justify-center p-4 px-3 py-10">
+    <div class="w-full">
+      <!--    <div class="w-full max-w-xl	">-->
+      <div class="bg-white shadow-md rounded-lg px-3 py-2 mb-4">
+
+        <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight text-center">New Folder</h2>
+
+        <%= render "form", folder: @folder %>
+
+        <br>
+
+        <!--        <div>-->
+        <%#= link_to "Back to units", units_path %>
+        <!--        </div>-->
+
+      </div>
+    </div>
+  </div>
+</div>

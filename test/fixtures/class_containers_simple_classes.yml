@@ -1,0 +1,9 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  class_containers: one
+  simple_class: one
+
+two:
+  class_containers: two
+  simple_class: two

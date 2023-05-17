@@ -10,6 +10,7 @@ class Units::UnitVersion < ApplicationRecord
   has_many :improvement, through: :unit_version_improvements, class_name: "Improvement"
 
   has_many :substeps, as: :substepable, class_name: "Algorithms::Substep"
+  has_many :simple_objects, as: :instructionable, class_name: "SimpleObjects::SimpleObject"
 
   include PgSearch::Model
   pg_search_scope :english_global_search,
