@@ -5,8 +5,9 @@ module Services
 
         attr_reader :errors, :article
 
-        def initialize(params, current_user)
+        def initialize(params, target_folder, current_user)
           @params = params
+          @target_folder = target_folder
           @current_user = current_user
         end
 
@@ -19,7 +20,11 @@ module Services
             set_visibility
 
             binding.pry
-            put_in_root_folder
+            set_owner
+
+            binding.pry
+            set_folder
+            set_tags
 
             binding.pry
             @article.save!
@@ -38,12 +43,17 @@ module Services
 
         def create_article
           binding.pry
-          @article = ::Articles::Article.new(@params)
+          @article = ::Articles::Article.new(@params.except(:tag_list))
         end
 
         def set_visibility
           binding.pry
           @article.visibility_status = ::Articles::VisibilityStatusTypes[:public]
+        end
+
+        def set_folder
+          binding.pry
+          @article.folder = @target_folder
         end
 
         def set_default_version
@@ -52,8 +62,20 @@ module Services
           @article.save!
         end
 
-        def put_in_root_folder
-          @article.folder = @current_user.root_folder
+        def set_owner
+          binding.pry
+          @article.ownerable = @current_user
+        end
+
+        def set_tags
+          binding.pry
+          @article.tag_list = parse_tags
+        end
+
+        def parse_tags
+          if @params[:tag_list].present?
+            JSON.parse(@params[:tag_list]).map{|h| h.values}.join(",")
+          end
         end
 
       end
