@@ -13,7 +13,18 @@ yarn add flowbite-typography
 elasticsearch-8.7.0-linux-x86_64/elasticsearch-8.7.0/bin$ ./elasticsearch
 
 # to reindex model 
+Articles::Article.searchkick_index.delete
+
+Articles::Article.reindex
+Units::Unit.reindex
+Algorithms::Algorithm.reindex
 SimpleClasses::SimpleClass.reindex
+Frameworks::Framework.reindex
+ActsAsTaggableOn::Tag.reindex
+User.reindex
+
+# to redo slugs
+Articles::ArticleVersion.find_each(&:save)
 
 # README
 
