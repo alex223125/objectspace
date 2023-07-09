@@ -54,8 +54,21 @@ application.register("step_accordion", StepAccordionController)
 import StepFinishCheckTinymceController from "./tinymce/step/step_finish_check_tinymce_controller"
 application.register("step_finish_check_tinymce", StepFinishCheckTinymceController)
 
-import SubstepsDragController from "./algorithms/substeps_drag_controller.js"
-application.register("substeps_drag", SubstepsDragController)
+// import SubstepsDragController from "./algorithms/substeps_drag_controller.js"
+// application.register("substeps_drag", SubstepsDragController)
+
+import AlgorithmStepTypeSelectController from "./algorithms/algorithm_step_type_select_controller.js"
+application.register("algorithm_step_type_select", AlgorithmStepTypeSelectController)
+
+import StepTypeOptionsModalController from "./algorithms/step_type_options_modal_controller.js"
+application.register("step_type_options_modal", StepTypeOptionsModalController)
+
+import StepsNestedFormController from "./algorithms/steps_nested_form_controller.js"
+application.register("steps_nested_form", StepsNestedFormController)
+
+import DynamicStepFormController from "./algorithms/dynamic_step_form_controller.js"
+application.register("dynamic_step_form", DynamicStepFormController)
+
 
 // import DroppableController from 'stimulus-droppable';
 // application.register('droppable', DroppableController);
@@ -94,6 +107,11 @@ application.register("modal", ModalController)
 import TabsController from "./shared/tabs_controller"
 application.register("tabs", TabsController)
 
+import TagsController from "./shared/tags_controller"
+application.register("tags", TagsController)
+
+
+
 
 // Objects
 import ObjectCreationModalController from "./objects/object_creation_options_modal_controller"
@@ -102,3 +120,41 @@ application.register("object_creation_options_modal", ObjectCreationModalControl
 
 import InterfaceGroupsDragController from "./interface_groups/interface_groups_drag_controller"
 application.register("interface_groups_drag", InterfaceGroupsDragController)
+
+// Dashboard
+import DashboardTabsController from "./dashboard/dashboard_tabs_controller"
+application.register("dashboard_tabs", DashboardTabsController)
+
+import DashboardTechnologiesController from "./dashboard/dashboard_technologies_controller"
+application.register("dashboard_technologies", DashboardTechnologiesController)
+
+// Folder
+import FolderItemsController from "./folder/folder_items_controller"
+application.register("folder_items", FolderItemsController)
+
+
+// Technologies
+// import TechnologiesController from "./technologies_controller"
+// application.register("technologies", TechnologiesController)
+
+import TechSerpSearchController from "./technologies/tech_serp_search_controller"
+application.register("tech_serp_search", TechSerpSearchController)
+
+import TechSerpTabsController from "./technologies/tech_serp_tabs_controller"
+application.register("tech_serp_tabs", TechSerpTabsController)
+
+import TechSerpTagsInputController from "./technologies/tech_serp_tags_input_controller"
+application.register("tech_serp_tags_input", TechSerpTagsInputController)
+
+import TechSerpUsersInputController from "./technologies/tech_serp_users_input_controller"
+application.register("tech_serp_users_input", TechSerpUsersInputController)
+
+
+// Users (forms,inputs)
+import AvatarInputController from "./users/users_avatar_input_controller"
+application.register("users_avatar_input", AvatarInputController)
+
+
+// Uncategorized
+import NavigationSearchFormController from "./navigation_search_form_controller"
+application.register("navigation_search_form", NavigationSearchFormController)
