@@ -1,4 +1,7 @@
+# MOVE TO API NAMESPACE as API controller
 class SearchController < ApplicationController
+
+  include Pagy::Backend
 
   ARTICLES_SEARCH_TYPE = 'articles'.freeze
   UNITS_SEARCH_TYPE = 'units'.freeze
@@ -25,8 +28,8 @@ class SearchController < ApplicationController
     # render json: Gitlab::Json.dump(search_autocomplete_opts(term, filter: @filter))
   end
 
-
-
+  # This method is used only for modal to pick technology during creation
+  # rename to technology modal
   def index
     binding.pry
     # case 1. articles search
@@ -36,7 +39,7 @@ class SearchController < ApplicationController
                                            fields: [:title, :source_page_description],
                                            match: :text_middle)
       binding.pry
-      @pagy, @articles = pagy(@articles, page: params[:page], items: 3 )
+      @pagy, @articles = pagy(@articles, page: params[:page], items: 3)
       respond_to do |format|
         format.json {
           render json: { entries: render_to_string(partial: "shared/technologies_search/articles/list",
@@ -45,7 +48,7 @@ class SearchController < ApplicationController
         }
       end
 
-    # case 2. units search
+      # case 2. units search
     elsif params[:query] && params[:type] == UNITS_SEARCH_TYPE
       binding.pry
       # @unit_versions = Units::UnitVersion.english_global_search(params[:query])
@@ -54,7 +57,7 @@ class SearchController < ApplicationController
                                   fields: [:title, :source_page_description], match: :text_middle)
 
       binding.pry
-      @pagy, @units = pagy(@units, page: params[:page], items: 3 )
+      @pagy, @units = pagy(@units, page: params[:page], items: 3)
       respond_to do |format|
         format.json {
           render json: { entries: render_to_string(partial: "shared/technologies_search/units/list",
@@ -63,17 +66,17 @@ class SearchController < ApplicationController
         }
       end
 
-    # case 2. algorithms search
+      # case 2. algorithms search
     elsif params[:query] && params[:type] == ALGORITHMS_SEARCH_TYPE
       binding.pry
       # @algorithms = Algorithms::Algorithm.english_global_search(params[:query])
       # @algorithms_versions = Algorithms::AlgorithmVersion.english_global_search(params[:query])
       @algorithms = Algorithms::Algorithm.search(params[:query], operator: "or",
-                                            fields: [:title, :source_page_description], match: :text_middle)
+                                                 fields: [:title, :source_page_description], match: :text_middle)
 
       binding.pry
       # @algorithms = @algorithms_groups + @algorithms_versions
-      @pagy, @algorithms = pagy(@algorithms, page: params[:page], items: 3 )
+      @pagy, @algorithms = pagy(@algorithms, page: params[:page], items: 3)
 
       binding.pry
       respond_to do |format|
@@ -84,14 +87,14 @@ class SearchController < ApplicationController
         }
       end
 
-    # case 3. classes search
+      # case 3. classes search
     elsif params[:query] && params[:type] == CLASSES_SEARCH_TYPE
       binding.pry
       @simple_classes = SimpleClasses::SimpleClass.search(params[:query], operator: "or",
                                                           fields: [:title, :description], match: :text_middle)
 
       binding.pry
-      @pagy, @simple_classes = pagy(@simple_classes, page: params[:page], items: 3 )
+      @pagy, @simple_classes = pagy(@simple_classes, page: params[:page], items: 3)
       respond_to do |format|
         format.json {
           render json: { entries: render_to_string(partial: "shared/technologies_search/simple_classes/list",
@@ -100,14 +103,14 @@ class SearchController < ApplicationController
         }
       end
 
-    # case 4. mixed technology search
+      # case 4. mixed technology search
     elsif params[:query] && params[:type] == FRAMEWORKS_SEARCH_TYPE
       binding.pry
       @frameworks = Frameworks::Framework.search(params[:query], operator: "or",
                                                  fields: [:title, :description], match: :text_middle)
 
       binding.pry
-      @pagy, @frameworks = pagy(@frameworks, page: params[:page], items: 3 )
+      @pagy, @frameworks = pagy(@frameworks, page: params[:page], items: 3)
       respond_to do |format|
         format.json {
           render json: { entries: render_to_string(partial: "shared/technologies_search/frameworks/list",
@@ -128,7 +131,7 @@ class SearchController < ApplicationController
                                           fields: fields, models: models)
       binding.pry
       ###
-      @pagy, @search_results = pagy(@search_results, page: params[:page], items: 3 )
+      @pagy, @search_results = pagy(@search_results, page: params[:page], items: 3)
       respond_to do |format|
         format.json {
           render json: { entries: render_to_string(partial: "shared/technologies_search/mixed_tech_select/list",
@@ -137,125 +140,294 @@ class SearchController < ApplicationController
         }
       end
     end
-
-
-
-
-
-    # format.html
-
-    # format.json do
-    #
-    #   binding.pry
-    #   form_stub = Algorithms::Step.new
-    #
-    #   # binding.pry
-    #   # form_builder = view_context.form_for(form_stub) { |builder| break builder }
-    #
-    #   form_builder = ActionView::Helpers::FormBuilder.new(
-    #     'object', # the scope for the inputs
-    #     form_stub,        # object wrapped by the form builder
-    #     view_context,  # the template where the form builder can call the tag helpers on
-    #     {}             # options
-    #   )
-    #
-    #   html = render_to_string(
-    #     entries: render_to_string(partial: "algorithm/shared/partials/instructions_autocomplete/units/list",
-    #     formats: [:html],
-    #     locals: { form: form_builder })
-    #   )
-    #   # render json: { html: html }
-    #   binding.pry
-    #   render json: html
-    # end
-
-
-
   end
 
+  def user_dashboard_technologies
+  end
 
-  # def index
-  #   respond_to do |format|
-  #
-  #     format.json do
-  #       form_builder = view_context.form_for(@some_object) { |builder| break builder }
-  #
-  #       html = render_to_string(
-  #         '/path/to/_form.html.erb',
-  #         layout: false,
-  #         locals: { f: form_builder }
-  #       )
-  #       render json: { html: html }
-  #     end
-  #   end
-  # end
+  def folder_technologies
+  end
 
+  def technologies
+    binding.pry
+    if params[:target_folder].present? || params[:target_user].present?
+      if params[:target_folder].present?
+        # Case 1.Technologies based on folder we in
+        target_folder = Folder.friendly.find(params[:target_folder])
+        @folder_owner = target_folder.user
+      elsif params[:target_user].present?
+        # Case 2.Technologies for basic dashboard for user
+        @folder_owner = User.where(username: params[:target_user]).first
+        target_folder = @folder_owner.root_folder
+      end
 
-  # def index
-  #
-  #   @results
-  #
-  #   @results = search_for_posts
-  #
-  #   binding.pry
-  #   respond_to do |format|
-  #     format.turbo_stream do
-  #       render turbo_stream:
-  #                # turbo_stream.update('posts',
-  #                #                     partial: 'posts/posts',
-  #                #                     locals: { posts: @results })
-  #                turbo_stream.update('units',
-  #                                    partial: 'algorithm/shared/partials/instructions_autocomplete/units/list',
-  #                                    locals: { units: @results })
-  #
-  #       # render turbo_stream:
-  #       #          # turbo_stream.update('posts',
-  #       #          #                     partial: 'posts/posts',
-  #       #          #                     locals: { posts: @results })
-  #       #          turbo_stream.update('units',
-  #       #                              partial: 'algorithm/shared/partials/instructions_autocomplete/units/list',
-  #       #                              locals: { units: @results }), content_type: "text/html"
-  #
-  #       # render turbo_stream: turbo_stream.replace("units",
-  #       #                               partial: "algorithm/shared/partials/instructions_autocomplete/units/list",
-  #       #                               locals: {units: @results})
-  #
-  #     end
-  #     # format.html do
-  #     #   render turbo_stream:
-  #     #            # turbo_stream.update('posts',
-  #     #            #                     partial: 'posts/posts',
-  #     #            #                     locals: { posts: @results })
-  #     #            turbo_stream.update('unitsss',
-  #     #                                partial: 'algorithm/shared/partials/instructions_autocomplete/units/list',
-  #     #                                locals: { units: @results })
-  #     # end
-  #     # format.html {}
-  #   end
-  #
-  # end
+      # 1.1 child folders
+      binding.pry
+      @child_folders = target_folder.children
 
-  def suggestions
-    @results = search_for_posts
+      # 1.2 methods whih in folder
+      models = [Articles::Article, Units::Unit,
+                Algorithms::Algorithm, SimpleClasses::SimpleClass,
+                Frameworks::Framework]
+
+      condition = {
+        folder_id: target_folder.id
+      }
+
+      find_all = '*'
+      search_results = Searchkick.search(find_all, where: condition, models: models)
+      @technologies = search_results
+    elsif params[:tag].present?
+      binding.pry
+      @technologies = []
+      @technologies += Articles::Article.tagged_with([params[:tag]], wild: true, any: true)
+      @technologies += Units::Unit.tagged_with([params[:tag]], wild: true, any: true)
+      @technologies += Algorithms::Algorithm.tagged_with([params[:tag]], wild: true, any: true)
+      @technologies += SimpleClasses::SimpleClass.tagged_with([params[:tag]], wild: true, any: true)
+      @technologies += Frameworks::Framework.tagged_with([params[:tag]], wild: true, any: true)
+
+      # models = [Articles::Article, Units::Unit,
+      #           Algorithms::Algorithm, SimpleClasses::SimpleClass,
+      #           Frameworks::Framework]
+      # condition = {
+      #   list_of_tags: ["aaa", "bbb", "ccc"]
+      # }
+      #
+      # condition = {
+      #   list_of_tags: "aaa"
+      # }
+      #
+      # condition = {
+      #   list_of_tags: ["aaa", "ooo"]
+      # }
+      #
+      # condition = ["list_of_tags LIKE aaa"]
+      #
+      # condition = {
+      #   list_of_tags: "kkk"
+      # }
+      #
+      # condition = {
+      #   list_of_tags: ["kkk", "mmm"]
+      # }
+      #
+      # find_all = '*'
+      # search_results = Searchkick.search(find_all, where: condition, models: models)
+      #
+      # User.search("admi", fields: [{name: :text_middle}])
+      # Articles::Article.search(find_all, where: condition)
+
+    end
 
     respond_to do |format|
-      format.turbo_stream do
-        render turbo_stream:
-                 turbo_stream.update('suggestions',
-                                     # partial: 'search/suggestions',
-                                     partial: 'algorithm/shared/partials/instructions_autocomplete/units/suggestions',
-                                     locals: { results: @results })
+      format.json {
+        render json: { entries: render_to_string(partial: "technologies/list",
+                                                 formats: [:html], :locals => {:list_type => "all_mixed_entries"}) }
+        # current_folder_id: target_folder.id }
+      }
+    end
+  end
+
+
+
+
+
+  def serp_page_technologies
+    # TODO: Move it to service object
+
+    # Define scope of search
+    binding.pry
+    if params[:search_type] =="mixed-search"
+      models = [Articles::Article, Units::Unit,
+                Algorithms::Algorithm, SimpleClasses::SimpleClass,
+                Frameworks::Framework]
+    elsif params[:search_type] =="articles-search"
+      models = [Articles::Article]
+    elsif params[:search_type] =="methods-search"
+      models = [Units::Unit]
+    elsif params[:search_type] =="algorithms-search"
+      models = [Algorithms::Algorithm]
+    elsif params[:search_type] =="classes-search"
+      models = [SimpleClasses::SimpleClass]
+    elsif params[:search_type] =="frameworks-search"
+      models = [Frameworks::Framework]
+    end
+
+    binding.pry
+    # default
+    find_all = '*'
+    query = find_all
+    conditions = {}
+
+    binding.pry
+    # building conditions
+    if params[:tags].present?
+      tags = params[:tags].split(",")
+      conditions.merge!({ list_of_tags: tags })
+    end
+
+    binding.pry
+    if params[:users].present?
+      users_ids = params[:users].split(",")
+      conditions.merge!({ ownerable_id: users_ids })
+    end
+
+    if params[:search_query].present?
+      if params[:search_query] == "no-query"
+        query = find_all
+      else
+        query = params[:search_query]
       end
     end
-  end
 
-  private
+    binding.pry
+    # Run search
+    # search_results = Searchkick.search(query, where: condition, models: models)
 
-  def search_for_posts
-    if params[:query].blank?
-      Units::Unit.all
-    else
-      Units::Unit.search(params[:query], fields: %i[title source_page_description], operator: 'or', match: :text_middle)
+    if params[:search_type] =="mixed-search"
+      # format data from search results
+
+      binding.pry
+      @technologies_query = Searchkick.pagy_search(query, where: conditions, models: models)
+      @technologies_pagy, @technologies = pagy_searchkick(@technologies_query, page: params[:page], items: 3)
+      @technologies_count = @technologies_pagy.count
+
+      @articles_query = Searchkick.pagy_search(query, where: conditions, models: Articles::Article)
+      @articles_pagy, @articles = pagy_searchkick(@articles_query, page: params[:page], items: 3)
+      @articles_count = @articles_pagy.count
+
+      @units_query = Searchkick.pagy_search(query, where: conditions, models: Units::Unit)
+      @units_pagy, @units = pagy_searchkick(@units_query, page: params[:page], items: 3)
+      @units_count = @units_pagy.count
+
+      @algorithms_query = Searchkick.pagy_search(query, where: conditions, models: Algorithms::Algorithm)
+      @algorithms_pagy, @algorithms = pagy_searchkick(@algorithms_query, page: params[:page], items: 3)
+      @algorithms_count = @algorithms_pagy.count
+
+      @simple_classes_query = Searchkick.pagy_search(query, where: conditions, models: SimpleClasses::SimpleClass)
+      @simple_classes_pagy, @simple_classes = pagy_searchkick(@simple_classes_query, page: params[:page], items: 3)
+      @simple_classes_count = @simple_classes_pagy.count
+
+      @frameworks_query = Searchkick.pagy_search(query, where: conditions, models: Frameworks::Framework)
+      @frameworks_pagy, @frameworks = pagy_searchkick(@frameworks_query, page: params[:page], items: 3)
+      @frameworks_count = @frameworks_pagy.count
+
+      entries_amount = {technologies_count: @technologies_count,
+                        articles_count: @articles_count,
+                        units_count: @units_count,
+                        algorithms_count: @algorithms_count,
+                        simple_classes_count: @simple_classes_count,
+                        frameworks_count: @frameworks_count }
+
+
+    elsif params[:search_type] =="articles-search"
+      binding.pry
+      @articles_query = Searchkick.pagy_search(query, where: conditions, models: Articles::Article)
+      @articles_pagy, @articles = pagy_searchkick(@articles_query, page: params[:page], items: 3)
+      @articles_count = @articles_pagy.count
+
+      entries_amount = { articles_count: @articles_count}
+    elsif params[:search_type] =="methods-search"
+      binding.pry
+      @units_query = Searchkick.pagy_search(query, where: conditions, models: Units::Unit)
+      @units_pagy, @units = pagy_searchkick(@units_query, page: params[:page], items: 3)
+      @units_count = @units_pagy.count
+
+      entries_amount = {units_count: @units_count}
+    elsif params[:search_type] =="algorithms-search"
+      binding.pry
+      @algorithms_query = Searchkick.pagy_search(query, where: conditions, models: Algorithms::Algorithm)
+      @algorithms_pagy, @algorithms = pagy_searchkick(@algorithms_query, page: params[:page], items: 3)
+      @algorithms_count = @algorithms_pagy.count
+
+      entries_amount = {algorithms_count: @algorithms_count }
+    elsif params[:search_type] =="classes-search"
+      binding.pry
+      @simple_classes_query = Searchkick.pagy_search(query, where: conditions, models: SimpleClasses::SimpleClass)
+      @simple_classes_pagy, @simple_classes = pagy_searchkick(@simple_classes_query, page: params[:page], items: 3)
+      @simple_classes_count = @simple_classes_pagy.count
+
+      entries_amount = {simple_classes_count: @simple_classes_count }
+    elsif params[:search_type] =="frameworks-search"
+      binding.pry
+      @frameworks_query = Searchkick.pagy_search(query, where: conditions, models: Frameworks::Framework)
+      @frameworks_pagy, @frameworks = pagy_searchkick(@frameworks_query, page: params[:page], items: 3)
+      @frameworks_count = @frameworks_pagy.count
+
+      entries_amount = {frameworks_count: @frameworks_count}
+    end
+
+    # generating response
+    if params[:search_type] =="mixed-search"
+      binding.pry
+      response = { all_mixed_entries: render_to_string(partial: "technologies/list",
+                                                       formats: [:html], :locals => {:list_type => "all_mixed_entries"}),
+                   technologies_pagination: @technologies_pagy,
+
+                   articles_entries: render_to_string(partial: "technologies/list",
+                                                      formats: [:html], :locals => {:list_type => "articles_entries"}),
+                   articles_pagination: @articles_pagy,
+
+                   units_entries: render_to_string(partial: "technologies/list",
+                                                   formats: [:html], :locals => {:list_type => "units_entries"}),
+                   units_pagination: @units_pagy,
+
+                   algorithms_entries: render_to_string(partial: "technologies/list",
+                                                        formats: [:html], :locals => {:list_type => "algorithms_entries"}),
+                   algorithms_pagination: @algorithms_pagy,
+
+                   simple_classes_entries: render_to_string(partial: "technologies/list",
+                                                            formats: [:html], :locals => {:list_type => "simple_classes_entries"}),
+                   simple_classes_pagination: @simple_classes_pagy,
+
+                   frameworks_entries: render_to_string(partial: "technologies/list",
+                                                        formats: [:html], :locals => {:list_type => "frameworks_entries"}),
+                   frameworks_pagination: @frameworks_pagy,
+
+                   entries_amount: entries_amount}
+    elsif params[:search_type] =="articles-search"
+      binding.pry
+      response = { articles_entries: render_to_string(partial: "technologies/list",
+                                                      formats: [:html], :locals => {:list_type => "articles_entries"}),
+                   articles_pagination: @articles_pagy,
+                   entries_amount: entries_amount}
+    elsif params[:search_type] =="methods-search"
+      binding.pry
+      response = { units_entries: render_to_string(partial: "technologies/list",
+                                                   formats: [:html], :locals => {:list_type => "units_entries"}),
+                   units_pagination: @units_pagy,
+                   entries_amount: entries_amount}
+    elsif params[:search_type] =="algorithms-search"
+      binding.pry
+      response = { algorithms_entries: render_to_string(partial: "technologies/list",
+                                                        formats: [:html], :locals => {:list_type => "algorithms_entries"}),
+                   algorithms_pagination: @algorithms_pagy,
+                   entries_amount: entries_amount}
+    elsif params[:search_type] =="classes-search"
+      binding.pry
+      response = { simple_classes_entries: render_to_string(partial: "technologies/list",
+                                                            formats: [:html], :locals => {:list_type => "simple_classes_entries"}),
+                   simple_classes_pagination: @simple_classes_pagy,
+                   entries_amount: entries_amount}
+
+    elsif params[:search_type] =="frameworks-search"
+      binding.pry
+      response = { frameworks_entries: render_to_string(partial: "technologies/list",
+                                                        formats: [:html], :locals => {:list_type => "frameworks_entries"}),
+                   frameworks_pagination: @frameworks_pagy,
+                   entries_amount: entries_amount}
+
+    end
+
+    binding.pry
+    ## prepare json response
+
+    binding.pry
+    respond_to do |format|
+      format.json {
+        render json: response
+      }
     end
   end
+
 end
