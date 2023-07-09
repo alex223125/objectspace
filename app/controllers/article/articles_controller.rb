@@ -1,5 +1,8 @@
 class Article::ArticlesController < ApplicationController
+  include Folderable
+
   before_action :set_article, only: %i[ show edit update destroy preview ]
+  before_action :set_target_folder, only: %i[ new create ]
 
   # GET /articles or /articles.json
   def index
@@ -35,14 +38,16 @@ class Article::ArticlesController < ApplicationController
   def create
     binding.pry
     # @article = Articles::Article.new(article_params)
-    service = Services::Articles::Articles::Create.new(article_params, current_user)
+    service = Services::Articles::Articles::Create.new(article_params, @target_folder, current_user)
     service.call
 
     respond_to do |format|
 
       binding.pry
       if service.errors.blank?
-        format.html { redirect_to article_article_version_path(service.article.default_version), notice: "Article was successfully created." }
+        format.html { redirect_to article_version_path(username: service.article.ownerable.ownername,
+                                                       id: service.article.default_version.slug),
+                                  notice: "Article was successfully created." }
         # format.html { redirect_to algorithm_algorithm_version_path(service.algorithm.default_version), notice: "Algorithm was successfully created." }
         format.json { render :show, status: :created, location: @article }
       else
@@ -84,6 +89,7 @@ class Article::ArticlesController < ApplicationController
     # Only allow a list of trusted parameters through.
     def article_params
       params.require(:articles_article).permit(:title, :default_version_id, :visibility_status, :source_page_description,
+                                               :tag_list,
                                                article_versions_attributes: [:title, :solves_the_problem, :content,
                                                                              :sources, :additional_information])
     end
