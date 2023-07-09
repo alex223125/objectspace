@@ -1,0 +1,14 @@
+<!-- list is used for showing in different places -->
+<section class="relative py-2 overflow-hidden">
+  <div class="relative container px-4 mx-auto">
+
+    <div class="max-w-5xl mx-auto">
+      <% folders.each do |children_folder| %>
+        <%= render "folders/list_partials/children_folder_preview", folder: children_folder %>
+      <% end %>
+
+    </div>
+  </div>
+</section>
+
+

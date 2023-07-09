@@ -1,15 +1,37 @@
-<div class="mx-auto md:w-2/3 w-full flex">
-  <div class="mx-auto">
-    <% if notice.present? %>
-      <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
-    <% end %>
+<!--<div class="mx-auto md:w-2/3 w-full flex">-->
+<!--  <div class="mx-auto">-->
+    <%# if notice.present? %>
+<!--      <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-lg inline-block" id="notice"><%#= notice %></p>-->
+    <%# end %>
 
-    <%= render @folder %>
+    <%#= render @folder %>
 
-    <%= link_to 'Edit this folder', edit_folder_path(@folder), class: "mt-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
-    <div class="inline-block ml-2">
-      <%= button_to 'Destroy this folder', folder_path(@folder), method: :delete, class: "mt-2 rounded-lg py-3 px-5 bg-gray-100 font-medium" %>
+    <%#= link_to 'Edit this folder', edit_folder_path(@folder), class: "mt-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+<!--    <div class="inline-block ml-2">-->
+      <%#= button_to 'Destroy this folder', folder_path(@folder), method: :delete, class: "mt-2 rounded-lg py-3 px-5 bg-gray-100 font-medium" %>
+<!--    </div>-->
+    <%#= link_to 'Back to folders', folders_path, class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+<!--  </div>-->
+<!--</div>-->
+
+
+<div data-controller="folder_items">
+  <!-- 1 filters and search features -->
+  1 filters and search features
+  <%#= render "dashboards/partials/technologies_header" %>
+
+  <!-- 2 breadcrumbs -->
+  <%= render "shared/tech_show_partials/tech_breadcrumbs" %>
+
+  <!-- 3 actions -->
+  <%= render "folders/show_partials/actions_bar", folder_owner: @folder_owner %>
+
+  <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+    <!-- 4 folders and units -->
+    <div data-target="folder_items.entries">
+
     </div>
-    <%= link_to 'Back to folders', folders_path, class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
   </div>
+
+  <%#= render "shared/technologies_search/algorithms/list", algorithms: [] %>
 </div>
