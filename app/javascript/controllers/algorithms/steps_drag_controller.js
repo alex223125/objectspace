@@ -4,7 +4,7 @@ import {useMutation} from "stimulus-use";
 
 export default class extends Controller {
 
-    static targets = ['stepsArea'];
+    static targets = ['stepsArea', 'stepPositionVisibleField', 'stepPositionHiddenField'];
 
     connect() {
         console.log("Steps drag controller connected")
@@ -18,11 +18,14 @@ export default class extends Controller {
         // mutation observer to recalculate indexes when new step is added
         this.stepsAmount = this.currentStepsAmount()
         useMutation(this, {attributes: false, childList: true, characterData: false, subtree:true})
+
+        this.handleFormWithPredefinedSteps()
     }
 
     disconnect() {
         console.log("Steps drag controller disconnected")
     }
+
 
     mutate(entries) {
 
@@ -49,8 +52,15 @@ export default class extends Controller {
 
     // PRIVATE
 
+    handleFormWithPredefinedSteps(){
+        if (this.stepPositionVisibleFieldTargets.length > 1) {
+            this.recalculateIndexes()
+        }
+    }
+
     currentStepsAmount(){
-        return this.stepsAreaTarget.querySelectorAll('.step-position-hidden-field').length
+        // return this.stepsAreaTarget.querySelectorAll('.step-position-hidden-field').length
+        return this.stepPositionHiddenFieldTargets.length
     }
 
     end(event) {
@@ -59,13 +69,15 @@ export default class extends Controller {
 
     recalculateIndexes(){
         // // recount hidden inputs indexes
-        var positionHiddenElemenets = [...this.stepsAreaTarget.querySelectorAll(".step-position-hidden-field")]
+        // var positionHiddenElemenets = [...this.stepsAreaTarget.querySelectorAll(".step-position-hidden-field")]
+        var positionHiddenElemenets = [...this.stepPositionHiddenFieldTargets]
         positionHiddenElemenets.forEach(function callback(value, index) {
             value.value = index + 1
         });
 
         // recount visible indexes 2
-        var positionHiddenElemenets = [...this.stepsAreaTarget.querySelectorAll(".step-position-visible-field")]
+        // var positionHiddenElemenets = [...this.stepsAreaTarget.querySelectorAll(".step-position-visible-field")]
+        var positionHiddenElemenets = [...this.stepPositionVisibleFieldTargets]
         positionHiddenElemenets.forEach(function callback(value, index) {
             value.innerHTML = (index + 1)
             // value.text(index + 1)
