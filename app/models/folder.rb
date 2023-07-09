@@ -1,5 +1,8 @@
 class Folder < ApplicationRecord
 
+  extend FriendlyId
+  friendly_id :slug_candidates, use: [:slugged, :finders, :history]
+
   searchkick callbacks: :async, text_middle: [:title, :description]
 
   has_closure_tree
@@ -21,5 +24,17 @@ class Folder < ApplicationRecord
   has_many :simple_classes, class_name: "SimpleClasses::SimpleClass"
   has_many :frameworks, class_name: "Frameworks::Framework"
 
+
+  def folders_tree_without_root
+    self_and_ancestors.where.not(parent_id: nil)
+  end
+
+  private
+
+  def slug_candidates
+    [ :title,
+      [:title, :id]
+    ]
+  end
 
 end
