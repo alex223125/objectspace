@@ -1,0 +1,13 @@
+<section class="relative py-2 overflow-hidden">
+  <div class="relative container px-4 mx-auto">
+
+    <div class="max-w-5xl mx-auto">
+
+      <!--          // Articles -->
+      <% technologies.each do |technology_member| %>
+        <%= render "technologies/partials/technology_preview", technology_member: technology_member %>
+      <% end %>
+
+    </div>
+  </div>
+</section>

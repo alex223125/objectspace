@@ -1,0 +1,31 @@
+<% if list_type == "all_mixed_entries" %>
+  <% @technologies = @technologies %>
+<% elsif list_type == "articles_entries" %>
+  <% @technologies = @articles %>
+<% elsif list_type == "units_entries" %>
+  <% @technologies = @units %>
+<% elsif list_type == "algorithms_entries" %>
+  <% @technologies = @algorithms %>
+<% elsif list_type == "simple_classes_entries" %>
+  <% @technologies = @simple_classes %>
+<% elsif list_type == "frameworks_entries" %>
+  <% @technologies = @frameworks %>
+<% end %>
+
+<div class="technologies-content">
+  <!--1 folders-->
+  <% if @child_folders.try(:any?) %>
+    <%= render "folders/list", folders: @child_folders %>
+  <% end %>
+  <!--2. units and etc depending on search results -->
+  <% if @technologies.any? %>
+    <%= render "technologies/partials/technologies_list", technologies: @technologies %>
+  <% end %>
+
+  <!--3. not folders and technologies ! RENDER IT FOR FOLDERS USING SEPARATE PARTIAL, NOT HERE -->
+  <% if @child_folders.try(:blank?) && @technologies.blank? %>
+    <%= render "technologies/partials/folder_is_empty", folder_owner: @folder_owner %>
+  <% end %>
+
+
+</div>
