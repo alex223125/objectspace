@@ -5,6 +5,14 @@
 <%= link_to "Add new unit version (move it somewhere)",
             new_unit_unit_version_path(unit_id: unit_version.unit.id),
             style: "text-decoration: none", class: "no-underline text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+<br>
+<%= link_to "Edit unit version (move it somewhere)",
+            edit_unit_unit_version_path(id: unit_version),
+            style: "text-decoration: none", class: "no-underline text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+
+<br>
+<br>
+<%= render "unit/unit_versions/partials/method_content/copy_to_clipboard_input" %>
 
 
 <div class="max-w-4xl p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
@@ -18,7 +26,7 @@
         </h1>
 
         <%= render "unit/unit_versions/partials/method_content/toc", unit_version: @unit_version %>
-
+        <br>
       </div>
 
       <% if unit_version.solves_the_problem.present? %>

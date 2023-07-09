@@ -1,4 +1,6 @@
-<%= simple_form_for(@unit_version, url: unit_unit_versions_path) do |f| %>
+<% path = @unit_version.new_record? ? unit_unit_versions_path : unit_unit_version_path %>
+<% method = @unit_version.new_record? ? :post : :patch %>
+<%= simple_form_for(@unit_version, url: path, method: method) do |f| %>
 
   <% if @unit_version.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
@@ -30,7 +32,8 @@
   <div class="bg-gray-50 px-4 py-3 sm:px-6">
     <div class="text-end">
       <%= link_to "Back to dashboard", unit_units_path, class: "py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" %>
-      <%= f.button :submit, "Create method", class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+      <% button_text = @unit_version.new_record? ? "Create Method" : "Submit changes" %>
+      <%= f.button :submit, button_text, class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
     </div>
   </div>
 
