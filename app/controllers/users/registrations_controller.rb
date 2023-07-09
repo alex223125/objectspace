@@ -98,20 +98,21 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   def configure_sign_up_params
     binding.pry
-    devise_parameter_sanitizer.permit(:sign_up, keys: [:name, :username, :email, :password, :password_confirmation, :tos_agreement])
+    devise_parameter_sanitizer.permit(:sign_up, keys: [:name, :username, :email, :password, :password_confirmation, :tos_agreement, :avatar])
   end
 
 
   # If you have extra params to permit, append them to the sanitizer.
   def configure_account_update_params
     binding.pry
-    devise_parameter_sanitizer.permit(:account_update, keys: [:name, :username, :email, :password, :password_confirmation, :tos_agreement])
+    devise_parameter_sanitizer.permit(:account_update, keys: [:name, :username, :email, :password, :password_confirmation, :tos_agreement, :avatar])
   end
 
   # The path used after sign up.
-  # def after_sign_up_path_for(resource)
-  #   super(resource)
-  # end
+  def after_sign_up_path_for(resource)
+    # super(resource)
+    dashboard_path(username: resource.username)
+  end
 
   # The path used after sign up for inactive accounts.
   # def after_inactive_sign_up_path_for(resource)
