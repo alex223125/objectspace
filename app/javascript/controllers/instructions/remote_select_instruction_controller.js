@@ -2,14 +2,23 @@ import { Controller } from '@hotwired/stimulus';
 import { useMutation } from 'stimulus-use'
 
 // controller use cases:
-const substepAdditionCase = "substep_addition";
+// remove substepAdditionCase - doesnt exists enymore
+// const substepAdditionCase = "substep_addition";
+// const wrapperStepAdditionCase = "wrapper_step_addition";
+// TODO: REMOVE COMMENTS AFTER FIRST GOOD VERSION
+// TOOD: REMOVE SELECTOR WHICH ARE NOT IN USE
+// TODO: is there a possibility to refator it's to differnt files with includes?
+
+
+const algorithmFormWrapperStepAdditionCase = "algorithm_form_wrapper_step_addition";
 const dpoInstructionSelectCase = "dpo_instruction_select";
 const interfaceMemberAdditionCase = "interface_member_addition";
 const containerMemberAdditionCase = "container_member_addition";
 const folderItemAdditionCase = "folder_item_addition";
 
 // Fields selectors
-const substepAdditionCaseNestedFields = '.nested-fields-substeps'
+// const substepAdditionCaseNestedFields = '.substeps-nested-fields'
+const wrapperStepAdditionCaseNestedFields = '.steps-nested-fields'
 const interfaceMemberAdditionCaseNestedFields = '.nested-fields-interface-members'
 const containerMemberAdditionCaseNestedFields = '.nested-fields-container-members'
 const folderItemAdditionCaseNestedFields = '.nested-fields-folder-items'
@@ -31,7 +40,10 @@ export default class extends Controller {
                      // Case 1. substeps addition
                      'addSubstepOriginalButton',
                      'substepFields', 'substepsArea',
-                     // Case 2. decision process object instruction select
+                     // Case 1.2 Steps addition (algorithmFormWrapperStep Addition)
+                     'stepsArea', 'addWrapperStepOriginalButton',
+                     'stepsNestedFields',
+                     // Case 2. decision process object instruction select (DPO form)
                      'instructionableFieldsArea',
                      // Case 3. addition of interface member during creation of class
                      'interfaceMembersArea',
@@ -59,12 +71,18 @@ export default class extends Controller {
         this.instructionPreviewContainer = null
         this.fieldsContainer = null
 
-        if (this.selectTypeValue == substepAdditionCase) {
+        // if (this.selectTypeValue == substepAdditionCase) {
+        //     // mutation is used to check if new susbtep is added on ui side
+        //     useMutation(this, {attributes: false, childList: true, characterData: false, subtree: true})
+        //     this.afterclickSubstepsAmount = null
+        //     this.currentSubstepsAmount = null
+        //     this.postmutationSubstepsAmount = 0
+        if (this.selectTypeValue == algorithmFormWrapperStepAdditionCase) {
             // mutation is used to check if new susbtep is added on ui side
             useMutation(this, {attributes: false, childList: true, characterData: false, subtree:true})
-            this.afterclickSubstepsAmount = null
-            this.currentSubstepsAmount = null
-            this.postmutationSubstepsAmount = 0
+            this.afterclickStepsAmount = null
+            this.currentStepsAmount = null
+            this.postmutationStepsAmount = 0
         } else if (this.selectTypeValue == dpoInstructionSelectCase) {
             // do nothing
         } else if (this.selectTypeValue == interfaceMemberAdditionCase) {
@@ -97,25 +115,48 @@ export default class extends Controller {
 
     // Callbacks
     mutate(entries) {
-        if (this.selectTypeValue == substepAdditionCase) {
-            console.log(`mutation for ${substepAdditionCase} case triggered`)
+        // if (this.selectTypeValue == substepAdditionCase) {
+        //     console.log(`mutation for ${substepAdditionCase} case triggered`)
+        //
+        //     var nestedFields = substepAdditionCaseNestedFields
+        //     this.afterclickSubstepsAmount = this.substepsAreaTarget.querySelectorAll(nestedFields).length
+        //     console.log("this.currentSubstepsAmount")
+        //     console.log(this.currentSubstepsAmount)
+        //     console.log("this.afterclickSubstepsAmount")
+        //     console.log(this.afterclickSubstepsAmount)
+        //
+        //     var changedAmount = (this.currentSubstepsAmount + 1)
+        //     if ((changedAmount == this.afterclickSubstepsAmount) && (changedAmount != this.postmutationSubstepsAmount)) {
+        //         console.log("New substep added!");
+        //         this.setFieldsContainer()
+        //         this.setInstructionValues()
+        //         this.setInstructionPreviewContainer()
+        //         this.loadPreview()
+        //         this.postmutationSubstepsAmount = changedAmount
+        //     }
+        if (this.selectTypeValue == algorithmFormWrapperStepAdditionCase) {
+            console.log(`mutation for ${algorithmFormWrapperStepAdditionCase} case triggered`)
+            // var nestedFields = wrapperStepAdditionCaseNestedFields
+            // this.afterclickStepsAmount = this.stepsAreaTarget.querySelectorAll(nestedFields).length
+            this.afterclickStepsAmount = this.stepsNestedFieldsTargets.length
 
-            var nestedFields = substepAdditionCaseNestedFields
-            this.afterclickSubstepsAmount = this.substepsAreaTarget.querySelectorAll(nestedFields).length
-            console.log("this.currentSubstepsAmount")
-            console.log(this.currentSubstepsAmount)
-            console.log("this.afterclickSubstepsAmount")
-            console.log(this.afterclickSubstepsAmount)
+            console.log("this.currentStepsAmount")
+            console.log(this.currentStepsAmount)
+            console.log("this.afterclickStepsAmount")
+            console.log(this.afterclickStepsAmount)
 
-            var changedAmount = (this.currentSubstepsAmount + 1)
-            if ((changedAmount == this.afterclickSubstepsAmount) && (changedAmount != this.postmutationSubstepsAmount)) {
-                console.log("New substep added!");
+            var changedAmount = (this.currentStepsAmount + 1)
+            if ((changedAmount == this.afterclickStepsAmount) && (changedAmount != this.postmutationStepsAmount)) {
+                console.log("New Wrapper step added!");
                 this.setFieldsContainer()
                 this.setInstructionValues()
                 this.setInstructionPreviewContainer()
                 this.loadPreview()
-                this.postmutationSubstepsAmount = changedAmount
+                this.postmutationStepsAmount = changedAmount
+            } else {
+                console.log("Amount not changed or error");
             }
+
         } else if (this.selectTypeValue == interfaceMemberAdditionCase) {
             console.log(`mutation for ${interfaceMemberAdditionCase} case triggered`)
 
@@ -134,6 +175,8 @@ export default class extends Controller {
                 this.setInstructionPreviewContainer()
                 this.loadPreview()
                 this.postmutationInterfaceMembersAmount = changedAmount
+            } else {
+                console.log("Amount not changed or error");
             }
         } else if (this.selectTypeValue == containerMemberAdditionCase) {
             console.log(`mutation for ${containerMemberAdditionCase} case triggered`)
@@ -153,6 +196,8 @@ export default class extends Controller {
                 this.setInstructionPreviewContainer()
                 this.loadPreview()
                 this.postmutationContainerMembersAmount = changedAmount
+            } else {
+                console.log("Amount not changed or error");
             }
         } else if (this.selectTypeValue == folderItemAdditionCase) {
             console.log(`mutation for ${folderItemAdditionCase} case triggered`)
@@ -172,6 +217,8 @@ export default class extends Controller {
                 this.setInstructionPreviewContainer()
                 this.loadPreview()
                 this.postmutationFolderItemsAmount = changedAmount
+            } else {
+                console.log("Amount not changed or error");
             }
         }
 
@@ -195,9 +242,10 @@ export default class extends Controller {
         this.removeModal()
 
         // Split on flows for each case
-        if (this.selectTypeValue == substepAdditionCase) {
-            this.addSubstep()
-        } else if (this.selectTypeValue == dpoInstructionSelectCase) {
+
+        // if (this.selectTypeValue == substepAdditionCase) {
+        //     this.addSubstep()
+        if (this.selectTypeValue == dpoInstructionSelectCase) {
             this.setInstruction()
         } else if (this.selectTypeValue == interfaceMemberAdditionCase) {
             this.addInterfaceMember()
@@ -205,8 +253,9 @@ export default class extends Controller {
             this.addContainerMember()
         } else if (this.selectTypeValue == folderItemAdditionCase) {
             this.addFolderItem()
+        } else if (this.selectTypeValue == algorithmFormWrapperStepAdditionCase) {
+            this.addWrapperStep()
         }
-
     }
 
 
@@ -244,17 +293,31 @@ export default class extends Controller {
         this.addContainerMemberOriginalButtonTarget.click()
     }
 
-    addSubstep(){
+    // addSubstep(){
+    //     //Calculate amount of substep before adding new substep
+    //     this.currentSubstepsAmount = this.substepsAreaTarget.querySelectorAll(substepAdditionCaseNestedFields).length
+    //     console.log("currentSubstepsAmount")
+    //     console.log(this.currentSubstepsAmount)
+    //
+    //     // 3.click hidden button under previous selected step
+    //     // console.log(this.addSubstepOriginalButtonTarget)
+    //     console.log("addSubstepOriginalButtonTarget.click() fired")
+    //     this.addSubstepOriginalButtonTarget.click()
+    // }
+
+    addWrapperStep(){
         //Calculate amount of substep before adding new substep
-        this.currentSubstepsAmount = this.substepsAreaTarget.querySelectorAll(substepAdditionCaseNestedFields).length
-        console.log("currentSubstepsAmount")
-        console.log(this.currentSubstepsAmount)
+        // this.currentStepsAmount = this.stepsAreaTarget.querySelectorAll(wrapperStepAdditionCaseNestedFields).length
+        this.currentStepsAmount = this.stepsNestedFieldsTargets.length
+        console.log("currentStepsAmount")
+        console.log(this.currentStepsAmount)
 
         // 3.click hidden button under previous selected step
         // console.log(this.addSubstepOriginalButtonTarget)
-        console.log("addSubstepOriginalButtonTarget.click() fired")
-        this.addSubstepOriginalButtonTarget.click()
+        console.log("addWrapperStepOriginalButtonTarget.click() fired")
+        this.addWrapperStepOriginalButtonTarget.click()
     }
+
 
     addInterfaceMember(){
         //Calculate amount of substep before adding new substep
@@ -268,6 +331,7 @@ export default class extends Controller {
         this.addInterfaceMemberOriginalButtonTarget.click()
     }
 
+    ////////////////////
     resetSearchForm(){
         // multiple instances on the same page
         this.searchInstructionsInstanceTargets.forEach(target => {
@@ -282,12 +346,18 @@ export default class extends Controller {
         selectInstructionModalController.close()
         // data-action="remote_select_instruction:addSubstepRemoteButtonClick->select_instruction_modal#close">
     }
+    ////////////////////
+
 
     setFieldsContainer(){
         // 4.1 select field container of added substep
-        if (this.selectTypeValue == substepAdditionCase) {
-            var selector = substepAdditionCaseNestedFields
-            this.fieldsContainer = [...this.substepsAreaTarget.querySelectorAll(selector)].pop()
+        // if (this.selectTypeValue == substepAdditionCase) {
+        //     var selector = substepAdditionCaseNestedFields
+        //     this.fieldsContainer = [...this.substepsAreaTarget.querySelectorAll(selector)].pop()
+        if (this.selectTypeValue == algorithmFormWrapperStepAdditionCase) {
+            // stepsNestedFieldsTargets ?
+            var selector = wrapperStepAdditionCaseNestedFields
+            this.fieldsContainer = [...this.stepsAreaTarget.querySelectorAll(selector)].pop()
         } else if (this.selectTypeValue == interfaceMemberAdditionCase) {
             var selector = interfaceMemberAdditionCaseNestedFields
             this.fieldsContainer = [...this.interfaceMembersAreaTarget.querySelectorAll(selector)].pop()
@@ -303,7 +373,9 @@ export default class extends Controller {
     }
 
     setInstructionPreviewContainer(){
-        if (this.selectTypeValue == substepAdditionCase) {
+        // if (this.selectTypeValue == substepAdditionCase) {
+        //     this.instructionPreviewContainer = this.fieldsContainer.querySelector(".instruction-preview")
+        if (this.selectTypeValue == algorithmFormWrapperStepAdditionCase) {
             this.instructionPreviewContainer = this.fieldsContainer.querySelector(".instruction-preview")
         } else if (this.selectTypeValue == dpoInstructionSelectCase) {
             this.instructionPreviewContainer = this.instructionableFieldsAreaTarget.querySelector(".instruction-preview")
@@ -317,8 +389,10 @@ export default class extends Controller {
 
     setInstructionValues(){
         // 4.2 stet variables for substep inputs field
-        if (this.selectTypeValue == substepAdditionCase) {
-            this.setSubstepableInstructionValues()
+        // if (this.selectTypeValue == substepAdditionCase) {
+        //     this.setSubstepableInstructionValues()
+        if (this.selectTypeValue == algorithmFormWrapperStepAdditionCase) {
+            this.setTechnologiableAlgorithmValues()
         } else if (this.selectTypeValue == dpoInstructionSelectCase) {
             this.setInstructionableInstructionValues()
         } else if (this.selectTypeValue == interfaceMemberAdditionCase) {
@@ -328,6 +402,14 @@ export default class extends Controller {
         } else if (this.selectTypeValue == folderItemAdditionCase) {
             this.setFolderItemValues()
         }
+    }
+
+    setStepValues(){
+        var idField = "technology-id-hidden-field"
+        var typeField = "technology-type-hidden-field"
+
+        this.fieldsContainer.querySelector(`.${idField}`).value = this.instructionId
+        this.fieldsContainer.querySelector(`.${typeField}`).value = this.instructionType
     }
 
     setFolderItemValues(){
@@ -359,10 +441,10 @@ export default class extends Controller {
         }
     }
 
-
-    setSubstepableInstructionValues(){
-        var idField = "substepable-id-hidden-field"
-        var typeField = "substepable-type-hidden-field"
+    setTechnologiableAlgorithmValues(){
+        // define these 2 as targets
+        var idField = "technologiable-id-hidden-field"
+        var typeField = "technologiable-type-hidden-field"
 
         if (this.instructionType == unitCase) {
             this.fieldsContainer.querySelector(`.${idField}`).value = this.instructionId
@@ -372,6 +454,21 @@ export default class extends Controller {
             this.fieldsContainer.querySelector(`.${typeField}`).value = "Algorithms::Algorithm"
         }
     }
+
+
+// setSubstepableInstructionValues(){
+    //     var idField = "substepable-id-hidden-field"
+    //     var typeField = "substepable-type-hidden-field"
+    //
+    //     if (this.instructionType == unitCase) {
+    //         this.fieldsContainer.querySelector(`.${idField}`).value = this.instructionId
+    //         this.fieldsContainer.querySelector(`.${typeField}`).value = "Units::Unit"
+    //     } else if (this.instructionType == algorithmCase) {
+    //         this.fieldsContainer.querySelector(`.${idField}`).value = this.instructionId
+    //         this.fieldsContainer.querySelector(`.${typeField}`).value = "Algorithms::Algorithm"
+    //     }
+    // }
+
 
 
     setInstructionableInstructionValues(){
@@ -427,7 +524,7 @@ export default class extends Controller {
 
 
     insertPreview(data){
-        if (this.selectTypeValue == substepAdditionCase
+        if (this.selectTypeValue == algorithmFormWrapperStepAdditionCase
             || this.selectTypeValue == interfaceMemberAdditionCase
             || this.selectTypeValue == containerMemberAdditionCase
             || this.selectTypeValue == folderItemAdditionCase) {
