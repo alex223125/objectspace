@@ -44,3 +44,18 @@
     </address>
   </div>
 </div>
+
+Related articles:
+<div class="related-articles">
+  <% @related_articles.each do |article| %>
+    <%= article.title %>
+  <% end %>
+</div>
+
+
+More articles from this owner:
+<div class="more-articles">
+  <% @owner_articles.each do |article| %>
+    <%= article.title %>
+  <% end %>
+</div>
