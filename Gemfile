@@ -91,6 +91,15 @@ gem 'elasticsearch', '~> 7.17'
 
 gem 'closure_tree'
 
+gem 'acts-as-taggable-on', '~> 9.0'
+
+gem 'friendly_id', '~> 5.4.0'
+
+gem "actionpack-page_caching"
+
+gem 'image_processing', '~> 1.2'
+gem 'active_model_serializers', '~> 0.10.0'
+
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
