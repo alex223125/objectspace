@@ -1,4 +1,8 @@
 class Units::UnitVersion < ApplicationRecord
+  include Unitable
+
+  extend FriendlyId
+  friendly_id :slug_candidates, use: [:slugged, :finders, :history]
 
   belongs_to :unit
 
@@ -9,7 +13,8 @@ class Units::UnitVersion < ApplicationRecord
   has_many :unit_version_improvements, class_name: "UnitVersionImprovement"
   has_many :improvement, through: :unit_version_improvements, class_name: "Improvement"
 
-  has_many :substeps, as: :substepable, class_name: "Algorithms::Substep"
+  # unit can not have substeps
+  # has_many :substeps, as: :substepable, class_name: "Algorithms::Substep"
   has_many :simple_objects, as: :instructionable, class_name: "SimpleObjects::SimpleObject"
 
   include PgSearch::Model
@@ -28,4 +33,16 @@ class Units::UnitVersion < ApplicationRecord
                       prefix: true
                     }
                   }
+
+
+  alias_method :whole_unit, :unit
+
+  private
+
+  def slug_candidates
+    [ :title,
+      [:title, :id]
+    ]
+  end
+
 end

@@ -1,10 +1,19 @@
 class Units::Unit < ApplicationRecord
 
-  searchkick callbacks: :async, text_middle: [:title, :source_page_description]
+  extend Pagy::Searchkick
+
+  searchkick callbacks: :async,
+             text_middle: [:title, :source_page_description],
+             word: [:list_of_tags, :ownerable_id]
+  acts_as_taggable_on :tags
+  scope :search_import, -> { includes(:tags) }
+
 
 
   # belongs_to :algorithm, optional: true
   # acts_as_list scope: :algorithm
+
+  belongs_to :ownerable, polymorphic: true
 
   belongs_to :folder, class_name: "Folder"
 
@@ -45,6 +54,15 @@ class Units::Unit < ApplicationRecord
 
   def default_version
     Units::UnitVersion.find_by(id: self.default_version_id)
+  end
+
+  def search_data
+    {
+      title: title,
+      source_page_description: source_page_description,
+      list_of_tags: tag_list,
+      ownerable_id: ownerable_id
+    }
   end
 
 end
