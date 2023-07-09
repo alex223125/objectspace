@@ -16,6 +16,7 @@ module Objectspace
     Dir[Rails.root.join('app/builders/**/*.rb')].each{|rb| require rb}
     Dir[Rails.root.join('app/enums/**/*.rb')].each{|rb| require rb}
     Dir[Rails.root.join('app/queries/**/*.rb')].each{|rb| require rb}
+    Dir[Rails.root.join('app/serializers/**/*.rb')].each{|rb| require rb}
 
     # Configuration for the application, engines, and railties goes here.
     #
@@ -24,5 +25,7 @@ module Objectspace
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    config.i18n.default_locale = :en
   end
 end
