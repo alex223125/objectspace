@@ -1,4 +1,6 @@
 class Algorithm::AlgorithmVersionsController < ApplicationController
+  include TechBreadcrumbable
+
   before_action :set_algorithm_version, only: %i[ show edit update destroy ]
 
   # GET /algorithm_versions or /algorithm_versions.json
@@ -8,24 +10,34 @@ class Algorithm::AlgorithmVersionsController < ApplicationController
 
   # GET /algorithm_versions/1 or /algorithm_versions/1.json
   def show
+    technology_breadcrumbs(@algorithm_version)
+    @algorithm = @algorithm_version.algorithm
   end
 
   # GET /algorithm_versions/new
   def new
-    @algorithm_version = Algorithms::AlgorithmVersion.new
+    set_algorithm
+    @algorithm_version = @algorithm.algorithm_versions.new
   end
 
   # GET /algorithm_versions/1/edit
   def edit
+    binding.pry
+    @algorithm = @algorithm_version.algorithm
+    @target_folder = @algorithm.folder
   end
 
   # POST /algorithm_versions or /algorithm_versions.json
   def create
+    binding.pry
     @algorithm_version = Algorithms::AlgorithmVersion.new(algorithm_version_params)
 
     respond_to do |format|
-      if @algorithm_version.save
-        format.html { redirect_to algorithm_version_url(@algorithm_version), notice: "Algorithm version was successfully created." }
+      if @algorithm_version.save(validate: false)
+        format.html { redirect_to algorithm_version_path(username: @algorithm_version.algorithm.ownerable.ownername,
+                                                       id: @algorithm_version.slug),
+                                  notice: "Algorithm version was successfully created." }
+
         format.json { render :show, status: :created, location: @algorithm_version }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -36,11 +48,15 @@ class Algorithm::AlgorithmVersionsController < ApplicationController
 
   # PATCH/PUT /algorithm_versions/1 or /algorithm_versions/1.json
   def update
+    binding.pry
     respond_to do |format|
-      if @algorithm_version.update(algorithm_version_params)
+      # if @algorithm_version.update(algorithm_version_params)
+      @algorithm_version.assign_attributes(algorithm_version_params)
+      if @algorithm_version.save(validate: false)
         format.html { redirect_to algorithm_version_url(@algorithm_version), notice: "Algorithm version was successfully updated." }
         format.json { render :show, status: :ok, location: @algorithm_version }
       else
+        @algorithm = @algorithm_version.algorithm
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @algorithm_version.errors, status: :unprocessable_entity }
       end
@@ -58,13 +74,32 @@ class Algorithm::AlgorithmVersionsController < ApplicationController
   end
 
   private
+
+  def set_algorithm
+    binding.pry
+    @algorithm = Algorithms::Algorithm.find(params[:algorithm_id])
+  end
+
+
     # Use callbacks to share common setup or constraints between actions.
     def set_algorithm_version
-      @algorithm_version = Algorithms::AlgorithmVersion.find(params[:id])
+      binding.pry
+      @algorithm_version = Algorithms::AlgorithmVersion.friendly.find(params[:id])
+
+      # If an old id or a numeric id was used to find the record, then
+      # the request path will not match the post_path, and we should do
+      # a 301 redirect that uses the current friendly id.
+      request_slug = params[:id]
+      if request_slug != @algorithm_version.slug
+        return redirect_to algorithm_version_path(username: @algorithm_version.owner.ownername,
+                                                id: @algorithm_version.slug),
+                           :status => :moved_permanently
+      end
     end
 
     # Only allow a list of trusted parameters through.
     def algorithm_version_params
-      params.require(:algorithm_version).permit(:title, :solves_the_problem, :sources, :additional_information)
+      binding.pry
+      params.require(:algorithms_algorithm_version).permit(:title, :solves_the_problem, :sources, :additional_information, :algorithm_id)
     end
 end
