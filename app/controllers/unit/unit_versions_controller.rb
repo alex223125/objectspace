@@ -1,4 +1,6 @@
 class Unit::UnitVersionsController < ApplicationController
+  include TechBreadcrumbable
+
   before_action :set_unit_version, only: %i[ show edit update destroy preview ]
 
   # GET /unit_versions or /unit_versions.json
@@ -9,27 +11,21 @@ class Unit::UnitVersionsController < ApplicationController
   # GET /unit_versions/1 or /unit_versions/1.json
   def show
     binding.pry
-    # if params[:default_version].present?
-    #
-    #   binding.pry
-    #   set_unit
-    #   @unit_version = @unit.default_version
-    # end
+    technology_breadcrumbs(@unit_version)
+    @unit = @unit_version.unit
   end
 
   # GET /unit_versions/new
   def new
     binding.pry
-    if params[:unit_id]
-      set_unit
-      @unit_version = @unit.unit_versions.new
-    else
-      @unit_version = Units::UnitVersion.new
-    end
+    set_unit
+    @unit_version = @unit.unit_versions.new
   end
 
   # GET /unit_versions/1/edit
   def edit
+    @unit = @unit_version.unit
+    @target_folder = @unit.folder
   end
 
   # POST /unit_versions or /unit_versions.json
@@ -43,8 +39,9 @@ class Unit::UnitVersionsController < ApplicationController
     respond_to do |format|
       if service.errors.blank?
         binding.pry
-        format.html { redirect_to unit_unit_version_path(service.unit_version), notice: "Method was successfully created." }
-        # format.html { redirect_to unit_version_url(@unit_version), notice: "Unit version was successfully created." }
+        format.html { redirect_to unit_version_path(username: service.unit_version.unit.ownerable.ownername,
+                                                       id: service.unit_version.slug),
+                                  notice: "Method was successfully created." }
         format.json { render :show, status: :created, location: @unit_version }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -55,9 +52,13 @@ class Unit::UnitVersionsController < ApplicationController
 
   # PATCH/PUT /unit_versions/1 or /unit_versions/1.json
   def update
+    binding.pry
     respond_to do |format|
       if @unit_version.update(unit_version_params)
-        format.html { redirect_to unit_version_url(@unit_version), notice: "Unit version was successfully updated." }
+        format.html { redirect_to unit_version_path(username: @unit_version.unit.ownerable.ownername,
+                                                    id: @unit_version.slug),
+                                  notice: "Method was successfully updated." }
+
         format.json { render :show, status: :ok, location: @unit_version }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -84,7 +85,17 @@ class Unit::UnitVersionsController < ApplicationController
 
     # Use callbacks to share common setup or constraints between actions.
     def set_unit_version
-      @unit_version = Units::UnitVersion.find(params[:id])
+      @unit_version = Units::UnitVersion.friendly.find(params[:id])
+
+      # If an old id or a numeric id was used to find the record, then
+      # the request path will not match the post_path, and we should do
+      # a 301 redirect that uses the current friendly id.
+      request_slug = params[:id]
+      if request_slug != @unit_version.slug
+        return redirect_to unit_version_path(username: @unit_version.owner.ownername,
+                                                id: @unit_version.slug),
+                           :status => :moved_permanently
+      end
     end
 
     # Only allow a list of trusted parameters through.

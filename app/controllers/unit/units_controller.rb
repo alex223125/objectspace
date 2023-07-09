@@ -1,5 +1,8 @@
 class Unit::UnitsController < ApplicationController
+  include Folderable
+
   before_action :set_unit, only: %i[ show edit update destroy preview ]
+  before_action :set_target_folder, only: %i[ new create ]
 
   # GET /units or /units.json
   def index
@@ -13,10 +16,12 @@ class Unit::UnitsController < ApplicationController
   # end
 
   def preview
-    binding.pry
+    # binding.pry
     if params[:type] == "substep_addition"
       path = "algorithm/shared/partials/preview/unit/main_page"
-    elsif params[:type] == "dpo_instruction_select" || params[:type] == "interface_member_addition"
+    elsif params[:type] == "dpo_instruction_select" ||
+          params[:type] == "interface_member_addition" ||
+          params[:type] == "algorithm_form_wrapper_step_addition"
       path = "shared/technologies_search/dpo_instruction_select/preview/unit"
     end
 
@@ -45,14 +50,16 @@ class Unit::UnitsController < ApplicationController
   def create
     binding.pry
     # @unit = Units::Unit.new(unit_params)
-    service = Services::Units::Units::Create.new(unit_params)
+    service = Services::Units::Units::Create.new(unit_params, @target_folder, current_user)
     service.call
 
     respond_to do |format|
       binding.pry
       if service.errors.blank?
         # format.html { redirect_to unit_unit_version_path(@unit.default_version, default_version: true), notice: "Unit was successfully created." }
-        format.html { redirect_to unit_unit_version_path(service.unit.default_version), notice: "Unit was successfully created." }
+        format.html { redirect_to unit_version_path(username: service.unit.ownerable.ownername,
+                                                    id: service.unit.default_version.slug),
+                                  notice: "Unit was successfully created." }
         format.json { render :show, status: :created, location: service.unit }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -94,7 +101,7 @@ class Unit::UnitsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def unit_params
-      params.require(:units_unit).permit(:title, :visibility_status, :source_page_description,
+      params.require(:units_unit).permit(:title, :visibility_status, :source_page_description, :tag_list,
                                          unit_versions_attributes: [:title, :solves_the_problem,
                                                         :instruction, :sources, :target_audience,
                                                         :additional_information],
@@ -102,4 +109,5 @@ class Unit::UnitsController < ApplicationController
                                                                           :sources, :_destroy])
       # params.require(:user).permit(:name, friends_attributes: [:id, :friend_name, :_destroy])
     end
+
 end
