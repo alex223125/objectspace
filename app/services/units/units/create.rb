@@ -5,8 +5,10 @@ module Services
 
         attr_reader :errors, :unit
 
-        def initialize(params)
+        def initialize(params, target_folder, current_user)
           @params = params
+          @target_folder = target_folder
+          @current_user = current_user
         end
 
         def call
@@ -16,6 +18,11 @@ module Services
 
             binding.pry
             set_usage_unit_example_flag
+
+            binding.pry
+            set_owner
+            set_folder
+            set_tags
 
             binding.pry
             set_visibility
@@ -37,7 +44,7 @@ module Services
 
         def create_unit
           binding.pry
-          @unit = ::Units::Unit.new(@params)
+          @unit = ::Units::Unit.new(@params.except(:tag_list))
         end
 
         def set_usage_unit_example_flag
@@ -56,6 +63,25 @@ module Services
           binding.pry
           @unit.default_version_id = @unit.unit_versions.first.id
           @unit.save!
+        end
+
+        def set_owner
+          @unit.ownerable = @current_user
+        end
+
+        def set_folder
+          @unit.folder = @target_folder
+        end
+
+        def set_tags
+          binding.pry
+          @unit.tag_list = parse_tags
+        end
+
+        def parse_tags
+          if @params[:tag_list].present?
+            JSON.parse(@params[:tag_list]).map{|h| h.values}.join(",")
+          end
         end
 
       end
