@@ -53,6 +53,19 @@
                         class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
                         placeholder: "Ex: Different versions on how you can install Ruby on Rails on different environments" %>
     </div>
+    <br>
+
+    <div class="col-span-6 sm:col-span-3" data-controller="tags">
+      <%= f.label "Tags", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.hint "It is recommended to use no more than 5 tags. The maximum number is 8. Tags are separated by a comma.",
+                 class: "mt-2 text-sm text-gray-500" %>
+      <%= f.input_field :tag_list,
+                        required: false,
+                        class: "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5",
+                        placeholder: "write some tags",
+                        data: {target: "tags.output"}%>
+    </div>
+
     <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
 
     <%#= f.hidden_field :type, :input_html => { value: @class_type } %>
@@ -70,6 +83,8 @@
 
     <%#= render "simple_class/simple_classes/partials/interfaces/interface_groups/nested_form", :form => f %>
     <%= render "shared/form_partials/interfaces/root_interface_group/form", :form => f %>
+
+    <%= hidden_field_tag 'target_folder', @target_folder.id  %>
 
     <div class="bg-gray-50 px-4 py-3 sm:px-6">
       <div class="text-end">
