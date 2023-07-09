@@ -15,9 +15,14 @@ module Services
 
       private
 
+      # why: container.root.simple_class.id not faster the container.simple_class_id
       def link_object_with_all_groups
-        # why: container.root.simple_class.id not faster the container.simple_class_id
+        binding.pry
+        # there always will be not more than 1 instance
         root_group = @object.public_send(@root_object_association).first
+        return if root_group.blank?
+
+        binding.pry
         root_group.public_send(@child_objects_associations).each do |group|
           recursively_link_object_with_(group)
         end
