@@ -11,8 +11,10 @@ module Services
 
         attr_reader :errors, :framework
 
-        def initialize(params)
+        def initialize(params, target_folder, current_user)
           @params = params
+          @target_folder = target_folder
+          @current_user = current_user
         end
 
         def call
@@ -20,6 +22,12 @@ module Services
             create_framework
             link_framework_with_all_containers
             link_framework_with_all_interface_groups
+
+            binding.pry
+            set_owner
+            set_folder
+            set_tags
+
             binding.pry
             @framework.save!
           end
@@ -32,7 +40,7 @@ module Services
 
         def create_framework
           binding.pry
-          @framework = ::Frameworks::Framework.new(@params)
+          @framework = ::Frameworks::Framework.new(@params.except(:tag_list))
         end
 
         def link_framework_with_all_containers
@@ -49,6 +57,25 @@ module Services
                                                                INTERFACE_GROUP_ROOT_ASSOCIATION,
                                                                INTERFACE_GROUP_CHILD_ASSOCIATIONS)
           service.call
+        end
+
+        def set_owner
+          @framework.ownerable = @current_user
+        end
+
+        def set_folder
+          @framework.folder = @target_folder
+        end
+
+        def set_tags
+          binding.pry
+          @framework.tag_list = parse_tags
+        end
+
+        def parse_tags
+          if @params[:tag_list].present?
+            JSON.parse(@params[:tag_list]).map{|h| h.values}.join(",")
+          end
         end
 
       end
