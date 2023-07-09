@@ -207,6 +207,11 @@
   resolved "https://registry.yarnpkg.com/@vue/shared/-/shared-3.1.5.tgz#74ee3aad995d0a3996a6bb9533d4d280514ede03"
   integrity sha512-oJ4F3TnvpXaQwZJNF3ZK+kLPHKarDmJjJ6jyzVNDKH9md1dptjC7lWR//jrGuLdek/U6iltWxqAnYOu8gCiOvA==
 
+"@yaireo/tagify@^4.17.8":
+  version "4.17.8"
+  resolved "https://registry.yarnpkg.com/@yaireo/tagify/-/tagify-4.17.8.tgz#2696570843e3cd14318f305e80699d457aad918a"
+  integrity sha512-MqU3JhE/35r8qZPgfLshXfOkTkgtFEXh2Ja8J3Nn1rPuut28yorJLtxH67jbrbanE1gFH2vCvxe6meqM6oZ8rA==
+
 acorn-node@^1.8.2:
   version "1.8.2"
   resolved "https://registry.npmjs.org/acorn-node/-/acorn-node-1.8.2.tgz"
@@ -262,6 +267,11 @@ binary-extensions@^2.0.0:
   version "2.2.0"
   resolved "https://registry.npmjs.org/binary-extensions/-/binary-extensions-2.2.0.tgz"
   integrity sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==
+
+blueimp-canvas-to-blob@^3.29.0:
+  version "3.29.0"
+  resolved "https://registry.yarnpkg.com/blueimp-canvas-to-blob/-/blueimp-canvas-to-blob-3.29.0.tgz#d965f06cb1a67fdae207a2be56683f55ef531466"
+  integrity sha512-0pcSSGxC0QxT+yVkivxIqW0Y4VlO2XSDPofBAqoJ1qJxgH9eiUDLv50Rixij2cDuEfx4M6DpD9UGZpRhT5Q8qg==
 
 bootstrap-icons@^1.10.3:
   version "1.10.3"
@@ -326,6 +336,11 @@ color-name@^1.1.4:
   version "1.1.4"
   resolved "https://registry.npmjs.org/color-name/-/color-name-1.1.4.tgz"
   integrity sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==
+
+cropperjs@1.5.11:
+  version "1.5.11"
+  resolved "https://registry.yarnpkg.com/cropperjs/-/cropperjs-1.5.11.tgz#502ae6d8ca098b124de6813601cca70015879fc0"
+  integrity sha512-SJUeBBhtNBnnn+UrLKluhFRIXLJn7XFPv8QN1j49X5t+BIMwkgvDev541f96bmu8Xe0TgCx3gON22KmY/VddaA==
 
 cssesc@^3.0.0:
   version "3.0.0"
@@ -732,6 +747,11 @@ sortablejs@^1.15.0:
   version "1.0.2"
   resolved "https://registry.npmjs.org/source-map-js/-/source-map-js-1.0.2.tgz"
   integrity sha512-R0XvVJ9WusLiqTCEiGCmICCMplcCkIwwR11mOSD9CR5u+IXYdiseeEuXCVAjS54zqwkLcPNnmU4OeJ6tUrWhDw==
+
+stimulus-clipboard@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/stimulus-clipboard/-/stimulus-clipboard-4.0.1.tgz#acc9212b479fedc633ecdec8f191a28c1d826a6b"
+  integrity sha512-dem+ihC3Q8+gbyGINdd+dK+9d5vUTnOwoH+n3KcDJvbxrFcq9lV8mWjyhEaDquGxYy3MmqSdz9FHQbG88TBqGg==
 
 stimulus-use@^0.52.0:
   version "0.52.0"
