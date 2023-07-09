@@ -3,10 +3,14 @@ module Services
     module Algorithms
       class Create
 
-        attr_reader :errors, :algorithm
+        # MAX_ALLOWED_AMOUNT_OF_STEPS_PER_NEW_ALGORITHM_CREATION = 5.freeze
 
-        def initialize(params)
+        attr_reader :errors, :algorithm, :dynamic_steps
+
+        def initialize(params, target_folder, current_user)
           @params = params
+          @target_folder = target_folder
+          @current_user = current_user
         end
 
         def call
@@ -18,12 +22,17 @@ module Services
             set_visibility
 
             binding.pry
+            set_folder
+            set_owner
+            set_tags
+
+            binding.pry
             @algorithm.save!
 
             binding.pry
             set_default_version
           end
-        rescue ActiveRecord::RecordInvalid => e
+        rescue ActiveRecord::RecordInvalid, StandardError => e
 
           binding.pry
           @errors = e.message
@@ -34,7 +43,7 @@ module Services
 
         def create_algorithm
           binding.pry
-          @algorithm = ::Algorithms::Algorithm.new(@params)
+          @algorithm = ::Algorithms::Algorithm.new(@params.except(:tag_list))
         end
 
         def set_visibility
@@ -46,6 +55,27 @@ module Services
           binding.pry
           @algorithm.default_version_id = @algorithm.algorithm_versions.first.id
           @algorithm.save!
+        end
+
+        def set_folder
+          binding.pry
+          @algorithm.folder = @target_folder
+        end
+
+        def set_owner
+          binding.pry
+          @algorithm.ownerable = @current_user
+        end
+
+        def set_tags
+          binding.pry
+          @algorithm.tag_list = parse_tags
+        end
+
+        def parse_tags
+          if @params[:tag_list].present?
+            JSON.parse(@params[:tag_list]).map{|h| h.values}.join(",")
+          end
         end
 
       end
