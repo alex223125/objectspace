@@ -1,6 +1,9 @@
 class SimpleClass::SimpleClassesController < ApplicationController
+  include Folderable
+  include TechBreadcrumbable
 
   before_action :set_simple_class, only: %i[ show edit update destroy preview ]
+  before_action :set_target_folder, only: %i[ new create ]
 
   # GET /simple_classes or /simple_classes.json
   def index
@@ -9,6 +12,7 @@ class SimpleClass::SimpleClassesController < ApplicationController
 
   # GET /simple_classes/1 or /simple_classes/1.json
   def show
+    technology_breadcrumbs(@simple_class)
   end
 
   def preview
@@ -54,14 +58,15 @@ class SimpleClass::SimpleClassesController < ApplicationController
   # POST /simple_classes or /simple_classes.json
   def create
     binding.pry
-    service = Services::SimpleClasses::SimpleClasses::Create.new(simple_class_params)
+    service = Services::SimpleClasses::SimpleClasses::Create.new(simple_class_params, @target_folder, current_user)
     service.call
 
     binding.pry
     respond_to do |format|
       if service.errors.blank?
-        # format.html { redirect_to simple_class_url(@simple_class), notice: "Simple class was successfully created." }
-        format.html { redirect_to simple_class_simple_class_path(service.simple_class), notice: "Simple class was successfully created." }
+        format.html { redirect_to simple_class_path(username: service.simple_class.owner.ownername,
+                                                         id: service.simple_class.slug),
+                                  notice: "Class was successfully created." }
         format.json { render :show, status: :created, location: service.simple_class }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -96,14 +101,24 @@ class SimpleClass::SimpleClassesController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_simple_class
-      @simple_class = SimpleClasses::SimpleClass.find(params[:id])
+      @simple_class = SimpleClasses::SimpleClass.friendly.find(params[:id])
+
+      # If an old id or a numeric id was used to find the record, then
+      # the request path will not match the post_path, and we should do
+      # a 301 redirect that uses the current friendly id.
+      request_slug = params[:id]
+      if request_slug != @simple_class.slug
+        return redirect_to simple_class_path(username: @simple_class.owner.ownername,
+                                             id: @simple_class.slug),
+                           :status => :moved_permanently
+      end
     end
 
     # Only allow a list of trusted parameters through.
     def simple_class_params
       params.require(:simple_classes_simple_class).permit(
         :title, :description, :type,
-        :instructionable_type, :instructionable_id,
+        :instructionable_type, :instructionable_id, :tag_list,
         interface_groups_attributes, class_containers_attributes
       )
     end
