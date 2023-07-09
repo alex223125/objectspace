@@ -10,9 +10,38 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_05_17_194211) do
+ActiveRecord::Schema[7.0].define(version: 2023_06_23_233410) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "pgcrypto"
   enable_extension "plpgsql"
+
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "record_type", null: false
+    t.bigint "record_id", null: false
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.string "key", null: false
+    t.string "filename", null: false
+    t.string "content_type"
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.datetime "created_at", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
 
   create_table "algorithm_versions", force: :cascade do |t|
     t.string "title"
@@ -24,7 +53,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_17_194211) do
     t.integer "algorithm_id"
     t.text "target_audience"
     t.virtual "searchable", type: :tsvector, as: "(((setweight(to_tsvector('english'::regconfig, (COALESCE(title, ''::character varying))::text), 'A'::\"char\") || setweight(to_tsvector('english'::regconfig, COALESCE(solves_the_problem, ''::text)), 'B'::\"char\")) || setweight(to_tsvector('english'::regconfig, COALESCE(sources, ''::text)), 'C'::\"char\")) || setweight(to_tsvector('english'::regconfig, COALESCE(additional_information, ''::text)), 'D'::\"char\"))", stored: true
+    t.string "slug"
     t.index ["searchable"], name: "index_algorithm_versions_on_searchable", using: :gin
+    t.index ["slug"], name: "index_algorithm_versions_on_slug", unique: true
   end
 
   create_table "algorithms", force: :cascade do |t|
@@ -36,6 +67,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_17_194211) do
     t.text "source_page_description"
     t.virtual "searchable", type: :tsvector, as: "(setweight(to_tsvector('english'::regconfig, (COALESCE(title, ''::character varying))::text), 'A'::\"char\") || setweight(to_tsvector('english'::regconfig, COALESCE(source_page_description, ''::text)), 'B'::\"char\"))", stored: true
     t.integer "folder_id"
+    t.string "ownerable_type", null: false
+    t.bigint "ownerable_id", null: false
+    t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
+    t.index ["ownerable_type", "ownerable_id"], name: "index_algorithms_on_ownerable"
     t.index ["searchable"], name: "index_algorithms_on_searchable", using: :gin
   end
 
@@ -48,6 +83,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_17_194211) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "article_id"
+    t.string "slug"
+    t.index ["slug"], name: "index_article_versions_on_slug", unique: true
   end
 
   create_table "articles", force: :cascade do |t|
@@ -58,6 +95,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_17_194211) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "folder_id"
+    t.string "ownerable_type", null: false
+    t.bigint "ownerable_id", null: false
+    t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
+    t.index ["ownerable_type", "ownerable_id"], name: "index_articles_on_ownerable"
   end
 
   create_table "class_container_hierarchies", id: false, force: :cascade do |t|
@@ -94,6 +135,12 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_17_194211) do
     t.integer "algorithm_version_id"
   end
 
+  create_table "dashboards", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id"
+  end
+
   create_table "folder_hierarchies", id: false, force: :cascade do |t|
     t.integer "ancestor_id", null: false
     t.integer "descendant_id", null: false
@@ -110,6 +157,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_17_194211) do
     t.integer "parent_id"
     t.integer "user_id"
     t.integer "responsibility_type"
+    t.string "slug"
+    t.index ["slug"], name: "index_folders_on_slug", unique: true
   end
 
   create_table "frameworks", force: :cascade do |t|
@@ -118,6 +167,23 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_17_194211) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "folder_id"
+    t.string "ownerable_type", null: false
+    t.bigint "ownerable_id", null: false
+    t.string "slug"
+    t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
+    t.index ["ownerable_type", "ownerable_id"], name: "index_frameworks_on_ownerable"
+    t.index ["slug"], name: "index_frameworks_on_slug", unique: true
+  end
+
+  create_table "friendly_id_slugs", force: :cascade do |t|
+    t.string "slug", null: false
+    t.integer "sluggable_id", null: false
+    t.string "sluggable_type", limit: 50
+    t.string "scope"
+    t.datetime "created_at"
+    t.index ["slug", "sluggable_type", "scope"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type_and_scope", unique: true
+    t.index ["slug", "sluggable_type"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type"
+    t.index ["sluggable_type", "sluggable_id"], name: "index_friendly_id_slugs_on_sluggable_type_and_sluggable_id"
   end
 
   create_table "improvements", force: :cascade do |t|
@@ -169,7 +235,21 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_17_194211) do
     t.string "instructionable_type"
     t.bigint "instructionable_id"
     t.integer "folder_id"
+    t.string "ownerable_type", null: false
+    t.bigint "ownerable_id", null: false
+    t.string "slug"
+    t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
     t.index ["instructionable_type", "instructionable_id"], name: "index_simple_classes_on_instructionable"
+    t.index ["ownerable_type", "ownerable_id"], name: "index_simple_classes_on_ownerable"
+    t.index ["slug"], name: "index_simple_classes_on_slug", unique: true
+  end
+
+  create_table "step_hierarchies", id: false, force: :cascade do |t|
+    t.integer "ancestor_id", null: false
+    t.integer "descendant_id", null: false
+    t.integer "generations", null: false
+    t.index ["ancestor_id", "descendant_id", "generations"], name: "step_anc_desc_idx", unique: true
+    t.index ["descendant_id"], name: "step_desc_idx"
   end
 
   create_table "steps", force: :cascade do |t|
@@ -177,12 +257,18 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_17_194211) do
     t.text "instruction"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "position"
     t.text "step_finish_check"
     t.text "solves_the_problem"
     t.text "sources"
     t.text "additional_information"
     t.integer "control_structure_id"
+    t.integer "parent_id"
+    t.text "note"
+    t.integer "type"
+    t.string "technologiable_type"
+    t.bigint "technologiable_id"
+    t.integer "position", null: false
+    t.index ["technologiable_type", "technologiable_id"], name: "index_steps_on_technologiable"
   end
 
   create_table "substeps", force: :cascade do |t|
@@ -195,6 +281,37 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_17_194211) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["substepable_type", "substepable_id"], name: "index_substeps_on_substepable"
+  end
+
+  create_table "taggings", force: :cascade do |t|
+    t.integer "tag_id"
+    t.string "taggable_type"
+    t.integer "taggable_id"
+    t.string "tagger_type"
+    t.integer "tagger_id"
+    t.string "context", limit: 128
+    t.datetime "created_at", precision: nil
+    t.string "tenant", limit: 128
+    t.index ["context"], name: "index_taggings_on_context"
+    t.index ["tag_id", "taggable_id", "taggable_type", "context", "tagger_id", "tagger_type"], name: "taggings_idx", unique: true
+    t.index ["tag_id"], name: "index_taggings_on_tag_id"
+    t.index ["taggable_id", "taggable_type", "context"], name: "taggings_taggable_context_idx"
+    t.index ["taggable_id", "taggable_type", "tagger_id", "context"], name: "taggings_idy"
+    t.index ["taggable_id"], name: "index_taggings_on_taggable_id"
+    t.index ["taggable_type", "taggable_id"], name: "index_taggings_on_taggable_type_and_taggable_id"
+    t.index ["taggable_type"], name: "index_taggings_on_taggable_type"
+    t.index ["tagger_id", "tagger_type"], name: "index_taggings_on_tagger_id_and_tagger_type"
+    t.index ["tagger_id"], name: "index_taggings_on_tagger_id"
+    t.index ["tagger_type", "tagger_id"], name: "index_taggings_on_tagger_type_and_tagger_id"
+    t.index ["tenant"], name: "index_taggings_on_tenant"
+  end
+
+  create_table "tags", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "taggings_count", default: 0
+    t.index ["name"], name: "index_tags_on_name", unique: true
   end
 
   create_table "unit_usage_examples", force: :cascade do |t|
@@ -236,7 +353,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_17_194211) do
     t.integer "unit_id"
     t.text "target_audience"
     t.virtual "searchable", type: :tsvector, as: "(((setweight(to_tsvector('english'::regconfig, (COALESCE(title, ''::character varying))::text), 'A'::\"char\") || setweight(to_tsvector('english'::regconfig, COALESCE(instruction, ''::text)), 'B'::\"char\")) || setweight(to_tsvector('english'::regconfig, COALESCE(solves_the_problem, ''::text)), 'C'::\"char\")) || setweight(to_tsvector('english'::regconfig, COALESCE(sources, ''::text)), 'D'::\"char\"))", stored: true
+    t.string "slug"
     t.index ["searchable"], name: "index_unit_versions_on_searchable", using: :gin
+    t.index ["slug"], name: "index_unit_versions_on_slug", unique: true
   end
 
   create_table "units", force: :cascade do |t|
@@ -248,6 +367,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_17_194211) do
     t.text "source_page_description"
     t.virtual "searchable", type: :tsvector, as: "(setweight(to_tsvector('english'::regconfig, (COALESCE(title, ''::character varying))::text), 'A'::\"char\") || setweight(to_tsvector('english'::regconfig, COALESCE(source_page_description, ''::text)), 'B'::\"char\"))", stored: true
     t.integer "folder_id"
+    t.string "ownerable_type", null: false
+    t.bigint "ownerable_id", null: false
+    t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
+    t.index ["ownerable_type", "ownerable_id"], name: "index_units_on_ownerable"
     t.index ["searchable"], name: "index_units_on_searchable", using: :gin
   end
 
@@ -265,10 +388,18 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_17_194211) do
     t.string "uid"
     t.string "avatar_url"
     t.string "provider"
+    t.text "biography"
+    t.boolean "is_email_public"
+    t.text "website"
+    t.text "company"
+    t.text "location"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "taggings", "tags"
   add_foreign_key "unit_version_improvements", "improvements"
   add_foreign_key "unit_version_improvements", "unit_versions"
   add_foreign_key "unit_version_unit_usage_examples", "unit_usage_examples"
