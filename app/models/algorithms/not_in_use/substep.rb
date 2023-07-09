@@ -1,3 +1,4 @@
+# NOT IN USE
 class Algorithms::Substep < ApplicationRecord
 
   belongs_to :step

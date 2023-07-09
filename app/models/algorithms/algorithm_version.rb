@@ -1,4 +1,9 @@
 class Algorithms::AlgorithmVersion < ApplicationRecord
+  include Unitable
+
+  extend FriendlyId
+  friendly_id :slug_candidates, use: [:slugged, :finders, :history]
+
 
   belongs_to :algorithm
 
@@ -9,11 +14,10 @@ class Algorithms::AlgorithmVersion < ApplicationRecord
   # accepts_nested_attributes_for :steps
 
   has_many :substeps, as: :substepable
-  has_many :simple_classes, as: :instructionable, class_name: "SimpleClasses::SimpleClass"
-
 
   validates :control_structures, presence: { message: "Algorithm should have at least 1 step" }
 
+  validates :title, presence: true
 
   include PgSearch::Model
   pg_search_scope :english_global_search,
@@ -31,5 +35,15 @@ class Algorithms::AlgorithmVersion < ApplicationRecord
                       prefix: true
                     }
                   }
+
+  alias_method :whole_unit, :algorithm
+
+  private
+
+  def slug_candidates
+    [ :title,
+      [:title, :id]
+    ]
+  end
 
 end
