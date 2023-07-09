@@ -1,0 +1,68 @@
+<div class="profile-left-bar">
+  <div class="flex-1 py-6 overflow-x-hidden overflow-y-auto" >
+    <div class="flex flex-col flex-wrap px-7 -m-2.5">
+
+      <div class="w-auto p-2.5">
+        <%= link_to user_settings_profile_path(username: current_user.username), class: "flex flex-wrap items-center" do %>
+          <img class="mr-3" src="dashy-assets/images/home-2.svg" alt="" >
+          <p class="text-gray-700 hover:underline inline-flex text font-medium text-black hover:text-blue-600 dark:hover:text-white">Profile settings</p>
+        <% end %>
+      </div>
+
+
+      <div class="w-auto p-2.5">
+        <%= link_to user_settings_account_path(username: current_user.username), class: "flex flex-wrap items-center" do %>
+          <img class="mr-3" src="dashy-assets/images/home-2.svg" alt="" >
+          <p class="text-gray-700 hover:underline inline-flex text font-medium text-black hover:text-blue-600 dark:hover:text-white">Account settings</p>
+        <% end %>
+      </div>
+
+      <div class="w-auto p-2.5">
+        <%= link_to user_settings_account_path(username: current_user.username), class: "flex flex-wrap items-center" do %>
+          <img class="mr-3" src="dashy-assets/images/home-2.svg" alt="" >
+          <p class="text-gray-700 hover:underline inline-flex text font-medium text-black hover:text-blue-600 dark:hover:text-white">Notifications settings</p>
+        <% end %>
+      </div>
+
+      <div class="w-auto p-2.5"><a class="flex flex-wrap items-center mb-3.5" href="#" ><img class="mr-3" src="dashy-assets/images/gear.svg" alt="" >
+        <p class="hover:text-neutral-700 font-medium">People &amp; Settings</p></a>
+        <div class="ml-8">
+          <div class="flex flex-wrap -m-1">
+            <div class="w-auto p-1"><a class="font-medium text-neutral-500 hover:text-neutral-600" href="#" >
+              Help with
+              Sketch</a></div>
+            <div class="w-auto p-1"><a class="font-medium text-neutral-500 hover:text-neutral-600" href="#" >
+              All
+              Documents</a></div>
+            <div class="w-auto p-1"><a class="font-medium text-neutral-500 hover:text-neutral-600" href="#" >
+              Shared with
+              Me</a></div>
+            <div class="w-auto p-1"><a class="font-medium text-neutral-500 hover:text-neutral-600" href="#" >Libraries</a></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="w-auto p-2.5">
+        <%= link_to user_settings_account_path(username: current_user.username), class: "flex flex-wrap items-center" do %>
+          <img class="mr-3" src="dashy-assets/images/home-2.svg" alt="" >
+          <p class="text-gray-700 hover:underline inline-flex text font-medium text-black hover:text-blue-600 dark:hover:text-white">Notifications settings</p>
+        <% end %>
+      </div>
+
+      <div class="w-auto p-2.5">
+        <%= link_to user_settings_account_path(username: current_user.username), class: "flex flex-wrap items-center" do %>
+          <img class="mr-3" src="dashy-assets/images/home-2.svg" alt="" >
+          <p class="text-gray-700 hover:underline inline-flex text font-medium text-black hover:text-blue-600 dark:hover:text-white">Notifications settings</p>
+        <% end %>
+      </div>
+
+      <div class="w-auto p-2.5">
+        <%= link_to user_settings_account_path(username: current_user.username), class: "flex flex-wrap items-center" do %>
+          <img class="mr-3" src="dashy-assets/images/home-2.svg" alt="" >
+          <p class="text-gray-700 hover:underline inline-flex text font-medium text-black hover:text-blue-600 dark:hover:text-white">Notifications settings</p>
+        <% end %>
+      </div>
+
+    </div>
+  </div>
+</div>

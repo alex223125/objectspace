@@ -1,0 +1,14 @@
+<!-- Two columns -->
+<div class="flex mb-4">
+  <div class="w-1/5 h-12">
+    <!--left side menu-->
+    <%= render "users/user_settings/shared/left_bar" %>
+  </div>
+  <div class="w-3/5">
+    <% if settings_type == "profile"%>
+      <%= render "users/user_settings/profile_partials/right_bar" %>
+    <% elsif settings_type == "account"%>
+      <%= render "users/user_settings/account_partials/right_bar" %>
+    <% end %>
+  </div>
+</div>

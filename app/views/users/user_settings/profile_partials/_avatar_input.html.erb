@@ -1,0 +1,119 @@
+<style>
+
+    img {
+        display: block;
+        max-width: 100%;
+    }
+
+    .preview {
+        overflow: hidden;
+        width: 160px;
+        height: 160px;
+        margin: 10px;
+        border: 1px solid red;
+    }
+
+</style>
+
+<div data-controller="users_avatar_input">
+  <div class="col-span-6 sm:col-span-3"  data-target="users_avatar_input.inputInstance">
+    <% if @user.cropped_avatar.present? %>
+      <%= f.label "Current avatar", class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+      <div class="col-sm-4">
+          <%= image_tag settings_edit_user_avatar(@user), class: "rounded-full" %>
+      </div>
+    <% end %>
+    <br>
+
+    <%= f.label "New Avatar", class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+    <div class="col-sm-4">
+      <img src="" id="croppedImgPreview" data-target="users_avatar_input.croppedImagePreview"
+           style="disaply:none;" class="rounded-full"/>
+    </div>
+    <br>
+    <%= f.hint 'Use this file input to set new profile picture (Avatar)',
+               class: "mt-2 text-sm text-gray-500" %>
+    <%= f.file_field :avatar,
+                     required: false,
+                     data: {target: "users_avatar_input.avatarInput", action: "input->users_avatar_input#handleFileInputChange"},
+                     class: "block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" %>
+  </div>
+
+  <div style="display:none;">
+    <%= f.label :cropped_image_result, "Cropped image result" %>
+    <%= f.input_field :cropped_image_result, :class => "form-control", data: {target: "users_avatar_input.croppedImageResult"} %>
+  </div>
+
+  <!-- MODAL MODAL MODAL MODAL -->
+  <!-- Modal toggle -->
+  <button
+    data-modal-toggle="avatarCroppingModal"
+    data-target="users_avatar_input.croppingModalButton modal.avatarCroppingModal"
+    id="modal-cropping-button"
+    style="display:none;"
+    class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+    Toggle modal
+  </button>
+
+  <!-- Main modal -->
+  <div id="avatarCroppingModal" tabindex="-1"
+       data-modal-backdrop="static"
+       data-target="users_avatar_input.croppingModalPopup"
+       aria-hidden="true"
+       class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative w-full max-w-2xl max-h-full">
+
+      <!-- Modal content -->
+      <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+
+        <!-- Modal header -->
+        <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+            Crop your new profile picture
+          </h3>
+          <button type="button"
+                  data-action="click->users_avatar_input#handleModalClose"
+                  data-target="users_avatar_input.closeModalUpperButton"
+                  class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                  data-modal-hide="avatarCroppingModal">
+            <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+            <span class="sr-only">Close modal</span>
+          </button>
+        </div>
+
+
+        <!-- Modal body -->
+        <div class="img-container">
+          <div class="row">
+            <div class="col-md-8">
+              <img id="modal-image"
+                   data-target="users_avatar_input.modalImage"
+                   src="https://avatars0.githubusercontent.com/u/3456749">
+            </div>
+            <div class="col-md-4">
+              <div class="preview"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+          <button data-modal-hide="avatarCroppingModal"
+                  type="button"
+                  data-target="users_avatar_input.closeModalButton"
+                  data-action="click->users_avatar_input#handleModalClose"
+                  class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+            Cancel
+          </button>
+          <button data-action="click->users_avatar_input#crop"
+                  type="button"
+                  class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
+            Save new profile picture
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- MODAL MODAL MODAL MODAL -->
+
+</div>

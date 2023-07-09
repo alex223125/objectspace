@@ -1,0 +1,41 @@
+<%= simple_form_for(@user, url: users_user_setting_path(@user), method: :patch) do |f| %>
+
+  <% if @user.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+      <h2><%= pluralize(@user.errors.count, "error") %> prohibited this improvement from being saved:</h2>
+
+      <ul>
+        <% @user.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-inputs">
+
+    <div class="col-span-6 sm:col-span-3">
+      <%= f.label "Your Username", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.hint 'Thats the description which will be shown on the top of the source page',
+                 class: "mt-2 text-sm text-gray-500" %>
+      <%= f.input_field :username,
+                        required: false,
+                        class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
+                        placeholder: "Ex: Different versions on how you can install Ruby on Rails on different environments" %>
+    </div>
+    <br>
+
+    <%= hidden_field_tag 'settings_type', "account_settings"  %>
+
+  </div>
+  <br>
+
+  <div class="bg-gray-50 px-4 py-3 sm:px-6">
+    <div class="text-end">
+      <%= f.button :submit, "Update account", class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+    </div>
+  </div>
+
+
+<% end %>
+

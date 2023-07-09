@@ -1,0 +1,113 @@
+<%= simple_form_for(@user, url: users_user_setting_path(@user), method: :patch) do |f| %>
+
+  <% if @user.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+      <h2><%= pluralize(@user.errors.count, "error") %> prohibited this improvement from being saved:</h2>
+
+      <ul>
+        <% @user.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-inputs">
+    <div class="col-span-6 sm:col-span-3">
+      <%= f.label "Yor name", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.hint 'What this method does? What this method changes, modifies? What task this method performs? This title should unite all version of instruction', class: "mt-2 text-sm text-gray-500" %>
+      <%= f.input_field :name,
+                        required: false,
+                        class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
+                        placeholder: "Ex: How to install Ruby on Rails on your Desktop" %>
+    </div>
+    <br>
+
+    <div class="col-span-6 sm:col-span-3">
+      <%= f.label "Your Username", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.hint 'Thats the description which will be shown on the top of the source page',
+                 class: "mt-2 text-sm text-gray-500" %>
+      <%= f.input_field :username,
+                        required: false,
+                        class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
+                        placeholder: "Ex: Different versions on how you can install Ruby on Rails on different environments" %>
+    </div>
+    <br>
+
+    <div class="col-span-6 sm:col-span-3">
+      <%= f.label "Biography", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.hint "It is recommended to use no more than 5 tags. The maximum number is 8. Tags are separated by a comma.",
+                 class: "mt-2 text-sm text-gray-500" %>
+      <%= f.input_field :biography,
+                        required: false,
+                        class: "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5",
+                        placeholder: "Write few words about yourself"%>
+    </div>
+    <br>
+
+    <div class="col-span-6 sm:col-span-3">
+      <%= f.label "Website", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.hint 'Thats the description which will be shown on the top of the source page',
+                 class: "mt-2 text-sm text-gray-500" %>
+      <%= f.input_field :website,
+                        required: false,
+                        class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
+                        placeholder: "Ex: Different versions on how you can install Ruby on Rails on different environments" %>
+    </div>
+    <br>
+
+    <div class="col-span-6 sm:col-span-3">
+      <%= f.label "Company", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.hint 'Thats the description which will be shown on the top of the source page',
+                 class: "mt-2 text-sm text-gray-500" %>
+      <%= f.input_field :company,
+                        required: false,
+                        class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
+                        placeholder: "Ex: Different versions on how you can install Ruby on Rails on different environments" %>
+    </div>
+    <br>
+
+    <div class="col-span-6 sm:col-span-3">
+      <%= f.label "Location", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.hint 'Thats the description which will be shown on the top of the source page',
+                 class: "mt-2 text-sm text-gray-500" %>
+      <%= f.input_field :location,
+                        required: false,
+                        class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
+                        placeholder: "Ex: Different versions on how you can install Ruby on Rails on different environments" %>
+    </div>
+    <br>
+
+    <%= render "users/user_settings/profile_partials/avatar_input", f: f %>
+    <br>
+
+
+    <div class="col-span-6 sm:col-span-3">
+      <%= f.label "Display email to public?", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.hint "If this options set to 'yes' your email will be displayed to other users",
+                 class: "mt-2 text-sm text-gray-500" %>
+      <%= f.collection_radio_buttons :is_email_public, [[true, 'Yes'], [false, 'No']], :first, :last do |b| %>
+        <div class="flex items-center mb-4">
+          <% binding.pry %>
+          <%= b.radio_button(class: "w-4 h-4 border-gray-300 focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-600 dark:focus:bg-blue-600 dark:bg-gray-700 dark:border-gray-600") %>
+          <%= b.label(class: "block ml-2 text-sm font-medium text-gray-900 dark:text-gray-300") %>
+        </div>
+      <% end %>
+
+    </div>
+    <br>
+
+    <%= hidden_field_tag 'settings_type', "profile_settings"  %>
+
+  </div>
+  <br>
+
+  <div class="bg-gray-50 px-4 py-3 sm:px-6">
+    <div class="text-end">
+      <%= f.button :submit, "Update profile", class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+    </div>
+  </div>
+
+
+<% end %>
+
