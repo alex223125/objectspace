@@ -4,6 +4,14 @@ class ApplicationController < ActionController::Base
 
   include RecursiveParametersBuilder
 
+  before_action :configure_active_storage, if: -> { Rails.env.development? }
+
+  def configure_active_storage
+    # ActiveStorage::Current.host = request.base_url
+    # ActiveStorage::Current.url_options = "http://127.0.0.1:3000/"
+    ActiveStorage::Current.url_options = request.base_url
+  end
+
   private
 
   # for container and interface groups
