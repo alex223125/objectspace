@@ -1,7 +1,16 @@
 class SimpleClasses::SimpleClass < ApplicationRecord
 
-  searchkick callbacks: :async, text_middle: [:title, :description]
+  extend FriendlyId
+  friendly_id :slug_candidates, use: [:slugged, :finders, :history]
 
+  extend Pagy::Searchkick
+  searchkick callbacks: :async,
+             text_middle: [:title, :description],
+             word: [:list_of_tags, :ownerable_id]
+  scope :search_import, -> { includes(:tags) }
+  acts_as_taggable_on :tags
+
+  belongs_to :ownerable, polymorphic: true
 
   belongs_to :folder, class_name: "Folder"
   # has_many :folders, class_name: "SimpleObjects::Folder", dependent: :destroy
@@ -31,6 +40,27 @@ class SimpleClasses::SimpleClass < ApplicationRecord
 
   def root_interface_group
     self.interface_groups.where(parent_id: nil).first
+  end
+
+  def owner
+    self.ownerable
+  end
+
+  def search_data
+    {
+      title: title,
+      description: description,
+      list_of_tags: tag_list,
+      ownerable_id: ownerable_id
+    }
+  end
+
+  private
+
+  def slug_candidates
+    [ :title,
+      [:title, :id]
+    ]
   end
 
 end
