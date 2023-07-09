@@ -30,4 +30,17 @@
 # available at https://guides.rubyonrails.org/i18n.html.
 
 en:
-  hello: "Hello world"
+  activerecord:
+    errors:
+      messages:
+        format: '%{attribute}: %{message}'
+#        invalid: 'record is invalid %{errors}'
+#        invalid: 'record is invalid %{errors}'
+  errors:
+    format: '%{attribute}: %{message}'
+    messages:
+      blank: 'attribute is blank'
+      email_invalid: "Email is invalid, please use another email"
+      username_invalid: "One or more conditions for username has failed"
+      too_much_steps: "Too much steps, maximum allowed amount is %{amount}"
+
