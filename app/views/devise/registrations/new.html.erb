@@ -54,6 +54,8 @@
 
           <div class="flex flex-col my-4">
             <label for="username" class="text-gray-700">User name</label>
+            <%= f.hint 'A username allows capital and lowercase English letters, digits, should contain at least 1 character. Can not start or end with hypen or underscore. Consecutively there can be only 1 hyphen or underscore.',
+                       class: "mt-2 text-sm text-gray-500" %>
             <%= f.input_field :username,
                               required: true,
                               placeholder: "Enter your Username",
@@ -112,6 +114,15 @@
               </button>
             </div>
           </div>
+
+          <div class="flex flex-col my-4">
+            <label for="avatar" class="text-gray-700">Avatar</label>
+            <%= f.file_field :avatar,
+                              required: true,
+                              placeholder: "Enter your First and Second name",
+                              class: "mt-2 p-2 border border-gray-300 focus:outline-none focus:ring-0 focus:border-gray-300 rounded text-sm text-gray-900" %>
+          </div>
+
 
           <div class="flex items-center">
             <%= f.input_field :tos_agreement,
