@@ -1,14 +1,60 @@
 class Articles::Article < ApplicationRecord
 
-  searchkick callbacks: :async, text_middle: [:title, :source_page_description]
+  extend Pagy::Searchkick
+
+  acts_as_taggable_on :tags
+
+  searchkick callbacks: :async,
+             text_middle: [:title, :source_page_description],
+             word: [:list_of_tags, :ownerable_id]
+  scope :search_import, -> { includes(:tags) }
+
+
 
   belongs_to :folder, class_name: "Folder"
+
+  belongs_to :ownerable, polymorphic: true
 
   has_many :article_versions, class_name: "Articles::ArticleVersion", dependent: :destroy
   accepts_nested_attributes_for :article_versions
 
+  validates :title, presence: true, allow_blank: false
+
   def default_version
     Articles::ArticleVersion.find_by(id: self.default_version_id)
   end
+
+
+  def search_data
+    {
+      title: title,
+      source_page_description: source_page_description,
+      list_of_tags: tag_list,
+      ownerable_id: ownerable_id
+    }
+  end
+
+  # def search_data
+  #   {
+  #     ##XXXXXXXX  why cant i use this XXXXXXXXX
+  #     ###active: true,
+  #     name: name, index: "not_analyzed",
+  #     capacity: capacity.to_i,
+  #     slug: slug,
+  #     ### i need to add active to so that i can use where(:active => true) in search
+  #     active: active,
+  #     event_type_name: event_types.map(&:name),
+  #     facility_name: facilities.map(&:name),
+  #     ratings: ratings.map(&:stars),
+  #     location: [self.address.latitude, self.address.longitude],
+  #     picture_url: pictures.select{|p| p == pictures.last}.map do |i|{
+  #
+  #       original:  i.original_url
+  #
+  #     }
+  #     end
+  #   }
+  # end
+
 
 end
