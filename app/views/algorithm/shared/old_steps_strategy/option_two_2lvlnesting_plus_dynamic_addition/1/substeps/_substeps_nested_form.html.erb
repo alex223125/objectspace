@@ -1,0 +1,92 @@
+<div class="nodraggablesteps">
+  <div class="col-span-6 sm:col-span-3">
+    <p class="text-xl font-bold hover:text-gray-700">Substeps: (2222)</p>
+    <p class="mt-2 text-sm text-gray-500">SubSteps will go right after instruction if it's provided. SubSteps are designed to use Algorithms and Units as reusable instructions. Click on substep and move up or down to change position in the substeps list.</p>
+    <%#= link_to "Add new usage example", units_path, class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+  </div>
+  <br>
+  <br>
+
+<!--  <div data-controller="substeps_drag" data-drag-url="/todos/:id/move">-->
+<!--  <div data-controller="substeps_drag remote_select_instruction"-->
+  <div data-controller="remote_select_instruction algorithm_step_type_select steps_nested_form"
+       data-drag-url="/todos/:id/move"
+       data-target="remote_select_instruction.substepsArea"
+       data-remote_select_instruction-select-type-value="substep_addition"
+  >
+
+      <!--    // Temlate 1 regular step-->
+      <template data-target='steps_nested_form.regularStepFieldsTemplate'>
+        <%= form.fields_for :substeps, Algorithms::Step.new, child_index: 'SUBSTEP' do |step| %>
+          <% binding.pry %>
+          <%# step.options[:child_index] = 'TEMPLATE_RECORD' %>
+          <%= render "algorithm/shared/partials/substeps/regular_substep_fields", :f => step %>
+        <% end %>
+      </template>
+
+      <!--    // Temlate 2 wrapper step-->
+      <template data-target='steps_nested_form.wrapperStepFieldsTemplate'>
+        <%= form.fields_for :substeps, Algorithms::Step.new, child_index: 'SUBSTEP' do |step| %>
+          <% binding.pry %>
+          <%# step.options[:child_index] = 'TEMPLATE_RECORD' %>
+          <%= render "algorithm/shared/partials/substeps/wrapper_substep_fields", :f => step %>
+        <% end %>
+      </template>
+
+<!--    <div data-target="substeps_drag.substepsArea">-->
+<!--      data-target="substeps_drag.substepsArea"-->
+
+      <div data-controller="substeps_drag" data-target="substeps_drag.substepsArea">
+        <%#= form.fields_for :steps, algorithm_version.steps.order(position: :asc) do |t| %>
+        <%= form.fields_for :substeps do |step| %>
+          <% if Steps::TypeTypes[step.object[:type]] == "regular" %>
+            <%= render "algorithm/shared/partials/substeps/regular_substep_fields", :f => step %>
+          <% else %>
+            <%= render "algorithm/shared/partials/substeps/wrapper_substep_fields", :f => step %>
+          <% end %>
+        <% end %>
+
+
+        <div data-target="steps_nested_form.add_item">
+
+          <button data-action="click->steps_nested_form#add_association"
+                  data-step-type="regular_step"
+                  data-child-index-keyword="SUBSTEP"
+                  data-target="algorithm_step_type_select.addRegularStepOriginalButton"
+                  class="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800"
+                  type="button"
+                  style="display:none;"
+          >
+        <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+          + Add new Step
+        </span>
+          </button>
+
+          <button data-action="click->steps_nested_form#add_association"
+                  data-step-type="wrapper_step"
+                  data-child-index-keyword="SUBSTEP"
+                  data-target="algorithm_step_type_select.addWrapperStepOriginalButton"
+                  class="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800"
+                  type="button"
+                  style="display:none;"
+          >
+        <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+          + Add new Step
+        </span>
+          </button>
+        </div>
+
+      </div>
+
+      <%= render "algorithm/shared/partials/shared/step_type_select_modal" %>
+
+
+
+<!--    №№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№-->
+  <!--    TODO: СДЕЛАТЬ КНОПКУ ИЗ ДАННОЙ МОДАЛКИ В ВИДЕ ХИДДЕН КОНПКИ КОТОРАЯ БУДЕТ НАЖИМАТЬСЯ ПОСЛЕ ВЫБОРА В ПОПАПЕ ВРАППЕР ВИДА ШАГА-->
+    <%#= render "shared/technologies_search/modal", :form => form, :type => "substep_addition" %>
+<!--    №№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№-->
+
+  </div>
+
+</div>

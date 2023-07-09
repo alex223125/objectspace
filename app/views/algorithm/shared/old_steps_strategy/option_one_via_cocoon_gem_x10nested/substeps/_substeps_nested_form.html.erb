@@ -1,0 +1,69 @@
+<div class="nodraggablesteps">
+  <div class="col-span-6 sm:col-span-3">
+    <p class="text-xl font-bold hover:text-gray-700">Substeps:</p>
+    <p class="mt-2 text-sm text-gray-500">SubSteps will go right after instruction if it's provided. SubSteps are designed to use Algorithms and Units as reusable instructions. Click on substep and move up or down to change position in the substeps list.</p>
+    <%#= link_to "Add new usage example", units_path, class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+  </div>
+  <br>
+  <br>
+
+<!--  <div data-controller="substeps_drag" data-drag-url="/todos/:id/move">-->
+<!--  <div data-controller="substeps_drag remote_select_instruction"-->
+  <div data-controller="remote_select_instruction algorithm_step_type_select"
+       data-drag-url="/todos/:id/move"
+       data-target="remote_select_instruction.substepsArea"
+       data-remote_select_instruction-select-type-value="substep_addition"
+  >
+
+<!--    <div data-target="substeps_drag.substepsArea">-->
+<!--      data-target="substeps_drag.substepsArea"-->
+
+      <div data-controller="substeps_drag" data-target="substeps_drag.substepsArea">
+        <%#= form.fields_for :steps, algorithm_version.steps.order(position: :asc) do |t| %>
+        <%= form.fields_for :substeps do |t| %>
+
+          <%= render "algorithm/shared/partials/substeps/regular_substep_fields", :f => t %>
+
+          <%= render "algorithm/shared/partials/substeps/wrapper_substep_fields", :f => t %>
+
+        <% end %>
+
+
+        <!--      <div data-controller="algorithm_step_type_select">-->
+
+        <!--    Option 1.Regular step-->
+        <div>
+          <%= link_to_add_association "Add Step (regular)", form,
+                                      :substeps,
+                                      style: "display:none;",
+                                      partial: 'algorithm/shared/partials/substeps/regular_substep_fields',
+                                      class: "nodraggablesteps nodraggablesubsteps  inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2",
+                                      data: {target: "algorithm_step_type_select.addRegularStepOriginalButton"}
+          %>
+        </div>
+
+        <!--    Option 2.Wrapper step-->
+        <div>
+          <%= link_to_add_association "Add Step (wrapper)", form,
+                                      :substeps,
+                                      style: "display:none;",
+                                      partial: 'algorithm/shared/partials/substeps/wrapper_substep_fields',
+                                      class: "nodraggablesteps inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2",
+                                      data: {target: "algorithm_step_type_select.addWrapperStepOriginalButton"}
+          %>
+        </div>
+
+      </div>
+
+      <%= render "algorithm/shared/partials/shared/step_type_select_modal" %>
+
+
+
+<!--    №№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№-->
+  <!--    TODO: СДЕЛАТЬ КНОПКУ ИЗ ДАННОЙ МОДАЛКИ В ВИДЕ ХИДДЕН КОНПКИ КОТОРАЯ БУДЕТ НАЖИМАТЬСЯ ПОСЛЕ ВЫБОРА В ПОПАПЕ ВРАППЕР ВИДА ШАГА-->
+    <%#= render "shared/technologies_search/modal", :form => form, :type => "substep_addition" %>
+<!--    №№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№-->
+
+  </div>
+
+</div>

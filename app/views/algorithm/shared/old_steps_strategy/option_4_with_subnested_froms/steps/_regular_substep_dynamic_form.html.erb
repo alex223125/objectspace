@@ -1,0 +1,9 @@
+<div data-controller="dynamic_step_form"
+     data-target="dynamic_step_form.dynamicStepForm">
+
+  <%= form.simple_fields_for(:substeps, Algorithms::Step.new) do |step| %>
+    <%# step.options[:child_index] = Time.now.strftime("%I%M%S") %>
+    <%= render "algorithm/shared/partials/steps/regular_step_fields", :f => step %>
+  <% end %>
+
+</div>

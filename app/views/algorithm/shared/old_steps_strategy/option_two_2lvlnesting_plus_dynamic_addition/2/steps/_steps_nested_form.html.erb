@@ -1,0 +1,125 @@
+<hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+
+<!--<h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight text-center">Steps</h2>-->
+
+<div class="col-span-6 sm:col-span-3">
+  <p class="text-xl font-bold hover:text-gray-700">Steps:</p>
+  <p class="mt-2 text-sm text-gray-500">Here you can add examples how to use the method on practice with different cases
+    and scenarios. Click on substep and move up or down to change position in the substeps list.</p>
+  <%#= link_to "Add new usage example", units_path, class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+</div>
+<br>
+
+<!--<h1>Tasks</h1>-->
+<!--<div data-controller="nested-form">-->
+<!--  <template data-target='nested-form.template'>-->
+<%#= form.fields_for :tasks, Task.new, child_index: 'TEMPLATE_RECORD' do |task| %>
+<%#= render 'task_fields', form: task %>
+<%# end %>
+<!--  </template>-->
+
+<%#= form.fields_for :tasks do |task| %>
+<%#= render 'task_fields', form: task %>
+<%# end %>
+
+<!--  <div data-target="nested-form.add_item">-->
+<%#= link_to "Add Task", "#", data: { action: "nested-form#add_association" } %>
+<!--  </div>-->
+<!--</div>-->
+
+<div>
+
+  <div data-controller="steps_drag remote_select_instruction algorithm_step_type_select steps_nested_form"
+       data-drag-url="/todos/:id/move"
+       data-target="remote_select_instruction.stepsArea steps_drag.stepsArea"
+       data-remote_select_instruction-select-type-value="wrapper_step_addition"
+  >
+
+    <!--    // Temlate 1 regular step-->
+    <template data-target='steps_nested_form.regularStepFieldsTemplate' class="step-fields-template">
+      <%= form.fields_for :steps, Algorithms::Step.new, child_index: 'TEMPLATE_RECORD' do |step| %>
+        <%= render "algorithm/shared/partials/steps/regular_step_fields", :f => step %>
+      <% end %>
+    </template>
+
+    <!--    // Temlate 2 wrapper step-->
+    <template data-target='steps_nested_form.wrapperStepFieldsTemplate' class="step-fields-template">
+      <%= form.fields_for :steps, Algorithms::Step.new, child_index: 'TEMPLATE_RECORD' do |step| %>
+        <%= render "algorithm/shared/partials/steps/wrapper_step_fields", :f => step %>
+      <% end %>
+    </template>
+
+    <%= form.fields_for :steps do |step| %>
+      <% binding.pry %>
+      <% if Steps::TypeTypes[step.object[:type]] == "regular" %>
+        <%= render "algorithm/shared/partials/steps/regular_step_fields", :f => step %>
+      <% else %>
+        <%= render "algorithm/shared/partials/steps/wrapper_step_fields", :f => step %>
+      <% end %>
+    <% end %>
+
+
+    <%#= form.fields_for :steps do |t| %>
+    <%#= render "algorithm/shared/partials/steps/regular_step_fields", :f => t %>
+
+    <%#= render "algorithm/shared/partials/steps/wrapper_step_fields", :f => t %>
+    <%# end %>
+
+    <div data-target="steps_nested_form.add_item">
+
+      <button data-action="click->steps_nested_form#add_association"
+              data-step-type="regular_step"
+              data-child-index-keyword="TEMPLATE_RECORD"
+              data-target="algorithm_step_type_select.addRegularStepOriginalButton"
+              class="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800"
+              type="button"
+              style="display:none;"
+      >
+        <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+          + Add new Step
+        </span>
+      </button>
+
+      <button data-action="click->steps_nested_form#add_association"
+              data-step-type="wrapper_step"
+              data-child-index-keyword="TEMPLATE_RECORD"
+              data-target="algorithm_step_type_select.addWrapperStepOriginalButton"
+              class="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800"
+              type="button"
+              style="display:none;"
+      >
+        <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+          + Add new Step
+        </span>
+      </button>
+    </div>
+
+    <!--    <div data-controller="algorithm_step_type_select">-->
+
+    <!--    Option 1.Regular step-->
+
+    <!--    Option 2.Wrapper step-->
+
+
+    <%= render "algorithm/shared/partials/shared/step_type_select_modal" %>
+
+
+    <%#= render "shared/technologies_search/modal", :form => form, :type => "wrapper_step_addition" %>
+
+
+  </div>
+
+  <!--  <div data-controller="sortable" data-sortable-url="/recipes/:recipe_id/steps/:id/step_position">-->
+  <%#= f.fields_for :steps, @recipe.steps.order(position: :asc) do |step| %>
+  <!--      <div data-id="<%#= step.object.id %>">-->
+  <%#= step.text_area :description %>
+  <!--      </div>-->
+  <%# end %>
+  <!--  </div>-->
+
+
+</div>
+
+<hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+
+

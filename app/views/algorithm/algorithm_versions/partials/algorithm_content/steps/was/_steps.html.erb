@@ -89,7 +89,7 @@
             <% end %>
 
             <div class="step-instruction">
-              <%= step.instruction.html_safe %>
+              <%= step.try(:instruction).try(:html_safe) %>
             </div>
 
             <% if step.sources.present? %>

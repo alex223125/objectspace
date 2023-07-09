@@ -14,7 +14,7 @@
     <div class="p-5 border border-b-0 border-gray-200 dark:border-gray-700 dark:bg-gray-900">
 
       <div class="break-words">
-        <%= step.instruction.html_safe %>
+        <%= step.try(:instruction).try(:html_safe) %>
       </div>
       <!--        test content-->
       <!--        <p class="mb-2 text-gray-500 dark:text-gray-400">Flowbite is an open-source library of interactive components built on top of Tailwind CSS including buttons, dropdowns, modals, navbars, and more.</p>-->
@@ -22,7 +22,7 @@
       <!--        <p class="mb-4 text-gray-500 dark:text-gray-400">What are the differences between Flowbite and Tailwind UI?</p>-->
 
 
-      <%= render "algorithm/algorithm_versions/partials/algorithm_content/steps/substeps", step: step %>
+      <%#= render "algorithm/algorithm_versions/partials/algorithm_content/steps/substeps", step: step %>
 
 
     </div>

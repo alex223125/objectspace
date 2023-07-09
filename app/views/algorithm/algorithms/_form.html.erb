@@ -1,6 +1,7 @@
 <%= simple_form_for(@algorithm, url: algorithm_algorithms_path) do |f| %>
 
 
+  <% binding.pry %>
   <% if @algorithm.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
       <h2><%= pluralize(@algorithm.errors.count, "error") %> prohibited this Algorithm from being saved:</h2>
@@ -36,6 +37,20 @@
     </div>
     <br>
 
+    <div class="col-span-6 sm:col-span-3" data-controller="tags">
+      <%= f.label "Tags", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.hint "It is recommended to use no more than 5 tags. The maximum number is 8. Tags are separated by a comma.",
+                 class: "mt-2 text-sm text-gray-500" %>
+      <%= f.input_field :tag_list,
+                        required: false,
+                        class: "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5",
+                        placeholder: "write some tags",
+                        data: {target: "tags.output"}%>
+    </div>
+    <br>
+
+    <%= hidden_field_tag 'target_folder', @target_folder.id  %>
+
 <!--    <div class="col-span-6 sm:col-span-3" data-controller="unit_instruction_tinymce">-->
       <%#= f.label "Description", class: "block text-sm font-medium text-gray-700" %>
       <%#= f.hint 'Describe algorithm', class: "mt-2 text-sm text-gray-500" %>
@@ -43,17 +58,16 @@
 <!--    </div>-->
 <!--    <br>-->
 
-    <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Algorithm version fields</h2>
-    <%= render "algorithm/shared/partials/algorithm_version/algorithm_version_nested_form", :form => f %>
-
-
-
   </div>
+
+  <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Algorithm version fields</h2>
+  <%= render "algorithm/shared/partials/algorithm_version/algorithm_version_nested_form", :form => f %>
 
   <div class="bg-gray-50 px-4 py-3 sm:px-6">
     <div class="text-end">
       <%= link_to "Back to dashboard", algorithm_algorithms_path, class: "py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" %>
-      <%= f.button :submit, "Create algorithm", class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+      <%= f.button :submit, "Create algorithm",
+                   class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
     </div>
   </div>
 

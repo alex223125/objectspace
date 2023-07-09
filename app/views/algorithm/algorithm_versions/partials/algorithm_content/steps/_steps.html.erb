@@ -5,8 +5,10 @@
     <p class="text-xl font-bold hover:text-gray-700">Steps:</p>
   </div>
 
-  <% algorithm_version.control_structures.first.steps.each do |step| %>
-    <%= render "algorithm/algorithm_versions/partials/algorithm_content/steps/step", step: step %>
+  <% if algorithm_version.control_structures.present? %>
+    <% algorithm_version.control_structures.first.steps.each do |step| %>
+      <%= render "algorithm/algorithm_versions/partials/algorithm_content/steps/step", step: step %>
+    <% end %>
   <% end %>
 </div>
 <br>
