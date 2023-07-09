@@ -1,5 +1,9 @@
 class Framework::FrameworksController < ApplicationController
+  include Folderable
+  include TechBreadcrumbable
+
   before_action :set_framework, only: %i[ show edit update destroy preview]
+  before_action :set_target_folder, only: %i[ new create ]
 
   # GET /frameworks or /frameworks.json
   def index
@@ -8,6 +12,7 @@ class Framework::FrameworksController < ApplicationController
 
   # GET /frameworks/1 or /frameworks/1.json
   def show
+    technology_breadcrumbs(@framework)
   end
 
   def preview
@@ -37,7 +42,7 @@ class Framework::FrameworksController < ApplicationController
   def create
     # @framework = Frameworks::Framework.new(framework_params)
     binding.pry
-    service = Services::Frameworks::Frameworks::Create.new(framework_params)
+    service = Services::Frameworks::Frameworks::Create.new(framework_params, @target_folder, current_user)
 
     binding.pry
     service.call
@@ -45,7 +50,8 @@ class Framework::FrameworksController < ApplicationController
     binding.pry
     respond_to do |format|
       if service.errors.blank?
-        format.html { redirect_to framework_frameworks_path(service.framework), notice: "Framework was successfully created." }
+        format.html { redirect_to framework_path(username: service.framework.ownerable.ownername, id: service.framework.slug),
+                                  notice: "Framework was successfully created." }
         format.json { render :show, status: :created, location: service.framework }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -80,13 +86,23 @@ class Framework::FrameworksController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_framework
-      @framework = Frameworks::Framework.find(params[:id])
+      @framework = Frameworks::Framework.friendly.find(params[:id])
+
+      # If an old id or a numeric id was used to find the record, then
+      # the request path will not match the post_path, and we should do
+      # a 301 redirect that uses the current friendly id.
+      request_slug = params[:id]
+      if request_slug != @framework.slug
+        return redirect_to framework_path(username: @framework.owner.ownername,
+                                             id: @framework.slug),
+                           :status => :moved_permanently
+      end
     end
 
     # Only allow a list of trusted parameters through.
     def framework_params
       params.require(:frameworks_framework).permit(
-        :title, :description,
+        :title, :description, :tag_list,
         interface_groups_attributes, class_containers_attributes
       )
     end
