@@ -1,5 +1,4 @@
-<div class="pt-8 pb-16 lg:pt-16 lg:pb-24 bg-white dark:bg-gray-900">
-
+<div class="framework-tabs">
   <div class="mb-4 border-b border-gray-200 dark:border-gray-700">
     <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="myTab" data-tabs-toggle="#myTabContent" role="tablist">
       <li class="mr-2" role="presentation">
@@ -31,7 +30,8 @@
     <!--        <div class="max-w-4xl hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="method" role="tabpanel" aria-labelledby="method-tab">-->
     <div class="hidden p-4 rounded-lg h-full" id="class" role="tabpanel" aria-labelledby="class-tab">
       <!--        <p class="text-sm text-gray-500 dark:text-gray-400">This is some placeholder content the <strong class="font-medium text-gray-800 dark:text-white">Profile tab's associated content</strong>. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling.</p>-->
-      <%= render "simple_class/simple_classes/partials/content/main_page", framework: @framework %>
+      <%= render "framework/frameworks/partials/content/bars/middle_bar", framework: @framework %>
+
     </div>
 
     <!--      <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="improvements" role="tabpanel" aria-labelledby="improvements-tab">-->
@@ -53,5 +53,4 @@
       444
     </div>
   </div>
-
 </div>
