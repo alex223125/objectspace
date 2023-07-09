@@ -19,8 +19,8 @@ class EmailValidator < ActiveModel::Validator
       return
     else
       binding.pry
-      record.errors[:email] << I18n.t('errors.messages.invalid')
-      raise ActiveRecord::Rollback
+      record.errors.add(:email, I18n.t('errors.messages.email_invalid'))
+      # raise ActiveRecord::Rollback
     end
   end
 end
