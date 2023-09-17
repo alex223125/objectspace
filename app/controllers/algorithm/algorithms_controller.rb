@@ -1,8 +1,10 @@
 class Algorithm::AlgorithmsController < ApplicationController
   include Folderable
+  include Algorithm::Concerns::Subnodable
 
-  before_action :set_algorithm, only: %i[ show edit update destroy preview ]
+  before_action :set_algorithm, only: %i[ show edit update destroy preview view]
   before_action :set_target_folder, only: %i[ new create ]
+  before_action :set_target_interface_group, only: %i[ new create ]
 
   # GET /algorithms or /algorithms.json
   def index
@@ -15,18 +17,27 @@ class Algorithm::AlgorithmsController < ApplicationController
 
   def preview
     binding.pry
-    if params[:type] == "substep_addition"
-      path = "algorithm/shared/partials/preview/algorithm/main_page"
-    elsif params[:type] == "dpo_instruction_select" ||
-          params[:type] == "interface_member_addition" ||
-          params[:type] == "algorithm_form_wrapper_step_addition"
-      path = "shared/technologies_search/dpo_instruction_select/preview/algorithm"
-    end
+    service = Services::Algorithms::Algorithms::PreviewSettings.new(params[:case])
+    service.call
 
     respond_to do |format|
       format.json {
-        render json: { preview: render_to_string(partial: path,
-                                                 formats: [:html])}
+        render json: { preview: render_to_string(partial: service.path,
+                                                 formats: [:html],
+                                                 locals: {algorithm: @algorithm})}
+      }
+    end
+  end
+
+  def view
+    binding.pry
+    @algorithm_version = @algorithm.default_version
+    path = "algorithm/algorithm_versions/dynamic_view/main"
+
+    respond_to do |format|
+      format.json {
+        render json: { view: render_to_string(partial: path,
+                                              formats: [:html])}
       }
     end
   end
@@ -35,10 +46,22 @@ class Algorithm::AlgorithmsController < ApplicationController
   def new
     @algorithm = Algorithms::Algorithm.new
     @algorithm_version = @algorithm.algorithm_versions.new
-    @control_structure = @algorithm_version.control_structures.new
+    # @control_structure = @algorithm_version.control_structures.new
+    # algorithm_default_control_structure = ControlStructures::FunctionalTypes[:following]
+    # @default_algorithm_structure = @algorithm_version.control_structures.new(control_structure_functional_type: algorithm_default_control_structure)
+    @default_algorithm_structure = @algorithm_version.control_structures.new
+
     binding.pry
+    if params[:functional_type].present?
+      @functional_type = Algorithms::FunctionalTypes[params[:functional_type]]
+    end
+    if params[:simple_class].present?
+      @simple_class = SimpleClasses::SimpleClass.find(params[:simple_class])
+    end
     # @step = @algorithm_version.steps.new
   end
+
+
 
   # GET /algorithms/1/edit
   def edit
@@ -46,21 +69,22 @@ class Algorithm::AlgorithmsController < ApplicationController
 
   # POST /algorithms or /algorithms.json
   def create
+
+    # 1.prepare params
+    action_type = :algorithm_creation
     binding.pry
-    service = Services::Algorithms::Algorithms::Params::Create.new(params)
+    service = Services::Algorithms::Shared::Params::Create.new(params, action_type)
     binding.pry
     new_params = service.call
-
     binding.pry
     @params = ActionController::Parameters.new(new_params)
 
-    # params_for_dynamic_steps = dynamic_strong_params_for_dyn_steps(dynamic_steps_params)
+    # 2.create record
     binding.pry
-    service = Services::Algorithms::Algorithms::Create.new(algorithm_params, @target_folder, current_user)
-
+    service = Services::Algorithms::Algorithms::Create.new(algorithm_params, @target_folder,
+                                                           current_user, @target_interface_group)
     binding.pry
     service.call
-
 
     respond_to do |format|
 
@@ -77,6 +101,7 @@ class Algorithm::AlgorithmsController < ApplicationController
         binding.pry
         @algorithm = service.algorithm
         @control_structure = @algorithm.algorithm_versions.first.control_structures.first
+        @functional_type = @algorithm.functional_type
 
         format.html { render :new, status: :unprocessable_entity}
         format.json { render json: @algorithm.errors, status: :unprocessable_entity }
@@ -108,81 +133,58 @@ class Algorithm::AlgorithmsController < ApplicationController
   end
 
   private
+
+  def set_target_interface_group
+    if params[:target_interface_group].present?
+      @target_interface_group = SimpleClasses::InterfaceGroup.where(id: params[:target_interface_group]).first
+    end
+  end
+
     # Use callbacks to share common setup or constraints between actions.
-    def set_algorithm
-      @algorithm = Algorithms::Algorithm.find(params[:id])
-    end
-
-    # Only allow a list of trusted parameters through.
-    def algorithm_params
-      @params.require(:algorithms_algorithm).permit(:title, :description, :source_page_description, :tag_list,
-
-                                                   algorithm_versions_attributes: [:title, :solves_the_problem,
-                                                                                   :sources, :additional_information,
-
-                                                       control_structures_attributes: [
-                                                           steps_attributes: [
-                                                                             :technologiable_type,
-                                                                             :technologiable_id,
-
-                                                                              :position,
-                                                                              :type,
-                                                                              :title,
-                                                                              :instruction,
-                                                                              :step_finish_check,
-                                                                              :solves_the_problem,
-                                                                              :sources,
-                                                                              :additional_information,
-
-                                                                              :note,
-                                                                              :_destroy, substeps_attributes]
-                                                         ]
-                                                   ])
-
-
-    end
-
-  def set_target_folder
-    binding.pry
-    @target_folder = Folder.find(params[:target_folder])
+  def set_algorithm
+    @algorithm = Algorithms::Algorithm.find(params[:id])
   end
 
-  def substeps_attributes
-    {substeps_attributes: [:technologiable_type,
-                           :technologiable_id,
+  def algorithm_params
+    @params.require(:algorithms_algorithm).permit(:title, :description, :source_page_description, :tag_list,
+                                                  :functional_type,
 
-                           :position,
-                           :type,
-                           :title,
-                           :instruction,
-                           :step_finish_check,
-                           :solves_the_problem,
-                           :sources,
-                           :additional_information,
+                                                  algorithm_versions_attributes: [:id, :title, :solves_the_problem,
+                                                                                  :sources, :additional_information,
+                                                                                  :description,
 
-                           :note,
-                           :_destroy, recursive_nested_substeps_attr]}
-  end
+                                                                                  control_structures_attributes: [
 
-  def recursive_nested_substeps_attr
-    build_recursive_params(
-      recursive_key: 'substeps_attributes',
-      parameters: @params,
-      permitted_attributes: [:technologiable_type,
-                             :technologiable_id,
+                                                                                    :id,
+                                                                                    :position,
+                                                                                    :control_structure_functional_type,
 
-                             :position,
-                             :type,
-                             :title,
-                             :instruction,
-                             :step_finish_check,
-                             :solves_the_problem,
-                             :sources,
-                             :additional_information,
+                                                                                    subnodes_attributes: [
+                                                                                      :technologiable_type,
+                                                                                      :technologiable_id,
 
-                             :note,
-                             :_destroy]
-    )
+                                                                                      :id,
+
+                                                                                      :position,
+                                                                                      :type,
+                                                                                      :title,
+                                                                                      :instruction,
+                                                                                      :step_finish_check,
+                                                                                      :solves_the_problem,
+                                                                                      :sources,
+                                                                                      :additional_information,
+
+                                                                                      :step_functional_type,
+                                                                                      :control_structure_functional_type,
+                                                                                      :note,
+                                                                                      :description,
+
+                                                                                      :_destroy,
+                                                                                      recursive_nested_substeps_attr,
+                                                                                      conditions_attributes: [:title, :instruction]]
+                                                                                  ]
+                                                  ])
+
   end
 
 end
