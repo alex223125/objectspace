@@ -14,8 +14,12 @@ class Article::ArticlesController < ApplicationController
   end
 
   def preview
-    binding.pry
-    path = "article/articles/preview"
+    if params[:preview_type] == "basic_preview"
+      path = "article/articles/previews/basic_preview"
+    elsif params[:preview_type] == "small_line_preview"
+      path = "article/articles/previews/small_line_preview"
+    end
+
     respond_to do |format|
       format.json {
         render json: { preview: render_to_string(partial: path,
@@ -51,6 +55,7 @@ class Article::ArticlesController < ApplicationController
         # format.html { redirect_to algorithm_algorithm_version_path(service.algorithm.default_version), notice: "Algorithm was successfully created." }
         format.json { render :show, status: :created, location: @article }
       else
+        @article = service.article
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @article.errors, status: :unprocessable_entity }
       end
@@ -72,10 +77,12 @@ class Article::ArticlesController < ApplicationController
 
   # DELETE /articles/1 or /articles/1.json
   def destroy
+    binding.pry
+    @folder = @article.folder
     @article.destroy
 
     respond_to do |format|
-      format.html { redirect_to articles_url, notice: "Article was successfully destroyed." }
+      format.html { redirect_to target_folder_path(username: @folder.user.username, id: @folder.id), notice: "Article was successfully destroyed." }
       format.json { head :no_content }
     end
   end
