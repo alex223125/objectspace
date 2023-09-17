@@ -10,11 +10,12 @@ class Algorithm::StepsController < ApplicationController
   def show
   end
 
+  # TODO do we use it? or we use nodes controlller?
   def substep_template
 
     form = SimpleForm::FormBuilder.new(
       "dynamic_step_#{Time.now.strftime("%I%M%S")}", # the scope for the inputs
-      Algorithms::Step.new,        # object wrapped by the form builder
+      Algorithms::Nodes::Step.new,        # object wrapped by the form builder
       view_context,  # the template where the form builder can call the tag helpers on
       {}             # options
     )
