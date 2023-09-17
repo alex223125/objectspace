@@ -59,7 +59,7 @@ export default class extends Controller {
         //     url = '/technologies'
         // }
 
-
+        // TODO: add load animation
         Rails.ajax({
             type: 'GET',
             url: url,
