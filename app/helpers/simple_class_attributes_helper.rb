@@ -1,0 +1,2 @@
+module SimpleClassAttributesHelper
+end
