@@ -88,7 +88,7 @@ class FoldersController < ApplicationController
       # a 301 redirect that uses the current friendly id.
       request_slug = params[:id]
       if request_slug != @folder.slug
-        return redirect_to target_folder_path(username: @folder.owner.ownername,
+        return redirect_to target_folder_path(username: @folder.user.username,
                                              id: @folder.slug),
                            :status => :moved_permanently
       end
