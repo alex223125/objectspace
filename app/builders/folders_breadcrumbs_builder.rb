@@ -18,7 +18,7 @@ class FoldersBreadcrumbsBuilder < BreadcrumbsOnRails::Breadcrumbs::Builder
 
   def render
     @context.content_tag(:nav, class: 'flex py-3 px-5 text-slate-700 bg-slate-50 rounded-lg border border-slate-200', aria: { label: 'Breadcrumb' }) do
-      @context.content_tag(:ol, class: 'inline-flex items-center space-x-1 md:space-x-3') do
+      @context.content_tag(:ol, class: 'inline-flex flex-wrap items-center space-x-1 md:space-x-3') do
         @elements.collect do |element|
           render_element(element)
         end.join.html_safe
