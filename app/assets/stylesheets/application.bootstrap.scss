@@ -6,3 +6,10 @@
 @import "@yaireo/tagify/src/tagify.scss";
 
 @import "cropperjs/src/css/cropper.scss";
+
+//dont change, it loads styles only like this
+@import 'jstree/src/themes/default/style';
+//@import "jstree/src/**/*";
+
+@import 'treejs_customization';
+
