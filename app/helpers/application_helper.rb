@@ -1,11 +1,6 @@
 module ApplicationHelper
   # include Pagy::Frontend
 
-  def type_readable_name(simple_class)
-    type = simple_class.type
-    SimpleClasses::TypeTypes.meta(type)[:readable_name]
-  end
-
   def technology_item_link_to(item, html_options = {}, &block)
     if item.class == Articles::Article
       path = article_version_path(username: item.ownerable.ownername, id: item.default_version.slug)
