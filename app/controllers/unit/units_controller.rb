@@ -1,8 +1,9 @@
 class Unit::UnitsController < ApplicationController
   include Folderable
 
-  before_action :set_unit, only: %i[ show edit update destroy preview ]
+  before_action :set_unit, only: %i[ show edit update destroy preview view]
   before_action :set_target_folder, only: %i[ new create ]
+  before_action :set_target_interface_group, only: %i[ new create ]
 
   # GET /units or /units.json
   def index
@@ -17,11 +18,17 @@ class Unit::UnitsController < ApplicationController
 
   def preview
     # binding.pry
+    # TODO: remove subste_addition case, we don't have this case
+    # TODO -more unit preview to units folder
+    # TODO - create settings object
     if params[:type] == "substep_addition"
       path = "algorithm/shared/partials/preview/unit/main_page"
     elsif params[:type] == "dpo_instruction_select" ||
           params[:type] == "interface_member_addition" ||
-          params[:type] == "algorithm_form_wrapper_step_addition"
+          params[:type] == "algorithm_form_wrapper_step_addition" ||
+          params[:type] == "interface_group_form_action_addition" ||
+          params[:type] == "algorithm_form_class_level_wrapper_step_addition"
+
       path = "shared/technologies_search/dpo_instruction_select/preview/unit"
     end
 
@@ -30,6 +37,20 @@ class Unit::UnitsController < ApplicationController
     respond_to do |format|
       format.json {
         render json: { preview: render_to_string(partial: path,
+                                                 formats: [:html],
+                                                 locals: {unit: @unit})}
+      }
+    end
+  end
+
+  def view
+    binding.pry
+    @unit_version = @unit.default_version
+    path = "unit/unit_versions/dynamic_view/main"
+
+    respond_to do |format|
+      format.json {
+        render json: { view: render_to_string(partial: path,
                                                  formats: [:html])}
       }
     end
@@ -38,6 +59,7 @@ class Unit::UnitsController < ApplicationController
   # GET /units/new
   # new unit and first unit version
   def new
+    binding.pry
     @unit = Units::Unit.new
     @unit.unit_versions.new
   end
@@ -50,7 +72,7 @@ class Unit::UnitsController < ApplicationController
   def create
     binding.pry
     # @unit = Units::Unit.new(unit_params)
-    service = Services::Units::Units::Create.new(unit_params, @target_folder, current_user)
+    service = Services::Units::Units::Create.new(unit_params, @target_folder, current_user, @target_interface_group)
     service.call
 
     respond_to do |format|
@@ -95,6 +117,13 @@ class Unit::UnitsController < ApplicationController
 
   private
     # Use callbacks to share common setup or constraints between actions.
+
+    def set_target_interface_group
+      if params[:target_interface_group].present?
+        @target_interface_group = SimpleClasses::InterfaceGroup.where(id: params[:target_interface_group]).first
+      end
+    end
+
     def set_unit
       @unit = Units::Unit.find(params[:id])
     end
@@ -104,6 +133,7 @@ class Unit::UnitsController < ApplicationController
       params.require(:units_unit).permit(:title, :visibility_status, :source_page_description, :tag_list,
                                          unit_versions_attributes: [:title, :solves_the_problem,
                                                         :instruction, :sources, :target_audience,
+                                                                    :description,
                                                         :additional_information],
                                          unit_usage_examples_attributes: [:id, :title, :description,
                                                                           :sources, :_destroy])
