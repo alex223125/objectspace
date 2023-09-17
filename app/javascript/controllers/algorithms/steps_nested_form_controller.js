@@ -1,16 +1,26 @@
+// TODO: rename to nodes nested form
 import { Controller } from '@hotwired/stimulus';
 
 const regularStepType = "regular_step"
 const wrapperStepType = "wrapper_step"
 const containerStepType = "container_step"
 
+const singleAlternativeControlStructureType = "single_alternative_control_structure"
+
 export default class extends Controller {
     static targets = [
         "add_item",
         "template",
+
+        // steps
         "regularStepFieldsTemplate",
         "wrapperStepFieldsTemplate",
-        "containerStepFieldsTemplate"]
+        "containerStepFieldsTemplate",
+
+        // control structures
+        "singleAlternativeControlStructureFieldsTemplate"
+
+    ]
 
     initialize() {
         console.log("Steps nested form controller initialized")
@@ -31,16 +41,16 @@ export default class extends Controller {
         console.log("add_association triggered")
         event.preventDefault()
         // let value = event.target.dataset.value
-        let stepType = event.target.dataset.stepType
+        let nodeType = event.target.dataset.nodeType
         let childIndexKeyword = event.target.dataset.childIndexKeyword
 
         // means we will get it's content by 'get' request to webservier
         let class_of_template_without_inner_content = 'ghost-class'
 
         // set content
-        if (stepType == regularStepType) {
+        if (nodeType == regularStepType) {
             if (this.regularStepFieldsTemplateTarget.className == class_of_template_without_inner_content) {
-                var content = this.loadSubstepTemplate(stepType)
+                var content = this.loadNodeTemplate(nodeType)
             } else {
                 console.log("childIndexKeyword")
                 console.log(childIndexKeyword)
@@ -49,22 +59,33 @@ export default class extends Controller {
                 this.add_itemTarget.insertAdjacentHTML('beforebegin', content)
             }
 
-        } else if (stepType == wrapperStepType) {
+        } else if (nodeType == wrapperStepType) {
             if (this.wrapperStepFieldsTemplateTarget.className == class_of_template_without_inner_content) {
-                var content = this.loadSubstepTemplate(stepType)
+                var content = this.loadNodeTemplate(nodeType)
             } else {
                 var content = this.wrapperStepFieldsTemplateTarget.innerHTML.replace(/TEMPLATE_RECORD/g, new Date().valueOf())
                 this.add_itemTarget.insertAdjacentHTML('beforebegin', content)
             }
 
-        } else if (stepType == containerStepType) {
+        } else if (nodeType == containerStepType) {
             if (this.containerStepFieldsTemplateTarget.className == class_of_template_without_inner_content) {
-                var content = this.loadSubstepTemplate(stepType)
+                var content = this.loadNodeTemplate(nodeType)
             } else {
                 var content = this.containerStepFieldsTemplateTarget.innerHTML.replace(/TEMPLATE_RECORD/g, new Date().valueOf())
                 this.add_itemTarget.insertAdjacentHTML('beforebegin', content)
             }
+
+        } else if (nodeType == singleAlternativeControlStructureType) {
+            if (this.containerStepFieldsTemplateTarget.className == class_of_template_without_inner_content) {
+                var content = this.loadNodeTemplate(nodeType)
+            } else {
+                var content = this.singleAlternativeControlStructureFieldsTemplateTarget.innerHTML.replace(/TEMPLATE_RECORD/g, new Date().valueOf())
+                this.add_itemTarget.insertAdjacentHTML('beforebegin', content)
+            }
         }
+
+
+
 
         console.log("content124124124124214")
         console.log(content)
@@ -88,8 +109,8 @@ export default class extends Controller {
     }
 
     // PRIVATE
-    loadSubstepTemplate(stepType){
-        var url = `/substep_template?type=${stepType}`
+    loadNodeTemplate(stepType){
+        var url = `/node_template?type=${stepType}`
 
         // 4.3 make request
         Rails.ajax({
