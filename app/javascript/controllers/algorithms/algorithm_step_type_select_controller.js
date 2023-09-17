@@ -1,11 +1,18 @@
+// TODO: rename to algorithm_node_type_select
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
     static targets = [
+
+        // steps
+        'closeOptionsModalButton',
         'addRegularStepOriginalButton',
         'addContainerStepOriginalButton',
         'wrapperStepAdditionButton',
-        'closeOptionsModalButton'
+
+        // control structures
+        'closeControlStructuresOptionsModalButton',
+        'addSingleAlternativeControlStructureOriginalButton'
         ];
 
 
@@ -20,6 +27,8 @@ export default class extends Controller {
 
 
     // PUBLIC
+
+    // 1.1 steps options:
     handleRegularStepButtonClick(){
         this.addRegularStepOriginalButtonTarget.click()
         this.closeOptionsModal()
@@ -30,13 +39,6 @@ export default class extends Controller {
         this.closeOptionsModal()
         // 2) Open modal to select technology (algorithm or method)
         this.wrapperStepAdditionButtonTarget.click()
-
-        // // 2) Create step
-        // this.addWrapperStepOriginalButtonTarget.click()
-        //
-        // // 3) put data in step
-        // this.closeOptionsModal()
-
     }
 
     handleContainerStepButtonClick(){
@@ -45,11 +47,22 @@ export default class extends Controller {
     }
 
 
+    /// 1.2 control structures options:
+    handleSingleAlternativeControlStructureButtonClick(){
+        this.addSingleAlternativeControlStructureOriginalButtonTarget.click()
+        this.closeControlStructuresOptionsModal()
+    }
+
+
 
 
     // PRIVATE
     closeOptionsModal(){
         this.closeOptionsModalButtonTarget.click()
+    }
+
+    closeControlStructuresOptionsModal(){
+        this.closeControlStructuresOptionsModalButtonTarget.click()
     }
 
 
