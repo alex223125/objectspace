@@ -5,7 +5,7 @@
     <details class="" data-action="toggle->step_accordion#toggle" data-accordion-target="item">
       <summary
         class="flex items-center justify-between w-full p-5 font-medium text-left border border-gray-200 rounded-xl focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400">
-        <span>Step (wrapper) <span class="step-position-visible-field" data-target="steps_drag.stepPositionVisibleField">1</span>: Accordion with another icon</span>
+        <span>Step (wrapper) <span class="step-position-visible-field" data-target="nodes_drag.nodePositionVisibleField">1</span>: Accordion with another icon</span>
         <svg data-accordion-icon class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13l-3 3m0 0l-3-3m3 3V8m0 13a9 9 0 110-18 9 9 0 010 18z"></path></svg>
       </summary>
 
@@ -18,7 +18,9 @@
           <!--          <div class="nested-fields">-->
           <div class="">
 
-            <%= f.hidden_field :position, class: "step-position-hidden-field", data: { target: 'steps_drag.stepPositionHiddenField'} %>
+            <%= f.hidden_field :position, class: "node-position-hidden-field", data: { target: 'nodes_drag.nodePositionHiddenField'} %>
+
+            <%= f.hidden_field :type, value: "Algorithms::Nodes::Step" %>
 
             <div class="col-span-6 sm:col-span-3">
               <%= f.label "Title", class: "block text-sm font-medium text-gray-700" %>
@@ -60,7 +62,7 @@
             </div>
             <br>
 
-            <%= f.hidden_field :type, value: Steps::TypeTypes[:wrapper] %>
+            <%= f.hidden_field :step_functional_type, value: Steps::FunctionalTypes[:wrapper] %>
 
             <%= f.hidden_field :_destroy %>
 
@@ -68,8 +70,8 @@
             <%= f.hidden_field :technologiable_id, class: "technologiable-id-hidden-field" %>
 
             <!-- actual only for dynamic substeps-->
-            <%= f.hidden_field 'current_step_frontend_id', data: { target: 'dynamic_step_form.currentStepFrontendId'}  %>
-            <%= f.hidden_field 'parent_id_dynamic_step', data: { target: 'dynamic_step_form.parentOfDynamicStep'}  %>
+            <%= f.hidden_field 'current_node_frontend_id', data: { target: 'dynamic_step_form.currentNodeFrontendId'}  %>
+            <%= f.hidden_field 'parent_id_dynamic_node', data: { target: 'dynamic_step_form.parentOfDynamicNode'}  %>
 
 
 

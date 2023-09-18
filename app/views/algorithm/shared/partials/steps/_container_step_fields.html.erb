@@ -6,7 +6,7 @@
     <details class="" data-action="toggle->step_accordion#toggle" data-accordion-target="item">
       <summary
         class="flex items-center justify-between w-full p-5 font-medium text-left border border-gray-200 rounded-xl focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400">
-        <span>Step (container) <span class="step-position-visible-field" data-target="steps_drag.stepPositionVisibleField">1</span>: Accordion with another icon</span>
+        <span>Step (container) <span class="step-position-visible-field" data-target="nodes_drag.nodePositionVisibleField">1</span>: Accordion with another icon</span>
         <svg data-accordion-icon class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13l-3 3m0 0l-3-3m3 3V8m0 13a9 9 0 110-18 9 9 0 010 18z"></path></svg>
       </summary>
 
@@ -19,7 +19,9 @@
           <!--          <div class="nested-fields">-->
           <div class="">
 
-            <%= f.hidden_field :position, class: "step-position-hidden-field", data: { target: 'steps_drag.stepPositionHiddenField'} %>
+            <%= f.hidden_field :position, class: "node-position-hidden-field", data: { target: 'nodes_drag.nodePositionHiddenField'} %>
+
+            <%= f.hidden_field :type, value: "Algorithms::Nodes::Step" %>
 
             <div class="col-span-6 sm:col-span-3">
               <%= f.label "Title", class: "block text-sm font-medium text-gray-700" %>
@@ -76,14 +78,14 @@
 <!--            </div>-->
 <!--            <br>-->
 
-            <%= f.hidden_field :type, value: Steps::TypeTypes[:container] %>
+            <%= f.hidden_field :step_functional_type, value: Steps::FunctionalTypes[:container] %>
 
             <%= f.hidden_field :_destroy %>
 
 
             <!-- actual only for dynamic substeps-->
-            <%= f.hidden_field 'current_step_frontend_id', data: { target: 'dynamic_step_form.currentStepFrontendId'}  %>
-            <%= f.hidden_field 'parent_id_dynamic_step', data: { target: 'dynamic_step_form.parentOfDynamicStep'}  %>
+            <%= f.hidden_field 'current_node_frontend_id', data: { target: 'dynamic_step_form.currentNodeFrontendId'}  %>
+            <%= f.hidden_field 'parent_id_dynamic_node', data: { target: 'dynamic_step_form.parentOfDynamicNode'}  %>
 
 
             <%#= render "algorithm/shared/partials/substeps/substeps_nested_form", :form => f %>
@@ -102,7 +104,6 @@
                 <br>
 
                 <div data-controller="remote_select_instruction algorithm_step_type_select steps_nested_form"
-                     data-drag-url="/todos/:id/move"
                      data-target="remote_select_instruction.stepsArea"
                      data-remote_select_instruction-select-type-value="algorithm_form_wrapper_step_addition"
                 >
@@ -121,18 +122,26 @@
                   <template style="display:none;" class="ghost-class" data-value="container_step" data-target='steps_nested_form.containerStepFieldsTemplate'>
                   </template>
 
+                  <!--    // Template 4 container step-->
+                  <template style="display:none;" class="ghost-class"
+                            data-value="single_alternative_control_structure"
+                            data-target='steps_nested_form.singleAlternativeControlStructureFieldsTemplate'>
+                  </template>
+
                   <!--    <div data-target="substeps_drag.substepsArea">-->
                   <!--      data-target="substeps_drag.substepsArea"-->
 
-                  <div data-controller="steps_drag" data-target="steps_drag.stepsArea">
+                  <div data-controller="nodes_drag" data-target="nodes_drag.nodesArea">
                     <%#= form.fields_for :steps, algorithm_version.steps.order(position: :asc) do |t| %>
-                    <%= f.fields_for :substeps do |step| %>
-                      <% if Steps::TypeTypes[step.object[:type]] == "regular" %>
-                        <%= render "algorithm/shared/partials/steps/regular_step_fields", :f => step %>
-                      <% elsif Steps::TypeTypes[step.object[:type]] == "wrapper" %>
-                        <%= render "algorithm/shared/partials/steps/wrapper_step_fields", :f => step %>
-                      <% elsif Steps::TypeTypes[step.object[:type]] == "container" %>
-                        <%= render "algorithm/shared/partials/steps/container_step_fields", :f => step %>
+                    <%= f.fields_for :subnodes do |node| %>
+                      <% if Steps::FunctionalTypes.try(:[], node.object.functional_type_id) == "regular" %>
+                        <%= render "algorithm/shared/partials/steps/regular_step_fields", :f => node %>
+                      <% elsif Steps::FunctionalTypes.try(:[], node.object.functional_type_id) == "wrapper" %>
+                        <%= render "algorithm/shared/partials/steps/wrapper_step_fields", :f => node %>
+                      <% elsif Steps::FunctionalTypes.try(:[], node.object.functional_type_id) == "container" %>
+                        <%= render "algorithm/shared/partials/steps/container_step_fields", :f => node %>
+                      <% elsif ControlStructures::FunctionalTypes.try(:[], node.object.functional_type_id) == "single_alternative" %>
+                        <%= render "algorithm/shared/partials/control_structures/single_alternative_cs_fields", :f => node %>
                       <% end %>
                     <% end %>
 
@@ -140,7 +149,7 @@
                     <div data-target="steps_nested_form.add_item">
 
                       <button data-action="click->steps_nested_form#add_association"
-                              data-step-type="regular_step"
+                              data-node-type="regular_step"
                               data-target="algorithm_step_type_select.addRegularStepOriginalButton"
                               class="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800"
                               type="button"
@@ -152,7 +161,7 @@
                       </button>
 
                       <button data-action="click->steps_nested_form#add_association"
-                              data-step-type="wrapper_step"
+                              data-node-type="wrapper_step"
                               data-target="algorithm_step_type_select.addWrapperStepOriginalButton remote_select_instruction.addWrapperStepOriginalButton"
                               class="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800"
                               type="button"
@@ -165,7 +174,7 @@
 
                       <!--      container step original button -->
                       <button data-action="click->steps_nested_form#add_association"
-                              data-step-type="container_step"
+                              data-node-type="container_step"
                               data-target="algorithm_step_type_select.addContainerStepOriginalButton"
                               class="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800"
                               type="button"
@@ -176,12 +185,27 @@
                         </span>
                       </button>
 
+                      <button data-action="click->steps_nested_form#add_association"
+                              data-node-type="single_alternative_control_structure"
+                              data-child-index-keyword="TEMPLATE_RECORD"
+                              data-target="algorithm_step_type_select.addSingleAlternativeControlStructureOriginalButton"
+                              class="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800"
+                              type="button"
+                              style="display:none;"
+                      >
+                        <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                          + Add new Single Alternative Control Structure
+                        </span>
+                      </button>
 
                     </div>
 
                   </div>
 
                   <%= render "algorithm/shared/partials/shared/step_type_select_modal" %>
+
+                  <%= render "algorithm/shared/partials/shared/control_structure_select_modal" %>
+
                   <%= render "shared/technologies_search/modal", :type => "algorithm_form_wrapper_step_addition" %>
 
                 </div>

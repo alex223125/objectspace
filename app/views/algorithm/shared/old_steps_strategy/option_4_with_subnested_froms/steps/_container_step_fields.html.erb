@@ -76,7 +76,7 @@
 <!--            </div>-->
 <!--            <br>-->
 
-            <%= f.hidden_field :type, value: Steps::TypeTypes[:container] %>
+            <%= f.hidden_field :type, value: Steps::FunctionalTypes[:container] %>
 
             <%= f.hidden_field :_destroy %>
 
@@ -127,11 +127,11 @@
                   <div data-controller="steps_drag" data-target="steps_drag.stepsArea">
                     <%#= form.fields_for :steps, algorithm_version.steps.order(position: :asc) do |t| %>
                     <%= f.fields_for :substeps do |step| %>
-                      <% if Steps::TypeTypes[step.object[:type]] == "regular" %>
+                      <% if Steps::FunctionalTypes[step.object[:type]] == "regular" %>
                         <%= render "algorithm/shared/partials/steps/regular_step_fields", :f => step %>
-                      <% elsif Steps::TypeTypes[step.object[:type]] == "wrapper" %>
+                      <% elsif Steps::FunctionalTypes[step.object[:type]] == "wrapper" %>
                         <%= render "algorithm/shared/partials/steps/wrapper_step_fields", :f => step %>
-                      <% elsif Steps::TypeTypes[step.object[:type]] == "container" %>
+                      <% elsif Steps::FunctionalTypes[step.object[:type]] == "container" %>
                         <%= render "algorithm/shared/partials/steps/container_step_fields", :f => step %>
                       <% end %>
                     <% end %>

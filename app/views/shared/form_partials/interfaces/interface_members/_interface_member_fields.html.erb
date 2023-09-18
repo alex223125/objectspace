@@ -10,7 +10,7 @@
     <details class="" data-action="toggle->step_accordion#toggle" data-accordion-target="item">
       <summary
         class="flex items-center justify-between w-full p-5 font-medium text-left border border-gray-200 rounded-xl focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400">
-        <span>Action <span class="interface-member-position-visible-field">1</span>: Accordion with another icon</span>
+        <span>Action <span class="interface-member-position-visible-field" data-target="interface_members_drag.memberPositionVisibleField">1</span>: Accordion with another icon</span>
         <svg data-accordion-icon class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13l-3 3m0 0l-3-3m3 3V8m0 13a9 9 0 110-18 9 9 0 010 18z"></path></svg>
       </summary>
 
@@ -23,7 +23,8 @@
           <!--          <div class="nested-fields">-->
           <div class="">
 
-            <%#= f.hidden_field :position, class: "substep-position-hidden-field" %>
+            <%= f.hidden_field :position, class: "substep-position-hidden-field",
+                               data: {target: "interface_members_drag.memberPositionHiddenField"} %>
 
             <%#= f.hidden_field :unit_version_id, class: "unit-id-hidden-field" %>
             <%#= f.hidden_field :algorithm_version_id, class: "algorithm-id-hidden-field" %>

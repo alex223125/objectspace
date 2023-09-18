@@ -1,0 +1,83 @@
+<div class="technology_pick_modal">
+  <div data-controller="technology_pick_modal"
+       data-technology_pick_modal-allow-background-close="false"
+       data-target="remote_select_instruction.classTreeModal">
+
+    <% if type == "algorithm_form_wrapper_step_addition" %>
+      <button
+        type="button"
+        data-target="algorithm_step_type_select.wrapperStepAdditionButton"
+        data-action="click->technology_pick_modal#open"
+        class="hidden relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800">
+              <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                Open Modal for Picking Wrapper Step Button
+              </span>
+      </button>
+    <% else %>
+      <!--      other cases ... -->
+    <% end %>
+
+    <!-- Modal Container -->
+    <div data-technology_pick_modal-target="container"
+         data-action="click->technology_pick_modal#closeBackground keyup@window->technology_pick_modal#closeWithKeyboard"
+         class="hidden animated fadeIn fixed inset-0 overflow-y-auto flex items-center justify-center" style="z-index: 9999;">
+      <!-- Modal Inner Container -->
+      <div id="selectInstructionModal" class="fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full justify-center items-center flex">
+        <div class="relative w-full max-w-7xl max-h-full">
+          <!-- Modal content -->
+          <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+
+
+            <!-- Modal header -->
+            <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
+              <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                <% if type == "algorithm_form_wrapper_step_addition" %>
+                  Select Technology
+                <% end %>
+              </h3>
+              <button type="button" data-action="click->technology_pick_modal#close" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
+                <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                <span class="sr-only">Close modal</span>
+              </button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="p-6 space-y-6">
+              <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                <% if type == "algorithm_form_wrapper_step_addition" %>
+                  In this popup you can select multiple Actions to add them as Linked Actions to Attribute
+                <% end %>
+              </p>
+            </div>
+
+
+            <% if type == "algorithm_form_wrapper_step_addition" && scope == "simple_class" %>
+              <%= render "shared/technology_pick/modal_bodies/simple_class_actions_modal_body", simple_class: simple_class %>
+            <% end %>
+
+
+            <!-- Modal footer -->
+            <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+              <button data-action="click->technology_pick_modal#submit"
+                      type="button"
+                      class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                Save
+              </button>
+
+              <button data-action="click->technology_pick_modal#close"
+                      type="button"
+                      class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">Close</button>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

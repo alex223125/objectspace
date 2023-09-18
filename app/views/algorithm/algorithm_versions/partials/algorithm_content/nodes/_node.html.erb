@@ -1,0 +1,18 @@
+<!--routing by type -->
+<% binding.pry %>
+<% if node.type == "Algorithms::Nodes::Step" && node.functional_type == "regular" %>
+  <%= render "algorithm/algorithm_versions/partials/algorithm_content/nodes/types/regular_step", node: node %>
+
+<% elsif node.type == "Algorithms::Nodes::Step" && node.functional_type == "wrapper" %>
+  <%= render "algorithm/algorithm_versions/partials/algorithm_content/nodes/types/wrapper_step", node: node %>
+
+<% elsif node.type == "Algorithms::Nodes::Step" && node.functional_type == "container" %>
+  <%= render "algorithm/algorithm_versions/partials/algorithm_content/nodes/types/container_step", node: node %>
+
+<% elsif node.type == "Algorithms::Nodes::ControlStructure" && node.functional_type == "single_alternative"  %>
+  <%= render "algorithm/algorithm_versions/partials/algorithm_content/nodes/types/single_alternative_cs", node: node %>
+<% end %>
+
+
+
+

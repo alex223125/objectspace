@@ -1,28 +1,53 @@
 <!--      TOC-->
-<div class="algorithm-toc">
+<div class="algorithm-toc" data-controller="toc_scrolling">
   <br>
   Table of content:
   <ul role="list" a="" class="space-y-3 text-base list-none sm:text-lg md:mt-5 md:text-xl">
     <% if algorithm_version.solves_the_problem.present? %>
       <li>
-        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
-           href="#algorithm-solves-the-problem-<%= algorithm_version.id %>">
+        <a class="hover:underline hover:text-blue-600 font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+           onclick="return false;"
+           href="#algorithm-solves-the-problem-<%= algorithm_version.id %>"
+           data-action="click->toc_scrolling#scroll"
+           data-anchor="#algorithm-solves-the-problem-<%= algorithm_version.id %>"
+        >
           ↳ Solves the problem
         </a>
       </li>
     <% end %>
 
+    <% if algorithm_version.description.present? %>
+      <li>
+        <a class="hover:underline hover:text-blue-600 font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+           onclick="return false;"
+           href="#algorithm-description-<%= algorithm_version.id %>"
+           data-action="click->toc_scrolling#scroll"
+           data-anchor="#algorithm-description-<%= algorithm_version.id %>"
+        >
+          ↳ Description
+        </a>
+      </li>
+    <% end %>
+
     <li>
-      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
-         href="#steps-for-algorithm-version-<%= algorithm_version.id %>">
+      <a class="hover:underline hover:text-blue-600 font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+         onclick="return false;"
+         href="#steps-for-algorithm-version-<%= algorithm_version.id %>"
+         data-action="click->toc_scrolling#scroll"
+         data-anchor="#steps-for-algorithm-version-<%= algorithm_version.id %>"
+      >
         ↳ Steps
       </a>
     </li>
 
     <% if algorithm_version.sources.present? %>
       <li>
-        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
-           href="#algorithm-sources-<%= algorithm_version.id %>">
+        <a class="hover:underline hover:text-blue-600 font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+           onclick="return false;"
+           href="#algorithm-sources-<%= algorithm_version.id %>"
+           data-action="click->toc_scrolling#scroll"
+           data-anchor="#algorithm-sources-<%= algorithm_version.id %>"
+        >
           ↳ Sources
         </a>
       </li>
@@ -30,23 +55,35 @@
 
     <% if algorithm_version.additional_information.present? %>
       <li>
-        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
-           href="#algorithm-additional-information-<%= algorithm_version.id %>">
+        <a class="hover:underline hover:text-blue-600 font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+           onclick="return false;"
+           href="#algorithm-additional-information-<%= algorithm_version.id %>"
+           data-action="click->toc_scrolling#scroll"
+           data-anchor="#algorithm-additional-information-<%= algorithm_version.id %>"
+        >
           ↳ Additional information
         </a>
       </li>
     <% end %>
 
     <li>
-      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
-         href="#contribute">
+      <a class="hover:underline hover:text-blue-600 font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+         onclick="return false;"
+         href="#contribute-<%= algorithm_version.id %>"
+         data-action="click->toc_scrolling#scroll"
+         data-anchor="#contribute-<%= algorithm_version.id %>"
+      >
         ↳ Contribute
       </a>
     </li>
 
     <li>
-      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
-         href="#comments">
+      <a class="hover:underline hover:text-blue-600 font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+         onclick="return false;"
+         href="#comments-<%= algorithm_version.id %>"
+         data-action="click->toc_scrolling#scroll"
+         data-anchor="#comments-<%= algorithm_version.id %>"
+      >
         ↳ Comments
       </a>
     </li>

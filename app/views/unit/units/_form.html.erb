@@ -46,6 +46,8 @@
     </div>
     <br>
 
+    <%= hidden_field_tag :target_interface_group, @target_interface_group.try(:id) %>
+
     <%= hidden_field_tag 'target_folder', @target_folder.id  %>
 
     <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Method version fields</h2>

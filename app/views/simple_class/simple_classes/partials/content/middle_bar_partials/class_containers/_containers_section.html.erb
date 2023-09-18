@@ -1,16 +1,21 @@
 <!--containers section -->
 
-<% if object.root_class_container.present? %>
+<!--if root container not present it means we dealing with dpo or do-->
+<% if simple_class.root_class_container.present? %>
   <div class="class-containers-section">
+
+    <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+    <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center" id="class-components">Components:</h2>
+
     <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/class_containers/class_containers_toc",
-               class_containers: object.root_class_container.children, class_containers_root: object.root_class_container %>
+               class_containers: simple_class.root_class_container.children, class_containers_root: simple_class.root_class_container %>
 
     <!--  uncategorized containers-->
     <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/class_containers/class_container_preview",
-               class_container: object.root_class_container %>
+               class_container: simple_class.root_class_container %>
 
     <!--  children containers-->
-    <% object.root_class_container.children.each do |class_container| %>
+    <% simple_class.root_class_container.children.each do |class_container| %>
       <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/class_containers/class_container_preview",
                  class_container: class_container %>
     <% end %>

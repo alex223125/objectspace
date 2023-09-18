@@ -1,0 +1,77 @@
+<!--<div data-id="<%#= f.object_name.match(/(\d+)]/)[1] %>" class="nested-fields">-->
+<div class="nested-fields interface-group-nested-fields">
+  <div class="" data-controller="step_accordion">
+
+    <details class="" data-action="toggle->step_accordion#toggle" data-accordion-target="item" open>
+      <summary
+        class="flex items-center justify-between w-full p-5 font-medium text-left border border-b-0 border-gray-200 rounded-t-xl focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white">
+        <span>Actions group №<span data-target="interface_groups_drag.groupPositionVisibleField" class="interface-group-position-visible-field"><%=interface_group.try(:position) %></span>: <%=interface_group.title %></span>
+        <svg data-accordion-icon class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13l-3 3m0 0l-3-3m3 3V8m0 13a9 9 0 110-18 9 9 0 010 18z"></path></svg>
+      </summary>
+
+      <div id="" aria-labelledby="accordion-arrow-icon-heading-2">
+        <!--        <div class="p-5 font-light border border-b-0 border-gray-200 dark:border-gray-700">-->
+        <!--          <p class="mb-2 text-gray-500 dark:text-gray-400">Flowbite is first conceptualized and designed using the Figma software so everything you see in the library has a design equivalent in our Figma file.</p>-->
+        <!--          <p class="text-gray-500 dark:text-gray-400">Check out the <a href="https://flowbite.com/figma/" class="text-blue-600 dark:text-blue-500 hover:underline">Figma design system</a> based on the utility classes from Tailwind CSS and components from Flowbite.</p>-->
+        <!--        </div>-->
+        <div class="p-5 font-light border border-b-0 border-gray-200 dark:border-gray-700">
+          <!--          <div class="nested-fields">-->
+          <div class="">
+
+            <div class="interface-group-title">
+              <p class="text-base sm:text-lg lg:text-base xl:text-lg font-semibold text-black mb-0.5"><%= interface_group.title %></p>
+            </div>
+
+            <div class="action-description">
+              <p class="text-lg	text-gray-900"><%= interface_group.description.html_safe %></p>
+            </div>
+
+            <!--  actions section -->
+            <% if interface_group.interface_members.any? %>
+              <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+              <p class="text-xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Actions:</p>
+              <br>
+              <!--  interface members -->
+              <% interface_group.interface_members.preload(:memberable).each do |interface_member| %>
+                <%= render "simple_class/simple_classes/partials/tree_view/interface_member", :interface_member => interface_member %>
+              <% end %>
+            <% else %>
+              <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+              <p class="text-xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Actions:</p>
+              <br>
+              <div class="no-actions-found">
+                <p class="text-lg	text-gray-900">No actions found for this group. You can create them using
+                  <%= link_to simple_class_path(username: interface_group.simple_class.owner, id: interface_group.simple_class.id), target: '_blank' do %>
+                    <span class="mb-2 font-bold tracking-tight text-gray-900 dark:text-white hover:underline hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">Class source page</span>
+                <% end %>
+                </p>
+              </div>
+            <% end %>
+
+
+            <!-- children interface groups section -->
+            <% if interface_group.children.any? %>
+              <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-6 dark:bg-gray-700">
+              <p class="text-xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Inner Actions groups:</p>
+              <!--  child interface groups -->
+              <% interface_group.children.each do |interface_group| %>
+                <%= render "simple_class/simple_classes/partials/tree_view/interface_group", :interface_group => interface_group %>
+              <% end %>
+            <% end %>
+
+            <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700">
+
+          </div>
+        </div>
+        <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+      </div>
+    </details>
+  </div>
+  <br>
+</div>
+
+
+
+
+
+

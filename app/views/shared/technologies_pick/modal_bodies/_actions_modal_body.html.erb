@@ -1,0 +1,42 @@
+<div class="actions-pick-modal">
+  <!--Part 1. Input for gathering ids of selected actions -->
+  <h1 class="text-2xl text-center mt-5 mb-4">Actions select form</h1>
+
+  <div data-controller="search_instructions" data-target="remote_select_instruction.searchInstructionsInstance">
+    <div class="flex justify-center">
+      <div class="w-full">
+        <div class="flex flex-col">
+          <div class="bg-white p-6 rounded-xl shadow-lg">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6">
+              <!-- selected technologies -->
+              <div class="mb-6">
+                <div class="relative mt-1 min-w-80 max-w-3xl">
+
+                  <label for="modal-items" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Selected Actions:</label>
+                  <div>
+                    <input type="text"
+                           name="modal-items"
+                           data-target="remote_technologies_pick.itemsModalInput"
+                           id="modal-items"
+                           class="text-sm block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                           placeholder="Select Actions from menu below..."
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--Part 2. Dynamicly rendered whole tree of interfaces with actions -->
+    <div class="actions-groups-tree"
+         data-target="remote_technologies_pick.actionsGroupTreeArea"
+    >
+    </div>
+
+  </div>
+</div>
+
+

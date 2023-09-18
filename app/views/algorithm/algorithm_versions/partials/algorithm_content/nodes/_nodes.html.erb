@@ -1,0 +1,19 @@
+<div id="steps-for-algorithm-version-<%= algorithm_version.id%>" data-controller="scroll_to_step_beginning">
+
+  <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+  <div class="text-center col-span-6 sm:col-span-3">
+    <p class="text-xl font-bold hover:text-gray-700">Steps:</p>
+  </div>
+
+  <% if algorithm_version.control_structures.present? %>
+    <% algorithm_version.control_structures.first.children.each do |node| %>
+      <%= render "algorithm/algorithm_versions/partials/algorithm_content/nodes/node", node: node %>
+      <br>
+    <% end %>
+  <% end %>
+</div>
+<br>
+
+
+
+

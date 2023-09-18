@@ -4,19 +4,35 @@
 
     <div class="max-w-5xl mx-auto">
 
-      <!--          // Articles -->
-      <% interface_group.interface_members.last(3).each do |interface_member| %>
-        <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/interface_groups/interface_member_preview",
-                   interface_member: interface_member %>
+      <% if interface_group.interface_members.any? %>
+        <!--          // Articles -->
+        <% interface_group.interface_members.last(3).each do |interface_member| %>
+          <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/interface_groups/interface_member_preview",
+                     interface_member: interface_member %>
+        <% end %>
+
+        <!--         See more button -->
+        <div class="pt-12 border-t-2 border-gray-100 text-center">
+          <%= link_to simple_class_interface_group_path(interface_group), :target => "_blank", class: "relative group inline-block py-4 px-7 font-semibold text-orange-900 hover:text-orange-50 rounded-full bg-orange-50 transition duration-300 overflow-hidden" do %>
+            <div class="absolute top-0 right-full w-full h-full bg-gray-900 transform group-hover:translate-x-full group-hover:scale-102 transition duration-500"></div>
+            <span class="relative">See More Actions</span>
+          <% end %>
+        </div>
+      <% else %>
+        <!--  nothing found card -->
+        <div class="max-w-4xl p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+          <a href="#">
+            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">This actions group doesnt have actions</h5>
+          </a>
+          <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">To add new actions use the button below.</p>
+          <div class="flex justify-center">
+            <%= render "simple_class/simple_classes/partials/add_new_action_options_modal",
+                       type: "no_actions_in_interface_group",
+                       target_interface_group: interface_group %>
+          </div>
+        </div>
       <% end %>
 
-      <!--         See more button -->
-      <div class="pt-12 border-t-2 border-gray-100 text-center">
-        <%= link_to simple_class_interface_group_path(interface_group), :target => "_blank", class: "relative group inline-block py-4 px-7 font-semibold text-orange-900 hover:text-orange-50 rounded-full bg-orange-50 transition duration-300 overflow-hidden" do %>
-          <div class="absolute top-0 right-full w-full h-full bg-gray-900 transform group-hover:translate-x-full group-hover:scale-102 transition duration-500"></div>
-          <span class="relative">See More Actions</span>
-        <% end %>
-      </div>
     </div>
   </div>
 </section>

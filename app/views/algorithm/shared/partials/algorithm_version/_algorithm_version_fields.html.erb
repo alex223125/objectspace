@@ -45,11 +45,23 @@
 </div>
 <br>
 
+<div class="col-span-6 sm:col-span-3" data-controller="unit_instruction_tinymce">
+  <%= f.label "Description (optional)", class: "block text-sm font-medium text-gray-700" %>
+  <%= f.hint 'Use this place to prepare users for using algorithm', class: "mt-2 text-sm text-gray-500" %>
+  <%= f.input_field :description,
+                    placeholder: "Template of description goes here (goals, principles,intro)",
+                    data: { target: 'unit_instruction_tinymce.field' } %>
+</div>
+<br>
+
+
 <div class="col-span-6 sm:col-span-3" data-controller="unit_solves_the_problem_tinymce">
   <%= f.label "Problem (optional)", class: "block text-sm font-medium text-gray-700" %>
   <%= f.hint 'Describe what problem or problems this method solves.', class: "mt-2 text-sm text-gray-500" %>
   <%= f.input_field :solves_the_problem,
-                    placeholder: "Using this algorithm we can build RoR app",
+                    placeholder: "Using this algorithm we can build RoR app.
+                    If this instruction solves specific task or problem, you can desribe in this field.
+                    For example: 'This algorithm solves problem of step-by-step creating sorting algorithm for binaies trees.'",
                     data: { target: 'unit_solves_the_problem_tinymce.field' } %>
 </div>
 <br>

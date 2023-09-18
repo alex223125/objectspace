@@ -1,0 +1,36 @@
+<!--Content area-->
+<div class="max-w-6xl p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
+  <!--center -->
+  <div class="flex justify-between px-4 mx-auto max-w-screen-xl ">
+    <div class="w-full format-sm sm:format-base lg:format-lg format-blue dark:format-invert">
+      <div class="mb-4 lg:mb-6 not-format p-3">
+        <h1 class="break-words mb-4 text-3xl font-extrabold leading-tight text-gray-900 lg:mb-6 lg:text-4xl dark:text-white">
+          List of Models where the tutorial is used
+        </h1>
+      </div>
+
+      <% simple_classes = @algorithm_version.algorithm.simple_classes %>
+      <% interfacable_simple_classes = @algorithm_version.algorithm.interfacable_simple_classes %>
+      <% simple_classes = simple_classes.concat(interfacable_simple_classes) %>
+
+      <% binding.pry %>
+      <% if simple_classes.any? %>
+        <!-- List -->
+        <div class="list-of-classes">
+          <br>
+          <ul role="list" a="" class="space-y-3 text-base list-none sm:text-lg md:mt-5 md:text-xl">
+            <% simple_classes.each do |simple_class| %>
+              <li>
+                <%= technology_item_link_to simple_class, :target => "_blank",
+                                            class: "inline-flex items-center text-xl font-semibold text-orange-900 hover:text-gray-900" do %>
+                  Title: <%= simple_class.title %>, id: <%= simple_class.id %>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+    </div>
+  </div>
+</div>

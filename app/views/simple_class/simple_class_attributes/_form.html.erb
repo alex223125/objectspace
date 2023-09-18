@@ -1,0 +1,43 @@
+<% path = @simple_class_attribute.new_record? ? simple_class_simple_class_attributes_path : simple_class_simple_class_attribute_path %>
+<% method = @simple_class_attribute.new_record? ? :post : :patch %>
+<%= simple_form_for(@simple_class_attribute, url: path, method: method) do |f| %>
+  <% if @simple_class_attribute.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+      <h2><%= pluralize(@simple_class_attribute.errors.count, "error") %> prohibited this simple_class_attribute from being saved:</h2>
+
+      <ul>
+        <% @simple_class_attribute.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+
+  <div class="col-span-6 sm:col-span-3">
+    <%= f.label "For", class: "block text-sm font-medium text-gray-700" %>
+    <%= render "shared/preview_cards/simple_class_card", simple_class: @target_simple_class %>
+  </div>
+  <br>
+
+
+  <div data-controller="remote_select_instruction"
+       data-target="remote_select_instruction.simpleClassAttributeFormArea"
+       data-remote_select_instruction-select-type-value="simple_class_attribute_form_article_addition"
+  >
+
+    <div class="form-inputs">
+      <%= render "simple_class/simple_class_attributes/partials/regular_fields", :f => f %>
+    </div>
+
+  </div>
+
+  <div class="bg-gray-50 px-4 py-3 sm:px-6">
+    <div class="text-end">
+      <%= link_to "Back to Class", article_articles_path, class: "py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" %>
+      <% button_text = @simple_class_attribute.new_record? ? "Create Attribute" : "Submit changes" %>
+      <%= f.button :submit, button_text, class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+    </div>
+  </div>
+
+<% end %>

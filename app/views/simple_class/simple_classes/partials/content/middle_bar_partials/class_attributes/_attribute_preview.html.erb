@@ -1,0 +1,57 @@
+<div class="py-2 border-t-2 border-gray-100">
+  <div class="flex flex-wrap lg:flex-nowrap items-center">
+    <div class="w-full lg:w-auto px-4 mb-8 lg:mb-0">
+      <img src="/_next/static/media/jucy-beef-burger.346917d5ccb0b705233bb1665ffb63f6.jpg" loading="lazy" alt="" width="144" height="144" class="flex-none w-18 h-18 rounded-lg object-cover bg-gray-100">
+    </div>
+
+    <div class="w-full lg:w-9/12 px-4 mb-10 lg:mb-0">
+      <div class="max-w-2xl">
+
+        <div class="action-last-update-time">
+          <span class="block text-gray-400 mb-1"><%= simple_class_attribute.updated_at.strftime("%B %d, %Y")%></span>
+        </div>
+
+        <div class="action-title">
+          <!--                    <p class="text-2xl font-semibold text-gray-900">Consectures Dummy Content Velit officia consequat duis enim velit mollit adipsing</p>-->
+          <p class="text-base sm:text-lg lg:text-base xl:text-lg font-semibold text-black mb-0.5"><%= simple_class_attribute.title %></p>
+        </div>
+
+        <div class="action-description">
+          <p class="text-sm	 text-gray-900"><%= truncate(simple_class_attribute.description, length: 170, omission: '...', :escape => false) %></p>
+        </div>
+
+        <div class="action-author">
+          <div class="text-sm	flex-none w-full mt-0.5 font-normal">
+            <dt class="inline">By</dt>
+            <dd class="inline text-black">Hank Douglas</dd>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- read button -->
+    <div class="w-full lg:w-auto px-4 ml-auto text-right">
+
+
+
+      <%#= technology_item_link_to simple_class_attribute.article, :target => "_blank", class: "inline-flex items-center text-xl font-semibold text-orange-900 hover:text-gray-900" do %>
+<!--        <span class="mr-2">Read</span>-->
+<!--        <svg class="animate-bounce" width="16" height="16" viewbox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">-->
+<!--          <path d="M1.33301 14.6668L14.6663 1.3335" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>-->
+<!--          <path d="M1.33301 1.3335H14.6663V14.6668" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>-->
+<!--        </svg>-->
+      <%# end %>
+
+      <%#= link_to simple_class_interface_member_path(interface_member), :target => "_blank", class: "inline-flex items-center text-xl font-semibold text-orange-900 hover:text-gray-900" do %>
+      <!--        <span class="mr-2">Read</span>-->
+      <!--        <svg class="animate-bounce" width="16" height="16" viewbox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">-->
+      <!--          <path d="M1.33301 14.6668L14.6663 1.3335" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>-->
+      <!--          <path d="M1.33301 1.3335H14.6663V14.6668" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>-->
+      <!--        </svg>-->
+      <%# end %>
+    </div>
+  </div>
+</div>
+
+

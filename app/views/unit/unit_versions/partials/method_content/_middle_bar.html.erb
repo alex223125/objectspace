@@ -30,7 +30,7 @@
       </div>
 
       <% if unit_version.solves_the_problem.present? %>
-        <div class="break-words solves-the-problem-section" id="solves-the-problem">
+        <div class="break-words solves-the-problem-section" id="solves-the-problem-<%=unit_version.unit.uniq_key%>">
           # Solves the problem:
           <%= unit_version.solves_the_problem.html_safe %>
         </div>
@@ -38,21 +38,29 @@
       <% end %>
 
       <% if unit_version.target_audience.present? %>
-        <div class="break-words target-audience-section" id="target-audience">
+        <div class="break-words target-audience-section" id="target-audience-<%=unit_version.unit.uniq_key%>">
           # Target audience:
           <%= unit_version.target_audience.html_safe %>
         </div>
         <br>
       <% end %>
 
-      <div class="break-words instruction-section" id="instruction">
+      <% if unit_version.description.present? %>
+        <div class="break-words description-section" id="description-<%=unit_version.unit.uniq_key%>">
+          # Description:
+          <%= unit_version.description.html_safe %>
+        </div>
+        <br>
+      <% end %>
+
+      <div class="break-words instruction-section" id="instruction-<%=unit_version.unit.uniq_key%>">
         # Instruction:
         <%= unit_version.instruction.html_safe %>
       </div>
       <br>
 
       <% if unit_version.sources.present? %>
-        <div class="break-words sources-section" id="sources">
+        <div class="break-words sources-section" id="sources-<%=unit_version.unit.uniq_key%>">
           # Sources:
           <%= unit_version.sources.html_safe %>
         </div>
@@ -60,14 +68,14 @@
       <% end %>
 
       <% if unit_version.additional_information.present? %>
-        <div class="break-words additional-information-section" id="additional-information">
+        <div class="break-words additional-information-section" id="additional-information-<%=unit_version.unit.uniq_key%>">
           # Additional information:
           <%= unit_version.additional_information.html_safe %>
         </div>
         <br>
       <% end %>
 
-      <div class="contribute-section" id="contribute">
+      <div class="contribute-section" id="contribute-<%=unit_version.unit.uniq_key%>">
         <div class="mt-8">
           <div class="w-full p-4 border border-gray-200 bg-gray-50 rounded-t-xl dark:border-gray-600 dark:bg-gray-700">
             <div class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">Contribute</div>

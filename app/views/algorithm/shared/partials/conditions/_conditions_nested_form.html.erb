@@ -1,0 +1,11 @@
+<div class="conditions-nested-form">
+
+  <%= form.fields_for :conditions, Algorithms::Nodes::Condition.new do |f| %>
+
+    <%= render "algorithm/shared/partials/conditions/condition_fields", :f => f %>
+
+  <% end %>
+
+</div>
+<br>
+

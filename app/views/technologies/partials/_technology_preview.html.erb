@@ -19,6 +19,10 @@
           <p class="text-base sm:text-lg lg:text-base xl:text-lg font-semibold text-black mb-0.5"><%= technology_member.title %></p>
         </div>
 
+        <div class="technology-type">
+          <p class="text-base sm:text-lg lg:text-base xl:text-lg font-semibold text-black mb-0.5"><%= technology_member.class %></p>
+        </div>
+
         <div class="technology-description">
           <% if technology_member.try(:source_page_description).present? %>
             <p class="text-sm	 text-gray-900"><%= truncate(technology_member.source_page_description, length: 170, omission: '...', :escape => false) %></p>

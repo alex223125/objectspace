@@ -4,7 +4,8 @@ Title:
 <%= @simple_class.title %>
 <br>
 Type of class:
-<%= type_readable_name(@simple_class) %>
+<% binding.pry %>
+<%= @simple_class.functional_type_readable_name %>
 <br>
 
 

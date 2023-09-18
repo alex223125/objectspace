@@ -1,11 +1,16 @@
 <!--      TOC-->
-<div class="method-toc">
+<div class="method-toc" data-controller="toc_scrolling">
   <br>
   Table of content:
   <ul role="list" a="" class="space-y-3 text-base list-none sm:text-lg md:mt-5 md:text-xl">
     <% if unit_version.solves_the_problem.present? %>
       <li>
-        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#solves-the-problem">
+        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+           onclick="return false;"
+           href=""
+           data-action="click->toc_scrolling#scroll"
+           data-anchor="#solves-the-problem-<%=unit_version.unit.uniq_key%>"
+        >
           ↳ Solves the problem
         </a>
       </li>
@@ -13,21 +18,49 @@
 
     <% if unit_version.target_audience.present? %>
       <li>
-        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#target-audience">
+        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+           onclick="return false;"
+           href=""
+           data-action="click->toc_scrolling#scroll"
+           data-anchor="#target-audience-<%=unit_version.unit.uniq_key%>"
+        >
           ↳ Target audience
         </a>
       </li>
     <% end %>
 
+    <% if unit_version.description.present? %>
+      <li>
+        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+           onclick="return false;"
+           href=""
+           data-action="click->toc_scrolling#scroll"
+           data-anchor="#description-<%=unit_version.unit.uniq_key%>"
+        >
+          ↳ Description
+        </a>
+      </li>
+    <% end %>
+
     <li>
-      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#instruction">
+      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+         onclick="return false;"
+         href=""
+         data-action="click->toc_scrolling#scroll"
+         data-anchor="#instruction-<%=unit_version.unit.uniq_key%>"
+      >
         ↳ Instruction
       </a>
     </li>
 
     <% if unit_version.sources.present? %>
       <li>
-        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#sources">
+        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+           onclick="return false;"
+           href=""
+           data-action="click->toc_scrolling#scroll"
+           data-anchor="#sources-<%=unit_version.unit.uniq_key%>"
+        >
           ↳ Sources
         </a>
       </li>
@@ -35,22 +68,38 @@
 
     <% if unit_version.additional_information.present? %>
       <li>
-        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#additional-information">
+        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+           onclick="return false;"
+           href=""
+           data-action="click->toc_scrolling#scroll"
+           data-anchor="#additional-information-<%=unit_version.unit.uniq_key%>"
+        >
           ↳ Additional information
         </a>
       </li>
     <% end %>
 
     <li>
-      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#contribute">
+      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+         onclick="return false;"
+         href=""
+         data-action="click->toc_scrolling#scroll"
+         data-anchor="#contribute-<%=unit_version.unit.uniq_key%>"
+      >
         ↳ Contribute
       </a>
     </li>
 
     <li>
-      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#comments">
+      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+         onclick="return false;"
+         href=""
+         data-action="click->toc_scrolling#scroll"
+         data-anchor="#comments-<%=unit_version.unit.uniq_key%>"
+      >
         ↳ Comments
       </a>
     </li>
+
   </ul>
 </div>

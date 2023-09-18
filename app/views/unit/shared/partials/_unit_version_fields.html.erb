@@ -46,6 +46,21 @@
 <br>
 
 
+<div class="col-span-6 sm:col-span-3" data-controller="unit_description_tinymce">
+  <%= f.label "Description", class: "block text-sm font-medium text-gray-700" %>
+  <%= f.hint 'Here you can describe what can be achieved by using this method, in what cases this method can be useful, on which step it can be used in algorithms. What benefits and negatives this method have comparing to other methods.',
+             class: "mt-2 text-sm text-gray-500" %>
+  <%= f.input_field :description, data: { target: 'unit_description_tinymce.field' } %>
+</div>
+<br>
+
+<div class="col-span-6 sm:col-span-3" data-controller="unit_instruction_tinymce">
+  <%= f.label "Method", class: "block text-sm font-medium text-gray-700" %>
+  <%= f.hint 'Describe the method by which the problem is solved.', class: "mt-2 text-sm text-gray-500" %>
+  <%= f.input_field :instruction, data: { target: 'unit_instruction_tinymce.field' } %>
+</div>
+<br>
+
 <div class="col-span-6 sm:col-span-3" data-controller="unit_additional_information_tinymce">
   <%= f.label "Target audience (optional)", class: "block text-sm font-medium text-gray-700" %>
   <%= f.hint 'If you have something to add which does not fit in any of the above category you can add it here..',
@@ -59,13 +74,6 @@
   <%= f.label "Problem (optional)", class: "block text-sm font-medium text-gray-700" %>
   <%= f.hint 'Describe what problem or problems this method solves.', class: "mt-2 text-sm text-gray-500" %>
   <%= f.input_field :solves_the_problem, data: { target: 'unit_solves_the_problem_tinymce.field' } %>
-</div>
-<br>
-
-<div class="col-span-6 sm:col-span-3" data-controller="unit_instruction_tinymce">
-  <%= f.label "Method", class: "block text-sm font-medium text-gray-700" %>
-  <%= f.hint 'Describe the method by which the problem is solved.', class: "mt-2 text-sm text-gray-500" %>
-  <%= f.input_field :instruction, data: { target: 'unit_instruction_tinymce.field' } %>
 </div>
 <br>
 

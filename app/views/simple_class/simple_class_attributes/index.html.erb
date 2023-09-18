@@ -1,0 +1,53 @@
+<% if notice.present? %>
+  <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
+<% end %>
+
+<!-- component -->
+<div id="top">
+  <div class="w-full max-w-screen-xl mx-auto px-6">
+    <div class="flex justify-center p-4 px-3 py-10">
+      <div class="w-full">
+        <div class="bg-white shadow-md rounded-lg px-3 py-2 mb-4">
+
+          <!-- to partial -->
+          <div class="text-left pl-8">
+            <%= link_to simple_class_path(username: @target_simple_class.owner, id: @target_simple_class.id) do %>
+              <button type="button" class="bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 text-white rounded-md border-r border-gray-100 py-2 hover:bg-red-700 hover:text-white px-10">
+                <div class="flex flex-row align-middle">
+                  <svg class="w-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M7.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+                  </svg>
+                  <p class="">Back to Class</p>
+                </div>
+              </button>
+            <% end %>
+          </div>
+
+          <div class="text-center">
+            <h2 class="font-semibold text-3xl">List of Attributes</h2>
+            <p class="max-w-md mx-auto mt-2 text-gray-500">On this page list of all attributes added to <%= @target_simple_class.title %>.</p>
+          </div>
+          <br>
+
+          <% if @simple_class_attributes.any? %>
+            <div class="attributes-toc-section pl-8">
+              <%= render "simple_class/simple_class_attributes/partials/toc",  simple_class_attributes: @simple_class_attributes %>
+            </div>
+            <br>
+
+            <div id="simple_class_attributes" class="min-w-full">
+              <% @simple_class_attributes.each do |simple_class_attribute| %>
+                <%= render "simple_class/simple_class_attributes/partials/attribute_card",  simple_class_attribute: simple_class_attribute %>
+              <% end %>
+            </div>
+          <% else %>
+            No attributes added, you can add it using this button (not found card here)
+          <% end %>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%= render "shared/scroll_to_top" %>

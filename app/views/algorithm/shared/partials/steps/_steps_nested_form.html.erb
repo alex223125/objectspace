@@ -3,7 +3,7 @@
 <!--<h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight text-center">Steps</h2>-->
 
 <div class="col-span-6 sm:col-span-3">
-  <p class="text-xl font-bold hover:text-gray-700">Steps:</p>
+  <p class="text-xl font-bold hover:text-gray-700">Moves:</p>
   <p class="mt-2 text-sm text-gray-500">Here you can add examples how to use the method on practice with different cases
     and scenarios. Click on substep and move up or down to change position in the substeps list.</p>
 </div>
@@ -26,41 +26,50 @@
 <!--  </div>-->
 <!--</div>-->
 <div class="steps-nested-form">
-  <div data-controller="steps_drag remote_select_instruction algorithm_step_type_select steps_nested_form"
+  <div data-controller="nodes_drag remote_select_instruction algorithm_step_type_select steps_nested_form"
        data-drag-url="/todos/:id/move"
-       data-target="remote_select_instruction.stepsArea steps_drag.stepsArea"
+       data-target="remote_select_instruction.stepsArea nodes_drag.nodesArea"
        data-remote_select_instruction-select-type-value="algorithm_form_wrapper_step_addition">
 
     <!--    // Template 1 regular step-->
     <template data-target='steps_nested_form.regularStepFieldsTemplate' class="step-fields-template">
-      <%= form.fields_for :steps, Algorithms::Step.new, child_index: 'TEMPLATE_RECORD' do |step| %>
+      <%= form.fields_for :subnodes, Algorithms::Nodes::Step.new, child_index: 'TEMPLATE_RECORD' do |step| %>
         <%= render "algorithm/shared/partials/steps/regular_step_fields", :f => step %>
       <% end %>
     </template>
 
     <!--    // Template 2 wrapper step-->
     <template data-target='steps_nested_form.wrapperStepFieldsTemplate' class="step-fields-template">
-      <%= form.fields_for :steps, Algorithms::Step.new, child_index: 'TEMPLATE_RECORD' do |step| %>
+      <%= form.fields_for :subnodes, Algorithms::Nodes::Step.new, child_index: 'TEMPLATE_RECORD' do |step| %>
         <%= render "algorithm/shared/partials/steps/wrapper_step_fields", :f => step %>
       <% end %>
     </template>
 
     <!--    // Template 3 container step-->
     <template data-target='steps_nested_form.containerStepFieldsTemplate' class="step-fields-template">
-      <%= form.fields_for :steps, Algorithms::Step.new, child_index: 'TEMPLATE_RECORD' do |step| %>
+      <%= form.fields_for :subnodes, Algorithms::Nodes::Step.new, child_index: 'TEMPLATE_RECORD' do |step| %>
         <%= render "algorithm/shared/partials/steps/container_step_fields", :f => step %>
       <% end %>
     </template>
 
+    <!--    // Template 4 container step-->
+    <template data-target='steps_nested_form.singleAlternativeControlStructureFieldsTemplate' class="step-fields-template">
+      <%= form.fields_for :subnodes, Algorithms::Nodes::ControlStructure.new, child_index: 'TEMPLATE_RECORD' do |node| %>
+        <%= render "algorithm/shared/partials/control_structures/single_alternative_cs_fields", :f => node %>
+      <% end %>
+    </template>
 
-    <%= form.fields_for :steps do |step| %>
+
+    <%= form.fields_for :subnodes, Algorithms::Nodes::Step.new do |step| %>
       <% binding.pry %>
-      <% if Steps::TypeTypes[step.object[:type]] == "regular" %>
+      <% if Steps::FunctionalTypes.try(:[], step.object[:type]) == "regular" %>
         <%= render "algorithm/shared/partials/steps/regular_step_fields", :f => step %>
-      <% elsif Steps::TypeTypes[step.object[:type]] == "wrapper" %>
+      <% elsif Steps::FunctionalTypes.try(:[], step.object[:type]) == "wrapper" %>
         <%= render "algorithm/shared/partials/steps/wrapper_step_fields", :f => step %>
-      <% elsif Steps::TypeTypes[step.object[:type]] == "container" %>
+      <% elsif Steps::FunctionalTypes.try(:[], step.object[:type]) == "container" %>
         <%= render "algorithm/shared/partials/steps/container_step_fields", :f => step %>
+      <% elsif ControlStructures::FunctionalTypes.try(:[], node.object[:type]) == "single_alternative" %>
+        <%= render "algorithm/shared/partials/control_structures/single_alternative_cs_fields", :f => node %>
       <% end %>
     <% end %>
 
@@ -74,7 +83,7 @@
 
       <!--      regular step original button -->
       <button data-action="click->steps_nested_form#add_association"
-              data-step-type="regular_step"
+              data-node-type="regular_step"
               data-child-index-keyword="TEMPLATE_RECORD"
               data-target="algorithm_step_type_select.addRegularStepOriginalButton"
               class="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800"
@@ -88,7 +97,7 @@
 
       <!--      wrapper step original button -->
       <button data-action="click->steps_nested_form#add_association"
-              data-step-type="wrapper_step"
+              data-node-type="wrapper_step"
               data-child-index-keyword="TEMPLATE_RECORD"
               data-target="algorithm_step_type_select.addWrapperStepOriginalButton remote_select_instruction.addWrapperStepOriginalButton"
               class="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800"
@@ -102,7 +111,7 @@
 
       <!--      container step original button -->
       <button data-action="click->steps_nested_form#add_association"
-              data-step-type="container_step"
+              data-node-type="container_step"
               data-child-index-keyword="TEMPLATE_RECORD"
               data-target="algorithm_step_type_select.addContainerStepOriginalButton"
               class="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800"

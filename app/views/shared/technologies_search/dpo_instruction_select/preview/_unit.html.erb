@@ -1,4 +1,8 @@
-<% unit = @unit %>
+<% if unit.present? %>
+  <!--  do nothing -->
+<% else  %>
+  <% unit = @unit %>
+<% end %>
 
 <div class="rounded-xl border p-5 shadow-md bg-white">
   <div class="flex w-full items-center justify-between border-b pb-3">

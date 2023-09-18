@@ -1,23 +1,6 @@
-<%#= form_with(model: simple_class, class: "contents") do |form| %>
-  <%# if simple_class.errors.any? %>
-<!--    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">-->
-<!--      <h2><%#= pluralize(simple_class.errors.count, "error") %> prohibited this simple_class from being saved:</h2>-->
-
-<!--      <ul>-->
-        <%# simple_class.errors.each do |error| %>
-<!--          <li><%#= error.full_message %></li>-->
-        <%# end %>
-<!--      </ul>-->
-<!--    </div>-->
-  <%# end %>
-
-<!--  <div class="inline">-->
-    <%#= form.submit class: "rounded-lg py-3 px-5 bg-blue-600 text-white inline-block font-medium cursor-pointer" %>
-<!--  </div>-->
-<%# end %>
-
-
-<%= simple_form_for(@simple_class, url: simple_class_simple_classes_path) do |f| %>
+<% path = @simple_class.new_record? ? simple_class_simple_classes_path : simple_class_simple_class_path %>
+<% method = @simple_class.new_record? ? :post : :patch %>
+<%= simple_form_for(@simple_class, url: path, method: method) do |f| %>
 
 
   <% if @simple_class.errors.any? %>
@@ -44,14 +27,27 @@
     </div>
     <br>
 
-    <div class="col-span-6 sm:col-span-3">
-      <%= f.label "Description", class: "block text-sm font-medium text-gray-700" %>
+    <div class="col-span-6 sm:col-span-3" data-controller="unit_instruction_tinymce">
+      <%= f.label "Source page description (optional)", class: "block text-sm font-medium text-gray-700" %>
       <%= f.hint 'Thats the description which will be shown on the top of the source page',
+                 class: "mt-2 text-sm text-gray-500" %>
+      <%= f.input_field :source_page_description,
+                        required: false,
+                        class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
+                        placeholder: "Ex: Different versions on how you can install Ruby on Rails on different environments",
+                        data: { target: 'unit_instruction_tinymce.field' }%>
+    </div>
+    <br>
+
+    <div class="col-span-6 sm:col-span-3" data-controller="unit_instruction_tinymce">
+      <%= f.label "Description (optional)", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.hint "Here you can add information about how to use class and it's organizational structure",
                  class: "mt-2 text-sm text-gray-500" %>
       <%= f.input_field :description,
                         required: false,
                         class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
-                        placeholder: "Ex: Different versions on how you can install Ruby on Rails on different environments" %>
+                        placeholder: "Ex: This class contains algorithms which are used during day-to-day decision making",
+                        data: { target: 'unit_instruction_tinymce.field' } %>
     </div>
     <br>
 
@@ -68,28 +64,37 @@
 
     <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
 
-    <%#= f.hidden_field :type, :input_html => { value: @class_type } %>
-    <%= f.hidden_field :type, value: @class_type %>
-
-    <% if @class_type ==  SimpleClasses::TypeTypes[:decision_object_container_class] %>
-      <%#= render "simple_class/simple_classes/partials/class_containers/nested_form", :form => f %>
-      <%= render "shared/form_partials/containers/root_class_container/form", :form => f %>
+    <% if @class_type.present? %>
+      <%= f.hidden_field :functional_type, value: @class_type %>
     <% end %>
 
+    <div class="simple-class-components-nested-forms">
+      <!-- 1.1 algorithm selection form (if DPO) -->
+      <% if @class_type ==  SimpleClasses::FunctionalTypes[:decision_process_object_class] %>
+        <%= render "simple_class/simple_classes/partials/instruction_select_field", :f => f %>
+      <% end %>
 
-    <% if @class_type ==  SimpleClasses::TypeTypes[:decision_process_object_class] %>
-      <%= render "simple_class/simple_classes/partials/instruction_select_field", :f => f %>
-    <% end %>
+      <!-- 1.2 attributes -->
+      <%= render "simple_class/simple_classes/partials/simple_attributes/nested_from", :form => f %>
 
-    <%#= render "simple_class/simple_classes/partials/interfaces/interface_groups/nested_form", :form => f %>
-    <%= render "shared/form_partials/interfaces/root_interface_group/form", :form => f %>
+      <!-- 1.3 actions -->
+      <%#= render "simple_class/simple_classes/partials/interfaces/interface_groups/nested_form", :form => f %>
+      <%= render "shared/form_partials/interfaces/root_interface_group/form", :form => f %>
 
-    <%= hidden_field_tag 'target_folder', @target_folder.id  %>
+      <!-- 1.4 components -->
+      <% if @class_type ==  SimpleClasses::FunctionalTypes[:decision_object_container_class] %>
+        <%#= render "simple_class/simple_classes/partials/class_containers/nested_form", :form => f %>
+        <%= render "shared/form_partials/containers/root_class_container/form", :form => f %>
+      <% end %>
+    </div>
+
+    <%= hidden_field_tag 'target_folder', @target_folder.try(:id)  %>
 
     <div class="bg-gray-50 px-4 py-3 sm:px-6">
       <div class="text-end">
         <%= link_to "Back to dashboard", simple_class_simple_classes_path, class: "py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" %>
-        <%= f.button :submit, "Create Class", class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+        <% button_text = @simple_class.new_record? ? "Create Class" : "Submit changes" %>
+        <%= f.button :submit, button_text, class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
       </div>
     </div>
 

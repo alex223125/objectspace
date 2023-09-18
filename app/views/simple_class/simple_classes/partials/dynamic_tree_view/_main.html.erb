@@ -1,0 +1,42 @@
+<div id="dynamic-tree" data-target="simple_class_tree_map.dynamicTree">
+  <ul>
+    <li class="jstree-open">
+      <% binding.pry %>
+      <%= render "simple_class/simple_classes/partials/dynamic_tree_view/root_node_menu", simple_class: simple_class %>
+      <ul>
+        <!-- Part 1.Attributes -->
+        <li class="jstree-open">
+          <%= render "simple_class/simple_classes/partials/dynamic_tree_view/attributes_menu", attributes: simple_class.simple_class_attributes %>
+          <ul>
+            <% simple_class.simple_class_attributes.each do |attribute| %>
+              <li>
+                <%= render "simple_class/simple_classes/partials/dynamic_tree_view/attribute_item", attribute: attribute %>
+              </li>
+            <% end %>
+          </ul>
+        </li>
+
+
+        <!-- Part 2.Actions -->
+        <li class="jstree-open">
+          <%= render "simple_class/simple_classes/partials/dynamic_tree_view/actions_menu", simple_class: simple_class %>
+          <ul>
+            <% simple_class.interface_groups.each do |interface_group| %>
+              <li class="jstree-open">
+                <%= render "simple_class/simple_classes/partials/dynamic_tree_view/interface_group_item", interface_group: interface_group %>
+                <ul>
+                  <% interface_group.interface_members.each do |interface_member| %>
+                    <li>
+                      <%= render "simple_class/simple_classes/partials/dynamic_tree_view/interface_member_item",
+                                 interface_member: interface_member, type: type %>
+                    </li>
+                  <% end %>
+                </ul>
+              </li>
+            <% end %>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>

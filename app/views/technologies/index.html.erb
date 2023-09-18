@@ -5,138 +5,18 @@
 
     <!-- header of the page -->
     <dev class="flex justify-center items-center">
-
       <!-- 1 search with filters form -->
       <%= render "technologies/index_partials/search_form" %>
-
     </dev>
 
     <!--    middle of the page -->
     <div class="flex-1 flex flex-col sm:flex-row">
 
       <dev class="flex-1">
-
-        <div data-controller="tech_serp_tabs"
-             data-tech_serp_search-target="searchTabs"
-             data-tech_serp_tabs-active-tab="active inline-block p-4 border-b-2 rounded-t-lg text-blue-600 hover:text-blue-600 dark:text-blue-500 dark:hover:text-blue-500 border-blue-600 dark:border-blue-500"
-             data-tech_serp_tabs-inactive-tab="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300">
-
-          <div class="mb-4 border-b border-gray-200 dark:border-gray-700">
-            <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="tech-search-results-tabs" role="tablist">
-              <li class="mr-2" role="presentation"
-                  data-tech_serp_tabs-target="tab"
-                  data-action="click->tech_serp_tabs#change">
-                <button class="inline-block p-4 border-b-2 rounded-t-lg text-blue-600 hover:text-blue-600 dark:text-blue-500 dark:hover:text-blue-500 border-blue-600 dark:border-blue-500"
-                        data-tech_serp_search-target="allTab"
-                        id="mixed-results-tab" type="button" role="tab" aria-controls="dashboard" aria-selected="false">All</button>
-              </li>
-              <li class="mr-2" role="presentation"
-                  data-tech_serp_tabs-target="tab"
-                  data-action="click->tech_serp_tabs#change">
-                <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
-                        data-tech_serp_search-target="articlesTab"
-                        id="articles-tab" type="button" role="tab" aria-controls="dashboard" aria-selected="false">Articles</button>
-              </li>
-              <li class="mr-2" role="presentation"
-                  data-tech_serp_tabs-target="tab"
-                  data-action="click->tech_serp_tabs#change">
-                <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
-                        data-tech_serp_search-target="methodsTab"
-                        id="methods-tab" type="button" role="tab" aria-controls="settings" aria-selected="false">Methods</button>
-              </li>
-              <li class="mr-2" role="presentation"
-                  data-tech_serp_tabs-target="tab"
-                  data-action="click->tech_serp_tabs#change">
-                <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
-                        data-tech_serp_search-target="algorithmsTab"
-                        id="algorithms-tab" type="button" role="tab" aria-controls="settings" aria-selected="false">Algorithms</button>
-              </li>
-              <li class="mr-2" role="presentation"
-                  data-tech_serp_tabs-target="tab"
-                  data-action="click->tech_serp_tabs#change">
-                <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
-                        data-tech_serp_search-target="classesTab"
-                        id="classes-tab" type="button" role="tab" aria-controls="settings" aria-selected="false">Classes</button>
-              </li>
-              <li class="mr-2" role="presentation"
-                  data-tech_serp_tabs-target="tab"
-                  data-action="click->tech_serp_tabs#change">
-                <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
-                        data-tech_serp_search-target="frameworksTab"
-                        id="frameworks-tab" type="button" role="tab" aria-controls="settings" aria-selected="false">Frameworks</button>
-              </li>
-            </ul>
-          </div>
-
-          <div class="hidden py-4 px-4 border-l border-b border-r"
-               data-tech_serp_search-target="allMixedEntriesTab"
-               data-tech_serp_tabs-target="panel">
-            <div data-target="tech_serp_search.allMixedEntries">
-
-            </div>
-            <%= render "technologies/index_partials/loading_indicator" %>
-            <%= render "technologies/index_partials/load_more_button" %>
-          </div>
-
-          <div class="hidden py-4 px-4 border-l border-b border-r"
-               data-tech_serp_search-target="articlesEntriesTab"
-               data-tech_serp_tabs-target="panel">
-            <div data-target="tech_serp_search.articlesEntries">
-
-            </div>
-            <%= render "technologies/index_partials/loading_indicator" %>
-            <%= render "technologies/index_partials/load_more_button" %>
-          </div>
-
-          <div class="hidden py-4 px-4 border-l border-b border-r"
-               data-tech_serp_search-target="methodsEntriesTab"
-               data-tech_serp_tabs-target="panel">
-<!--            Methods-->
-            <div data-target="tech_serp_search.methodsEntries">
-
-            </div>
-            <%= render "technologies/index_partials/loading_indicator" %>
-            <%= render "technologies/index_partials/load_more_button" %>
-          </div>
-
-          <div class="hidden py-4 px-4 border-l border-b border-r"
-               data-tech_serp_search-target="algorithmsEntriesTab"
-               data-tech_serp_tabs-target="panel">
-<!--            Algorithms-->
-            <div data-target="tech_serp_search.algorithmsEntries">
-
-            </div>
-            <%= render "technologies/index_partials/loading_indicator" %>
-            <%= render "technologies/index_partials/load_more_button" %>
-          </div>
-
-          <div class="hidden py-4 px-4 border-l border-b border-r"
-               data-tech_serp_search-target="classesEntriesTab"
-               data-tech_serp_tabs-target="panel">
-<!--            Classes-->
-            <div data-target="tech_serp_search.classesEntries">
-
-            </div>
-            <%= render "technologies/index_partials/loading_indicator" %>
-            <%= render "technologies/index_partials/load_more_button" %>
-          </div>
-
-          <div class="hidden py-4 px-4 border-l border-b border-r"
-               data-tech_serp_search-target="frameworksEntriesTab"
-               data-tech_serp_tabs-target="panel">
-<!--            Frameworks-->
-            <div data-target="tech_serp_search.frameworksEntries">
-
-            </div>
-            <%= render "technologies/index_partials/loading_indicator" %>
-            <%= render "technologies/index_partials/load_more_button" %>
-          </div>
-
-        </div>
-
+        <%= render "technologies/index_partials/search_result_tabs" %>
       </dev>
 
-      <nav class="order-first sm:w-32 bg-purple-200">Sidebar</nav>
+      <nav class="order-first sm:w-32 bg-purple-200">Left Sidebar</nav>
 
       <aside class="w-1/5 bg-yellow-100">Right Sidebar</aside>
     </div>

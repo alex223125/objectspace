@@ -1,0 +1,9 @@
+<div data-controller="dynamic_step_form"
+     data-target="dynamic_step_form.dynamicNodeForm">
+
+  <%= form.simple_fields_for(:subnodes, Algorithms::Nodes::ControlStructure.new) do |node| %>
+    <%# step.options[:child_index] = Time.now.strftime("%I%M%S") %>
+    <%= render "algorithm/shared/partials/control_structures/single_alternative_cs_fields", :f => node %>
+  <% end %>
+
+</div>

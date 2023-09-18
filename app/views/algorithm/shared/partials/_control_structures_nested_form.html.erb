@@ -1,5 +1,23 @@
-<%= form.fields_for :control_structures do |f| %>
+<div data-controller="nodes_drag"
+     data-target="nodes_drag.nodesArea">
+<!--     data-remote_select_instruction-select-type-value="algorithm_form_wrapper_step_addition"-->
 
-  <%= render "algorithm/shared/partials/steps/steps_nested_form", :form => f %>
 
-<% end %>
+  <%= form.fields_for :control_structures do |f| %>
+
+    <%= f.hidden_field :position, class: "node-position-hidden-field",
+                       data: { target: 'nodes_drag.nodePositionHiddenField'},
+                       id: "algorithm-base-control-structure"
+    %>
+
+    <%= f.hidden_field :control_structure_functional_type, value: ControlStructures::FunctionalTypes[:initial_template] %>
+
+    <%#= render "algorithm/shared/partials/steps/steps_nested_form", :form => f %>
+
+    <% binding.pry %>
+    <%= render "algorithm/shared/partials/nodes_nested_form", :form => f %>
+
+  <% end %>
+
+</div>
+<br>

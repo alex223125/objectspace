@@ -1,4 +1,9 @@
-<% algorithm_version = @algorithm_version %>
+<% if algorithm.present? %>
+  <!--  do nothing -->
+<% else  %>
+  <% algorithm = @algorithm %>
+<% end %>
+
 
 <div class="rounded-xl border p-5 shadow-md bg-white">
   <div class="flex w-full items-center justify-between border-b pb-3">
@@ -13,11 +18,8 @@
   </div>
 
   <div class="mt-4 mb-6">
-    <!--          <div data-select_instruction-target="instructionId" style="visibility: hidden;"><%#= unit.id %></div>-->
-    <!--          <div data-select_instruction-target="instructionType" style="visibility: hidden;"><%#= unit.class %></div>-->
-
-    <div class="mb-3 text-xl font-bold"><%= algorithm_version.title %></div>
-    <div class="text-sm text-neutral-600"><%= truncate(algorithm_version.solves_the_problem.html_safe, :length => 500, :omission => "" , :escape => false) %></div>
+    <div class="mb-3 text-xl font-bold"><%= algorithm.title %></div>
+    <div class="text-sm text-neutral-600"><%= truncate(algorithm.source_page_description.html_safe, :length => 500, :omission => "" , :escape => false) %></div>
   </div>
 
   <div>
@@ -43,14 +45,14 @@
 
       <!--            <div data-select_instruction-target="addSubstepRemoteButtonClick">-->
 
-<!--      <div data-action="click->remote_select_instruction#addSubstepRemoteButtonClick"-->
-<!--           data-instructionId="<%#= algorithm_version.id %>"-->
-<!--           data-instructionType="algorithm_version">-->
-<!--        <button type="button"-->
-<!--                class="flex text-white right-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">-->
-<!--          Add to substeps-->
-<!--        </button>-->
-<!--      </div>-->
+      <!--      <div data-action="click->remote_select_instruction#addSubstepRemoteButtonClick"-->
+      <!--           data-instructionId="<%#= algorithm_version.id %>"-->
+      <!--           data-instructionType="algorithm_version">-->
+      <!--        <button type="button"-->
+      <!--                class="flex text-white right-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">-->
+      <!--          Add to substeps-->
+      <!--        </button>-->
+      <!--      </div>-->
 
       <!--            justify-end	 align-right right flex text-white right-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800-->
 

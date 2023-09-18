@@ -1,21 +1,18 @@
 <!-- TOC-->
-<% if interface_groups.any? || interface_groups_root.present? %>
-  <div class="interface-groups-toc">
+<% if interface_groups.any? %>
+  <div class="interface-groups-toc" data-controller="toc_scrolling">
     <br>
     Actions groups:
-    <ul role="list" a="" class="space-y-3 text-base list-none sm:text-lg md:mt-5 md:text-xl">
-
-      <li>
-        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
-           href="#interface-group-<%= interface_groups_root.id %>">
-          ↳ <%= interface_groups_root.title %>
-        </a>
-      </li>
+    <ul role="list" class="space-y-3 text-base list-none sm:text-lg md:mt-5 md:text-xl">
 
       <% interface_groups.each do |interface_group| %>
         <li>
           <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
-             href="#interface-group-<%= interface_group.id %>">
+             onclick="return false;"
+             href=""
+             data-action="click->toc_scrolling#scroll"
+             data-anchor=#interface-group-<%= interface_group.id %>
+          >
             ↳ <%= interface_group.title %>
           </a>
         </li>
@@ -24,4 +21,13 @@
     </ul>
   </div>
   <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+<% else %>
+  <br>
+  <!--  no interface group exists card -->
+  <div class="max-w-4xl p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+    <a href="#">
+      <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">This class doesn't have any Actions Group</h5>
+    </a>
+    <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Add new Actions Group Using button below .</p>
+  </div>
 <% end %>

@@ -1,0 +1,19 @@
+<div class="col-span-6 sm:col-span-3">
+  <%= f.label "Title", class: "block text-sm font-medium text-gray-700" %>
+  <%= f.input_field :title, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+</div>
+
+<div class="col-span-6 sm:col-span-3" data-controller="unit_instruction_tinymce">
+  <%= f.label "Instruction", class: "block text-sm font-medium text-gray-700" %>
+  <%= f.hint 'Describe the method by which the problem is solved.', class: "mt-2 text-sm text-gray-500" %>
+  <%= f.input_field :instruction, data: { target: 'unit_instruction_tinymce.field' } %>
+</div>
+<br>
+
+
+
+
+
+
+
+

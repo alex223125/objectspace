@@ -1,0 +1,24 @@
+<div class="interface-groups-tree p-8">
+
+  <!-- 1.1 root uncategorized actions -->
+  <!--  We don't have actions in default root-->
+
+  <!-- 1.2 actions groups -->
+  <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+
+  <div class="col-span-6 sm:col-span-3">
+    <p class="text-xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Actions Groups:</p>
+    <p class="mt-2 text-sm text-gray-500 text-center">Here you can pick different actions to use link them with Attributes.</p>
+  </div>
+  <br>
+
+  <div>
+    <div>
+      <% children_interface_groups.each do |interface_group| %>
+        <%= render "simple_class/simple_classes/partials/tree_view/interface_group", :interface_group => interface_group %>
+      <% end %>
+    </div>
+  </div>
+
+  <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+</div>

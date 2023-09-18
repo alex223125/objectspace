@@ -1,11 +1,11 @@
 <!--<div data-id="<%#= f.object_name.match(/(\d+)]/)[1] %>" class="nested-fields">-->
-<div class="nested-fields">
+<div class="nested-fields interface-group-nested-fields">
   <div class="" data-controller="step_accordion">
 
     <details class="" data-action="toggle->step_accordion#toggle" data-accordion-target="item">
       <summary
         class="flex items-center justify-between w-full p-5 font-medium text-left border border-gray-200 rounded-xl focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400">
-        <span>Actions group №<span class="interface-group-position-visible-field">1</span>: Group title here</span>
+        <span>Actions group №<span data-target="interface_groups_drag.groupPositionVisibleField" class="interface-group-position-visible-field">1</span>: Group title here</span>
         <div class="ml-auto pr-10">
           <%= link_to_remove_association "Delete",
                                          f,
@@ -25,7 +25,8 @@
           <!--          <div class="nested-fields">-->
           <div class="">
 
-            <%= f.hidden_field :position, class: "interface-group-position-hidden-field" %>
+            <%= f.hidden_field :position, class: "interface-group-position-hidden-field",
+                               data: {target: "interface_groups_drag.groupPositionHiddenField"} %>
 
             <div class="col-span-6 sm:col-span-3">
               <%= f.label "Group title", class: "block text-sm font-medium text-gray-700" %>

@@ -20,7 +20,14 @@
 
   <div class="form-inputs">
     <%#= render "algorithm/shared/partials/algorithm_version/algorithm_version_fields", :f => f %>
-    <%= render "algorithm/shared/partials/algorithm_version/algorithm_version_nested_form", :form => f %>
+    <%#= render "algorithm/shared/partials/algorithm_version/algorithm_version_nested_form", :form => f %>
+
+    <%= render "algorithm/shared/partials/algorithm_version/algorithm_version_fields", :f => f %>
+    <br>
+    <%#= render "algorithm/shared/partials/steps_nested_form", :form => f %>
+
+    <%= render "algorithm/shared/partials/control_structures_nested_form", :form => f %>
+
   </div>
   <br>
 

@@ -1,43 +1,45 @@
-<!--    <div class="flex justify-center">-->
-
-
-<!--Bar with options before content -->
-<%= render "algorithm/algorithm_versions/partials/algorithm_content/version_select_bar", algorithm_version: algorithm_version %>
-<br>
-<%= link_to "Add new algorithm version (move it somewhere)",
-            new_algorithm_algorithm_version_path(algorithm_id: algorithm_version.algorithm.id),
-            style: "text-decoration: none", class: "no-underline text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
-<br>
-<br>
-<%= link_to "Edit algorithm version (move it somewhere)",
-            edit_algorithm_algorithm_version_path(id: algorithm_version),
-            style: "text-decoration: none", class: "no-underline text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
-
-<br>
-<br>
-<div data-controller="clipboard" data-clipboard-success-content-value="<strong>Copied!</strong>" class="mt-1 flex rounded-md shadow-sm">
-  <input type="text" value='<%= @algorithm.uuid %>' data-clipboard-target="source" readonly="" class="py-3 px-2 outline-none flex-1 block rounded-none rounded-l-md sm:text-sm border border-gray-300">
-  <button type="button" data-action="clipboard#copy" data-clipboard-target="button" class="inline-flex items-center px-3 focus:outline-none rounded-r-md border border-l-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="mr-2 w-5 h-5">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0118 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3l1.5 1.5 3-3.75"></path>
-    </svg>
-    Copy to clipboard
-  </button>
-</div>
-
-
 <!--Content area-->
-<div class="max-w-4xl p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
+<div class="max-w-6xl p-4 rounded-lg bg-gray-50 dark:bg-gray-800" data-controller="content_area" data-target="content_area.area">
   <!--center -->
   <div class="flex justify-between px-4 mx-auto max-w-screen-xl ">
-    <div class="mx-auto w-full max-w-4xl format format-sm sm:format-base lg:format-lg format-blue dark:format-invert">
-      <div class="mb-4 lg:mb-6 not-format">
+    <div class="w-full format-sm sm:format-base lg:format-lg format-blue dark:format-invert">
+      <div class="mb-4 lg:mb-6 not-format p-3">
         <h1 class="break-words mb-4 text-3xl font-extrabold leading-tight text-gray-900 lg:mb-6 lg:text-4xl dark:text-white"><%= algorithm_version.title %></h1>
+
+        <!-- submenu -->
+        <div class="mt-1 flex flex-col space-x-4 sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+          <div class="mt-2 flex items-center text-sm">
+            <%= render "algorithm/algorithm_versions/partials/algorithm_content/version_select_bar", algorithm_version: algorithm_version %>
+          </div>
+
+          <div class="mt-2 flex items-center text-sm">
+            <%= render "algorithm/algorithm_versions/partials/algorithm_content/copy_to_clipboard", algorithm: @algorithm %>
+          </div>
+
+          <div class="mt-2 flex items-center text-sm text-gray-500">
+            <%= render "algorithm/algorithm_versions/partials/algorithm_content/options_dropdown", algorithm_version: algorithm_version %>
+          </div>
+        </div>
 
         <%= render "algorithm/algorithm_versions/partials/algorithm_content/toc", algorithm_version: algorithm_version %>
         <br>
 
       </div>
+
+      <% if algorithm_version.description.present? %>
+        <div class="break-words description-section" id="algorithm-description-<%= algorithm_version.id %>">
+
+          <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+          <div class="text-center col-span-6 sm:col-span-3">
+            <p class="text-xl font-bold hover:text-gray-700"># Description:</p>
+          </div>
+          <div class="algorithm-description-content bg-white rounded-xl p-5">
+            <%= algorithm_version.description.html_safe %>
+          </div>
+
+        </div>
+        <br>
+      <% end %>
 
       <% if algorithm_version.solves_the_problem.present? %>
         <div class="break-words solves-the-problem-section" id="algorithm-solves-the-problem-<%= algorithm_version.id %>">
@@ -47,15 +49,6 @@
         <br>
       <% end %>
 
-      <%= render "algorithm/algorithm_versions/partials/algorithm_content/steps/steps", algorithm_version: algorithm_version %>
-
-      <% if algorithm_version.sources.present? %>
-        <div class="break-words sources-section" id="algorithm-sources-<%= algorithm_version.id %>">
-          # Sources:
-          <%= algorithm_version.sources.html_safe %>
-        </div>
-        <br>
-      <% end %>
 
       <% if algorithm_version.additional_information.present? %>
         <div class="break-words additional-information-section" id="algorithm-additional-information-<%= algorithm_version.id %>">
@@ -65,6 +58,27 @@
         <br>
       <% end %>
 
+
+      <%= render "algorithm/algorithm_versions/partials/algorithm_content/nodes/nodes", algorithm_version: algorithm_version %>
+
+      <% if algorithm_version.sources.present? %>
+        <div class="break-words sources-section" id="algorithm-sources-<%= algorithm_version.id %>">
+
+          <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+          <div class="text-center col-span-6 sm:col-span-3">
+            <p class="text-xl font-bold hover:text-gray-700"># Sources:</p>
+          </div>
+
+          <div class="algorithm-sources-content bg-white rounded-xl p-5">
+            <%= algorithm_version.sources.html_safe %>
+          </div>
+
+        </div>
+        <br>
+      <% end %>
+
+
+      <!-- contribute section -->
       <div class="contribute-section" id="contribute">
         <div class="mt-8">
           <div class="w-full p-4 border border-gray-200 bg-gray-50 rounded-t-xl dark:border-gray-600 dark:bg-gray-700">
@@ -87,9 +101,6 @@
       </div>
       <br>
 
-      <%= render "algorithm/algorithm_versions/partials/algorithm_content/comments" %>
-
     </div>
   </div>
 </div>
-<!--    </div>-->

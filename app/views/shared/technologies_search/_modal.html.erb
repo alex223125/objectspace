@@ -1,3 +1,6 @@
+<!--TODO: Write settings object which will have type, button description, search engine fields, TechnologySearchSettings-->
+<!--we initialize it by type of search and then use it in all templates in tech search-->
+
 <div class="select-technology-modal">
   <div data-controller="select_instruction_modal"
        data-select_instruction_modal-allow-background-close="false"
@@ -13,6 +16,7 @@
 
     <% if type == "algorithm_form_wrapper_step_addition" %>
       <button
+        type="button"
         data-target="algorithm_step_type_select.wrapperStepAdditionButton"
         data-action="click->select_instruction_modal#open"
         class="hidden relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800">
@@ -29,12 +33,16 @@
                   Add SubStep
                 <% elsif type == "dpo_instruction_select" %>
                   Select Method or Algorithm
-                <% elsif type == "interface_member_addition" %>
-                  Add action
+                <% elsif type == "interface_member_addition" || type == "interface_group_form_action_addition" %>
+                  Add Action
                 <% elsif type == "container_member_addition" %>
                   Add children class
                 <% elsif type == "folder_item_addition" %>
-                  Add technology
+                  Add Technology
+                <% elsif type == "simple_class_attribute_addition" %>
+                  Add Attribute
+                <% elsif type == "simple_class_attribute_form_article_addition" %>
+                  Select Article
                 <% end %>
 
               </span>
@@ -70,6 +78,10 @@
                   Select technology
                 <% elsif type == "algorithm_form_wrapper_step_addition" %>
                   Wrapper step addition
+                <% elsif type == "interface_group_form_action_addition" %>
+                  Select Action
+                <% elsif type == "simple_class_attribute_addition" || type == "simple_class_attribute_form_article_addition" %>
+                  Select Article
                 <% end %>
               </h3>
               <button type="button" data-action="click->select_instruction_modal#close" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
@@ -93,18 +105,30 @@
                   In this popup you can pick any technology to add it to Folder
                 <% elsif type == "algorithm_form_wrapper_step_addition" %>
                   In this popup you can use different types of search to find Methods and Algorithms to add it as Step content.
+                <% elsif type == "interface_group_form_action_addition" %>
+                  In this popup you can select technology to add as Action to Action Group
+                <% elsif type == "simple_class_attribute_addition" || type == "simple_class_attribute_form_article_addition" %>
+                  In this popup you can select Article to add it as attribute description of the class
                 <% end %>
 
               </p>
             </div>
 
 
-            <% if type == "substep_addition" || type == "dpo_instruction_select" || type == "interface_member_addition" || type == "algorithm_form_wrapper_step_addition"  %>
-              <%= render "shared/technologies_search/shared/instructions_search_modal_body" %>
+            <% if type == "substep_addition" ||
+                  type == "dpo_instruction_select" ||
+                  type == "interface_member_addition" ||
+                  type == "algorithm_form_wrapper_step_addition" %>
+              <%= render "shared/technologies_search/modal_bodies/instructions_search_modal_body" %>
             <% elsif type == "container_member_addition" %>
-              <%= render "shared/technologies_search/shared/classes_search_modal_body" %>
+              <%= render "shared/technologies_search/modal_bodies/classes_search_modal_body" %>
             <% elsif type == "folder_item_addition" %>
-              <%= render "shared/technologies_search/shared/technologies_search_modal_body" %>
+              <%= render "shared/technologies_search/modal_bodies/technologies_search_modal_body" %>
+            <% elsif type == "interface_group_form_action_addition" %>
+              <!--  everything that can be considered as action-->
+              <%= render "shared/technologies_search/modal_bodies/actions_search_modal_body" %>
+            <% elsif type == "simple_class_attribute_addition" || type == "simple_class_attribute_form_article_addition" %>
+              <%= render "shared/technologies_search/modal_bodies/articles_search_modal_body" %>
             <% end %>
 
             <!-- Modal footer -->

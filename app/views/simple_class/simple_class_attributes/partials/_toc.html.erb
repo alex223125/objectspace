@@ -1,0 +1,19 @@
+<!--      TOC-->
+<div class="simple-class-attributes-toc" data-controller="toc_scrolling">
+  <br>
+  Table of content:
+  <ul role="list" class="space-y-3 text-base list-none sm:text-lg md:mt-5 md:text-xl">
+    <% simple_class_attributes.each do |simple_class_attribute| %>
+      <li>
+        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+           onclick="return false;"
+           href=""
+           data-action="click->toc_scrolling#scroll"
+           data-anchor="#attribute-<%=simple_class_attribute.uniq_key%>"
+        >
+          ↳ <%= simple_class_attribute.title %>
+        </a>
+      </li>
+    <% end %>
+   </ul>
+</div>
