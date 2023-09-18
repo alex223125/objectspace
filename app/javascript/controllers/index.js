@@ -131,8 +131,9 @@ import contentAreaController from "./shared/content_area_controller"
 application.register("content_area", contentAreaController)
 
 
-
-
+// navigation
+import NavigationSearchFormController from "./navigation/navigation_search_form_controller"
+application.register("navigation_search_form", NavigationSearchFormController)
 
 
 // Objects
@@ -181,11 +182,6 @@ application.register("tech_serp_users_input", TechSerpUsersInputController)
 // Users (forms,inputs)
 import AvatarInputController from "./users/users_avatar_input_controller"
 application.register("users_avatar_input", AvatarInputController)
-
-
-// Uncategorized
-import NavigationSearchFormController from "./navigation_search_form_controller"
-application.register("navigation_search_form", NavigationSearchFormController)
 
 
 // TOC
