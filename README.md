@@ -1,3 +1,9 @@
+### user
+asfasafsfsafsafsaasf@gmail.com
+123456
+
+
+
 # 1
 
 rails assets:precompile
