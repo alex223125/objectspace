@@ -5,10 +5,11 @@ module Services
 
         attr_reader :errors, :unit
 
-        def initialize(params, target_folder, current_user)
+        def initialize(params, target_folder, current_user, target_interface_group)
           @params = params
           @target_folder = target_folder
           @current_user = current_user
+          @target_interface_group = target_interface_group
         end
 
         def call
@@ -26,6 +27,8 @@ module Services
 
             binding.pry
             set_visibility
+
+            link_with_interface_group if @target_interface_group.present?
 
             binding.pry
             @unit.save!
@@ -82,6 +85,12 @@ module Services
           if @params[:tag_list].present?
             JSON.parse(@params[:tag_list]).map{|h| h.values}.join(",")
           end
+        end
+
+        def link_with_interface_group
+          interface_member = @target_interface_group.interface_members.new
+          interface_member.memberable = @unit
+          @unit.interface_members << interface_member
         end
 
       end
