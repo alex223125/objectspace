@@ -1,5 +1,6 @@
-// responsibility zone - addition of actins in differen places around simple clasees, container groups etc
-// TODO belongs to simple class???
+// doc:
+// responsibility zone - addition of actions in different places around simple classes, container groups etc
+// belongs to simple classes and frameworks => in shared folder
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
