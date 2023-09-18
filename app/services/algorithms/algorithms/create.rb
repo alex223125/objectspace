@@ -82,12 +82,9 @@ module Services
 
         def link_with_interface_group
           binding.pry
-          # @target_interface_group.interface_members.new(memberable_type: @algorithm.class,
-          #                                               memberable_id: @algorithm.id)
           interface_member = @target_interface_group.interface_members.new
           interface_member.memberable = @algorithm
           @algorithm.interface_members << interface_member
-          # @target_interface_group.save
         end
 
       end
