@@ -21,11 +21,15 @@ export default class extends Controller {
         // console.log(tag)
         var tag = {value:tag}
         // console.log(tag)
+
+        // TODO: Why 2 methods?
         this.tagify.whitelist.push(tag)
         // console.log(this.tagify.whitelist)
         this.tagify.addTags(([tag]))
         // tagify.addTags(["banana", "orange", "apple"])
     }
+
+    // PRIVATE
 
     tags(){
         var that = this
@@ -73,8 +77,6 @@ export default class extends Controller {
             that.loadWhiteList(e, that.tagify, url);
         });
     }
-
-    // PRIVATE
 
     loadWhiteList(e, tag, url) {
         let controller;
