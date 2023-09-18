@@ -15,16 +15,18 @@ class Frameworks::Framework < ApplicationRecord
   belongs_to :folder, class_name: "Folder"
 
   has_many :interface_groups, class_name: "SimpleClasses::InterfaceGroup", dependent: :destroy
-  accepts_nested_attributes_for :interface_groups
+  accepts_nested_attributes_for :interface_groups, allow_destroy: true
 
   has_many :class_containers, class_name: "SimpleClasses::ClassContainer", dependent: :destroy
-  accepts_nested_attributes_for :class_containers
+  accepts_nested_attributes_for :class_containers, allow_destroy: true
 
   # TODO: move to concern for framework and simple_Class
+  # # TODO: ADD CHECK BY TYPE - same as InterfaceGroups::FunctionalTypes[:root]
   def root_class_container
     self.class_containers.where(parent_id: nil).first
   end
 
+  # TODO: ADD CHECK BY TYPE - InterfaceGroups::FunctionalTypes[:root]
   def root_interface_group
     self.interface_groups.where(parent_id: nil).first
   end
@@ -38,7 +40,8 @@ class Frameworks::Framework < ApplicationRecord
       title: title,
       description: description,
       list_of_tags: tag_list,
-      ownerable_id: ownerable_id
+      ownerable_id: ownerable_id,
+      folder_id: folder_id
     }
   end
 
