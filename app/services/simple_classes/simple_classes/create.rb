@@ -19,9 +19,11 @@ module Services
 
         def call
           ActiveRecord::Base.transaction do
+            binding.pry
             create_simple_class
             link_simple_class_with_all_containers
             link_simple_class_with_all_interface_groups
+
             binding.pry
             set_owner
             set_folder
@@ -41,6 +43,7 @@ module Services
           @simple_class = ::SimpleClasses::SimpleClass.new(@params.except(:tag_list))
         end
 
+        # TODO: move into concernt for both create and update actions, or use hierarhy Update < Actions
         def link_simple_class_with_all_containers
           binding.pry
           service = Services::Shared::LinkGroupsWithObject.new(@simple_class,
