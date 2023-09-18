@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
 
+
   # resources :container_members
 
 
@@ -33,6 +34,7 @@ Rails.application.routes.draw do
     resources :units do
       member do
         get :preview
+        get :view
       end
     end
     resources :unit_versions, except: [:show]
@@ -40,9 +42,10 @@ Rails.application.routes.draw do
   get "/:username/methods/:id", to: "unit/unit_versions#show", as: 'unit_version'
 
   namespace :algorithm do
-    resources :algorithms do
+    resources :algorithms, except: [:show] do
       member do
         get :preview
+        get :view
       end
     end
     resources :algorithm_versions, except: [:show]
@@ -52,7 +55,7 @@ Rails.application.routes.draw do
 
     resources :substeps
   end
-  get "/substep_template", to: "algorithm/steps#substep_template", as: 'substep_template'
+  get "/node_template", to: "algorithm/nodes#template", as: 'node_template'
   get "/:username/algorithms/:id", to: "algorithm/algorithm_versions#show", as: 'algorithm_version'
 
   namespace :article do
@@ -69,11 +72,15 @@ Rails.application.routes.draw do
     resources :simple_classes, except: [:show] do
       member do
         get :preview
+        get :tree_view
+        get :tree_map
       end
     end
     resources :interface_groups
     resources :class_containers
     # resources :interface_members
+    get 'interface_members/preview/:id', to: 'interface_members#preview', as: 'preview'
+    resources :simple_class_attributes
   end
   get "/:username/classes/:id", to: "simple_class/simple_classes#show", as: 'simple_class'
 
