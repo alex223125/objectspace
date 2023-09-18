@@ -18,19 +18,19 @@ class Articles::Article < ApplicationRecord
   has_many :article_versions, class_name: "Articles::ArticleVersion", dependent: :destroy
   accepts_nested_attributes_for :article_versions
 
+  belongs_to :simple_class_attributes, class_name: "SimpleClasses::SimpleClassAttribute", optional: true
+
   validates :title, presence: true, allow_blank: false
 
-  def default_version
-    Articles::ArticleVersion.find_by(id: self.default_version_id)
-  end
-
+  belongs_to :default_version, foreign_key: "default_version_id", class_name: "Articles::ArticleVersion"
 
   def search_data
     {
       title: title,
       source_page_description: source_page_description,
       list_of_tags: tag_list,
-      ownerable_id: ownerable_id
+      ownerable_id: ownerable_id,
+      folder_id: folder_id
     }
   end
 
