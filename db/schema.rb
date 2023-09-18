@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_09_17_032839) do
+ActiveRecord::Schema[7.0].define(version: 2023_09_18_184446) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -81,6 +81,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_09_17_032839) do
     t.bigint "ownerable_id", null: false
     t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
     t.integer "functional_type"
+    t.integer "repository_id"
     t.index ["ownerable_type", "ownerable_id"], name: "index_algorithms_on_ownerable"
     t.index ["searchable"], name: "index_algorithms_on_searchable", using: :gin
   end
@@ -108,6 +109,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_09_17_032839) do
     t.string "ownerable_type", null: false
     t.bigint "ownerable_id", null: false
     t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
+    t.integer "repository_id"
     t.index ["ownerable_type", "ownerable_id"], name: "index_articles_on_ownerable"
   end
 
@@ -174,8 +176,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_09_17_032839) do
     t.datetime "updated_at", null: false
     t.integer "parent_id"
     t.integer "user_id"
-    t.integer "responsibility_type"
     t.string "slug"
+    t.integer "repository_id"
+    t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
     t.index ["slug"], name: "index_folders_on_slug", unique: true
   end
 
@@ -189,6 +192,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_09_17_032839) do
     t.bigint "ownerable_id", null: false
     t.string "slug"
     t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
+    t.integer "repository_id"
     t.index ["ownerable_type", "ownerable_id"], name: "index_frameworks_on_ownerable"
     t.index ["slug"], name: "index_frameworks_on_slug", unique: true
   end
@@ -277,6 +281,18 @@ ActiveRecord::Schema[7.0].define(version: 2023_09_17_032839) do
     t.index ["technologiable_type", "technologiable_id"], name: "index_nodes_on_technologiable"
   end
 
+  create_table "repositories", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.boolean "is_private"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id"
+    t.string "slug"
+    t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
+    t.index ["slug"], name: "index_repositories_on_slug", unique: true
+  end
+
   create_table "simple_class_attributes", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -302,6 +318,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_09_17_032839) do
     t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
     t.integer "functional_type"
     t.text "source_page_description"
+    t.integer "repository_id"
     t.index ["instructionable_type", "instructionable_id"], name: "index_simple_classes_on_instructionable"
     t.index ["ownerable_type", "ownerable_id"], name: "index_simple_classes_on_ownerable"
     t.index ["slug"], name: "index_simple_classes_on_slug", unique: true
@@ -434,6 +451,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_09_17_032839) do
     t.string "ownerable_type", null: false
     t.bigint "ownerable_id", null: false
     t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
+    t.integer "repository_id"
     t.index ["ownerable_type", "ownerable_id"], name: "index_units_on_ownerable"
     t.index ["searchable"], name: "index_units_on_searchable", using: :gin
   end

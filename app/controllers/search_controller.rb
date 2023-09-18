@@ -150,20 +150,45 @@ class SearchController < ApplicationController
 
   def technologies
     binding.pry
-    if params[:target_folder].present? || params[:target_user].present?
-      if params[:target_folder].present?
-        # Case 1.Technologies based on folder we in
-        target_folder = Folder.friendly.find(params[:target_folder])
-        @folder_owner = target_folder.user
-      elsif params[:target_user].present?
-        # Case 2.Technologies for basic dashboard for user
-        @folder_owner = User.where(username: params[:target_user]).first
-        target_folder = @folder_owner.root_folder
-      end
+    # Case 1. Tecnologies for repository
+    if params[:target_type] == "repository"
+      target = Repository.friendly.find(params[:target])
 
       # 1.1 child folders
       binding.pry
-      @child_folders = target_folder.children
+      @child_folders = target.folders
+
+      # 1.2 methods whih in folder
+      models = [Articles::Article, Units::Unit,
+                Algorithms::Algorithm, SimpleClasses::SimpleClass,
+                Frameworks::Framework]
+
+      condition = {
+        repository_id: target.id
+      }
+
+      find_all = '*'
+      search_results = Searchkick.search(find_all, where: condition, models: models)
+      @technologies = search_results
+
+    # Case 2: technologies for folder
+    elsif params[:target].present? && params[:target_type] == "folder"
+      # if params[:target].present?
+      #   # Case 1.Technologies based on folder we in
+      #   target_folder = Folder.friendly.find(params[:target])
+      #   @folder_owner = target_folder.user
+      # elsif params[:target_user].present?
+      #   # Case 2.Technologies for basic dashboard for user
+      #   @folder_owner = User.where(username: params[:target_user]).first
+      #   target_folder = @folder_owner.root_folder
+      # end
+
+      target_folder = Folder.friendly.find(params[:target])
+      @folder_owner = target_folder.root.repository.user
+
+      # 1.1 child folders
+      binding.pry
+      @child_folders = target_folder.subfolders
 
       # 1.2 methods whih in folder
       models = [Articles::Article, Units::Unit,

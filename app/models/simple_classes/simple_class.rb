@@ -12,7 +12,8 @@ class SimpleClasses::SimpleClass < ApplicationRecord
 
   belongs_to :ownerable, polymorphic: true
 
-  belongs_to :folder, class_name: "Folder"
+  belongs_to :folder, class_name: "Folder", optional: true
+  belongs_to :repository, class_name: "Repository", optional: true
   # has_many :folders, class_name: "SimpleObjects::Folder", dependent: :destroy
 
 
@@ -63,7 +64,8 @@ class SimpleClasses::SimpleClass < ApplicationRecord
       description: description,
       list_of_tags: tag_list,
       ownerable_id: ownerable_id,
-      folder_id: folder_id
+      folder_id: folder_id,
+      repository_id: repository_id
     }
   end
 

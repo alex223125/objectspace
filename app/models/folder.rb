@@ -8,7 +8,9 @@ class Folder < ApplicationRecord
   has_closure_tree
   # belongs_to :simple_object, class_name: "SimpleObjects::SimpleObject"
 
-  belongs_to :user
+  # belongs_to :user
+  # TODO: check that it has parent or repository, not both, not nothing
+  belongs_to :repository, optional: true
 
   has_many :subfolders,
            class_name: "Folder",
@@ -25,15 +27,15 @@ class Folder < ApplicationRecord
   has_many :frameworks, class_name: "Frameworks::Framework"
 
 
-  def folders_tree_without_root
-    self_and_ancestors.where.not(parent_id: nil)
-  end
+  # def folders_tree_without_root
+  #   self_and_ancestors.where.not(parent_id: nil)
+  # end
 
   private
 
   def slug_candidates
     [ :title,
-      [:title, :id]
+      [:title, :uuid]
     ]
   end
 

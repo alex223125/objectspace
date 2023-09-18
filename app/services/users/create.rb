@@ -13,7 +13,7 @@ module Services
         create_dashboard
 
         binding.pry
-        create_root_folder
+        # create_root_folder
 
         binding.pry
         @user.save
@@ -21,10 +21,10 @@ module Services
 
       private
 
-      def create_root_folder
-        binding.pry
-        @user.folders.new(responsibility_type: ::Folders::ResponsibilityTypeTypes[:user_root])
-      end
+      # def create_root_folder
+      #   binding.pry
+      #   @user.folders.new(responsibility_type: ::Folders::ResponsibilityTypeTypes[:user_root])
+      # end
 
       def create_dashboard
         @user.build_dashboard

@@ -157,9 +157,19 @@ application.register("dashboard_tabs", DashboardTabsController)
 import DashboardTechnologiesController from "./dashboard/dashboard_technologies_controller"
 application.register("dashboard_technologies", DashboardTechnologiesController)
 
+import DashboardRepositoriesController from "./dashboard/dashboard_repositories_controller"
+application.register("dashboard_repositories", DashboardRepositoriesController)
+
+
+
 // Folder
 import FolderItemsController from "./folder/folder_items_controller"
 application.register("folder_items", FolderItemsController)
+
+// Repository
+import RepositoryItemsController from "./repository/repository_items_controller"
+application.register("repository_items", RepositoryItemsController)
+
 
 
 // Technologies

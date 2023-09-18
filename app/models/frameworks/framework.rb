@@ -12,7 +12,8 @@ class Frameworks::Framework < ApplicationRecord
 
   belongs_to :ownerable, polymorphic: true
 
-  belongs_to :folder, class_name: "Folder"
+  belongs_to :folder, class_name: "Folder", optional: true
+  belongs_to :repository, class_name: "Repository", optional: true
 
   has_many :interface_groups, class_name: "SimpleClasses::InterfaceGroup", dependent: :destroy
   accepts_nested_attributes_for :interface_groups, allow_destroy: true
@@ -41,7 +42,8 @@ class Frameworks::Framework < ApplicationRecord
       description: description,
       list_of_tags: tag_list,
       ownerable_id: ownerable_id,
-      folder_id: folder_id
+      folder_id: folder_id,
+      repository_id: repository_id
     }
   end
 

@@ -8,23 +8,35 @@ class FoldersController < ApplicationController
 
   # GET /folders/1 or /folders/1.json
   def show
-    binding.pry
     @folder_owner = User.where(username: params[:username]).first
-    @target_folder = @folder_owner.folders.friendly.find(params[:id])
+    # @target_folder = @folder_owner.folders.friendly.find(params[:id])
+    binding.pry
+    @target_folder = Folder.friendly.find(params[:id])
 
-    folders_tree_without_root = @target_folder.folders_tree_without_root.reverse
+    # folders_tree_without_root = @target_folder.folders_tree_without_root.reverse
+    folders_tree = @target_folder.self_and_ancestors.reverse
+    repository = @target_folder.root.repository
 
     # breadcrumbs
     add_breadcrumb @folder_owner.ownername, dashboard_path(username: @folder_owner.ownername), {link_type: "profile_page"}
-    folders_tree_without_root.each do |folder|
+    add_breadcrumb repository.name, repository_path(username: @folder_owner.ownername, id: repository.slug), {link_type: "repository_page"}
+    folders_tree.each do |folder|
       add_breadcrumb folder.title, target_folder_path(username: @folder_owner.ownername, id: folder.slug), {link_type: "folder_page"}
     end
+
   end
 
   # GET /folders/new
   def new
+    binding.pry
     @folder = Folder.new
-    @target_folder = Folder.friendly.find(params[:target_folder])
+    if params[:target_type] == "folder"
+      @target = Folder.friendly.find(params[:target])
+      @target_type = "folder"
+    elsif params[:target_type] == "repository"
+      @target = Repository.friendly.find(params[:target])
+      @target_type = "repository"
+    end
   end
 
   # GET /folders/1/edit
@@ -34,21 +46,35 @@ class FoldersController < ApplicationController
   # POST /folders or /folders.json
   def create
     binding.pry
-    service = Services::Folders::Create.new(folder_params, current_user, params[:target_folder_id])
+    if params[:target_repository_id].present?
+      target = params[:target_repository_id]
+      target_type = "repository"
+    elsif params[:target_folder_id].present?
+      target = params[:target_folder_id]
+      target_type = "folder"
+    end
+
+    service = Services::Folders::Create.new(folder_params, current_user, target, target_type)
 
     binding.pry
     service.call
 
-    parent_folder = service.folder.parent
+    if service.folder.parent.present?
+      parent_folder = service.folder.parent
+      path = target_folder_path(username: current_user.username, id: parent_folder.slug)
+    else
+      repository = service.folder.repository
+      path = target_repository_path(username: current_user.username, id: repository.slug)
+    end
+
     binding.pry
     respond_to do |format|
       if service.errors.blank?
-
         binding.pry
-        format.html { redirect_to target_folder_path(username: current_user.username, id: parent_folder.slug),
-                                  notice: "Folder was successfully created." }
+        format.html { redirect_to path, notice: "Folder was successfully created." }
         format.json { render :show, status: :created, location: service.folder }
       else
+        @target = service.target
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: service.folder.errors, status: :unprocessable_entity }
       end

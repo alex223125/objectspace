@@ -19,7 +19,9 @@ class User < ApplicationRecord
 
   has_one :dashboard
   # has_many :articles, class_name: "Articles::Article"
-  has_many :folders
+  # has_many :folders
+  has_many :repositories
+  has_many :folders, through: :repositories
 
   has_one_attached :avatar
   has_one_attached :cropped_avatar
@@ -40,10 +42,9 @@ class User < ApplicationRecord
     self.tos_agreement == true
   end
 
-  def root_folder
-    self.folders.where(responsibility_type: Folders::ResponsibilityTypeTypes[:user_root]).first
-  end
-
+  # def root_folder
+  #   self.folders.where(responsibility_type: Folders::ResponsibilityTypeTypes[:user_root]).first
+  # end
 
   def self.from_omniauth(auth)
     binding.pry

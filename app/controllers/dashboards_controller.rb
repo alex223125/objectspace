@@ -32,13 +32,25 @@ class DashboardsController < ApplicationController
 
   end
 
-  def methodologies
-    # folders
-    # articles
-    # units
-    # algorithms
-    # sort by creation updated date
+  def repositories
+    repositories = current_user.repositories
+    respond_to do |format|
+      format.json {
+        render json: { entries: render_to_string(partial: "repositories/list",
+                                                 formats: [:html],
+                                                 :locals => {:repositories => repositories}) }
+      }
+    end
+
   end
+
+  # def methodologies
+  #   # folders
+  #   # articles
+  #   # units
+  #   # algorithms
+  #   # sort by creation updated date
+  # end
 
   # GET /dashboards/new
   def new

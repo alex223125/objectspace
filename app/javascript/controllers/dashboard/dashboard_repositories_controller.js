@@ -5,7 +5,7 @@ export default class extends Controller {
     static targets = ['entries', 'newFolderAdditionButton']
 
     initialize() {
-        console.log("Dashboard Technologies controller initialized")
+        console.log("Dashboard repositories controller initialized")
         this.targetUser = ''
         this.setInitialFolder()
         this.initialLoad()
@@ -17,14 +17,12 @@ export default class extends Controller {
     }
 
     connect() {
-        console.log("Dashboard Technologies controller connected")
-        // this.currentFolderId = ""
-        // this.initialFolderId = ''
+        console.log("Dashboard repositories controller connected")
     }
 
 
     disconnect() {
-        console.log("Dashboard Technologies controller disconnected")
+        console.log("Dashboard repositories controller disconnected")
     }
 
     // PRIVATE
@@ -57,42 +55,21 @@ export default class extends Controller {
 
 
         // TODO: add auth key
-        let url = `/search_technologies?target_user=${this.targetUser}`
+        let url = `/dashboard/repositories?target_user=${this.targetUser}`
         Rails.ajax({
             type: 'GET',
             url: url,
             dataType: 'json',
             success: (data) => {
                 console.log(data)
-                this.insertFoldersAndTechnologies(data)
-
-                // this.setCurrentFolder(data.current_folder_id)
-                // this.setPathForNewFolderAdditionButton()
-                // this.entriesTarget.insertAdjacentHTML('beforeend', data.entries)
+                this.insertRepositories(data)
             }
         })
     }
 
-    insertFoldersAndTechnologies(data) {
+    insertRepositories(data) {
         this.entriesTarget.insertAdjacentHTML('beforeend', data.entries)
     }
-
-    // setCurrentFolder(folderId) {
-    //     this.currentFolderId = folderId
-    // }
-
-    // setPathForNewFolderAdditionButton(){
-    //     let path =`/folders/new?target_folder=${this.currentFolderId}`
-    //     this.newFolderAdditionButtonTarget.href = path
-    // }
-
-    // processIntersectionEntries(entries) {
-    //     entries.forEach(entry => {
-    //         if (entry.isIntersecting) {
-    //             this.loadMore()
-    //         }
-    //     })
-    // }
 
     loadMore() {
         let next_page = this.paginationTarget.querySelector("a[rel='next']")

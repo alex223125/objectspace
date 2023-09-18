@@ -1,6 +1,5 @@
 Rails.application.routes.draw do
 
-
   # resources :container_members
 
 
@@ -96,6 +95,9 @@ Rails.application.routes.draw do
   resources :folders, except: [:show]
   get "/:username/folders/:id", to: "folders#show", as: 'target_folder'
 
+  resources :repositories, except: [:show]
+  get "/:username/repositories/:id", to: "repositories#show", as: 'target_repository'
+
   resources :technologies, only: [:index]
 
   # search routes
@@ -116,10 +118,10 @@ Rails.application.routes.draw do
   # resources :dashboards
   # get 'dashboard', to: 'dashboards#show', as: 'dashboard'
 
-
-
+  get "/dashboard/repositories", to: "dashboards#repositories"
   # should be last in list of all routes
   get "/:username(/:target_folder)", to: "dashboards#show", as: 'dashboard'
+
 
 
 

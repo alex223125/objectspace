@@ -15,7 +15,8 @@ class Units::Unit < ApplicationRecord
 
   belongs_to :ownerable, polymorphic: true
 
-  belongs_to :folder, class_name: "Folder"
+  belongs_to :folder, class_name: "Folder", optional: true
+  belongs_to :repository, class_name: "Repository", optional: true
 
   has_many :unit_versions, dependent: :destroy, class_name: "Units::UnitVersion"
   accepts_nested_attributes_for :unit_versions
@@ -72,7 +73,8 @@ class Units::Unit < ApplicationRecord
       source_page_description: source_page_description,
       list_of_tags: tag_list,
       ownerable_id: ownerable_id,
-      folder_id: folder_id
+      folder_id: folder_id,
+      repository_id: repository_id
     }
   end
 

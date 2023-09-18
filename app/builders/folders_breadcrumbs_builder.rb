@@ -6,6 +6,7 @@ class FoldersBreadcrumbsBuilder < BreadcrumbsOnRails::Breadcrumbs::Builder
 
   PROFILE_PAGE_BREADCRUMB_TYPE = "profile_page".freeze
   FOLDER_PAGE_BREADCRUMB_TYPE = "folder_page".freeze
+  REPOSITORY_PAGE_BREADCRUMB_TYPE = "repository_page".freeze
   # ARTICLE_VERSION_PAGE_BREADCRUMB_TYPE = "article_version_page".freeze
   # UNIT_VERSION_PAGE_BREADCRUMB_TYPE = "unit_version_page".freeze
   # ALGORITHM_VERSION_PAGE_BREADCRUMB_TYPE = "algorithm_version_page".freeze
@@ -57,6 +58,8 @@ class FoldersBreadcrumbsBuilder < BreadcrumbsOnRails::Breadcrumbs::Builder
       profile_page_breadcrumb(element, style)
     elsif element.options[:link_type] == FOLDER_PAGE_BREADCRUMB_TYPE
       folder_page_breadcrumb(element, style)
+    elsif element.options[:link_type] == REPOSITORY_PAGE_BREADCRUMB_TYPE
+      repository_page_breadcrumb(element, style)
     else
       technology_page_breadcrumb(element, style)
     end
@@ -75,6 +78,11 @@ class FoldersBreadcrumbsBuilder < BreadcrumbsOnRails::Breadcrumbs::Builder
     end
   end
 
+  def repository_page_breadcrumb(element, style)
+    link_to element.path do
+      @context.content_tag(:span, compute_full_name(element), class: style).html_safe
+    end
+  end
 
   def profile_page_breadcrumb(element, style)
     link_to dashboard_path(username: element.name) do

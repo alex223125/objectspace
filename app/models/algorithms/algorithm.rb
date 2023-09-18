@@ -10,6 +10,8 @@ class Algorithms::Algorithm < ApplicationRecord
   acts_as_taggable_on :tags
 
   belongs_to :folder, class_name: "Folder", optional: true
+  belongs_to :repository, class_name: "Repository", optional: true
+
   belongs_to :ownerable, polymorphic: true
 
   # open question: should it be has_one or allow has_many for DPO ?
@@ -80,7 +82,8 @@ class Algorithms::Algorithm < ApplicationRecord
       source_page_description: source_page_description,
       list_of_tags: tag_list,
       ownerable_id: ownerable_id,
-      folder_id: folder_id
+      folder_id: folder_id,
+      repository_id: repository_id
     }
   end
 
