@@ -19,6 +19,8 @@ import UnitSourcesTinymceController from "./tinymce/unit/unit_sources_tinymce_co
 application.register("unit_sources_tinymce", UnitSourcesTinymceController)
 import UnitAdditionalInformationTinymceController from "./tinymce/unit/unit_additional_information_tinymce_controller.js"
 application.register("unit_additional_information_tinymce", UnitAdditionalInformationTinymceController)
+import UnitDescriptionTinymceController from "./tinymce/unit/unit_description_tinymce_controller.js"
+application.register("unit_description_tinymce", UnitDescriptionTinymceController)
 
 
 //UnitUsageExample
@@ -45,8 +47,12 @@ application.register("improvements_infinite_scroll", ImprovementsInfiniteScrollC
 
 // Algorithms
 //// Steps
-import StepsDragController from "./algorithms/steps_drag_controller.js"
-application.register("steps_drag", StepsDragController)
+// import StepsDragController from "./algorithms/steps_drag_controller.js"
+// application.register("steps_drag", StepsDragController)
+
+import NodesDragController from "./algorithms/nodes_drag_controller.js"
+application.register("nodes_drag", NodesDragController)
+
 
 import StepAccordionController from "./algorithms/step_accordion_controller.js"
 application.register("step_accordion", StepAccordionController)
@@ -69,6 +75,8 @@ application.register("steps_nested_form", StepsNestedFormController)
 import DynamicStepFormController from "./algorithms/dynamic_step_form_controller.js"
 application.register("dynamic_step_form", DynamicStepFormController)
 
+import ScrollToStepBeginningController from "./algorithms/scroll_to_step_beginning_controller.js"
+application.register("scroll_to_step_beginning", ScrollToStepBeginningController)
 
 // import DroppableController from 'stimulus-droppable';
 // application.register('droppable', DroppableController);
@@ -110,6 +118,20 @@ application.register("tabs", TabsController)
 import TagsController from "./shared/tags_controller"
 application.register("tags", TagsController)
 
+import addActionOptionsModalController from "./shared/add_action_options_modal_controller"
+application.register("add_action_options_modal", addActionOptionsModalController)
+
+import technologyAsynchRenderingController from "./shared/technology_asynch_rendering_controller"
+application.register("technology_asynch_rendering", technologyAsynchRenderingController)
+
+import nodeAccordionController from "./shared/node_accordion_controller"
+application.register("node_accordion", nodeAccordionController)
+
+import contentAreaController from "./shared/content_area_controller"
+application.register("content_area", contentAreaController)
+
+
+
 
 
 
@@ -120,6 +142,12 @@ application.register("object_creation_options_modal", ObjectCreationModalControl
 
 import InterfaceGroupsDragController from "./interface_groups/interface_groups_drag_controller"
 application.register("interface_groups_drag", InterfaceGroupsDragController)
+
+import InterfaceGroupManagementOptionsButtonController from "./interface_groups/interface_group_management_options_button_controller"
+application.register("interface_group_management_options_button", InterfaceGroupManagementOptionsButtonController)
+
+
+
 
 // Dashboard
 import DashboardTabsController from "./dashboard/dashboard_tabs_controller"
@@ -158,3 +186,40 @@ application.register("users_avatar_input", AvatarInputController)
 // Uncategorized
 import NavigationSearchFormController from "./navigation_search_form_controller"
 application.register("navigation_search_form", NavigationSearchFormController)
+
+
+// TOC
+import TocScrollingController from "./toc/toc_scrolling_controller"
+application.register("toc_scrolling", TocScrollingController)
+
+
+//SimpleClassAttributes
+import SimpleClassAttributePreviewController from "./simple_class_attributes/simple_class_attribute_preview_controller"
+application.register("simple_class_attribute_preview", SimpleClassAttributePreviewController)
+
+//technologies pick module
+import TechnologiesPickModalController from "./technologies_pick/technologies_pick_modal_controller"
+application.register("technologies_pick_modal", TechnologiesPickModalController)
+import RemoteTechnologiesPickController from "./technologies_pick/remote_technologies_pick_controller"
+application.register("remote_technologies_pick", RemoteTechnologiesPickController)
+
+// InterfaceMember
+import InterfaceMembersDragController from "./interface_members/interface_members_drag_controller"
+application.register("interface_members_drag", InterfaceMembersDragController)
+
+// SimpleClass
+import SimpleClassTreeMapController from "./simple_class/tree_map/simple_class_tree_map_controller"
+application.register("simple_class_tree_map", SimpleClassTreeMapController)
+
+import ClassTreeMapModalController from "./simple_class/tree_map/class_tree_map_modal_controller"
+application.register("class_tree_map_modal", ClassTreeMapModalController)
+
+
+// Technology pick
+// import RemoteTechnologyPickController from "./technology_pick/remote_technology_pick_controller"
+// application.register("remote_technology_pick", RemoteTechnologyPickController)
+
+import TechnologyPickModalController from "./technology_pick/technology_pick_modal_controller"
+application.register("technology_pick_modal", TechnologyPickModalController)
+
+
