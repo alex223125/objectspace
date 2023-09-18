@@ -6,7 +6,9 @@ class SimpleClasses::InterfaceGroup < ApplicationRecord
   has_many :groups,
            class_name: "SimpleClasses::InterfaceGroup",
            foreign_key: "parent_id"
-  accepts_nested_attributes_for :groups
+  accepts_nested_attributes_for :groups, allow_destroy: true
+  # -> { order 'interface_groups.position ASC' },
+
 
   # add validation that it's connected to at least one of these SmpleClass or framework
   belongs_to :simple_class, class_name: "SimpleClasses::SimpleClass", optional: true
@@ -14,8 +16,10 @@ class SimpleClasses::InterfaceGroup < ApplicationRecord
   belongs_to :framework, class_name: "Frameworks::Framework", optional: true
 
   has_many :interface_members, class_name: "SimpleClasses::InterfaceMember", dependent: :destroy
-  accepts_nested_attributes_for :interface_members
+  accepts_nested_attributes_for :interface_members, allow_destroy: true
 
+
+  validates :title, presence: true, allow_blank: false
 
 
 end

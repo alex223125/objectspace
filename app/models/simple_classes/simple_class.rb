@@ -22,24 +22,35 @@ class SimpleClasses::SimpleClass < ApplicationRecord
 
   belongs_to :instructionable, polymorphic: true, optional: true
 
-  self.inheritance_column = nil
+  # self.inheritance_column = nil
 
   has_many :interface_groups, class_name: "SimpleClasses::InterfaceGroup", dependent: :destroy
-  accepts_nested_attributes_for :interface_groups
+  accepts_nested_attributes_for :interface_groups, allow_destroy: true
 
 
   has_many :class_containers, class_name: "SimpleClasses::ClassContainer", dependent: :destroy
-  accepts_nested_attributes_for :class_containers
+  accepts_nested_attributes_for :class_containers, allow_destroy: true
 
   # has_many :sub_containers, class_name: "SimpleClasses::ClassContainer", foreign_key: :simple_class_id
   # accepts_nested_attributes_for :sub_containers
+
+  has_many :simple_class_attributes
+  accepts_nested_attributes_for :simple_class_attributes, allow_destroy: true
+
+  has_many :interface_members, through: :interface_groups, class_name: "SimpleClasses::InterfaceMember"
+
 
   def root_class_container
     self.class_containers.where(parent_id: nil).first
   end
 
+  # TODO: ADD CHECK BY TYPE - InterfaceGroups::FunctionalTypes[:root]
   def root_interface_group
     self.interface_groups.where(parent_id: nil).first
+  end
+
+  def root_interface_groups
+    self.interface_groups.where(parent_id: nil)
   end
 
   def owner
@@ -51,8 +62,19 @@ class SimpleClasses::SimpleClass < ApplicationRecord
       title: title,
       description: description,
       list_of_tags: tag_list,
-      ownerable_id: ownerable_id
+      ownerable_id: ownerable_id,
+      folder_id: folder_id
     }
+  end
+
+  def functional_type_value
+    SimpleClasses::FunctionalTypes[self.functional_type]
+  end
+
+  def functional_type_readable_name
+    binding.pry
+    type = self.functional_type_value
+    SimpleClasses::FunctionalTypes.meta(type)[:readable_name]
   end
 
   private
