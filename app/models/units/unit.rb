@@ -21,7 +21,7 @@ class Units::Unit < ApplicationRecord
   accepts_nested_attributes_for :unit_versions
 
   has_many :unit_usage_examples, dependent: :destroy, class_name: "UnitUsageExample"
-  accepts_nested_attributes_for :unit_usage_examples
+  accepts_nested_attributes_for :unit_usage_examples, allow_destroy: true
 
   has_many :improvements
 
@@ -56,12 +56,23 @@ class Units::Unit < ApplicationRecord
     Units::UnitVersion.find_by(id: self.default_version_id)
   end
 
+  def class_key
+    "unit"
+  end
+
+  def uniq_key
+    class_key + self.uuid
+  end
+
+  private
+
   def search_data
     {
       title: title,
       source_page_description: source_page_description,
       list_of_tags: tag_list,
-      ownerable_id: ownerable_id
+      ownerable_id: ownerable_id,
+      folder_id: folder_id
     }
   end
 

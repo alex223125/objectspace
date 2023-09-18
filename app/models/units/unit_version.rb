@@ -37,6 +37,7 @@ class Units::UnitVersion < ApplicationRecord
 
   alias_method :whole_unit, :unit
 
+
   private
 
   def slug_candidates
