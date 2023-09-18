@@ -3,14 +3,13 @@ module Services
     module Algorithms
       class Create
 
-        # MAX_ALLOWED_AMOUNT_OF_STEPS_PER_NEW_ALGORITHM_CREATION = 5.freeze
-
         attr_reader :errors, :algorithm, :dynamic_steps
 
-        def initialize(params, target_folder, current_user)
+        def initialize(params, target_folder, current_user, target_interface_group)
           @params = params
           @target_folder = target_folder
           @current_user = current_user
+          @target_interface_group = target_interface_group
         end
 
         def call
@@ -27,12 +26,15 @@ module Services
             set_tags
 
             binding.pry
+            link_with_interface_group if @target_interface_group.present?
+
+            binding.pry
             @algorithm.save!
 
             binding.pry
             set_default_version
           end
-        rescue ActiveRecord::RecordInvalid, StandardError => e
+        rescue ActiveRecord::RecordInvalid => e
 
           binding.pry
           @errors = e.message
@@ -76,6 +78,16 @@ module Services
           if @params[:tag_list].present?
             JSON.parse(@params[:tag_list]).map{|h| h.values}.join(",")
           end
+        end
+
+        def link_with_interface_group
+          binding.pry
+          # @target_interface_group.interface_members.new(memberable_type: @algorithm.class,
+          #                                               memberable_id: @algorithm.id)
+          interface_member = @target_interface_group.interface_members.new
+          interface_member.memberable = @algorithm
+          @algorithm.interface_members << interface_member
+          # @target_interface_group.save
         end
 
       end
