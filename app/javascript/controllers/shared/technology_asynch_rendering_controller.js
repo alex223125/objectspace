@@ -64,6 +64,7 @@ export default class extends Controller {
                 // 3.disable load animation
                 this.toggleLoadingIndicator("hide")
                 this.insertView(data)
+                this.recalculateViewAccordionsSize()
                 // this.entriesTarget.insertAdjacentHTML('beforeend', data.entries)
             },
             error: (response) => {
@@ -74,6 +75,13 @@ export default class extends Controller {
             }
 
         })
+    }
+
+    recalculateViewAccordionsSize(){
+        // we need it for node_accordion_controller to be sure that after
+        // last load and display of algorithm step divs doesnt split with each other
+        const trigger = new CustomEvent("recalculate-height");
+        window.dispatchEvent(trigger);
     }
 
     setLoadUrl(){
