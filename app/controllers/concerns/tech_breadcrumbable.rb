@@ -19,8 +19,8 @@ module TechBreadcrumbable
     simple_class = interface_member.simple_class
 
     current_folder = current_folder(simple_class)
-    current_folder_user = current_folder.user
-    folders_tree_without_root = current_folder.folders_tree_without_root.reverse
+    current_folder_user = current_folder.root.repository.user
+    folders_tree_without_root = current_folder.self_and_ancestors.reverse
 
     add_breadcrumb current_folder_user.username, dashboard_path(username: current_folder_user.username), {link_type: "profile_page"}
     folders_tree_without_root.each do |folder|
@@ -33,8 +33,8 @@ module TechBreadcrumbable
 
   def folder_layer_technology(technology)
     current_folder = current_folder(technology)
-    current_folder_user = current_folder.user
-    folders_tree_without_root = current_folder.folders_tree_without_root.reverse
+    current_folder_user = current_folder.root.repository.user
+    folders_tree_without_root = current_folder.self_and_ancestors.reverse
 
     add_breadcrumb current_folder_user.username, dashboard_path(username: current_folder_user.username), {link_type: "profile_page"}
     folders_tree_without_root.each do |folder|
