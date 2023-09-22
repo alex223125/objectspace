@@ -1,0 +1,11 @@
+<div class="attachments-nested-form">
+
+  <%= form.fields_for :attachments, Attachment.new do |f| %>
+
+    <%= render "algorithm/shared/partials/attachments/attachment_fields", :f => f %>
+
+  <% end %>
+
+</div>
+<br>
+

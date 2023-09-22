@@ -79,8 +79,12 @@
     <%#= render "algorithm/shared/partials/steps/wrapper_step_fields", :f => t %>
     <%# end %>
 
+    <!-- TODO: change to addedItemsArea - that's the place where new records are added -->
     <div data-target="steps_nested_form.add_item">
 
+    </div>
+
+    <div class="hidden-addition-buttons">
       <!--      1.1 regular step original button -->
       <button data-action="click->steps_nested_form#add_association"
               data-node-type="regular_step"
@@ -136,9 +140,6 @@
           + Add new Single Alternative Control Structure
         </span>
       </button>
-
-
-
     </div>
 
     <!--    <div data-controller="algorithm_step_type_select">-->

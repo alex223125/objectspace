@@ -66,11 +66,13 @@ module Services
             end
 
             binding.pry
+            # parse_attachments(basic_tree)
+
             basic_tree
-            binding.pry
+            # binding.pry
             unsafe_params[TYPES_MAPPING[@action_type][:params_root_key]] = basic_tree
 
-            binding.pry
+            # binding.pry
             unsafe_params
           end
 
@@ -128,7 +130,7 @@ module Services
           def create_hash_with_numeric_key(tree_hash, parent_id_key)
             # binding.pry
             if tree_hash.respond_to?(:key?) && tree_hash.key?(parent_id_key)
-              binding.pry
+              # binding.pry
               # TODO: here we should have only dynamic keys, somehow not dynamic key-value par got there during update algorthm scenario
               # ["0", "dynamic_node_011824", "dynamic_node_011835"]
               # if tree_hash.keys[0].start_with?("dynamic_node")
@@ -150,19 +152,36 @@ module Services
             end
           end
 
+          # def parse_attachments(tree_hash)
+          #   if tree_hash.respond_to?(:key?) && (tree_hash["type"] == "Algorithms::Nodes::Step")
+          #     binding.pry
+          #     attachments = JSON.parse(tree_hash[:attachments][0])
+          #     attachments_attributes = []
+          #     attachments.each_with_index do |attachment, index|
+          #       attachments_attributes << {"attachable_id" => attachment["value"], "attachable_type" => attachment["type"]}
+          #       # attachments_attributes << {"attachable_id" => attachment["value"]}
+          #     end
+          #     tree_hash.merge!({"attachments_attributes" => attachments_attributes})
+          #   elsif tree_hash.respond_to?(:each)
+          #     r = nil
+          #     tree_hash.find{ |*a| r=parse_attachments(a.last) }
+          #     r
+          #   end
+          # end
+
           def switch_hash_with_dynamic_key_on_hash_with_numeric_key(tree_hash, parent_id_key, dynamic_key, new_hash)
               # binding.pry
               # parent_id_key.split("_")[2] - sometimes parent key already formatted to numbers and we will find it
               # only by number-key
-              binding.pry
+              # binding.pry
               if tree_hash.respond_to?(:key?) && (tree_hash.key?(parent_id_key) || tree_hash.key?(parent_id_key.split("_")[2]))
-                  binding.pry
+                  # binding.pry
                   if parent_id_key.start_with?("dynamic_node")
                     # binding.pry
                     # parent_id_key_from_tree = tree_hash.keys[0]
                     # 1 drop key
                     # tree_hash[parent_id_key_from_tree]["substeps_attributes"].delete(dynamic_key)
-                    binding.pry
+                    # binding.pry
                     numeric_key = parent_id_key.split("_")[2]
                     tree_hash[numeric_key]["subnodes_attributes"].delete(dynamic_key)
                     # assign new via merge!

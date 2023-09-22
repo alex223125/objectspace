@@ -142,6 +142,9 @@ export default class extends Controller {
         let itemHasAddedButton = this.itemHasAddedButton(buttonUniqKey)
         addItemButton.classList.remove("hidden");
         itemHasAddedButton.classList.add("hidden");
+
+        // remove from dropdown
+        this.tagifyFormInput.whitelist.pop(e)
     }
 
     addItemButton(buttonUniqKey){

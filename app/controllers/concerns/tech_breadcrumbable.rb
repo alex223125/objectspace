@@ -18,13 +18,20 @@ module TechBreadcrumbable
     interface_group = interface_member.interface_group
     simple_class = interface_member.simple_class
 
-    current_folder = current_folder(simple_class)
-    current_folder_user = current_folder.root.repository.user
-    folders_tree_without_root = current_folder.self_and_ancestors.reverse
+    current_place = current_folder(simple_class)
 
-    add_breadcrumb current_folder_user.username, dashboard_path(username: current_folder_user.username), {link_type: "profile_page"}
-    folders_tree_without_root.each do |folder|
-      add_breadcrumb folder.title, target_folder_path(username: current_folder_user.username, id: folder.slug), {link_type: "folder_page"}
+    # TODO: add methods for this expressions
+    if current_place.class == Folder
+      current_place_user = current_place.root.repository.user
+      places_tree = current_place.self_and_ancestors.reverse
+    elsif current_place.class == Repository
+      current_place_user = current_place.user
+      places_tree = [current_place]
+    end
+
+    add_breadcrumb current_place_user.username, dashboard_path(username: current_place_user.username), {link_type: "profile_page"}
+    places_tree.each do |place|
+      add_breadcrumb place_title(place), place_path(current_place_user, place), {link_type: "folder_page"}
     end
     add_breadcrumb simple_class.title, technology_path(simple_class)[:path], {link_type: technology_path(simple_class)[:link_type]}
     add_breadcrumb interface_group.title, technology_path(interface_group)[:path], {link_type: technology_path(interface_group)[:link_type]}
@@ -32,18 +39,33 @@ module TechBreadcrumbable
   end
 
   def folder_layer_technology(technology)
-    current_folder = current_folder(technology)
-    current_folder_user = current_folder.root.repository.user
-    folders_tree_without_root = current_folder.self_and_ancestors.reverse
+    current_place = current_place(technology)
 
-    add_breadcrumb current_folder_user.username, dashboard_path(username: current_folder_user.username), {link_type: "profile_page"}
-    folders_tree_without_root.each do |folder|
-      add_breadcrumb folder.title, target_folder_path(username: current_folder_user.username, id: folder.slug), {link_type: "folder_page"}
+    # TODO: add methods for this expressions
+    if current_place.class == Folder
+      current_place_user = current_place.root.repository.user
+      places_tree = current_place.self_and_ancestors.reverse
+    elsif current_place.class == Repository
+      current_place_user = current_place.user
+      places_tree = [current_place]
+    end
+
+    add_breadcrumb current_place_user.username, dashboard_path(username: current_place_user.username), {link_type: "profile_page"}
+    places_tree.each do |place|
+      add_breadcrumb place_title(place), place_path(current_place_user, place), {link_type: "folder_page"}
     end
     add_breadcrumb technology.title, technology_path(technology)[:path], {link_type: technology_path(technology)[:link_type]}
   end
 
   private
+
+  def place_path(current_place_user, place)
+    if place.class == Folder
+      target_folder_path(username: current_place_user.username, id: place.slug)
+    elsif place.class == Repository
+      target_repository_path(username: current_place_user.username, id: place.slug)
+    end
+  end
 
   def technology_path(technology)
     if technology.class == Articles::ArticleVersion
@@ -69,14 +91,16 @@ module TechBreadcrumbable
     end
   end
 
-
-
-  def current_folder(technology)
+  def current_place(technology)
     if VERSIONED_TECHNOLOGIES.include?(technology.class)
-      technology.whole_unit.folder
+      technology.whole_unit.folder || technology.whole_unit.repository
     else
-      technology.folder
+      technology.folder || technology.repository
     end
+  end
+
+  def place_title(place)
+    place.try(:title) || place.try(:name)
   end
 
 end

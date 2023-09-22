@@ -36,7 +36,11 @@
             <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Add new Article</h5>
           </a>
           <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Articles are useful for reference information such as links to useful tools, bibliography, useful websites etc.</p>
-          <%= link_to "Create new article", new_article_article_path(target_folder: target_folder), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+          <% if target_type == "folder" %>
+            <%= link_to "Create new article", new_article_article_path(target_folder: target_folder), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+          <% elsif target_type == "repository" %>
+            <%= link_to "Create new article", new_article_article_path(target_repository: repository), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+          <% end %>
         </div>
 
 
@@ -57,7 +61,12 @@
 <!--            Add new Method-->
 <!--            <svg aria-hidden="true" class="w-4 h-4 ml-2 -mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>-->
 <!--          </a>-->
-          <%= link_to "Create new method", new_unit_unit_path(target_folder: target_folder), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+
+          <% if target_type == "folder" %>
+            <%= link_to "Create new method", new_unit_unit_path(target_folder: target_folder), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+          <% elsif target_type == "repository" %>
+            <%= link_to "Create new method", new_unit_unit_path(target_repository: repository), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+          <% end %>
         </div>
 
         <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
@@ -70,9 +79,16 @@
 <!--            Add new Algorithm-->
 <!--            <svg aria-hidden="true" class="w-4 h-4 ml-2 -mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>-->
 <!--          </a>-->
-          <%= link_to "Create new algorithm",
-                      new_algorithm_algorithm_path(target_folder: target_folder),
-                      class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+
+          <% if target_type == "folder" %>
+            <%= link_to "Create new algorithm",
+                        new_algorithm_algorithm_path(target_folder: target_folder),
+                        class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+          <% elsif target_type == "repository" %>
+            <%= link_to "Create new algorithm",
+                        new_algorithm_algorithm_path(target_repository: repository),
+                        class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+          <% end %>
         </div>
 
 
@@ -106,9 +122,19 @@
                     estimate how much was done, validate process - this is right choice.
                   </p>
                 </div>
-                <%= link_to "Create new class for Decision process object",
-                            new_simple_class_simple_class_path(class_type: "decision_process_object_class", target_folder: target_folder),
-                            class: "mt-6 inline-flex items-center px-6 py-3 text-white font-semibold bg-blue-700 rounded-md shadow-sm" %>
+
+                <% if target_type == "folder" %>
+                  <%= link_to "Create new class for Decision process object",
+                              new_simple_class_simple_class_path(class_type: "decision_process_object_class", target_folder: target_folder),
+                              class: "mt-6 inline-flex items-center px-6 py-3 text-white font-semibold bg-blue-700 rounded-md shadow-sm" %>
+                <% elsif target_type == "repository" %>
+                  <%= link_to "Create new class for Decision process object",
+                              new_simple_class_simple_class_path(class_type: "decision_process_object_class", target_repository: repository),
+                              class: "mt-6 inline-flex items-center px-6 py-3 text-white font-semibold bg-blue-700 rounded-md shadow-sm" %>
+                <% end %>
+
+
+
               </div>
             </div>
 
@@ -128,9 +154,18 @@
                     and then grow methdologies around how to validate decisiion, estimate it's state, update decision to new fresh version and etc
                   </p>
                 </div>
-                <%= link_to "Create new class for decision object",
-                            new_simple_class_simple_class_path(class_type: "decision_object_class", target_folder: target_folder),
-                            class: "mt-6 inline-flex items-center px-6 py-3 text-white font-semibold bg-blue-700 rounded-md shadow-sm" %>
+
+                <% if target_type == "folder" %>
+                  <%= link_to "Create new class for decision object",
+                              new_simple_class_simple_class_path(class_type: "decision_object_class", target_folder: target_folder),
+                              class: "mt-6 inline-flex items-center px-6 py-3 text-white font-semibold bg-blue-700 rounded-md shadow-sm" %>
+                <% elsif target_type == "repository" %>
+                  <%= link_to "Create new class for decision object",
+                              new_simple_class_simple_class_path(class_type: "decision_object_class", target_repository: repository),
+                              class: "mt-6 inline-flex items-center px-6 py-3 text-white font-semibold bg-blue-700 rounded-md shadow-sm" %>
+                <% end %>
+
+
               </div>
             </div>
 
@@ -150,9 +185,17 @@
                     If you have a lot of decisions which in group organize one big, that's the right choice.
                   </p>
                 </div>
-                <%= link_to "Create new class for decision object container",
-                            new_simple_class_simple_class_path(class_type: "decision_object_container_class", target_folder: target_folder),
-                            class: "mt-6 inline-flex items-center px-6 py-3 text-white font-semibold bg-blue-700 rounded-md shadow-sm" %>
+
+                <% if target_type == "folder" %>
+                  <%= link_to "Create new class for decision object container",
+                              new_simple_class_simple_class_path(class_type: "decision_object_container_class", target_folder: target_folder),
+                              class: "mt-6 inline-flex items-center px-6 py-3 text-white font-semibold bg-blue-700 rounded-md shadow-sm" %>
+                <% elsif target_type == "repository" %>
+                  <%= link_to "Create new class for decision object container",
+                              new_simple_class_simple_class_path(class_type: "decision_object_container_class", target_repository: repository),
+                              class: "mt-6 inline-flex items-center px-6 py-3 text-white font-semibold bg-blue-700 rounded-md shadow-sm" %>
+                <% end %>
+
               </div>
             </div>
           </div>
@@ -173,7 +216,14 @@
 <!--            Add new Decision object-->
 <!--            <svg aria-hidden="true" class="w-4 h-4 ml-2 -mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>-->
 <!--          </a>-->
-          <%= link_to "Create new Framework", new_framework_framework_path(target_folder: target_folder), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+
+          <% if target_type == "folder" %>
+            <%= link_to "Create new Framework", new_framework_framework_path(target_folder: target_folder), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+          <% elsif target_type == "repository" %>
+            <%= link_to "Create new Framework", new_framework_framework_path(target_repository: repository), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+          <% end %>
+
+
         </div>
 
 

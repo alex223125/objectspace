@@ -80,8 +80,9 @@ class Algorithm::AlgorithmsController < ApplicationController
     @params = ActionController::Parameters.new(new_params)
 
     # 2.create record
+    target_pace = @target_repository || @target_folder
     binding.pry
-    service = Services::Algorithms::Algorithms::Create.new(algorithm_params, @target_folder,
+    service = Services::Algorithms::Algorithms::Create.new(algorithm_params, target_pace,
                                                            current_user, @target_interface_group)
     binding.pry
     service.call
@@ -181,7 +182,10 @@ class Algorithm::AlgorithmsController < ApplicationController
 
                                                                                       :_destroy,
                                                                                       recursive_nested_substeps_attr,
-                                                                                      conditions_attributes: [:title, :instruction]]
+                                                                                      conditions_attributes: [:id, :title,
+                                                                                                              :instruction, :_destroy],
+                                                                                      attachments_attributes: [:id, :attachable_id,
+                                                                                                               :attachable_type, :_destroy] ]
                                                                                   ]
                                                   ])
 

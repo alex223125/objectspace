@@ -61,6 +61,7 @@ Rails.application.routes.draw do
     resources :articles do
       member do
         get :preview
+        get :dynamic_view
       end
     end
     resources :article_versions, except: [:show]

@@ -82,6 +82,9 @@ export default class extends Controller {
     }
 
 
+
+    // TODO: fix miscalculation of postmutation variable
+    //  if we remove + add mixing begavior, see how it's done in attachments '
     connect() {
         console.log("Remote select instruction controller connected")
 
@@ -149,25 +152,6 @@ export default class extends Controller {
 
     // Callbacks
     mutate(entries) {
-        // if (this.selectTypeValue == substepAdditionCase) {
-        //     console.log(`mutation for ${substepAdditionCase} case triggered`)
-        //
-        //     var nestedFields = substepAdditionCaseNestedFields
-        //     this.afterclickSubstepsAmount = this.substepsAreaTarget.querySelectorAll(nestedFields).length
-        //     console.log("this.currentSubstepsAmount")
-        //     console.log(this.currentSubstepsAmount)
-        //     console.log("this.afterclickSubstepsAmount")
-        //     console.log(this.afterclickSubstepsAmount)
-        //
-        //     var changedAmount = (this.currentSubstepsAmount + 1)
-        //     if ((changedAmount == this.afterclickSubstepsAmount) && (changedAmount != this.postmutationSubstepsAmount)) {
-        //         console.log("New substep added!");
-        //         this.setFieldsContainer()
-        //         this.setInstructionValues()
-        //         this.setInstructionPreviewContainer()
-        //         this.loadPreview()
-        //         this.postmutationSubstepsAmount = changedAmount
-        //     }
         if ((this.selectTypeValue == algorithmFormWrapperStepAdditionCase)
              || (this.selectTypeValue == algorithmFormClassLevelWrapperStepAdditionCase)) {
             console.log(`mutation for ${this.selectTypeValue} case triggered`)

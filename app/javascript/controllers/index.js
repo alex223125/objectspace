@@ -46,10 +46,6 @@ application.register("improvements_infinite_scroll", ImprovementsInfiniteScrollC
 
 
 // Algorithms
-//// Steps
-// import StepsDragController from "./algorithms/steps_drag_controller.js"
-// application.register("steps_drag", StepsDragController)
-
 import NodesDragController from "./algorithms/nodes_drag_controller.js"
 application.register("nodes_drag", NodesDragController)
 
@@ -59,9 +55,6 @@ application.register("step_accordion", StepAccordionController)
 
 import StepFinishCheckTinymceController from "./tinymce/step/step_finish_check_tinymce_controller"
 application.register("step_finish_check_tinymce", StepFinishCheckTinymceController)
-
-// import SubstepsDragController from "./algorithms/substeps_drag_controller.js"
-// application.register("substeps_drag", SubstepsDragController)
 
 import AlgorithmStepTypeSelectController from "./algorithms/algorithm_step_type_select_controller.js"
 application.register("algorithm_step_type_select", AlgorithmStepTypeSelectController)
@@ -78,10 +71,15 @@ application.register("dynamic_step_form", DynamicStepFormController)
 import ScrollToStepBeginningController from "./algorithms/scroll_to_step_beginning_controller.js"
 application.register("scroll_to_step_beginning", ScrollToStepBeginningController)
 
-// import DroppableController from 'stimulus-droppable';
-// application.register('droppable', DroppableController);
+// Attachments
+import AttachmentsNestedFormController from "./attachments/attachments_nested_form_controller.js"
+application.register("attachments_nested_form", AttachmentsNestedFormController)
 
+import RemoteSelectAttachmentController from "./attachments/remote_select_attachment_controller.js"
+application.register("remote_select_attachment", RemoteSelectAttachmentController)
 
+import AttachmentPreviewController from "./attachments/attachment_preview_controller.js"
+application.register("attachment_preview", AttachmentPreviewController)
 
 
 // Instructions

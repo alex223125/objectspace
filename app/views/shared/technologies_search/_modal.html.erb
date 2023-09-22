@@ -4,7 +4,7 @@
 <div class="select-technology-modal">
   <div data-controller="select_instruction_modal"
        data-select_instruction_modal-allow-background-close="false"
-       data-target="remote_select_instruction.instructionModalInstance">
+       data-target="remote_select_instruction.instructionModalInstance remote_select_attachment.instructionModalInstance">
     <!--      <a href="#" data-action="click->modal#open" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded">-->
     <!--        <span>Open Modal</span>-->
     <!--      </a>-->
@@ -43,8 +43,9 @@
                   Add Attribute
                 <% elsif type == "simple_class_attribute_form_article_addition" %>
                   Select Article
+                <% elsif type == "step_attachment_addition" %>
+                  Add Attachment
                 <% end %>
-
               </span>
       </button>
     <% end %>
@@ -80,7 +81,9 @@
                   Wrapper step addition
                 <% elsif type == "interface_group_form_action_addition" %>
                   Select Action
-                <% elsif type == "simple_class_attribute_addition" || type == "simple_class_attribute_form_article_addition" %>
+                <% elsif type == "simple_class_attribute_addition" ||
+                         type == "simple_class_attribute_form_article_addition" ||
+                         type == "step_attachment_addition" %>
                   Select Article
                 <% end %>
               </h3>
@@ -109,6 +112,8 @@
                   In this popup you can select technology to add as Action to Action Group
                 <% elsif type == "simple_class_attribute_addition" || type == "simple_class_attribute_form_article_addition" %>
                   In this popup you can select Article to add it as attribute description of the class
+                <% elsif type == "step_attachment_addition" %>
+                  In this popup you can select Article to add it as attachment to the step
                 <% end %>
 
               </p>
@@ -127,8 +132,11 @@
             <% elsif type == "interface_group_form_action_addition" %>
               <!--  everything that can be considered as action-->
               <%= render "shared/technologies_search/modal_bodies/actions_search_modal_body" %>
-            <% elsif type == "simple_class_attribute_addition" || type == "simple_class_attribute_form_article_addition" %>
-              <%= render "shared/technologies_search/modal_bodies/articles_search_modal_body" %>
+            <% elsif type == "simple_class_attribute_addition" ||
+                     type == "simple_class_attribute_form_article_addition" %>
+              <%= render "shared/technologies_search/modal_bodies/articles_search_modal_body", scenario: "regular" %>
+            <% elsif type == "step_attachment_addition" %>
+              <%= render "shared/technologies_search/modal_bodies/articles_search_modal_body", scenario: "step_attachment_addition" %>
             <% end %>
 
             <!-- Modal footer -->

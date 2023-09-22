@@ -1,7 +1,7 @@
 class Article::ArticlesController < ApplicationController
   include Folderable
 
-  before_action :set_article, only: %i[ show edit update destroy preview ]
+  before_action :set_article, only: %i[ show edit update destroy preview dynamic_view ]
   before_action :set_target_folder, only: %i[ new create ]
 
   # GET /articles or /articles.json
@@ -18,12 +18,30 @@ class Article::ArticlesController < ApplicationController
       path = "article/articles/previews/basic_preview"
     elsif params[:preview_type] == "small_line_preview"
       path = "article/articles/previews/small_line_preview"
+    elsif params[:preview_type] == "algorithm_step_attachment_preview"
+      path = "article/articles/previews/algorithm_step_attachment_preview"
     end
 
     respond_to do |format|
       format.json {
         render json: { preview: render_to_string(partial: path,
                                                  formats: [:html])}
+      }
+    end
+  end
+
+  def dynamic_view
+    binding.pry
+    @article_version = @article.default_version
+    if params[:type] == "regular"
+      path = "article/article_versions/dynamic_view/main"
+    end
+
+
+    respond_to do |format|
+      format.json {
+        render json: { dynamic_view: render_to_string(partial: path,
+                                              formats: [:html])}
       }
     end
   end
@@ -90,7 +108,8 @@ class Article::ArticlesController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_article
-      @article = Articles::Article.find(params[:id])
+      binding.pry
+      @article = Articles::Article.find_by(uuid: params[:id]) || Articles::Article.find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.

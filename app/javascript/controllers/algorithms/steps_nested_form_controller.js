@@ -85,8 +85,6 @@ export default class extends Controller {
         }
 
 
-
-
         console.log("content124124124124214")
         console.log(content)
     }

@@ -28,7 +28,9 @@ module Algorithm
 
                                  :_destroy,
 
-                                 conditions_attributes: [:id, :title, :instruction]]
+                                 conditions_attributes: [:id, :title, :instruction],
+                                 attachments_attributes: [:id, :attachable_id,
+                                                          :attachable_type, :_destroy]]
         )
       end
 

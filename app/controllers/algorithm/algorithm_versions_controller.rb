@@ -155,7 +155,10 @@ class Algorithm::AlgorithmVersionsController < ApplicationController
 
                                                                :_destroy,
                                                                recursive_nested_substeps_attr,
-                                                               conditions_attributes: [:id, :title, :instruction, :_destroy,]]
+                                                               conditions_attributes: [:id, :title,
+                                                                                       :instruction, :_destroy,],
+                                                               attachments_attributes: [:id, :attachable_id,
+                                                                                        :attachable_type, :_destroy]]
                                                            ])
     end
 

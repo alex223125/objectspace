@@ -40,10 +40,19 @@ class SearchController < ApplicationController
                                            match: :text_middle)
       binding.pry
       @pagy, @articles = pagy(@articles, page: params[:page], items: 3)
+
+      if params[:scenario] == "step_attachment_addition"
+        locals = {scenario: "step_attachment_addition"}
+      else
+        locals = {}
+      end
+
+
       respond_to do |format|
         format.json {
           render json: { entries: render_to_string(partial: "shared/technologies_search/articles/list",
-                                                   formats: [:html]),
+                                                   formats: [:html],
+                                                   locals: locals),
                          pagination: @pagy }
         }
       end

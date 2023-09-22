@@ -39,12 +39,14 @@ class Algorithms::Algorithm < ApplicationRecord
 
   validates :folder, presence: true, if: :regular_algorithm?
 
-  validate :class_level_algorithm_has_only_one_interface_member
+  validate :class_level_algorithm_has_only_one_interface_member, if: :class_level_algorithm?
 
   def regular_algorithm?
-    binding.pry
-    # TODO: change on normal check
-    self.functional_type != Algorithms::FunctionalTypes[:class_level]
+    self.functional_type == Algorithms::FunctionalTypes[:regular]
+  end
+
+  def class_level_algorithm?
+    self.functional_type == Algorithms::FunctionalTypes[:class_level]
   end
 
     include PgSearch::Model

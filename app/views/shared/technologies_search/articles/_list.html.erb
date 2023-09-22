@@ -2,9 +2,10 @@
 
   <% if @articles.present? %>
     <% @articles.each do |article| %>
-      <%= render partial: "shared/technologies_search/articles/single_preview", locals: {article: article} %>
+      <%= render partial: "shared/technologies_search/articles/single_preview", locals: {article: article, scenario: scenario} %>
     <% end %>
+  <% else %>
+    Nothing was found
   <% end %>
-
 </div>
 <br>

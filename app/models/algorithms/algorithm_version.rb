@@ -17,6 +17,8 @@ class Algorithms::AlgorithmVersion < ApplicationRecord
   has_many :control_structures, class_name: "Algorithms::Nodes::ControlStructure"
   accepts_nested_attributes_for :control_structures, allow_destroy: true
 
+  # has_many :attachments, as: :attachable, class_name: "Attachment"
+  # accepts_nested_attributes_for :control_structures, allow_destroy: true
 
   # has_many :steps, class_name: "Algorithms::Step"
   # accepts_nested_attributes_for :steps
@@ -25,7 +27,6 @@ class Algorithms::AlgorithmVersion < ApplicationRecord
 
   validates :control_structures, presence: { message: "Algorithm should have at least 1 step" }
   # validates :nodes, presence: { message: "Algorithm should have at least 1 step" }
-
 
   validates :title, presence: true
 

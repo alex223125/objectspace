@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
     // static targets = ["query", "cocktails"]
-    static targets = ["textQuery", "uuidQuery", "instructionType", "entries"]
+    static targets = ["textQuery", "uuidQuery", "instructionType", "scenario", "entries"]
 
     initialize() {
         let options = {
@@ -38,11 +38,12 @@ export default class extends Controller {
         const textQuery = this.textQueryTarget.value
         const uuidQuery = this.uuidQueryTarget.value
         const instructionType = this.instructionTypeTarget.value
+        const scenario = this.scenarioTarget.value
         this.page = 1
 
         let url = `/search`
         let postData = {query: textQuery, uuid: uuidQuery,
-                            page: this.page, type: instructionType}
+                            page: this.page, type: instructionType, scenario: scenario}
 
         // 2.check if same form submitted second time
         if (textQuery == this.lastTextQueryValue &&

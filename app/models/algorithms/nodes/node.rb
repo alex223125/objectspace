@@ -12,6 +12,9 @@ class Algorithms::Nodes::Node < ApplicationRecord
            foreign_key: "parent_id"
   accepts_nested_attributes_for :subnodes, allow_destroy: true
 
+  has_many :attachments, class_name: "Attachment"
+  accepts_nested_attributes_for :attachments, allow_destroy: true
+
   def functional_type_id
     if self.type == "Algorithms::Nodes::Step"
       self.step_functional_type

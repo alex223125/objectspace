@@ -55,6 +55,10 @@
       <%= hidden_field_tag 'target_folder', @target_folder.id  %>
     <% end %>
 
+    <% if @target_repository.present? %>
+      <%= hidden_field_tag 'target_repository', @target_repository.id  %>
+    <% end %>
+
     <%= f.hidden_field :functional_type, value: @functional_type %>
 
 <!--    <div class="col-span-6 sm:col-span-3" data-controller="unit_instruction_tinymce">-->

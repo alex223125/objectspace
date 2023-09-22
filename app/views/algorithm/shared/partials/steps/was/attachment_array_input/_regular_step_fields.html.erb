@@ -87,37 +87,54 @@
 
             <!-- selected attachments form input -->
             <div class="col-span-6 sm:col-span-3"
-                 id="step-attachments"
-                 data-controller="remote_select_attachment attachments_nested_form"
-                 data-target="remote_select_attachment.attachmentsArea"
-                 data-remote_select_attachment-select-type-value="algorithm_form_attachment_addition">
+                 id="remote-attachment"
+                 data-controller="steps_attachment"
+            >
 
-              <p class="text-lg font-bold hover:text-gray-700">Attachments:</p>
-              <p class="mt-2 text-sm text-gray-500">
-                Here you can add Articles to current step to help Hero of your tutorial to get through it more effectively.
-              </p>
-              <br>
-
-
-              <%= f.fields_for :attachments do |attachment| %>
+              <%= form.fields_for :attachments do |attachment| %>
                 <%= render "algorithm/shared/partials/attachments/attachment_fields", :f => attachment %>
               <% end %>
 
-              <!--      1.1 article as attachment button -->
-              <div class="add-new-attachment-button">
-                <%= link_to_add_association "+ Add new Attachment", f,
-                                            :attachments,
-                                            style: "display:none;",
-                                            partial: 'algorithm/shared/partials/attachments/attachment_fields',
-                                            class: "nodraggablesteps inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2",
-                                            data: {target: "remote_select_attachment.addArticleAttachmentOriginalButton"}
+              <%= render "shared/technologies_search/modal", :type => "step_attachment_addition" %>
 
-                %>
+            </div>
+
+
+
+            <!-- selected attachments form input -->
+            <div class="col-span-6 sm:col-span-3"
+                 id="remote-attachment"
+                 data-controller="steps_attachment"
+            >
+
+              <%= f.label "Attachments", class: "block text-sm font-medium text-gray-700" %>
+              <%= f.hint 'Use this input to add helpful Articles to this step',
+                         class: "mt-2 text-sm text-gray-500" %>
+
+              <div class="mb-6">
+                <div class="relative mt-1 min-w-80 max-w-3xl">
+                  <!--          <label for="items" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Selected Actions:</label>-->
+                  <div>
+                    <%= f.input_field :attachments,
+                                     id: "attachments", multiple: true,
+                                     placeholder: "Use button below to add Action",
+                                     class: "text-sm block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500",
+                                     data: {target: "steps_attachment.attachmentsFormInput"} %>
+                    <!--            <input type="text"-->
+                    <!--                   name="items-form-input"-->
+                    <!--                   readonly-->
+                    <!--                   data-target="remote_technologies_pick.itemsFormInput"-->
+                    <!--                   id="items-form-input"-->
+                    <!--                   class="text-sm block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"-->
+                    <!--                   placeholder="Use button below to add Action"-->
+                    <!--            >-->
+                  </div>
+                </div>
               </div>
 
               <%= render "shared/technologies_search/modal", :type => "step_attachment_addition" %>
-            </div>
 
+            </div>
 
 
             <br>

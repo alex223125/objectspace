@@ -5,9 +5,9 @@ module Services
 
         attr_reader :errors, :algorithm, :dynamic_steps
 
-        def initialize(params, target_folder, current_user, target_interface_group)
+        def initialize(params, target_place, current_user, target_interface_group)
           @params = params
-          @target_folder = target_folder
+          @target_place = target_place
           @current_user = current_user
           @target_interface_group = target_interface_group
         end
@@ -21,7 +21,7 @@ module Services
             set_visibility
 
             binding.pry
-            set_folder
+            set_place
             set_owner
             set_tags
 
@@ -59,9 +59,13 @@ module Services
           @algorithm.save!
         end
 
-        def set_folder
+        def set_place
           binding.pry
-          @algorithm.folder = @target_folder
+          if @target_place.class == Folder
+            @algorithm.folder = @target_place
+          elsif @target_place.class == Repository
+            @algorithm.repository = @target_place
+          end
         end
 
         def set_owner
