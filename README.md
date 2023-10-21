@@ -18,6 +18,12 @@ yarn add flowbite-typography
 # to run elasticsearch
 elasticsearch-8.7.0-linux-x86_64/elasticsearch-8.7.0/bin$ ./elasticsearch
 
+# elsticsearch 
+sudo systemctl start elasticsearch
+sudo systemctl status elasticsearch
+sudo systemctl stop elasticsearch
+
+
 # to reindex model 
 Articles::Article.searchkick_index.delete
 

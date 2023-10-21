@@ -357,6 +357,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_09_19_224201) do
     t.string "technologiable_type"
     t.bigint "technologiable_id"
     t.integer "position", null: false
+    t.index ["position"], name: "index_steps_on_position", unique: true
     t.index ["technologiable_type", "technologiable_id"], name: "index_steps_on_technologiable"
   end
 

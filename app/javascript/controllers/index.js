@@ -8,9 +8,8 @@ import HelloController from "./hello_controller"
 application.register("hello", HelloController)
 
 
-// tinymce
-
-//Unit
+// Tinymce:
+// 1.1 Unit
 import UnitInstructionTinymceController from "./tinymce/unit/unit_instruction_tinymce_controller.js"
 application.register("unit_instruction_tinymce", UnitInstructionTinymceController)
 import UnitSolvesTheProblemTinymceController from "./tinymce/unit/unit_solves_the_problem_tinymce_controller.js"
@@ -22,23 +21,29 @@ application.register("unit_additional_information_tinymce", UnitAdditionalInform
 import UnitDescriptionTinymceController from "./tinymce/unit/unit_description_tinymce_controller.js"
 application.register("unit_description_tinymce", UnitDescriptionTinymceController)
 
-
-//UnitUsageExample
+// 1.2 UnitUsageExample
 import UnitUsageExampleDescriptionTinymceController from "./tinymce/unit/unit_usage_example_description_tinymce_controller.js"
 application.register("unit_usage_example_description_tinymce", UnitUsageExampleDescriptionTinymceController)
 import UnitUsageExampleSourcesTinymceController from "./tinymce/unit/unit_usage_example_sources_tinymce_controller.js"
 application.register("unit_usage_example_sources_tinymce", UnitUsageExampleSourcesTinymceController)
-
 import UsageExamplesSerpController from "./usage_examples_serp_controller.js"
 application.register("usage_examples_serp", UsageExamplesSerpController)
 
-
-
-//Improvements
+//1.3 Improvements
 import ImprovementContentTinymceController from "./tinymce/improvements/improvement_content_tinymce_controller.js"
 application.register("improvement_content_tinymce", ImprovementContentTinymceController)
 import ImprovementSourcesTinymceController from "./tinymce/improvements/improvement_sources_tinymce_controller.js"
 application.register("improvement_sources_tinymce", ImprovementSourcesTinymceController)
+
+// 1.4 Repositories
+import RepositoryDescriptionTinymceController from "./tinymce/repositories/repository_description_tinymce_controller.js"
+application.register("repository_description_tinymce", RepositoryDescriptionTinymceController)
+
+// 1.5 Folders
+import FolderDescriptionTinymceController from "./tinymce/folders/folder_description_tinymce_controller.js"
+application.register("folder_description_tinymce", FolderDescriptionTinymceController)
+
+
 
 
 import ImprovementsInfiniteScrollController from "./improvements_infinite_scroll_controller.js"

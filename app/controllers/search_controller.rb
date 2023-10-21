@@ -161,7 +161,9 @@ class SearchController < ApplicationController
     binding.pry
     # Case 1. Tecnologies for repository
     if params[:target_type] == "repository"
+      target_type = "repository"
       target = Repository.friendly.find(params[:target])
+      @folder_owner = target.user
 
       # 1.1 child folders
       binding.pry
@@ -182,6 +184,7 @@ class SearchController < ApplicationController
 
     # Case 2: technologies for folder
     elsif params[:target].present? && params[:target_type] == "folder"
+      target_type = "folder"
       # if params[:target].present?
       #   # Case 1.Technologies based on folder we in
       #   target_folder = Folder.friendly.find(params[:target])
@@ -212,6 +215,7 @@ class SearchController < ApplicationController
       search_results = Searchkick.search(find_all, where: condition, models: models)
       @technologies = search_results
     elsif params[:tag].present?
+      target_type = "search_by_tag"
       binding.pry
       @technologies = []
       @technologies += Articles::Article.tagged_with([params[:tag]], wild: true, any: true)
@@ -256,7 +260,9 @@ class SearchController < ApplicationController
     respond_to do |format|
       format.json {
         render json: { entries: render_to_string(partial: "technologies/list",
-                                                 formats: [:html], :locals => {:list_type => "all_mixed_entries"}) }
+                                                 formats: [:html],
+                                                 locals: {list_type: "all_mixed_entries",
+                                                          target_type: target_type }) }
         # current_folder_id: target_folder.id }
       }
     end

@@ -24,7 +24,7 @@
 
   <!--3. not folders and technologies ! RENDER IT FOR FOLDERS USING SEPARATE PARTIAL, NOT HERE -->
   <% if @child_folders.try(:blank?) && @technologies.blank? %>
-    <%= render "technologies/partials/folder_is_empty", folder_owner: @folder_owner %>
+    <%= render "technologies/partials/folder_is_empty", folder_owner: @folder_owner, target_type: target_type %>
   <% end %>
 
 

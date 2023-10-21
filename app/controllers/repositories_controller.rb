@@ -8,8 +8,17 @@ class RepositoriesController < ApplicationController
 
   # GET /repositories/1 or /repositories/1.json
   def show
-    @folder_owner = User.where(username: params[:username]).first
-    @target_repository = @folder_owner.repositories.friendly.find(params[:id])
+    @repository_owner = User.where(username: params[:username]).first
+    @target = @repository_owner.repositories.friendly.find(params[:id])
+
+    # breadcrumbs
+    binding.pry
+    add_breadcrumb @repository_owner.ownername,
+                   dashboard_path(username: @repository_owner.ownername),
+                   {link_type: "profile_page"}
+    add_breadcrumb @target.name,
+                   target_repository_path(username: @repository_owner.ownername, id: @target.slug),
+                   {link_type: "repository_page"}
   end
 
   # GET /repositories/new
@@ -28,7 +37,10 @@ class RepositoriesController < ApplicationController
 
     respond_to do |format|
       if @repository.save
-        format.html { redirect_to repository_url(@repository), notice: "Repository was successfully created." }
+
+        binding.pry
+        format.html { redirect_to target_repository_path(username: current_user.username, id: @repository),
+                                  notice: "Repository was successfully created." }
         format.json { render :show, status: :created, location: @repository }
       else
         format.html { render :new, status: :unprocessable_entity }

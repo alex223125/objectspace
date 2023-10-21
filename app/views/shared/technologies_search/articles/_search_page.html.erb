@@ -3,7 +3,9 @@
 <div data-controller="search_instructions"
      data-target="remote_select_instruction.searchInstructionsInstance remote_select_attachment.searchInstructionsInstance">
   <div class="flex justify-center">
-    <%= render partial: "shared/technologies_search/shared/search_form", locals: { type: "articles", scenario: scenario } %>
+    <%= render partial: "shared/technologies_search/shared/search_form",
+               locals: { type: "articles",
+                         scenario: (try(:scenario) ? scenario : nil) } %>
   </div>
 
 

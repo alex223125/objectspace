@@ -19,7 +19,7 @@
         </div>
 
         <% if repository.description.present? %>
-          <div class="folder-description">
+          <div class="repository-description">
             <p class="text-sm	 text-gray-900"><%= truncate(repository.description, length: 170, omission: '...', :escape => false) %></p>
           </div>
         <% end %>

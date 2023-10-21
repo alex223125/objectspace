@@ -11,19 +11,21 @@ class FoldersController < ApplicationController
     @folder_owner = User.where(username: params[:username]).first
     # @target_folder = @folder_owner.folders.friendly.find(params[:id])
     binding.pry
-    @target_folder = Folder.friendly.find(params[:id])
+    @target = @folder
 
     # folders_tree_without_root = @target_folder.folders_tree_without_root.reverse
-    folders_tree = @target_folder.self_and_ancestors.reverse
-    repository = @target_folder.root.repository
+    folders_tree = @folder.self_and_ancestors.reverse
+    repository = @folder.root.repository
 
     # breadcrumbs
-    add_breadcrumb @folder_owner.ownername, dashboard_path(username: @folder_owner.ownername), {link_type: "profile_page"}
-    add_breadcrumb repository.name, repository_path(username: @folder_owner.ownername, id: repository.slug), {link_type: "repository_page"}
+    add_breadcrumb @folder_owner.ownername, dashboard_path(username: @folder_owner.ownername),
+                   {link_type: "profile_page"}
+    add_breadcrumb repository.name, target_repository_path(username: @folder_owner.ownername, id: repository.slug),
+                   {link_type: "repository_page"}
     folders_tree.each do |folder|
-      add_breadcrumb folder.title, target_folder_path(username: @folder_owner.ownername, id: folder.slug), {link_type: "folder_page"}
+      add_breadcrumb folder.title, target_folder_path(username: @folder_owner.ownername, id: folder.slug),
+                     {link_type: "folder_page"}
     end
-
   end
 
   # GET /folders/new
