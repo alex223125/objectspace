@@ -14,8 +14,8 @@
     <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
 
     <!--    assets for tinymce-->
-    <%= tinymce_assets %>
-    <script type="text/javascript" src="/assets/tinymce.js"></script>
+    <%#= tinymce_assets %>
+<!--    <script type="text/javascript" src="/assets/tinymce.js"></script>-->
 
   </head>
 
@@ -24,8 +24,9 @@
 <!--    <main class="container mx-auto mt-28 px-5 flex">-->
 <!--    <main class="container mx-auto mt-28 px-5">-->
     <main class="container mx-auto px-5">
-      <%= render "layouts/general_notice" %>
-      <%= render "layouts/general_alert" %>
+      <%= render "layouts/flash_messages/general_notice" %>
+      <%= render "layouts/flash_messages/general_alert" %>
+      <%= render "layouts/flash_messages/general_error" %>
 
       <%= yield %>
     </main>

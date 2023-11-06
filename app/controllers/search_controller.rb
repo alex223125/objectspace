@@ -41,8 +41,11 @@ class SearchController < ApplicationController
       binding.pry
       @pagy, @articles = pagy(@articles, page: params[:page], items: 3)
 
+      binding.pry
       if params[:scenario] == "step_attachment_addition"
         locals = {scenario: "step_attachment_addition"}
+      elsif params[:scenario] == "regular"
+        locals = {scenario: "regular"}
       else
         locals = {}
       end
@@ -81,9 +84,18 @@ class SearchController < ApplicationController
       # @algorithms = Algorithms::Algorithm.english_global_search(params[:query])
       # @algorithms_versions = Algorithms::AlgorithmVersion.english_global_search(params[:query])
       @algorithms = Algorithms::Algorithm.search(params[:query], operator: "or",
-                                                 fields: [:title, :source_page_description], match: :text_middle)
-
+                                                 fields:[{title: :text_middle}, {title: :word},
+                                                         {title: :word_start}, {title: :word_end},
+                                                         {source_page_description: :text_middle},
+                                                         {source_page_description: :word},
+                                                         {source_page_description: :word_start},
+                                                         {source_page_description: :word_end}])
       binding.pry
+      # @algorithms = Algorithms::Algorithm.search(params[:query], operator: "or",
+      #                                            fields:[{name: :word_start}, ]
+      # fields: [:title, :source_page_description],
+      #   match: :word)
+      # match: [:text_middle, :word, :word_start, :word_end]	)
       # @algorithms = @algorithms_groups + @algorithms_versions
       @pagy, @algorithms = pagy(@algorithms, page: params[:page], items: 3)
 

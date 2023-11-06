@@ -27,19 +27,18 @@
     </div>
     <br>
 
-    <div class="col-span-6 sm:col-span-3" data-controller="unit_instruction_tinymce">
+    <div class="col-span-6 sm:col-span-3">
       <%= f.label "Source page description (optional)", class: "block text-sm font-medium text-gray-700" %>
       <%= f.hint 'Thats the description which will be shown on the top of the source page',
                  class: "mt-2 text-sm text-gray-500" %>
       <%= f.input_field :source_page_description,
                         required: false,
                         class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
-                        placeholder: "Ex: Different versions on how you can install Ruby on Rails on different environments",
-                        data: { target: 'unit_instruction_tinymce.field' }%>
+                        placeholder: "Ex: Different versions on how you can install Ruby on Rails on different environments"%>
     </div>
     <br>
 
-    <div class="col-span-6 sm:col-span-3" data-controller="unit_instruction_tinymce">
+    <div class="col-span-6 sm:col-span-3" data-controller="simple_class_description_tinymce">
       <%= f.label "Description (optional)", class: "block text-sm font-medium text-gray-700" %>
       <%= f.hint "Here you can add information about how to use class and it's organizational structure",
                  class: "mt-2 text-sm text-gray-500" %>
@@ -47,7 +46,7 @@
                         required: false,
                         class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
                         placeholder: "Ex: This class contains algorithms which are used during day-to-day decision making",
-                        data: { target: 'unit_instruction_tinymce.field' } %>
+                        data: { target: 'simple_class_description_tinymce.field' } %>
     </div>
     <br>
 

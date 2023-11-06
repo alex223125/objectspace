@@ -20,10 +20,11 @@ const containerMemberAdditionCase = "container_member_addition";
 const folderItemAdditionCase = "folder_item_addition";
 const interfaceGroupActionAdditionCase = "interface_group_form_action_addition";
 const simpleClassAttributeAdditionCase = "simple_class_attribute_addition"
-const simpleClassAttributeFormArticleAdditionCase = "simple_class_attribute_form_article_addition"
 const algorithmFormClassLevelWrapperStepAdditionCase = "algorithm_form_class_level_wrapper_step_addition"
+const simpleClassFormArticleToAttributeAttachmentCase = "simple_class_form_article_to_attribute_attachment"
 
-
+// this case probably not in use, check it and remove if that's correct
+const simpleClassAttributeFormArticleAdditionCase = "simple_class_attribute_form_article_addition"
 
 // Fields selectors
 // const substepAdditionCaseNestedFields = '.substeps-nested-fields'
@@ -34,6 +35,7 @@ const folderItemAdditionCaseNestedFields = '.nested-fields-folder-items'
 const interfaceGroupActionAdditionCaseNestedFields = '.nested-fields-interface-group-actions'
 const simpleClassAttributeAdditionCaseNestedFields = '.attributes-nested-fields'
 const wrapperStepClassLevelAdditionCaseNestedFields = '.steps-nested-fields'
+const simpleClassFormArticleToAttributeAttachmentCaseNestedFields = '.article-attachment-nested-fields'
 
 // 'select button' cases:
 const aticleCase = "article";
@@ -73,8 +75,11 @@ export default class extends Controller {
                       // Case 7. Simple class attribute addition
                       'simpleClassAttributesArea',
                       'addAttributeToSimpleClassOriginalButton',
-                        // Case 8. simpleClassAttributeForm article addition
-                      'simpleClassAttributeFormArea'
+                       // Case 8. simpleClassAttributeForm article addition
+                      'simpleClassAttributeFormArea',
+                       // Case 9. addition of articles as attachments to attributes in simple class form
+                       'simpleClassAttributeArticleAttahcmnetsArea',
+                       'addArticleToAttributeInSimpleClassFormOriginalButton'
                      ];
 
     static values = {
@@ -138,7 +143,13 @@ export default class extends Controller {
             useMutation(this, {attributes: false, childList: true, characterData: false, subtree:true})
             this.afterClickAttributesAmount = null
             this.currentAttributesAmount = null
-            this.postmutationAttributesAAmount = 0
+            this.postmutationAttributesAmount = 0
+        } else if (this.selectTypeValue == simpleClassFormArticleToAttributeAttachmentCase) {
+            // mutation is used to check if new class is added on ui side
+            useMutation(this, {attributes: false, childList: true, characterData: false, subtree:true})
+            this.afterClickArticleAttachmentsAmount = null
+            this.currentArticleAttachmentsAmount = null
+            this.postmutationArticleAttachmentsAmount = 0
         } else if (this.selectTypeValue == simpleClassAttributeFormArticleAdditionCase) {
             // do nothing
         }
@@ -281,6 +292,27 @@ export default class extends Controller {
             } else {
                 console.log("Amount not changed or error");
             }
+        } else if (this.selectTypeValue == simpleClassFormArticleToAttributeAttachmentCase) {
+            console.log(`mutation for ${simpleClassFormArticleToAttributeAttachmentCase} case triggered`)
+
+            var nestedFields = simpleClassFormArticleToAttributeAttachmentCaseNestedFields
+            this.afterClickArticleAttachmentsAmount = this.simpleClassAttributeArticleAttahcmnetsAreaTarget.querySelectorAll(nestedFields).length
+            console.log("this.currentArticleAttachmentsAmount")
+            console.log(this.currentArticleAttachmentsAmount)
+            console.log("this.afterClickArticleAttachmentsAmount")
+            console.log(this.afterClickArticleAttachmentsAmount)
+
+            var changedAmount = (this.currentArticleAttachmentsAmount + 1)
+            if ((changedAmount == this.afterClickArticleAttachmentsAmount) && (changedAmount != this.postmutationArticleAttachmentsAmount)) {
+                console.log("New Article Attachment added to Attribute in Simple Class form!");
+                this.setFieldsContainer()
+                this.setInstructionValues()
+                this.setInstructionPreviewContainer()
+                this.loadPreview()
+                this.postmutationArticleAttachmentsAmount = changedAmount
+            } else {
+                console.log("Amount not changed or error");
+            }
         }
 
     }
@@ -297,6 +329,53 @@ export default class extends Controller {
         console.log(this.instructionId)
         console.log(this.instructionType)
 
+        this.resetModalState()
+        this.dispatchSelectCase()
+    }
+
+
+
+    // PRIVATE
+
+    dispatchSelectCase(){
+        // Split on flows for each case
+
+        console.log("Current select type:")
+        console.log(this.selectTypeValue)
+        // if (this.selectTypeValue == substepAdditionCase) {
+        //     this.addSubstep()
+        if (this.selectTypeValue == dpoInstructionSelectCase) {
+            console.log("dpoInstructionSelectCase triggered")
+            this.setInstruction()
+        } else if (this.selectTypeValue == interfaceMemberAdditionCase) {
+            console.log("interfaceMemberAdditionCase triggered")
+            this.addInterfaceMember()
+        } else if (this.selectTypeValue == containerMemberAdditionCase) {
+            console.log("containerMemberAdditionCase triggered")
+            this.addContainerMember()
+        } else if (this.selectTypeValue == folderItemAdditionCase) {
+            console.log("folderItemAdditionCase triggered")
+            this.addFolderItem()
+        } else if ((this.selectTypeValue == algorithmFormWrapperStepAdditionCase)
+            || (this.selectTypeValue == algorithmFormClassLevelWrapperStepAdditionCase) ) {
+            console.log("algorithmFormWrapperStepAdditionCase or algorithmFormClassLevelWrapperStepAdditionCase triggered")
+            this.addWrapperStep()
+        } else if (this.selectTypeValue == interfaceGroupActionAdditionCase) {
+            console.log("interfaceGroupActionAdditionCase triggered")
+            this.addActionToInterfaceGroup()
+        } else if (this.selectTypeValue == simpleClassAttributeAdditionCase) {
+            console.log("simpleClassAttributeAdditionCase triggered")
+            this.addAttributeToSimpleClass()
+        } else if (this.selectTypeValue == simpleClassAttributeFormArticleAdditionCase) {
+            console.log("simpleClassAttributeFormArticleAdditionCase triggered")
+            this.addArticleToSimpleClassAttribute()
+        } else if (this.selectTypeValue == simpleClassFormArticleToAttributeAttachmentCase) {
+            console.log("simpleClassFormArticleToAttributeAttachmentCase triggered")
+            this.addArticleAttachmentToSimpleClassAttribute()
+        }
+    }
+
+    resetModalState(){
         if (this.selectTypeValue == algorithmFormClassLevelWrapperStepAdditionCase) {
             // 2.1 remove modal
             this.closeClassTreeModal()
@@ -307,34 +386,7 @@ export default class extends Controller {
             // 2.2 remove modal
             this.removeModal()
         }
-
-        // Split on flows for each case
-
-        // if (this.selectTypeValue == substepAdditionCase) {
-        //     this.addSubstep()
-        if (this.selectTypeValue == dpoInstructionSelectCase) {
-            this.setInstruction()
-        } else if (this.selectTypeValue == interfaceMemberAdditionCase) {
-            this.addInterfaceMember()
-        } else if (this.selectTypeValue == containerMemberAdditionCase) {
-            this.addContainerMember()
-        } else if (this.selectTypeValue == folderItemAdditionCase) {
-            this.addFolderItem()
-        } else if ((this.selectTypeValue == algorithmFormWrapperStepAdditionCase)
-                    || (this.selectTypeValue == algorithmFormClassLevelWrapperStepAdditionCase) ) {
-            this.addWrapperStep()
-        } else if (this.selectTypeValue == interfaceGroupActionAdditionCase) {
-            this.addActionToInterfaceGroup()
-        } else if (this.selectTypeValue == simpleClassAttributeAdditionCase) {
-            this.addAttributeToSimpleClass()
-        } else if (this.selectTypeValue == simpleClassAttributeFormArticleAdditionCase) {
-            this.addArticleToSimpleClassAttribute()
-        }
     }
-
-
-
-    // PRIVATE
 
     setInstruction(){
         this.setInstructionValues()
@@ -419,7 +471,8 @@ export default class extends Controller {
 
     addAttributeToSimpleClass(){
         //Calculate amount of substep before adding new substep
-        this.currentAttributesAmount = this.simpleClassAttributesAreaTarget.querySelectorAll(simpleClassAttributeAdditionCaseNestedFields).length
+        this.currentAttributesAmount = this.simpleClassAttributesAreaTarget
+            .querySelectorAll(simpleClassAttributeAdditionCaseNestedFields).length
         console.log("currentAttributesAmount")
         console.log(this.currentAttributesAmount)
 
@@ -427,6 +480,19 @@ export default class extends Controller {
         // console.log(this.addSubstepOriginalButtonTarget)
         console.log("addActionsToInterfaceGroupOriginalButtonTarget.click() fired")
         this.addAttributeToSimpleClassOriginalButtonTarget.click()
+    }
+
+    addArticleAttachmentToSimpleClassAttribute(){
+        //Calculate amount of attachments before adding new substep
+        this.currentArticleAttachmentsAmount = this.simpleClassAttributeArticleAttahcmnetsAreaTarget
+            .querySelectorAll(simpleClassFormArticleToAttributeAttachmentCaseNestedFields).length
+        console.log("currentArticleAttachmentsAmount")
+        console.log(this.currentArticleAttachmentsAmount)
+
+        // 3.click hidden button under previous selected step
+        // console.log(this.addSubstepOriginalButtonTarget)
+        console.log("addArticleToAttributeInSimpleClassFormOriginalButtonTarget.click() fired")
+        this.addArticleToAttributeInSimpleClassFormOriginalButtonTarget.click()
     }
 
 
@@ -439,6 +505,7 @@ export default class extends Controller {
 
 
     ////////////////////
+    // Remove modal logic
     resetSearchForm(){
         // multiple instances on the same page
         this.searchInstructionsInstanceTargets.forEach(target => {
@@ -487,12 +554,16 @@ export default class extends Controller {
             this.fieldsContainer = [...this.simpleClassAttributesAreaTarget.querySelectorAll(selector)].pop()
         } else if (this.selectTypeValue == simpleClassAttributeFormArticleAdditionCase) {
             this.fieldsContainer = this.simpleClassAttributeFormAreaTarget
+        } else if (this.selectTypeValue == simpleClassFormArticleToAttributeAttachmentCase) {
+            var selector = simpleClassFormArticleToAttributeAttachmentCaseNestedFields
+            this.fieldsContainer = [...this.simpleClassAttributeArticleAttahcmnetsAreaTarget.querySelectorAll(selector)].pop()
         }
         console.log("Last target or single target:")
         console.log(this.fieldsContainer)
     }
 
     // TODO: technology preview container instead of instructionPreviewContainer
+    // technolgy == all, including articles and dec proc objects
     setInstructionPreviewContainer(){
         // if (this.selectTypeValue == substepAdditionCase) {
         //     this.instructionPreviewContainer = this.fieldsContainer.querySelector(".instruction-preview")
@@ -510,6 +581,8 @@ export default class extends Controller {
         } else if (this.selectTypeValue == simpleClassAttributeAdditionCase
                    || this.selectTypeValue == simpleClassAttributeFormArticleAdditionCase) {
             this.instructionPreviewContainer = this.fieldsContainer.querySelector(".attribute-preview")
+        } else if (this.selectTypeValue == simpleClassFormArticleToAttributeAttachmentCase) {
+            this.instructionPreviewContainer = this.fieldsContainer.querySelector(".article-attachment-preview")
         }
     }
 
@@ -534,11 +607,22 @@ export default class extends Controller {
         } else if (this.selectTypeValue == simpleClassAttributeAdditionCase
                    || this.selectTypeValue == simpleClassAttributeFormArticleAdditionCase) {
             this.setAttributeValues()
+        } else if (this.selectTypeValue == simpleClassFormArticleToAttributeAttachmentCase) {
+            this.setArticleAttachmentValue()
         }
     }
 
+    //// set values methods
+    setArticleAttachmentValue(){
+        // in this case we have only article
+        var idField = "article-id-hidden-field"
+
+        this.fieldsContainer.querySelector(`.${idField}`).value = this.instructionId
+    }
+
+
     setAttributeValues(){
-        // in this case we have only articles
+        // in this case we have only article
         var idField = "article-id-hidden-field"
 
         this.fieldsContainer.querySelector(`.${idField}`).value = this.instructionId
@@ -595,7 +679,6 @@ export default class extends Controller {
         }
     }
 
-
 // setSubstepableInstructionValues(){
     //     var idField = "substepable-id-hidden-field"
     //     var typeField = "substepable-type-hidden-field"
@@ -609,8 +692,6 @@ export default class extends Controller {
     //     }
     // }
 
-
-
     setInstructionableInstructionValues(){
         var idField = "instructionable-id-hidden-field"
         var typeField = "instructionable-type-hidden-field"
@@ -623,6 +704,7 @@ export default class extends Controller {
             this.instructionableFieldsAreaTarget.querySelector(`.${typeField}`).value = "Algorithms::Algorithm"
         }
     }
+    ////
 
 
     // Load preview logic
@@ -668,7 +750,8 @@ export default class extends Controller {
             || this.selectTypeValue == containerMemberAdditionCase
             || this.selectTypeValue == folderItemAdditionCase
             || this.selectTypeValue == simpleClassAttributeAdditionCase
-            || this.selectTypeValue == interfaceGroupActionAdditionCase) {
+            || this.selectTypeValue == interfaceGroupActionAdditionCase
+            || this.selectTypeValue == simpleClassFormArticleToAttributeAttachmentCase) {
             this.instructionPreviewContainer.insertAdjacentHTML('beforeend', data.preview)
         } else if (this.selectTypeValue == dpoInstructionSelectCase
                    || this.selectTypeValue == simpleClassAttributeFormArticleAdditionCase) {

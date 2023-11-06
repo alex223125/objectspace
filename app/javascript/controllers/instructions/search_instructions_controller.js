@@ -38,7 +38,13 @@ export default class extends Controller {
         const textQuery = this.textQueryTarget.value
         const uuidQuery = this.uuidQueryTarget.value
         const instructionType = this.instructionTypeTarget.value
-        const scenario = this.scenarioTarget.value
+
+        const scenario = this.scenario()
+
+        console.log("SCENARIO:")
+        console.log(scenario)
+        console.log(this.scenario())
+
         this.page = 1
 
         let url = `/search`
@@ -56,7 +62,7 @@ export default class extends Controller {
 
 
         // 3.clear past results
-        this.clearEntries
+        this.clearEntries()
 
 
 
@@ -142,6 +148,15 @@ export default class extends Controller {
 
 
     // PRIVATE
+
+
+    scenario() {
+        if (this.hasScenarioTarget) {
+            return this.scenarioTarget.value
+        } else {
+            return "scenario_not_defined"
+        }
+    }
 
     clearEntries(){
         this.entriesTarget.innerHTML = "";

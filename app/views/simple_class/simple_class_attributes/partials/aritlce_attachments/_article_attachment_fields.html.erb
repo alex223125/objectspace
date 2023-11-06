@@ -1,0 +1,39 @@
+<div class="nested-fields article-attachment-nested-fields">
+<!-- DOC: simple_class_attribute_preview controller - works in case of edit forms -->
+  <div class="attribute-fields-attribute-preview"
+       data-controller="simple_class_attribute_preview"
+       data-simple_class_attribute_preview-preview-type-value="regular_fields_form"
+  >
+
+    <%= f.hidden_field :article_id, class: "article-id-hidden-field", data: {target: "simple_class_attribute_preview.attributeIdHiddenField"}%>
+
+    <%= f.hidden_field :_destroy %>
+
+    <div class="col-span-6 sm:col-span-3">
+      <div class="grid grid-cols-2 gap-2">
+        <div class="py-3">
+          <%= f.label "Attached Article", class: "block text-sm font-medium text-gray-700" %>
+        </div>
+        <div>
+          <div class="px-4 py-3 pt-1">
+            <div class="text-end">
+              <%= link_to_remove_association "Delete",
+                                             f,
+                                             class: "focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4
+                                               focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600
+                                               dark:hover:bg-red-700 dark:focus:ring-red-900"
+              %>
+              <!--      <button type="button" class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Remove</button>-->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="article-attachment-preview" data-target="simple_class_attribute_preview.attributePreviewContainer">
+        <!-- place for injecting preview of article -->
+      </div>
+    </div>
+    <br>
+  </div>
+  <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-5 dark:bg-gray-700">
+</div>

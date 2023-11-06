@@ -31,8 +31,18 @@ class Algorithms::Nodes::Step < Algorithms::Nodes::Node
   # belongs_to :algorithm_version
   # acts_as_list scope: :algorithm_version
 
-  validates :instruction, presence: { message: "Step instruction can not be blank" }
+  validates :instruction,
+            presence: { message: "Step instruction can not be blank" },
+            if: :should_contain_instruction?
 
+  def should_contain_instruction?
+    if self.step_functional_type == Steps::FunctionalTypes[:container] ||
+      self.step_functional_type == Steps::FunctionalTypes[:wrapper]
+      false
+    else
+      true
+    end
+  end
 
   def functional_type
     Steps::FunctionalTypes[self.step_functional_type]

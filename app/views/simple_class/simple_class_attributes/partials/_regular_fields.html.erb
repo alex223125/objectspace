@@ -24,24 +24,7 @@
     <%= f.hidden_field :simple_class_id, value: @target_simple_class.id %>
   <% end %>
 
-
-  <div class="attribute-fields-attribute-preview"
-       data-controller="simple_class_attribute_preview"
-       data-simple_class_attribute_preview-preview-type-value="regular_fields_form">
-    <%= f.hidden_field :article_id, class: "article-id-hidden-field",
-                       data: {target: "simple_class_attribute_preview.attributeIdHiddenField"} %>
-
-    <div class="col-span-6 sm:col-span-3">
-      <%= f.label "Attached Article", class: "block text-sm font-medium text-gray-700" %>
-      <%= f.hint 'For more detailed description you can attach articles about this attribute.', class: "mt-2 text-sm text-gray-500" %>
-      <div class="attribute-preview" data-target="simple_class_attribute_preview.attributePreviewContainer">
-        <!-- place for injecting preview of article -->
-      </div>
-    </div>
-    <br>
-  </div>
-  <%= render "shared/technologies_search/modal", :type => "simple_class_attribute_form_article_addition" %>
-  <br>
+  <%= render "simple_class/simple_class_attributes/partials/aritlce_attachments/nested_form", :f => f %>
 
   <% if @simple_class_attribute.present? ? !@simple_class_attribute.new_record? : false %>
     <div class="col-span-6 sm:col-span-3"

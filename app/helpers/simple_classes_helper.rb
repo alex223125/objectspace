@@ -28,4 +28,21 @@ module SimpleClassesHelper
   #   result
   # end
 
+
+  def has_interface_groups?(simple_class)
+    if simple_class.functional_type == SimpleClasses::FunctionalTypes[:decision_object_class] ||
+      simple_class.functional_type == SimpleClasses::FunctionalTypes[:decision_object_container_class]
+      true
+    else
+      false
+    end
+  end
+
+  def simple_class_for(interface_group)
+    if interface_group.simple_class.present?
+      interface_group.simple_class
+    else
+      interface_group.root.simple_class
+    end
+  end
 end

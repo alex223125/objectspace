@@ -10,15 +10,15 @@
         <!-- submenu -->
         <div class="mt-1 flex flex-col space-x-4 sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
           <div class="mt-2 flex items-center text-sm">
-            <%= render "algorithm/algorithm_versions/partials/algorithm_content/version_select_bar", algorithm_version: algorithm_version %>
+            <%= render "algorithm/algorithm_versions/partials/algorithm_content/submenu/version_select_bar", algorithm_version: algorithm_version %>
           </div>
 
           <div class="mt-2 flex items-center text-sm">
-            <%= render "algorithm/algorithm_versions/partials/algorithm_content/copy_to_clipboard", algorithm: @algorithm %>
+            <%= render "algorithm/algorithm_versions/partials/algorithm_content/submenu/copy_to_clipboard", algorithm: @algorithm %>
           </div>
 
           <div class="mt-2 flex items-center text-sm text-gray-500">
-            <%= render "algorithm/algorithm_versions/partials/algorithm_content/options_dropdown", algorithm_version: algorithm_version %>
+            <%= render "algorithm/algorithm_versions/partials/algorithm_content/submenu/options_dropdown", algorithm_version: algorithm_version %>
           </div>
         </div>
 

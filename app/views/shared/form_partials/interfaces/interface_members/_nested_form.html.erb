@@ -2,11 +2,8 @@
   <div class="col-span-6 sm:col-span-3">
     <p class="text-xl font-bold hover:text-gray-700">Actions:</p>
     <% if type == "root_class" %>
-      <p class="mt-2 text-sm text-gray-500">Here you can add few children Classes to current class.
-        If you have a lot of chldren classes it's recommended to use class containers.
-        You also will be able to add them after current Class creation.
-        Actions added here will be added to Main folder.
-        You will be able create actions specifically for this class after submitting of this form.</p>
+      <p class="mt-2 text-sm text-gray-500">Here you can add Methods and Algorithms as Actions to your Model.
+        Everything what will be added in this category will go in "Main actions" action group which created by default with current model.</p>
     <% elsif type == "interface_group"  %>
       <p class="mt-2 text-sm text-gray-500"><p class="mt-2 text-sm text-gray-500">Here you can add actions which will be part of the group. You also will be able to add them after Class creation.</p></p>
     <% end %>

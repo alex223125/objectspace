@@ -27,10 +27,10 @@ module Services
             set_tags
 
             binding.pry
-            @article.save!
+            set_default_version
 
             binding.pry
-            set_default_version
+            @article.save!
           end
         rescue ActiveRecord::RecordInvalid => e
 
@@ -58,8 +58,7 @@ module Services
 
         def set_default_version
           binding.pry
-          @article.default_version_id = @article.article_versions.first.id
-          @article.save!
+          @article.default_version = @article.article_versions.first
         end
 
         def set_owner

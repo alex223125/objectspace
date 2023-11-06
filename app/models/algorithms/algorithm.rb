@@ -5,7 +5,10 @@ class Algorithms::Algorithm < ApplicationRecord
   extend Pagy::Searchkick
   searchkick callbacks: :async,
              text_middle: [:title, :source_page_description],
-             word: [:list_of_tags, :ownerable_id]
+             word: [:title, :source_page_description, :list_of_tags, :ownerable_id],
+             word_start: [:title, :source_page_description],
+             word_end: [:title, :source_page_description]
+
   scope :search_import, -> { includes(:tags) }
   acts_as_taggable_on :tags
 

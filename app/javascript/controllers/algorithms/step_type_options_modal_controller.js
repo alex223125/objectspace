@@ -7,7 +7,6 @@ export default class extends Controller {
         restoreScroll: { type: Boolean, default: false }
     }
 
-
     initialize() {
         console.log("Step type options controller initialized")
     }

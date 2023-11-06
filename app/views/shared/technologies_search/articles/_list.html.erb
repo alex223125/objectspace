@@ -1,5 +1,6 @@
 <div class='items-center justify-center'>
 
+  <% binding.pry %>
   <% if @articles.present? %>
     <% @articles.each do |article| %>
       <%= render partial: "shared/technologies_search/articles/single_preview", locals: {article: article, scenario: scenario} %>

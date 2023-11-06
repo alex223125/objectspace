@@ -54,7 +54,10 @@ class Algorithm::AlgorithmsController < ApplicationController
     binding.pry
     if params[:functional_type].present?
       @functional_type = Algorithms::FunctionalTypes[params[:functional_type]]
+    else
+      @functional_type = Algorithms::FunctionalTypes[:regular]
     end
+
     if params[:simple_class].present?
       @simple_class = SimpleClasses::SimpleClass.find(params[:simple_class])
     end

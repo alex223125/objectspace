@@ -51,7 +51,7 @@ class SimpleClass::InterfaceGroupsController < ApplicationController
     respond_to do |format|
       binding.pry
       if @interface_group.update(interface_group_params)
-        simple_class = @interface_group.simple_class
+        simple_class = @interface_group.simple_class ? @interface_group.simple_class : @interface_group.root.simple_class
         # format.html { redirect_to interface_group_url(@interface_group), notice: "Interface group was successfully updated." }
         format.html { redirect_to simple_class_path(username: simple_class.owner.username, id: simple_class.id),
                                   notice: "Actions group was successfully updated." }

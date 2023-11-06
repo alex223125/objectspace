@@ -20,6 +20,7 @@
     <div class="relative col-start-2 col-end-3 lg:col-end-3 row-start-2 row-end-3 lg:row-start-3 lg:row-end-4 self-center pl-8 sm:px-6 md:px-8 pt-6 md:pt-8 lg:px-0 lg:pt-0">
       <div class="relative bg-white rounded-tl-xl sm:rounded-t-xl lg:rounded-xl shadow-lg divide-y divide-gray-100">
 
+        <!--  TODO REDO THIS TABS ON EXTERNAL STIMULUS JS LIBRARY, FLOWBITE IS BROKEN -->
         <!--tabs -->
         <nav class="p-4 text-sm font-medium">
           <ul class="flex space-x-2" id="interface-group-tab-<%= interface_group.id %>"
@@ -31,7 +32,7 @@
                    type="button"
                    role="tab"
                    aria-controls="featured-<%= interface_group.id %>"
-                   aria-selected="false">Featured
+                   aria-selected="true">Featured
               </div>
             </li>
             <li>
@@ -62,7 +63,7 @@
         </nav>
 
         <div id="myTabContentInterfaceGroup<%= interface_group.id %>">
-          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800 hidden"
+          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800"
                id="featured-<%= interface_group.id %>"
                role="tabpanel"
                aria-labelledby="featured-tab-<%= interface_group.id %>">

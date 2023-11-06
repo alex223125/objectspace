@@ -14,6 +14,7 @@ class Article::ArticlesController < ApplicationController
   end
 
   def preview
+    binding.pry
     if params[:preview_type] == "basic_preview"
       path = "article/articles/previews/basic_preview"
     elsif params[:preview_type] == "small_line_preview"
@@ -22,6 +23,7 @@ class Article::ArticlesController < ApplicationController
       path = "article/articles/previews/algorithm_step_attachment_preview"
     end
 
+    binding.pry
     respond_to do |format|
       format.json {
         render json: { preview: render_to_string(partial: path,

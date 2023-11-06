@@ -269,11 +269,17 @@ export default class extends Controller {
 
     setUuid(){
         // technology pick case
-        if (typeof this.data.get("simpleClassUuid") !== "undefined") {
+        if (typeof this.data.get("simpleClassUuid") !== "undefined" && this.data.get("simpleClassUuid") !== null  ) {
             return this.data.get("simpleClassUuid")
         } else {
             var contentAreaController = this.contentAreaController()
+            console.log("contentAreaController:")
+            console.log(contentAreaController)
             var value = contentAreaController.uuidInputTarget.value
+
+            console.log("contentAreaController.uuidInputTarget:")
+            console.log(contentAreaController.uuidInputTarget)
+
             return value
         }
     }

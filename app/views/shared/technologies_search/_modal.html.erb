@@ -1,4 +1,4 @@
-<!--TODO: Write settings object which will have type, button description, search engine fields, TechnologySearchSettings-->
+<!-- TODO: Write settings object which will have type, button description, search engine fields, TechnologySearchSettings-->
 <!--we initialize it by type of search and then use it in all templates in tech search-->
 
 <div class="select-technology-modal">
@@ -29,10 +29,14 @@
         data-action="click->select_instruction_modal#open"
         class="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800">
               <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+
+                <% binding.pry %>
                 <% if type == "substep_addition" %>
                   Add SubStep
-                <% elsif type == "dpo_instruction_select" %>
+                <% elsif type == "dpo_instruction_select" && scenario == "instruction_not_selected"  %>
                   Select Method or Algorithm
+                <% elsif type == "dpo_instruction_select" && scenario == "instruction_was_previously_selected"  %>
+                  Pick another Method or Algorithm
                 <% elsif type == "interface_member_addition" || type == "interface_group_form_action_addition" %>
                   Add Action
                 <% elsif type == "container_member_addition" %>
@@ -43,6 +47,8 @@
                   Add Attribute
                 <% elsif type == "simple_class_attribute_form_article_addition" %>
                   Select Article
+                <% elsif type == "simple_class_form_article_to_attribute_attachment" %>
+                  Add Article
                 <% elsif type == "step_attachment_addition" %>
                   Add Attachment
                 <% end %>
@@ -83,7 +89,8 @@
                   Select Action
                 <% elsif type == "simple_class_attribute_addition" ||
                          type == "simple_class_attribute_form_article_addition" ||
-                         type == "step_attachment_addition" %>
+                         type == "step_attachment_addition" ||
+                         type == "simple_class_form_article_to_attribute_attachment" %>
                   Select Article
                 <% end %>
               </h3>
@@ -110,8 +117,10 @@
                   In this popup you can use different types of search to find Methods and Algorithms to add it as Step content.
                 <% elsif type == "interface_group_form_action_addition" %>
                   In this popup you can select technology to add as Action to Action Group
-                <% elsif type == "simple_class_attribute_addition" || type == "simple_class_attribute_form_article_addition" %>
-                  In this popup you can select Article to add it as attribute description of the class
+                <% elsif type == "simple_class_attribute_addition" ||
+                         type == "simple_class_attribute_form_article_addition" ||
+                         type == "simple_class_form_article_to_attribute_attachment" %>
+                  In this popup you can select Article to add it as attribute of the model
                 <% elsif type == "step_attachment_addition" %>
                   In this popup you can select Article to add it as attachment to the step
                 <% end %>
@@ -133,7 +142,8 @@
               <!--  everything that can be considered as action-->
               <%= render "shared/technologies_search/modal_bodies/actions_search_modal_body" %>
             <% elsif type == "simple_class_attribute_addition" ||
-                     type == "simple_class_attribute_form_article_addition" %>
+                     type == "simple_class_attribute_form_article_addition" ||
+                     type == "simple_class_form_article_to_attribute_attachment" %>
               <%= render "shared/technologies_search/modal_bodies/articles_search_modal_body", scenario: "regular" %>
             <% elsif type == "step_attachment_addition" %>
               <%= render "shared/technologies_search/modal_bodies/articles_search_modal_body", scenario: "step_attachment_addition" %>

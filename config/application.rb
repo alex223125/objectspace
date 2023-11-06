@@ -27,5 +27,14 @@ module Objectspace
     # config.eager_load_paths << Rails.root.join("extras")
 
     config.i18n.default_locale = :en
+
+    config.assets.paths << Rails.root.join('node_modules')
+
+
+    # config.assets.paths << Rails.root.join('node_modules')
+
+    # config.tinymce.install = :copy
+    # config.tinymce.install = :compile
+
   end
 end

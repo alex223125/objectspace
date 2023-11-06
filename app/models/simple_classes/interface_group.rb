@@ -1,6 +1,6 @@
 class SimpleClasses::InterfaceGroup < ApplicationRecord
 
-  has_closure_tree
+  has_closure_tree order: 'position', numeric_order: true
   has_closure_tree_root :root_class_group
 
   has_many :groups,
@@ -8,7 +8,6 @@ class SimpleClasses::InterfaceGroup < ApplicationRecord
            foreign_key: "parent_id"
   accepts_nested_attributes_for :groups, allow_destroy: true
   # -> { order 'interface_groups.position ASC' },
-
 
   # add validation that it's connected to at least one of these SmpleClass or framework
   belongs_to :simple_class, class_name: "SimpleClasses::SimpleClass", optional: true

@@ -1,4 +1,4 @@
-<div class="class-container">
+<div class="class-container-<%= class_container.id %>">
   <!--title-->
   <h2 id="class-container-<%= class_container.id %>" class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center"># <%= class_container.title %>:</h2>
 
@@ -15,7 +15,7 @@
   <% end %>
 
   <!--preview container -->
-  <div class="class-container-preview-container">
+  <div class="class-container-preview-container-<%= class_container.id %>">
     <div class="relative col-start-2 col-end-3 lg:col-end-3 row-start-2 row-end-3 lg:row-start-3 lg:row-end-4 self-center pl-8 sm:px-6 md:px-8 pt-6 md:pt-8 lg:px-0 lg:pt-0">
       <div class="relative z-10 bg-white rounded-tl-xl sm:rounded-t-xl lg:rounded-xl shadow-lg divide-y divide-gray-100">
 
@@ -57,14 +57,12 @@
         </nav>
 
         <div id="myTabContentClassContainer<%= class_container.id %>">
-          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800 hidden"
+          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800"
                id="featured-<%= class_container.id %>"
                role="tabpanel"
                aria-labelledby="featured-tab-<%= class_container.id %>">
             <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/class_containers/container_members_list",
                        class_container: class_container %>
-
-
           </div>
           <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800 hidden"
                id="popular-<%= class_container.id %>"

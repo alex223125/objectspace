@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_09_19_224201) do
+ActiveRecord::Schema[7.0].define(version: 2023_11_05_211242) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -111,6 +111,15 @@ ActiveRecord::Schema[7.0].define(version: 2023_09_19_224201) do
     t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
     t.integer "repository_id"
     t.index ["ownerable_type", "ownerable_id"], name: "index_articles_on_ownerable"
+  end
+
+  create_table "articles_simple_class_attributes", force: :cascade do |t|
+    t.bigint "article_id", null: false
+    t.bigint "simple_class_attribute_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["article_id"], name: "index_articles_attributes_on_article_id"
+    t.index ["simple_class_attribute_id"], name: "index_articles_attributes_on_simple_class_attribute_id"
   end
 
   create_table "attachments", force: :cascade do |t|
@@ -305,7 +314,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_09_19_224201) do
   create_table "simple_class_attributes", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "article_id"
     t.integer "simple_class_id"
     t.string "title"
     t.text "description"
@@ -493,6 +501,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_09_19_224201) do
   add_foreign_key "actions_simple_class_attributes", "simple_class_attributes"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "articles_simple_class_attributes", "articles"
+  add_foreign_key "articles_simple_class_attributes", "simple_class_attributes"
   add_foreign_key "taggings", "tags"
   add_foreign_key "unit_version_improvements", "improvements"
   add_foreign_key "unit_version_improvements", "unit_versions"

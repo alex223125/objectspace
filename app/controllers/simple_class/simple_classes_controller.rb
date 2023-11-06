@@ -57,10 +57,11 @@ class SimpleClass::SimpleClassesController < ApplicationController
                                               .includes(:simple_class_attributes, :interface_groups)
                                               .includes(interface_groups: [interface_members: [:memberable]]).first
 
+    binding.pry
     if params[:map_type] == "technology_pick"
-      locals = { simple_class: @simple_class, type: "technology_pick"}
+      locals = { simple_class: @simple_class, leaf_type: "technology_pick"}
     else
-      locals = { simple_class: @simple_class, type: "regular_view"}
+      locals = { simple_class: @simple_class, leaf_type: "regular_view"}
     end
 
     path = "simple_class/simple_classes/partials/dynamic_tree_view/main"
@@ -106,6 +107,7 @@ class SimpleClass::SimpleClassesController < ApplicationController
   def edit
     binding.pry
     @root_interface_group = @simple_class.root_interface_group
+    @class_type = @simple_class.functional_type
   end
 
   # POST /simple_classes or /simple_classes.json
@@ -160,7 +162,8 @@ class SimpleClass::SimpleClassesController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_simple_class
-      @simple_class = SimpleClasses::SimpleClass.friendly.find(params[:id])
+      binding.pry
+      @simple_class = SimpleClasses::SimpleClass.friendly.try(:find, params[:id])
 
       # If an old id or a numeric id was used to find the record, then
       # the request path will not match the post_path, and we should do
@@ -171,6 +174,10 @@ class SimpleClass::SimpleClassesController < ApplicationController
                                              id: @simple_class.slug),
                            :status => :moved_permanently
       end
+      # TODO: add in all controller with friendly find rescue from not found case
+    rescue ActiveRecord::RecordNotFound
+      flash[:error] = "Model not found"
+      redirect_to :root
     end
 
     # Only allow a list of trusted parameters through.
@@ -179,7 +186,8 @@ class SimpleClass::SimpleClassesController < ApplicationController
         :title, :description, :functional_type, :source_page_description,
         :instructionable_type, :instructionable_id, :tag_list,
         interface_groups_attributes, class_containers_attributes,
-        simple_class_attributes_attributes: [:id, :title, :description, :article_id, :_destroy ]
+        simple_class_attributes_attributes: [:id, :title, :description, :_destroy,
+                                             articles_simple_class_attributes_attributes: [:id, :article_id, :_destroy]]
       )
     end
 

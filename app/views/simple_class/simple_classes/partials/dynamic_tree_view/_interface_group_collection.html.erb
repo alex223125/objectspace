@@ -1,0 +1,11 @@
+<li class="jstree-open">
+  <%= render "simple_class/simple_classes/partials/dynamic_tree_view/interface_group_item", interface_group: interface_group %>
+  <ul>
+    <% interface_group.interface_members.each do |interface_member| %>
+      <li>
+        <%= render "simple_class/simple_classes/partials/dynamic_tree_view/interface_member_item",
+                   interface_member: interface_member, leaf_type: leaf_type %>
+      </li>
+    <% end %>
+  </ul>
+</li>

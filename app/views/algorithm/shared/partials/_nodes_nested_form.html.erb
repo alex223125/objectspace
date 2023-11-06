@@ -2,7 +2,7 @@
 
 <!--<h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight text-center">Steps</h2>-->
 
-<div class="col-span-6 sm:col-span-3">
+<div class="nodraggablesteps col-span-6 sm:col-span-3">
   <p class="text-xl font-bold hover:text-gray-700">Steps:</p>
   <p class="mt-2 text-sm text-gray-500">Here you can add examples how to use the method on practice with different cases
     and scenarios. Click on substep and move up or down to change position in the substeps list.</p>
@@ -27,6 +27,7 @@
 <!--</div>-->
 <div class="steps-nested-form">
 
+  <% binding.pry %>
   <div data-controller="nodes_drag remote_select_instruction algorithm_step_type_select steps_nested_form"
        data-target="remote_select_instruction.stepsArea nodes_drag.nodesArea"
        data-remote_select_instruction-select-type-value="<%=remote_select_instruction_select_type(@functional_type)%>">

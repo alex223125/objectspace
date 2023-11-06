@@ -1,0 +1,40 @@
+<hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+
+<div class="col-span-6 sm:col-span-3">
+  <p class="text-xl font-bold hover:text-gray-700">Attributes:</p>
+  <p class="mt-2 text-sm text-gray-500">Here you can add articles which describe attributes of the class, things like performance, effectiveness, reliability.</p>
+  <%#= link_to "Add new usage example", units_path, class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+</div>
+<br>
+
+<div>
+
+  <div data-controller="remote_select_instruction"
+       data-target="remote_select_instruction.simpleClassAttributesArea"
+       data-remote_select_instruction-select-type-value="simple_class_attribute_addition"
+  >
+
+    <%= form.fields_for :simple_class_attributes do |t| %>
+      <%= render "simple_class/simple_classes/partials/simple_attributes/attribute_fields", :f => t %>
+    <% end %>
+
+
+    <div>
+      <%= link_to_add_association "Add Attribute", form,
+                                  :simple_class_attributes,
+                                  style: "display:none;",
+                                  partial: 'simple_class/simple_classes/partials/simple_attributes/attribute_fields',
+                                  class: "nodraggablesteps inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2",
+                                  data: {target: "remote_select_instruction.addAttributeToSimpleClassOriginalButton"}
+      %>
+    </div>
+
+    <%= render "shared/technologies_search/modal", form: form, type: "simple_class_attribute_addition", scenario: "regular" %>
+
+  </div>
+
+</div>
+
+<hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+
+

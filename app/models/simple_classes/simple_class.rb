@@ -40,6 +40,8 @@ class SimpleClasses::SimpleClass < ApplicationRecord
 
   has_many :interface_members, through: :interface_groups, class_name: "SimpleClasses::InterfaceMember"
 
+  validates :title, presence: true, allow_blank: false
+  validates :description, presence: true, allow_blank: false
 
   def root_class_container
     self.class_containers.where(parent_id: nil).first

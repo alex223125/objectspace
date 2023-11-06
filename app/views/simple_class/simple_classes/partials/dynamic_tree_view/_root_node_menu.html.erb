@@ -1,6 +1,6 @@
-<% interface_groups_count = simple_class.interface_groups.length %>
+<% interface_groups_count = simple_class.interface_groups.first.self_and_descendants.size %>
 <% interface_members_count = 0  %>
-<% simple_class.interface_groups.each do |interface_group| %>
+<% simple_class.interface_groups.first.self_and_descendants.each do |interface_group| %>
   <% interface_members_count += interface_group.interface_members.length  %>
 <% end %>
 

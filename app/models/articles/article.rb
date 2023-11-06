@@ -16,15 +16,16 @@ class Articles::Article < ApplicationRecord
   # TODO: validate that its in repository or in folder, not in both
 
   belongs_to :ownerable, polymorphic: true
+  belongs_to :simple_class_attributes, class_name: "SimpleClasses::SimpleClassAttribute", optional: true
+  belongs_to :default_version, foreign_key: "default_version_id", class_name: "Articles::ArticleVersion"
 
   has_many :article_versions, class_name: "Articles::ArticleVersion", dependent: :destroy
   accepts_nested_attributes_for :article_versions
 
-  belongs_to :simple_class_attributes, class_name: "SimpleClasses::SimpleClassAttribute", optional: true
+  has_many :articles_simple_class_attributes, dependent: :destroy, class_name: "SimpleClasses::ArticlesSimpleClassAttribute"
+  has_many :simple_class_attributes, through: :articles_simple_class_attributes, class_name: "SimpleClasses::SimpleClassAttribute"
 
   validates :title, presence: true, allow_blank: false
-
-  belongs_to :default_version, foreign_key: "default_version_id", class_name: "Articles::ArticleVersion"
 
   def search_data
     {

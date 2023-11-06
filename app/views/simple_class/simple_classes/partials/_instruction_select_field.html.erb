@@ -18,6 +18,11 @@
   </div>
   <br>
 
-  <%= render "shared/technologies_search/modal", :type => "dpo_instruction_select" %>
+  <% binding.pry %>
+  <% if  f.object.instructionable.nil? %>
+    <%= render "shared/technologies_search/modal", :type => "dpo_instruction_select", scenario: "instruction_not_selected" %>
+  <% elsif  f.object.instructionable.present? %>
+    <%= render "shared/technologies_search/modal", :type => "dpo_instruction_select", scenario: "instruction_was_previously_selected" %>
+  <% end %>
 
 </div>

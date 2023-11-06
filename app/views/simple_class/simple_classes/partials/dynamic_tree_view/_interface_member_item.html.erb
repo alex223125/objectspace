@@ -19,7 +19,7 @@
         </h5>
 
         <% binding.pry %>
-        <% if type == "technology_pick" %>
+        <% if leaf_type == "technology_pick" %>
           <div data-action="click->remote_select_instruction#selectInstruction"
                data-instructionId="<%= interface_member.memberable.id %>"
                data-instructionType="<%= interface_member.memberable.class_key %>">
