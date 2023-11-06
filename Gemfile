@@ -8,7 +8,7 @@ ruby "2.7.1"
 gem "rails", "~> 7.0.0"
 
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
-gem "sprockets-rails"
+gem 'sprockets-rails', '~> 3.0', '>= 3.0.4'
 
 # Use postgresql as the database for Active Record
 gem "pg", "~> 1.1"
@@ -57,7 +57,7 @@ gem 'simple_form'
 
 gem 'acts_as_list'
 
-gem 'tinymce-rails', '~> 5.10.7'
+# gem 'tinymce-rails', '~> 5.10.7'
 
 gem 'cocoon', '~> 1.2', '>= 1.2.9'
 

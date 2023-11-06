@@ -3,14 +3,24 @@ asfasafsfsafsafsaasf@gmail.com
 123456
 
 
+testeamiladress1@gmail.com
+123456
+
+
+# work with server
+lsof -i :3000
+kill -QUIT 13907
+
 
 # 1
 
-rails assets:precompile
+bin/rails assets:precompile
 rails assets:clean
-./bin/dev
-
+rake assets:clobber
 https://stackoverflow.com/questions/74242584/problem-installing-tailwindcss-into-rails-7-app-windows-10-dev-environemnt
+
+# To watch changes during dev 
+yarn build --watch
 
 # Use yarn not npm
 yarn add flowbite-typography
