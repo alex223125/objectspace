@@ -9,6 +9,14 @@
     </div>
 
     <div class="flex md:order-2">
+      <!--      we setting target_folder params dynamically using 'technologies' controller-->
+      <%= link_to "Edit current folder", edit_folder_path(folder: @target),
+                  id: "new-folder-addition-button",
+                  class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"%>
+    </div>
+
+
+    <div class="flex md:order-2">
       <%#= link_to "Add new technology", new_article_article_path, class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
       <%= render "technologies/add_new_technology_options_modal", target: @target %>
 

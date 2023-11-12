@@ -1,34 +1,6 @@
-<%#= form_with(model: folder, class: "contents") do |form| %>
-  <%# if folder.errors.any? %>
-<!--    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">-->
-<!--      <h2><%#= pluralize(folder.errors.count, "error") %> prohibited this folder from being saved:</h2>-->
-
-<!--      <ul>-->
-        <%# folder.errors.each do |error| %>
-<!--          <li><%#= error.full_message %></li>-->
-        <%# end %>
-<!--      </ul>-->
-<!--    </div>-->
-  <%# end %>
-
-<!--  <div class="my-5">-->
-    <%#= form.label :title %>
-    <%#= form.text_field :title, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
-<!--  </div>-->
-
-<!--  <div class="my-5">-->
-    <%#= form.label :description %>
-    <%#= form.text_area :description, rows: 4, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
-<!--  </div>-->
-
-<!--  <div class="inline">-->
-    <%#= form.submit class: "rounded-lg py-3 px-5 bg-blue-600 text-white inline-block font-medium cursor-pointer" %>
-<!--  </div>-->
-<%# end %>
-
-
-<%= simple_form_for(@folder, url: folders_path) do |f| %>
-
+<% path = @folder.new_record? ? folders_path : folder_path %>
+<% method = @folder.new_record? ? :post : :patch %>
+<%= simple_form_for(@folder, url: path, method: method) do |f| %>
 
   <% if @folder.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
@@ -76,9 +48,20 @@
 
 
     <div class="bg-gray-50 px-4 py-3 sm:px-6">
+      <%#= link_to "Show this folder", target_folder_path(username: @folder.root.repository.user.username, id: folder.slug)  %>
       <div class="text-end">
-        <%= link_to "Back to dashboard", simple_class_simple_classes_path, class: "py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" %>
-        <%= f.button :submit, "Create Folder", class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+        <% if @folder.new_record? %>
+          <% if @target.is_a?(Repository) %>
+            <%= link_to "Back to Repository", target_repository_path(username: @target.user.username, id: @target.slug), class: "py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" %>
+          <% elsif @target.is_a?(Folder) %>
+            <%= link_to "Back to Folder", target_folder_path(username: @target.root.repository.user.username, id: @folder.slug), class: "py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" %>
+          <% end %>
+          <%= f.button :submit, "Create Folder", class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+        <% else %>
+          <%= link_to "Back to Folder", target_folder_path(username: @folder.root.repository.user.username, id: @folder.slug), class: "py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" %>
+          <%= f.button :submit, "Update Folder", class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+        <% end %>
+
       </div>
     </div>
 

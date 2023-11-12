@@ -21,17 +21,17 @@
         <li class="jstree-open">
           <%= render "simple_class/simple_classes/partials/dynamic_tree_view/actions_menu", simple_class: simple_class %>
           <ul>
-            <% simple_class.interface_groups.each do |interface_group| %>
+              <!-- 1.1 One iteration for default Main group -->
               <%= render "simple_class/simple_classes/partials/dynamic_tree_view/interface_group_collection",
-                         interface_group: interface_group, leaf_type: leaf_type %>
+                         interface_group: simple_class.root_interface_group, leaf_type: leaf_type %>
 
-              <% if interface_group.groups.count > 0 %>
-                <% interface_group.groups.each do |interface_group| %>
+              <!-- 1.2 All children of main group -->
+              <% if simple_class.root_interface_group.children.count > 0 %>
+                <% simple_class.root_interface_group.children.each do |interface_group| %>
                   <%= render "simple_class/simple_classes/partials/dynamic_tree_view/interface_group_collection",
                              interface_group: interface_group, leaf_type: leaf_type %>
                 <% end %>
               <% end %>
-            <% end %>
           </ul>
         </li>
       </ul>

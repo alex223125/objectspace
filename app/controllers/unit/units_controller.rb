@@ -27,13 +27,14 @@ class Unit::UnitsController < ApplicationController
           params[:type] == "interface_member_addition" ||
           params[:type] == "algorithm_form_wrapper_step_addition" ||
           params[:type] == "interface_group_form_action_addition" ||
-          params[:type] == "algorithm_form_class_level_wrapper_step_addition"
-
+          params[:type] == "algorithm_form_class_level_wrapper_step_addition" ||
+          params[:type] == "basic_preview"
       path = "shared/technologies_search/dpo_instruction_select/preview/unit"
     end
 
 
 
+    binding.pry
     respond_to do |format|
       format.json {
         render json: { preview: render_to_string(partial: path,

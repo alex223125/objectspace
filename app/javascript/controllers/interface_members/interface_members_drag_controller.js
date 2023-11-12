@@ -2,7 +2,9 @@ import { Controller } from "@hotwired/stimulus"
 import Sortable from "sortablejs"
 import {useMutation} from "stimulus-use";
 
-const nestedFieldsTemplateSelector = ".nested-fields-interface-members"
+// const nestedFieldsTemplateSelector = ".nested-fields-interface-members"
+const nestedFieldsTemplateSelector = ".nested-fields-interface-group-actions"
+
 
 export default class extends Controller {
 
@@ -10,7 +12,7 @@ export default class extends Controller {
         'interfaceMembersArea',
         'memberPositionVisibleField',
         'memberPositionHiddenField'
-    ];A
+    ];
 
     connect() {
         console.log("Interface members drag controller connected")
@@ -75,7 +77,7 @@ export default class extends Controller {
     recalculateIndexes(){
         // // recount hidden inputs indexes
 
-        // 1.select only visible (hidden steps - deleted steps taken from db to edit form)
+        // 1.select only hidden (hidden steps are deleted steps which was taken from db to edit form and then deleted in form)
         let filteredHiddenFieldTargets = this.memberPositionHiddenFieldTargets.filter((field) => {
             return field.closest(nestedFieldsTemplateSelector).style.display != 'none'
         });
@@ -88,7 +90,7 @@ export default class extends Controller {
         });
 
 
-        // 1.select only visible (hidden steps - deleted steps taken from db to edit form)
+        // 1.select only visible (hidden steps are deleted steps which was taken from db to edit form and then deleted in form)
         let filteredVisibleFieldTargets = this.memberPositionVisibleFieldTargets.filter((field) => {
             return field.closest(nestedFieldsTemplateSelector).style.display != 'none'
         });

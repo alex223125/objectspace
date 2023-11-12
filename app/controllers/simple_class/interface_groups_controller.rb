@@ -93,6 +93,6 @@ class SimpleClass::InterfaceGroupsController < ApplicationController
     # Only allow a list of trusted parameters through.
     def interface_group_params
       params.require(:simple_classes_interface_group).permit(:title, :description,
-                                                             interface_members_attributes: [:id, :_destroy, :memberable_type, :memberable_id ])
+                                                             interface_members_attributes: [:id, :_destroy, :memberable_type, :memberable_id, :position ])
     end
 end

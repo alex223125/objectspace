@@ -1,5 +1,7 @@
 class SimpleClasses::InterfaceMember < ApplicationRecord
 
+  default_scope { order(position: :asc) }
+
   belongs_to :interface_group
   belongs_to :memberable, polymorphic: true
   has_one :simple_class, :through => :interface_group, class_name: "SimpleClasses::SimpleClass"

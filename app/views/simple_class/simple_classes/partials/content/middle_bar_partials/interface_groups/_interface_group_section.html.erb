@@ -6,20 +6,18 @@
 
   <!--  toc -->
   <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/interface_groups/toc",
-             interface_groups: simple_class.root_interface_group.groups %>
+             root_interface_group: simple_class.root_interface_group %>
   <br>
 
   <!--  first layer of interface groups (next layer after first root interface group) -->
-  <% binding.pry %>
-  <% simple_class.root_interface_group.groups.each do |root_interface_group| %>
+    <% binding.pry %>
     <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/interface_groups/interface_group_preview",
-               interface_group: root_interface_group  %>
-  <% end %>
+               interface_group: simple_class.root_interface_group  %>
 
-  <!--  children interface groups -->
-  <%# simple_class.root_interface_group.children.each do |interface_group| %>
-    <%#= render "simple_class/simple_classes/partials/content/middle_bar_partials/interface_groups/interface_group_preview", interface_group: interface_group %>
-  <%# end %>
+  <!-- children interface groups -->
+  <% simple_class.root_interface_group.children.each do |interface_group| %>
+    <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/interface_groups/interface_group_preview", interface_group: interface_group %>
+  <% end %>
 
   <div class="bg-gray-50 px-4 py-3 sm:px-6">
     <div class="text-end">

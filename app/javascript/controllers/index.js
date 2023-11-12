@@ -165,6 +165,7 @@ import ObjectCreationModalController from "./objects/object_creation_options_mod
 application.register("object_creation_options_modal", ObjectCreationModalController)
 
 
+// Interface groups
 import InterfaceGroupsDragController from "./interface_groups/interface_groups_drag_controller"
 application.register("interface_groups_drag", InterfaceGroupsDragController)
 
@@ -236,6 +237,11 @@ application.register("remote_technologies_pick", RemoteTechnologiesPickControlle
 // InterfaceMember
 import InterfaceMembersDragController from "./interface_members/interface_members_drag_controller"
 application.register("interface_members_drag", InterfaceMembersDragController)
+
+import InterfaceMemberAsynchPreviewController from "./interface_members/interface_member_asynch_preview_controller"
+application.register("interface_member_asynch_preview", InterfaceMemberAsynchPreviewController)
+
+
 
 // SimpleClass
 import SimpleClassTreeMapController from "./simple_class/tree_map/simple_class_tree_map_controller"
