@@ -105,18 +105,15 @@
               (picture of Process of linking + algorithm)
               <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">A regular step includes such fields as title, instruction, instruction for checking that the step is completed, additional information, and sources of information.</p>
 
-              <button data-action="click->algorithm_step_type_select#handleSingleAlternativeControlStructureButtonClick"
-                      type="button"
-                      onclick="return false;"
-                      class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                Use existing Algorithm
-              </button>
+              <%= link_to 'Use existing Algorithm', edit_simple_class_interface_group_path(target_interface_group),
+                          class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              %>
             </div>
 
             <!-- Option 5. Model level tutorial -->
             <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
               <a href="#">
-                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white"> United Tutorial</h5>
+                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white"> Model Combo tutorial</h5>
               </a>
               (picture of Process of linking + algorithm)
               <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Main point of United Tutorial is to unite group of Tutorials and Combo tutorials in one place. Use this if you want to get benefits from massive group of similar-niche Tutorials</p>
@@ -126,6 +123,19 @@
                                                        functional_type: "class_level",
                                                        simple_class: @simple_class.id),
                           class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+            </div>
+
+            <!-- Option 6. Existing DPO as Action -->
+            <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+              <a href="#">
+                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white"> Decision Process Object as Action</h5>
+              </a>
+              (picture of Process of linking + algorithm)
+              <p class="mb-3 font-normal text-gray-700 dark:text-gray-400"> Here you can add Decision Process Object as action</p>
+
+              <%= link_to 'Use existing DPO as Action', edit_simple_class_interface_group_path(target_interface_group),
+                          class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              %>
             </div>
 
           </div>

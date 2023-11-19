@@ -190,5 +190,4 @@ class SimpleClass::SimpleClassesController < ApplicationController
                                              articles_simple_class_attributes_attributes: [:id, :article_id, :_destroy]]
       )
     end
-
 end

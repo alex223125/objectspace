@@ -6,7 +6,10 @@ class SimpleClasses::SimpleClass < ApplicationRecord
   extend Pagy::Searchkick
   searchkick callbacks: :async,
              text_middle: [:title, :description],
-             word: [:list_of_tags, :ownerable_id]
+             word: [:title, :description, :list_of_tags, :ownerable_id],
+             word_start: [:title, :description],
+             word_end: [:title, :description]
+
   scope :search_import, -> { includes(:tags) }
   acts_as_taggable_on :tags
 

@@ -18,7 +18,8 @@ module TechBreadcrumbable
     interface_group = interface_member.interface_group
     simple_class = interface_member.simple_class
 
-    current_place = current_folder(simple_class)
+    binding.pry
+    current_place = current_place(simple_class)
 
     # TODO: add methods for this expressions
     if current_place.class == Folder
@@ -80,11 +81,11 @@ module TechBreadcrumbable
       link_type: "algorithm_version_page"}
     elsif technology.class == SimpleClasses::SimpleClass
      {path: simple_class_path(username: technology.owner.ownername, id: technology.slug),
-      link_type: "class_page"}
+      link_type: "simple_class_page"}
     elsif technology.class == SimpleClasses::InterfaceGroup
       simple_class = technology.simple_class
       {path: simple_class_path(username: simple_class.owner.ownername, id: simple_class.slug),
-       link_type: "class_page"}
+       link_type: "interface_group_page"}
     elsif technology.class == Frameworks::Framework
      {path: framework_path(username: technology.ownerable.ownername, id: technology.slug),
       link_type: "framework_page"}

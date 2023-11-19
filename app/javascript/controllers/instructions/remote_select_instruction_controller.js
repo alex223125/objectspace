@@ -294,6 +294,7 @@ export default class extends Controller {
             }
         } else if (this.selectTypeValue == simpleClassFormArticleToAttributeAttachmentCase) {
             console.log(`mutation for ${simpleClassFormArticleToAttributeAttachmentCase} case triggered`)
+            if (this.is_edit_form_field_display()) { return }
 
             var nestedFields = simpleClassFormArticleToAttributeAttachmentCaseNestedFields
             this.afterClickArticleAttachmentsAmount = this.simpleClassAttributeArticleAttahcmnetsAreaTarget.querySelectorAll(nestedFields).length
@@ -336,6 +337,18 @@ export default class extends Controller {
 
 
     // PRIVATE
+
+    // doc: sometimes we have edit form where we show preview of attachment
+    // with hidden field. If mutation runs it sets it value to blank string as
+    // in connect() method. To prevent this we checking if we dealing with edit from
+    // where attachemnt already added.
+    is_edit_form_field_display(){
+        if (this.instructionId == "" && this.instructionType == "") {
+            return true
+        } else {
+            return false
+        }
+    }
 
     dispatchSelectCase(){
         // Split on flows for each case

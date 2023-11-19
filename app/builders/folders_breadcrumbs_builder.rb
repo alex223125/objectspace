@@ -10,7 +10,8 @@ class FoldersBreadcrumbsBuilder < BreadcrumbsOnRails::Breadcrumbs::Builder
   # ARTICLE_VERSION_PAGE_BREADCRUMB_TYPE = "article_version_page".freeze
   # UNIT_VERSION_PAGE_BREADCRUMB_TYPE = "unit_version_page".freeze
   # ALGORITHM_VERSION_PAGE_BREADCRUMB_TYPE = "algorithm_version_page".freeze
-  # SIMPLE_CLASS_PAGE_BREADCRUMB_TYPE = "class_page".freeze
+  SIMPLE_CLASS_PAGE_BREADCRUMB_TYPE = "simple_class_page".freeze
+  INTERFACE_GROUP_PAGE_BREADCRUMB_TYPE = "interface_group_page".freeze
   # FRAMEWORK_PAGE_BREADCRUMB_TYPE = "framework_page".freeze
 
   SELECTED_PAGE_STYLE = "hover:underline inline-flex text font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white font-bold".freeze
@@ -60,41 +61,62 @@ class FoldersBreadcrumbsBuilder < BreadcrumbsOnRails::Breadcrumbs::Builder
       folder_page_breadcrumb(element, style)
     elsif element.options[:link_type] == REPOSITORY_PAGE_BREADCRUMB_TYPE
       repository_page_breadcrumb(element, style)
+    elsif element.options[:link_type] == SIMPLE_CLASS_PAGE_BREADCRUMB_TYPE
+      simple_class_page_breadcrumb(element, style)
+    elsif element.options[:link_type] == INTERFACE_GROUP_PAGE_BREADCRUMB_TYPE
+      interface_group_page_breadcrumb(element, style)
     else
       technology_page_breadcrumb(element, style)
     end
   end
-
+  
   ###############
   def technology_page_breadcrumb(element, style)
     link_to element.path do
-      @context.content_tag(:span, compute_full_name(element), class: style).html_safe
+      @context.content_tag(:span, compute_full_name(element, nil), class: style).html_safe
     end
   end
 
   def folder_page_breadcrumb(element, style)
     link_to element.path do
-      @context.content_tag(:span, compute_full_name(element), class: style).html_safe
+      @context.content_tag(:span, compute_full_name(element, nil), class: style).html_safe
     end
   end
 
   def repository_page_breadcrumb(element, style)
     link_to element.path do
-      @context.content_tag(:span, compute_full_name(element), class: style).html_safe
+      @context.content_tag(:span, compute_full_name(element, nil), class: style).html_safe
     end
   end
 
   def profile_page_breadcrumb(element, style)
     link_to dashboard_path(username: element.name) do
-      @context.content_tag(:span, compute_full_name(element), class: style).html_safe
+      @context.content_tag(:span, compute_full_name(element, nil), class: style).html_safe
+    end
+  end
+
+  def simple_class_page_breadcrumb(element, style)
+    link_to element.path do
+      @context.content_tag(:span, compute_full_name(element, SIMPLE_CLASS_PAGE_BREADCRUMB_TYPE), class: style).html_safe
+    end
+  end
+
+  def interface_group_page_breadcrumb(element, style)
+    link_to element.path do
+      @context.content_tag(:span, compute_full_name(element, INTERFACE_GROUP_PAGE_BREADCRUMB_TYPE), class: style).html_safe
     end
   end
   ###############
 
   # add technology breadcrumb
 
-  def compute_full_name(element)
+  def compute_full_name(element, page)
+    binding.pry
     if @context.breadcrumbs.first.name == element.name
+      home_icon + compute_name(element)
+    elsif page == SIMPLE_CLASS_PAGE_BREADCRUMB_TYPE
+      home_icon + compute_name(element)
+    elsif page == INTERFACE_GROUP_PAGE_BREADCRUMB_TYPE
       home_icon + compute_name(element)
     else
       compute_name(element)

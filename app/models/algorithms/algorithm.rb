@@ -52,20 +52,20 @@ class Algorithms::Algorithm < ApplicationRecord
     self.functional_type == Algorithms::FunctionalTypes[:class_level]
   end
 
-    include PgSearch::Model
-  pg_search_scope :english_global_search,
-                  against: {
-                    title: 'A',
-                    source_page_description: 'B'
-                  },
-                  using: {
-                    tsearch: {
-                      dictionary: 'english',
-                      tsvector_column: 'searchable',
-                      any_word: true,
-                      prefix: true
-                    }
-                  }
+  # include PgSearch::Model
+  # pg_search_scope :english_global_search,
+  #                 against: {
+  #                   title: 'A',
+  #                   source_page_description: 'B'
+  #                 },
+  #                 using: {
+  #                   tsearch: {
+  #                     dictionary: 'english',
+  #                     tsvector_column: 'searchable',
+  #                     any_word: true,
+  #                     prefix: true
+  #                   }
+  #                 }
 
 
   def default_version

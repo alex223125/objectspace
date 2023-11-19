@@ -22,6 +22,15 @@
           <p class="text-sm	 text-gray-900"><%= truncate(interface_member.memberable.source_page_description, length: 170, omission: '...', :escape => false) %></p>
         </div>
 
+        <% binding.pry %>
+        <% if interface_member.memberable.class == Algorithms::Algorithm %>
+          <% if Algorithms::FunctionalTypes[interface_member.memberable.functional_type] == "class_level" %>
+            <div class="action-special-flag">
+              <p class="text-sm	 text-gray-900"> Model level algorithm </p>
+            </div>
+          <% end %>
+        <% end %>
+
         <div class="action-author">
           <div class="text-sm	flex-none w-full mt-0.5 font-normal">
             <dt class="inline">By</dt>
