@@ -64,3 +64,8 @@
   <%= f.hint 'If you have something to add which does not fit in any of the above category you can add it here..', class: "mt-2 text-sm text-gray-500" %>
   <%= f.input_field :additional_information, data: { target: 'unit_additional_information_tinymce.field' } %>
 </div>
+<br>
+<%= render "attachments/attachments_nested_form",
+           :f => f ,
+           attachment_select_type: "article_version_form_attachment_addition",
+           technologies_search_modal_type: "article_version_attachment_addition"%>

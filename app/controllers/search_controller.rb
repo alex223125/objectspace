@@ -44,6 +44,10 @@ class SearchController < ApplicationController
       binding.pry
       if params[:scenario] == "step_attachment_addition"
         locals = {scenario: "step_attachment_addition"}
+      elsif params[:scenario] == "unit_version_attachment_addition"
+        locals = {scenario: "unit_version_attachment_addition"}
+      elsif params[:scenario] == "article_version_attachment_addition"
+        locals = {scenario: "article_version_attachment_addition"}
       elsif params[:scenario] == "regular"
         locals = {scenario: "regular"}
       else

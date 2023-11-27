@@ -33,10 +33,11 @@ class RepositoriesController < ApplicationController
   # POST /repositories or /repositories.json
   def create
     binding.pry
-    @repository = current_user.repositories.new(repository_params)
-
+    service = Services::Repositories::Create.new(repository_params, current_user)
+    service.call
+    @repository = service.repository
     respond_to do |format|
-      if @repository.save
+      if @repository.errors.blank?
 
         binding.pry
         format.html { redirect_to target_repository_path(username: current_user.username, id: @repository),
@@ -51,9 +52,14 @@ class RepositoriesController < ApplicationController
 
   # PATCH/PUT /repositories/1 or /repositories/1.json
   def update
+    service = Services::Repositories::Update.new(@repository, repository_params)
+    service.call
+    @repository = service.repository
     respond_to do |format|
-      if @repository.update(repository_params)
-        format.html { redirect_to repository_url(@repository), notice: "Repository was successfully updated." }
+      binding.pry
+      if @repository.errors.blank?
+        format.html { redirect_to target_repository_path(username: current_user.username, id: @repository),
+                                  notice: "Repository was successfully updated." }
         format.json { render :show, status: :ok, location: @repository }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -67,7 +73,7 @@ class RepositoriesController < ApplicationController
     @repository.destroy
 
     respond_to do |format|
-      format.html { redirect_to repositories_url, notice: "Repository was successfully destroyed." }
+      format.html { redirect_to dashboard_path(username: current_user.username), notice: "Repository was successfully destroyed." }
       format.json { head :no_content }
     end
   end
@@ -89,6 +95,6 @@ class RepositoriesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def repository_params
-      params.require(:repository).permit(:name, :description, :is_private)
+      params.require(:repository).permit(:name, :description, :is_private, :tag_list)
     end
 end

@@ -10,10 +10,10 @@ class Articles::Article < ApplicationRecord
   scope :search_import, -> { includes(:tags) }
 
 
-
+  # TODO: validate that its in repository or in folder, not in both and not without at leas one of them
   belongs_to :folder, class_name: "Folder", optional: true
   belongs_to :repository, class_name: "Repository", optional: true
-  # TODO: validate that its in repository or in folder, not in both
+
 
   belongs_to :ownerable, polymorphic: true
   belongs_to :simple_class_attributes, class_name: "SimpleClasses::SimpleClassAttribute", optional: true
@@ -36,6 +36,14 @@ class Articles::Article < ApplicationRecord
       folder_id: folder_id,
       repository_id: repository_id
     }
+  end
+
+  def class_key
+    "article"
+  end
+
+  def uniq_key
+    class_key + self.uuid
   end
 
   # def search_data

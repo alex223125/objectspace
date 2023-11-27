@@ -18,13 +18,12 @@ class Folder < ApplicationRecord
   accepts_nested_attributes_for :subfolders
 
 
-  has_many :articles, class_name: "Articles::Article"
+  has_many :articles, class_name: "Articles::Article", dependent: :destroy
   accepts_nested_attributes_for :articles
-
-  has_many :units, class_name: "Units::Unit"
-  has_many :algorithms, class_name: "Algorithms::Algorithm"
-  has_many :simple_classes, class_name: "SimpleClasses::SimpleClass"
-  has_many :frameworks, class_name: "Frameworks::Framework"
+  has_many :units, class_name: "Units::Unit", dependent: :destroy
+  has_many :algorithms, class_name: "Algorithms::Algorithm", dependent: :destroy
+  has_many :simple_classes, class_name: "SimpleClasses::SimpleClass", dependent: :destroy
+  has_many :frameworks, class_name: "Frameworks::Framework", dependent: :destroy
 
 
   # def folders_tree_without_root

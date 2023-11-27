@@ -17,22 +17,25 @@ class Units::UnitVersion < ApplicationRecord
   # has_many :substeps, as: :substepable, class_name: "Algorithms::Substep"
   has_many :simple_objects, as: :instructionable, class_name: "SimpleObjects::SimpleObject"
 
-  include PgSearch::Model
-  pg_search_scope :english_global_search,
-                  against: {
-                    title: 'A',
-                    instruction: 'B',
-                    solves_the_problem: 'C',
-                    sources: 'D'
-                  },
-                  using: {
-                    tsearch: {
-                      dictionary: 'english',
-                      tsvector_column: 'searchable',
-                      any_word: true,
-                      prefix: true
-                    }
-                  }
+  has_many :attachments, class_name: "Attachment"
+  accepts_nested_attributes_for :attachments, allow_destroy: true
+
+  # include PgSearch::Model
+  # pg_search_scope :english_global_search,
+  #                 against: {
+  #                   title: 'A',
+  #                   instruction: 'B',
+  #                   solves_the_problem: 'C',
+  #                   sources: 'D'
+  #                 },
+  #                 using: {
+  #                   tsearch: {
+  #                     dictionary: 'english',
+  #                     tsvector_column: 'searchable',
+  #                     any_word: true,
+  #                     prefix: true
+  #                   }
+  #                 }
 
 
   alias_method :whole_unit, :unit

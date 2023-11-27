@@ -85,40 +85,12 @@
             <%= f.hidden_field 'current_node_frontend_id', data: { target: 'dynamic_step_form.currentNodeFrontendId'}  %>
             <%= f.hidden_field 'parent_id_dynamic_node', data: { target: 'dynamic_step_form.parentOfDynamicNode'}  %>
 
-            <!-- selected attachments form input -->
-            <div class="col-span-6 sm:col-span-3"
-                 id="step-attachments"
-                 data-controller="remote_select_attachment attachments_nested_form"
-                 data-target="remote_select_attachment.attachmentsArea"
-                 data-remote_select_attachment-select-type-value="algorithm_form_attachment_addition">
-
-              <p class="text-lg font-bold hover:text-gray-700">Attachments:</p>
-              <p class="mt-2 text-sm text-gray-500">
-                Here you can add Articles to current step to help Hero of your tutorial to get through it more effectively.
-              </p>
-              <br>
-
-
-              <%= f.fields_for :attachments do |attachment| %>
-                <%= render "algorithm/shared/partials/attachments/attachment_fields", :f => attachment %>
-              <% end %>
-
-              <!--      1.1 article as attachment button -->
-              <div class="add-new-attachment-button">
-                <%= link_to_add_association "+ Add new Attachment", f,
-                                            :attachments,
-                                            style: "display:none;",
-                                            partial: 'algorithm/shared/partials/attachments/attachment_fields',
-                                            class: "nodraggablesteps inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2",
-                                            data: {target: "remote_select_attachment.addArticleAttachmentOriginalButton"}
-
-                %>
-              </div>
-
-              <%= render "shared/technologies_search/modal", :type => "step_attachment_addition" %>
-            </div>
-
-
+            <!-- Selected Attachments form input START -->
+            <%= render "attachments/attachments_nested_form",
+                       :f => f ,
+                       attachment_select_type: "algorithm_form_attachment_addition",
+                       technologies_search_modal_type: "step_attachment_addition"%>
+            <!-- Selected Attachments form input END -->
 
             <br>
             <div class="bg-zinc-50 px-4 py-3 sm:px-6">

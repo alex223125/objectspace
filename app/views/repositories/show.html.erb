@@ -6,7 +6,10 @@
   <!-- 2 breadcrumbs -->
   <%= render "shared/tech_show_partials/tech_breadcrumbs" %>
 
-  <!-- 3 actions -->
+  <!-- 3 sourcepage descirotion -->
+  <%= render "shared/tech_show_partials/sourcepage_card", entity: @repository  %>
+
+  <!-- 4 actions -->
   <%= render "repositories/show_partials/actions_bar", repository: @repository %>
 
   <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">

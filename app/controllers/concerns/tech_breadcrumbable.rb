@@ -51,6 +51,7 @@ module TechBreadcrumbable
       places_tree = [current_place]
     end
 
+    binding.pry
     add_breadcrumb current_place_user.username, dashboard_path(username: current_place_user.username), {link_type: "profile_page"}
     places_tree.each do |place|
       add_breadcrumb place_title(place), place_path(current_place_user, place), {link_type: "folder_page"}

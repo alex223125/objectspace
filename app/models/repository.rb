@@ -3,8 +3,10 @@ class Repository < ApplicationRecord
   extend FriendlyId
   friendly_id :slug_candidates, use: [:slugged, :finders, :history]
 
+  acts_as_taggable_on :tags
+
   belongs_to :user
-  has_many :folders
+  has_many :folders, dependent: :destroy
 
   has_many :articles, class_name: "Articles::Article"
   has_many :units, class_name: "Units::Unit"

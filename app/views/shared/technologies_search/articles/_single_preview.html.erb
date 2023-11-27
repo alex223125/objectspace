@@ -36,9 +36,7 @@
         </div>
 
       </div>
-
-
-      <!--            <div data-select_instruction-target="addSubstepRemoteButtonClick">-->
+      
       <% if scenario == "regular" %>
         <div data-action="click->remote_select_instruction#selectInstruction"
              data-instructionId="<%= article.id %>"
@@ -48,7 +46,10 @@
             Select
           </button>
         </div>
-      <% elsif scenario == "step_attachment_addition" %>
+      <% elsif scenario == "step_attachment_addition" ||
+               scenario == "unit_version_attachment_addition" ||
+               scenario == "article_version_attachment_addition"
+      %>
         <div data-action="click->remote_select_attachment#selectAttachment"
              data-attachmentId="<%= article.id %>"
              data-attachmentType="article"
@@ -59,10 +60,6 @@
           </button>
         </div>
       <% end %>
-
-
-      <!--            justify-end	 align-right right flex text-white right-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800-->
-
     </div>
   </div>
 </div>

@@ -1,12 +1,22 @@
 <!-- Three columns -->
+<!--<div class="flex mb-4">-->
+<!--  <div class="w-1/5 h-12">-->
+    <%#= render "article/article_versions/partials/article_content/left_bar", article_version: article_version %>
+<!--  </div>-->
+<!--  <div class="w-3/5">-->
+    <%#= render "article/article_versions/partials/article_content/middle_bar", article_version: article_version %>
+<!--  </div>-->
+<!--  <div class="w-1/5 h-12">-->
+    <%#= render "article/article_versions/partials/article_content/right_bar", article_version: article_version %>
+<!--  </div>-->
+<!--</div>-->
+
+<!-- 2 columns -->
 <div class="flex mb-4">
-  <div class="w-1/5 h-12">
-    <%= render "article/article_versions/partials/article_content/left_bar", article_version: article_version %>
+  <div class="w-full">
+    <%= render "article/article_versions/partials/article_content/bars/middle_bar", article_version: article_version %>
   </div>
-  <div class="w-3/5">
-    <%= render "article/article_versions/partials/article_content/middle_bar", article_version: article_version %>
-  </div>
-  <div class="w-1/5 h-12">
-    <%= render "article/article_versions/partials/article_content/right_bar", article_version: article_version %>
+  <div class="w-1/5 h-12 flex-shrink-0">
+    <%= render "article/article_versions/partials/article_content/bars/right_bar", article_version: article_version %>
   </div>
 </div>

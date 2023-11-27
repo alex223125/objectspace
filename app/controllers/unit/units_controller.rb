@@ -73,7 +73,8 @@ class Unit::UnitsController < ApplicationController
   def create
     binding.pry
     # @unit = Units::Unit.new(unit_params)
-    service = Services::Units::Units::Create.new(unit_params, @target_folder, current_user, @target_interface_group)
+    target_place = @target_repository || @target_folder
+    service = Services::Units::Units::Create.new(unit_params, target_place, current_user, @target_interface_group)
     service.call
 
     respond_to do |format|
@@ -85,8 +86,9 @@ class Unit::UnitsController < ApplicationController
                                   notice: "Unit was successfully created." }
         format.json { render :show, status: :created, location: service.unit }
       else
+        @unit = service.unit
         format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: service.unit.errors, status: :unprocessable_entity }
+        format.json { render json: @unit.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -133,12 +135,12 @@ class Unit::UnitsController < ApplicationController
     def unit_params
       params.require(:units_unit).permit(:title, :visibility_status, :source_page_description, :tag_list,
                                          unit_versions_attributes: [:title, :solves_the_problem,
-                                                        :instruction, :sources, :target_audience,
-                                                                    :description,
-                                                        :additional_information],
+                                                                    :instruction, :sources, :target_audience,
+                                                                    :description, :additional_information,
+                                                                    attachments_attributes: [:id, :attachable_id,
+                                                                                             :attachable_type, :_destroy]],
                                          unit_usage_examples_attributes: [:id, :title, :description,
                                                                           :sources, :_destroy])
-      # params.require(:user).permit(:name, friends_attributes: [:id, :friend_name, :_destroy])
     end
 
 end

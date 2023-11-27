@@ -100,8 +100,10 @@ class Unit::UnitVersionsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def unit_version_params
-      params.require(:units_unit_version).permit(:title, :instruction, :solves_the_problem, :target_audience,
+      params.require(:units_unit_version).permit(:title, :instruction, :description, :solves_the_problem, :target_audience,
                                                  :sources, :additional_information, :unit_id,
+                                                 attachments_attributes: [:id, :attachable_id,
+                                                                          :attachable_type, :_destroy],
                                                  unit_usage_examples_attributes: [:id, :title, :description,
                                                                                   :sources, :_destroy])
     end

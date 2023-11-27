@@ -83,9 +83,9 @@ class Algorithm::AlgorithmsController < ApplicationController
     @params = ActionController::Parameters.new(new_params)
 
     # 2.create record
-    target_pace = @target_repository || @target_folder
+    target_place = @target_repository || @target_folder
     binding.pry
-    service = Services::Algorithms::Algorithms::Create.new(algorithm_params, target_pace,
+    service = Services::Algorithms::Algorithms::Create.new(algorithm_params, target_place,
                                                            current_user, @target_interface_group)
     binding.pry
     service.call

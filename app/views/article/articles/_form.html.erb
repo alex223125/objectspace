@@ -46,7 +46,11 @@
     </div>
     <br>
 
-    <%= hidden_field_tag 'target_folder', @target_folder.id  %>
+    <% if @target_folder.present? %>
+      <%= hidden_field_tag 'target_folder', @target_folder.id  %>
+    <% elsif @target_repository.present? %>
+      <%= hidden_field_tag 'target_repository', @target_repository.id  %>
+    <% end %>
 
     <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Article version fields</h2>
     <%= render "article/shared/partials/article_version_nested_form", :form => f %>

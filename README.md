@@ -9,8 +9,8 @@ testeamiladress1@gmail.com
 
 # work with server
 lsof -i :3000
-kill -QUIT 13907
-
+kill -QUIT PID_HERE
+kill -9 PID_HERE
 
 # 1
 

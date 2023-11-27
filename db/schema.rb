@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_11_05_211242) do
+ActiveRecord::Schema[7.0].define(version: 2023_11_27_013009) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -127,7 +127,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_11_05_211242) do
     t.integer "attachable_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "unit_version_id"
     t.integer "node_id"
+    t.integer "article_version_id"
     t.index ["attachable_type", "attachable_id"], name: "index_attachments_on_attachable"
   end
 

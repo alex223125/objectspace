@@ -2,9 +2,10 @@
 <div class="rounded-lg overflow-hidden shadow-lg">
 <!--  <img class="w-full" src="/img/card-top.jpg" alt="Sunset in the mountains">-->
   <div class="px-6 py-4">
-    <div class="font-bold text-xl mb-2"><%= entity.title %></div>
+    <% title = entity.try(:title) || entity.try(:name)  %>
+    <div class="font-bold text-xl mb-2"><%= title %></div>
     <p class="text-gray-700 text-base">
-      <% description = entity.try(:source_page_description).try(:html_safe) %>
+      <% description = entity.try(:source_page_description).try(:html_safe) || entity.try(:description).try(:html_safe) %>
       <%= description %>
     </p>
   </div>
@@ -12,9 +13,9 @@
   <div class="px-6 pt-4 pb-4">
     <!--  Tags -->
     <%= render "shared/tech_show_partials/tags", entity: entity %>
-<!--    <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#photography</span>-->
-<!--    <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#travel</span>-->
-<!--    <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#winter</span>-->
+    <!--    <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#photography</span>-->
+    <!--    <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#travel</span>-->
+    <!--    <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#winter</span>-->
   </div>
 </div>
 <br>

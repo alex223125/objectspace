@@ -62,7 +62,8 @@ class Article::ArticlesController < ApplicationController
   def create
     binding.pry
     # @article = Articles::Article.new(article_params)
-    service = Services::Articles::Articles::Create.new(article_params, @target_folder, current_user)
+    target_place = @target_repository || @target_folder
+    service = Services::Articles::Articles::Create.new(article_params, target_place, current_user)
     service.call
 
     respond_to do |format|
@@ -119,6 +120,8 @@ class Article::ArticlesController < ApplicationController
       params.require(:articles_article).permit(:title, :default_version_id, :visibility_status, :source_page_description,
                                                :tag_list,
                                                article_versions_attributes: [:title, :solves_the_problem, :content,
-                                                                             :sources, :additional_information])
+                                                                             :sources, :additional_information,
+                                                                             attachments_attributes: [:id, :attachable_id,
+                                                                                                      :attachable_type, :_destroy]])
     end
 end

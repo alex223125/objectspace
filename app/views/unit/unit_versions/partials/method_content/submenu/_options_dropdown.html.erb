@@ -1,0 +1,35 @@
+<div class="relative inline-block text-left">
+
+  <button id="dropdownAlgorithmManagement" data-dropdown-toggle="unitManagementDropdown"
+          class="relative z-10 flex items-center p-2 text-sm text-gray-600 bg-white border border-blue-500 rounded-md focus:border-blue-500 focus:ring-opacity-40 dark:focus:ring-opacity-40 focus:ring-blue-300 dark:focus:ring-blue-400 focus:ring dark:text-white dark:bg-gray-800 focus:outline-none py-2.5 px-2"
+          type="button">
+    Options
+    <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+    </svg>
+  </button>
+
+  <!-- Dropdown menu -->
+  <div id="unitManagementDropdown"
+       class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
+    <div class="py-1" role="none">
+      <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownAlgorithmManagement">
+        <li>
+          <%= link_to "Add new unit version",
+                      new_unit_unit_version_path(unit_id: unit_version.unit.id),
+                      style: "text-decoration: none", class: "block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-200 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white" %>
+        </li>
+
+        <li>
+          <%= link_to "Edit unit version",
+                      edit_unit_unit_version_path(id: unit_version),
+                      style: "text-decoration: none", class: "block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-200 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white" %>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+</div>
+
+

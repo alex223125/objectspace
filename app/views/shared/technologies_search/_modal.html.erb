@@ -48,7 +48,9 @@
                   Select Article
                 <% elsif type == "simple_class_form_article_to_attribute_attachment" %>
                   Add Article
-                <% elsif type == "step_attachment_addition" %>
+                <% elsif type == "step_attachment_addition" ||
+                         type == "unit_version_attachment_addition" ||
+                         type == "article_version_attachment_addition" %>
                   Add Attachment
                 <% end %>
               </span>
@@ -89,7 +91,10 @@
                 <% elsif type == "simple_class_attribute_addition" ||
                          type == "simple_class_attribute_form_article_addition" ||
                          type == "step_attachment_addition" ||
-                         type == "simple_class_form_article_to_attribute_attachment" %>
+                         type == "simple_class_form_article_to_attribute_attachment" ||
+                         type == "unit_version_attachment_addition" ||
+                         type == "article_version_attachment_addition"
+                %>
                   Select Article
                 <% end %>
               </h3>
@@ -120,8 +125,12 @@
                          type == "simple_class_attribute_form_article_addition" ||
                          type == "simple_class_form_article_to_attribute_attachment" %>
                   In this popup you can select Article to add it as attribute of the model
-                <% elsif type == "step_attachment_addition" %>
+                <% elsif type == "step_attachment_addition"%>
                   In this popup you can select Article to add it as attachment to the step
+                <% elsif type == "unit_version_attachment_addition"%>
+                  In this popup you can select Article to add it as attachment to current Method
+                <% elsif type == "article_version_attachment_addition"%>
+                  In this popup you can select Article to add it as attachment to current Article
                 <% end %>
 
               </p>
@@ -146,7 +155,13 @@
               <%= render "shared/technologies_search/modal_bodies/articles_search_modal_body", scenario: "regular" %>
             <% elsif type == "step_attachment_addition" %>
               <%= render "shared/technologies_search/modal_bodies/articles_search_modal_body", scenario: "step_attachment_addition" %>
+            <% elsif type == "unit_version_attachment_addition" %>
+              <%= render "shared/technologies_search/modal_bodies/articles_search_modal_body", scenario: "unit_version_attachment_addition" %>
+            <% elsif type == "article_version_attachment_addition" %>
+              <%= render "shared/technologies_search/modal_bodies/articles_search_modal_body", scenario: "article_version_attachment_addition" %>
             <% end %>
+
+
 
             <!-- Modal footer -->
             <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">

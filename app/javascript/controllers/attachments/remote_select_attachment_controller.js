@@ -4,7 +4,9 @@ import { useMutation } from 'stimulus-use'
 
 const attachmentCaseNestedFields = '.nested-fields-attachment'
 
-const attachmentAdditionCase = "algorithm_form_attachment_addition";
+const algorithmFormAttachmentAdditionCase = "algorithm_form_attachment_addition";
+const unitVersionFormAttachmentAdditionCase = "unit_version_form_attachment_addition";
+const articleVersionFormAttachmentAdditionCase = "article_version_form_attachment_addition";
 
 const articleCase = "article";
 const articleClass = "Articles::Article"
@@ -43,7 +45,9 @@ export default class extends Controller {
         console.log("SELECT TYPE VALUE")
         console.log(this.selectTypeValue)
 
-        if (this.selectTypeValue == attachmentAdditionCase) {
+        if (this.selectTypeValue == algorithmFormAttachmentAdditionCase ||
+            this.selectTypeValue == unitVersionFormAttachmentAdditionCase ||
+            this.selectTypeValue == articleVersionFormAttachmentAdditionCase) {
             console.log("mutation listener added")
             // mutation is used to check if new interface member is added on ui side
             useMutation(this, {attributes: false, childList: true, characterData: false, subtree: true})
@@ -61,8 +65,10 @@ export default class extends Controller {
 
     // Callbacks
     mutate(entries) {
-        if (this.selectTypeValue == attachmentAdditionCase) {
-            console.log(`mutation for ${attachmentAdditionCase} case triggered`)
+        if (this.selectTypeValue == algorithmFormAttachmentAdditionCase ||
+            this.selectTypeValue == unitVersionFormAttachmentAdditionCase ||
+            this.selectTypeValue == articleVersionFormAttachmentAdditionCase) {
+            console.log(`mutation for ${this.selectTypeValue} case triggered`)
             var nestedFields = attachmentCaseNestedFields
             this.afterClickAttachmentsAmount = this.attachmentsAreaTarget.querySelectorAll(nestedFields).length
 
@@ -71,14 +77,14 @@ export default class extends Controller {
             console.log("this.afterClickAttachmentsAmount")
             console.log(this.afterClickAttachmentsAmount)
 
-            // Case 2: Should go in code before case 1. This is the case when we removed
+            // Doc: Case 2: Should go in code before case 1. This is the case when we removed
             // some of the attachments and have disbalanse in this.postmutationAttachmentsAmount variable
             // so we calibrating it back to normal situation
             if (this.afterClickAttachmentsAmount < this.postmutationAttachmentsAmount){
                 this.postmutationAttachmentsAmount = this.afterClickAttachmentsAmount
             }
 
-            // Case 1. When we increase amount if attachments
+            // Doc: Case 1. When we increase amount of attachments
             var changedAmount = (this.currentAttachmentsAmount + 1)
             if ((changedAmount == this.afterClickAttachmentsAmount) && (changedAmount != this.postmutationAttachmentsAmount)) {
                 console.log("New Attachment added!");
@@ -107,13 +113,7 @@ export default class extends Controller {
         this.resetSearchForm()
         this.removeModal()
 
-        if (this.numberOfMatches() > 0) {
-            console.log("Attachment was already added")
-            // TODO: flash popup - article was already added
-            return
-        } else {
-            // do nothing
-        }
+        this.prevent_from_adding_already_added_attachments()
 
         if (this.attachmentType == "article") {
             this.addArticleAttachment()
@@ -124,11 +124,12 @@ export default class extends Controller {
 
     // when in a form we already have attached attachments
     loadExistingAttachments(){
+        console.log("loadExistingAttachments triggered")
         // 1.select all containers
         let selector = attachmentCaseNestedFields
         this.fieldsContainers = [...this.attachmentsAreaTarget.querySelectorAll(selector)]
 
-        var that = this
+        var that= this
         // 2.iterate thru each container
         this.fieldsContainers.filter(function (fieldsContainer) {
             // 3. load preview for container
@@ -145,13 +146,28 @@ export default class extends Controller {
 
         let attachmentId = fieldsContainer.querySelector(`.${idFieldSelector}`).value
         let attachmentType = fieldsContainer.querySelector(`.${typeFieldSelector}`).value
+        console.log("remote_select_attachment: attachmentId")
+        console.log(attachmentId)
+        console.log("remote_select_attachment: attachmentType")
+        console.log(attachmentType)
 
         this.attachmentId = attachmentId
         if (attachmentType == articleClass) {
-            this.attachmentType =  articleCase
+            this.attachmentType = articleCase
         }
     }
     //
+
+
+    prevent_from_adding_already_added_attachments(){
+        if (this.numberOfMatches() > 0) {
+            console.log("Attachment was already added")
+            // TODO: flash popup - article was already added
+            return
+        } else {
+            // do nothing
+        }
+    }
 
     numberOfMatches(){
         let allAttachments = this.attachmentsAreaTarget.querySelectorAll(attachmentCaseNestedFields)
@@ -193,7 +209,9 @@ export default class extends Controller {
     }
 
     setAttachmentValues(){
-        if (this.selectTypeValue == attachmentAdditionCase) {
+        if (this.selectTypeValue == algorithmFormAttachmentAdditionCase ||
+            this.selectTypeValue == unitVersionFormAttachmentAdditionCase ||
+            this.selectTypeValue == articleVersionFormAttachmentAdditionCase) {
             this.setAttachableValues()
         }
     }
@@ -205,12 +223,19 @@ export default class extends Controller {
         if (this.attachmentType == articleCase) {
             this.fieldsContainer.querySelector(`.${idField}`).value = this.attachmentId
             this.fieldsContainer.querySelector(`.${typeField}`).value = articleClass
+
+            console.log("this.fieldsContainer.querySelector(`.${idField}`).value")
+            console.log("this.fieldsContainer.querySelector(`.${typeField}`).value")
+            console.log(this.fieldsContainer.querySelector(`.${idField}`).value)
+            console.log(this.fieldsContainer.querySelector(`.${typeField}`).value)
         }
 
     }
 
     setAttachmentPreviewContainer(){
-        if (this.selectTypeValue == attachmentAdditionCase) {
+        if (this.selectTypeValue == algorithmFormAttachmentAdditionCase ||
+            this.selectTypeValue == unitVersionFormAttachmentAdditionCase ||
+            this.selectTypeValue == articleVersionFormAttachmentAdditionCase) {
             this.attachmentPreviewContainer = this.fieldsContainer.querySelector(".attachment-preview")
         }
     }
@@ -234,6 +259,9 @@ export default class extends Controller {
     }
 
     setLoadUrl(){
+        console.log("remote_select_attachment: setLoadUrl triggered")
+        console.log("remote_select_attachment: this.attachmentType")
+        console.log(this.attachmentType)
         if (this.attachmentType == articleCase) {
             const params = 'preview_type=algorithm_step_attachment_preview'
             this.previewUrl = `/article/articles/${this.attachmentId}/preview?${params}`
@@ -246,7 +274,9 @@ export default class extends Controller {
         if (typeof container !== "undefined") {
             container.insertAdjacentHTML('beforeend', this.preview)
         } else {
-            if (this.selectTypeValue == attachmentAdditionCase) {
+            if (this.selectTypeValue == algorithmFormAttachmentAdditionCase ||
+                this.selectTypeValue == unitVersionFormAttachmentAdditionCase ||
+                this.selectTypeValue == articleVersionFormAttachmentAdditionCase) {
                 this.attachmentPreviewContainer.insertAdjacentHTML('beforeend', this.preview)
             }
         }

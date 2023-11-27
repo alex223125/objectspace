@@ -1,3 +1,4 @@
+<% scenario ||= nil %>
 <h1 class="text-2xl text-center mt-5 mb-4">Articles search form</h1>
 
 <div data-controller="search_instructions"
@@ -7,7 +8,7 @@
   <div class="flex justify-center">
     <%= render partial: "shared/technologies_search/shared/search_form",
                locals: { type: "articles",
-                         scenario: defined?(scenario) ? scenario : nil } %>
+                         scenario: scenario } %>
   </div>
 
   <!--  Part 2. Form results -->

@@ -5,9 +5,9 @@ module Services
 
         attr_reader :errors, :article
 
-        def initialize(params, target_folder, current_user)
+        def initialize(params, target_place, current_user)
           @params = params
-          @target_folder = target_folder
+          @target_place = target_place
           @current_user = current_user
         end
 
@@ -20,10 +20,10 @@ module Services
             set_visibility
 
             binding.pry
+            set_place
             set_owner
 
             binding.pry
-            set_folder
             set_tags
 
             binding.pry
@@ -51,10 +51,19 @@ module Services
           @article.visibility_status = ::Articles::VisibilityStatusTypes[:public]
         end
 
-        def set_folder
+        def set_place
           binding.pry
-          @article.folder = @target_folder
+          if @target_place.class == Folder
+            @article.folder = @target_place
+          elsif @target_place.class == Repository
+            @article.repository = @target_place
+          end
         end
+
+        def set_owner
+          @article.ownerable = @current_user
+        end
+
 
         def set_default_version
           binding.pry

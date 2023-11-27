@@ -11,6 +11,7 @@
 <!--  </div>-->
 <!--</form>-->
 
+<% scenario ||=nil %>
 
 <div class="w-full">
   <table>
@@ -31,7 +32,7 @@
 
             <%= hidden_field_tag 'type', type, data: {target: "search_instructions.instructionType"}  %>
 
-            <% if defined?(scenario) %>
+            <% if scenario.present? %>
               <%= hidden_field_tag 'scenario', scenario, data: {target: "search_instructions.scenario"}  %>
             <% end %>
 

@@ -1,0 +1,36 @@
+<div class="col-span-6 sm:col-span-3"
+     id="attachments-nested-form"
+     data-controller="remote_select_attachment attachments_nested_form"
+     data-target="remote_select_attachment.attachmentsArea"
+     data-remote_select_attachment-select-type-value="<%= attachment_select_type %>">
+  <p class="text-lg font-bold hover:text-gray-700">Attachments:</p>
+  <p class="mt-2 text-sm text-gray-500">
+    <% if attachment_select_type == "algorithm_form_attachment_addition" %>
+      Here you can add Articles to current step to help Hero of your tutorial to get through it more effectively.
+    <% elsif attachment_select_type == "unit_version_attachment_addition" %>
+      Here you can add Articles as attachment to current Method.
+    <% elsif attachment_select_type == "article_version_form_attachment_addition" %>
+      Here you can add Articles as attachment to current Article.
+    <% end %>
+  </p>
+  <br>
+
+  <%= f.fields_for :attachments do |attachment| %>
+    <%= render "attachments/attachment_fields", :f => attachment %>
+  <% end %>
+
+  <!--      1.1 article as attachment button -->
+  <% binding.pry %>
+  <div class="add-new-attachment-button">
+    <%= link_to_add_association "+ Add new Attachment", f,
+                                :attachments,
+                                style: "display:none;",
+                                partial: 'attachments/attachment_fields',
+                                class: "nodraggablesteps inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2",
+                                data: {target: "remote_select_attachment.addArticleAttachmentOriginalButton"}
+
+    %>
+  </div>
+
+  <%= render "shared/technologies_search/modal", :type => technologies_search_modal_type %>
+</div>

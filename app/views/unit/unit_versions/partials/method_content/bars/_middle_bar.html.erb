@@ -1,29 +1,29 @@
 <!--    <div class="flex justify-center">-->
-
-<%= render "unit/unit_versions/partials/method_content/version_select_bar", unit_version: unit_version %>
-
-<%= link_to "Add new unit version (move it somewhere)",
-            new_unit_unit_version_path(unit_id: unit_version.unit.id),
-            style: "text-decoration: none", class: "no-underline text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
-<br>
-<%= link_to "Edit unit version (move it somewhere)",
-            edit_unit_unit_version_path(id: unit_version),
-            style: "text-decoration: none", class: "no-underline text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
-
-<br>
-<br>
-<%= render "unit/unit_versions/partials/method_content/copy_to_clipboard_input" %>
-
-
-<div class="max-w-4xl p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
+<div class="max-w-6xl p-4 rounded-lg bg-gray-50 dark:bg-gray-800" data-controller="content_area" data-target="content_area.area">
   <!--center -->
-  <div class="flex justify-between px-4 mx-auto max-w-screen-xl ">
-    <div class="mx-auto w-full max-w-4xl format format-sm sm:format-base lg:format-lg format-blue dark:format-invert">
-      <div class="mb-4 lg:mb-6 not-format">
+  <div class="flex justify-between px-4 mx-auto max-w-screen-xl">
+    <div class="w-full format-sm sm:format-base lg:format-lg format-blue dark:format-invert">
+      <div class="mb-4 lg:mb-6 not-format p-3">
         <% binding.pry %>
         <h1 class="break-words mb-4 text-3xl font-extrabold leading-tight text-gray-900 lg:mb-6 lg:text-4xl dark:text-white">
           <%= unit_version.title %>
         </h1>
+
+        <!-- submenu -->
+        <div class="mt-1 flex flex-col space-x-4 sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+          <div class="mt-2 flex items-center text-sm">
+            <%= render "unit/unit_versions/partials/method_content/submenu/version_select_bar", unit_version: unit_version %>
+          </div>
+
+          <div class="mt-2 flex items-center text-sm">
+            <%= render "unit/unit_versions/partials/method_content/submenu/copy_to_clipboard", unit: unit_version.unit %>
+          </div>
+
+          <div class="mt-2 flex items-center text-sm text-gray-500">
+            <%= render "unit/unit_versions/partials/method_content/submenu/options_dropdown",
+                       unit_version: unit_version %>
+          </div>
+        </div>
 
         <%= render "unit/unit_versions/partials/method_content/toc", unit_version: @unit_version %>
         <br>
@@ -74,6 +74,12 @@
         </div>
         <br>
       <% end %>
+
+
+      <div class="attachments" data-controller="attachment_preview">
+        <%= render "unit/unit_versions/partials/method_content/attachments", unit_version: unit_version %>
+        <%= render "shared/attachment_preview/modal" %>
+      </div>
 
       <div class="contribute-section" id="contribute-<%=unit_version.unit.uniq_key%>">
         <div class="mt-8">
