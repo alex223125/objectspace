@@ -11,17 +11,17 @@
   </div>
   <br>
 
-  <div class="col-span-6 sm:col-span-3" data-controller="unit_usage_example_description_tinymce">
+  <div class="col-span-6 sm:col-span-3" data-controller="usage_example_description_tinymce">
     <%= f.label "Description", class: "block text-sm font-medium text-gray-700" %>
     <%= f.hint 'Describe scenario or situation of method usage.', class: "mt-2 text-sm text-gray-500" %>
-    <%= f.input_field :description, data: { target: 'unit_usage_example_description_tinymce.field' } %>
+    <%= f.input_field :description, data: { target: 'usage_example_description_tinymce.field' } %>
   </div>
   <br>
 
-  <div class="col-span-6 sm:col-span-3" data-controller="unit_usage_example_sources_tinymce">
+  <div class="col-span-6 sm:col-span-3" data-controller="usage_example_sources_tinymce">
     <%= f.label "Sources (optional)", class: "block text-sm font-medium text-gray-700" %>
     <%= f.hint 'If your method based on any credible sources of information you can add it here.', class: "mt-2 text-sm text-gray-500" %>
-    <%= f.input_field :sources, data: { target: 'unit_usage_example_sources_tinymce.field' } %>
+    <%= f.input_field :sources, data: { target: 'usage_example_sources_tinymce.field' } %>
   </div>
 
   <br>

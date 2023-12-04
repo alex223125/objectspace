@@ -24,6 +24,7 @@ class Unit::UnitVersionsController < ApplicationController
 
   # GET /unit_versions/1/edit
   def edit
+    binding.pry
     @unit = @unit_version.unit
     @target_folder = @unit.folder
   end
@@ -53,14 +54,17 @@ class Unit::UnitVersionsController < ApplicationController
   # PATCH/PUT /unit_versions/1 or /unit_versions/1.json
   def update
     binding.pry
+    set_unit
     respond_to do |format|
       if @unit_version.update(unit_version_params)
+        binding.pry
         format.html { redirect_to unit_version_path(username: @unit_version.unit.ownerable.ownername,
                                                     id: @unit_version.slug),
                                   notice: "Method was successfully updated." }
 
         format.json { render :show, status: :ok, location: @unit_version }
       else
+        binding.pry
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @unit_version.errors, status: :unprocessable_entity }
       end
@@ -80,7 +84,7 @@ class Unit::UnitVersionsController < ApplicationController
   private
 
     def set_unit
-      @unit = Units::Unit.find(params[:unit_id])
+      @unit = Units::Unit.find_by(id: params[:unit_id]) || Units::Unit.find_by(id: unit_version_params[:unit_id])
     end
 
     # Use callbacks to share common setup or constraints between actions.
@@ -104,7 +108,7 @@ class Unit::UnitVersionsController < ApplicationController
                                                  :sources, :additional_information, :unit_id,
                                                  attachments_attributes: [:id, :attachable_id,
                                                                           :attachable_type, :_destroy],
-                                                 unit_usage_examples_attributes: [:id, :title, :description,
+                                                 usage_examples_attributes: [:id, :title, :description,
                                                                                   :sources, :_destroy])
     end
 end

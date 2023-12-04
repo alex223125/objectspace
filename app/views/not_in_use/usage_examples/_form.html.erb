@@ -1,0 +1,17 @@
+<%= form_with(model: usage_example, class: "contents") do |form| %>
+  <% if usage_example.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+      <h2><%= pluralize(usage_example.errors.count, "error") %> prohibited this usage_example from being saved:</h2>
+
+      <ul>
+        <% usage_example.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="inline">
+    <%= form.submit class: "rounded-lg py-3 px-5 bg-blue-600 text-white inline-block font-medium cursor-pointer" %>
+  </div>
+<% end %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_11_27_013009) do
+ActiveRecord::Schema[7.0].define(version: 2023_12_04_000342) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -414,16 +414,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_11_27_013009) do
     t.index ["name"], name: "index_tags_on_name", unique: true
   end
 
-  create_table "unit_usage_examples", force: :cascade do |t|
-    t.string "title"
-    t.text "description"
-    t.text "sources"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "unit_id"
-    t.boolean "is_for_all_unit_versions"
-  end
-
   create_table "unit_version_improvements", force: :cascade do |t|
     t.bigint "unit_version_id", null: false
     t.bigint "improvement_id", null: false
@@ -431,15 +421,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_11_27_013009) do
     t.datetime "updated_at", null: false
     t.index ["improvement_id"], name: "index_unit_version_improvements_on_improvement_id"
     t.index ["unit_version_id"], name: "index_unit_version_improvements_on_unit_version_id"
-  end
-
-  create_table "unit_version_unit_usage_examples", force: :cascade do |t|
-    t.bigint "unit_version_id", null: false
-    t.bigint "unit_usage_example_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["unit_usage_example_id"], name: "index_unit_version_unit_usage_examples_on_unit_usage_example_id"
-    t.index ["unit_version_id"], name: "index_unit_version_unit_usage_examples_on_unit_version_id"
   end
 
   create_table "unit_versions", force: :cascade do |t|
@@ -476,6 +457,17 @@ ActiveRecord::Schema[7.0].define(version: 2023_11_27_013009) do
     t.index ["searchable"], name: "index_units_on_searchable", using: :gin
   end
 
+  create_table "usage_examples", force: :cascade do |t|
+    t.string "title"
+    t.text "description"
+    t.text "sources"
+    t.string "usage_exampable_type", null: false
+    t.bigint "usage_exampable_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["usage_exampable_type", "usage_exampable_id"], name: "index_usage_examples_on_usage_exampable"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -508,6 +500,4 @@ ActiveRecord::Schema[7.0].define(version: 2023_11_27_013009) do
   add_foreign_key "taggings", "tags"
   add_foreign_key "unit_version_improvements", "improvements"
   add_foreign_key "unit_version_improvements", "unit_versions"
-  add_foreign_key "unit_version_unit_usage_examples", "unit_usage_examples"
-  add_foreign_key "unit_version_unit_usage_examples", "unit_versions"
 end

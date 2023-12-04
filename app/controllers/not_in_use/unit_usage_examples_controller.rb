@@ -1,9 +1,9 @@
 class UnitUsageExamplesController < ApplicationController
   before_action :set_unit_usage_example, only: %i[ show edit update destroy ]
 
-  # GET /unit_usage_examples or /unit_usage_examples.json
+  # GET /usage_examples or /usage_examples.json
   def index
-    # @unit_usage_examples = UnitUsageExample.all
+    # @usage_examples = UnitUsageExample.all
 
     binding.pry
     if params[:unit_version_id].present?
@@ -62,7 +62,7 @@ class UnitUsageExamplesController < ApplicationController
   #   end
   # end
 
-  # GET /unit_usage_examples/1 or /unit_usage_examples/1.json
+  # GET /usage_examples/1 or /usage_examples/1.json
   def show
 
     # breadcrumbs
@@ -71,7 +71,7 @@ class UnitUsageExamplesController < ApplicationController
     add_breadcrumb "Example", unit_usage_example_path(@unit_usage_example)
   end
 
-  # GET /unit_usage_examples/new
+  # GET /usage_examples/new
   def new
     if params[:unit_id].present?
       set_unit
@@ -79,11 +79,11 @@ class UnitUsageExamplesController < ApplicationController
     @unit_usage_example = UnitUsageExample.new
   end
 
-  # GET /unit_usage_examples/1/edit
+  # GET /usage_examples/1/edit
   def edit
   end
 
-  # POST /unit_usage_examples or /unit_usage_examples.json
+  # POST /usage_examples or /usage_examples.json
   def create
     binding.pry
     @unit_usage_example = UnitUsageExample.new(unit_usage_example_params)
@@ -100,7 +100,7 @@ class UnitUsageExamplesController < ApplicationController
     end
   end
 
-  # PATCH/PUT /unit_usage_examples/1 or /unit_usage_examples/1.json
+  # PATCH/PUT /usage_examples/1 or /usage_examples/1.json
   def update
     respond_to do |format|
       if @unit_usage_example.update(unit_usage_example_params)
@@ -113,7 +113,7 @@ class UnitUsageExamplesController < ApplicationController
     end
   end
 
-  # DELETE /unit_usage_examples/1 or /unit_usage_examples/1.json
+  # DELETE /usage_examples/1 or /usage_examples/1.json
   def destroy
     @unit_usage_example.destroy
 

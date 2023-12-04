@@ -4,20 +4,20 @@
   <div class="flex justify-between px-4 mx-auto max-w-screen-xl ">
     <div class="mx-auto w-full max-w-4xl format format-sm sm:format-base lg:format-lg format-blue dark:format-invert">
       <div class="mb-4 lg:mb-6 not-format">
-        <h1 class="mb-4 text-3xl font-extrabold leading-tight text-gray-900 lg:mb-6 lg:text-4xl dark:text-white"><%= unit_usage_example.title %></h1>
+        <h1 class="mb-4 text-3xl font-extrabold leading-tight text-gray-900 lg:mb-6 lg:text-4xl dark:text-white"><%= usage_example.title %></h1>
       </div>
 
 
       <div class="description-section" id="instruction">
         # Description:
-        <%= unit_usage_example.description.html_safe %>
+        <%= usage_example.description.html_safe %>
       </div>
       <br>
 
-      <% if unit_usage_example.sources.present? %>
+      <% if usage_example.sources.present? %>
         <div class="sources-section" id="sources">
           # Sources:
-          <%= unit_usage_example.sources.html_safe %>
+          <%= usage_example.sources.html_safe %>
         </div>
         <br>
       <% end %>
@@ -34,7 +34,7 @@
             <div id="default-button-example" class="flex p-0 bg-white border-gray-200 bg-gradient-to-r code-preview dark:bg-gray-900 border-x dark:border-gray-600">
               <div class="p-4 m-5 bg-white dark:bg-gray-900 ">
                 <div class="w-full h-0 mx-auto bg-white dark:bg-gray-900 iframe-code">
-                  <%= link_to "Add new improvement!", new_improvement_path(unit_id: unit_usage_example.unit.id), style: "text-decoration: none", class: "no-underline	 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+                  <%= link_to "Add new improvement!", new_improvement_path(unit_id: usage_example.unit.id), style: "text-decoration: none", class: "no-underline	 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
                   <%= link_to "Add new usage example!", new_improvement_path, style: "text-decoration: none", class: "no-underline	 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
                 </div>
               </div>

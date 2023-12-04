@@ -36,20 +36,19 @@ export default class extends Controller {
 
     connect() {
         console.log("remote_select_attachment_controller connected")
-        // this.selectedItemsFormInput();
 
         // General variables for all cases
         this.attachmentId = ""
         this.attachmentType = ""
 
-        console.log("SELECT TYPE VALUE")
+        console.log("remote_select_attachment_controller: select type value")
         console.log(this.selectTypeValue)
 
         if (this.selectTypeValue == algorithmFormAttachmentAdditionCase ||
             this.selectTypeValue == unitVersionFormAttachmentAdditionCase ||
             this.selectTypeValue == articleVersionFormAttachmentAdditionCase) {
-            console.log("mutation listener added")
-            // mutation is used to check if new interface member is added on ui side
+            console.log("remote_select_attachment: mutation listener added")
+            // mutation is used to check if new attachment is added on ui side
             useMutation(this, {attributes: false, childList: true, characterData: false, subtree: true})
             this.afterClickAttachmentsAmount = null
             this.currentAttachmentsAmount = null
@@ -68,13 +67,19 @@ export default class extends Controller {
         if (this.selectTypeValue == algorithmFormAttachmentAdditionCase ||
             this.selectTypeValue == unitVersionFormAttachmentAdditionCase ||
             this.selectTypeValue == articleVersionFormAttachmentAdditionCase) {
-            console.log(`mutation for ${this.selectTypeValue} case triggered`)
+            console.log(`remote_select_attachment: mutation for ${this.selectTypeValue} case triggered`)
+
+            if (this.is_edit_form_field_display()) {
+                console.log("remote_select_attachment: Edit form filed disaply mutation")
+                return
+            }
+
             var nestedFields = attachmentCaseNestedFields
             this.afterClickAttachmentsAmount = this.attachmentsAreaTarget.querySelectorAll(nestedFields).length
 
-            console.log("this.currentAttachmentsAmount")
+            console.log("remote_select_attachment: this.currentAttachmentsAmount")
             console.log(this.currentAttachmentsAmount)
-            console.log("this.afterClickAttachmentsAmount")
+            console.log("remote_select_attachment: this.afterClickAttachmentsAmount")
             console.log(this.afterClickAttachmentsAmount)
 
             // Doc: Case 2: Should go in code before case 1. This is the case when we removed
@@ -87,7 +92,7 @@ export default class extends Controller {
             // Doc: Case 1. When we increase amount of attachments
             var changedAmount = (this.currentAttachmentsAmount + 1)
             if ((changedAmount == this.afterClickAttachmentsAmount) && (changedAmount != this.postmutationAttachmentsAmount)) {
-                console.log("New Attachment added!");
+                console.log("remote_select_attachment: New Attachment added!");
                 this.setFieldsContainer()
                 this.setAttachmentValues()
                 this.setAttachmentPreviewContainer()
@@ -95,7 +100,7 @@ export default class extends Controller {
                 this.loadPreview()
                 this.postmutationAttachmentsAmount = changedAmount
             } else {
-                console.log("Amount not changed or error");
+                console.log("remote_select_attachment: Amount not changed or error");
             }
 
         }
@@ -106,7 +111,7 @@ export default class extends Controller {
         this.attachmentId = event.currentTarget.dataset.attachmentid
         this.attachmentType = event.currentTarget.dataset.attachmenttype
 
-        console.log("attachmentId and attachmentType")
+        console.log("remote_select_attachment: attachmentId and attachmentType")
         console.log(this.attachmentId)
         console.log(this.attachmentType)
 
@@ -122,22 +127,42 @@ export default class extends Controller {
 
     // PRIVATE
 
-    // when in a form we already have attached attachments
+    // doc: sometimes we have edit form where we show preview of attachment
+    // with hidden field. If mutation runs it sets it value to blank string as
+    // in connect() method. To prevent this we checking if we dealing with edit from
+    // where attachemnt already added.
+    is_edit_form_field_display(){
+        if (this.attachmentId == "" && this.attachmentType == "") {
+            return true
+        } else {
+            return false
+        }
+    }
+
+    // Doc: When in a form we already have attached attachments (edit for for example)
     loadExistingAttachments(){
-        console.log("loadExistingAttachments triggered")
-        // 1.select all containers
+        console.log("remote_select_attachment: loadExistingAttachments triggered")
+        // 1.1 select all containers
         let selector = attachmentCaseNestedFields
         this.fieldsContainers = [...this.attachmentsAreaTarget.querySelectorAll(selector)]
 
         var that= this
-        // 2.iterate thru each container
+        // 1.2 iterate thru each container
         this.fieldsContainers.filter(function (fieldsContainer) {
-            // 3. load preview for container
+            // 1.3 load preview for container
             let attachmentPreviewContainer = fieldsContainer.querySelector(".attachment-preview")
             that.setAttachmentIdAndTypeBy(fieldsContainer)
             that.setLoadUrl()
             that.loadPreview(attachmentPreviewContainer)
+            // Doc: prevents mutation code block from considering loaded in edit form existing attachments
+            // as new added items. If we don't have this method mutation code block will add new preview attachment.
+            that.cleaAttachmentVariables()
         });
+    }
+
+    cleaAttachmentVariables(){
+        this.attachmentId = ""
+        this.attachmentType = ""
     }
 
     setAttachmentIdAndTypeBy(fieldsContainer){

@@ -14,11 +14,9 @@
   <ul class="p-3 space-y-1 text-sm text-gray-700 dark:text-gray-200"
       aria-labelledby="dropdownRadioHelperButtonSortingOne-<%=unit_version.unit.uniq_key%>">
 
-
     <% unit_version.unit.unit_versions.each do |unit_version|  %>
-
       <li>
-        <%= link_to unit_unit_version_path(id: unit_version.id),
+        <%= link_to unit_version_path(username: unit_version.owner.ownername, id: unit_version.slug),
                    style: "text-decoration: none",
                    class: "w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500" do %>
 
@@ -32,7 +30,6 @@
           </div>
         <% end %>
       </li>
-
     <% end %>
 
   </ul>

@@ -15,7 +15,11 @@
   <% end %>
 
   <br>
-  <%= render "shared/unit_preview", unit: @unit %>
+  <% if @unit_version.new_record? %>
+    <%= render "shared/unit_preview", unit: @unit %>
+  <% else %>
+    <%= render "shared/unit_version_preview", unit_version: @unit_version %>
+  <% end %>
   <br>
 
   <div class="form-inputs">
@@ -23,7 +27,7 @@
   </div>
   <br>
 
-  <%= render "unit/shared/partials/unit_usage_examples_nested_form", :form => f %>
+  <%= render "unit/shared/partials/usage_examples_nested_form", :form => f %>
 
   <%= f.hidden_field :unit_id, value: @unit.id %>
 

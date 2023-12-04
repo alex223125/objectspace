@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
 
+
   # resources :container_members
 
 
@@ -26,9 +27,7 @@ Rails.application.routes.draw do
   get "settings/account/:username", to: "users/user_settings#account", as: 'user_settings_account'
   get 'users_suggestions', to: 'users/users#suggestions', as: 'users_suggestions'
 
-  resources :improvements
-  resources :unit_usage_examples
-
+  # Simple technologies
   namespace :unit do
     resources :units do
       member do
@@ -67,6 +66,10 @@ Rails.application.routes.draw do
     resources :article_versions, except: [:show]
   end
   get "/:username/articles/:id", to: "article/article_versions#show", as: 'article_version'
+
+  # shared for Simple Technologies
+  resources :improvements
+  resources :usage_examples
 
   namespace :simple_class do
     resources :simple_classes, except: [:show] do
@@ -120,10 +123,7 @@ Rails.application.routes.draw do
   # get 'dashboard', to: 'dashboards#show', as: 'dashboard'
 
   get "/dashboard/repositories", to: "dashboards#repositories"
+
   # should be last in list of all routes
   get "/:username(/:target_folder)", to: "dashboards#show", as: 'dashboard'
-
-
-
-
 end

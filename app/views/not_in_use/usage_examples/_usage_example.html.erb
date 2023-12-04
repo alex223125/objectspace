@@ -1,0 +1,7 @@
+<div id="<%= dom_id usage_example %>">
+  <% if action_name != "show" %>
+    <%= link_to "Show this usage example", usage_example, class: "rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+    <%= link_to 'Edit this usage example', edit_usage_example_path(usage_example), class: "rounded-lg py-3 ml-2 px-5 bg-gray-100 inline-block font-medium" %>
+    <hr class="mt-6">
+  <% end %>
+</div>

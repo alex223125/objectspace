@@ -38,7 +38,7 @@ module Services
         # unit versions
         # def set_unit_for_unit_usage_examples
         #   binding.pry
-        #   @unit_version.unit_usage_examples.each do |example|
+        #   @unit_version.usage_examples.each do |example|
         #     example.unit = @unit_version.unit
         #   end
         # end

@@ -20,8 +20,8 @@ class Units::Unit < ApplicationRecord
   has_many :unit_versions, dependent: :destroy, class_name: "Units::UnitVersion"
   accepts_nested_attributes_for :unit_versions
 
-  has_many :unit_usage_examples, dependent: :destroy, class_name: "UnitUsageExample"
-  accepts_nested_attributes_for :unit_usage_examples, allow_destroy: true
+  has_many :usage_examples, through: :unit_versions, dependent: :destroy, class_name: "UsageExample"
+  accepts_nested_attributes_for :usage_examples, allow_destroy: true
 
   has_many :improvements
 

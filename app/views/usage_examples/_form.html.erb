@@ -1,10 +1,10 @@
-<%= simple_form_for(@unit_usage_example) do |f| %>
-  <% if unit_usage_example.errors.any? %>
+<%= simple_form_for(@usage_example) do |f| %>
+  <% if usage_example.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-      <h2><%= pluralize(unit_usage_example.errors.count, "error") %> prohibited this improvement from being saved:</h2>
+      <h2><%= pluralize(usage_example.errors.count, "error") %> prohibited this improvement from being saved:</h2>
 
       <ul>
-        <% unit_usage_example.errors.each do |error| %>
+        <% usage_example.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
       </ul>
