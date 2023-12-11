@@ -1,0 +1,24 @@
+<% if usage_examples.any? %>
+  <% usage_examples.each do |usage_example| %>
+    <div class="container mx-auto mx-auto p-4">
+      <div class="grid grid-cols-1 gap-4">
+        <div class="bg-white rounded-lg border p-4">
+          <div class="grid grid-cols-6 gap-3">
+            <div class="col-span-2">
+              <img src="https://placehold.co/300x200/d1d4ff/352cb5.png" alt="Placeholder Image" class="w-full h-20 rounded-md object-cover">
+            </div>
+            <div class="col-span-4 px-1 py-4">
+              <div class="px-1 py-4">
+                <div class="font-bold text-xl mb-2"><%= usage_example.title %></div>
+                <p class="text-gray-700 text-base">
+                  <%= truncate(usage_example.content, length: 300, omission: '...', :escape => false) %>
+                </p>
+              </div>
+              <a href="#" class="text-blue-500 hover:underline">Read More</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+<% end %>

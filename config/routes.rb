@@ -35,7 +35,9 @@ Rails.application.routes.draw do
         get :view
       end
     end
-    resources :unit_versions, except: [:show]
+    resources :unit_versions, except: [:show] do
+      resources :comments
+    end
   end
   get "/:username/methods/:id", to: "unit/unit_versions#show", as: 'unit_version'
 
@@ -69,7 +71,11 @@ Rails.application.routes.draw do
 
   # shared for Simple Technologies
   resources :improvements
-  resources :usage_examples
+  resources :usage_examples do
+    collection do
+      get :preview_index
+    end
+  end
 
   namespace :simple_class do
     resources :simple_classes, except: [:show] do
@@ -103,6 +109,10 @@ Rails.application.routes.draw do
   get "/:username/repositories/:id", to: "repositories#show", as: 'target_repository'
 
   resources :technologies, only: [:index]
+
+  resources :comments do
+    resources :comments
+  end
 
   # search routes
   post 'search', to: 'search#index', as: 'search'

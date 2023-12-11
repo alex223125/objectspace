@@ -1,0 +1,57 @@
+<% binding.pry %>
+<div data-controller="usage_examples_display_infinity_scroll"
+     data-usage_examples_display_infinity_scroll-technology-uuid-value="<%= unit_version.uuid %>"
+     data-usage_examples_display_infinity_scroll-technology-type-value="<%= unit_version.class_key %>"
+>
+
+  <div id="usage-examples-<%=unit_version.unit.uniq_key%>">
+    <p class="text-lg font-bold hover:text-gray-700 text-center">Usage examples:</p>
+  </div>
+  <br>
+  <div class="bg-gradient-to-bl from-blue-50 to-violet-50 grid items-center justify-center">
+
+    <!-- spinner-->
+    <div class="loading-indicator" data-target="usage_examples_display_infinity_scroll.loadingIndicator" style="display: none;">
+      <%= render "shared/small_ui_elements/loading_indicator" %>
+    </div>
+
+    <div class="content-container" data-target="usage_examples_display_infinity_scroll.contentArea">
+
+    </div>
+
+    <!-- load more button-->
+    <div class="load-more-button flex justify-center items-center block space-y-4 md:flex md:space-y-0 md:space-x-4"
+         data-target="usage_examples_display_infinity_scroll.loadMoreButton"
+         style="display: none;">
+      <!-- Modal toggle -->
+      <button data-action="click->usage_examples_display_infinity_scroll#loadMore"
+              class="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800"
+              type="button">
+                <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                  Load more
+                </span>
+      </button>
+    </div>
+
+    <!--  request failed card -->
+    <div data-target="usage_examples_display_infinity_scroll.retryCard" style="display: none;"
+         class="max-w-6xl p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+      <a href="#">
+        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Something went wrong</h5>
+      </a>
+      <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Use the following button to reload content.</p>
+
+      <div class="flex justify-center">
+        <div class="block space-y-4 md:flex md:space-y-0 md:space-x-4 ">
+          <button data-action="click->usage_examples_display_infinity_scroll#retryLoad"
+                  class="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800"
+                  type="button">
+                <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                  Reload
+                </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

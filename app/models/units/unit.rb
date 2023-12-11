@@ -20,8 +20,10 @@ class Units::Unit < ApplicationRecord
   has_many :unit_versions, dependent: :destroy, class_name: "Units::UnitVersion"
   accepts_nested_attributes_for :unit_versions
 
-  has_many :usage_examples, through: :unit_versions, dependent: :destroy, class_name: "UsageExample"
-  accepts_nested_attributes_for :usage_examples, allow_destroy: true
+  has_many :unit_version_usage_examples, through: :unit_versions, class_name: "UsageExamples::UnitVersionUsageExample"
+  has_many :usage_examples, through: :unit_version_usage_examples, class_name: "UsageExamples::UsageExample"
+
+  # accepts_nested_attributes_for :usage_examples, allow_destroy: true
 
   has_many :improvements
 
@@ -31,6 +33,7 @@ class Units::Unit < ApplicationRecord
 
 
   validates :title, presence: true, allow_blank: false
+
 
   # has_many :substeps, class_name: "Algorithms::Substep"
 

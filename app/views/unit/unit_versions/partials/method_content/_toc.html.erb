@@ -79,6 +79,19 @@
       </li>
     <% end %>
 
+    <% if unit_version.usage_examples.any? %>
+      <li>
+        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+           onclick="return false;"
+           href=""
+           data-action="click->toc_scrolling#scroll"
+           data-anchor="#usage-examples-<%=unit_version.unit.uniq_key%>"
+        >
+          ↳ Usage examples
+        </a>
+      </li>
+    <% end %>
+
     <li>
       <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
          onclick="return false;"

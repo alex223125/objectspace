@@ -52,8 +52,8 @@ module Services
 
         def set_usage_unit_example_flag
           binding.pry
-          @unit.unit_usage_examples.each do |example|
-            example.is_for_all_unit_versions = true
+          @unit.unit_versions.first.usage_examples.each do |example|
+            example.is_for_all_versions = true
           end
         end
 

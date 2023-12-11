@@ -138,9 +138,10 @@ class Unit::UnitsController < ApplicationController
                                                                     :instruction, :sources, :target_audience,
                                                                     :description, :additional_information,
                                                                     attachments_attributes: [:id, :attachable_id,
-                                                                                             :attachable_type, :_destroy]],
-                                         unit_usage_examples_attributes: [:id, :title, :description,
-                                                                          :sources, :_destroy])
+                                                                                             :attachable_type, :_destroy],
+                                                                    usage_examples_attributes: [:id, :title, :content,
+                                                                                                :sources, :_destroy]]
+      )
     end
 
 end

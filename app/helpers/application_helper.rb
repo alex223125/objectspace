@@ -50,5 +50,16 @@ module ApplicationHelper
   #   result
   # end
 
+  def polymorphic_path_builder(record, options = {})
+    binding.pry
+    if record.class == Units::UnitVersion
+      binding.pry
+      #link to create action
+      unit_unit_version_comments_path(unit_version_id: record.id)
+      # other classes
+    else
+      polymorphic_url(record, options)
+    end
+  end
 
 end

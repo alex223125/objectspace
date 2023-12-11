@@ -9,7 +9,7 @@ class UsageExamplesController < ApplicationController
     if params[:unit_version_id].present?
       binding.pry
       @unit_version = Units::UnitVersion.find_by_id(params[:unit_version_id])
-      @usage_examples = @unit_version.unit.usage_examples
+      @usage_examples = @unit_version.usage_examples
     end
 
     #search (add after first layer build)
@@ -25,6 +25,21 @@ class UsageExamplesController < ApplicationController
       }
     end
 
+  end
+
+  def preview_index
+    if params[:technology_type] == "unit_version"
+      unit_version = Units::UnitVersion.find_by(uuid: params[:technology_uuid])
+      @usage_examples = unit_version.usage_examples
+    end
+    @pagy, @usage_examples = pagy(@usage_examples, page: params[:page], items: 3 )
+    respond_to do |format|
+      format.json {
+        render json: { entries: render_to_string(partial: "usage_examples/preview_index/index",
+                                                 formats: [:html],
+                                                 locals: {usage_examples: @usage_examples}) }
+      }
+    end
   end
 
   # GET /usage_examples/1 or /usage_examples/1.json

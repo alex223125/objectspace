@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_12_04_000342) do
+ActiveRecord::Schema[7.0].define(version: 2023_12_10_223336) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -148,6 +148,24 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_04_000342) do
     t.datetime "updated_at", null: false
     t.integer "simple_class_id"
     t.integer "framework_id"
+    t.integer "parent_id"
+  end
+
+  create_table "comment_hierarchies", id: false, force: :cascade do |t|
+    t.integer "ancestor_id", null: false
+    t.integer "descendant_id", null: false
+    t.integer "generations", null: false
+    t.index ["ancestor_id", "descendant_id", "generations"], name: "comment_anc_desc_idx", unique: true
+    t.index ["descendant_id"], name: "comment_desc_idx"
+  end
+
+  create_table "comments", force: :cascade do |t|
+    t.text "content"
+    t.integer "commentable_id"
+    t.string "commentable_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id"
     t.integer "parent_id"
   end
 
@@ -423,6 +441,15 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_04_000342) do
     t.index ["unit_version_id"], name: "index_unit_version_improvements_on_unit_version_id"
   end
 
+  create_table "unit_version_usage_examples", force: :cascade do |t|
+    t.bigint "unit_version_id", null: false
+    t.bigint "usage_example_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["unit_version_id"], name: "index_unit_version_usage_examples_on_unit_version_id"
+    t.index ["usage_example_id"], name: "index_unit_version_usage_examples_on_usage_example_id"
+  end
+
   create_table "unit_versions", force: :cascade do |t|
     t.string "title"
     t.text "instruction"
@@ -436,6 +463,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_04_000342) do
     t.virtual "searchable", type: :tsvector, as: "(((setweight(to_tsvector('english'::regconfig, (COALESCE(title, ''::character varying))::text), 'A'::\"char\") || setweight(to_tsvector('english'::regconfig, COALESCE(instruction, ''::text)), 'B'::\"char\")) || setweight(to_tsvector('english'::regconfig, COALESCE(solves_the_problem, ''::text)), 'C'::\"char\")) || setweight(to_tsvector('english'::regconfig, COALESCE(sources, ''::text)), 'D'::\"char\"))", stored: true
     t.string "slug"
     t.text "description"
+    t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
     t.index ["searchable"], name: "index_unit_versions_on_searchable", using: :gin
     t.index ["slug"], name: "index_unit_versions_on_slug", unique: true
   end
@@ -459,13 +487,11 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_04_000342) do
 
   create_table "usage_examples", force: :cascade do |t|
     t.string "title"
-    t.text "description"
+    t.text "content"
     t.text "sources"
-    t.string "usage_exampable_type", null: false
-    t.bigint "usage_exampable_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["usage_exampable_type", "usage_exampable_id"], name: "index_usage_examples_on_usage_exampable"
+    t.boolean "is_for_all_versions", default: false
   end
 
   create_table "users", force: :cascade do |t|
@@ -500,4 +526,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_04_000342) do
   add_foreign_key "taggings", "tags"
   add_foreign_key "unit_version_improvements", "improvements"
   add_foreign_key "unit_version_improvements", "unit_versions"
+  add_foreign_key "unit_version_usage_examples", "unit_versions"
+  add_foreign_key "unit_version_usage_examples", "usage_examples"
 end

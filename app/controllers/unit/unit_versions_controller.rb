@@ -1,5 +1,6 @@
 class Unit::UnitVersionsController < ApplicationController
   include TechBreadcrumbable
+  include Commentable
 
   before_action :set_unit_version, only: %i[ show edit update destroy preview ]
 
@@ -108,7 +109,7 @@ class Unit::UnitVersionsController < ApplicationController
                                                  :sources, :additional_information, :unit_id,
                                                  attachments_attributes: [:id, :attachable_id,
                                                                           :attachable_type, :_destroy],
-                                                 usage_examples_attributes: [:id, :title, :description,
+                                                 usage_examples_attributes: [:id, :title, :content,
                                                                                   :sources, :_destroy])
     end
 end

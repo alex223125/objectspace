@@ -81,30 +81,15 @@
         <%= render "shared/attachment_preview/modal" %>
       </div>
 
-      <div class="contribute-section" id="contribute-<%=unit_version.unit.uniq_key%>">
-        <div class="mt-8">
-          <div class="w-full p-4 border border-gray-200 bg-gray-50 rounded-t-xl dark:border-gray-600 dark:bg-gray-700">
-            <div class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">Contribute</div>
-            <!--        <div class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight text-center">Contribute:</div>-->
-            Help us make Encyclopedia better, add improvements and examples.
-          </div>
+      <%= render "unit/unit_versions/partials/method_content/usage_examples", unit_version: unit_version %>
 
-          <div class="code-preview-wrapper">
-            <div id="default-button-example" class="flex p-0 bg-white border-gray-200 bg-gradient-to-r code-preview dark:bg-gray-900 border-x dark:border-gray-600">
-              <div class="p-4 m-5 bg-white dark:bg-gray-900 ">
-                <div class="w-full h-0 mx-auto bg-white dark:bg-gray-900 iframe-code">
-                  <%= link_to "Add new improvement!", new_improvement_path(unit_id: unit_version.unit.id), style: "text-decoration: none", class: "no-underline	 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
-                  <%= link_to "Add new usage example!", new_improvement_path, style: "text-decoration: none", class: "no-underline	 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <%= render "unit/unit_versions/partials/method_content/contribute", unit_version: unit_version %>
       <br>
 
-      <%= render "unit/unit_versions/partials/method_content/comments_section" %>
+      <%= render "unit/unit_versions/partials/method_content/comments" %>
 
+      <%= nested_comments @comments %>
+      <%= render "comments/form" %>
 
 
     </div>

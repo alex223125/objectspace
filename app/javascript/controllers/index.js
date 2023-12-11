@@ -21,13 +21,16 @@ application.register("unit_additional_information_tinymce", UnitAdditionalInform
 import UnitDescriptionTinymceController from "./tinymce/unit/unit_description_tinymce_controller.js"
 application.register("unit_description_tinymce", UnitDescriptionTinymceController)
 
-// 1.2 UnitUsageExample
-import UnitUsageExampleDescriptionTinymceController from "./tinymce/unit/unit_usage_example_description_tinymce_controller.js"
-application.register("unit_usage_example_description_tinymce", UnitUsageExampleDescriptionTinymceController)
-import UnitUsageExampleSourcesTinymceController from "./tinymce/unit/unit_usage_example_sources_tinymce_controller.js"
-application.register("unit_usage_example_sources_tinymce", UnitUsageExampleSourcesTinymceController)
+// 1.2 UsageExample
+import UsageExampleContentTinymceController from "./tinymce/usage_example/usage_example_content_tinymce_controller.js"
+application.register("usage_example_content_tinymce", UsageExampleContentTinymceController)
+import UsageExampleSourcesTinymceController from "./tinymce/usage_example/usage_example_sources_tinymce_controller.js"
+application.register("usage_example_sources_tinymce", UsageExampleSourcesTinymceController)
 import UsageExamplesSerpController from "./usage_examples_serp_controller.js"
 application.register("usage_examples_serp", UsageExamplesSerpController)
+import UsageExamplesDisplayInfinityScrollController from "./usage_examples/usage_examples_display_infinity_scroll_controller"
+application.register("usage_examples_display_infinity_scroll", UsageExamplesDisplayInfinityScrollController)
+
 
 //1.3 Improvement
 import ImprovementContentTinymceController from "./tinymce/improvements/improvement_content_tinymce_controller.js"

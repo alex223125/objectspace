@@ -1,0 +1,16 @@
+<%= simple_form_for(@comment, url: comments_path(commentable_id: @commentable.id, commentable_type: @commentable.model_name.to_s),
+  html: { method: :post }) do |f| %>
+
+  <%= f.hidden_field :parent_id %>
+  <%= f.hidden_field :user_id, value: current_user.id %>
+  <p>
+    <%= f.label :content, "New comment" %>
+    <br/>
+    <%= f.text_area :content, :rows => 4 %>
+  </p>
+  <p>
+    <%= f.submit "Post Comment" %>
+  </p>
+<% end %>
+
+

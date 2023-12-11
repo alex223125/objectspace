@@ -22,6 +22,7 @@ class User < ApplicationRecord
   # has_many :folders
   has_many :repositories
   has_many :folders, through: :repositories
+  has_many :comments
 
   has_one_attached :avatar
   has_one_attached :cropped_avatar
