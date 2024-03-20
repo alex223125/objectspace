@@ -68,7 +68,7 @@
       <div class="nodes" data-controller="attachment_preview">
         <%= render "algorithm/algorithm_versions/partials/algorithm_content/nodes/nodes", algorithm_version: algorithm_version %>
 
-        <%= render "shared/attachment_preview/modal" %>
+        <%= render "shared/attachment_preview/modal", entity: algorithm_version %>
       </div>
 
       <% if algorithm_version.sources.present? %>

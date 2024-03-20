@@ -1,6 +1,4 @@
 Rails.application.routes.draw do
-
-
   # resources :container_members
 
 
@@ -28,6 +26,18 @@ Rails.application.routes.draw do
   get 'users_suggestions', to: 'users/users#suggestions', as: 'users_suggestions'
 
   # Simple technologies
+
+  namespace :article do
+    resources :articles do
+      member do
+        get :preview
+        get :view
+      end
+    end
+    resources :article_versions, except: [:show]
+  end
+  get "/:ownername/articles/:id", to: "article/article_versions#show", as: 'article_version'
+
   namespace :unit do
     resources :units do
       member do
@@ -39,7 +49,7 @@ Rails.application.routes.draw do
       resources :comments
     end
   end
-  get "/:username/methods/:id", to: "unit/unit_versions#show", as: 'unit_version'
+  get "/:ownername/methods/:id", to: "unit/unit_versions#show", as: 'unit_version'
 
   namespace :algorithm do
     resources :algorithms, except: [:show] do
@@ -52,22 +62,31 @@ Rails.application.routes.draw do
     resources :control_structures
     resources :steps
 
-
-    resources :substeps
+    # ??? in use??
+    # resources :substeps
   end
   get "/node_template", to: "algorithm/nodes#template", as: 'node_template'
-  get "/:username/algorithms/:id", to: "algorithm/algorithm_versions#show", as: 'algorithm_version'
+  get "/:ownername/algorithms/:id", to: "algorithm/algorithm_versions#show", as: 'algorithm_version'
 
-  namespace :article do
-    resources :articles do
+  namespace :cheat_sheet do
+    resources :cheat_sheets, except: [:show] do
       member do
         get :preview
-        get :dynamic_view
       end
     end
-    resources :article_versions, except: [:show]
+    resources :cheat_sheet_versions, except: [:show]
   end
-  get "/:username/articles/:id", to: "article/article_versions#show", as: 'article_version'
+  get "/:ownername/cheat_sheets/:id", to: "cheat_sheet/cheat_sheet_versions#show", as: 'cheat_sheet_version'
+
+  namespace :cheat_sheet_group do
+    resources :cheat_sheet_groups, except: [:show] do
+      member do
+        get :preview
+      end
+    end
+    resources :cheat_sheet_group_versions, except: [:show]
+  end
+  get "/:ownername/cheat_sheet_groups/:id", to: "cheat_sheet_group/cheat_sheet_group_versions#show", as: 'cheat_sheet_group_version'
 
   # shared for Simple Technologies
   resources :improvements
@@ -76,6 +95,7 @@ Rails.application.routes.draw do
       get :preview_index
     end
   end
+  ################################
 
   namespace :simple_class do
     resources :simple_classes, except: [:show] do
@@ -91,7 +111,7 @@ Rails.application.routes.draw do
     get 'interface_members/preview/:id', to: 'interface_members#preview', as: 'preview'
     resources :simple_class_attributes
   end
-  get "/:username/classes/:id", to: "simple_class/simple_classes#show", as: 'simple_class'
+  get "/:ownername/classes/:id", to: "simple_class/simple_classes#show", as: 'simple_class'
 
   namespace :framework do
     resources :frameworks, except: [:show] do
@@ -100,18 +120,21 @@ Rails.application.routes.draw do
       end
     end
   end
-  get "/:username/framework/:id", to: "framework/frameworks#show", as: 'framework'
+  get "/:ownername/framework/:id", to: "framework/frameworks#show", as: 'framework'
 
   resources :folders, except: [:show]
-  get "/:username/folders/:id", to: "folders#show", as: 'target_folder'
+  get "/:ownername/folders/:id", to: "folders#show", as: 'target_folder'
 
   resources :repositories, except: [:show]
-  get "/:username/repositories/:id", to: "repositories#show", as: 'target_repository'
+  get "/:ownername/repositories/:id", to: "repositories#show", as: 'target_repository'
 
   resources :technologies, only: [:index]
 
   resources :comments do
     resources :comments
+    collection do
+      get :list
+    end
   end
 
   # search routes

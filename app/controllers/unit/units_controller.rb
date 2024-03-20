@@ -30,9 +30,9 @@ class Unit::UnitsController < ApplicationController
           params[:type] == "algorithm_form_class_level_wrapper_step_addition" ||
           params[:type] == "basic_preview"
       path = "shared/technologies_search/dpo_instruction_select/preview/unit"
+    elsif params[:preview_type] == "cheat_sheet_from_notes_link_attachment_preview"
+      path = "shared/tech_previews/basic_preview"
     end
-
-
 
     binding.pry
     respond_to do |format|
@@ -44,10 +44,13 @@ class Unit::UnitsController < ApplicationController
     end
   end
 
+  # doc: dynamic view in the model
   def view
     binding.pry
     @unit_version = @unit.default_version
-    path = "unit/unit_versions/dynamic_view/main"
+    if params[:type] = "regular"
+      path = "unit/unit_versions/dynamic_view/main"
+    end
 
     respond_to do |format|
       format.json {
@@ -81,7 +84,7 @@ class Unit::UnitsController < ApplicationController
       binding.pry
       if service.errors.blank?
         # format.html { redirect_to unit_unit_version_path(@unit.default_version, default_version: true), notice: "Unit was successfully created." }
-        format.html { redirect_to unit_version_path(username: service.unit.ownerable.ownername,
+        format.html { redirect_to unit_version_path(ownername: service.unit.ownerable.ownername,
                                                     id: service.unit.default_version.slug),
                                   notice: "Unit was successfully created." }
         format.json { render :show, status: :created, location: service.unit }
@@ -128,7 +131,7 @@ class Unit::UnitsController < ApplicationController
     end
 
     def set_unit
-      @unit = Units::Unit.find(params[:id])
+      @unit = Units::Unit.find_by(uuid: params[:id]) || Units::Unit.find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.

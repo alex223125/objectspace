@@ -17,6 +17,7 @@ module Objectspace
     Dir[Rails.root.join('app/enums/**/*.rb')].each{|rb| require rb}
     Dir[Rails.root.join('app/queries/**/*.rb')].each{|rb| require rb}
     Dir[Rails.root.join('app/serializers/**/*.rb')].each{|rb| require rb}
+    Dir[Rails.root.join('app/forms/**/*.rb')].each{|rb| require rb}
 
     # Configuration for the application, engines, and railties goes here.
     #

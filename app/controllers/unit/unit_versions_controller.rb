@@ -41,7 +41,7 @@ class Unit::UnitVersionsController < ApplicationController
     respond_to do |format|
       if service.errors.blank?
         binding.pry
-        format.html { redirect_to unit_version_path(username: service.unit_version.unit.ownerable.ownername,
+        format.html { redirect_to unit_version_path(ownername: service.unit_version.unit.ownerable.ownername,
                                                        id: service.unit_version.slug),
                                   notice: "Method was successfully created." }
         format.json { render :show, status: :created, location: @unit_version }
@@ -59,7 +59,7 @@ class Unit::UnitVersionsController < ApplicationController
     respond_to do |format|
       if @unit_version.update(unit_version_params)
         binding.pry
-        format.html { redirect_to unit_version_path(username: @unit_version.unit.ownerable.ownername,
+        format.html { redirect_to unit_version_path(ownername: @unit_version.unit.ownerable.ownername,
                                                     id: @unit_version.slug),
                                   notice: "Method was successfully updated." }
 
@@ -97,7 +97,7 @@ class Unit::UnitVersionsController < ApplicationController
       # a 301 redirect that uses the current friendly id.
       request_slug = params[:id]
       if request_slug != @unit_version.slug
-        return redirect_to unit_version_path(username: @unit_version.owner.ownername,
+        return redirect_to unit_version_path(ownername: @unit_version.owner.ownername,
                                                 id: @unit_version.slug),
                            :status => :moved_permanently
       end

@@ -40,9 +40,12 @@ Articles::Article.searchkick_index.delete
 Articles::Article.reindex
 Units::Unit.reindex
 Algorithms::Algorithm.reindex
+CheatSheets::CheatSheet.reindex
+CheatSheetGroups::CheatSheetGroup.reindex
 SimpleClasses::SimpleClass.reindex
 Frameworks::Framework.reindex
 ActsAsTaggableOn::Tag.reindex
+Improvements::Improvement.reindex
 User.reindex
 
 # to redo slugs

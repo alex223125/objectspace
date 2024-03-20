@@ -1,0 +1,54 @@
+<!--      TOC-->
+<div class="improvement-toc" data-controller="toc_scrolling">
+  <br>
+  Table of content:
+  <ul role="list" a="" class="space-y-3 text-base list-none sm:text-lg md:mt-5 md:text-xl">
+
+    <li>
+      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+         onclick="return false;"
+         href=""
+         data-action="click->toc_scrolling#scroll"
+         data-anchor="#content-<%=improvement.uniq_key%>"
+      >
+        ↳ Content
+      </a>
+    </li>
+
+    <% if improvement.sources.present? %>
+      <li>
+        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+           onclick="return false;"
+           href=""
+           data-action="click->toc_scrolling#scroll"
+           data-anchor="#sources-<%=improvement.uniq_key%>"
+        >
+          ↳ Sources
+        </a>
+      </li>
+    <% end %>
+
+    <li>
+      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+         onclick="return false;"
+         href=""
+         data-action="click->toc_scrolling#scroll"
+         data-anchor="#contribute-<%=improvement.uniq_key%>"
+      >
+        ↳ Contribute
+      </a>
+    </li>
+
+    <li>
+      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+         onclick="return false;"
+         href=""
+         data-action="click->toc_scrolling#scroll"
+         data-anchor="#comments-<%=improvement.uniq_key%>"
+      >
+        ↳ Comments
+      </a>
+    </li>
+
+  </ul>
+</div>

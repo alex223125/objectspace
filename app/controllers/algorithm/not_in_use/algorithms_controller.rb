@@ -73,7 +73,7 @@ class Algorithm::AlgorithmsController < ApplicationController
 
         binding.pry
         # format.html { redirect_to algorithm_algorithm_url(service.algorithm), notice: "Algorithm was successfully created." }
-        format.html { redirect_to algorithm_version_path(username: service.algorithm.ownerable.ownername,
+        format.html { redirect_to algorithm_version_path(ownername: service.algorithm.ownerable.ownername,
                                                          id: service.algorithm.default_version.slug),
                                   notice: "Algorithm was successfully created." }
         format.json { render :show, status: :created, location: @algorithm }

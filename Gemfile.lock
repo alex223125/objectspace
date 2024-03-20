@@ -89,8 +89,6 @@ GEM
       activerecord (>= 4.2)
     addressable (2.8.1)
       public_suffix (>= 2.0.2, < 6.0)
-    ancestry (4.3.3)
-      activerecord (>= 5.2.6)
     bcrypt (3.1.18)
     bindex (0.8.1)
     bootsnap (1.16.0)
@@ -172,6 +170,8 @@ GEM
     loofah (2.19.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
+    macaddr (1.7.2)
+      systemu (~> 2.6.5)
     mail (2.8.1)
       mini_mime (>= 0.1.1)
       net-imap
@@ -314,6 +314,7 @@ GEM
       sprockets (>= 3.0.0)
     stimulus-rails (1.2.1)
       railties (>= 6.0.0)
+    systemu (2.6.5)
     tailwindcss-rails (2.0.21)
       railties (>= 6.0.0)
     tailwindcss-rails (2.0.21-x86_64-linux)
@@ -326,6 +327,8 @@ GEM
       railties (>= 6.0.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
+    uuid (2.3.9)
+      macaddr (~> 1.0)
     valid_email2 (4.0.5)
       activemodel (>= 3.2)
       mail (~> 2.5)
@@ -361,7 +364,6 @@ DEPENDENCIES
   active_model_serializers (~> 0.10.0)
   acts-as-taggable-on (~> 9.0)
   acts_as_list
-  ancestry
   bootsnap
   breadcrumbs_on_rails
   capybara
@@ -397,6 +399,7 @@ DEPENDENCIES
   tailwindcss-rails
   turbo-rails (= 1.0.0)
   tzinfo-data
+  uuid (~> 2.3, >= 2.3.9)
   valid_email2
   web-console
   webdrivers

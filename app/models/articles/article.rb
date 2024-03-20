@@ -1,13 +1,11 @@
 class Articles::Article < ApplicationRecord
 
   extend Pagy::Searchkick
-
-  acts_as_taggable_on :tags
-
   searchkick callbacks: :async,
              text_middle: [:title, :source_page_description],
              word: [:list_of_tags, :ownerable_id]
   scope :search_import, -> { includes(:tags) }
+  acts_as_taggable_on :tags
 
 
   # TODO: validate that its in repository or in folder, not in both and not without at leas one of them
@@ -25,8 +23,13 @@ class Articles::Article < ApplicationRecord
   has_many :articles_simple_class_attributes, dependent: :destroy, class_name: "SimpleClasses::ArticlesSimpleClassAttribute"
   has_many :simple_class_attributes, through: :articles_simple_class_attributes, class_name: "SimpleClasses::SimpleClassAttribute"
 
+  has_many :link_attachments, as: :linkable, class_name: "CheatSheets::LinkAttachment"
+
+  has_many :sections, as: :sectionable, class_name: "CheatSheetGroups::Section"
+
   validates :title, presence: true, allow_blank: false
 
+  # doc: mapping for searchkick
   def search_data
     {
       title: title,

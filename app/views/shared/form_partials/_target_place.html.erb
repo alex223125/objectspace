@@ -1,0 +1,13 @@
+<!--    Place:-->
+<!--    Option 1: Place to folder -->
+<% if @target_folder.present? %>
+  <%= hidden_field_tag 'target_folder', @target_folder.uuid  %>
+<% end %>
+<!--    Option 2: Place to repository -->
+<% if @target_repository.present? %>
+  <%= hidden_field_tag 'target_repository', @target_repository.uuid  %>
+<% end %>
+<!--    Option 3: Place to interface group-->
+<% if @target_interface_group.present? %>
+  <%= hidden_field_tag :target_interface_group, @target_interface_group.uuid %>
+<% end %>

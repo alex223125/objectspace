@@ -35,7 +35,7 @@ class Algorithm::AlgorithmVersionsController < ApplicationController
 
     respond_to do |format|
       if @algorithm_version.save(validate: false)
-        format.html { redirect_to algorithm_version_path(username: @algorithm_version.algorithm.ownerable.ownername,
+        format.html { redirect_to algorithm_version_path(ownername: @algorithm_version.algorithm.ownerable.ownername,
                                                        id: @algorithm_version.slug),
                                   notice: "Algorithm version was successfully created." }
 
@@ -68,7 +68,7 @@ class Algorithm::AlgorithmVersionsController < ApplicationController
       binding.pry
       if @algorithm_version.update(algorithm_version_params)
         binding.pry
-        format.html { redirect_to algorithm_version_path(username: @algorithm_version.algorithm.ownerable.ownername,
+        format.html { redirect_to algorithm_version_path(ownername: @algorithm_version.algorithm.ownerable.ownername,
                                                          id: @algorithm_version.slug),
                                   notice: "Algorithm version was successfully updated." }
 
@@ -113,7 +113,7 @@ class Algorithm::AlgorithmVersionsController < ApplicationController
       # a 301 redirect that uses the current friendly id.
       request_slug = params[:id]
       if request_slug != @algorithm_version.slug
-        return redirect_to algorithm_version_path(username: @algorithm_version.owner.ownername,
+        return redirect_to algorithm_version_path(ownername: @algorithm_version.owner.ownername,
                                                 id: @algorithm_version.slug),
                            :status => :moved_permanently
       end

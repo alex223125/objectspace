@@ -3,7 +3,10 @@ require 'active_support/concern'
 module Commentable
   extend ActiveSupport::Concern
 
-  COMMENTABLE_MAPPING = [ { controller: "unit/unit_versions", class: Units::UnitVersion } ]
+  COMMENTABLE_MAPPING = [
+    { controller: "unit/unit_versions", class: Units::UnitVersion },
+    { controller: "improvements", class: Improvements::Improvement }
+  ]
 
   included do
     before_action :comments, only: [:show]
@@ -12,7 +15,7 @@ module Commentable
   def comments
     @commentable = find_commentable
     binding.pry
-    @comments = @commentable.comments.order("created_at desc")
+    # @comments = @commentable.comments.order("created_at desc")
     @comment = Comment.new
   end
 

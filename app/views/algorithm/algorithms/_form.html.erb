@@ -49,17 +49,9 @@
     </div>
     <br>
 
-    <%= hidden_field_tag :target_interface_group, @target_interface_group.try(:id) %>
-
-    <% if @target_folder.present? %>
-      <%= hidden_field_tag 'target_folder', @target_folder.id  %>
-    <% end %>
-
-    <% if @target_repository.present? %>
-      <%= hidden_field_tag 'target_repository', @target_repository.id  %>
-    <% end %>
-
     <%= f.hidden_field :functional_type, value: @functional_type %>
+
+    <%= render "shared/form_partials/target_place" %>
 
 <!--    <div class="col-span-6 sm:col-span-3" data-controller="unit_instruction_tinymce">-->
       <%#= f.label "Description", class: "block text-sm font-medium text-gray-700" %>

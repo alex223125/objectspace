@@ -1,11 +1,11 @@
 <%= simple_form_for(@article, url: article_articles_path) do |f| %>
 
-  <% if article.errors.any? %>
+  <% if @article.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-      <h2><%= pluralize(article.errors.count, "error") %> prohibited this improvement from being saved:</h2>
+      <h2><%= pluralize(@article.errors.count, "error") %> prohibited this improvement from being saved:</h2>
 
       <ul>
-        <% article.errors.each do |error| %>
+        <% @article.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
       </ul>
@@ -46,17 +46,12 @@
     </div>
     <br>
 
-    <% if @target_folder.present? %>
-      <%= hidden_field_tag 'target_folder', @target_folder.id  %>
-    <% elsif @target_repository.present? %>
-      <%= hidden_field_tag 'target_repository', @target_repository.id  %>
-    <% end %>
+    <%= render "shared/form_partials/target_place" %>
 
     <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Article version fields</h2>
     <%= render "article/shared/partials/article_version_nested_form", :form => f %>
   </div>
   <br>
-
 
   <div class="bg-gray-50 px-4 py-3 sm:px-6">
     <div class="text-end">

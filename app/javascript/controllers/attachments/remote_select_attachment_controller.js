@@ -13,18 +13,11 @@ const articleClass = "Articles::Article"
 
 export default class extends Controller {
     static targets = [
-        'itemsModalInput',
-        'attachmentsFormInput',
-
         'searchInstructionsInstance',
         'instructionModalInstance',
 
         'attachmentsArea',
-
         'addArticleAttachmentOriginalButton',
-
-        'attachableTypeHiddenField',
-        'attachableIdHiddenField'
 ]
 
     static values = {
@@ -217,7 +210,7 @@ export default class extends Controller {
     }
 
     addArticleAttachment(){
-        //Calculate amount of substep before adding new substep
+        //Calculate amount of attachments before adding new attachments
         var nestedFields = attachmentCaseNestedFields
         this.currentAttachmentsAmount = this.attachmentsAreaTarget.querySelectorAll(nestedFields).length
         console.log("current attachments:")

@@ -34,7 +34,7 @@ class SimpleClass::InterfaceGroupsController < ApplicationController
     respond_to do |format|
       if service.errors.blank?
         # format.html { redirect_to interface_group_url(@interface_group), notice: "Interface group was successfully created." }
-        format.html { redirect_to simple_class_path(username: simple_class.owner.username, id: simple_class.id),
+        format.html { redirect_to simple_class_path(ownername: simple_class.owner.username, id: simple_class.id),
                                   notice: "Actions group was successfully created." }
         format.json { render :show, status: :created, location: @interface_group }
       else
@@ -53,7 +53,7 @@ class SimpleClass::InterfaceGroupsController < ApplicationController
       if @interface_group.update(interface_group_params)
         simple_class = @interface_group.simple_class ? @interface_group.simple_class : @interface_group.root.simple_class
         # format.html { redirect_to interface_group_url(@interface_group), notice: "Interface group was successfully updated." }
-        format.html { redirect_to simple_class_path(username: simple_class.owner.username, id: simple_class.id),
+        format.html { redirect_to simple_class_path(ownername: simple_class.owner.username, id: simple_class.id),
                                   notice: "Actions group was successfully updated." }
         format.json { render :show, status: :ok, location: @interface_group }
       else
@@ -71,7 +71,7 @@ class SimpleClass::InterfaceGroupsController < ApplicationController
 
     binding.pry
     respond_to do |format|
-      format.html { redirect_to simple_class_path(username: simple_class.owner.username, id: simple_class.id),
+      format.html { redirect_to simple_class_path(ownername: simple_class.owner.username, id: simple_class.id),
                                 notice: "Actions group was successfully deleted." }
       format.json { head :no_content }
     end

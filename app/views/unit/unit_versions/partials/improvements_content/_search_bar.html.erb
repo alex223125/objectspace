@@ -1,16 +1,7 @@
 <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
-  <!--<div class="bg-grey col-12 mt-3 align-middle justify-content-center flex" >-->
-  <!--  <input type="text" class="col-8 border-2 p-2 w-full" placeholder="Search for Startups..." id="search-filter">-->
-  <!--  <button type="button" class="btn btn-light mr-10 shadow-sm" data-toggle="collapse" data-target="#filters">Drop search query and filters <i class="fa fa-filter"></i></button>-->
-  <!--</div>-->
-
-
-  <!--<div class="bg-grey col-12 mt-3 align-middle justify-content-center flex" >-->
-  <!--  <input type="text" class="col-8 border-2 p-2 w-full" placeholder="Search for Startups..." id="search-filter">-->
-  <!--</div>-->
 
   <!--Part 1: Search bar -->
-  <div class="search-bar" data-controller="improvements_infinite_scroll">
+  <div class="search-bar">
 
     <form onsubmit="return false">
       <label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
@@ -37,6 +28,7 @@
         <button
           data-target="improvements_infinite_scroll.openClosedOption"
           data-action="click->improvements_infinite_scroll#selectOpenClosedOption"
+          data-status-filter-value="view_all"
           class="px-5 py-2 text-xs font-medium text-gray-600 transition-colors duration-200 bg-gray-100 sm:text-sm dark:bg-gray-800 dark:text-gray-300">
           View all
         </button>
@@ -44,6 +36,7 @@
         <button
           data-target="improvements_infinite_scroll.openClosedOption"
           data-action="click->improvements_infinite_scroll#selectOpenClosedOption"
+          data-status-filter-value="open"
           class="px-5 py-2 text-xs font-medium text-gray-600 transition-colors duration-200 sm:text-sm dark:hover:bg-gray-800 dark:text-gray-300 hover:bg-gray-100">
           Open
         </button>
@@ -51,6 +44,7 @@
         <button
           data-target="improvements_infinite_scroll.openClosedOption"
           data-action="click->improvements_infinite_scroll#selectOpenClosedOption"
+          data-status-filter-value="closed"
           class="px-5 py-2 text-xs font-medium text-gray-600 transition-colors duration-200 sm:text-sm dark:hover:bg-gray-800 dark:text-gray-300 hover:bg-gray-100">
           Closed
         </button>
@@ -59,23 +53,10 @@
 
       <%= render "unit/unit_versions/partials/improvements_content/sorting_button" %>
 
-
-      <!--    Sorting -->
-      <button id="dropdownRadioHelperButtonSorting"
-              data-dropdown-toggle="dropdownRadioHelperSorting"
-              class="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-              type="button">Filter by versions (multiselect from array with autocomplete) <svg class="w-4 h-4 ml-2" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-      </button>
+      <%= render "unit/unit_versions/partials/improvements_content/filter_by_tech_version_button", unit_version: unit_version %>
 
 
     </div>
-
-    <!--<div class="bg-grey col-12 mt-3 align-middle justify-content-center flex">-->
-    <!--  <button type="button" class="btn btn-light mr-10 shadow-sm collapsed" data-toggle="collapse" data-target="#filters" aria-expanded="false">Filters <i class="fa fa-filter"></i></button>-->
-    <!--  <input type="text" class="col-8 border-2 p-2" placeholder="Search for Startups..." id="search-filter">-->
-    <!--</div>-->
-
-    <%#= render "units/partials/improvements_content/search_bar_two" %>
 
   </div>
 

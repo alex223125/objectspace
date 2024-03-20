@@ -21,26 +21,6 @@ export default class extends Controller {
         console.log("usage_examples_display_infinity_scroll_controller disconnected")
     }
 
-    // scroll() {
-    //
-    //     let nextPage = this.paginationTarget.querySelector("a[rel='next']")
-    //
-    //     if (nextPage == null) {
-    //         return
-    //     }
-    //
-    //     let url = nextPage.href
-    //
-    //     let body = document.body,
-    //         html = document.documentElement
-    //
-    //     let height = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight)
-    //
-    //     if (window.pageYOffset >= height - window.innerHeight - 100) {
-    //         this.loadMore(url);
-    //     }
-    // }
-
     // PRIVATE
 
     toggleLoadSpinner(action){

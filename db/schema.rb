@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_12_10_223336) do
+ActiveRecord::Schema[7.0].define(version: 2024_03_12_210654) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -64,6 +64,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_10_223336) do
     t.virtual "searchable", type: :tsvector, as: "(((setweight(to_tsvector('english'::regconfig, (COALESCE(title, ''::character varying))::text), 'A'::\"char\") || setweight(to_tsvector('english'::regconfig, COALESCE(solves_the_problem, ''::text)), 'B'::\"char\")) || setweight(to_tsvector('english'::regconfig, COALESCE(sources, ''::text)), 'C'::\"char\")) || setweight(to_tsvector('english'::regconfig, COALESCE(additional_information, ''::text)), 'D'::\"char\"))", stored: true
     t.string "slug"
     t.text "description"
+    t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
     t.index ["searchable"], name: "index_algorithm_versions_on_searchable", using: :gin
     t.index ["slug"], name: "index_algorithm_versions_on_slug", unique: true
   end
@@ -131,6 +132,64 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_10_223336) do
     t.integer "node_id"
     t.integer "article_version_id"
     t.index ["attachable_type", "attachable_id"], name: "index_attachments_on_attachable"
+  end
+
+  create_table "cheat_sheet_group_sections", force: :cascade do |t|
+    t.string "sectionable_type", null: false
+    t.bigint "sectionable_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "cheat_sheet_group_version_id"
+    t.index ["sectionable_type", "sectionable_id"], name: "index_cheat_sheet_group_sections_on_sectionable"
+  end
+
+  create_table "cheat_sheet_group_versions", force: :cascade do |t|
+    t.string "title"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "cheat_sheet_group_id"
+    t.string "slug"
+    t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
+    t.index ["slug"], name: "index_cheat_sheet_group_versions_on_slug", unique: true
+  end
+
+  create_table "cheat_sheet_groups", force: :cascade do |t|
+    t.string "title"
+    t.text "source_page_description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "default_version_id"
+    t.string "ownerable_type"
+    t.integer "ownerable_id"
+    t.integer "folder_id"
+    t.integer "repository_id"
+  end
+
+  create_table "cheat_sheet_versions", force: :cascade do |t|
+    t.string "title"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "cheat_sheet_id"
+    t.string "slug"
+    t.text "description"
+    t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
+    t.index ["slug"], name: "index_cheat_sheet_versions_on_slug", unique: true
+  end
+
+  create_table "cheat_sheets", force: :cascade do |t|
+    t.string "title"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "folder_id"
+    t.integer "repository_id"
+    t.integer "visibility_status"
+    t.integer "default_version_id"
+    t.text "source_page_description"
+    t.string "ownerable_type"
+    t.integer "ownerable_id"
+    t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
   end
 
   create_table "class_container_hierarchies", id: false, force: :cascade do |t|
@@ -217,6 +276,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_10_223336) do
     t.string "slug"
     t.integer "repository_id"
     t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
+    t.string "ownerable_type"
+    t.integer "ownerable_id"
     t.index ["slug"], name: "index_folders_on_slug", unique: true
   end
 
@@ -255,7 +316,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_10_223336) do
     t.integer "unit_id"
     t.virtual "searchable", type: :tsvector, as: "((setweight(to_tsvector('english'::regconfig, (COALESCE(title, ''::character varying))::text), 'A'::\"char\") || setweight(to_tsvector('english'::regconfig, COALESCE(content, ''::text)), 'B'::\"char\")) || setweight(to_tsvector('english'::regconfig, COALESCE(sources, ''::text)), 'C'::\"char\"))", stored: true
     t.integer "active_status"
+    t.string "slug"
+    t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
     t.index ["searchable"], name: "index_improvements_on_searchable", using: :gin
+    t.index ["slug"], name: "index_improvements_on_slug", unique: true
   end
 
   create_table "interface_group_hierarchies", id: false, force: :cascade do |t|
@@ -276,6 +340,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_10_223336) do
     t.integer "framework_id"
     t.integer "parent_id"
     t.integer "functional_type"
+    t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
   end
 
   create_table "interface_members", force: :cascade do |t|
@@ -286,6 +351,15 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_10_223336) do
     t.integer "interface_group_id"
     t.integer "position"
     t.index ["memberable_type", "memberable_id"], name: "index_interface_members_on_memberable"
+  end
+
+  create_table "link_attachments", force: :cascade do |t|
+    t.string "linkable_type", null: false
+    t.bigint "linkable_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "note_id"
+    t.index ["linkable_type", "linkable_id"], name: "index_link_attachments_on_linkable"
   end
 
   create_table "node_hierarchies", id: false, force: :cascade do |t|
@@ -319,6 +393,15 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_10_223336) do
     t.index ["technologiable_type", "technologiable_id"], name: "index_nodes_on_technologiable"
   end
 
+  create_table "notes", force: :cascade do |t|
+    t.string "title"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "cheat_sheet_version_id"
+    t.text "content"
+    t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
+  end
+
   create_table "repositories", force: :cascade do |t|
     t.string "name"
     t.text "description"
@@ -328,6 +411,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_10_223336) do
     t.integer "user_id"
     t.string "slug"
     t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
+    t.string "ownerable_type"
+    t.integer "ownerable_id"
     t.index ["slug"], name: "index_repositories_on_slug", unique: true
   end
 

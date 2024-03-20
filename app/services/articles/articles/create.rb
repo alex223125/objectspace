@@ -60,11 +60,6 @@ module Services
           end
         end
 
-        def set_owner
-          @article.ownerable = @current_user
-        end
-
-
         def set_default_version
           binding.pry
           @article.default_version = @article.article_versions.first

@@ -7,6 +7,7 @@ class Articles::ArticleVersion < ApplicationRecord
 
   belongs_to :article, class_name: "Articles::Article"
 
+  # WHY 2 attachments?
   has_many :attachments, as: :attachable, class_name: "Attachment"
 
   has_many :attachments, class_name: "Attachment", foreign_key: :article_version_id

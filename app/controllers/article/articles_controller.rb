@@ -1,7 +1,7 @@
 class Article::ArticlesController < ApplicationController
   include Folderable
 
-  before_action :set_article, only: %i[ show edit update destroy preview dynamic_view ]
+  before_action :set_article, only: %i[ show edit update destroy preview view ]
   before_action :set_target_folder, only: %i[ new create ]
 
   # GET /articles or /articles.json
@@ -21,6 +21,8 @@ class Article::ArticlesController < ApplicationController
       path = "article/articles/previews/small_line_preview"
     elsif params[:preview_type] == "algorithm_step_attachment_preview"
       path = "article/articles/previews/algorithm_step_attachment_preview"
+    elsif params[:preview_type] == "cheat_sheet_from_notes_link_attachment_preview"
+      path = "article/articles/previews/basic_preview"
     end
 
     binding.pry
@@ -32,7 +34,8 @@ class Article::ArticlesController < ApplicationController
     end
   end
 
-  def dynamic_view
+  # doc: dynamic view in the model
+  def view
     binding.pry
     @article_version = @article.default_version
     if params[:type] == "regular"
@@ -42,7 +45,7 @@ class Article::ArticlesController < ApplicationController
 
     respond_to do |format|
       format.json {
-        render json: { dynamic_view: render_to_string(partial: path,
+        render json: { view: render_to_string(partial: path,
                                               formats: [:html])}
       }
     end
@@ -70,10 +73,9 @@ class Article::ArticlesController < ApplicationController
 
       binding.pry
       if service.errors.blank?
-        format.html { redirect_to article_version_path(username: service.article.ownerable.ownername,
+        format.html { redirect_to article_version_path(ownername: service.article.ownerable.ownername,
                                                        id: service.article.default_version.slug),
                                   notice: "Article was successfully created." }
-        # format.html { redirect_to algorithm_algorithm_version_path(service.algorithm.default_version), notice: "Algorithm was successfully created." }
         format.json { render :show, status: :created, location: @article }
       else
         @article = service.article
@@ -103,7 +105,7 @@ class Article::ArticlesController < ApplicationController
     @article.destroy
 
     respond_to do |format|
-      format.html { redirect_to target_folder_path(username: @folder.user.username, id: @folder.id), notice: "Article was successfully destroyed." }
+      format.html { redirect_to target_folder_path(ownername: @folder.user.username, id: @folder.id), notice: "Article was successfully destroyed." }
       format.json { head :no_content }
     end
   end
@@ -119,7 +121,7 @@ class Article::ArticlesController < ApplicationController
     def article_params
       params.require(:articles_article).permit(:title, :default_version_id, :visibility_status, :source_page_description,
                                                :tag_list,
-                                               article_versions_attributes: [:title, :solves_the_problem, :content,
+                                               article_versions_attributes: [:id, :title, :solves_the_problem, :content,
                                                                              :sources, :additional_information,
                                                                              attachments_attributes: [:id, :attachable_id,
                                                                                                       :attachable_type, :_destroy]])

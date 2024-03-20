@@ -1,0 +1,62 @@
+<%= simple_form_for(@cheat_sheet, url: cheat_sheet_cheat_sheets_path) do |f| %>
+  <% if @cheat_sheet.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+      <h2><%= pluralize(@cheat_sheet.errors.count, "error") %> prohibited this improvement from being saved:</h2>
+
+      <ul>
+        <% @cheat_sheet.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-inputs">
+    <div class="col-span-6 sm:col-span-3">
+      <%= f.label "Title", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.hint 'Describe title of article', class: "mt-2 text-sm text-gray-500" %>
+      <%= f.input_field :title,
+        required: true,
+        class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
+        placeholder: "Ex: How to install Ruby on Rails on your Desktop" %>
+    </div>
+    <br>
+
+    <div class="col-span-6 sm:col-span-3">
+      <%= f.label "Source page description", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.hint 'Thats the description which will be shown on the top of the source page',
+        class: "mt-2 text-sm text-gray-500" %>
+      <%= f.input_field :source_page_description,
+        required: false,
+        class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
+        placeholder: "Ex: Different versions on how you can install Ruby on Rails on different environments" %>
+    </div>
+    <br>
+
+    <div class="col-span-6 sm:col-span-3" data-controller="tags">
+      <%= f.label "Tags", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.hint "It is recommended to use no more than 5 tags. The maximum number is 8. Tags are separated by a comma.",
+        class: "mt-2 text-sm text-gray-500" %>
+      <%= f.input_field :tag_list,
+        required: false,
+        class: "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5",
+        placeholder: "write some tags",
+        data: {target: "tags.output"}%>
+    </div>
+    <br>
+
+    <%= render "shared/form_partials/target_place" %>
+
+    <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Version fields</h2>
+    <%= render "cheat_sheet/shared/cheat_sheet_version_nested_form", :form => f %>
+  </div>
+  <br>
+
+  <div class="bg-gray-50 px-4 py-3 sm:px-6">
+    <div class="text-end">
+      <%= link_to "Back", back_to_place_path(@target_folder, @target_repository), class: "py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" %>
+      <%= f.button :submit, "Create Cheat Sheet", class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+    </div>
+  </div>
+
+<% end %>

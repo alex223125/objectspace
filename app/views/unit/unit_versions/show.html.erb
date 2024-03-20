@@ -1,17 +1,4 @@
-<!--<p style="color: green"><%#= notice %></p>-->
-
-<%#= render @unit %>
-
-<!--<div>-->
-<!--  <%#= link_to "Edit this unit", edit_unit_path(@unit) %> |-->
-<%#= link_to "Back to units", units_path %>
-
-<%#= button_to "Destroy this unit", @unit, method: :delete %>
-<!--</div>-->
-
-
-
-<div id="top">
+<div id="top" data-controller="unit_page" data-target="unit_page.pageArea">
   <div class="pt-8 pb-16 lg:pt-8 lg:pb-24 bg-white dark:bg-gray-900">
 
     <%= render "shared/tech_show_partials/tech_breadcrumbs" %>

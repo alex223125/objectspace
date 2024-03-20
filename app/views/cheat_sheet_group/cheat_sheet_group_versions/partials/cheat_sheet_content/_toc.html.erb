@@ -1,0 +1,32 @@
+<div class="cheat-sheet-group-toc" data-controller="toc_scrolling">
+  <br>
+  Sections table of content:
+  <ul role="list" a="" class="space-y-3 text-base list-none sm:text-lg md:mt-5 md:text-xl">
+
+    <% cheat_sheet_group_version.sections.each do |section| %>
+      <% binding.pry %>
+      <li>
+        <a class="hover:underline hover:text-blue-600 font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+           onclick="return false;"
+           href="#section-<%=section.sectionable.default_version.uuid%>"
+           data-action="click->toc_scrolling#scroll"
+           data-anchor="#section-<%=section.sectionable.default_version.uuid%>"
+        >
+          ↳ <%= section.sectionable.default_version.title %>
+        </a>
+      </li>
+    <% end %>
+
+    <li>
+      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#contribute">
+        ↳ Contribute
+      </a>
+    </li>
+
+    <li>
+      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#comments">
+        ↳ Comments
+      </a>
+    </li>
+  </ul>
+</div>

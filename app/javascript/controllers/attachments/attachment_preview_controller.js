@@ -1,7 +1,12 @@
-// doc: responsibility zone - load preview of article and other types of attachments on click during reading of algorithm
+// doc:
+// responsibility zone #1 - load preview of article and other types of attachments
+// on click during reading of algorithm
+// responsibility zone #2 - load preview of articles,units,algorithms (link_attachments) on CheatSheet page
 import { Controller } from '@hotwired/stimulus';
 
 const articleCase = "article"
+const unitCase = "unit"
+const algorithmCase = "algorithm"
 
 export default class extends Controller {
 
@@ -34,8 +39,8 @@ export default class extends Controller {
         let dataset = event.target.dataset
         this.setAttachmentData(dataset)
 
+        this.removePreviouslyLoadedAttachment()
         this.loadView()
-
     }
 
     retryLoad(){
@@ -51,6 +56,7 @@ export default class extends Controller {
     }
 
     loadView(){
+        this.toggleRetryCard("hide")
         var url = this.setLoadUrl()
 
         // 1.set load animation
@@ -62,7 +68,7 @@ export default class extends Controller {
             url: url,
             dataType: 'json',
             success: (data) => {
-                console.log("View loaded!")
+                console.log("attachment_preview_controller: View loaded!")
                 // console.log(data.preview)
                 // 3.disable load animation
                 this.toggleLoadingIndicator("hide")
@@ -70,7 +76,7 @@ export default class extends Controller {
                 // this.entriesTarget.insertAdjacentHTML('beforeend', data.entries)
             },
             error: (response) => {
-                console.log("View not loaded!")
+                console.log("attachment_preview_controller: View not loaded!")
                 console.log(response)
                 this.toggleLoadingIndicator("hide")
                 this.toggleRetryCard("show")
@@ -79,20 +85,32 @@ export default class extends Controller {
         })
     }
 
-    setLoadUrl(){
+    setLoadUrl() {
         // 4.2 stet variables for substep inputs field
         if (this.attachmentType == articleCase) {
             var params = 'type=regular'
-            var url = `/article/articles/${this.attachmentUuid}/dynamic_view?${params}`
+            var url = `/article/articles/${this.attachmentUuid}/view?${params}`
+        } else if (this.attachmentType == unitCase) {
+            var params = 'type=regular'
+            var url = `/unit/units/${this.attachmentUuid}/view?${params}`
+        } else if (this.attachmentType == algorithmCase) {
+            var params = 'type=regular'
+            var url = `/algorithm/algorithms/${this.attachmentUuid}/view?${params}`
         } else {
             console.log("Can not set load url, case not programmed")
         }
         return url;
     }
 
+    removePreviouslyLoadedAttachment() {
+        console.log("attachment_preview_controller: previously loaded attachment removed")
+        this.containerTarget.innerHTML = ""
+    }
+
     insertView(data){
-        this.containerTarget.innerHTML = "";
-        this.containerTarget.insertAdjacentHTML('beforeend', data.dynamic_view)
+        this.containerTarget.innerHTML = ""
+        this.containerTarget.insertAdjacentHTML('beforeend', data.view)
+        // this.containerTarget.focus()
     }
 
 

@@ -50,7 +50,7 @@ class Framework::FrameworksController < ApplicationController
     binding.pry
     respond_to do |format|
       if service.errors.blank?
-        format.html { redirect_to framework_path(username: service.framework.ownerable.ownername, id: service.framework.slug),
+        format.html { redirect_to framework_path(ownername: service.framework.ownerable.ownername, id: service.framework.slug),
                                   notice: "Framework was successfully created." }
         format.json { render :show, status: :created, location: service.framework }
       else
@@ -93,7 +93,7 @@ class Framework::FrameworksController < ApplicationController
       # a 301 redirect that uses the current friendly id.
       request_slug = params[:id]
       if request_slug != @framework.slug
-        return redirect_to framework_path(username: @framework.owner.ownername,
+        return redirect_to framework_path(ownername: @framework.owner.ownername,
                                              id: @framework.slug),
                            :status => :moved_permanently
       end

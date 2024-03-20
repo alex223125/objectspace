@@ -19,8 +19,8 @@ class Units::UnitVersion < ApplicationRecord
   # has_many :usage_examples, through: :unit_version_unit_usage_examples, class_name: "UnitUsageExample"
   # accepts_nested_attributes_for :usage_examples
 
-  has_many :unit_version_improvements, class_name: "UnitVersionImprovement"
-  has_many :improvement, through: :unit_version_improvements, class_name: "Improvement"
+  has_many :unit_version_improvements, class_name: "Improvements::UnitVersionImprovement"
+  has_many :improvements, through: :unit_version_improvements, class_name: "Improvements::Improvement"
 
   # unit can not have substeps
   # has_many :substeps, as: :substepable, class_name: "Algorithms::Substep"
@@ -32,6 +32,10 @@ class Units::UnitVersion < ApplicationRecord
   has_many :comments, :as => :commentable, :dependent => :destroy, class_name: "Comment"
 
   alias_method :whole_unit, :unit
+
+  def uniq_key
+    class_key + self.uuid
+  end
 
   def class_key
     "unit_version"

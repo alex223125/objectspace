@@ -119,7 +119,7 @@ class SimpleClass::SimpleClassesController < ApplicationController
     binding.pry
     respond_to do |format|
       if service.errors.blank?
-        format.html { redirect_to simple_class_path(username: service.simple_class.owner.ownername,
+        format.html { redirect_to simple_class_path(ownername: service.simple_class.owner.ownername,
                                                          id: service.simple_class.slug),
                                   notice: "Class was successfully created." }
         format.json { render :show, status: :created, location: service.simple_class }
@@ -139,7 +139,7 @@ class SimpleClass::SimpleClassesController < ApplicationController
     respond_to do |format|
       if service.errors.blank?
         binding.pry
-        format.html { redirect_to simple_class_path(username: service.simple_class.owner.ownername, id: service.simple_class.slug),
+        format.html { redirect_to simple_class_path(ownername: service.simple_class.owner.ownername, id: service.simple_class.slug),
                                   notice: "Simple class was successfully updated." }
         format.json { render :show, status: :ok, location: @simple_class }
       else
@@ -170,7 +170,7 @@ class SimpleClass::SimpleClassesController < ApplicationController
       # a 301 redirect that uses the current friendly id.
       request_slug = params[:id]
       if request_slug != @simple_class.slug
-        return redirect_to simple_class_path(username: @simple_class.owner.ownername,
+        return redirect_to simple_class_path(ownername: @simple_class.owner.ownername,
                                              id: @simple_class.slug),
                            :status => :moved_permanently
       end

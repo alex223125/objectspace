@@ -1,9 +1,12 @@
+<% scenario = scenario || nil %>
+
+
 <p style="color: green"><%= notice %></p>
 <h1 class="text-2xl text-center mt-5 mb-4">Algorithms search form</h1>
 
 <div data-controller="search_instructions" data-target="remote_select_instruction.searchInstructionsInstance">
   <div class="flex justify-center">
-    <%= render "shared/technologies_search/shared/search_form", type: "algorithms" %>
+    <%= render partial: "shared/technologies_search/shared/search_form", locals: { type: "algorithms", scenario: scenario } %>
   </div>
 
 

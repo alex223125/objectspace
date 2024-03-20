@@ -100,7 +100,7 @@ gem "actionpack-page_caching"
 gem 'image_processing', '~> 1.2'
 gem 'active_model_serializers', '~> 0.10.0'
 gem 'sass-rails'
-
+gem 'uuid', '~> 2.3', '>= 2.3.9'
 
 
 

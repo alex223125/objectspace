@@ -1,16 +1,26 @@
-<%= simple_form_for(@comment, url: comments_path(commentable_id: @commentable.id, commentable_type: @commentable.model_name.to_s),
-  html: { method: :post }) do |f| %>
+<% commentable = commentable || @commentable %>
+<% comment = Comment.new %>
+<div class="mb-6">
+  <%= simple_form_for(comment,
+    url: comments_path(commentable_id: commentable.id, commentable_type: commentable.model_name.to_s),
+    html: { method: :post },
+    class: "py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700") do |f| %>
 
-  <%= f.hidden_field :parent_id %>
-  <%= f.hidden_field :user_id, value: current_user.id %>
-  <p>
-    <%= f.label :content, "New comment" %>
-    <br/>
-    <%= f.text_area :content, :rows => 4 %>
-  </p>
-  <p>
-    <%= f.submit "Post Comment" %>
-  </p>
-<% end %>
+    <%= f.hidden_field :parent_id %>
+    <%= f.hidden_field :user_id, value: current_user.id %>
 
+    <%= f.hidden_field :commentable_id, value: commentable.id %>
+    <%= f.hidden_field :commentable_type, value: commentable.model_name.to_s %>
+    <p>
+      <%= f.label :content, "Your comment", class: "sr-only" %>
+      <br/>
+      <%= f.text_area :content, :rows => 8,
+        class: "px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 dark:text-white dark:placeholder-gray-400 dark:bg-gray-800",
+        placeholder: "Write a comment..."%>
+    </p>
+    <p>
+      <%= f.submit "Post Comment", class: "inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-primary-700 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800" %>
+    </p>
+  <% end %>
+</div>
 

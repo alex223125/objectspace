@@ -36,6 +36,7 @@ class Frameworks::Framework < ApplicationRecord
     self.ownerable
   end
 
+  # doc: mapping for searchkick
   def search_data
     {
       title: title,

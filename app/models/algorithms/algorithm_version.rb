@@ -4,7 +4,6 @@ class Algorithms::AlgorithmVersion < ApplicationRecord
   extend FriendlyId
   friendly_id :slug_candidates, use: [:slugged, :finders, :history]
 
-
   belongs_to :algorithm
 
   # has_many :control_structures, class_name: "Algorithms::ControlStructure"
@@ -30,24 +29,15 @@ class Algorithms::AlgorithmVersion < ApplicationRecord
 
   validates :title, presence: true
 
-  include PgSearch::Model
-  pg_search_scope :english_global_search,
-                  against: {
-                    title: 'A',
-                    solves_the_problem: 'B',
-                    sources: 'C',
-                    additional_information: 'D'
-                  },
-                  using: {
-                    tsearch: {
-                      dictionary: 'english',
-                      tsvector_column: 'searchable',
-                      any_word: true,
-                      prefix: true
-                    }
-                  }
-
   alias_method :whole_unit, :algorithm
+
+  def class_key
+    "algorithm_version"
+  end
+
+  def uniq_key
+    class_key + self.uuid
+  end
 
   private
 

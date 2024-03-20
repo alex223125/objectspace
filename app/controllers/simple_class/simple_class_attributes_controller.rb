@@ -36,7 +36,7 @@ class SimpleClass::SimpleClassAttributesController < ApplicationController
     binding.pry
     respond_to do |format|
       if @simple_class_attribute.save
-        format.html { redirect_to simple_class_path(username: @simple_class_attribute.simple_class.owner.username,
+        format.html { redirect_to simple_class_path(ownername: @simple_class_attribute.simple_class.owner.username,
                                                     id: @simple_class_attribute.simple_class.id),
                                   notice: "Attribute was successfully created." }
         format.json { render :show, status: :created, location: @simple_class_attribute }

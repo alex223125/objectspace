@@ -3,18 +3,43 @@ module ApplicationHelper
 
   def technology_item_link_to(item, html_options = {}, &block)
     if item.class == Articles::Article
-      path = article_version_path(username: item.ownerable.ownername, id: item.default_version.slug)
+      path = article_version_path(ownername: item.ownerable.ownername, id: item.default_version.slug)
     elsif item.class == Units::Unit
-      path = unit_version_path(username: item.ownerable.ownername, id: item.default_version.slug)
+      path = unit_version_path(ownername: item.ownerable.ownername, id: item.default_version.slug)
     elsif item.class == Algorithms::Algorithm
-      path = algorithm_version_path(username: item.ownerable.ownername, id: item.default_version.slug)
+      path = algorithm_version_path(ownername: item.ownerable.ownername, id: item.default_version.slug)
+    elsif item.class == CheatSheets::CheatSheet
+      path = cheat_sheet_version_path(ownername: item.ownerable.ownername, id: item.default_version.slug)
+    elsif item.class == CheatSheetGroups::CheatSheetGroup
+      path = cheat_sheet_group_version_path(ownername: item.ownerable.ownername, id: item.default_version.slug)
     elsif item.class == SimpleClasses::SimpleClass
-      path = simple_class_path(username: item.ownerable.ownername, id: item.slug)
+      path = simple_class_path(ownername: item.ownerable.ownername, id: item.slug)
     elsif item.class == Frameworks::Framework
-      path = framework_path(username: item.ownerable.ownername, id: item.slug)
+      path = framework_path(ownername: item.ownerable.ownername, id: item.slug)
     end
 
     result = link_to(path, html_options, &block)
+    result
+  end
+
+  def technology_item_path_to(item)
+    if item.class == Articles::Article
+      path = article_version_path(ownername: item.ownerable.ownername, id: item.default_version.slug)
+    elsif item.class == Units::Unit
+      path = unit_version_path(ownername: item.ownerable.ownername, id: item.default_version.slug)
+    elsif item.class == Algorithms::Algorithm
+      path = algorithm_version_path(ownername: item.ownerable.ownername, id: item.default_version.slug)
+    elsif item.class == CheatSheets::CheatSheet
+      path = cheat_sheet_version_path(ownername: item.ownerable.ownername, id: item.default_version.slug)
+    elsif item.class == CheatSheetGroups::CheatSheetGroup
+      path = cheat_sheet_group_version_path(ownername: item.ownerable.ownername, id: item.default_version.slug)
+    elsif item.class == SimpleClasses::SimpleClass
+      path = simple_class_path(ownername: item.ownerable.ownername, id: item.slug)
+    elsif item.class == Frameworks::Framework
+      path = framework_path(ownername: item.ownerable.ownername, id: item.slug)
+    end
+
+    result = path
     result
   end
 
@@ -62,4 +87,14 @@ module ApplicationHelper
     end
   end
 
+  # DOC: back to place from which we started creation of tech
+  def back_to_place_path(target_folder, target_repository)
+    if target_folder.present?
+      current_place_owner = target_folder.root.repository.ownerable
+      target_folder_path(ownername: current_place_owner.ownername, id: target_folder.id)
+    elsif target_repository.present?
+      current_place_owner = target_repository.ownerable
+      target_repository_path(ownername: current_place_owner.ownername, id: target_repository.slug)
+    end
+  end
 end

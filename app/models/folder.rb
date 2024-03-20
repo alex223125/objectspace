@@ -9,6 +9,8 @@ class Folder < ApplicationRecord
   # belongs_to :simple_object, class_name: "SimpleObjects::SimpleObject"
 
   # belongs_to :user
+  belongs_to :ownerable, polymorphic: true
+
   # TODO: check that it has parent or repository, not both, not nothing
   belongs_to :repository, optional: true
 
@@ -22,6 +24,7 @@ class Folder < ApplicationRecord
   accepts_nested_attributes_for :articles
   has_many :units, class_name: "Units::Unit", dependent: :destroy
   has_many :algorithms, class_name: "Algorithms::Algorithm", dependent: :destroy
+  has_many :cheat_sheets, class_name: "CheatSheets::CheatSheet", dependent: :destroy
   has_many :simple_classes, class_name: "SimpleClasses::SimpleClass", dependent: :destroy
   has_many :frameworks, class_name: "Frameworks::Framework", dependent: :destroy
 

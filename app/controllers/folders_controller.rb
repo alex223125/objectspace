@@ -8,7 +8,7 @@ class FoldersController < ApplicationController
 
   # GET /folders/1 or /folders/1.json
   def show
-    @folder_owner = User.where(username: params[:username]).first
+    @folder_owner = User.where(username: params[:ownername]).first
     # @target_folder = @folder_owner.folders.friendly.find(params[:id])
     binding.pry
     @target = @folder
@@ -17,13 +17,14 @@ class FoldersController < ApplicationController
     folders_tree = @folder.self_and_ancestors.reverse
     repository = @folder.root.repository
 
+
     # breadcrumbs
     add_breadcrumb @folder_owner.ownername, dashboard_path(username: @folder_owner.ownername),
                    {link_type: "profile_page"}
-    add_breadcrumb repository.name, target_repository_path(username: @folder_owner.ownername, id: repository.slug),
+    add_breadcrumb repository.name, target_repository_path(ownername: @folder_owner.ownername, id: repository.slug),
                    {link_type: "repository_page"}
     folders_tree.each do |folder|
-      add_breadcrumb folder.title, target_folder_path(username: @folder_owner.ownername, id: folder.slug),
+      add_breadcrumb folder.title, target_folder_path(ownername: @folder_owner.ownername, id: folder.slug),
                      {link_type: "folder_page"}
     end
   end
@@ -56,17 +57,20 @@ class FoldersController < ApplicationController
       target_type = "folder"
     end
 
-    service = Services::Folders::Create.new(folder_params, current_user, target, target_type)
+    owner = current_user
+
+    binding.pry
+    service = Services::Folders::Create.new(folder_params, owner, target, target_type)
 
     binding.pry
     service.call
 
     if service.folder.parent.present?
       parent_folder = service.folder.parent
-      path = target_folder_path(username: current_user.username, id: parent_folder.slug)
+      path = target_folder_path(ownername: current_user.username, id: parent_folder.slug)
     else
       repository = service.folder.repository
-      path = target_repository_path(username: current_user.username, id: repository.slug)
+      path = target_repository_path(ownername: current_user.username, id: repository.slug)
     end
 
     binding.pry
@@ -77,6 +81,7 @@ class FoldersController < ApplicationController
         format.json { render :show, status: :created, location: service.folder }
       else
         @target = service.target
+        @folder = service.folder
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: service.folder.errors, status: :unprocessable_entity }
       end
@@ -87,7 +92,7 @@ class FoldersController < ApplicationController
   def update
     respond_to do |format|
       if @folder.update(folder_params)
-        format.html { redirect_to target_folder_path(username: @folder.root.repository.user.username, id: @folder.slug),
+        format.html { redirect_to target_folder_path(ownername: @folder.root.repository.ownerable.ownername, id: @folder.slug),
                                   notice: "Folder was successfully updated." }
         format.json { render :show, status: :ok, location: @folder }
       else
@@ -117,7 +122,7 @@ class FoldersController < ApplicationController
       # a 301 redirect that uses the current friendly id.
       request_slug = params[:id]
       if request_slug != @folder.slug
-        return redirect_to target_folder_path(username: @folder.user.username,
+        return redirect_to target_folder_path(ownername: @folder.ownerable.ownername,
                                              id: @folder.slug),
                            :status => :moved_permanently
       end

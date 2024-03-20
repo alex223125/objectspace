@@ -1,33 +1,18 @@
 class ImprovementsController < ApplicationController
+  include TechBreadcrumbable
+  include Commentable
+
   before_action :set_improvement, only: %i[ show edit update destroy ]
 
-  # # GET /improvements or /improvements.json
-  # def index
-  #   @improvements = Improvement.all
-  # end
-
   def index
+    binding.pry
+    form = Forms::Improvements::TechnologyRelatedImprovementsSearchFrom.new(search_params)
 
     binding.pry
-    @improvements = Improvement.all
+    form.submit
 
     binding.pry
-    if params[:unit_version_id].present?
-      binding.pry
-      @unit_version = Units::UnitVersion.find_by_id(params[:unit_version_id])
-      @improvements = @unit_version.unit.improvements
-    end
-
-    binding.pry
-    if params[:query].present?
-      @improvements.global_search(params[:query])
-    end
-
-
-    # Improvement.global_search("a")
-
-    binding.pry
-    @pagy, @improvements = pagy(@improvements, page: params[:page], items: 3 )
+    @pagy, @improvements = pagy(form.improvements, page: form.page, items: form.items_per_page )
 
     binding.pry
     respond_to do |format|
@@ -42,31 +27,32 @@ class ImprovementsController < ApplicationController
 
   # GET /improvements/1 or /improvements/1.json
   def show
-
+    technology_breadcrumbs(@improvement.unit)
     # breadcrumbs
-    add_breadcrumb "Unit", unit_unit_version_path(@improvement.unit.default_version)
-    add_breadcrumb "Improvements", unit_unit_version_path(@improvement.unit.default_version)
-    add_breadcrumb "Improvement", improvement_path(@improvement)
+    # add_breadcrumb @improvement.unit.title, unit_unit_version_path(@improvement.unit.default_version)
+    add_breadcrumb "Improvements", unit_version_path(ownername: @improvement.unit.ownerable.ownername,
+                                                     id: @improvement.unit.default_version.slug,
+                                                     target_tab: "improvements")
+    add_breadcrumb @improvement.title, improvement_path(@improvement)
   end
 
   # GET /improvements/new
   def new
     binding.pry
-    if params[:unit_id].present?
-      binding.pry
-      set_unit
-    end
-    @improvement = Improvement.new
+    set_unit
+    @improvement = Improvements::Improvement.new
   end
 
   # GET /improvements/1/edit
   def edit
+    @unit = @improvement.unit
   end
 
   # POST /improvements or /improvements.json
   def create
     binding.pry
-    @improvement = Improvement.new(improvement_params)
+    # rebuild_technology_params
+    @improvement = Improvements::Improvement.new(improvement_params)
 
     binding.pry
     respond_to do |format|
@@ -109,18 +95,31 @@ class ImprovementsController < ApplicationController
 
   private
 
+    def search_params
+      params.require(:improvements_search).permit(:tech_id, :tech_type, :page, :query, :status, :sort_by, :tech_version)
+    end
+
     def set_unit
-      @unit = Units::Unit.find_by(id: params[:unit_id])
+      binding.pry
+      @unit = Units::Unit.find_by(uuid: params[:unit_id])
     end
 
     # Use callbacks to share common setup or constraints between actions.
     def set_improvement
-      @improvement = Improvement.find(params[:id])
+      @improvement = Improvements::Improvement.find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.
     def improvement_params
-      params.require(:improvement).permit(:title, :content, :sources, :unit_id,
-                                          unit_versions: [:id])
+      params.require(:improvements_improvement).permit(:title, :content, :sources, :unit_id,
+        unit_version_improvements_attributes: [:unit_version_id])
     end
+
+    # def rebuild_technology_params
+    #   if params[:improvements_improvement][:unit_version_improvement].present?
+    #     technologies_ids = []
+    #     params[:improvements_improvement][:unit_version_improvement].map{ |id| technologies_ids << {id: id} }
+    #     params[:improvements_improvement][:unit_version_improvement] = technologies_ids
+    #   end
+    # end
 end

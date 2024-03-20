@@ -45,6 +45,7 @@ export default class extends Controller {
         // this.username = window.location.href.split('/')[3]
     }
 
+    // TODO: add message retry for folder items when search controller have error
     initialLoad() {
         console.log("initialLoad triggered")
         // let url = `/${this.username}/folder/${this.initialFolderId}`

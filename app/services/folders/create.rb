@@ -4,9 +4,10 @@ module Services
 
       attr_reader :errors, :folder, :target
 
-      def initialize(params, current_user, target, target_type)
+      def initialize(params, owner, target, target_type)
+        binding.pry
         @params = params
-        @current_user = current_user
+        @owner = owner
         @target = target
         @target_type = target_type
       end
@@ -19,7 +20,7 @@ module Services
           binding.pry
           create_folder
 
-          link_current_user_with_all_subfolders
+          link_owner_with_all_subfolders
 
           binding.pry
           @folder.save!
@@ -50,18 +51,19 @@ module Services
         end
       end
 
-      def link_current_user_with_all_subfolders
+      def link_owner_with_all_subfolders
         binding.pry
-        return unless @target_type == "folder"
-        # why: folder.root.folder.user_id not faster the folder.user_id
-        @folder.user_id = @current_user.id
+        return if @target_type == "repository"
+        # why: folder.root.folder.ownerable not faster then folder.ownerable
+        @folder.ownerable = @owner
         @folder.subfolders.each do |subfolder|
           recursively_link_object_with_(subfolder)
         end
       end
 
       def recursively_link_object_with_(subfolder)
-        subfolder.user_id = @current_user.id
+        subfolder.ownerable = @owner
+
         if subfolder.subfolders.any?
           subfolder.subfolders.each do |next_subfolder|
             recursively_link_object_with_(next_subfolder)

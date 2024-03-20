@@ -1,0 +1,12 @@
+<div class='items-center justify-center'>
+
+  <% binding.pry %>
+  <% if @cheat_sheets.present? %>
+    <% @cheat_sheets.each do |cheat_sheet| %>
+      <%= render partial: "shared/technologies_search/cheat_sheets/single_preview", locals: {cheat_sheet: cheat_sheet, scenario: scenario} %>
+    <% end %>
+  <% else %>
+    Nothing was found
+  <% end %>
+</div>
+<br>

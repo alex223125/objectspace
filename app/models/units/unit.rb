@@ -24,35 +24,13 @@ class Units::Unit < ApplicationRecord
   has_many :usage_examples, through: :unit_version_usage_examples, class_name: "UsageExamples::UsageExample"
 
   # accepts_nested_attributes_for :usage_examples, allow_destroy: true
-
-  has_many :improvements
+  has_many :improvements, through: :unit_versions, class_name: "Improvements::Improvement"
 
   has_many :interface_members, as: :memberable, class_name: "SimpleClasses::InterfaceMember"
 
-
-
+  has_many :link_attachments, as: :linkable, class_name: "CheatSheets::LinkAttachment"
 
   validates :title, presence: true, allow_blank: false
-
-
-  # has_many :substeps, class_name: "Algorithms::Substep"
-
-
-  # include PgSearch::Model
-  # pg_search_scope :english_unit_search,
-  #                 against: {
-  #                   title: 'A',
-  #                   source_page_description: 'B'
-  #                 },
-  #                 using: {
-  #                   tsearch: {
-  #                     dictionary: 'english',
-  #                     tsvector_column: 'searchable',
-  #                     any_word: true,
-  #                     prefix: true
-  #                   }
-  #                 }
-
 
 
   def default_version
@@ -69,6 +47,7 @@ class Units::Unit < ApplicationRecord
 
   private
 
+  # doc: mapping for searchkick
   def search_data
     {
       title: title,
@@ -79,5 +58,4 @@ class Units::Unit < ApplicationRecord
       repository_id: repository_id
     }
   end
-
 end

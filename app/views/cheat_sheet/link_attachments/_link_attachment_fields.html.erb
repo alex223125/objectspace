@@ -1,0 +1,21 @@
+<div class="nested-fields nested-fields-link-attachment">
+  <%= f.hidden_field :linkable_type, class: "linkable-type-hidden-field" %>
+  <%= f.hidden_field :linkable_id, class: "linkable-id-hidden-field" %>
+
+  <%= f.hidden_field :_destroy %>
+
+  <!--  doc: filled dynamically using stimulus controller-->
+  <div class="link-attachment-preview">
+    <!--        content of attachment-->
+  </div>
+
+  <%= link_to_remove_association "Delete",
+    f,
+    style: "display:none;",
+    class: "remove-nested-from-button",
+    data: {target: "attachments_nested_form.removeArticleAttachmentOriginalButton"}
+  %>
+</div>
+
+
+

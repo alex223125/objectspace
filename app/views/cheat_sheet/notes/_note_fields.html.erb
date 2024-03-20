@@ -1,0 +1,35 @@
+<div class="nested-fields nested-fields-attachment">
+  <div class="col-span-6 sm:col-span-3" data-controller="unit_instruction_tinymce">
+    <%= f.label "Title", class: "block text-sm font-medium text-gray-700" %>
+    <%= f.hint 'Describe purpose of this note.', class: "mt-2 text-sm text-gray-500" %>
+    <%= f.input_field :title, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+    <%#= form.label :title %>
+    <%#= form.text_field :title, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
+  </div>
+  <br>
+
+  <div class="col-span-6 sm:col-span-3" data-controller="unit_instruction_tinymce">
+    <%= f.label "Content", class: "block text-sm font-medium text-gray-700" %>
+    <%= f.hint 'Place for descripton, hints, methods and over usable information about note', class: "mt-2 text-sm text-gray-500" %>
+    <%= f.input_field :content, data: { target: 'unit_instruction_tinymce.field' } %>
+  </div>
+
+  <%= f.hidden_field :_destroy %>
+
+  <br>
+  <%= render "cheat_sheet/link_attachments/link_attachments_nested_form", :f => f %>
+
+  <br>
+  <div class="bg-zinc-50 px-4 py-3 sm:px-6">
+    <div class="text-end">
+      <%= link_to_remove_association "Delete",
+        f,
+        class: "focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4
+                                               focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600
+                                               dark:hover:bg-red-700 dark:focus:ring-red-900"
+      %>
+    </div>
+  </div>
+
+  <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700">
+</div>

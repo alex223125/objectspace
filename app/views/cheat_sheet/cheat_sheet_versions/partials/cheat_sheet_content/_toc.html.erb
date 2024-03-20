@@ -1,0 +1,44 @@
+<div class="cheat-sheet-toc" data-controller="toc_scrolling">
+  <br>
+  Table of content:
+  <ul role="list" a="" class="space-y-3 text-base list-none sm:text-lg md:mt-5 md:text-xl">
+
+    <% cheat_sheet_version.notes.each do |note| %>
+      <li>
+        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#note-<%=note.title%>">
+          ↳ <%= note.title %>
+        </a>
+      </li>
+    <% end %>
+
+
+
+    <%# if article_version.sources.present? %>
+<!--      <li>-->
+<!--        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#sources">-->
+<!--          ↳ Sources-->
+<!--        </a>-->
+<!--      </li>-->
+    <%# end %>
+
+    <%# if article_version.additional_information.present? %>
+<!--      <li>-->
+<!--        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#additional-information">-->
+<!--          ↳ Additional information-->
+<!--        </a>-->
+<!--      </li>-->
+    <%# end %>
+
+    <li>
+      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#contribute">
+        ↳ Contribute
+      </a>
+    </li>
+
+    <li>
+      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#comments">
+        ↳ Comments
+      </a>
+    </li>
+  </ul>
+</div>

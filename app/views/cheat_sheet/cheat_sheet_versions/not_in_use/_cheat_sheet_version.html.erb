@@ -1,0 +1,17 @@
+<div id="<%= dom_id cheat_sheet_version %>">
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Title:</strong>
+    <%= cheat_sheet_version.title %>
+  </p>
+
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Description:</strong>
+    <%= cheat_sheet_version.description %>
+  </p>
+
+  <% if action_name != "show" %>
+    <%= link_to "Show this cheat sheet version", cheat_sheet_version, class: "rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+    <%= link_to 'Edit this cheat sheet version', edit_cheat_sheet_version_path(cheat_sheet_version), class: "rounded-lg py-3 ml-2 px-5 bg-gray-100 inline-block font-medium" %>
+    <hr class="mt-6">
+  <% end %>
+</div>

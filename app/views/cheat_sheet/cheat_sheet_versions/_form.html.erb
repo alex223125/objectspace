@@ -1,0 +1,67 @@
+<%#= form_with(model: cheat_sheet_version, class: "contents") do |form| %>
+  <%# if cheat_sheet_version.errors.any? %>
+<!--    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">-->
+<!--      <h2><%#= pluralize(cheat_sheet_version.errors.count, "error") %> prohibited this cheat_sheet_version from being saved:</h2>-->
+
+<!--      <ul>-->
+        <%# cheat_sheet_version.errors.each do |error| %>
+<!--          <li><%#= error.full_message %></li>-->
+        <%# end %>
+<!--      </ul>-->
+<!--    </div>-->
+  <%# end %>
+
+<!--  <div class="my-5">-->
+    <%#= form.label :title %>
+    <%#= form.text_field :title, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
+<!--  </div>-->
+
+<!--  <div class="my-5">-->
+    <%#= form.label :description %>
+    <%#= form.text_area :description, rows: 4, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
+<!--  </div>-->
+
+<!--  <div class="inline">-->
+    <%#= form.submit class: "rounded-lg py-3 px-5 bg-blue-600 text-white inline-block font-medium cursor-pointer" %>
+<!--  </div>-->
+<%# end %>
+
+<% path = @cheat_sheet_version.new_record? ? cheat_sheet_cheat_sheet_versions_path : cheat_sheet_cheat_sheet_version_path %>
+<% method = @cheat_sheet_version.new_record? ? :post : :patch %>
+<%= simple_form_for(@cheat_sheet_version, url: path, method: method) do |f| %>
+
+  <% if @cheat_sheet_version.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+      <h2><%= pluralize(@cheat_sheet_version.errors.count, "error") %> prohibited this improvement from being saved:</h2>
+
+      <ul>
+        <% @cheat_sheet_version.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+
+<!--  <br>-->
+  <%#= render "article_preview", article: @article %>
+<!--  <br>-->
+
+  <div class="form-inputs">
+    <%= render "cheat_sheet/shared/cheat_sheet_version_fields", :f => f %>
+  </div>
+  <br>
+
+  <%#= f.hidden_field :article_id, value: @article.id %>
+
+
+
+  <div class="bg-gray-50 px-4 py-3 sm:px-6">
+    <div class="text-end">
+      <%= link_to "Back to dashboard", cheat_sheet_cheat_sheets_path, class: "py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" %>
+      <% button_text = @cheat_sheet_version.new_record? ? "Create Cheat Sheet" : "Submit changes" %>
+      <%= f.button :submit, button_text, class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+    </div>
+  </div>
+<% end %>
+

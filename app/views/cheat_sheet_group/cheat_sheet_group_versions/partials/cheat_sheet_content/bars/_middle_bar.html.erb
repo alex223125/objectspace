@@ -1,0 +1,85 @@
+<div class="max-w-6xl p-4 rounded-lg bg-gray-50 dark:bg-gray-800" data-controller="content_area" data-target="content_area.area">
+  <!--center -->
+  <div class="flex justify-between px-4 mx-auto max-w-screen-xl">
+    <div class="w-full format-sm sm:format-base lg:format-lg format-blue dark:format-invert">
+      <div class="mb-4 lg:mb-6 not-format p-3">
+        <h1 class="break-words mb-4 text-3xl font-extrabold leading-tight text-gray-900 lg:mb-6 lg:text-4xl dark:text-white">
+          <%= cheat_sheet_group_version.title %>
+        </h1>
+
+        <!-- submenu -->
+        <div class="mt-1 flex flex-col space-x-4 sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+          <div class="mt-2 flex items-center text-sm">
+            <%= render "cheat_sheet_group/cheat_sheet_group_versions/partials/cheat_sheet_content/submenu/version_select_bar", cheat_sheet_group_version: cheat_sheet_group_version %>
+          </div>
+
+          <div class="mt-2 flex items-center text-sm">
+            <%= render "cheat_sheet_group/cheat_sheet_group_versions/partials/cheat_sheet_content/submenu/copy_to_clipboard", cheat_sheet_group_version: cheat_sheet_group_version %>
+          </div>
+
+          <div class="mt-2 flex items-center text-sm text-gray-500">
+            <%= render "cheat_sheet_group/cheat_sheet_group_versions/partials/cheat_sheet_content/submenu/options_dropdown", cheat_sheet_group_version: cheat_sheet_group_version %>
+          </div>
+        </div>
+
+        <!--      TOC-->
+        <%= render "cheat_sheet_group/cheat_sheet_group_versions/partials/cheat_sheet_content/toc", cheat_sheet_group_version: cheat_sheet_group_version %>
+        <br>
+
+      </div>
+
+      <div class="content-section bg-gradient-to-bl from-blue-50 to-violet-50 p-4 rounded-lg">
+          <%= cheat_sheet_group_version.description.html_safe %>
+      </div>
+
+      <div class="sections">
+        <% cheat_sheet_group_version.sections.each do |section| %>
+          <% if section.sectionable.class == CheatSheetGroups::CheatSheetGroup %>
+            <% binding.pry %>
+            <%= render "cheat_sheet_group/cheat_sheet_group_versions/partials/cheat_sheet_content/parts/cheat_sheet_group",
+              cheat_sheet_group_version: section.sectionable.default_version %>
+          <% elsif section.sectionable.class == CheatSheets::CheatSheet %>
+            <% binding.pry %>
+            <%= render "cheat_sheet_group/cheat_sheet_group_versions/partials/cheat_sheet_content/parts/cheat_sheet",
+              cheat_sheet_version: section.sectionable.default_version %>
+          <% end %>
+        <% end %>
+      </div>
+
+
+
+
+
+      <!--      <div class="content-section" id="content">-->
+      <!--        # Instruction:-->
+      <%#= cheat_sheet_version.content.html_safe %>
+      <!--      </div>-->
+      <!--      <br>-->
+
+      <%# if article_version.sources.present? %>
+      <!--        <div class="sources-section" id="sources">-->
+      <!--          # Sources:-->
+      <%#= article_version.sources.html_safe %>
+      <!--        </div>-->
+      <!--        <br>-->
+      <%# end %>
+
+      <%# if article_version.additional_information.present? %>
+      <!--        <div class="additional-information-section" id="additional-information">-->
+      <!--          # Additional information:-->
+      <%#= article_version.additional_information.html_safe %>
+      <!--        </div>-->
+      <!--        <br>-->
+      <%# end %>
+
+
+
+      <!--      TODO: ADD IT -->
+      <%#= render "article/article_versions/partials/article_content/contribute" %>
+      <!--      <br>-->
+
+      <%#= render "article/article_versions/partials/article_content/comments" %>
+
+    </div>
+  </div>
+</div>

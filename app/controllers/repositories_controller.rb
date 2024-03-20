@@ -8,7 +8,8 @@ class RepositoriesController < ApplicationController
 
   # GET /repositories/1 or /repositories/1.json
   def show
-    @repository_owner = User.where(username: params[:username]).first
+    # TODO: not only User but also Organization
+    @repository_owner = User.where(username: params[:ownername]).first
     @target = @repository_owner.repositories.friendly.find(params[:id])
 
     # breadcrumbs
@@ -17,7 +18,7 @@ class RepositoriesController < ApplicationController
                    dashboard_path(username: @repository_owner.ownername),
                    {link_type: "profile_page"}
     add_breadcrumb @target.name,
-                   target_repository_path(username: @repository_owner.ownername, id: @target.slug),
+                   target_repository_path(ownername: @repository_owner.ownername, id: @target.slug),
                    {link_type: "repository_page"}
   end
 
@@ -40,7 +41,7 @@ class RepositoriesController < ApplicationController
       if @repository.errors.blank?
 
         binding.pry
-        format.html { redirect_to target_repository_path(username: current_user.username, id: @repository),
+        format.html { redirect_to target_repository_path(ownername: current_user.username, id: @repository),
                                   notice: "Repository was successfully created." }
         format.json { render :show, status: :created, location: @repository }
       else
@@ -58,7 +59,7 @@ class RepositoriesController < ApplicationController
     respond_to do |format|
       binding.pry
       if @repository.errors.blank?
-        format.html { redirect_to target_repository_path(username: current_user.username, id: @repository),
+        format.html { redirect_to target_repository_path(ownername: current_user.username, id: @repository),
                                   notice: "Repository was successfully updated." }
         format.json { render :show, status: :ok, location: @repository }
       else
@@ -87,7 +88,7 @@ class RepositoriesController < ApplicationController
       # a 301 redirect that uses the current friendly id.
       request_slug = params[:id]
       if request_slug != @repository.slug
-        return redirect_to repository_path(username: @repository.user.username,
+        return redirect_to repository_path(ownername: @repository.user.username,
                                               id: @repository.slug),
                            :status => :moved_permanently
       end

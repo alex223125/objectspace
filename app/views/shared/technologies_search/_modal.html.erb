@@ -4,7 +4,7 @@
 <div class="select-technology-modal">
   <div data-controller="select_instruction_modal"
        data-select_instruction_modal-allow-background-close="false"
-       data-target="remote_select_instruction.instructionModalInstance remote_select_attachment.instructionModalInstance">
+       data-target="remote_select_instruction.instructionModalInstance remote_select_attachment.instructionModalInstance remote_select_link_attachment.instructionModalInstance remote_select_cheat_sheet_group_section.instructionModalInstance">
     <!--      <a href="#" data-action="click->modal#open" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded">-->
     <!--        <span>Open Modal</span>-->
     <!--      </a>-->
@@ -52,6 +52,10 @@
                          type == "unit_version_attachment_addition" ||
                          type == "article_version_attachment_addition" %>
                   Add Attachment
+                <% elsif type == "cheat_sheet_version_notes_link_attachment_addition" %>
+                  Add Link
+                <% elsif type == "cheat_sheet_group_version_section_addition" %>
+                  Add Section
                 <% end %>
               </span>
       </button>
@@ -96,6 +100,10 @@
                          type == "article_version_attachment_addition"
                 %>
                   Select Article
+                <% elsif type == "cheat_sheet_version_notes_link_attachment_addition" %>
+                  Select technology
+                <% elsif type == "cheat_sheet_group_version_section_addition" %>
+                  Select Cheat Sheet
                 <% end %>
               </h3>
               <button type="button" data-action="click->select_instruction_modal#close" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
@@ -131,6 +139,10 @@
                   In this popup you can select Article to add it as attachment to current Method
                 <% elsif type == "article_version_attachment_addition"%>
                   In this popup you can select Article to add it as attachment to current Article
+                <% elsif type == "cheat_sheet_version_notes_link_attachment_addition" %>
+                  In this popup you can select technology to add as Link to Note
+                <% elsif type == "cheat_sheet_group_version_section_addition" %>
+                  In this popup you can select Cheat Sheet to add it as Section to Cheat Sheet Combo
                 <% end %>
 
               </p>
@@ -146,7 +158,7 @@
               <%= render "shared/technologies_search/modal_bodies/classes_search_modal_body" %>
             <% elsif type == "folder_item_addition" %>
               <%= render "shared/technologies_search/modal_bodies/technologies_search_modal_body" %>
-            <% elsif type == "interface_group_form_action_addition" %>
+            <% elsif type == "interface_group_form_action_addition"%>
               <!-- doc: everything that can be considered as action-->
               <%= render "shared/technologies_search/modal_bodies/actions_search_modal_body" %>
             <% elsif type == "simple_class_attribute_addition" ||
@@ -159,6 +171,10 @@
               <%= render "shared/technologies_search/modal_bodies/articles_search_modal_body", scenario: "unit_version_attachment_addition" %>
             <% elsif type == "article_version_attachment_addition" %>
               <%= render "shared/technologies_search/modal_bodies/articles_search_modal_body", scenario: "article_version_attachment_addition" %>
+            <% elsif type == "cheat_sheet_version_notes_link_attachment_addition" %>
+              <%= render "shared/technologies_search/modal_bodies/links_search_modal_body", scenario: "cheat_sheet_version_notes_link_attachment_addition" %>
+            <% elsif type == "cheat_sheet_group_version_section_addition" %>
+              <%= render "shared/technologies_search/modal_bodies/section_search_modal_body", scenario: "cheat_sheet_group_version_section_addition" %>
             <% end %>
 
 

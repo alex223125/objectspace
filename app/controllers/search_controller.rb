@@ -6,6 +6,8 @@ class SearchController < ApplicationController
   ARTICLES_SEARCH_TYPE = 'articles'.freeze
   UNITS_SEARCH_TYPE = 'units'.freeze
   ALGORITHMS_SEARCH_TYPE = 'algorithms'.freeze
+  CHEAT_SHEET_SEARCH_TYPE = 'cheat_sheets'.freeze
+  CHEAT_SHEET_GROUP_SEARCH_TYPE = 'cheat_sheet_groups'.freeze
   CLASSES_SEARCH_TYPE = 'simple_class'.freeze
   FRAMEWORKS_SEARCH_TYPE = 'frameworks'.freeze
   ALL_TECHNOLOGIES_SEARCH_TYPE = 'all_technologies'.freeze
@@ -50,6 +52,8 @@ class SearchController < ApplicationController
         locals = {scenario: "article_version_attachment_addition"}
       elsif params[:scenario] == "regular"
         locals = {scenario: "regular"}
+      elsif params[:scenario] == "cheat_sheet_version_notes_link_attachment_addition"
+        locals = {scenario: "cheat_sheet_version_notes_link_attachment_addition"}
       else
         locals = {}
       end
@@ -72,12 +76,17 @@ class SearchController < ApplicationController
       @units = Units::Unit.search(params[:query], operator: "or",
                                   fields: [:title, :source_page_description], match: :text_middle)
 
+      if params[:scenario] == "cheat_sheet_version_notes_link_attachment_addition"
+        locals = {scenario: "cheat_sheet_version_notes_link_attachment_addition"}
+      end
+
       binding.pry
       @pagy, @units = pagy(@units, page: params[:page], items: 3)
       respond_to do |format|
         format.json {
           render json: { entries: render_to_string(partial: "shared/technologies_search/units/list",
-                                                   formats: [:html]),
+                                                   formats: [:html],
+                                                   locals: locals),
                          pagination: @pagy }
         }
       end
@@ -103,16 +112,78 @@ class SearchController < ApplicationController
       # @algorithms = @algorithms_groups + @algorithms_versions
       @pagy, @algorithms = pagy(@algorithms, page: params[:page], items: 3)
 
+      if params[:scenario] == "cheat_sheet_version_notes_link_attachment_addition"
+        locals = {scenario: "cheat_sheet_version_notes_link_attachment_addition"}
+      end
+
       binding.pry
       respond_to do |format|
         format.json {
           render json: { entries: render_to_string(partial: "shared/technologies_search/algorithms/list",
-                                                   formats: [:html]),
+                                                   formats: [:html],
+                                                   locals: locals),
                          pagination: @pagy }
         }
       end
 
-      # case 3. classes search
+
+      # case 3. cheat sheet
+    elsif params[:query] && params[:type] == CHEAT_SHEET_SEARCH_TYPE
+      @cheat_sheets = CheatSheets::CheatSheet.search(params[:query], operator: "or",
+                                                    fields:[{title: :text_middle}, {title: :word},
+                                                      {title: :word_start}, {title: :word_end},
+                                                      {source_page_description: :text_middle},
+                                                      {source_page_description: :word},
+                                                      {source_page_description: :word_start},
+                                                      {source_page_description: :word_end}]
+      )
+
+      @pagy, @cheat_sheets = pagy(@cheat_sheets, page: params[:page], items: 3)
+
+      if params[:scenario] == "cheat_sheet_group_version_section_addition"
+        locals = {scenario: "cheat_sheet_group_version_section_addition"}
+      else
+        locals = {}
+      end
+
+      respond_to do |format|
+        format.json {
+          render json: { entries: render_to_string(partial: "shared/technologies_search/cheat_sheets/list",
+                                                  formats: [:html],
+                                                  locals: locals),
+                                                  pagination: @pagy }
+        }
+      end
+
+      # case 4. cheat sheet group
+    elsif params[:query] && params[:type] == CHEAT_SHEET_GROUP_SEARCH_TYPE
+      @cheat_sheet_groups = CheatSheetGroups::CheatSheetGroup.search(params[:query], operator: "or",
+                                                                    fields:[{title: :text_middle}, {title: :word},
+                                                                      {title: :word_start}, {title: :word_end},
+                                                                      {source_page_description: :text_middle},
+                                                                      {source_page_description: :word},
+                                                                      {source_page_description: :word_start},
+                                                                      {source_page_description: :word_end}]
+      )
+
+      @pagy, @cheat_sheet_groups = pagy(@cheat_sheet_groups, page: params[:page], items: 3)
+
+      if params[:scenario] == "cheat_sheet_group_version_section_addition"
+        locals = {scenario: "cheat_sheet_group_version_section_addition"}
+      else
+        locals = {}
+      end
+
+      respond_to do |format|
+        format.json {
+          render json: { entries: render_to_string(partial: "shared/technologies_search/cheat_sheet_groups/list",
+                                                  formats: [:html],
+                                                  locals: locals),
+                                                  pagination: @pagy }
+        }
+      end
+
+      # case 5. classes search
     elsif params[:query] && params[:type] == CLASSES_SEARCH_TYPE
       binding.pry
       @simple_classes = SimpleClasses::SimpleClass.search(params[:query], operator: "or",
@@ -128,7 +199,7 @@ class SearchController < ApplicationController
         }
       end
 
-      # case 4. mixed technology search
+      # case 6. mixed technology search
     elsif params[:query] && params[:type] == FRAMEWORKS_SEARCH_TYPE
       binding.pry
       @frameworks = Frameworks::Framework.search(params[:query], operator: "or",
@@ -147,8 +218,8 @@ class SearchController < ApplicationController
       binding.pry
       query = params[:query]
       models = [Articles::Article, Units::Unit,
-                Algorithms::Algorithm, SimpleClasses::SimpleClass,
-                Frameworks::Framework]
+                Algorithms::Algorithm, CheatSheets::CheatSheet, CheatSheetGroups::CheatSheetGroup,
+                SimpleClasses::SimpleClass, Frameworks::Framework]
       fields = [:title, :description, :source_page_description]
 
       binding.pry
@@ -179,7 +250,7 @@ class SearchController < ApplicationController
     if params[:target_type] == "repository"
       target_type = "repository"
       target = Repository.friendly.find(params[:target])
-      @folder_owner = target.user
+      @folder_owner = target.ownerable
 
       # 1.1 child folders
       binding.pry
@@ -187,8 +258,8 @@ class SearchController < ApplicationController
 
       # 1.2 methods whih in folder
       models = [Articles::Article, Units::Unit,
-                Algorithms::Algorithm, SimpleClasses::SimpleClass,
-                Frameworks::Framework]
+                Algorithms::Algorithm, CheatSheets::CheatSheet,
+                SimpleClasses::SimpleClass, Frameworks::Framework]
 
       condition = {
         repository_id: target.id
@@ -212,7 +283,7 @@ class SearchController < ApplicationController
       # end
 
       target_folder = Folder.friendly.find(params[:target])
-      @folder_owner = target_folder.root.repository.user
+      @folder_owner = target_folder.root.repository.ownerable
 
       # 1.1 child folders
       binding.pry
@@ -220,8 +291,8 @@ class SearchController < ApplicationController
 
       # 1.2 methods whih in folder
       models = [Articles::Article, Units::Unit,
-                Algorithms::Algorithm, SimpleClasses::SimpleClass,
-                Frameworks::Framework]
+                Algorithms::Algorithm, CheatSheets::CheatSheet, CheatSheetGroups::CheatSheetGroup,
+                SimpleClasses::SimpleClass, Frameworks::Framework]
 
       condition = {
         folder_id: target_folder.id
@@ -237,6 +308,8 @@ class SearchController < ApplicationController
       @technologies += Articles::Article.tagged_with([params[:tag]], wild: true, any: true)
       @technologies += Units::Unit.tagged_with([params[:tag]], wild: true, any: true)
       @technologies += Algorithms::Algorithm.tagged_with([params[:tag]], wild: true, any: true)
+      @technologies += CheatSheets::CheatSheet.tagged_with([params[:tag]], wild: true, any: true)
+      @technologies += CheatSheetGroups::CheatSheetGroup.tagged_with([params[:tag]], wild: true, any: true)
       @technologies += SimpleClasses::SimpleClass.tagged_with([params[:tag]], wild: true, any: true)
       @technologies += Frameworks::Framework.tagged_with([params[:tag]], wild: true, any: true)
 

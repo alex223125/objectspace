@@ -1,0 +1,29 @@
+<div class="col-span-6 sm:col-span-3"
+     id="sections-nested-form"
+     data-controller="remote_select_cheat_sheet_group_section cheat_sheet_group_sections_nested_form"
+     data-target="remote_select_cheat_sheet_group_section.sectionsArea">
+  <p class="text-lg font-bold hover:text-gray-700">Sections:</p>
+  <p class="mt-2 text-sm text-gray-500">
+    Here you can add Cheat Sheets as sections to selected Note.
+  </p>
+  <br>
+
+  <%= f.fields_for :sections do |note| %>
+    <%= render "cheat_sheet_group/sections/section_fields", :f => note %>
+  <% end %>
+
+  <div class="add-new-section-button">
+    <br>
+    <%= link_to_add_association "+ Add Cheat Sheet", f,
+      :sections,
+      style: "display:none;",
+      partial: 'cheat_sheet_group/sections/section_fields',
+      class: "nodraggablesteps inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2",
+      data: {target: "remote_select_cheat_sheet_group_section.addSectionOriginalButton"}
+    %>
+  </div>
+
+  <%= render "shared/technologies_search/modal", :type => "cheat_sheet_group_version_section_addition" %>
+</div>
+
+

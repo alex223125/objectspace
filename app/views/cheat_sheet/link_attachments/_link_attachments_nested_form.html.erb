@@ -1,0 +1,28 @@
+<div class="col-span-6 sm:col-span-3"
+     id="link-attachments-nested-form"
+     data-controller="remote_select_link_attachment link_attachments_nested_form"
+     data-target="remote_select_link_attachment.linkAttachmentsArea">
+  <p class="text-lg font-bold hover:text-gray-700">Attachments (links):</p>
+  <p class="mt-2 text-sm text-gray-500">
+    Here you can add Articles, Methods, Algorithms as links to selected Note.
+  </p>
+  <br>
+
+  <%= f.fields_for :link_attachments do |attachment| %>
+    <%= render "cheat_sheet/link_attachments/link_attachment_fields", :f => attachment %>
+  <% end %>
+
+  <div class="add-new-link-attachment-button">
+    <br>
+    <%= link_to_add_association "+ Add new Attachment", f,
+      :link_attachments,
+      style: "display:none;",
+      partial: 'cheat_sheet/link_attachments/link_attachment_fields',
+      class: "nodraggablesteps inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2",
+      data: {target: "remote_select_link_attachment.addLinkAttachmentOriginalButton"}
+
+    %>
+  </div>
+
+  <%= render "shared/technologies_search/modal", :type => "cheat_sheet_version_notes_link_attachment_addition" %>
+</div>

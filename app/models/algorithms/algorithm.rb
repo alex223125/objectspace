@@ -8,7 +8,6 @@ class Algorithms::Algorithm < ApplicationRecord
              word: [:title, :source_page_description, :list_of_tags, :ownerable_id],
              word_start: [:title, :source_page_description],
              word_end: [:title, :source_page_description]
-
   scope :search_import, -> { includes(:tags) }
   acts_as_taggable_on :tags
 
@@ -37,6 +36,8 @@ class Algorithms::Algorithm < ApplicationRecord
            class_name: "SimpleClasses::SimpleClass",
            source: :simple_class
 
+  has_many :link_attachments, as: :linkable, class_name: "CheatSheets::LinkAttachment"
+
   validates :title, presence: true, allow_blank: false
   validates_with Algorithms::SizeOfStepsValidator, on: [:create]
 
@@ -52,22 +53,6 @@ class Algorithms::Algorithm < ApplicationRecord
     self.functional_type == Algorithms::FunctionalTypes[:class_level]
   end
 
-  # include PgSearch::Model
-  # pg_search_scope :english_global_search,
-  #                 against: {
-  #                   title: 'A',
-  #                   source_page_description: 'B'
-  #                 },
-  #                 using: {
-  #                   tsearch: {
-  #                     dictionary: 'english',
-  #                     tsvector_column: 'searchable',
-  #                     any_word: true,
-  #                     prefix: true
-  #                   }
-  #                 }
-
-
   def default_version
     Algorithms::AlgorithmVersion.find_by(id: self.default_version_id)
   end
@@ -80,7 +65,7 @@ class Algorithms::Algorithm < ApplicationRecord
     class_key + self.uuid
   end
 
-
+  # doc: mapping for searchkick
   def search_data
     {
       title: title,

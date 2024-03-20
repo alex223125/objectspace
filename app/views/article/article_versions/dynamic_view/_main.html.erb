@@ -1,6 +1,6 @@
 <% article_version = @article_version %>
 
-<%= render "article/article_versions/partials/article_content/version_select_bar", article_version: article_version %>
+<%= render "article/article_versions/partials/article_content/submenu/version_select_bar", article_version: article_version %>
 
 <br>
 <br>
@@ -21,7 +21,7 @@
 
 <br>
 <br>
-<%= render "article/article_versions/partials/article_content/copy_to_clipboard_input" %>
+<%= render "article/article_versions/partials/article_content/submenu/copy_to_clipboard", article: article_version.article %>
 
 
 <div class="max-w-4xl p-4 rounded-lg bg-gray-50 dark:bg-gray-800">

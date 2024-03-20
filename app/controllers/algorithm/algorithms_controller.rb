@@ -24,15 +24,18 @@ class Algorithm::AlgorithmsController < ApplicationController
       format.json {
         render json: { preview: render_to_string(partial: service.path,
                                                  formats: [:html],
-                                                 locals: {algorithm: @algorithm})}
+                                                 locals: {algorithm: @algorithm, scenario: service.scenario})}
       }
     end
   end
 
+  # doc: dynamic view in the model
   def view
     binding.pry
     @algorithm_version = @algorithm.default_version
-    path = "algorithm/algorithm_versions/dynamic_view/main"
+    if params[:type] = "regular"
+      path = "algorithm/algorithm_versions/dynamic_view/main"
+    end
 
     respond_to do |format|
       format.json {
@@ -97,7 +100,7 @@ class Algorithm::AlgorithmsController < ApplicationController
 
         binding.pry
         # format.html { redirect_to algorithm_algorithm_url(service.algorithm), notice: "Algorithm was successfully created." }
-        format.html { redirect_to algorithm_version_path(username: service.algorithm.ownerable.ownername,
+        format.html { redirect_to algorithm_version_path(ownername: service.algorithm.ownerable.ownername,
                                                          id: service.algorithm.default_version.slug),
                                   notice: "Algorithm was successfully created." }
         format.json { render :show, status: :created, location: @algorithm }
@@ -146,7 +149,7 @@ class Algorithm::AlgorithmsController < ApplicationController
 
     # Use callbacks to share common setup or constraints between actions.
   def set_algorithm
-    @algorithm = Algorithms::Algorithm.find(params[:id])
+    @algorithm = Algorithms::Algorithm.find_by(uuid: params[:id]) || Algorithms::Algorithm.find(params[:id])
   end
 
   def algorithm_params

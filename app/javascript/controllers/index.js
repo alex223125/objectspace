@@ -69,11 +69,8 @@ application.register("step_solves_the_problem_tinymce", StepSolvesTheProblemTiny
 import StepSourcesTinymceController from "./tinymce/step/step_sources_tinymce_controller"
 application.register("step_sources_tinymce", StepSourcesTinymceController)
 
-
-
-
-
-import ImprovementsInfiniteScrollController from "./improvements_infinite_scroll_controller.js"
+// Improvements
+import ImprovementsInfiniteScrollController from "./improvements/improvements_infinite_scroll_controller.js"
 application.register("improvements_infinite_scroll", ImprovementsInfiniteScrollController)
 
 
@@ -261,4 +258,28 @@ application.register("class_tree_map_modal", ClassTreeMapModalController)
 import TechnologyPickModalController from "./technology_pick/technology_pick_modal_controller"
 application.register("technology_pick_modal", TechnologyPickModalController)
 
+// Comments
+import CommentReplyController from "./comments/comment_reply_controller"
+application.register("comment_reply", CommentReplyController)
+
+import CommentsInfinityScrollController from "./comments/comments_infinity_scroll_controller"
+application.register("comments_infinity_scroll", CommentsInfinityScrollController)
+
+//Pages
+import UnitPageController from "./pages/unit_page_controller"
+application.register("unit_page", UnitPageController)
+
+// LinkAttachments
+import RemoteSelectLinkAttachmentController from "./link_attachments/remote_select_link_attachment_controller"
+application.register("remote_select_link_attachment", RemoteSelectLinkAttachmentController)
+
+import LinkAttachmentsNestedFromController from "./link_attachments/link_attachments_nested_form_controller"
+application.register("link_attachments_nested_form", LinkAttachmentsNestedFromController)
+
+// CheatSheetGroups
+import RemoteSelectCheatSheetGroupSectionController from "./cheat_sheet_groups/remote_select_cheat_sheet_group_section_controller"
+application.register("remote_select_cheat_sheet_group_section", RemoteSelectCheatSheetGroupSectionController)
+
+import CheatSheetGroupSectionsNestedFormController from "./cheat_sheet_groups/cheat_sheet_group_sections_nested_form_controller"
+application.register("cheat_sheet_group_sections_nested_form", CheatSheetGroupSectionsNestedFormController)
 

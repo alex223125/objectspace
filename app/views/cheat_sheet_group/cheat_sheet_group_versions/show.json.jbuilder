@@ -1,0 +1,1 @@
+json.partial! "cheat_sheet_group_versions/cheat_sheet_group_version", cheat_sheet_group_version: @cheat_sheet_group_version

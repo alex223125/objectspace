@@ -1,6 +1,5 @@
 class Article::ArticleVersionsController < ApplicationController
   include TechBreadcrumbable
-
   before_action :set_article_version, only: %i[ show edit update destroy ]
 
   # GET /article_versions or /article_versions.json
@@ -36,7 +35,7 @@ class Article::ArticleVersionsController < ApplicationController
     respond_to do |format|
       binding.pry
       if @article_version.save
-        format.html { redirect_to article_version_path(username: @article_version.article.ownerable.ownername,
+        format.html { redirect_to article_version_path(ownername: @article_version.article.ownerable.ownername,
                                                        id: @article_version.slug),
                                   notice: "Article version was successfully created." }
         # format.json { render :show, status: :created, location: @article_version }
@@ -53,7 +52,7 @@ class Article::ArticleVersionsController < ApplicationController
     respond_to do |format|
       if @article_version.update(article_version_params)
         # format.html { redirect_to article_version_url(@article_version), notice: "Article version was successfully updated." }
-        format.html { redirect_to article_version_path(username: @article_version.article.ownerable.ownername,
+        format.html { redirect_to article_version_path(ownername: @article_version.article.ownerable.ownername,
                                                        id: @article_version.slug),
                                   notice: "Article version was successfully updated." }
 
@@ -91,7 +90,7 @@ class Article::ArticleVersionsController < ApplicationController
       # a 301 redirect that uses the current friendly id.
       request_slug = params[:id]
       if request_slug != @article_version.slug
-        return redirect_to article_version_path(username: @article_version.owner.ownername,
+        return redirect_to article_version_path(ownername: @article_version.owner.ownername,
                                                 id: @article_version.slug),
                            :status => :moved_permanently
       end

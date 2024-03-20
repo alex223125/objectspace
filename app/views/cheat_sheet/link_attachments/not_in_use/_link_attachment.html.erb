@@ -1,0 +1,7 @@
+<div id="<%= dom_id link_attachment %>">
+  <% if action_name != "show" %>
+    <%= link_to "Show this link attachment", link_attachment, class: "rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+    <%= link_to 'Edit this link attachment', edit_link_attachment_path(link_attachment), class: "rounded-lg py-3 ml-2 px-5 bg-gray-100 inline-block font-medium" %>
+    <hr class="mt-6">
+  <% end %>
+</div>
