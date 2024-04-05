@@ -11,6 +11,7 @@ class CheatSheetGroup::CheatSheetGroupsController < ApplicationController
 
   # GET /cheat_sheet_groups/1 or /cheat_sheet_groups/1.json
   def show
+    # TODO: add breadcrumbs
   end
 
   def preview
@@ -44,13 +45,16 @@ class CheatSheetGroup::CheatSheetGroupsController < ApplicationController
   def create
     binding.pry
     # TODO: not only current user as owner, org also
-    service = Services::CheatSheetGroups::CheatSheetGroups::Create.new(cheat_sheet_group_params, target_place, current_user)
+    service = Services::CheatSheetGroups::CheatSheetGroups::Create.new(cheat_sheet_group_params, target_place,
+                                                                       current_user, current_user)
     service.call
+    @cheat_sheet_group = service.cheat_sheet_group
+    set_redirect_after_create_path
+
     respond_to do |format|
       if service.errors.blank?
-        format.html { redirect_to cheat_sheet_group_version_path(ownername: service.cheat_sheet_group.ownerable.ownername,
-                                                                 id: service.cheat_sheet_group.default_version.slug),
-                                                                 notice: "Cheat sheet group was successfully created." }
+        format.html { redirect_to @redirect_after_create_path,
+                                  notice: "Cheat sheet group was successfully created." }
         format.json { render :show, status: :created, location: @cheat_sheet_group }
       else
         @cheat_sheet_group = service.cheat_sheet_group
@@ -84,6 +88,18 @@ class CheatSheetGroup::CheatSheetGroupsController < ApplicationController
   end
 
   private
+
+    def set_redirect_after_create_path
+      if target_place.class == SimpleClasses::InterfaceGroup
+        interface_member = @cheat_sheet_group.interface_members.last
+        @redirect_after_create_path = interface_member_path(ownername: interface_member.simple_class.ownerable.ownername,
+                                                            id: interface_member.slug)
+      else
+        @redirect_after_create_path = cheat_sheet_group_version_path(ownername: @cheat_sheet_group.ownerable.ownername,
+                                                                     id: @cheat_sheet_group.default_version.slug)
+      end
+    end
+
     # Use callbacks to share common setup or constraints between actions.
     def set_cheat_sheet_group
       @cheat_sheet_group = CheatSheetGroups::CheatSheetGroup.find(params[:id])

@@ -14,8 +14,8 @@ class FoldersBreadcrumbsBuilder < BreadcrumbsOnRails::Breadcrumbs::Builder
   INTERFACE_GROUP_PAGE_BREADCRUMB_TYPE = "interface_group_page".freeze
   # FRAMEWORK_PAGE_BREADCRUMB_TYPE = "framework_page".freeze
 
-  SELECTED_PAGE_STYLE = "hover:underline inline-flex text font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white font-bold".freeze
-  REGULAR_PAGE_STYLE = "hover:underline inline-flex text font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white".freeze
+  SELECTED_PAGE_STYLE = "items-center hover:underline inline-flex text font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white font-bold".freeze
+  REGULAR_PAGE_STYLE = "items-center hover:underline inline-flex text font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white".freeze
 
 
   def render

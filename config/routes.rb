@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-  # resources :container_members
 
 
   devise_for :users, controllers: {
@@ -105,13 +104,20 @@ Rails.application.routes.draw do
         get :tree_map
       end
     end
-    resources :interface_groups
-    resources :class_containers
-    # resources :interface_members
+    resources :interface_groups, except: [:show]
+    resources :class_containers, except: [:show]
+
+    resources :interface_members, except: [:show]
+    resources :container_members, except: [:show]
     get 'interface_members/preview/:id', to: 'interface_members#preview', as: 'preview'
     resources :simple_class_attributes
   end
   get "/:ownername/classes/:id", to: "simple_class/simple_classes#show", as: 'simple_class'
+  get "/:ownername/components/:id", to: "simple_class/class_containers#show", as: 'class_container'
+  get "/:ownername/actions_group/:id", to: "simple_class/interface_groups#show", as: 'interface_group'
+
+  get "/:ownername/actions_group_member/:id", to: "simple_class/interface_members#show", as: 'interface_member'
+  get "/:ownername/component_member/:id", to: "simple_class/container_members#show", as: 'container_member'
 
   namespace :framework do
     resources :frameworks, except: [:show] do

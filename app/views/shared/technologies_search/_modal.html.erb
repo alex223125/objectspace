@@ -101,9 +101,9 @@
                 %>
                   Select Article
                 <% elsif type == "cheat_sheet_version_notes_link_attachment_addition" %>
-                  Select technology
+                  Select Technology
                 <% elsif type == "cheat_sheet_group_version_section_addition" %>
-                  Select Cheat Sheet
+                  Select Technology
                 <% end %>
               </h3>
               <button type="button" data-action="click->select_instruction_modal#close" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
@@ -142,7 +142,7 @@
                 <% elsif type == "cheat_sheet_version_notes_link_attachment_addition" %>
                   In this popup you can select technology to add as Link to Note
                 <% elsif type == "cheat_sheet_group_version_section_addition" %>
-                  In this popup you can select Cheat Sheet to add it as Section to Cheat Sheet Combo
+                  In this popup you can select Articles, Methods, Cheat Sheets and Cheat Sheet Combos to add it as Section to Cheat Sheet Combo
                 <% end %>
 
               </p>

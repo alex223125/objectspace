@@ -11,6 +11,9 @@
         <button class="inline-block p-4 border-b-2 rounded-t-lg" id="profile-tab" type="button" role="tab" aria-controls="profile" aria-selected="false">Articles</button>
       </li>
       <li class="mr-2" role="presentation" data-select_instruction_tabs-target="tab" data-action="click->select_instruction_tabs#change">
+        <button class="inline-block p-4 border-b-2 rounded-t-lg" id="profile-tab" type="button" role="tab" aria-controls="units" aria-selected="false">Methods</button>
+      </li>
+      <li class="mr-2" role="presentation" data-select_instruction_tabs-target="tab" data-action="click->select_instruction_tabs#change">
         <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="dashboard-tab" type="button" role="tab" aria-controls="dashboard" aria-selected="false">Cheat Sheets</button>
       </li>
       <li class="mr-2" role="presentation" data-select_instruction_tabs-target="tab" data-action="click->select_instruction_tabs#change">
@@ -24,6 +27,9 @@
   </div>
   <div class="hidden py-4 px-4 border-l border-b border-r" data-select_instruction_tabs-target="panel">
     <%= render "shared/technologies_search/articles/search_page", scenario: scenario %>
+  </div>
+  <div class="hidden py-4 px-4 border-l border-b border-r" data-select_instruction_tabs-target="panel">
+    <%= render "shared/technologies_search/units/search_page", scenario: scenario %>
   </div>
   <div class="hidden py-4 px-4 border-l border-b border-r" data-select_instruction_tabs-target="panel">
     <%= render "shared/technologies_search/cheat_sheets/search_page", scenario: scenario %>

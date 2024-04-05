@@ -1,0 +1,64 @@
+<div class="included-cheat-sheet-group">
+  <h2 id="section-<%=cheat_sheet_group_version.uuid%>" class="text-center break-words mb-4 text-3xl font-extrabold leading-tight text-gray-900 lg:mb-6 lg:text-4xl dark:text-white">
+    # <%= cheat_sheet_group_version.title %>
+  </h2>
+
+  <!--TOC-->
+  <div class="cheat-sheet-group-toc" data-controller="toc_scrolling">
+    <br>
+    Sections:
+    <ul role="list" a="" class="space-y-3 text-base list-none sm:text-lg md:mt-5 md:text-xl">
+
+      <% cheat_sheet_group_version.sections.each do |section| %>
+        <% binding.pry %>
+        <li>
+          <a class="hover:underline hover:text-blue-600 font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+             onclick="return false;"
+             href="#section-<%=section.sectionable.default_version.uuid%>"
+             data-action="click->toc_scrolling#scroll"
+             data-anchor="#section-<%=section.sectionable.default_version.uuid%>"
+          >
+            ↳ <%= section.sectionable.default_version.title %>
+          </a>
+        </li>
+      <% end %>
+
+      <li>
+        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#contribute">
+          ↳ Contribute
+        </a>
+      </li>
+
+      <li>
+        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#comments">
+          ↳ Comments
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="content-section bg-gradient-to-bl from-blue-50 to-violet-50 p-4 rounded-lg">
+    <%= cheat_sheet_group_version.description.html_safe %>
+  </div>
+
+  <%= render "cheat_sheet_group/cheat_sheet_group_versions/partials/cheat_sheet_content/parts/sections_iteration",
+             cheat_sheet_group_version: cheat_sheet_group_version %>
+
+</div>
+<!--DEVIDER -->
+<!--<div class="inline-flex items-center justify-center w-full">-->
+<!--  <hr class="w-64 h-1 my-8 bg-gray-200 border-0 rounded dark:bg-gray-700">-->
+<!--  <div class="absolute px-4 -translate-x-1/2 bg-white left-1/2 dark:bg-gray-900">-->
+<!--    <svg class="w-4 h-4 text-gray-700 dark:text-gray-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 14">-->
+<!--      <path d="M6 0H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h4v1a3 3 0 0 1-3 3H2a1 1 0 0 0 0 2h1a5.006 5.006 0 0 0 5-5V2a2 2 0 0 0-2-2Zm10 0h-4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h4v1a3 3 0 0 1-3 3h-1a1 1 0 0 0 0 2h1a5.006 5.006 0 0 0 5-5V2a2 2 0 0 0-2-2Z"/>-->
+<!--    </svg>-->
+<!--  </div>-->
+<!--</div>-->
+<!--<div class="inline-flex items-center justify-center w-full">-->
+<!--  <hr class="w-64 h-1 my-8 bg-gray-200 border-0 rounded dark:bg-gray-700">-->
+<!--  <div class="absolute px-4 -translate-x-1/2 bg-white left-1/2 dark:bg-gray-900">-->
+<!--    <svg class="w-4 h-4 text-gray-700 dark:text-gray-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 14">-->
+<!--      <path d="M6 0H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h4v1a3 3 0 0 1-3 3H2a1 1 0 0 0 0 2h1a5.006 5.006 0 0 0 5-5V2a2 2 0 0 0-2-2Zm10 0h-4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h4v1a3 3 0 0 1-3 3h-1a1 1 0 0 0 0 2h1a5.006 5.006 0 0 0 5-5V2a2 2 0 0 0-2-2Z"/>-->
+<!--    </svg>-->
+<!--  </div>-->
+<!--</div>-->

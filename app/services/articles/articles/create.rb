@@ -1,7 +1,11 @@
+require "./app/services/concerns/technologies/taggable"
+require "./app/services/concerns/technologies/memberable"
 module Services
   module Articles
     module Articles
       class Create
+        include ::Services::Concerns::Technologies::Taggable
+        include ::Services::Concerns::Technologies::Memberable
 
         attr_reader :errors, :article
 
@@ -39,6 +43,10 @@ module Services
           Rails.logger.error(@errors)
         end
 
+        def technology
+          @article
+        end
+
         private
 
         def create_article
@@ -57,6 +65,19 @@ module Services
             @article.folder = @target_place
           elsif @target_place.class == Repository
             @article.repository = @target_place
+          elsif @target_place.class == ::SimpleClasses::ClassContainer
+            binding.pry
+            container_member = create_container_member
+
+            binding.pry
+            @article.class_containers << container_member
+          elsif @target_place.class == ::SimpleClasses::InterfaceGroup
+
+            binding.pry
+            interface_member = create_interface_member
+
+            binding.pry
+            @article.interface_members << interface_member
           end
         end
 
@@ -68,17 +89,6 @@ module Services
         def set_owner
           binding.pry
           @article.ownerable = @current_user
-        end
-
-        def set_tags
-          binding.pry
-          @article.tag_list = parse_tags
-        end
-
-        def parse_tags
-          if @params[:tag_list].present?
-            JSON.parse(@params[:tag_list]).map{|h| h.values}.join(",")
-          end
         end
 
       end

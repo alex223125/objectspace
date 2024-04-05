@@ -17,19 +17,27 @@ class Article::ArticlesController < ApplicationController
     binding.pry
     if params[:preview_type] == "basic_preview"
       path = "article/articles/previews/basic_preview"
+      scenario = nil
     elsif params[:preview_type] == "small_line_preview"
       path = "article/articles/previews/small_line_preview"
+      scenario = nil
     elsif params[:preview_type] == "algorithm_step_attachment_preview"
       path = "article/articles/previews/algorithm_step_attachment_preview"
+      scenario = nil
     elsif params[:preview_type] == "cheat_sheet_from_notes_link_attachment_preview"
-      path = "article/articles/previews/basic_preview"
+      path = "shared/tech_previews/basic_preview"
+      scenario = "cheat_sheet_from_notes_link_attachment_preview"
+    elsif params[:preview_type] == "cheat_sheet_group_section_preview"
+      path = "shared/tech_previews/basic_preview"
+      scenario = "cheat_sheet_group_section_preview"
     end
 
     binding.pry
     respond_to do |format|
       format.json {
         render json: { preview: render_to_string(partial: path,
-                                                 formats: [:html])}
+                                                 formats: [:html],
+                                                 locals: {article: @article, scenario: scenario})}
       }
     end
   end
@@ -65,22 +73,21 @@ class Article::ArticlesController < ApplicationController
   def create
     binding.pry
     # @article = Articles::Article.new(article_params)
-    target_place = @target_repository || @target_folder
     service = Services::Articles::Articles::Create.new(article_params, target_place, current_user)
     service.call
+    @article = service.article
+    set_redirect_after_create_path
 
     respond_to do |format|
 
       binding.pry
       if service.errors.blank?
-        format.html { redirect_to article_version_path(ownername: service.article.ownerable.ownername,
-                                                       id: service.article.default_version.slug),
-                                  notice: "Article was successfully created." }
-        format.json { render :show, status: :created, location: @article }
+        format.html { redirect_to @redirect_after_create_path, notice: "Article was successfully created." }
+        # format.json { render :show, status: :created, location: @article }
       else
-        @article = service.article
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @article.errors, status: :unprocessable_entity }
+        # @article = service.article
+        # format.html { render :new, status: :unprocessable_entity }
+        # format.json { render json: @article.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -111,6 +118,19 @@ class Article::ArticlesController < ApplicationController
   end
 
   private
+
+  def set_redirect_after_create_path
+    if target_place.class == SimpleClasses::InterfaceGroup
+      interface_member = @article.interface_members.last
+      @redirect_after_create_path = interface_member_path(ownername: interface_member.simple_class.ownerable.ownername,
+                                                          id: interface_member.slug)
+    else
+      @redirect_after_create_path = article_version_path(ownername: @article.ownerable.ownername,
+                                                         id: @article.default_version.slug)
+
+    end
+  end
+
     # Use callbacks to share common setup or constraints between actions.
     def set_article
       binding.pry

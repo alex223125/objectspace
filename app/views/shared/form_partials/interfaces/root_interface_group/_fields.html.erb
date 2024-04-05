@@ -1,7 +1,11 @@
 <!--<div data-id="<%#= f.object_name.match(/(\d+)]/)[1] %>" class="nested-fields">-->
 <div class="root-interface-group">
+  <% binding.pry %>
   <%= f.hidden_field :title %>
   <%= f.hidden_field :description %>
+  <%= f.hidden_field :functional_type %>
+  <%= f.hidden_field :creator_id %>
+
 
   <%= render "shared/form_partials/interfaces/interface_members/nested_form", :form => f, :type => "root_class" %>
 

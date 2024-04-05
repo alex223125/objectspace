@@ -14,6 +14,7 @@ module Services
           binding.pry
           create_repository
           binding.pry
+          set_owner
           set_tags
 
           binding.pry
@@ -29,6 +30,11 @@ module Services
 
       def create_repository
         @repository = @current_user.repositories.new(@params)
+      end
+
+      def set_owner
+        binding.pry
+        @repository.ownerable = @current_user
       end
 
       def set_tags

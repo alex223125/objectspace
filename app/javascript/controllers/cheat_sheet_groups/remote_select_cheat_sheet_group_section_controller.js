@@ -4,8 +4,11 @@ import { useMutation } from 'stimulus-use'
 
 const sectionCaseNestedFields = '.nested-fields-section'
 
-// const articleCase = "article"
-// const articleClass = "Articles::Article"
+const articleCase = "article"
+const articleClass = "Articles::Article"
+
+const unitCase = "unit"
+const unitClass = "Units::Unit"
 
 const cheatSheetCase = "cheat_sheet"
 const cheatSheetClass = "CheatSheets::CheatSheet"
@@ -95,7 +98,12 @@ export default class extends Controller {
 
         if (this.was_already_added_sections()) return
 
-        if (this.sectionType == cheatSheetCase) {
+        // DOC: in future buttons can be different
+        if (this.sectionType == articleCase) {
+            this.addCheatSheetSection()
+        } else if (this.sectionType == unitCase) {
+            this.addCheatSheetSection()
+        } else if (this.sectionType == cheatSheetCase) {
             this.addCheatSheetSection()
         } else if (this.sectionType == cheatSheetGroupCase) {
             this.addCheatSheetSection()
@@ -246,7 +254,11 @@ export default class extends Controller {
         let typeField = "sectionable-type-hidden-field"
 
         this.fieldsContainer.querySelector(`.${idField}`).value = this.sectionId
-        if (this.sectionType == cheatSheetCase) {
+        if (this.sectionType == articleCase) {
+            this.fieldsContainer.querySelector(`.${typeField}`).value = articleClass
+        } else if (this.sectionType == unitCase) {
+            this.fieldsContainer.querySelector(`.${typeField}`).value = unitClass
+        } else if (this.sectionType == cheatSheetCase) {
             this.fieldsContainer.querySelector(`.${typeField}`).value = cheatSheetClass
         } else if (this.sectionType == cheatSheetGroupCase) {
             this.fieldsContainer.querySelector(`.${typeField}`).value = cheatSheetGroupClass
@@ -289,7 +301,11 @@ export default class extends Controller {
         console.log(this.sectionType)
 
         const params = 'preview_type=cheat_sheet_group_section_preview'
-        if (this.sectionType == cheatSheetCase) {
+        if (this.sectionType == articleCase) {
+            this.previewUrl = `/article/articles/${this.sectionId}/preview?${params}`
+        } else if (this.sectionType == unitCase) {
+            this.previewUrl = `/unit/units/${this.sectionId}/preview?${params}`
+        } else if (this.sectionType == cheatSheetCase) {
             this.previewUrl = `/cheat_sheet/cheat_sheets/${this.sectionId}/preview?${params}`
         } else if (this.sectionType == cheatSheetGroupCase) {
             this.previewUrl = `/cheat_sheet_group/cheat_sheet_groups/${this.sectionId}/preview?${params}`

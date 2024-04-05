@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_03_12_210654) do
+ActiveRecord::Schema[7.0].define(version: 2024_04_02_133613) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -81,7 +81,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_12_210654) do
     t.string "ownerable_type", null: false
     t.bigint "ownerable_id", null: false
     t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
-    t.integer "functional_type"
+    t.integer "functional_type", null: false
     t.integer "repository_id"
     t.index ["ownerable_type", "ownerable_id"], name: "index_algorithms_on_ownerable"
     t.index ["searchable"], name: "index_algorithms_on_searchable", using: :gin
@@ -96,6 +96,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_12_210654) do
     t.datetime "updated_at", null: false
     t.integer "article_id"
     t.string "slug"
+    t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
     t.index ["slug"], name: "index_article_versions_on_slug", unique: true
   end
 
@@ -128,8 +129,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_12_210654) do
     t.integer "attachable_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "unit_version_id"
     t.integer "node_id"
+    t.integer "unit_version_id"
     t.integer "article_version_id"
     t.index ["attachable_type", "attachable_id"], name: "index_attachments_on_attachable"
   end
@@ -164,15 +165,16 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_12_210654) do
     t.integer "ownerable_id"
     t.integer "folder_id"
     t.integer "repository_id"
+    t.integer "creator_id"
   end
 
   create_table "cheat_sheet_versions", force: :cascade do |t|
     t.string "title"
+    t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "cheat_sheet_id"
     t.string "slug"
-    t.text "description"
     t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
     t.index ["slug"], name: "index_cheat_sheet_versions_on_slug", unique: true
   end
@@ -208,6 +210,12 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_12_210654) do
     t.integer "simple_class_id"
     t.integer "framework_id"
     t.integer "parent_id"
+    t.integer "creator_id"
+    t.integer "related_simple_class_id"
+    t.integer "functional_type", null: false
+    t.string "slug"
+    t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
+    t.index ["slug"], name: "index_class_containers_on_slug", unique: true
   end
 
   create_table "comment_hierarchies", id: false, force: :cascade do |t|
@@ -242,7 +250,11 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_12_210654) do
     t.string "memberable_type"
     t.bigint "memberable_id"
     t.integer "class_container_id"
+    t.integer "reference_type", null: false
+    t.string "slug"
+    t.string "title"
     t.index ["memberable_type", "memberable_id"], name: "index_container_members_on_memberable"
+    t.index ["slug"], name: "index_container_members_on_slug", unique: true
   end
 
   create_table "control_structures", force: :cascade do |t|
@@ -339,8 +351,14 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_12_210654) do
     t.integer "simple_class_id"
     t.integer "framework_id"
     t.integer "parent_id"
-    t.integer "functional_type"
+    t.integer "functional_type", null: false
     t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
+    t.integer "class_container_id"
+    t.integer "related_simple_class_id"
+    t.integer "creator_id"
+    t.string "slug"
+    t.integer "related_class_container_id"
+    t.index ["slug"], name: "index_interface_groups_on_slug", unique: true
   end
 
   create_table "interface_members", force: :cascade do |t|
@@ -350,7 +368,11 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_12_210654) do
     t.bigint "memberable_id"
     t.integer "interface_group_id"
     t.integer "position"
+    t.integer "reference_type", null: false
+    t.string "slug"
+    t.string "title"
     t.index ["memberable_type", "memberable_id"], name: "index_interface_members_on_memberable"
+    t.index ["slug"], name: "index_interface_members_on_slug", unique: true
   end
 
   create_table "link_attachments", force: :cascade do |t|
@@ -438,9 +460,10 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_12_210654) do
     t.bigint "ownerable_id", null: false
     t.string "slug"
     t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
-    t.integer "functional_type"
+    t.integer "functional_type", null: false
     t.text "source_page_description"
     t.integer "repository_id"
+    t.integer "creator_id"
     t.index ["instructionable_type", "instructionable_id"], name: "index_simple_classes_on_instructionable"
     t.index ["ownerable_type", "ownerable_id"], name: "index_simple_classes_on_ownerable"
     t.index ["slug"], name: "index_simple_classes_on_slug", unique: true
@@ -566,6 +589,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_12_210654) do
     t.bigint "ownerable_id", null: false
     t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
     t.integer "repository_id"
+    t.integer "creator_id"
     t.index ["ownerable_type", "ownerable_id"], name: "index_units_on_ownerable"
     t.index ["searchable"], name: "index_units_on_searchable", using: :gin
   end

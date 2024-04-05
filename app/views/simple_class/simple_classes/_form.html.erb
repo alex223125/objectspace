@@ -87,7 +87,7 @@
       <% end %>
     </div>
 
-    <%= hidden_field_tag 'target_folder', @target_folder.try(:id)  %>
+    <%= render "shared/form_partials/target_place" %>
 
     <div class="bg-gray-50 px-4 py-3 sm:px-6">
       <div class="text-end">

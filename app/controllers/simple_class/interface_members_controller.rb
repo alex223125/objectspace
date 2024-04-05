@@ -1,4 +1,7 @@
 class SimpleClass::InterfaceMembersController < ApplicationController
+  include TechBreadcrumbable
+  include Commentable
+
   before_action :set_interface_member, only: %i[ show edit update destroy ]
 
   # GET /interface_members or /interface_members.json
@@ -7,8 +10,15 @@ class SimpleClass::InterfaceMembersController < ApplicationController
   # end
 
   # GET /interface_members/1 or /interface_members/1.json
-  # def show
-  # end
+  def show
+    technology_breadcrumbs(@interface_member)
+
+    if @interface_member.memberable.class == Articles::Article
+      @article = @interface_member.memberable
+      @related_articles = @article.find_related_tags.limit(3)
+      @owner_articles = @article.ownerable.articles
+    end
+  end
 
   def preview
     if @interface_member.memberable_type == "Units::Unit"
@@ -73,9 +83,24 @@ class SimpleClass::InterfaceMembersController < ApplicationController
   # end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
+
     def set_interface_member
-      @interface_member = SimpleClasses::InterfaceMember.find(params[:id])
+      binding.pry
+      @interface_member = SimpleClasses::InterfaceMember.friendly.try(:find, params[:id])
+
+      # If an old id or a numeric id was used to find the record, then
+      # the request path will not match the post_path, and we should do
+      # a 301 redirect that uses the current friendly id.
+      request_slug = params[:id]
+      if request_slug != @interface_member.slug
+        return redirect_to interface_member_path(ownername: @interface_member.simple_class.owner.ownername,
+                                             id: @interface_member.slug),
+                           :status => :moved_permanently
+      end
+      # TODO: add in all controller with friendly find rescue from not found case
+    rescue ActiveRecord::RecordNotFound
+      flash[:error] = "Model not found"
+      redirect_to :root
     end
 
     # Only allow a list of trusted parameters through.

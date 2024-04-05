@@ -1,0 +1,58 @@
+<h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Methods and Algorithms</h2>
+
+<p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+  In this section you can choose tools to work with instructions.
+</p>
+
+<!-- Add new Method-->
+<div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+  <a href="#">
+    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Add new Method (Simple Tutorial)</h5>
+  </a>
+  <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Methods are useful for short instructions that don't require many complicated steps. Perfect for small tutorials. Think about this as a single spell which hero can cast.</p>
+  <!--          <a href="#" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">-->
+  <!--            Add new Method-->
+  <!--            <svg aria-hidden="true" class="w-4 h-4 ml-2 -mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>-->
+  <!--          </a>-->
+
+  <% if target.is_a?(Folder) %>
+    <%= link_to "Create new method", new_unit_unit_path(target_folder: target.uuid), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+  <% elsif target.is_a?(Repository) %>
+    <%= link_to "Create new method", new_unit_unit_path(target_repository: target.uuid), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+  <% elsif target.is_a?(SimpleClasses::ClassContainer) %>
+    <%= link_to "Create new method", new_unit_unit_path(target_class_container: target.uuid), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+  <% elsif target.is_a?(SimpleClasses::InterfaceGroup) %>
+    <%= link_to "Create new method", new_unit_unit_path(target_interface_group: target.uuid), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+  <% end %>
+</div>
+
+<!-- Add new Algorithm-->
+<div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+  <a href="#">
+    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Add new Algorithm (Tutorial Combo)</h5>
+  </a>
+  <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Algorithms are useful when the instruction exceeds 3-4 steps.You can use Methods and other Algorithms as steps. When Methods and Algorithms included in your Algorithm as steps are updated, your Algorithm will also be updated accordingly. Think of Algorithm as a "combo" that the Hero can use to reach his goal.</p>
+  <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">If you do not know what to choose, Method or Algorithm, it's recommended to start by using the method as a tool. Once you know what your final instruction looks like, you can rewrite it as Algorithm.</p>
+  <!--          <a href="#" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">-->
+  <!--            Add new Algorithm-->
+  <!--            <svg aria-hidden="true" class="w-4 h-4 ml-2 -mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>-->
+  <!--          </a>-->
+
+  <% if target.is_a?(Folder) %>
+    <%= link_to "Create new algorithm",
+                new_algorithm_algorithm_path(target_folder: target.uuid),
+                class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+  <% elsif target.is_a?(Repository) %>
+    <%= link_to "Create new algorithm",
+                new_algorithm_algorithm_path(target_repository: target.uuid),
+                class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+  <% elsif target.is_a?(SimpleClasses::ClassContainer) %>
+    <%= link_to "Create new algorithm",
+                new_algorithm_algorithm_path(target_class_container: target.uuid),
+                class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+  <% elsif target.is_a?(SimpleClasses::InterfaceGroup) %>
+    <%= link_to "Create new algorithm",
+                new_algorithm_algorithm_path(target_interface_group: target.uuid),
+                class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+  <% end %>
+</div>

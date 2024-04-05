@@ -19,6 +19,7 @@ class Articles::ArticleVersion < ApplicationRecord
 
   private
 
+  # TODO: change id on uuid
   def slug_candidates
     [ :title,
       [:title, :id]

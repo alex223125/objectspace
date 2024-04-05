@@ -2,7 +2,9 @@ class Articles::Article < ApplicationRecord
 
   extend Pagy::Searchkick
   searchkick callbacks: :async,
+             text_start: [:title, :source_page_description],
              text_middle: [:title, :source_page_description],
+             text_end: [:title, :source_page_description],
              word: [:list_of_tags, :ownerable_id]
   scope :search_import, -> { includes(:tags) }
   acts_as_taggable_on :tags
@@ -12,6 +14,8 @@ class Articles::Article < ApplicationRecord
   belongs_to :folder, class_name: "Folder", optional: true
   belongs_to :repository, class_name: "Repository", optional: true
 
+  has_many :container_members, as: :memberable, class_name: "SimpleClasses::ContainerMember"
+  has_many :interface_members, as: :memberable, class_name: "SimpleClasses::InterfaceMember"
 
   belongs_to :ownerable, polymorphic: true
   belongs_to :simple_class_attributes, class_name: "SimpleClasses::SimpleClassAttribute", optional: true

@@ -11,7 +11,10 @@ module Objectspace
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.0
 
+    config.autoloader = :classic
+
     Dir[Rails.root.join('app/services/**/*.rb')].each{|rb| require rb}
+    Dir[Rails.root.join('app/services/concerns/**/*.rb')].each{|rb| require rb}
     Dir[Rails.root.join('app/services/simple_classes/simple_classes/*.rb')].each{|rb| require rb}
     Dir[Rails.root.join('app/builders/**/*.rb')].each{|rb| require rb}
     Dir[Rails.root.join('app/enums/**/*.rb')].each{|rb| require rb}

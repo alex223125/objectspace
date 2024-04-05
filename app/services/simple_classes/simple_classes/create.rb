@@ -11,10 +11,11 @@ module Services
 
         attr_reader :errors, :simple_class
 
-        def initialize(params, target_folder, current_user)
+        def initialize(params, target_place, creator, owner)
           @params = params
-          @target_folder = target_folder
-          @current_user = current_user
+          @target_place = target_place
+          @creator = creator
+          @owner = owner
         end
 
         def call
@@ -26,8 +27,16 @@ module Services
 
             binding.pry
             set_owner
-            set_folder
+            set_creator
+
+            binding.pry
+            set_place
+
+            binding.pry
             set_tags
+
+            binding.pry
+            set_root_container_related_simple_class
 
             binding.pry
             @simple_class.save!
@@ -60,11 +69,22 @@ module Services
         end
 
         def set_owner
-          @simple_class.ownerable = @current_user
+          binding.pry
+          @simple_class.ownerable = @owner
         end
 
-        def set_folder
-          @simple_class.folder = @target_folder
+        def set_creator
+          binding.pry
+          @simple_class.creator = @creator
+        end
+
+        def set_place
+          binding.pry
+          if @target_place.class == Folder
+            @simple_class.folder = @target_place
+          elsif @target_place.class == Repository
+            @simple_class.repository = @target_place
+          end
         end
 
         def set_tags
@@ -78,6 +98,11 @@ module Services
           end
         end
 
+        def set_root_container_related_simple_class
+          binding.pry
+          class_container = @simple_class.class_containers.find{|a| a.functional_type == ::ClassContainers::FunctionalTypes[:root_class_container]}
+          class_container.related_simple_class = @simple_class
+        end
       end
     end
   end

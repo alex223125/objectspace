@@ -2,8 +2,10 @@ class CheatSheets::CheatSheet < ApplicationRecord
 
   extend Pagy::Searchkick
   searchkick callbacks: :async,
-    text_middle: [:title, :source_page_description],
-    word: [:list_of_tags, :ownerable_id]
+             text_start: [:title, :source_page_description],
+             text_middle: [:title, :source_page_description],
+             text_end: [:title, :source_page_description],
+             word: [:list_of_tags, :ownerable_id]
   scope :search_import, -> { includes(:tags) }
   acts_as_taggable_on :tags
 
@@ -19,6 +21,9 @@ class CheatSheets::CheatSheet < ApplicationRecord
   accepts_nested_attributes_for :cheat_sheet_versions
 
   has_many :sections, as: :sectionable, class_name: "CheatSheetGroups::Section"
+
+  has_many :container_members, as: :memberable, class_name: "SimpleClasses::ContainerMember"
+  has_many :interface_members, as: :memberable, class_name: "SimpleClasses::InterfaceMember"
 
   def class_key
     "cheat_sheet"

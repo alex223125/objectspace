@@ -53,7 +53,7 @@
           <!-- user meta form medium screens -->
           <div class="hidden md:block">
             <h1 class="font-semibold"><%= @target_user.username %></h1>
-            <p><%= @target_user.biography.html_safe %></p>
+            <p><%= @target_user.try(:biography).try(:html_safe) %></p>
           </div>
 
         </div>

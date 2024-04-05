@@ -1,7 +1,9 @@
 <!--<div data-id="<%#= f.object_name.match(/(\d+)]/)[1] %>" class="nested-fields">-->
 <div class="root-class-container">
-  <%= f.hidden_field :title %>
+  <%= f.hidden_field :title, value: @root_class_container.title %>
   <%= f.hidden_field :description %>
+  <%= f.hidden_field :creator_id, value: @root_class_container.creator_id %>
+  <%= f.hidden_field :functional_type, value: @root_class_container.functional_type %>
 
   <%= render "shared/form_partials/containers/container_members/nested_form", :form => f, :type => "root_class" %>
 

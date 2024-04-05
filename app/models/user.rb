@@ -1,6 +1,6 @@
 class User < ApplicationRecord
   include Ownerable
-
+  include Creatorable
 
   USERNAME_MAXIMUM_LENGTH = 40.freeze
 

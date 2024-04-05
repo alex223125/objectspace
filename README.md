@@ -30,6 +30,7 @@ elasticsearch-8.7.0-linux-x86_64/elasticsearch-8.7.0/bin$ ./elasticsearch
 
 # elsticsearch 
 sudo systemctl start elasticsearch
+systemctl start elasticsearch
 sudo systemctl status elasticsearch
 sudo systemctl stop elasticsearch
 
@@ -50,6 +51,13 @@ User.reindex
 
 # to redo slugs
 Articles::ArticleVersion.find_each(&:save)
+
+# sart service
+systemctl start postgresql
+systemctl status postgresql
+
+# without pty
+DISABLE_PRY=1 rails s
 
 # README
 

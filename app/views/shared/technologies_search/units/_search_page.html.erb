@@ -2,9 +2,12 @@
 
 <h1 class="text-2xl text-center mt-5 mb-4">Units search form</h1>
 
-<div data-controller="search_instructions" data-target="remote_select_instruction.searchInstructionsInstance remote_select_link_attachment.searchInstructionsInstance">
+<div data-controller="search_instructions" data-target="remote_select_instruction.searchInstructionsInstance
+                                                        remote_select_link_attachment.searchInstructionsInstance
+                                                        remote_select_cheat_sheet_group_section.searchInstructionsInstance">
   <div class="flex justify-center">
-    <%= render partial: "shared/technologies_search/shared/search_form", locals: { type: "units", scenario: scenario } %>
+    <%= render partial: "shared/technologies_search/shared/search_form",
+               locals: { type: "units", scenario: scenario } %>
   </div>
 
 

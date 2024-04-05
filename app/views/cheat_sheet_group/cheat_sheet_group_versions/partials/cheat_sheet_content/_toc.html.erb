@@ -1,6 +1,6 @@
 <div class="cheat-sheet-group-toc" data-controller="toc_scrolling">
   <br>
-  Sections table of content:
+  Sections:
   <ul role="list" a="" class="space-y-3 text-base list-none sm:text-lg md:mt-5 md:text-xl">
 
     <% cheat_sheet_group_version.sections.each do |section| %>
@@ -18,13 +18,23 @@
     <% end %>
 
     <li>
-      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#contribute">
+      <a class="hover:underline hover:text-blue-600 font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+         onclick="return false;"
+         href="#contribute-<%cheat_sheet_group_version.uuid%>"
+         data-action="click->toc_scrolling#scroll"
+         data-anchor="#contribute-<%=cheat_sheet_group_version.uuid%>"
+      >
         ↳ Contribute
       </a>
     </li>
 
     <li>
-      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#comments">
+      <a class="hover:underline hover:text-blue-600 font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+         onclick="return false;"
+         href="#comments-<%cheat_sheet_group_version.uuid%>"
+         data-action="click->toc_scrolling#scroll"
+         data-anchor="#comments-<%=cheat_sheet_group_version.uuid%>"
+      >
         ↳ Comments
       </a>
     </li>

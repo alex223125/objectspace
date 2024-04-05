@@ -32,20 +32,22 @@
           <%= cheat_sheet_group_version.description.html_safe %>
       </div>
 
-      <div class="sections">
-        <% cheat_sheet_group_version.sections.each do |section| %>
-          <% if section.sectionable.class == CheatSheetGroups::CheatSheetGroup %>
-            <% binding.pry %>
-            <%= render "cheat_sheet_group/cheat_sheet_group_versions/partials/cheat_sheet_content/parts/cheat_sheet_group",
-              cheat_sheet_group_version: section.sectionable.default_version %>
-          <% elsif section.sectionable.class == CheatSheets::CheatSheet %>
-            <% binding.pry %>
-            <%= render "cheat_sheet_group/cheat_sheet_group_versions/partials/cheat_sheet_content/parts/cheat_sheet",
-              cheat_sheet_version: section.sectionable.default_version %>
-          <% end %>
-        <% end %>
+      <!--DEVIDER -->
+      <div class="inline-flex items-center justify-center w-full">
+        <hr class="w-64 h-1 my-8 bg-gray-200 border-0 rounded dark:bg-gray-700">
+        <div class="absolute px-4 -translate-x-1/2 bg-white left-1/2 dark:bg-gray-900">
+          <svg class="w-4 h-4 text-gray-700 dark:text-gray-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 14">
+            <path d="M6 0H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h4v1a3 3 0 0 1-3 3H2a1 1 0 0 0 0 2h1a5.006 5.006 0 0 0 5-5V2a2 2 0 0 0-2-2Zm10 0h-4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h4v1a3 3 0 0 1-3 3h-1a1 1 0 0 0 0 2h1a5.006 5.006 0 0 0 5-5V2a2 2 0 0 0-2-2Z"/>
+          </svg>
+        </div>
       </div>
 
+      <%= render "cheat_sheet_group/cheat_sheet_group_versions/partials/cheat_sheet_content/parts/sections_iteration",
+                 cheat_sheet_group_version: cheat_sheet_group_version %>
+      <br>
+      <%= render "cheat_sheet_group/cheat_sheet_group_versions/partials/cheat_sheet_content/parts/contribute", cheat_sheet_group_version: cheat_sheet_group_version %>
+      <br>
+      <%= render "cheat_sheet_group/cheat_sheet_group_versions/partials/cheat_sheet_content/parts/comments", cheat_sheet_group_version: cheat_sheet_group_version %>
 
 
 

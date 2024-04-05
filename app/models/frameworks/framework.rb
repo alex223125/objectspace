@@ -5,7 +5,9 @@ class Frameworks::Framework < ApplicationRecord
 
   extend Pagy::Searchkick
   searchkick callbacks: :async,
+             text_start: [:title, :description],
              text_middle: [:title, :description],
+             text_end: [:title, :description],
              word: [:list_of_tags, :ownerable_id]
   scope :search_import, -> { includes(:tags) }
   acts_as_taggable_on :tags

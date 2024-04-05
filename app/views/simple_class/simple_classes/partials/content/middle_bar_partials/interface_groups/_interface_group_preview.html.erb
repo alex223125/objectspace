@@ -1,9 +1,11 @@
 <div class="interface-group" data-controller="interface_group_management_options_button">
   <!--title-->
-  <h2 id="interface-group-<%= interface_group.id %>"
-      class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">
-    # <%= interface_group.title %>:
-  </h2>
+    <%= link_to interface_group_path(ownername: interface_group.related_simple_class.ownerable.ownername, id: interface_group.slug),
+                class: "text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center" do %>
+      <h2 id="interface-group-<%= interface_group.id %>">
+        # <%= interface_group.title %>:
+      </h2>
+    <% end %>
   <br>
 
   <!--actions group description-->

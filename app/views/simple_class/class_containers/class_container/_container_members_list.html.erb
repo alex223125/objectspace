@@ -19,23 +19,40 @@
 <section class="relative py-2 overflow-hidden">
   <div class="relative container px-4 mx-auto">
 
-    Breadcrumbs: root /
-    <br>
+    <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Part 1.Child containers:</h2>
+    <% if class_container.children.present? %>
+      <div class="max-w-8xl mx-auto">
+        <% class_container.children.each do |child_container| %>
+          <%= render "simple_class/class_containers/class_container/child_container_preview", child_container: child_container %>
+        <% end %>
+      </div>
+    <% else %>
+      No child containers (add new)
+    <% end %>
     <br>
 
-    Part 1.Child containers:
-    <div class="max-w-5xl mx-auto">
-      <% class_container.children.each do |child_container| %>
-        <%= render "simple_class/class_containers/class_container/child_container_preview", child_container: child_container %>
-      <% end %>
-    </div>
+    <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Part 2.Current layer container members:</h2>
+    <% if class_container.container_members.present? %>
+      <div class="max-w-8xl mx-auto">
+        <% class_container.container_members.each do |container_member| %>
+          <%= render "simple_class/class_containers/class_container/container_member_preview", container_member: container_member %>
+        <% end %>
+      </div>
+    <% else %>
+      No container members (add new)
+    <% end %>
+    <br>
 
-    Part 2.Current layer container members:
-    <div class="max-w-5xl mx-auto">
-      <% class_container.container_members.each do |container_member| %>
-        <%= render "simple_class/class_containers/class_container/container_member_preview", container_member: container_member %>
-      <% end %>
-    </div>
+    <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Part 3.Current layer interface groups (actions groups):</h2>
+    <% if class_container.interface_groups.present? %>
+      <div class="max-w-8xl mx-auto">
+        <% class_container.interface_groups.each do |interface_group| %>
+          <%= render "simple_class/class_containers/class_container/container_interface_group_preview", interface_group: interface_group %>
+        <% end %>
+      </div>
+    <% else %>
+      No container members (add new)
+    <% end %>
   </div>
 </section>
 

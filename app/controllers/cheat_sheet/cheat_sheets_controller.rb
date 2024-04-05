@@ -47,10 +47,12 @@ class CheatSheet::CheatSheetsController < ApplicationController
 
     binding.pry
     service.call
+    @cheat_sheet = service.cheat_sheet
+    set_redirect_after_create_path
+
     respond_to do |format|
       if service.errors.blank?
-        format.html { redirect_to cheat_sheet_version_path(ownername: service.cheat_sheet.ownerable.ownername,
-                                                       id: service.cheat_sheet.default_version.slug),
+        format.html { redirect_to @redirect_after_create_path,
                                   notice: "Cheat sheet was successfully created." }
         format.json { render :show, status: :created, location: @cheat_sheet }
       else
@@ -85,6 +87,18 @@ class CheatSheet::CheatSheetsController < ApplicationController
   end
 
   private
+
+  def set_redirect_after_create_path
+    if target_place.class == SimpleClasses::InterfaceGroup
+      interface_member = @cheat_sheet.interface_members.last
+      @redirect_after_create_path = interface_member_path(ownername: interface_member.simple_class.ownerable.ownername,
+                                                          id: interface_member.slug)
+    else
+      @redirect_after_create_path = cheat_sheet_version_path(ownername: @cheat_sheet.ownerable.ownername,
+                                                             id: @cheat_sheet.default_version.slug)
+    end
+  end
+
     # Use callbacks to share common setup or constraints between actions.
     def set_cheat_sheet
       binding.pry

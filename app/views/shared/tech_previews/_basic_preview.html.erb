@@ -1,11 +1,14 @@
 <% scenario = scenario || nil %>
+<% article = article || nil %>
 <% unit = unit || nil %>
 <% algorithm = algorithm || nil %>
 <% cheat_sheet = cheat_sheet || nil %>
 <% cheat_sheet_group = cheat_sheet_group || nil %>
 
 
-<% if unit.present? %>
+<% if article.present? %>
+  <% technology = article %>
+<% elsif unit.present? %>
   <% technology = unit %>
 <% elsif algorithm.present? %>
   <% technology = algorithm %>

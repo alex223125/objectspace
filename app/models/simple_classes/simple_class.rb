@@ -5,15 +5,15 @@ class SimpleClasses::SimpleClass < ApplicationRecord
 
   extend Pagy::Searchkick
   searchkick callbacks: :async,
+             text_start: [:title, :description],
              text_middle: [:title, :description],
-             word: [:title, :description, :list_of_tags, :ownerable_id],
-             word_start: [:title, :description],
-             word_end: [:title, :description]
-
+             text_end: [:title, :description],
+             word: [:list_of_tags, :ownerable_id]
   scope :search_import, -> { includes(:tags) }
   acts_as_taggable_on :tags
 
   belongs_to :ownerable, polymorphic: true
+  belongs_to :creator, class_name: "User", foreign_key: :creator_id
 
   belongs_to :folder, class_name: "Folder", optional: true
   belongs_to :repository, class_name: "Repository", optional: true
@@ -43,8 +43,10 @@ class SimpleClasses::SimpleClass < ApplicationRecord
 
   has_many :interface_members, through: :interface_groups, class_name: "SimpleClasses::InterfaceMember"
 
-  validates :title, presence: true, allow_blank: false
-  validates :description, presence: true, allow_blank: false
+  has_many :included_class_containers, class_name: "SimpleClasses::ClassContainer", foreign_key: :related_simple_class_id
+  has_many :included_interface_groups, class_name: "SimpleClasses::InterfaceGroup", foreign_key: :related_simple_class_id
+
+  validates :title, :description, :functional_type, presence: true, allow_blank: false
 
   def root_class_container
     self.class_containers.where(parent_id: nil).first
@@ -82,6 +84,14 @@ class SimpleClasses::SimpleClass < ApplicationRecord
     binding.pry
     type = self.functional_type_value
     SimpleClasses::FunctionalTypes.meta(type)[:readable_name]
+  end
+
+  def decision_process_object_class?
+    self.functional_type == SimpleClasses::FunctionalTypes[:decision_process_object_class]
+  end
+
+  def decision_object_container_class?
+    self.functional_type == SimpleClasses::FunctionalTypes[:decision_object_container_class]
   end
 
   private

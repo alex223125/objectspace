@@ -37,9 +37,17 @@ class SearchController < ApplicationController
     # case 1. articles search
     if params[:query] && params[:type] == ARTICLES_SEARCH_TYPE
       binding.pry
+      # @articles = Articles::Article.search(params[:query], operator: "or",
+      #                                      fields: [:title, :source_page_description],
+      #                                      match: [:text_middle, :phrase])
+
+      match_pattern = [{title: :text_start}, {title: :text_middle}, {title: :text_end}, {title: :exact},
+                       {source_page_description: :text_start}, {source_page_description: :text_middle}, {source_page_description: :text_end}]
       @articles = Articles::Article.search(params[:query], operator: "or",
-                                           fields: [:title, :source_page_description],
-                                           match: :text_middle)
+                                           fields: match_pattern)
+
+      # [{title: :text_start}, {title: :text_middle}, {title: :text_end},
+      #  {source_page_description: :text_start}, {source_page_description: :text_middle}, {source_page_description: :text_end}]
       binding.pry
       @pagy, @articles = pagy(@articles, page: params[:page], items: 3)
 
@@ -54,6 +62,8 @@ class SearchController < ApplicationController
         locals = {scenario: "regular"}
       elsif params[:scenario] == "cheat_sheet_version_notes_link_attachment_addition"
         locals = {scenario: "cheat_sheet_version_notes_link_attachment_addition"}
+      elsif params[:scenario] == "cheat_sheet_group_version_section_addition"
+        locals = {scenario: "cheat_sheet_group_version_section_addition"}
       else
         locals = {}
       end
@@ -73,11 +83,18 @@ class SearchController < ApplicationController
       binding.pry
       # @unit_versions = Units::UnitVersion.english_global_search(params[:query])
       # @units = Units::Unit.english_unit_search(params[:query])
-      @units = Units::Unit.search(params[:query], operator: "or",
-                                  fields: [:title, :source_page_description], match: :text_middle)
+      # @units = Units::Unit.search(params[:query], operator: "or",
+      #                             fields: [:title, :source_page_description], match: :text_middle)
 
+      match_pattern = [{title: :text_start}, {title: :text_middle}, {title: :text_end}, {title: :exact},
+                       {source_page_description: :text_start}, {source_page_description: :text_middle}, {source_page_description: :text_end}]
+      @units = Units::Unit.search(params[:query], operator: "or", fields: match_pattern)
+
+      binding.pry
       if params[:scenario] == "cheat_sheet_version_notes_link_attachment_addition"
         locals = {scenario: "cheat_sheet_version_notes_link_attachment_addition"}
+      elsif params[:scenario] == "cheat_sheet_group_version_section_addition"
+        locals = {scenario: "cheat_sheet_group_version_section_addition"}
       end
 
       binding.pry
@@ -129,14 +146,10 @@ class SearchController < ApplicationController
 
       # case 3. cheat sheet
     elsif params[:query] && params[:type] == CHEAT_SHEET_SEARCH_TYPE
+      match_pattern = [{title: :text_start}, {title: :text_middle}, {title: :text_end}, {title: :exact},
+                       {source_page_description: :text_start}, {source_page_description: :text_middle}, {source_page_description: :text_end}]
       @cheat_sheets = CheatSheets::CheatSheet.search(params[:query], operator: "or",
-                                                    fields:[{title: :text_middle}, {title: :word},
-                                                      {title: :word_start}, {title: :word_end},
-                                                      {source_page_description: :text_middle},
-                                                      {source_page_description: :word},
-                                                      {source_page_description: :word_start},
-                                                      {source_page_description: :word_end}]
-      )
+                                                     fields: match_pattern)
 
       @pagy, @cheat_sheets = pagy(@cheat_sheets, page: params[:page], items: 3)
 
@@ -157,14 +170,10 @@ class SearchController < ApplicationController
 
       # case 4. cheat sheet group
     elsif params[:query] && params[:type] == CHEAT_SHEET_GROUP_SEARCH_TYPE
+      match_pattern = [{title: :text_start}, {title: :text_middle}, {title: :text_end}, {title: :exact},
+                       {source_page_description: :text_start}, {source_page_description: :text_middle}, {source_page_description: :text_end}]
       @cheat_sheet_groups = CheatSheetGroups::CheatSheetGroup.search(params[:query], operator: "or",
-                                                                    fields:[{title: :text_middle}, {title: :word},
-                                                                      {title: :word_start}, {title: :word_end},
-                                                                      {source_page_description: :text_middle},
-                                                                      {source_page_description: :word},
-                                                                      {source_page_description: :word_start},
-                                                                      {source_page_description: :word_end}]
-      )
+                                                                    fields: match_pattern)
 
       @pagy, @cheat_sheet_groups = pagy(@cheat_sheet_groups, page: params[:page], items: 3)
 

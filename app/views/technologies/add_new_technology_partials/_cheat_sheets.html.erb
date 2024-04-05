@@ -1,0 +1,68 @@
+<h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Cheat Sheets</h2>
+
+<p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+  In this section you can choose type of cheat sheet to systemize multiple articles and algorithms to use them from short navigation single page. Perfect solution to get fast access to big amount of knowledges.
+</p>
+
+<!-- Add new Cheat Sheet-->
+<div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+  <a href="#">
+    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Add new Cheat Sheet</h5>
+  </a>
+  <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Cheat sheets are useful when you need to systemize methods and algorithms on one page for fast navigation and browse.</p>
+  <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Ideal when you want to mix multiple algorithmns and units tougether which can be used in different sequence.</p>
+  <!--          <a href="#" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">-->
+  <!--            Add new Algorithm-->
+  <!--            <svg aria-hidden="true" class="w-4 h-4 ml-2 -mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>-->
+  <!--          </a>-->
+
+  <% if target.is_a?(Folder) %>
+    <%= link_to "Create new Cheat Sheet Combo",
+                new_cheat_sheet_cheat_sheet_path(target_folder: target.uuid),
+                class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+  <% elsif target.is_a?(Repository) %>
+    <%= link_to "Create new Cheat Sheet Combo",
+                new_cheat_sheet_cheat_sheet_path(target_repository: target.uuid),
+                class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+  <% elsif target.is_a?(SimpleClasses::ClassContainer) %>
+    <%= link_to "Create new Cheat Sheet Combo",
+                new_cheat_sheet_cheat_sheet_path(target_class_container: target.uuid),
+                class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+  <% elsif target.is_a?(SimpleClasses::InterfaceGroup) %>
+    <%= link_to "Create new Cheat Sheet Combo",
+                new_cheat_sheet_cheat_sheet_path(target_interface_group: target.uuid),
+                class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+  <% end %>
+</div>
+
+
+<!-- Add new Cheat Sheet Group-->
+<div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+  <a href="#">
+    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Add new Cheat Sheet Combo</h5>
+  </a>
+  <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Cheat sheet combo is very useful when you have a lot of other cheat sheet which you would like to group on a single page.</p>
+  <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Ideal when you want to create big navigation, similar to reference to big section of the book.</p>
+  <!--          <a href="#" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">-->
+  <!--            Add new Algorithm-->
+  <!--            <svg aria-hidden="true" class="w-4 h-4 ml-2 -mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>-->
+  <!--          </a>-->
+
+  <% if target.is_a?(Folder) %>
+    <%= link_to "Create new Cheat Sheet Combo",
+                new_cheat_sheet_group_cheat_sheet_group_path(target_folder: target.uuid),
+                class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+  <% elsif target.is_a?(Repository) %>
+    <%= link_to "Create new Cheat Sheet Combo",
+                new_cheat_sheet_group_cheat_sheet_group_path(target_repository: target.uuid),
+                class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+  <% elsif target.is_a?(SimpleClasses::ClassContainer) %>
+    <%= link_to "Create new Cheat Sheet Combo",
+                new_cheat_sheet_group_cheat_sheet_group_path(target_class_container: target.uuid),
+                class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+  <% elsif target.is_a?(SimpleClasses::InterfaceGroup) %>
+    <%= link_to "Create new Cheat Sheet Combo",
+                new_cheat_sheet_group_cheat_sheet_group_path(target_interface_group: target.uuid),
+                class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+  <% end %>
+</div>

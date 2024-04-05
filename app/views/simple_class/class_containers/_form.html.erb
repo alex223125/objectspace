@@ -1,27 +1,54 @@
-<%= form_with(model: class_container, class: "contents") do |form| %>
-  <% if class_container.errors.any? %>
+<% path = @class_container.new_record? ? simple_class_class_containers_path : simple_class_class_container_path %>
+<% method = @class_container.new_record? ? :post : :patch %>
+<%= simple_form_for(@class_container, url: path, method: method) do |f| %>
+
+  <% if @class_container.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-      <h2><%= pluralize(class_container.errors.count, "error") %> prohibited this class_container from being saved:</h2>
+      <h2><%= pluralize(@class_container.errors.count, "error") %> prohibited this improvement from being saved:</h2>
 
       <ul>
-        <% class_container.errors.each do |error| %>
+        <% @class_container.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
       </ul>
     </div>
   <% end %>
 
-  <div class="my-5">
-    <%= form.label :title %>
-    <%= form.text_field :title, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
+  <div class="form-inputs">
+    <div class="col-span-6 sm:col-span-3">
+      <%= f.label "Title", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.hint 'Describe title of class container', class: "mt-2 text-sm text-gray-500" %>
+      <%= f.input_field :title,
+        required: true,
+        class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
+        placeholder: "Ex: How to install Ruby on Rails on your Desktop" %>
+    </div>
+    <br>
+
+    <div class="col-span-6 sm:col-span-3">
+      <%= f.label "Description", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.hint 'Describe what you planning to store in current class container',
+        class: "mt-2 text-sm text-gray-500" %>
+      <%= f.input_field :description,
+        required: false,
+        class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
+        placeholder: "Ex: Different versions on how you can install Ruby on Rails on different environments" %>
+    </div>
+    <br>
+
+    <%= render "shared/form_partials/target_container" %>
+
+<!--    <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Article version fields</h2>-->
+    <%#= render "article/shared/partials/article_version_nested_form", :form => f %>
+  </div>
+  <br>
+
+  <div class="bg-gray-50 px-4 py-3 sm:px-6">
+    <div class="text-end">
+      <%= link_to "Back to dashboard", article_articles_path, class: "py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" %>
+      <% button_text = @class_container.new_record? ? "Create Component" : "Submit changes" %>
+      <%= f.button :submit, button_text, class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+    </div>
   </div>
 
-  <div class="my-5">
-    <%= form.label :description %>
-    <%= form.text_area :description, rows: 4, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
-  </div>
-
-  <div class="inline">
-    <%= form.submit class: "rounded-lg py-3 px-5 bg-blue-600 text-white inline-block font-medium cursor-pointer" %>
-  </div>
 <% end %>

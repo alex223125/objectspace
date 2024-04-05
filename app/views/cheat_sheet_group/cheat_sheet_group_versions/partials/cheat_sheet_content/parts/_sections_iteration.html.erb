@@ -1,0 +1,17 @@
+<div class="sections">
+  <% cheat_sheet_group_version.sections.each do |section| %>
+    <% if section.sectionable.class == Articles::Article %>
+      <%= render "cheat_sheet_group/cheat_sheet_group_versions/partials/cheat_sheet_content/parts/sections/article_version",
+                 article_version: section.sectionable.default_version %>
+    <% elsif section.sectionable.class == Units::Unit %>
+      <%= render "cheat_sheet_group/cheat_sheet_group_versions/partials/cheat_sheet_content/parts/sections/unit_version",
+                 unit_version: section.sectionable.default_version %>
+    <% elsif section.sectionable.class == CheatSheets::CheatSheet %>
+      <%= render "cheat_sheet_group/cheat_sheet_group_versions/partials/cheat_sheet_content/parts/sections/cheat_sheet_version",
+                 cheat_sheet_version: section.sectionable.default_version %>
+    <% elsif section.sectionable.class == CheatSheetGroups::CheatSheetGroup %>
+      <%= render "cheat_sheet_group/cheat_sheet_group_versions/partials/cheat_sheet_content/parts/sections/cheat_sheet_group_version",
+                 cheat_sheet_group_version: section.sectionable.default_version %>
+    <% end %>
+  <% end %>
+</div>

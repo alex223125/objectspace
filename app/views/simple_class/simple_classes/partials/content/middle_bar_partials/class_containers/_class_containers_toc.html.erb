@@ -4,13 +4,13 @@
     <br>
     Class containers list :
     <ul role="list" a="" class="space-y-3 text-base list-none sm:text-lg md:mt-5 md:text-xl">
-
-      <li>
-        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
-           href="#interface-group-<%= class_containers_root.id %>">
-          ↳ <%= class_containers_root.title %>
-        </a>
-      </li>
+<!--  DOC: We dont display root class_container, it stays hidden from UI point of view -->
+<!--      <li>-->
+<!--        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"-->
+<!--           href="#interface-group-<%#= class_containers_root.id %>">-->
+<!--          ↳ <%#= class_containers_root.title %>-->
+<!--        </a>-->
+<!--      </li>-->
 
       <% class_containers.each do |class_container| %>
         <li>

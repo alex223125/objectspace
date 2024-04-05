@@ -1,6 +1,7 @@
 module ApplicationHelper
   # include Pagy::Frontend
 
+  # doc: to open in a new window
   def technology_item_link_to(item, html_options = {}, &block)
     if item.class == Articles::Article
       path = article_version_path(ownername: item.ownerable.ownername, id: item.default_version.slug)
@@ -14,6 +15,9 @@ module ApplicationHelper
       path = cheat_sheet_group_version_path(ownername: item.ownerable.ownername, id: item.default_version.slug)
     elsif item.class == SimpleClasses::SimpleClass
       path = simple_class_path(ownername: item.ownerable.ownername, id: item.slug)
+    elsif item.class == SimpleClasses::ClassContainer
+      simple_class = item.related_simple_class
+      path = class_container_path(ownername: simple_class.ownerable.ownername, id: item.slug)
     elsif item.class == Frameworks::Framework
       path = framework_path(ownername: item.ownerable.ownername, id: item.slug)
     end
@@ -22,6 +26,7 @@ module ApplicationHelper
     result
   end
 
+  # doc: to open in the same window
   def technology_item_path_to(item)
     if item.class == Articles::Article
       path = article_version_path(ownername: item.ownerable.ownername, id: item.default_version.slug)
@@ -35,6 +40,9 @@ module ApplicationHelper
       path = cheat_sheet_group_version_path(ownername: item.ownerable.ownername, id: item.default_version.slug)
     elsif item.class == SimpleClasses::SimpleClass
       path = simple_class_path(ownername: item.ownerable.ownername, id: item.slug)
+    elsif item.class == SimpleClasses::ClassContainer
+      simple_class = item.related_simple_class
+      path = class_container_path(ownername: simple_class.ownerable.ownername, id: item.slug)
     elsif item.class == Frameworks::Framework
       path = framework_path(ownername: item.ownerable.ownername, id: item.slug)
     end
@@ -49,6 +57,28 @@ module ApplicationHelper
       binding.pry
       user.cropped_avatar.variant(resize_to_fill: [400, 400])
     end
+  end
+
+  # DOC:helper to create link from list of technologies in SimpleClass interface_group or
+  # class_container to position where technology placed
+  def simple_class_member_path_to(member)
+    binding.pry
+    if member.class == SimpleClasses::InterfaceMember
+      interface_group = member.interface_group
+      binding.pry
+      simple_class = interface_group.related_simple_class || interface_group.simple_class
+
+      binding.pry
+      path = interface_member_path(ownername: simple_class.ownerable.ownername, id: member.slug)
+
+    elsif member.class == SimpleClasses::ContainerMember
+      class_container = member.class_container
+      simple_class = class_container.related_simple_class || class_container.simple_class
+      path = container_member_path(ownername: simple_class.ownerable.ownername, id: member.slug)
+    end
+
+    result = path
+    result
   end
 
   # def user_avatar(user, size=40)

@@ -79,6 +79,7 @@ class SimpleClass::SimpleClassesController < ApplicationController
   # GET /simple_classes/new
   def new
     binding.pry
+    # Detect what type of class we will create
     if params[:class_type] == "decision_process_object_class"
       @class_type = SimpleClasses::FunctionalTypes[:decision_process_object_class]
     elsif params[:class_type] == "decision_object_class"
@@ -89,18 +90,27 @@ class SimpleClass::SimpleClassesController < ApplicationController
 
     @simple_class = SimpleClasses::SimpleClass.new
 
-    @root_class_container = @simple_class.class_containers.new(title: "Main")
-
+    # 1.0 Default setup
+    # 1.1 Default interface group (for all types of classes)
     rig_description = "This is main interface group for all uncategorized actions."
-    @root_interface_group = @simple_class.interface_groups.new(title: "Main", description: rig_description)
-
     binding.pry
-    service = Services::SimpleClasses::InterfaceGroups::CreateDefaultCollection.new(:decision_process_object_class)
+    @root_interface_group = @simple_class.interface_groups.new(title: "Main", description: rig_description,
+                                                               functional_type: InterfaceGroups::FunctionalTypes[:root],
+                                                               creator: current_user)
 
-    default_interface_groups = service.call
-    @simple_class.interface_groups << default_interface_groups
+    # 1.2 Default class container for DOC
+    if @class_type == SimpleClasses::FunctionalTypes[:decision_object_container_class]
+      service = Services::SimpleClasses::ClassContainers::BuildRootContainer.new(current_user)
+      service.call
+      @root_class_container = service.class_container
+    end
 
-    # @interface_group = @simple_class.interface_groups.new
+    # TODO: doesnt work, fix it
+    # TODO: do this as option to fill with defaut data in the form
+    # 1 click on the button 2 these parameters in the form
+    # service = Services::SimpleClasses::InterfaceGroups::CreateDefaultCollection.new(:decision_process_object_class)
+    # default_interface_groups = service.call
+    # @simple_class.interface_groups << default_interface_groups
   end
 
   # GET /simple_classes/1/edit
@@ -113,7 +123,7 @@ class SimpleClass::SimpleClassesController < ApplicationController
   # POST /simple_classes or /simple_classes.json
   def create
     binding.pry
-    service = Services::SimpleClasses::SimpleClasses::Create.new(simple_class_params, @target_folder, current_user)
+    service = Services::SimpleClasses::SimpleClasses::Create.new(simple_class_params, target_place, current_user, current_user)
     service.call
 
     binding.pry
@@ -124,7 +134,7 @@ class SimpleClass::SimpleClassesController < ApplicationController
                                   notice: "Class was successfully created." }
         format.json { render :show, status: :created, location: service.simple_class }
       else
-        format.html { render :new, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_entity, assigns: { simple_class: service.simple_class } }
         format.json { render json: service.simple_class.errors, status: :unprocessable_entity }
       end
     end

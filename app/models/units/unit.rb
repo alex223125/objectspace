@@ -3,7 +3,9 @@ class Units::Unit < ApplicationRecord
   extend Pagy::Searchkick
 
   searchkick callbacks: :async,
+             text_start: [:title, :source_page_description],
              text_middle: [:title, :source_page_description],
+             text_end: [:title, :source_page_description],
              word: [:list_of_tags, :ownerable_id]
   acts_as_taggable_on :tags
   scope :search_import, -> { includes(:tags) }
@@ -12,6 +14,7 @@ class Units::Unit < ApplicationRecord
   # acts_as_list scope: :algorithm
 
   belongs_to :ownerable, polymorphic: true
+  belongs_to :creator, class_name: "User", foreign_key: :creator_id
 
   # TODO: add validation unit should be in folder or in repositry, not 2 places at the same time
   belongs_to :folder, class_name: "Folder", optional: true
@@ -29,6 +32,11 @@ class Units::Unit < ApplicationRecord
   has_many :interface_members, as: :memberable, class_name: "SimpleClasses::InterfaceMember"
 
   has_many :link_attachments, as: :linkable, class_name: "CheatSheets::LinkAttachment"
+
+  has_many :container_members, as: :memberable, class_name: "SimpleClasses::ContainerMember"
+  has_many :interface_members, as: :memberable, class_name: "SimpleClasses::InterfaceMember"
+
+  has_many :sections, as: :sectionable, class_name: "CheatSheetGroups::Section"
 
   validates :title, presence: true, allow_blank: false
 

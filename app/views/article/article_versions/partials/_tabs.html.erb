@@ -32,12 +32,12 @@
     <!--        <div class="max-w-4xl hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="method" role="tabpanel" aria-labelledby="method-tab">-->
     <div class="hidden p-4 rounded-lg h-full" id="article" role="tabpanel" aria-labelledby="article-tab">
       <!--        <p class="text-sm text-gray-500 dark:text-gray-400">This is some placeholder content the <strong class="font-medium text-gray-800 dark:text-white">Profile tab's associated content</strong>. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling.</p>-->
-      <%= render "article/article_versions/partials/article_content/main_page", article_version: @article_version %>
+      <%= render "article/article_versions/partials/article_content/main_page", article_version: article_version %>
     </div>
 
     <!--      <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="improvements" role="tabpanel" aria-labelledby="improvements-tab">-->
     <div class="hidden p-4" id="improvements" role="tabpanel" aria-labelledby="improvements-tab">
-      <%= render "article/article_versions/partials/improvements_content/main_page", article_version: @article_version %>
+      <%= render "article/article_versions/partials/improvements_content/main_page", article_version: article_version %>
       <!--        <p class="text-sm text-gray-500 dark:text-gray-400">This is some placeholder content the <strong class="font-medium text-gray-800 dark:text-white">Dashboard tab's associated content</strong>. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling.</p>-->
     </div>
 
@@ -47,7 +47,7 @@
     <!--      </div>-->
 
     <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="settings" role="tabpanel" aria-labelledby="settings-tab">
-      <%= render "article/article_versions/partials/settings_content/main_page", article_version: @article_version %>
+      <%= render "article/article_versions/partials/settings_content/main_page", article_version: article_version %>
       <!--        <p class="text-sm text-gray-500 dark:text-gray-400">This is some placeholder content the <strong class="font-medium text-gray-800 dark:text-white">Settings tab's associated content</strong>. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling.</p>-->
     </div>
   </div>

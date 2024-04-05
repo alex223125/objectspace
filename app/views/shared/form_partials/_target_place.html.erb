@@ -7,7 +7,12 @@
 <% if @target_repository.present? %>
   <%= hidden_field_tag 'target_repository', @target_repository.uuid  %>
 <% end %>
-<!--    Option 3: Place to interface group-->
+<!--    Option 3: Place to class container-->
+<% if @target_class_container.present? %>
+  <%= hidden_field_tag :target_class_container, @target_class_container.uuid %>
+<% end %>
+<% binding.pry %>
+<!--    Option 4: Place to interface group-->
 <% if @target_interface_group.present? %>
   <%= hidden_field_tag :target_interface_group, @target_interface_group.uuid %>
 <% end %>

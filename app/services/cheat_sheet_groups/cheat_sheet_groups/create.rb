@@ -1,14 +1,19 @@
+require "./app/services/concerns/technologies/taggable"
+require "./app/services/concerns/technologies/memberable"
 module Services
   module CheatSheetGroups
     module CheatSheetGroups
       class Create
+        include ::Services::Concerns::Technologies::Taggable
+        include ::Services::Concerns::Technologies::Memberable
 
         attr_reader :errors, :cheat_sheet_group
 
-        def initialize(params, target_place, current_user)
+        def initialize(params, target_place, creator, owner)
           @params = params
           @target_place = target_place
-          @current_user = current_user
+          @creator = creator
+          @owner = owner
         end
 
         def call
@@ -21,7 +26,9 @@ module Services
 
             binding.pry
             set_place
+
             set_owner
+            set_creator
 
             binding.pry
             set_tags
@@ -37,6 +44,10 @@ module Services
           binding.pry
           @errors = e.message
           Rails.logger.error(@errors)
+        end
+
+        def technology
+          @cheat_sheet_group
         end
 
         private
@@ -57,6 +68,12 @@ module Services
             @cheat_sheet_group.folder = @target_place
           elsif @target_place.class == Repository
             @cheat_sheet_group.repository = @target_place
+          elsif @target_place.class == ::SimpleClasses::ClassContainer
+            container_member = create_container_member
+            @cheat_sheet_group.class_containers << container_member
+          elsif @target_place.class == ::SimpleClasses::InterfaceGroup
+            interface_member = create_interface_member
+            @cheat_sheet_group.interface_members << interface_member
           end
         end
 
@@ -67,18 +84,12 @@ module Services
 
         def set_owner
           binding.pry
-          @cheat_sheet_group.ownerable = @current_user
+          @cheat_sheet_group.ownerable = @owner
         end
 
-        def set_tags
+        def set_creator
           binding.pry
-          @cheat_sheet_group.tag_list = parse_tags
-        end
-
-        def parse_tags
-          if @params[:tag_list].present?
-            JSON.parse(@params[:tag_list]).map{|h| h.values}.join(",")
-          end
+          @cheat_sheet_group.creator = @creator
         end
 
       end

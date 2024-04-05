@@ -5,8 +5,11 @@ module Commentable
 
   COMMENTABLE_MAPPING = [
     { controller: "unit/unit_versions", class: Units::UnitVersion },
-    { controller: "improvements", class: Improvements::Improvement }
-  ]
+    { controller: "improvements", class: Improvements::Improvement },
+    { controller: "simple_class/interface_members", class: "one_of_technology_classes" }
+  ].freeze
+
+  INTERFACE_MEMBER_CASE = "one_of_technology_classes".freeze
 
   included do
     before_action :comments, only: [:show]
@@ -24,6 +27,11 @@ module Commentable
   def find_commentable
     binding.pry
     commentable = COMMENTABLE_MAPPING.find {|commentable| commentable[:controller] == params[:controller] }
-    commentable[:class].find(params[:id])
+    if commentable[:class] == INTERFACE_MEMBER_CASE
+      interface_member = SimpleClasses::InterfaceMember.friendly.try(:find, params[:id])
+      interface_member.memberable.default_version
+    else
+      commentable[:class].find(params[:id])
+    end
   end
 end

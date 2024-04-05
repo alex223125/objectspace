@@ -29,27 +29,33 @@
         </div>
 
         <!-- Sections Toc-->
-        <%= render "simple_class/simple_classes/partials/content/bars/sections_toc", simple_class: @simple_class %>
+        <%= render "simple_class/simple_classes/partials/content/bars/sections_toc", simple_class: simple_class %>
 
         <div class="simple-class-content-area">
           <!--1.1 attributes section -->
-          <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/class_attributes/attributes_section", simple_class: @simple_class %>
+          <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/class_attributes/attributes_section",
+                     simple_class: simple_class %>
 
           <!--1.2 instruction -->
-          <% if @simple_class.functional_type_value == "decision_process_object_class" %>
+          <% if @simple_class.decision_process_object_class? %>
             <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/instruction",
                        instruction: @simple_class.instructionable %>
           <% end %>
 
+
+
+
           <!--1.3 interface groups section -->
-          <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/interface_groups/interface_group_section", simple_class: @simple_class %>
+          <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/interface_groups/interface_group_section",
+                     simple_class: simple_class %>
 
           <!--1.4 containers section (only for DOC) -->
-          <% if @simple_class.functional_type_value == "decision_object_container_class" %>
-            <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/class_containers/containers_section", simple_class: @simple_class %>
+          <% binding.pry %>
+          <% if @simple_class.decision_object_container_class? %>
+            <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/class_containers/containers_section",
+                       simple_class: simple_class %>
           <% end %>
         </div>
-
 
       </div>
     </div>

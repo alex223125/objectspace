@@ -30,22 +30,22 @@
     <!--        <div class="max-w-4xl hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="method" role="tabpanel" aria-labelledby="method-tab">-->
     <div class="hidden p-4 rounded-lg h-full" id="method" role="tabpanel" aria-labelledby="method-tab">
       <!--        <p class="text-sm text-gray-500 dark:text-gray-400">This is some placeholder content the <strong class="font-medium text-gray-800 dark:text-white">Profile tab's associated content</strong>. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling.</p>-->
-      <%= render "unit/unit_versions/partials/method_content/main_page", unit_version: @unit_version %>
+      <%= render "unit/unit_versions/partials/method_content/main_page", unit_version: unit_version %>
     </div>
 
     <!--      <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="improvements" role="tabpanel" aria-labelledby="improvements-tab">-->
     <div class="hidden p-4" id="improvements" role="tabpanel" aria-labelledby="improvements-tab">
-      <%= render "unit/unit_versions/partials/improvements_content/main_page", unit_version: @unit_version %>
+      <%= render "unit/unit_versions/partials/improvements_content/main_page", unit_version: unit_version %>
       <!--        <p class="text-sm text-gray-500 dark:text-gray-400">This is some placeholder content the <strong class="font-medium text-gray-800 dark:text-white">Dashboard tab's associated content</strong>. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling.</p>-->
     </div>
 
     <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="usage-examples" role="tabpanel"
          aria-labelledby="usage-examples-tab">
-      <%= render "unit/unit_versions/partials/usage_examples_content/main_page", unit_version: @unit_version %>
+      <%= render "unit/unit_versions/partials/usage_examples_content/main_page", unit_version: unit_version %>
     </div>
 
     <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="settings" role="tabpanel" aria-labelledby="settings-tab">
-      <%= render "unit/unit_versions/partials/settings_content/main_page", unit_version: @unit_version %>
+      <%= render "unit/unit_versions/partials/settings_content/main_page", unit_version: unit_version %>
       <!--        <p class="text-sm text-gray-500 dark:text-gray-400">This is some placeholder content the <strong class="font-medium text-gray-800 dark:text-white">Settings tab's associated content</strong>. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling.</p>-->
     </div>
   </div>

@@ -15,7 +15,7 @@
     <div class="">
       <div class="flex items-center mt-4 gap-x-3">
         <%= link_to "+ Add new Actions group",
-                    new_simple_class_interface_group_path(simple_class_id: interface_group.simple_class.id),
+                    new_simple_class_interface_group_path(target_interface_group: interface_group.uuid),
                     style: "text-decoration: none", class: "no-underline
         text-white bg-blue-700 hover:bg-blue-800 focus:ring-4
         focus:outline-none focus:ring-blue-300 font-medium rounded-lg

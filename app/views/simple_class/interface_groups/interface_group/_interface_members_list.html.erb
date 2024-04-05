@@ -1,32 +1,26 @@
-<!--<div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800">-->
-<!--  <div class="improvements-items">-->
-<!--    <div data-controller="improvements_infinite_scroll">-->
-<!--      <div data-target="improvements_infinite_scroll.entries">-->
-        <%#= render "units/partials/improvements_items" %>
-<!--      </div>-->
-
-<!--      <div data-target="improvements_infinite_scroll.pagination">-->
-        <%#== pagy_nav @pagy %>
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
-
-<!--</div>-->
-
-<!--  <a style="text-decoration: none" class="no-underline	 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" href="/improvements/new?unit_id=6">Load more</a>-->
-
-
 <section class="relative py-2 overflow-hidden">
   <div class="relative container px-4 mx-auto">
+    <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Part 1.Current layer interface groups (actions groups):</h2>
+    <% if interface_group.children.present? %>
+      <div class="max-w-8xl mx-auto">
+        <% interface_group.children.each do |interface_group| %>
+          <%= render "simple_class/interface_groups/interface_group/interface_group_preview", interface_group: interface_group %>
+        <% end %>
+      </div>
+    <% else %>
+      No container members (add new)
+    <% end %>
 
-    <div class="max-w-5xl mx-auto">
-
-      <!--          // Articles -->
-      <% interface_group.interface_members.each do |interface_member| %>
-        <%= render "simple_class/interface_groups/interface_group/interface_member_preview", interface_member: interface_member %>
-      <% end %>
-
-    </div>
+    <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Part 2.Current layer technologies:</h2>
+    <% if interface_group.interface_members.present? %>
+      <div class="max-w-8xl mx-auto">
+        <% interface_group.interface_members.each do |interface_member| %>
+          <%= render "simple_class/interface_groups/interface_group/interface_member_preview", interface_member: interface_member %>
+        <% end %>
+      </div>
+    <% else %>
+      No interface members (add new)
+    <% end %>
   </div>
 </section>
 

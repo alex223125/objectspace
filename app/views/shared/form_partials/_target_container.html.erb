@@ -1,0 +1,14 @@
+<!--    Place:-->
+<!--    Option 1: Place to simple_class -->
+<% binding.pry %>
+<% if @target_simple_class.present? %>
+  <%= hidden_field_tag 'target_simple_class', @target_simple_class.uuid  %>
+<% end %>
+<!--    Option 2: Place to class container -->
+<% if @target_class_container.present? %>
+  <%= hidden_field_tag 'target_class_container', @target_class_container.uuid  %>
+<% end %>
+<!--    Option 3: Place to interface group -->
+<% if @target_interface_group.present? %>
+  <%= hidden_field_tag 'target_interface_group', @target_interface_group.uuid  %>
+<% end %>

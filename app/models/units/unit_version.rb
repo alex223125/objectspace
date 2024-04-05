@@ -31,6 +31,8 @@ class Units::UnitVersion < ApplicationRecord
 
   has_many :comments, :as => :commentable, :dependent => :destroy, class_name: "Comment"
 
+  validates :title, presence: true, allow_blank: false
+
   alias_method :whole_unit, :unit
 
   def uniq_key
