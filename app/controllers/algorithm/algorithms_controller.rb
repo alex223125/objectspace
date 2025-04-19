@@ -1,10 +1,10 @@
 class Algorithm::AlgorithmsController < ApplicationController
-  include Folderable
+  include Placeable
   include Algorithm::Concerns::Subnodable
 
   before_action :set_algorithm, only: %i[ show edit update destroy preview view]
-  before_action :set_target_folder, only: %i[ new create ]
-  before_action :set_target_interface_group, only: %i[ new create ]
+  before_action :set_target_place, only: %i[ new create ]
+  # before_action :set_target_interface_group, only: %i[ new create ]
 
   # GET /algorithms or /algorithms.json
   def index
@@ -17,7 +17,7 @@ class Algorithm::AlgorithmsController < ApplicationController
 
   def preview
     binding.pry
-    service = Services::Algorithms::Algorithms::PreviewSettings.new(params[:case])
+    service = Services::Algorithms::Algorithms::PreviewSettings.new(params[:preview_type])
     service.call
 
     respond_to do |format|
@@ -49,6 +49,7 @@ class Algorithm::AlgorithmsController < ApplicationController
   def new
     @algorithm = Algorithms::Algorithm.new
     @algorithm_version = @algorithm.algorithm_versions.new
+    @introduction_step = @algorithm_version.build_introduction_step
     # @control_structure = @algorithm_version.control_structures.new
     # algorithm_default_control_structure = ControlStructures::FunctionalTypes[:following]
     # @default_algorithm_structure = @algorithm_version.control_structures.new(control_structure_functional_type: algorithm_default_control_structure)
@@ -61,10 +62,21 @@ class Algorithm::AlgorithmsController < ApplicationController
       @functional_type = Algorithms::FunctionalTypes[:regular]
     end
 
-    if params[:simple_class].present?
-      @simple_class = SimpleClasses::SimpleClass.find(params[:simple_class])
+    binding.pry
+    if @target_framework_interface.present?
+      binding.pry
+      @framework = @target_framework_interface.framework
+    elsif @target_simple_class_interface.present?
+      @simple_class = @target_simple_class_interface.simple_class
     end
+
+    # target_simple_class_interface
+    # if params[:simple_class].present?
+    #   @simple_class = SimpleClasses::SimpleClass.find(params[:simple_class])
+    # end
     # @step = @algorithm_version.steps.new
+
+    # DOC: Case when we creating algorithm inside of the SimpleClass
   end
 
 
@@ -86,32 +98,37 @@ class Algorithm::AlgorithmsController < ApplicationController
     @params = ActionController::Parameters.new(new_params)
 
     # 2.create record
-    target_place = @target_repository || @target_folder
     binding.pry
     service = Services::Algorithms::Algorithms::Create.new(algorithm_params, target_place,
-                                                           current_user, @target_interface_group)
+                                                           current_user, current_user)
     binding.pry
     service.call
-
+    @algorithm = service.algorithm
     respond_to do |format|
-
       binding.pry
       if service.errors.blank?
-
         binding.pry
+        set_redirect_after_success_create_path
         # format.html { redirect_to algorithm_algorithm_url(service.algorithm), notice: "Algorithm was successfully created." }
-        format.html { redirect_to algorithm_version_path(ownername: service.algorithm.ownerable.ownername,
-                                                         id: service.algorithm.default_version.slug),
-                                  notice: "Algorithm was successfully created." }
-        format.json { render :show, status: :created, location: @algorithm }
+        format.html { redirect_to @redirect_after_success_create_path, notice: "Algorithm was successfully created." }
+        # format.json { render :show, status: :created, location: @algorithm }
       else
         binding.pry
-        @algorithm = service.algorithm
+        @algorithm_tree = service.algorithm_tree
+        @root_leafe = service.root_leafe
+
+        binding.pry
         @control_structure = @algorithm.algorithm_versions.first.control_structures.first
+        # @functional_type = Algorithms::FunctionalTypes[@algorithm.functional_type]
         @functional_type = @algorithm.functional_type
 
-        format.html { render :new, status: :unprocessable_entity}
-        format.json { render json: @algorithm.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_entity,
+                             assigns: { algorithm: service.algorithm,
+                                        permission: service.permission,
+                                        algorithm_tree: service.algorithm_tree,
+                                        root_leafe: service.root_leafe,
+                                        simple_class: service.algorithm.simple_class_interface.simple_class} }
+        # format.json { render json: @algorithm.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -141,11 +158,25 @@ class Algorithm::AlgorithmsController < ApplicationController
 
   private
 
-  def set_target_interface_group
-    if params[:target_interface_group].present?
-      @target_interface_group = SimpleClasses::InterfaceGroup.where(id: params[:target_interface_group]).first
+  def set_redirect_after_success_create_path
+    if target_place.class == SimpleClasses::InterfaceGroup
+      interface_member = @algorithm.interface_members.last
+      related_class_layer_entity = interface_member.interface_group.related_class_layer_entity
+      @redirect_after_success_create_path = interface_member_path(ownername: related_class_layer_entity.ownerable.ownername,
+                                                          id: interface_member.slug)
+    else
+      @redirect_after_success_create_path = algorithm_version_path(ownername: @algorithm.ownerable.ownername,
+                                                           id: @algorithm.default_version.slug)
+
     end
   end
+
+  # We already have it in  include Folderable
+  # def set_target_interface_group
+  #   if params[:target_interface_group].present?
+  #     @target_interface_group = SimpleClasses::InterfaceGroup.where(id: params[:target_interface_group]).first
+  #   end
+  # end
 
     # Use callbacks to share common setup or constraints between actions.
   def set_algorithm
@@ -154,11 +185,16 @@ class Algorithm::AlgorithmsController < ApplicationController
 
   def algorithm_params
     @params.require(:algorithms_algorithm).permit(:title, :description, :source_page_description, :tag_list,
-                                                  :functional_type,
+                                                  :functional_type, :simple_class_id,
 
                                                   algorithm_versions_attributes: [:id, :title, :solves_the_problem,
                                                                                   :sources, :additional_information,
                                                                                   :description,
+
+                                                                                  introduction_step_attributes: [
+                                                                                      :title, :content
+
+                                                                                  ],
 
                                                                                   control_structures_attributes: [
 
