@@ -18,28 +18,23 @@ class ImprovementsController < ApplicationController
     respond_to do |format|
       format.html
       format.json {
-        render json: { entries: render_to_string(partial: "unit/unit_versions/partials/improvements_content/improvements_items",
+        render json: { entries: render_to_string(partial: "technologies/improvements_content/improvements_items",
                                                  formats: [:html]),
                        pagination: @pagy }
       }
     end
   end
 
+
   # GET /improvements/1 or /improvements/1.json
   def show
-    technology_breadcrumbs(@improvement.unit)
-    # breadcrumbs
-    # add_breadcrumb @improvement.unit.title, unit_unit_version_path(@improvement.unit.default_version)
-    add_breadcrumb "Improvements", unit_version_path(ownername: @improvement.unit.ownerable.ownername,
-                                                     id: @improvement.unit.default_version.slug,
-                                                     target_tab: "improvements")
-    add_breadcrumb @improvement.title, improvement_path(@improvement)
+    technology_breadcrumbs(@improvement)
   end
 
   # GET /improvements/new
   def new
     binding.pry
-    set_unit
+    set_improvable
     @improvement = Improvements::Improvement.new
   end
 
@@ -51,21 +46,23 @@ class ImprovementsController < ApplicationController
   # POST /improvements or /improvements.json
   def create
     binding.pry
-    # rebuild_technology_params
-    @improvement = Improvements::Improvement.new(improvement_params)
+    service = Services::Improvements::Improvements::Create.new(improvement_params, current_user, current_user)
+
+    binding.pry
+    service.call
 
     binding.pry
     respond_to do |format|
       binding.pry
-      if @improvement.save
-        # redirect_to product_path(@trademark.product, anchor: "trademarks")
-        # na show improvement sdelat redirect
-        # format.html { redirect_to unit_path(@improvement.unit, anchor: "improvements-tab"), notice: "Improvement was successfully submitted." }
-        format.html { redirect_to improvement_url(@improvement), notice: "Improvement was successfully submitted." }
-        format.json { render :show, status: :created, location: @improvement }
+      if service.errors.blank?
+        binding.pry
+        format.html { redirect_to improvement_show_path(technology_name: service.improvement.improvable.slug,
+                                                   id: service.improvement.slug),
+                                  notice: "Improvement was successfully submitted." }
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @improvement.errors, status: :unprocessable_entity }
+        binding.pry
+        format.html { render :new, status: :unprocessable_entity, assigns: { improvement: service.improvement,
+                                                                             permission: service.permission} }
       end
     end
   end
@@ -99,9 +96,15 @@ class ImprovementsController < ApplicationController
       params.require(:improvements_search).permit(:tech_id, :tech_type, :page, :query, :status, :sort_by, :tech_version)
     end
 
-    def set_unit
+    def set_improvable
       binding.pry
-      @unit = Units::Unit.find_by(uuid: params[:unit_id])
+      if params[:article_id].present?
+        @article = Articles::Article.find_by(uuid: params[:article_id])
+      elsif params[:unit_id].present?
+        @unit = Units::Unit.find_by(uuid: params[:unit_id])
+      elsif params[:algorithm_id].present?
+        @algorithm = Algorithms::Algorithm.find_by(uuid: params[:algorithm_id])
+      end
     end
 
     # Use callbacks to share common setup or constraints between actions.
@@ -111,8 +114,10 @@ class ImprovementsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def improvement_params
-      params.require(:improvements_improvement).permit(:title, :content, :sources, :unit_id,
-        unit_version_improvements_attributes: [:unit_version_id])
+      params.require(:improvements_improvement).permit(:title, :content, :sources, :unit_id, :article_id, :algorithm_id,
+        unit_version_improvements_attributes: [:unit_version_id],
+        article_version_improvements_attributes: [:article_version_id]
+      )
     end
 
     # def rebuild_technology_params
