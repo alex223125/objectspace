@@ -1,0 +1,233 @@
+
+### Start
+sudo systemctl restart postgresql-12
+sudo systemctl start elasticsearch
+sudo systemctl status elasticsearch
+
+
+## Elasticsearch not starting fedora38
+
+Do relink
+https://tecadmin.net/install-elasticsearch-on-fedora/
+
+Hix size fix
+https://stackoverflow.com/questions/58656747/elasticsearch-job-for-elasticsearch-service-failed
+
+Useful commands:
+sudo less /var/log/elasticsearch/elasticsearch.log
+journalctl -xe
+
+
+### Postgresql not starting
+
+sudo systemctl start postgresql
+sudo  systemctl enable postgresql
+
+# 1
+May 05 10:15:43 programming systemd[1]: Starting postgresql.service - PostgreSQL database server...
+May 05 10:15:43 programming postgresql-check-db-dir[8538]: Directory "/var/lib/pgsql/data" is missing or empty.
+May 05 10:15:43 programming postgresql-check-db-dir[8538]: Use "/usr/bin/postgresql-setup --initdb"
+May 05 10:15:43 programming postgresql-check-db-dir[8538]: to initialize the database cluster.
+May 05 10:15:43 programming postgresql-check-db-dir[8538]: See /usr/share/doc/postgresql/README.rpm-dist for more information.
+May 05 10:15:43 programming systemd[1]: postgresql.service: Control process exited, code=exited, status=1/FAILURE
+May 05 10:15:43 programming systemd[1]: postgresql.service: Failed with result 'exit-code'.
+May 05 10:15:43 programming systemd[1]: Failed to start postgresql.service - PostgreSQL database server.
+
+#
+https://reintech.io/blog/setting-up-postgresql-on-fedora-38
+
+#
+sudo less initdb_postgresql.log
+
+The files belonging to this database system will be owned by user "postgres".
+This user must also own the server process.
+
+The database cluster will be initialized with locale "C.UTF-8".
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+fixing permissions on existing directory /var/lib/pgsql/data ... ok
+creating subdirectories ... ok
+selecting dynamic shared memory implementation ... posix
+selecting default max_connections ... 100
+selecting default shared_buffers ... 128MB
+selecting default time zone ... America/New_York
+creating configuration files ... ok
+running bootstrap script ... ok
+performing post-bootstrap initialization ... ok
+syncing data to disk ... ok
+
+Success. You can now start the database server using:
+
+    /usr/bin/pg_ctl -D /var/lib/pgsql/data -l logfile start
+
+
+#
+bash-5.2$ less logfile
+bash-5.2$ less logfile
+bash-5.2$ pwd
+/var/lib/pgsql
+
+
+#
+FATAL:  configuration file "/var/lib/pgsql/data/postgresql.conf" contains errors
+
+## SOLUTION - VERSION 12 is INSTALLED !!!
+sudo systemctl status postgresql-12
+
+● postgresql-12.service - PostgreSQL 12 database server
+     Loaded: loaded (/usr/lib/systemd/system/postgresql-12.service; enabled; preset: disabled)
+    Drop-In: /usr/lib/systemd/system/service.d
+             └─10-timeout-abort.conf
+     Active: active (running) since Sun 2024-05-05 10:46:25 EDT; 5s ago
+       Docs: https://www.postgresql.org/docs/12/static/
+    Process: 9689 ExecStartPre=/usr/pgsql-12/bin/postgresql-12-check-db-dir ${PGDATA} (code=exited, status=0/SUCCESS)
+   Main PID: 9695 (postmaster)
+      Tasks: 8 (limit: 4618)
+     Memory: 16.5M
+        CPU: 121ms
+     CGroup: /system.slice/postgresql-12.service
+             ├─9695 /usr/pgsql-12/bin/postmaster -D /var/lib/pgsql/12/data/
+             ├─9696 "postgres: logger   "
+             ├─9698 "postgres: checkpointer   "
+             ├─9699 "postgres: background writer   "
+             ├─9700 "postgres: walwriter   "
+             ├─9701 "postgres: autovacuum launcher   "
+             ├─9702 "postgres: stats collector   "
+             └─9703 "postgres: logical replication launcher   "
+
+
+# Get to psql terminal
+sudo su - postgres
+postgres@student:~$ psql
+psql (10.0)
+Type "help" for help.
+
+## List all of the users
+\du
+
+postgres=# \du
+                                   List of roles
+ Role name |                         Attributes                         | Member of
+-----------+------------------------------------------------------------+-----------
+ earth     | Superuser, Create role, Create DB, Replication             | {}
+ postgres  | Superuser, Create role, Create DB, Replication, Bypass RLS | {}
+
+
+
+## List of all databases
+postgres-# \l
+                                             List of databases
+   Name    |  Owner   | Encoding | Collate |  Ctype  | ICU Locale | Locale Provider |   Access privileges
+-----------+----------+----------+---------+---------+------------+-----------------+-----------------------
+ postgres  | postgres | UTF8     | C.UTF-8 | C.UTF-8 |            | libc            |
+ template0 | postgres | UTF8     | C.UTF-8 | C.UTF-8 |            | libc            | =c/postgres          +
+           |          |          |         |         |            |                 | postgres=CTc/postgres
+ template1 | postgres | UTF8     | C.UTF-8 | C.UTF-8 |            | libc            | =c/postgres          +
+           |          |          |         |         |            |                 | postgres=CTc/postgres
+(3 rows)
+
+
+# Install pgadmin
+https://www.atlantic.net/dedicated-server-hosting/how-to-install-pgadmin-on-fedora/
+qwe23523523523523523523523523523523523523523535@qwe.com
+qwerty
+
+
+#
+bash-5.2$ sudo find / -wholename '*/bin/postgres' 2>&- | xargs -i xargs -t '{}' -V
+/usr/pgsql-12/bin/postgres -V
+postgres (PostgreSQL) 12.18
+/usr/bin/postgres -V
+postgres (PostgreSQL) 15.4
+
+
+#
+bash-5.2$  sudo -u postgres psql
+could not change directory to "/home/user/Downloads": Permission denied
+psql (15.4, server 12.18)
+Type "help" for help.
+
+DROP ROLE earth;
+postgres=#  CREATE ROLE earth WITH SUPERUSER CREATEDB CREATEROLE LOGIN ENCRYPTED PASSWORD 'earth';
+ERROR:  role "earth" already exists
+postgres=#  ALTER ROLE earth WITH SUPERUSER CREATEDB CREATEROLE LOGIN ENCRYPTED PASSWORD 'earth';
+ALTER ROLE
+
+
+#
+https://www.postgresql.org/docs/current/storage-file-layout.html
+Traditionally, the configuration and data files used by a database cluster are stored together
+within the cluster's data directory, commonly referred to as PGDATA (after the name of the environment
+variable that can be used to define it). A common location for PGDATA is /var/lib/pgsql/data .
+
+# make persistent
+binds+=( '/var/lib/pgsql' )
+https://www.qubes-os.org/doc/bind-dirs/
+
+
+
+
+
+
+## new error
+
+bash-5.2$ pwd
+/var/lib/pgsql/data
+bash-5.2$ sudo nano pg_hba.conf
+
+Caused by:
+PG::ConnectionBad: FATAL:  Peer authentication failed for user "earth"
+/home/user/.rvm/gems/ruby-2.7.1/gems/pg-1.5.6/lib/pg/connection.rb:701:in `async_connect_or_reset'
+/home/user/.rvm/gems/ruby-2.7.1/gems/pg-1.5.6/lib/pg/connection.rb:833:in `connect_to_hosts'
+/home/user/.rvm/gems/ruby-2.7.1/gems/pg-1.5.6/lib/pg/connection.rb:764:in `new'
+/home/user/.rvm/gems/ruby-2.7.1/gems/pg-1.5.6/lib/pg.rb:63:in `connect'
+
+# change to md5
+https://stackoverflow.com/questions/15306770/postgresql-fatal-peer-authentication-failed-for-user-pgconnectionbad
+
+#
+in shell: psql
+
+then:
+
+  create user alphauser with password 'alphapassword';
+  create database alpha_database owner alphauser;
+  alter user alphauser superuser createrole createdb replication;
+  \q
+
+
+###### I was in wrong folder, this one correct for version 12 of postgresql !!!!!
+bash-5.2$ cd data/
+bash-5.2$ ls
+PG_VERSION	  global	pg_dynshmem    pg_logical    pg_replslot   pg_stat	pg_tblspc    pg_xact		   postmaster.opts
+base		  log		pg_hba.conf    pg_multixact  pg_serial	   pg_stat_tmp	pg_twophase  postgresql.auto.conf  postmaster.pid
+current_logfiles  pg_commit_ts	pg_ident.conf  pg_notify     pg_snapshots  pg_subtrans	pg_wal	     postgresql.conf
+bash-5.2$ sudo nano pg_hba.conf
+bash-5.2$
+bash-5.2$ pwd
+/var/lib/pgsql/12/data
+
+
+
+## new error
+Caused by:
+PG::UndefinedFile: ERROR:  could not open extension control file "/usr/pgsql-12/share/extension/pgcrypto.control": No such file or directory
+/home/user/.rvm/gems/ruby-2.7.1/gems/activerecord-7.0.2.4/lib/active_record/connection_adapters/postgresql_adapter.rb:768:in `exec_params'
+/home/user/.rvm/gems/ruby-2.7.1/gems/activerecord-7.0.2.4/lib/active_record/connection_adapters/postgresql_adapter.rb
+## add this folder to persistent
+binds+=( '/usr/pgsql-12' )
+
+## add elsticsearch to persistens
+binds+=( '/var/lib/elasticsearch' )
+binds+=( '/etc/elasticsearch' )
+
+
+### PG ADMIN SETUP
+https://docs.bitnami.com/aws/infrastructure/ruby/administration/configure-pgadmin/
+
+### HOW TO SETUP CONNECTION WITH LOCAL DATABASE
+https://stackoverflow.com/questions/5080025/connecting-to-rails-app-postgres-db-using-pgadmin
+
