@@ -33,7 +33,9 @@ class DashboardsController < ApplicationController
   end
 
   def repositories
-    repositories = current_user.repositories
+    binding.pry
+    target_user = User.where(username: params[:target_user]).first
+    repositories = target_user.repositories
     respond_to do |format|
       format.json {
         render json: { entries: render_to_string(partial: "repositories/list",
@@ -41,7 +43,22 @@ class DashboardsController < ApplicationController
                                                  :locals => {:repositories => repositories}) }
       }
     end
+  end
 
+  def reports
+    binding.pry
+    target_user = User.where(username: params[:target_user]).first
+    # reports = target_user.reports_repository.algorithm_reports
+    reports_repositories = target_user.reports_repositories
+    folders = target_user.reports_repository_folders
+    respond_to do |format|
+      format.json {
+        render json: { entries: render_to_string(partial: "reports_repositories/list",
+                                                 formats: [:html],
+                                                 :locals => {:reports_repositories => reports_repositories,
+                                                             :folders => folders}) }
+      }
+    end
   end
 
   # def methodologies
