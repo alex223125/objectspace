@@ -2,7 +2,7 @@ module Containerable
   extend ActiveSupport::Concern
 
   def target_place
-    @target_simple_class || @target_class_container || @target_interface_group
+    @target_simple_class || @target_class_container || @target_interface_group || @target_framework
   end
 
   def containerable_back_path
@@ -17,12 +17,14 @@ module Containerable
 
   def set_target_place
     binding.pry
-    if params[:target_simple_class].present?
-      @target_simple_class = SimpleClasses::SimpleClass.find_by_uuid(params[:target_simple_class])
-    elsif params[:target_class_container].present?
+    if params[:target_class_container].present?
       @target_class_container = SimpleClasses::ClassContainer.find_by_uuid(params[:target_class_container])
     elsif params[:target_interface_group].present?
       @target_interface_group = SimpleClasses::InterfaceGroup.find_by_uuid(params[:target_interface_group])
+    elsif params[:target_simple_class].present?
+      @target_simple_class = SimpleClasses::SimpleClass.find_by_uuid(params[:target_simple_class])
+    elsif params[:target_framework].present?
+      @target_framework = Frameworks::Framework.find_by_uuid(params[:target_framework])
     end
   end
 end
