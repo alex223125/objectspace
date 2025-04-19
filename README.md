@@ -6,6 +6,8 @@ asfasafsfsafsafsaasf@gmail.com
 testeamiladress1@gmail.com
 123456
 
+test@test.com
+123456
 
 # work with server
 lsof -i :3000
@@ -29,6 +31,9 @@ yarn add flowbite-typography
 elasticsearch-8.7.0-linux-x86_64/elasticsearch-8.7.0/bin$ ./elasticsearch
 
 # elsticsearch 
+In case of this error:
+ActionView::Template::Error (Failed to open TCP connection to localhost:9200 (Connection refused - connect(2) for "localhost" port 9200)):
+
 sudo systemctl start elasticsearch
 systemctl start elasticsearch
 sudo systemctl status elasticsearch
@@ -59,6 +64,10 @@ systemctl status postgresql
 # without pty
 DISABLE_PRY=1 rails s
 
+# regenerate slugs 
+SimpleClasses::SimpleClassAttribute.find_each(&:save)
+
+
 # README
 
 This README would normally document whatever steps are necessary to get the
@@ -85,4 +94,10 @@ Things you may want to cover:
 * ...
 
 
-Alexey Sologub (c) Copyright
+# COPYRIGHT 
+
+Alexey Sologub (c) Copyright.
+Whole project designed and developed by Alexey Sologub.
+All rights to use this project belongs only to Author (Alexey Sologub) on this project.
+No one under any curicamstances has right to use this project for any purpose.
+You can contact Author of this project (Alexey Sologub) by his email: alexdevindeva@gmail.com
