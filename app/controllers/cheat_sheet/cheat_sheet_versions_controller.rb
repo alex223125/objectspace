@@ -1,5 +1,7 @@
 class CheatSheet::CheatSheetVersionsController < ApplicationController
   include TechBreadcrumbable
+  include Memberable
+
   before_action :set_cheat_sheet_version, only: %i[ show edit update destroy ]
 
   # GET /cheat_sheet_versions or /cheat_sheet_versions.json
@@ -9,8 +11,12 @@ class CheatSheet::CheatSheetVersionsController < ApplicationController
 
   # GET /cheat_sheet_versions/1 or /cheat_sheet_versions/1.json
   def show
-    technology_breadcrumbs(@cheat_sheet_version)
-    @cheat_sheet = @cheat_sheet_version.cheat_sheet
+    if container_members_present?(@cheat_sheet_version) || interface_members_present?(@cheat_sheet_version)
+      redirect_to_member(@cheat_sheet_version)
+    else
+      technology_breadcrumbs(@cheat_sheet_version)
+      @cheat_sheet = @cheat_sheet_version.cheat_sheet
+    end
   end
 
   # GET /cheat_sheet_versions/new
@@ -75,8 +81,11 @@ class CheatSheet::CheatSheetVersionsController < ApplicationController
       if request_slug != @cheat_sheet_version.slug
         return redirect_to cheat_sheet_version_path(ownername: @cheat_sheet_version.owner.ownername,
                                                     id: @cheat_sheet_version.slug),
-          :status => :moved_permanently
+                           :status => :moved_permanently
       end
+    rescue ActiveRecord::RecordNotFound
+      flash[:error] = "Model not found"
+      redirect_to :root
     end
 
     # Only allow a list of trusted parameters through.

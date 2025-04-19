@@ -1,8 +1,8 @@
 class CheatSheet::CheatSheetsController < ApplicationController
-  include Folderable
+  include Placeable
 
-  before_action :set_cheat_sheet, only: %i[ show edit update destroy preview ]
-  before_action :set_target_folder, only: %i[ new create ]
+  before_action :set_cheat_sheet, only: %i[ show edit update destroy preview view ]
+  before_action :set_target_place, only: %i[ new create ]
 
   # GET /cheat_sheets or /cheat_sheets.json
   def index
@@ -18,6 +18,15 @@ class CheatSheet::CheatSheetsController < ApplicationController
     if params[:preview_type] == "cheat_sheet_group_section_preview"
       path = "shared/tech_previews/basic_preview"
       scenario = "cheat_sheet_group_section_preview"
+    elsif params[:preview_type] == "algorithm_form_wrapper_step_addition"
+      path = "shared/tech_previews/basic_preview"
+      scenario = "algorithm_form_wrapper_step_addition"
+    elsif params[:preview_type] == "algorithm_form_class_level_wrapper_step_addition"
+      path = "shared/tech_previews/basic_preview"
+      scenario = "algorithm_form_class_level_wrapper_step_addition"
+    elsif params[:preview_type] == "article_attachment_preview"
+      path = "shared/tech_previews/basic_preview"
+      scenario = "article_attachment_preview"
     end
 
     binding.pry
@@ -26,6 +35,21 @@ class CheatSheet::CheatSheetsController < ApplicationController
         render json: { preview: render_to_string(partial: path,
                                                  formats: [:html],
                                                  locals: {cheat_sheet: @cheat_sheet, scenario: scenario})}
+      }
+    end
+  end
+
+  def view
+    binding.pry
+    @cheat_sheet_version = @cheat_sheet.default_version
+    if params[:type] == "regular"
+      path = "cheat_sheet/cheat_sheet_versions/dynamic_view/main"
+    end
+
+    respond_to do |format|
+      format.json {
+        render json: { view: render_to_string(partial: path,
+                                              formats: [:html])}
       }
     end
   end
@@ -43,7 +67,7 @@ class CheatSheet::CheatSheetsController < ApplicationController
   # POST /cheat_sheets or /cheat_sheets.json
   def create
     binding.pry
-    service = Services::CheatSheets::CheatSheets::Create.new(cheat_sheet_params, target_place, current_user)
+    service = Services::CheatSheets::CheatSheets::Create.new(cheat_sheet_params, target_place, current_user, current_user)
 
     binding.pry
     service.call
@@ -54,11 +78,12 @@ class CheatSheet::CheatSheetsController < ApplicationController
       if service.errors.blank?
         format.html { redirect_to @redirect_after_create_path,
                                   notice: "Cheat sheet was successfully created." }
-        format.json { render :show, status: :created, location: @cheat_sheet }
+        # format.json { render :show, status: :created, location: @cheat_sheet }
       else
-        @cheat_sheet = service.cheat_sheet
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @cheat_sheet.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_entity,
+                             assigns: { cheat_sheet: service.cheat_sheet,
+                                        permission: service.permission} }
+        # format.json { render json: @cheat_sheet.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -91,7 +116,7 @@ class CheatSheet::CheatSheetsController < ApplicationController
   def set_redirect_after_create_path
     if target_place.class == SimpleClasses::InterfaceGroup
       interface_member = @cheat_sheet.interface_members.last
-      @redirect_after_create_path = interface_member_path(ownername: interface_member.simple_class.ownerable.ownername,
+      @redirect_after_create_path = interface_member_path(ownername: interface_member.closest_simple_class.ownerable.ownername,
                                                           id: interface_member.slug)
     else
       @redirect_after_create_path = cheat_sheet_version_path(ownername: @cheat_sheet.ownerable.ownername,
@@ -102,7 +127,7 @@ class CheatSheet::CheatSheetsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_cheat_sheet
       binding.pry
-      @cheat_sheet = CheatSheets::CheatSheet.find(params[:id])
+      @cheat_sheet = CheatSheets::CheatSheet.find_by(uuid: params[:id]) || CheatSheets::CheatSheet.find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.
