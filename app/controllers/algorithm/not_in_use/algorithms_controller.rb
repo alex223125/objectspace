@@ -1,10 +1,10 @@
 ## SNAPSHOT WIT OLD VERSION OF STRONG PARAMS BEFORE 'NODES' UPDATE
 
 class Algorithm::AlgorithmsController < ApplicationController
-  include Folderable
+  include Placeable
 
   before_action :set_algorithm, only: %i[ show edit update destroy preview ]
-  before_action :set_target_folder, only: %i[ new create ]
+  before_action :set_target_place, only: %i[ new create ]
 
   # GET /algorithms or /algorithms.json
   def index
