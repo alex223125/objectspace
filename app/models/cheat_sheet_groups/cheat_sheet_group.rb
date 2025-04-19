@@ -1,4 +1,5 @@
 class CheatSheetGroups::CheatSheetGroup < ApplicationRecord
+  include Sourceable
 
   extend Pagy::Searchkick
   searchkick callbacks: :async,
@@ -10,7 +11,8 @@ class CheatSheetGroups::CheatSheetGroup < ApplicationRecord
   acts_as_taggable_on :tags
 
 
-  # TODO: validate that its in repository or in folder, not in both and not without at leas one of them
+  # TODO: validate that its in repository or in folder, or in one of the source locations
+  # TODO: not in both and not without at leas one of them
   belongs_to :folder, class_name: "Folder", optional: true
   belongs_to :repository, class_name: "Repository", optional: true
 
@@ -25,6 +27,16 @@ class CheatSheetGroups::CheatSheetGroup < ApplicationRecord
 
   has_many :container_members, as: :memberable, class_name: "SimpleClasses::ContainerMember"
   has_many :interface_members, as: :memberable, class_name: "SimpleClasses::InterfaceMember"
+
+  has_many :permissions, as: :permissionable, class_name: "Permission"
+
+  def class_key
+    "cheat_sheet_group"
+  end
+
+  def owner
+    self.ownerable
+  end
 
   private
 

@@ -7,8 +7,13 @@ class SimpleClasses::InterfaceGroup < ApplicationRecord
   has_closure_tree_root :root_class_group
 
   belongs_to :creator, class_name: "User", foreign_key: :creator_id
+
+  # TODO: Add valudation that one of these is present
   belongs_to :related_simple_class, class_name: "SimpleClasses::SimpleClass", foreign_key: :related_simple_class_id, optional: true
   belongs_to :related_class_container, class_name: "SimpleClasses::ClassContainer", foreign_key: :related_class_container_id, optional: true
+  belongs_to :related_framework, class_name: "Frameworks::Framework", foreign_key: :related_framework_id, optional: true
+
+
 
   # TODO: add validation that it's connected to at least one of these SmpleClass or framework
   belongs_to :class_container, class_name: "SimpleClasses::ClassContainer", optional: true
@@ -19,7 +24,9 @@ class SimpleClasses::InterfaceGroup < ApplicationRecord
 
   has_many :groups,
            class_name: "SimpleClasses::InterfaceGroup",
-           foreign_key: "parent_id"
+           foreign_key: "parent_id",
+           dependent: :destroy
+
   accepts_nested_attributes_for :groups, allow_destroy: true
   # -> { order 'interface_groups.position ASC' },
 
@@ -38,6 +45,34 @@ class SimpleClasses::InterfaceGroup < ApplicationRecord
 
   def class_container_root_functional_type?
     self.functional_type == InterfaceGroups::FunctionalTypes[:class_container_root]
+  end
+
+  def content_present?
+    if self.root?
+      self.interface_members.any?
+    else
+      self.interface_members.any? || self.groups.any?
+    end
+  end
+
+  def closest_simple_class
+    self.simple_class || self.related_simple_class
+  end
+
+  def closest_framework
+    self.framework || self.related_framework
+  end
+
+  def related_class_layer_entity
+    self.related_simple_class || self.related_framework
+  end
+
+  def class_layer_entity
+    self.simple_class || self.framework
+  end
+
+  def closest_class_layer_entity
+    self.related_class_layer_entity || self.class_layer_entity
   end
 
   private

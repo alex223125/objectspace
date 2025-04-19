@@ -1,4 +1,9 @@
 class Articles::Article < ApplicationRecord
+  include Sourceable
+  include Improvable
+
+  extend FriendlyId
+  friendly_id :slug_candidates, use: [:slugged, :finders, :history]
 
   extend Pagy::Searchkick
   searchkick callbacks: :async,
@@ -9,15 +14,18 @@ class Articles::Article < ApplicationRecord
   scope :search_import, -> { includes(:tags) }
   acts_as_taggable_on :tags
 
-
+  ###
   # TODO: validate that its in repository or in folder, not in both and not without at leas one of them
   belongs_to :folder, class_name: "Folder", optional: true
   belongs_to :repository, class_name: "Repository", optional: true
 
   has_many :container_members, as: :memberable, class_name: "SimpleClasses::ContainerMember"
   has_many :interface_members, as: :memberable, class_name: "SimpleClasses::InterfaceMember"
+  ###
 
   belongs_to :ownerable, polymorphic: true
+  belongs_to :creator, class_name: "User", foreign_key: :creator_id
+
   belongs_to :simple_class_attributes, class_name: "SimpleClasses::SimpleClassAttribute", optional: true
   belongs_to :default_version, foreign_key: "default_version_id", class_name: "Articles::ArticleVersion"
 
@@ -31,19 +39,9 @@ class Articles::Article < ApplicationRecord
 
   has_many :sections, as: :sectionable, class_name: "CheatSheetGroups::Section"
 
-  validates :title, presence: true, allow_blank: false
+  has_many :permissions, as: :permissionable, class_name: "Permission"
 
-  # doc: mapping for searchkick
-  def search_data
-    {
-      title: title,
-      source_page_description: source_page_description,
-      list_of_tags: tag_list,
-      ownerable_id: ownerable_id,
-      folder_id: folder_id,
-      repository_id: repository_id
-    }
-  end
+  validates :title, presence: true, allow_blank: false
 
   def class_key
     "article"
@@ -51,6 +49,30 @@ class Articles::Article < ApplicationRecord
 
   def uniq_key
     class_key + self.uuid
+  end
+
+  def owner
+    self.ownerable
+  end
+
+  private
+
+  # doc: mapping for searchkick
+  def search_data
+    {
+        title: title,
+        source_page_description: source_page_description,
+        list_of_tags: tag_list,
+        ownerable_id: ownerable_id,
+        folder_id: folder_id,
+        repository_id: repository_id
+    }
+  end
+
+  def slug_candidates
+    [ :title,
+      [:title, :uuid]
+    ]
   end
 
   # def search_data

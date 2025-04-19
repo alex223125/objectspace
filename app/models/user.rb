@@ -20,12 +20,13 @@ class User < ApplicationRecord
   has_one :dashboard
   # has_many :articles, class_name: "Articles::Article"
   # has_many :folders
-  has_many :repositories
-  has_many :folders, through: :repositories
+
   has_many :comments
 
   has_one_attached :avatar
   has_one_attached :cropped_avatar
+
+  has_many :permissions, as: :actorable, class_name: "Permission"
 
   validates :name, presence: true, allow_blank: false
   validates :email, presence: true, allow_blank: false
@@ -70,4 +71,59 @@ class User < ApplicationRecord
   end
 
 
+  def has_resource_modify_permissions?(entity)
+    if entity.class == Articles::Article
+      permissions = entity.permissions
+      correlated_permissions = permissions.select {|permission| permission.actorable == self}
+      permissions = correlated_permissions.select {|permission| modify_permissions.include?(permission.allowed_action_type)}
+      permissions.any?
+    elsif entity.class == Units::Unit
+      permissions = entity.permissions
+      correlated_permissions = permissions.select {|permission| permission.actorable == self}
+      permissions = correlated_permissions.select {|permission| modify_permissions.include?(permission.allowed_action_type)}
+      permissions.any?
+    elsif entity.class == Algorithms::Algorithm
+      permissions = entity.permissions
+      correlated_permissions = permissions.select {|permission| permission.actorable == self}
+      permissions = correlated_permissions.select {|permission| modify_permissions.include?(permission.allowed_action_type)}
+      permissions.any?
+    elsif entity.class == CheatSheets::CheatSheet
+      permissions = entity.permissions
+      correlated_permissions = permissions.select {|permission| permission.actorable == self}
+      permissions = correlated_permissions.select {|permission| modify_permissions.include?(permission.allowed_action_type)}
+      permissions.any?
+    elsif entity.class == CheatSheetGroups::CheatSheetGroup
+      permissions = entity.permissions
+      correlated_permissions = permissions.select {|permission| permission.actorable == self}
+      permissions = correlated_permissions.select {|permission| modify_permissions.include?(permission.allowed_action_type)}
+      permissions.any?
+    elsif entity.class == SimpleClasses::ClassContainer
+      class_layer_entity = entity.related_class_layer_entity
+      permissions = class_layer_entity.permissions
+      correlated_permissions = permissions.select {|permission| permission.actorable == self}
+      permissions = correlated_permissions.select {|permission| modify_permissions.include?(permission.allowed_action_type)}
+      permissions.any?
+    elsif entity.class == SimpleClasses::InterfaceGroup
+      binding.pry
+      class_layer_entity = entity.related_class_layer_entity
+      permissions = class_layer_entity.permissions
+      correlated_permissions = permissions.select {|permission| permission.actorable == self}
+      permissions = correlated_permissions.select {|permission| modify_permissions.include?(permission.allowed_action_type)}
+      permissions.any?
+    elsif entity.class == SimpleClasses::SimpleClass
+      permissions = entity.permissions
+      correlated_permissions = permissions.select {|permission| permission.actorable == self}
+      permissions = correlated_permissions.select {|permission| modify_permissions.include?(permission.allowed_action_type)}
+      permissions.any?
+    elsif entity.class == Frameworks::Framework
+      permissions = entity.permissions
+      correlated_permissions = permissions.select {|permission| permission.actorable == self}
+      permissions = correlated_permissions.select {|permission| modify_permissions.include?(permission.allowed_action_type)}
+      permissions.any?
+    end
+  end
+
+  def modify_permissions
+    [Permissions::AllowedActionTypes[:all_actions], Permissions::AllowedActionTypes[:modify]]
+  end
 end

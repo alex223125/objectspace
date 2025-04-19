@@ -1,4 +1,9 @@
 class Units::Unit < ApplicationRecord
+  include Sourceable
+  include Improvable
+
+  extend FriendlyId
+  friendly_id :slug_candidates, use: [:slugged, :finders, :history]
 
   extend Pagy::Searchkick
 
@@ -27,9 +32,7 @@ class Units::Unit < ApplicationRecord
   has_many :usage_examples, through: :unit_version_usage_examples, class_name: "UsageExamples::UsageExample"
 
   # accepts_nested_attributes_for :usage_examples, allow_destroy: true
-  has_many :improvements, through: :unit_versions, class_name: "Improvements::Improvement"
-
-  has_many :interface_members, as: :memberable, class_name: "SimpleClasses::InterfaceMember"
+  # has_many :improvements, through: :unit_versions, class_name: "Improvements::Improvement"
 
   has_many :link_attachments, as: :linkable, class_name: "CheatSheets::LinkAttachment"
 
@@ -37,6 +40,8 @@ class Units::Unit < ApplicationRecord
   has_many :interface_members, as: :memberable, class_name: "SimpleClasses::InterfaceMember"
 
   has_many :sections, as: :sectionable, class_name: "CheatSheetGroups::Section"
+
+  has_many :permissions, as: :permissionable, class_name: "Permission"
 
   validates :title, presence: true, allow_blank: false
 
@@ -53,6 +58,10 @@ class Units::Unit < ApplicationRecord
     class_key + self.uuid
   end
 
+  def owner
+    self.ownerable
+  end
+
   private
 
   # doc: mapping for searchkick
@@ -65,5 +74,11 @@ class Units::Unit < ApplicationRecord
       folder_id: folder_id,
       repository_id: repository_id
     }
+  end
+
+  def slug_candidates
+    [ :title,
+      [:title, :uuid]
+    ]
   end
 end

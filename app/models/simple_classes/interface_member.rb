@@ -14,9 +14,12 @@ class SimpleClasses::InterfaceMember < ApplicationRecord
   has_many :actions_simple_class_attributes, dependent: :destroy, foreign_key: "action_id"
   has_many :simple_class_attributes, through: :actions_simple_class_attributes, class_name: "SimpleClasses::SimpleClassAttribute"
 
-  def simple_class
-    self.interface_group.related_simple_class || self.interface_group.simple_class
+  def closest_simple_class
+    self.interface_group.simple_class || self.interface_group.related_simple_class
   end
+
+  # TODO: add callback to delete memberable in case if its record
+  # TODO: in case if it's link just delete interface member and do not touch Article, Algorithm, Unit or other technology
 
   private
 

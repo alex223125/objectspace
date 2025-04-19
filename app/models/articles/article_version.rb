@@ -17,6 +17,18 @@ class Articles::ArticleVersion < ApplicationRecord
 
   alias_method :whole_unit, :article
 
+  def class_key
+    "article_version"
+  end
+
+  def uniq_key
+    class_key + self.uuid
+  end
+
+  def all_versions
+    self.article.article_versions
+  end
+
   private
 
   # TODO: change id on uuid

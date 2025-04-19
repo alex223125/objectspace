@@ -47,11 +47,15 @@ class Units::UnitVersion < ApplicationRecord
     self.unit.ownerable
   end
 
+  def all_versions
+    self.unit.unit_versions
+  end
+
   private
 
   def slug_candidates
     [ :title,
-      [:title, :id]
+      [:title, :uuid]
     ]
   end
 

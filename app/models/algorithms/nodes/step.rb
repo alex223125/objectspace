@@ -1,11 +1,18 @@
 class Algorithms::Nodes::Step < Algorithms::Nodes::Node
 
+  REGULAR_STEP_TYPE = "regular".freeze
+  WRAPPER_STEP_TYPE = "wrapper".freeze
+  CONTAINER_STEP_TYPE = "container".freeze
+
   self.inheritance_column = nil
 
   belongs_to :control_structure, optional: true
 
   # cant use with clouser tree
   # acts_as_list scope: :control_structure
+
+  belongs_to :related_algorithm_version, class_name: "Algorithms::AlgorithmVersion",
+             foreign_key: :related_algorithm_version_id
 
   # Units and Algorithms for wrapper type of steps
   # TODO add validation, if step type wrapeer then we should have technology inside of it
@@ -35,6 +42,10 @@ class Algorithms::Nodes::Step < Algorithms::Nodes::Node
             presence: { message: "Step instruction can not be blank" },
             if: :should_contain_instruction?
 
+  validates :title, presence: true
+  validates :technologiable_id, :technologiable_type, presence: true, if: :wrapper_functional_type?
+
+
   def should_contain_instruction?
     if self.step_functional_type == Steps::FunctionalTypes[:container] ||
       self.step_functional_type == Steps::FunctionalTypes[:wrapper]
@@ -46,6 +57,19 @@ class Algorithms::Nodes::Step < Algorithms::Nodes::Node
 
   def functional_type
     Steps::FunctionalTypes[self.step_functional_type]
+  end
+
+  def regular_functional_type?
+    self.step_functional_type == Steps::FunctionalTypes[:regular]
+  end
+
+  def wrapper_functional_type?
+    binding.pry
+    self.step_functional_type == Steps::FunctionalTypes[:wrapper]
+  end
+
+  def container_functional_type?
+    self.step_functional_type == Steps::FunctionalTypes[:container]
   end
 
 end

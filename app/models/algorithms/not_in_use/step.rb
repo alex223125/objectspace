@@ -1,3 +1,4 @@
+# TODO: remove tables from schema and old files of previous algorithm business logic
 class Algorithms::Step < ApplicationRecord
 
   # for creation logic

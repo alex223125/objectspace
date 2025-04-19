@@ -1,4 +1,5 @@
 class CheatSheets::CheatSheet < ApplicationRecord
+  include Sourceable
 
   extend Pagy::Searchkick
   searchkick callbacks: :async,
@@ -9,11 +10,18 @@ class CheatSheets::CheatSheet < ApplicationRecord
   scope :search_import, -> { includes(:tags) }
   acts_as_taggable_on :tags
 
-  # TODO: validate that its in repository or in folder, not in both and not without at leas one of them
+  ####
+  # TODO: validate that its in repository or in folder, or in container member of in interface
+  # member
   belongs_to :folder, class_name: "Folder", optional: true
   belongs_to :repository, class_name: "Repository", optional: true
 
+  has_many :container_members, as: :memberable, class_name: "SimpleClasses::ContainerMember"
+  has_many :interface_members, as: :memberable, class_name: "SimpleClasses::InterfaceMember"
+  ####
+
   belongs_to :ownerable, polymorphic: true
+  belongs_to :creator, class_name: "User", foreign_key: :creator_id
 
   belongs_to :default_version, foreign_key: "default_version_id", class_name: "CheatSheets::CheatSheetVersion"
 
@@ -22,8 +30,7 @@ class CheatSheets::CheatSheet < ApplicationRecord
 
   has_many :sections, as: :sectionable, class_name: "CheatSheetGroups::Section"
 
-  has_many :container_members, as: :memberable, class_name: "SimpleClasses::ContainerMember"
-  has_many :interface_members, as: :memberable, class_name: "SimpleClasses::InterfaceMember"
+  has_many :permissions, as: :permissionable, class_name: "Permission"
 
   def class_key
     "cheat_sheet"
@@ -31,6 +38,10 @@ class CheatSheets::CheatSheet < ApplicationRecord
 
   def uniq_key
     class_key + self.uuid
+  end
+
+  def owner
+    self.ownerable
   end
 
   private

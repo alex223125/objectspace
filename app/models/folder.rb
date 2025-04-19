@@ -13,6 +13,8 @@ class Folder < ApplicationRecord
 
   # TODO: check that it has parent or repository, not both, not nothing
   belongs_to :repository, optional: true
+  # TODO: check that it assigned or to repository or to reports repository
+  belongs_to :reports_repository, optional: true
 
   has_many :subfolders,
            class_name: "Folder",
@@ -28,10 +30,15 @@ class Folder < ApplicationRecord
   has_many :simple_classes, class_name: "SimpleClasses::SimpleClass", dependent: :destroy
   has_many :frameworks, class_name: "Frameworks::Framework", dependent: :destroy
 
+  has_many :algorithm_reports, class_name: "AlgorithmReports::AlgorithmReport", dependent: :destroy
 
   # def folders_tree_without_root
   #   self_and_ancestors.where.not(parent_id: nil)
   # end
+
+  def parent_repository
+    self.repository || self.reports_repository
+  end
 
   private
 
