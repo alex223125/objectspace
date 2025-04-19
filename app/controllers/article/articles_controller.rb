@@ -1,8 +1,8 @@
 class Article::ArticlesController < ApplicationController
-  include Folderable
+  include Placeable
 
   before_action :set_article, only: %i[ show edit update destroy preview view ]
-  before_action :set_target_folder, only: %i[ new create ]
+  before_action :set_target_place, only: %i[ new create ]
 
   # GET /articles or /articles.json
   def index
@@ -24,12 +24,18 @@ class Article::ArticlesController < ApplicationController
     elsif params[:preview_type] == "algorithm_step_attachment_preview"
       path = "article/articles/previews/algorithm_step_attachment_preview"
       scenario = nil
+    elsif params[:preview_type] == "article_attachment_preview"
+      path = "article/articles/previews/article_attachment_preview"
+      scenario = nil
     elsif params[:preview_type] == "cheat_sheet_from_notes_link_attachment_preview"
       path = "shared/tech_previews/basic_preview"
       scenario = "cheat_sheet_from_notes_link_attachment_preview"
     elsif params[:preview_type] == "cheat_sheet_group_section_preview"
       path = "shared/tech_previews/basic_preview"
       scenario = "cheat_sheet_group_section_preview"
+    elsif params[:preview_type] == "algorithm_form_class_level_wrapper_step_addition"
+      path = "shared/tech_previews/basic_preview"
+      scenario = "algorithm_form_class_level_wrapper_step_addition"
     end
 
     binding.pry
@@ -73,18 +79,19 @@ class Article::ArticlesController < ApplicationController
   def create
     binding.pry
     # @article = Articles::Article.new(article_params)
-    service = Services::Articles::Articles::Create.new(article_params, target_place, current_user)
+    service = Services::Articles::Articles::Create.new(article_params, target_place, current_user, current_user)
     service.call
-    @article = service.article
-    set_redirect_after_create_path
-
     respond_to do |format|
 
       binding.pry
       if service.errors.blank?
+        @article = service.article
+        set_redirect_after_create_path
         format.html { redirect_to @redirect_after_create_path, notice: "Article was successfully created." }
         # format.json { render :show, status: :created, location: @article }
       else
+        format.html { render :new, status: :unprocessable_entity,
+                             assigns: { article: service.article, permission: service.permission } }
         # @article = service.article
         # format.html { render :new, status: :unprocessable_entity }
         # format.json { render json: @article.errors, status: :unprocessable_entity }
@@ -122,7 +129,7 @@ class Article::ArticlesController < ApplicationController
   def set_redirect_after_create_path
     if target_place.class == SimpleClasses::InterfaceGroup
       interface_member = @article.interface_members.last
-      @redirect_after_create_path = interface_member_path(ownername: interface_member.simple_class.ownerable.ownername,
+      @redirect_after_create_path = interface_member_path(ownername: interface_member.closest_simple_class.ownerable.ownername,
                                                           id: interface_member.slug)
     else
       @redirect_after_create_path = article_version_path(ownername: @article.ownerable.ownername,

@@ -1,5 +1,7 @@
 class Article::ArticleVersionsController < ApplicationController
   include TechBreadcrumbable
+  include Memberable
+
   before_action :set_article_version, only: %i[ show edit update destroy ]
 
   # GET /article_versions or /article_versions.json
@@ -9,10 +11,14 @@ class Article::ArticleVersionsController < ApplicationController
 
   # GET /article_versions/1 or /article_versions/1.json
   def show
-    technology_breadcrumbs(@article_version)
-    @article = @article_version.article
-    @related_articles = @article.find_related_tags.limit(3)
-    @owner_articles = @article.ownerable.articles
+    if container_members_present?(@article_version) || interface_members_present?(@article_version)
+      redirect_to_member(@article_version)
+    else
+      technology_breadcrumbs(@article_version)
+      @article = @article_version.article
+      @related_articles = @article.find_related_tags.limit(3)
+      @owner_articles = @article.ownerable.articles
+    end
   end
 
   # GET /article_versions/new
@@ -50,16 +56,18 @@ class Article::ArticleVersionsController < ApplicationController
   def update
     binding.pry
     respond_to do |format|
+      binding.pry
       if @article_version.update(article_version_params)
+        binding.pry
         # format.html { redirect_to article_version_url(@article_version), notice: "Article version was successfully updated." }
         format.html { redirect_to article_version_path(ownername: @article_version.article.ownerable.ownername,
                                                        id: @article_version.slug),
                                   notice: "Article version was successfully updated." }
 
-        format.json { render :show, status: :ok, location: @article_version }
+        # format.json { render :show, status: :ok, location: @article_version }
       else
         format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @article_version.errors, status: :unprocessable_entity }
+        # format.json { render json: @article_version.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -94,11 +102,16 @@ class Article::ArticleVersionsController < ApplicationController
                                                 id: @article_version.slug),
                            :status => :moved_permanently
       end
+    rescue ActiveRecord::RecordNotFound
+      flash[:error] = "Model not found"
+      redirect_to :root
     end
 
     # Only allow a list of trusted parameters through.
     def article_version_params
-      params.require(:articles_article_version).permit(:title, :solves_the_problem, :content, :sources,
-                                                       :additional_information, :article_id)
+      params.require(:articles_article_version).permit(:title, :solves_the_problem, :content,
+                                                       :sources, :additional_information,
+                                                       attachments_attributes: [:id, :attachable_id,
+                                                                                :attachable_type, :_destroy])
     end
 end
