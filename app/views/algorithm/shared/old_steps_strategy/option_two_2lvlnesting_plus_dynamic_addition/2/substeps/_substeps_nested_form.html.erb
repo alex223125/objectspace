@@ -18,7 +18,6 @@
       <!--    // Temlate 1 regular step-->
       <template data-target='steps_nested_form.regularStepFieldsTemplate'>
         <%= form.fields_for :substeps, Algorithms::Step.new, child_index: 'SUBSTEP' do |step| %>
-          <% binding.pry %>
           <%# step.options[:child_index] = 'TEMPLATE_RECORD' %>
           <%= render "algorithm/shared/partials/substeps/regular_substep_fields", :f => step %>
         <% end %>
@@ -27,7 +26,6 @@
       <!--    // Temlate 2 wrapper step-->
       <template data-target='steps_nested_form.wrapperStepFieldsTemplate'>
         <%= form.fields_for :substeps, Algorithms::Step.new, child_index: 'SUBSTEP' do |step| %>
-          <% binding.pry %>
           <%# step.options[:child_index] = 'TEMPLATE_RECORD' %>
           <%= render "algorithm/shared/partials/substeps/wrapper_substep_fields", :f => step %>
         <% end %>

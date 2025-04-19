@@ -1,0 +1,110 @@
+<div id='accordion-collapse-<%= "node#{logging_node.id}" %>' class="st-accordion"
+     data-controller="node_accordion"
+     data-node_accordion-target-content-card-id-value="accordion-collapse-body-<%= "node#{logging_node.id}" %>"
+
+     data-node_accordion-initial-state-value="opened"
+
+     data-node_accordion-header-opened-class-value="flex items-center justify-between w-full p-5 font-medium text-left border border-b-0 border-gray-200 rounded-t-xl focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white"
+     data-node_accordion-header-closed-class-value="flex items-center justify-between w-full p-5 font-medium text-left border border-b-0 border-gray-200 rounded-t-xl focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400"
+
+     data-node_accordion-header-svg-closed-class-value="w-6 h-6 shrink-0"
+     data-node_accordion-header-svg-opened-class-value="w-6 h-6 shrink-0 rotate-180"
+
+     data-node_accordion-content-opened-class-value=""
+     data-node_accordion-content-closed-class-value="hidden"
+
+     data-action="increase-height@window->node_accordion#increaseHeightOfParent
+                  reduce-height@window->node_accordion#reduceHeightOfParent
+                  recalculate-height@window->node_accordion#increaseHeightOfParent"
+>
+
+  <!--  header section-->
+  <div id="accordion-collapse-heading-<%= "node#{logging_node.id}" %>">
+    <button type="button"
+            class="flex items-center justify-between w-full p-5 font-medium text-left text-gray-500 border border-b-0 border-gray-200 rounded-t-xl focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+            data-action="node_accordion#toggle"
+            data-target="node_accordion.headerButton"
+    >
+      <span><%= "# Move №#{logging_node.position + 1}: #{logging_node.original_node.title}" %></span>
+      <svg data-target="node_accordion.headerSvg" class="w-6 h-6 rotate-180 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+    </button>
+
+  </div>
+
+
+  <!--  content section-->
+  <div id="accordion-collapse-body-<%= "node#{logging_node.id}" %>" class="hidden" data-target="node_accordion.targetContentCard">
+    <div class="p-5 border border-b-0 border-gray-200 dark:border-gray-700 dark:bg-gray-900 bg-white">
+      <div class="note-title break-words">
+        Note:
+      </div>
+      <div class="note break-words">
+         <%= logging_node.original_node.try(:note).try(:html_safe) %>
+      </div>
+
+      <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+      <div class="text-center col-span-6 sm:col-span-3">
+        <% if logging_node.original_node.technologiable_type == "Units::Unit" %>
+          <p class="text-xl font-bold hover:text-gray-700">Included Method:</p>
+        <% elsif logging_node.original_node.technologiable_type == "Algorithms::Algorithm" %>
+          <p class="text-xl font-bold hover:text-gray-700">Included Algorithm:</p>
+        <% elsif logging_node.original_node.technologiable_type == "CheatSheets::CheatSheet" %>
+          <p class="text-xl font-bold hover:text-gray-700">Included Cheat Sheet:</p>
+        <% elsif logging_node.original_node.technologiable_type == "CheatSheetGroups::CheatSheetGroup" %>
+          <p class="text-xl font-bold hover:text-gray-700">Included Cheat Sheet Group:</p>
+        <% end %>
+      </div>
+
+      <% binding.pry %>
+      <!--      asynch_loader seaction -->
+      <div class="container-inner-technology"
+           data-controller="technology_asynch_rendering"
+           data-target="technology_asynch_rendering.container"
+           data-technology_asynch_rendering-technologiable-type-value="<%= logging_node.original_node.technologiable_type %>"
+           data-technology_asynch_rendering-technologiable-id-value="<%= logging_node.original_node.technologiable_id %>"
+      >
+
+        <!-- spinner-->
+        <div class="inner-technology-loading-indicator" data-target="technology_asynch_rendering.loadingIndicator" style="display: none;">
+          <%= render "shared/small_ui_elements/loading_indicator" %>
+        </div>
+
+        <!--  request failed card -->
+        <div data-target="technology_asynch_rendering.retryCard" style="display: none;"
+          class="max-w-6xl p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+          <a href="#">
+            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Something went wrong</h5>
+          </a>
+          <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Use the following button to reload content.</p>
+
+          <div class="flex justify-center">
+            <div class="block space-y-4 md:flex md:space-y-0 md:space-x-4 ">
+              <button data-action="click->technology_asynch_rendering#retryLoad"
+                      class="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800"
+                      type="button">
+                <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                  Reload
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- scroll button -->
+    <div class="flex justify-center items-center w-full p-5 rounded-t-xl font-medium text-gray-500 dark:text-gray-400">
+      <button type="button"
+              href='#accordion-collapse-<%= "node#{logging_node.id}" %>'
+              class="scroll-to-top-node-button text-purple-700 hover:text-white border border-purple-700 hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 dark:border-purple-400 dark:text-purple-400 dark:hover:text-white dark:hover:bg-purple-500 dark:focus:ring-purple-900"
+              data-action="click->scroll_to_step_beginning#scroll"
+              data-anchor="#accordion-collapse-<%= "node#{logging_node.id}" %>"
+      >
+        Scroll to the step beginning
+      </button>
+    </div>
+
+  </div>
+
+</div>

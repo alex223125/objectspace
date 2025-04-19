@@ -1,0 +1,60 @@
+<!--containers section -->
+<div class="class-containers-section">
+
+  <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+  <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center" id="framework-decision-boxes">Decision boxes:</h2>
+
+  <%#= render "shared_class_layer/class_containers/class_containers_section_partials/class_containers_toc", class_containers: class_layer_technology.root_class_container.children, class_containers_root: class_layer_technology.root_class_container %>
+
+  <% root_framework_folder = framework.root_framework_folder %>
+  <% framework_members = root_framework_folder.framework_members %>
+
+
+  <% if framework_members.length > 0 %>
+    <%# framework_members.each do |framework_member| %>
+      <%# binding.pry %>
+      <%#= render "framework/frameworks/partials/content/framework_members_partials/framework_member_preview", framework_member: framework_member %>
+    <%# end %>
+
+    <br>
+    <%= render "framework/frameworks/partials/content/framework_members_partials/framework_members_preview",
+               framework: framework, framework_folder: root_framework_folder %>
+
+  <% elsif framework_members.length == 0 %>
+    <% if current_user.try(:has_resource_modify_permissions?, framework) %>
+      <br>
+      <!--  nothing found card for owner of class  -->
+      <div class="max-w-4xl p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+        <a href="#">
+          <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">This Decision Framework doesn't have any Decision Boxes</h5>
+        </a>
+        <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">To add new Components use the button below.</p>
+        <!--          NOT IN USE -->
+        <!--          <div class="flex justify-center">-->
+        <%#= render "shared_class_layer/container_members/modals/add_new_container_member_options_modal", type: "no_container_members_in_class_container", target_class_container: class_layer_technology.root_class_container %>
+        <!--          </div>-->
+      </div>
+    <% else %>
+      <!--  nothing found card for visitors -->
+      <div class="max-w-4xl p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+        <a href="#">
+          <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Nothing found
+          </h5>
+        </a>
+        <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Owner of this Decision Framework didn't added any components yet.</p>
+      </div>
+    <% end %>
+  <% end %>
+
+  <% if current_user.try(:has_resource_modify_permissions?, framework)  %>
+    <div class="bg-gray-50 px-4 py-3 sm:px-6">
+
+        <%= render "framework/frameworks/partials/content/framework_members_partials/add_new_framework_member_options_modal",
+                   framework_folder: root_framework_folder %>
+
+    </div>
+  <% end %>
+</div>
+
+
+

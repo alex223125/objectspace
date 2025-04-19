@@ -1,5 +1,5 @@
 <%= form.fields_for :article_versions do |f| %>
 
-  <%= render "article/shared/partials/article_version_fields", :f => f %>
+  <%= render "article/shared/partials/article_version_fields", :f => f, :article_creation_form => article_creation_form %>
 
 <% end %>

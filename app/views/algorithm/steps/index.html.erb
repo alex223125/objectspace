@@ -1,0 +1,12 @@
+<div id="top">
+  <div class="pt-8 pb-16 lg:pt-8 lg:pb-24 bg-white dark:bg-gray-900">
+    <%= render "shared/tech_show_partials/tech_breadcrumbs" %>
+
+    <%= render "shared/tech_show_partials/sourcepage_card", entity: @algorithm  %>
+
+    <%= render "algorithm/steps/index_partials/tabs", algorithm: @algorithm, algorithm_version: @algorithm_version %>
+  </div>
+</div>
+
+
+<%= render "shared/scroll_to_top" %>

@@ -1,0 +1,33 @@
+<div class="contribute-section" id="contribute-<%=improvement.uuid%>">
+  <div class="mt-8">
+    <div class="w-full p-4 border border-gray-200 bg-gray-50 rounded-t-xl dark:border-gray-600 dark:bg-gray-700">
+      <div class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">Contribute</div>
+      <!--        <div class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight text-center">Contribute:</div>-->
+      Help us make Encyclopedia better, add improvements and examples.
+      (2 gian button with art AI picture of improvement and AI picture of Usage Spell by Magician)
+    </div>
+
+    <div class="buttons-section">
+      <div id="default-button-example" class="flex p-0 bg-white border-gray-200 bg-gradient-to-r dark:bg-gray-900 border-x dark:border-gray-600">
+        <div class="grid grid-cols-2 gap-3 w-full">
+          <% if improvement.improvable.class == Articles::Article %>
+            <div class="col-span-1 flex items-center justify-center h-20 border-solid">
+              <%= link_to "Add new improvement!", new_improvement_path(article_id: improvement.improvable.uuid), style: "text-decoration: none", class: "no-underline	 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+            </div>
+            <div class="col-span-1 flex items-center justify-center h-20">
+              <%= link_to "Add new usage example!", new_improvement_path, style: "text-decoration: none", class: "no-underline	 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+            </div>
+          <% elsif improvement.improvable.class == Units::Unit %>
+            <div class="col-span-1 flex items-center justify-center h-20 border-solid">
+              <%= link_to "Add new improvement!", new_improvement_path(unit_id: improvement.improvable.uuid), style: "text-decoration: none", class: "no-underline	 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+            </div>
+            <div class="col-span-1 flex items-center justify-center h-20">
+              <%= link_to "Add new usage example!", new_improvement_path, style: "text-decoration: none", class: "no-underline	 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+            </div>
+          <% end %>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,31 @@
+<div class="article-version-tabs">
+  <div class="mb-4 border-b border-gray-200 dark:border-gray-700">
+    <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="myTab" data-tabs-toggle="#myTabContent" role="tablist">
+      <li class="mr-2" role="presentation">
+        <button class="inline-block p-4 border-b-2 rounded-t-lg" id="improvement-tab" data-tabs-target="#improvement" type="button"
+                role="tab" aria-controls="article" aria-selected="false" data-toggle="article-tab">Improvement</button>
+      </li>
+<!--      <li class="mr-2" role="presentation">-->
+<!--        <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"-->
+<!--                id="improvements-tab" data-tabs-target="#improvements" type="button" role="tab"-->
+<!--                aria-controls="improvements" aria-selected="false" data-toggle="improvements-tab">Improvements</button>-->
+<!--      </li>-->
+    </ul>
+  </div>
+
+  <div id="myTabContent">
+    <!--      <div class="flex justify-center">-->
+
+    <!--        <div class="" id="method" role="tabpanel" aria-labelledby="method-tab">-->
+    <!--        <div class="max-w-4xl hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="method" role="tabpanel" aria-labelledby="method-tab">-->
+    <div class="hidden p-4 rounded-lg h-full" id="improvement" role="tabpanel" aria-labelledby="improvement-tab">
+      <!--        <p class="text-sm text-gray-500 dark:text-gray-400">This is some placeholder content the <strong class="font-medium text-gray-800 dark:text-white">Profile tab's associated content</strong>. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling.</p>-->
+      <%= render "improvements/partials/improvement_content/main_page", improvement: @improvement %>
+    </div>
+
+<!--    <div class="hidden p-4" id="improvements" role="tabpanel" aria-labelledby="improvements-tab">-->
+      <%#= render "article/article_versions/partials/improvements_content/main_page", article_version: article_version %>
+<!--    </div>-->
+  </div>
+</div>
+

@@ -1,14 +1,17 @@
 <%= simple_form_for(@cheat_sheet, url: cheat_sheet_cheat_sheets_path) do |f| %>
-  <% if @cheat_sheet.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-      <h2><%= pluralize(@cheat_sheet.errors.count, "error") %> prohibited this improvement from being saved:</h2>
 
-      <ul>
-        <% @cheat_sheet.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
+  <% [@cheat_sheet, @permission].each do |entity| %>
+    <% if entity.try(:errors).present? %>
+      <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+        <h2><%= pluralize(entity.errors.count, "error") %> prohibited this Combo Tutorial from being saved:</h2>
+
+        <ul>
+          <% entity.errors.each do |error| %>
+            <li><%= error.full_message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
   <% end %>
 
   <div class="form-inputs">

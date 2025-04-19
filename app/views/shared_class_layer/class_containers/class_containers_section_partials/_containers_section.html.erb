@@ -1,0 +1,75 @@
+<!--containers section -->
+
+<!--DOC: if root container not present it means we dealing with dpo or do-->
+<% if class_layer_technology.root_class_container.present? %>
+  <div class="class-containers-section">
+
+    <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+    <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center" id="class-components">Components:</h2>
+
+    <%= render "shared_class_layer/class_containers/class_containers_section_partials/class_containers_toc",
+               class_containers: class_layer_technology.root_class_container.children,
+               class_containers_root: class_layer_technology.root_class_container %>
+
+
+    <!--  root container -->
+    <!--  DOC: WE DONT USE ROOT CLASS CONTAINER FOR DISPLAY, BECAUSE IT CAN BE 10 SUBCONTAINERS IMMIDIATELY IN Decision Object Container -->
+    <!--  WE ONLY HAVE DEFAULT ROOT CONTAINER FOR SIMPLICITY OF USAGE ITS ChiLDREN, KEEP CURRENT DESIGN BUT DONT DELETE root_class_container -->
+    <%#= render "simple_class/simple_classes/partials/content/middle_bar_partials/class_containers/class_container_preview", class_container: simple_class.root_class_container %>
+
+
+    <!--  children containers-->
+    <% children_containers = class_layer_technology.root_class_container.children %>
+
+    <% if children_containers.length > 0 %>
+      <% children_containers.each do |class_container| %>
+        <% binding.pry %>
+        <%= render "shared_class_layer/class_containers/class_containers_section_partials/class_container_preview",
+                   class_container: class_container %>
+      <% end %>
+    <% elsif children_containers.length == 0 %>
+      <% if current_user.try(:has_resource_modify_permissions?, class_layer_technology) %>
+        <!--  nothing found card for owner of class  -->
+        <div class="max-w-4xl p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+          <a href="#">
+            <% if class_layer_technology.class == SimpleClasses::SimpleClass %>
+              <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">This Decision Box doesn't have any Components</h5>
+            <% elsif class_layer_technology.class == Frameworks::Framework %>
+              <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">This Decision Framework doesn't have any Components</h5>
+            <% end %>
+          </a>
+          <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">To add new Components use the button below.</p>
+<!--          NOT IN USE -->
+<!--          <div class="flex justify-center">-->
+            <%#= render "shared_class_layer/container_members/modals/add_new_container_member_options_modal", type: "no_container_members_in_class_container", target_class_container: class_layer_technology.root_class_container %>
+<!--          </div>-->
+        </div>
+      <% else %>
+        <!--  nothing found card for visitors -->
+        <div class="max-w-4xl p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+          <a href="#">
+            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Nothing found
+            </h5>
+          </a>
+          <% if class_layer_technology.class == SimpleClasses::SimpleClass %>
+            <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Owner of this Decision Box didn't added any components yet.</p>
+          <% elsif class_layer_technology.class == Frameworks::Framework %>
+            <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Owner of this Decision Framework didn't added any components yet.</p>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
+
+    <% if current_user.try(:has_resource_modify_permissions?, class_layer_technology)  %>
+      <div class="bg-gray-50 px-4 py-3 sm:px-6">
+        <div class="text-end">
+          <% if class_layer_technology.class == SimpleClasses::SimpleClass %>
+            <%= link_to "+ Add new Component", new_shared_class_layer_class_container_path(target_simple_class: class_layer_technology.uuid), class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+          <% elsif class_layer_technology.class == Frameworks::Framework %>
+            <%= link_to "+ Add new Component", new_shared_class_layer_class_container_path(target_framework: class_layer_technology.uuid), class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+          <% end  %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>

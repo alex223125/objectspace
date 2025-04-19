@@ -1,0 +1,26 @@
+<div class="max-w-6xl p-4 rounded-lg bg-gray-50 dark:bg-gray-800" data-controller="content_area" data-target="content_area.area">
+  <!--center -->
+  <div class="flex justify-between px-4 mx-auto max-w-screen-xl">
+    <div class="w-full format-sm sm:format-base lg:format-lg format-blue dark:format-invert">
+      <div class="mb-4 lg:mb-6 not-format p-3">
+        <h1 class="break-words mb-4 text-3xl font-extrabold leading-tight text-gray-900 lg:mb-6 lg:text-4xl dark:text-white">
+          Initial step
+        </h1>
+      </div>
+
+      <div class="content-section break-words" id="content-<%=introduction_step.uuid%>">
+        <a href="#content-<%=introduction_step.uuid%>" >
+          <h3 class="hover:underline hover:text-blue-600 text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Content</h3>
+        </a>
+        <%= introduction_step.original_introduction_step.content.html_safe %>
+      </div>
+      <br>
+
+      <%= render "algorithm_reports/algorithm_execution/initial_place_partials/initial_place_navigation",
+                 current_step: introduction_step,
+                 algorithm_report: algorithm_report %>
+
+    </div>
+  </div>
+</div>
+

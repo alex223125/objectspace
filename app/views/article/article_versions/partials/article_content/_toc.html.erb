@@ -1,16 +1,26 @@
-<div class="article-toc">
+<div class="article-toc" data-controller="toc_scrolling" data-toc_scrolling-type-value="<%=toc_type%>" >
   <br>
   Table of content:
   <ul role="list" a="" class="space-y-3 text-base list-none sm:text-lg md:mt-5 md:text-xl">
     <li>
-      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#content">
+      <a class="hover:underline hover:text-blue-600 font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+         onclick="return false;"
+         href="#content-<%=article_version.uuid%>"
+         data-action="click->toc_scrolling#scroll"
+         data-anchor="#content-<%=article_version.uuid%>"
+      >
         ↳ Content
       </a>
     </li>
 
     <% if article_version.sources.present? %>
       <li>
-        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#sources">
+        <a class="hover:underline hover:text-blue-600 font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+           onclick="return false;"
+           href="#sources-<%=article_version.uuid%>"
+           data-action="click->toc_scrolling#scroll"
+           data-anchor="#sources-<%=article_version.uuid%>"
+        >
           ↳ Sources
         </a>
       </li>
@@ -18,20 +28,48 @@
 
     <% if article_version.additional_information.present? %>
       <li>
-        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#additional-information">
+        <a class="hover:underline hover:text-blue-600 font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+           onclick="return false;"
+           href="#additional-information-<%=article_version.uuid%>"
+           data-action="click->toc_scrolling#scroll"
+           data-anchor="#additional-information-<%=article_version.uuid%>"
+        >
           ↳ Additional information
         </a>
       </li>
     <% end %>
 
+    <% if article_version.attachments.present? %>
+      <li>
+        <a class="hover:underline hover:text-blue-600 font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+           onclick="return false;"
+           href="#attachments-<%=article_version.uuid%>"
+           data-action="click->toc_scrolling#scroll"
+           data-anchor="#attachments-<%=article_version.uuid%>"
+        >
+          ↳ Attachments
+        </a>
+      </li>
+    <% end %>
+
     <li>
-      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#contribute">
+      <a class="hover:underline hover:text-blue-600 font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+         onclick="return false;"
+         href="#contribute-<%=article_version.uuid%>"
+         data-action="click->toc_scrolling#scroll"
+         data-anchor="#contribute-<%=article_version.uuid%>"
+      >
         ↳ Contribute
       </a>
     </li>
 
     <li>
-      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#comments">
+      <a class="hover:underline hover:text-blue-600 font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+         onclick="return false;"
+         href="#comments-<%=article_version.uuid%>"
+         data-action="click->toc_scrolling#scroll"
+         data-anchor="#comments-<%=article_version.uuid%>"
+      >
         ↳ Comments
       </a>
     </li>

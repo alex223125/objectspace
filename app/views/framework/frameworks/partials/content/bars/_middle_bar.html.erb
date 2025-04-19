@@ -1,35 +1,71 @@
-<!--buttons bar -->
-bookmark button
+<!--Content area-->
+<div class="max-w-6xl p-4 rounded-lg bg-gray-50 dark:bg-gray-800" data-controller="content_area" data-target="content_area.area">
+  <!--center -->
+  <div class="flex justify-between px-4 mx-auto max-w-screen-xl ">
+    <div class="w-full format-sm sm:format-base lg:format-lg format-blue dark:format-invert">
+      <div class="mb-4 lg:mb-6 not-format p-3">
+        <h1 class="break-words mb-4 text-3xl font-extrabold leading-tight text-gray-900 lg:mb-6 lg:text-4xl dark:text-white"><%= framework.title %></h1>
 
-<button id="dropdownNavbarLink" data-dropdown-toggle="dropdownNavbar" class="text-gray-700 hover:bg-gray-50 border-b border-gray-100 md:hover:bg-transparent md:border-0 pl-3 pr-4 py-2 md:hover:text-blue-700 md:p-0 font-medium flex items-center justify-between w-full md:w-auto">options button-dropdown <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg></button>
-<!-- Dropdown menu -->
-<div id="dropdownNavbar" class="hidden bg-white text-base z-10 list-none divide-y divide-gray-100 rounded shadow my-4 w-44">
-  <ul class="py-1" aria-labelledby="dropdownLargeButton">
-    <li>
-      <a href="#" class="text-sm hover:bg-gray-100 text-gray-700 block px-4 py-2">Dashboard</a>
-    </li>
-    <li>
-      <a href="#" class="text-sm hover:bg-gray-100 text-gray-700 block px-4 py-2">Settings</a>
-    </li>
-    <li>
-      <a href="#" class="text-sm hover:bg-gray-100 text-gray-700 block px-4 py-2">Earnings</a>
-    </li>
-  </ul>
-  <div class="py-1">
-    <a href="#" class="text-sm hover:bg-gray-100 text-gray-700 block px-4 py-2">Sign out</a>
+        <!-- submenu -->
+        <div class="mt-1 flex flex-col space-x-4 sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+
+          <div class="mt-2 flex items-center text-sm">
+            <%= render "framework/frameworks/partials/content/bars/copy_to_clipboard", framework: framework %>
+          </div>
+
+          <% if current_user.try(:has_resource_modify_permissions?, framework)  %>
+            <div class="mt-2 flex items-center text-sm text-gray-500">
+              <%= render "framework/frameworks/partials/content/bars/options_dropdown", framework: framework %>
+            </div>
+          <% end %>
+
+<!--          <div class="mt-2 flex items-center text-sm text-gray-500">-->
+            <%#= render "simple_class/simple_classes/partials/class_tree_map_modal", simple_class: simple_class %>
+<!--          </div>-->
+
+          <div class="mt-2 flex items-center text-sm text-gray-500">
+            bookmark button
+          </div>
+        </div>
+
+        <!-- Sections Toc-->
+        <%= render "framework/frameworks/partials/content/bars/sections_toc", framework: framework, toc_type: "toc_for_regular_page" %>
+
+        <div class="framework-content-area">
+          <!--1.1 containers section (only for DOC) -->
+          <%#= render "shared_class_layer/class_containers/class_containers_section_partials/containers_section", class_layer_technology: framework %>
+
+          <!--1.2 interface groups section -->
+          <!--  DONT REMOVE, MAYBE WE WILL NEED INTERFACE WITH METHODS IN FUTURE ITERATIONS -->
+          <%#= render "shared_class_layer/interface_groups/interface_groups_section_partials/interface_group_section", class_layer_technology: framework %>
+
+          <!--  1.1 framework interface section -->
+          <%= render "framework/frameworks/partials/content/framework_interface_partials/framework_interface_section",
+                     framework: framework, framework_interface: framework.framework_interface %>
+
+
+
+          <!--  1.2 framework decision boxes -->
+          <%= render "framework/frameworks/partials/content/framework_members_partials/framework_members_section",
+                     framework: framework %>
+
+          <!--  1.3 framework folders -->
+          <%= render "framework/framework_folders/folder_section_partials/folders_section",
+                     framework: framework %>
+
+
+        </div>
+
+        Contribute
+        <br>
+        Start topic on forum
+        <br>
+        Support author
+        <br>
+        Comments
+
+      </div>
+    </div>
   </div>
 </div>
 
-<%= render "framework/frameworks/partials/content/bars/copy_to_clipboard_input" %>
-
-
-
-<!--containers section -->
-<%= render "simple_class/simple_classes/partials/content/middle_bar_partials/class_containers/containers_section", object: @framework %>
-
-<!--interface groups section -->
-<%= render "simple_class/simple_classes/partials/content/middle_bar_partials/interface_groups/interface_group_section", object: @framework %>
-
-
-If not interface groups found create new group button
-If not container groups found create new group button

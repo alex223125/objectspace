@@ -1,0 +1,119 @@
+<% cheat_sheet_version = @cheat_sheet_version %>
+
+<div class="max-w-6xl p-4 rounded-lg bg-gray-50 dark:bg-gray-800" data-controller="content_area" data-target="content_area.area">
+  <!--center -->
+  <div class="flex justify-between px-4 mx-auto max-w-screen-xl">
+    <div class="w-full format-sm sm:format-base lg:format-lg format-blue dark:format-invert">
+      <div class="mb-4 lg:mb-6 not-format p-3">
+        <h1 class="break-words mb-4 text-3xl font-extrabold leading-tight text-gray-900 lg:mb-6 lg:text-4xl dark:text-white">
+          <%= cheat_sheet_version.title %>
+        </h1>
+
+        <!-- submenu -->
+        <div class="mt-1 flex flex-col space-x-4 sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+          <div class="mt-2 flex items-center text-sm">
+            <%= render "cheat_sheet/cheat_sheet_versions/partials/cheat_sheet_content/submenu/version_select_bar", cheat_sheet_version: cheat_sheet_version %>
+          </div>
+
+          <div class="mt-2 flex items-center text-sm">
+            <%= render "cheat_sheet/cheat_sheet_versions/partials/cheat_sheet_content/submenu/copy_to_clipboard", cheat_sheet: cheat_sheet_version.cheat_sheet %>
+          </div>
+
+          <div class="mt-2 flex items-center text-sm text-gray-500">
+            <%= render "cheat_sheet/cheat_sheet_versions/partials/cheat_sheet_content/submenu/options_dropdown", cheat_sheet_version: cheat_sheet_version %>
+          </div>
+        </div>
+
+        <!--      TOC-->
+        <%= render "cheat_sheet/cheat_sheet_versions/partials/cheat_sheet_content/toc", cheat_sheet_version: cheat_sheet_version %>
+        <br>
+
+      </div>
+
+      <div class="notes-section">
+        <% cheat_sheet_version.notes.each do |note| %>
+          <div id="note-<%= note.title %>">
+            <div class="title">
+              <h2 class="break-words text-2xl font-bold leading-7 text-gray-900 sm:text-1xl sm:tracking-tight text-center"><%= note.title %></h2>
+            </div>
+            <div class="comments-section bg-gradient-to-bl from-blue-50 to-violet-50 p-4 rounded-lg">
+              <div class="content">
+                <%= note.content.html_safe %>
+              </div>
+
+              <div class="links">
+                <div data-controller="attachment_preview">
+
+                  <% binding.pry %>
+                  <% if note.link_attachments.present? %>
+                    <div class="step-attachments">
+                      <p class="text-xl font-bold hover:text-gray-700">Fast Links:</p>
+                      <ul>
+                        <% note.link_attachments.each do |attachment| %>
+                          <%# if attachment.type == LinkAttachmentsHelper::ARTICLE_ATTACHMENT_TYPE %>
+                          <li class="text-body-color mb-4 flex text-base">
+                            <span class="text-primary mr-2 flex items-center rounded-full text-base">
+                              <svg width="20" height="8" viewBox="0 0 20 8" class="fill-current">
+                                <path
+                                  d="M19.2188 2.90626L17.0625 0.343758C16.875 0.125008 16.5312 0.0937583 16.2812 0.281258C16.0625 0.468758 16.0312 0.812508 16.2188 1.06251L18.25 3.46876H0.9375C0.625 3.46876 0.375 3.71876 0.375 4.03126C0.375 4.34376 0.625 4.59376 0.9375 4.59376H18.25L16.2188 7.00001C16.0312 7.21876 16.0625 7.56251 16.2812 7.78126C16.375 7.87501 16.5 7.90626 16.625 7.90626C16.7812 7.90626 16.9375 7.84376 17.0312 7.71876L19.1875 5.15626C19.75 4.46876 19.75 3.53126 19.2188 2.90626Z"
+                                ></path>
+                              </svg>
+                            </span>
+                            <button type="button"
+                                    data-action="click->attachment_preview#openModal"
+                                    data-attachment-uuid="<%= attachment.linkable.uuid %>"
+                                    data-attachment-type="<%= attachment.type %>"
+                                    class="hover:underline inline-flex text-left font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
+                              <%= attachment.linkable.title %>
+                            </button>
+                          </li>
+                        <% end %>
+                      </ul>
+                    </div>
+                  <% end %>
+
+                  <%= render "shared/attachment_preview/modal", entity: note  %>
+
+                </div>
+              </div>
+
+            </div>
+          </div>
+          <br>
+        <% end %>
+      </div>
+
+
+      <!--      <div class="content-section" id="content">-->
+      <!--        # Instruction:-->
+      <%#= cheat_sheet_version.content.html_safe %>
+      <!--      </div>-->
+      <!--      <br>-->
+
+      <%# if article_version.sources.present? %>
+      <!--        <div class="sources-section" id="sources">-->
+      <!--          # Sources:-->
+      <%#= article_version.sources.html_safe %>
+      <!--        </div>-->
+      <!--        <br>-->
+      <%# end %>
+
+      <%# if article_version.additional_information.present? %>
+      <!--        <div class="additional-information-section" id="additional-information">-->
+      <!--          # Additional information:-->
+      <%#= article_version.additional_information.html_safe %>
+      <!--        </div>-->
+      <!--        <br>-->
+      <%# end %>
+
+
+
+      <!--      TODO: ADD IT -->
+      <%#= render "article/article_versions/partials/article_content/contribute" %>
+      <!--      <br>-->
+
+      <%#= render "article/article_versions/partials/article_content/comments" %>
+
+    </div>
+  </div>
+</div>

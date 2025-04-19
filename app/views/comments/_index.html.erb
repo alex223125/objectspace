@@ -12,7 +12,11 @@
       <h2 class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">Discussion (20)</h2>
     </div>
 
-    <%= render "comments/form", commentable: commentable, comment: comment %>
+    <% if current_user.present? %>
+      <%= render "comments/form", commentable: commentable, comment: comment %>
+    <% else %>
+      Please log in to leave a comment
+    <% end %>
 
     <div class="content-container" data-target="comments_infinity_scroll.contentArea">
 

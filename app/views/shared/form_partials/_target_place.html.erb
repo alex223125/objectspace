@@ -16,3 +16,15 @@
 <% if @target_interface_group.present? %>
   <%= hidden_field_tag :target_interface_group, @target_interface_group.uuid %>
 <% end %>
+<!--    Option 5: Place to framework folder-->
+<% if @target_framework_folder.present? %>
+  <%= hidden_field_tag :target_framework_folder, @target_framework_folder.uuid %>
+<% end %>
+<!--    Option 6: Place to framework interface-->
+<% if @target_framework_interface.present? %>
+  <%= hidden_field_tag :target_framework_interface, @target_framework_interface.uuid %>
+<% end %>
+<!--    Option 7: Place to simple class interface-->
+<% if @target_simple_class_interface.present? %>
+  <%= hidden_field_tag :target_simple_class_interface, @target_simple_class_interface.uuid %>
+<% end %>

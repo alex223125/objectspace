@@ -1,0 +1,60 @@
+<div id='accordion-collapse-<%= "node#{logging_node.id}" %>' data-accordion="open">
+  <div id="accordion-collapse-heading-<%= "node#{logging_node.id}" %>">
+    <button type="button"
+            class="flex items-center justify-between w-full p-5 font-medium text-left text-gray-500 border border-b-0 border-gray-200 rounded-t-xl focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+            data-accordion-target="#accordion-collapse-body-<%= "node#{logging_node.id}" %>"
+            aria-expanded="true"
+            aria-controls="accordion-collapse-body-<%= "node#{logging_node.id}" %>">
+      <span><%= "# Move №#{logging_node.position + 1}: #{logging_node.original_node.title}" %></span>
+      <svg data-accordion-icon class="w-6 h-6 rotate-180 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+    </button>
+  </div>
+
+  <div id="accordion-collapse-body-<%= "node#{logging_node.id}" %>" class="hidden" aria-labelledby="accordion-collapse-heading-<%= "node#{logging_node.id}" %>">
+    <div class="p-5 border border-b-0 border-gray-200 dark:border-gray-700 dark:bg-gray-900">
+
+      <div class="condition">
+        <div class="title">
+          <%= logging_node.original_node.conditions.first.title %>
+        </div>
+
+        <div class="instruction">
+          <%= logging_node.original_node.conditions.first.instruction.html_safe %>
+        </div>
+
+        <div class="inner-moves">
+          <% logging_node.children.each do |children_node| %>
+            <%= render "algorithm/algorithm_versions/partials/algorithm_content/nodes/node", logging_node: children_node %>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="instruction break-words">
+        <%= logging_node.original_node.try(:instruction).try(:html_safe) %>
+      </div>
+
+    </div>
+
+    <div class="flex justify-center items-center w-full p-5 rounded-t-xl font-medium text-gray-500 dark:text-gray-400">
+      <button type="button"
+              href='#accordion-collapse-<%= "node#{logging_node.id}" %>'
+              class="scroll-to-top-node-button text-purple-700 hover:text-white border border-purple-700 hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 dark:border-purple-400 dark:text-purple-400 dark:hover:text-white dark:hover:bg-purple-500 dark:focus:ring-purple-900">Scroll to the step beginning</button>
+    </div>
+
+  </div>
+
+</div>
+
+<!--    // example how it was before change -->
+<!--    <div id="accordion-collapse-heading-2">-->
+<!--      <button type="button" class="flex items-center justify-between w-full p-5 font-medium text-left text-gray-500 border border-gray-200 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800" data-accordion-target="#accordion-collapse-body-2" aria-expanded="false" aria-controls="accordion-collapse-body-2">-->
+<!--        <span>Is there a Figma file available?</span>-->
+<!--        <svg data-accordion-icon class="w-6 h-6 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>-->
+<!--      </button>-->
+<!--    </div>-->
+<!--    <div id="accordion-collapse-body-2" class="hidden" aria-labelledby="accordion-collapse-heading-2">-->
+<!--      <div class="p-5 border border-gray-200 dark:border-gray-700">-->
+<!--        <p class="mb-2 text-gray-500 dark:text-gray-400">Flowbite is first conceptualized and designed using the Figma software so everything you see in the library has a design equivalent in our Figma file.</p>-->
+<!--        <p class="text-gray-500 dark:text-gray-400">Check out the <a href="https://flowbite.com/figma/" class="text-blue-600 dark:text-blue-500 hover:underline">Figma design system</a> based on the utility classes from Tailwind CSS and components from Flowbite.</p>-->
+<!--      </div>-->
+<!--    </div>-->

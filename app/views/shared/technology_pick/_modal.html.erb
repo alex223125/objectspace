@@ -1,9 +1,10 @@
 <div class="technology_pick_modal">
-  <div data-controller="technology_pick_modal"
+  <div data-controller="technology_pick_modal select_instruction_modal"
        data-technology_pick_modal-allow-background-close="false"
        data-target="remote_select_instruction.classTreeModal">
 
-    <% if type == "algorithm_form_wrapper_step_addition" %>
+    <% if type == "algorithm_form_class_level_wrapper_step_addition" ||
+        type == "algorithm_form_framework_level_wrapper_step_addition" %>
       <button
         type="button"
         data-target="algorithm_step_type_select.wrapperStepAdditionButton"
@@ -18,9 +19,10 @@
     <% end %>
 
     <!-- Modal Container -->
-    <div data-technology_pick_modal-target="container"
+    <div data-target="remote_select_instruction.instructionModalInstance
+                      technology_pick_modal.container"
          data-action="click->technology_pick_modal#closeBackground keyup@window->technology_pick_modal#closeWithKeyboard"
-         class="hidden animated fadeIn fixed inset-0 overflow-y-auto flex items-center justify-center" style="z-index: 9999;">
+         class="modal-container hidden animated fadeIn fixed inset-0 overflow-y-auto flex items-center justify-center" style="z-index: 9999;">
       <!-- Modal Inner Container -->
       <div id="selectInstructionModal" class="fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full justify-center items-center flex">
         <div class="relative w-full max-w-7xl max-h-full">
@@ -31,7 +33,8 @@
             <!-- Modal header -->
             <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
               <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                <% if type == "algorithm_form_wrapper_step_addition" %>
+                <% if type == "algorithm_form_class_level_wrapper_step_addition" ||
+                      type == "algorithm_form_framework_level_wrapper_step_addition"%>
                   Select Technology
                 <% end %>
               </h3>
@@ -44,15 +47,19 @@
             <!-- Modal body -->
             <div class="p-6 space-y-6">
               <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                <% if type == "algorithm_form_wrapper_step_addition" %>
+                <% if type == "algorithm_form_class_level_wrapper_step_addition" ||
+                      type == "algorithm_form_framework_level_wrapper_step_addition"%>
                   In this popup you can select multiple Actions to add them as Linked Actions to Attribute
                 <% end %>
               </p>
             </div>
 
 
-            <% if type == "algorithm_form_wrapper_step_addition" && scope == "simple_class" %>
+            <% if type == "algorithm_form_class_level_wrapper_step_addition" && scope == "simple_class" %>
               <%= render "shared/technology_pick/modal_bodies/simple_class_actions_modal_body", simple_class: simple_class %>
+            <% elsif type == "algorithm_form_framework_level_wrapper_step_addition" && scope == "framework" %>
+              <% binding.pry %>
+              <%= render "shared/technology_pick/modal_bodies/framework_actions_modal_body", framework: framework %>
             <% end %>
 
 

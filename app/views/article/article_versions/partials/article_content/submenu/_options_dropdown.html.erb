@@ -1,6 +1,6 @@
 <div class="relative inline-block text-left">
 
-  <button id="dropdownAlgorithmManagement" data-dropdown-toggle="unitManagementDropdown"
+  <button id="dropdownArticleManagement-<%=article_version.uuid%>" data-dropdown-toggle="articleManagementDropdown-<%=article_version.uuid%>"
           class="relative z-10 flex items-center p-2 text-sm text-gray-600 bg-white border border-blue-500 rounded-md focus:border-blue-500 focus:ring-opacity-40 dark:focus:ring-opacity-40 focus:ring-blue-300 dark:focus:ring-blue-400 focus:ring dark:text-white dark:bg-gray-800 focus:outline-none py-2.5 px-2"
           type="button">
     Options
@@ -10,10 +10,10 @@
   </button>
 
   <!-- Dropdown menu -->
-  <div id="unitManagementDropdown"
+  <div id="articleManagementDropdown-<%=article_version.uuid%>"
        class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
     <div class="py-1" role="none">
-      <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownAlgorithmManagement">
+      <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownArticleManagement-<%=article_version.uuid%>">
         <li>
           <%= link_to "Add new article version",
                       new_article_article_version_path(article_id: article_version.article.id),
@@ -21,7 +21,7 @@
         </li>
         <li>
           <%= link_to "Edit article version",
-                      edit_article_article_version_path(id: article_version),
+                      edit_article_article_version_path(id: article_version.slug),
                       style: "text-decoration: none", class: "block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-200 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white" %>
         </li>
         <li>

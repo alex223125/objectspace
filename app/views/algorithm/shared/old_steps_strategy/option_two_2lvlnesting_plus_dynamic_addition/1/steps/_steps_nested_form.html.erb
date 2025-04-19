@@ -50,7 +50,6 @@
     </template>
 
     <%= form.fields_for :steps do |step| %>
-      <% binding.pry %>
       <% if Steps::TypeTypes[step.object[:type]] == "regular" %>
         <%= render "algorithm/shared/partials/steps/regular_step_fields", :f => step %>
       <% else %>

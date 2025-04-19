@@ -4,6 +4,8 @@
     <% @units.each do |unit| %>
       <%= render partial: "shared/technologies_search/units/single_preview", locals: {unit: unit, scenario: scenario} %>
     <% end %>
+  <% else %>
+    Nothing was found
   <% end %>
 
 </div>

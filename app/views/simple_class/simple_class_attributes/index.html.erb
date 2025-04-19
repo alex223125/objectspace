@@ -31,13 +31,13 @@
 
           <% if @simple_class_attributes.any? %>
             <div class="attributes-toc-section pl-8">
-              <%= render "simple_class/simple_class_attributes/partials/toc",  simple_class_attributes: @simple_class_attributes %>
+              <%= render "simple_class/simple_class_attributes/index_partials/toc",  simple_class_attributes: @simple_class_attributes %>
             </div>
             <br>
 
             <div id="simple_class_attributes" class="min-w-full">
               <% @simple_class_attributes.each do |simple_class_attribute| %>
-                <%= render "simple_class/simple_class_attributes/partials/attribute_card",  simple_class_attribute: simple_class_attribute %>
+                <%= render "simple_class/simple_class_attributes/index_partials/attribute_card",  simple_class_attribute: simple_class_attribute %>
               <% end %>
             </div>
           <% else %>

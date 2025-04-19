@@ -1,0 +1,40 @@
+
+  <li class="jstree-open">
+    <%= render "framework/framework_dynamic_tree_view/root_node_menu", framework: framework %>
+    <ul>
+
+
+<!--      NOTE: maybe in future framework will have attributes -->
+      <%# if class_layer_entity.class == SimpleClasses::SimpleClass %>
+        <!-- Part 1.Attributes -->
+<!--        <li class="jstree-open">-->
+          <%#= render "shared_class_layer/dynamic_tree_view/attributes_menu", attributes: class_layer_entity.simple_class_attributes %>
+<!--          <ul>-->
+            <%# class_layer_entity.simple_class_attributes.each do |attribute| %>
+<!--              <li>-->
+                <%#= render "shared_class_layer/dynamic_tree_view/attribute_item", attribute: attribute %>
+<!--              </li>-->
+            <%# end %>
+<!--          </ul>-->
+<!--        </li>-->
+      <%# end %>
+
+      <!--  Part 1.Framework folders -->
+<!--      <li class="jstree-open">-->
+        <%#= render "framework/framework_dynamic_tree_view/framework_folder_menu" %>
+<!--        <ul>-->
+          <%# root_framework_folder = framework.root_framework_folder %>
+          <%# root_framework_folder.self_and_descendants.each do |framework_folder| %>
+            <%#= render "framework/framework_dynamic_tree_view/framework_folder", framework_folder: framework_folder, leaf_type: leaf_type  %>
+          <%# end %>
+<!--        </ul>-->
+<!--      </li>-->
+
+      <% root_framework_folder = framework.root_framework_folder %>
+      <% root_framework_folder.self_and_descendants.each do |framework_folder| %>
+        <%= render "framework/framework_dynamic_tree_view/framework_folder", framework_folder: framework_folder, leaf_type: leaf_type  %>
+      <% end %>
+
+
+    </ul>
+  </li>

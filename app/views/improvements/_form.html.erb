@@ -1,20 +1,28 @@
 <% path = @improvement.new_record? ? improvements_path : improvement_path %>
 <% method = @improvement.new_record? ? :post : :patch %>
 <%= simple_form_for(@improvement, url: path, method: method) do |f| %>
-  <% if improvement.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-      <h2><%= pluralize(improvement.errors.count, "error") %> prohibited this improvement from being saved:</h2>
 
-      <ul>
-        <% improvement.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
+
+  <% [@improvement, @permission].each do |entity| %>
+    <% if entity.try(:errors).present? %>
+      <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+        <h2><%= pluralize(entity.errors.count, "error") %> prohibited this Article from being saved:</h2>
+
+        <ul>
+          <% entity.errors.each do |error| %>
+            <li><%= error.full_message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
   <% end %>
 
   <br>
-    <%= render "shared/unit_preview", unit: @unit %>
+    <% if @article.present? %>
+      <%= render "shared/form_partials/form_target_previews/article", article: @article %>
+    <% elsif @unit.present? %>
+      <%= render "shared/form_partials/form_target_previews/unit", unit: @unit %>
+    <% end %>
   <br>
 
   <div class="col-span-6 sm:col-span-3">
@@ -57,25 +65,49 @@
         </div>
       </li>
 
-      <% selected_technologies = f.object.unit_version_improvements.map {|a| a.unit_version_id} %>
-      <% @unit.unit_versions.each do |unit_version| %>
-        <%= f.fields_for :unit_version_improvements, Improvements::UnitVersionImprovement.new do |t| %>
-          <li class="py-4 flex items-top w-full border-b border-gray-200 rounded-t-lg dark:border-gray-600">
-            <div class="flex items-center pl-3">
-              <%= t.check_box(:unit_version_id,
-                {
-                  "aria-describedby": "helper-checkbox-text-#{unit_version.uuid}",
-                  class: "w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600",
-                  checked: selected_technologies.include?(unit_version.id) ? true : false
-                },
-                unit_version.id)
-              %>
-            </div>
-            <div class="ml-4 text-base">
-              <label for="improvement_<%=unit_version.uuid%>" class="font-medium text-gray-900 dark:text-gray-300"><%= unit_version.title %></label>
-              <p id="helper-checkbox-text-<%=unit_version.uuid%>" class="text-sm font-normal text-gray-500 dark:text-gray-300"><%= unit_version.title %></p>
-            </div>
-          </li>
+      <% if @article.present? %>
+        <% selected_technologies = f.object.article_version_improvements.map {|a| a.article_version_id} %>
+        <% @article.article_versions.each do |article_version| %>
+          <%= f.fields_for :article_version_improvements, Improvements::ArticleVersionImprovement.new do |t| %>
+            <li class="py-4 flex items-top w-full border-b border-gray-200 rounded-t-lg dark:border-gray-600">
+              <div class="flex items-center pl-3">
+                <%= t.check_box(:article_version_id,
+                                {
+                                    "aria-describedby": "helper-checkbox-text-#{article_version.uuid}",
+                                    class: "w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600",
+                                    checked: selected_technologies.include?(article_version.id) ? true : false
+                                },
+                                article_version.id)
+                %>
+              </div>
+              <div class="ml-4 text-base">
+                <label for="improvement_<%=article_version.uuid%>" class="font-medium text-gray-900 dark:text-gray-300"><%= article_version.title %></label>
+                <p id="helper-checkbox-text-<%=article_version.uuid%>" class="text-sm font-normal text-gray-500 dark:text-gray-300"><%= article_version.title %></p>
+              </div>
+            </li>
+          <% end %>
+        <% end %>
+      <% elsif @unit.present? %>
+        <% selected_technologies = f.object.unit_version_improvements.map {|a| a.unit_version_id} %>
+        <% @unit.unit_versions.each do |unit_version| %>
+          <%= f.fields_for :unit_version_improvements, Improvements::UnitVersionImprovement.new do |t| %>
+            <li class="py-4 flex items-top w-full border-b border-gray-200 rounded-t-lg dark:border-gray-600">
+              <div class="flex items-center pl-3">
+                <%= t.check_box(:unit_version_id,
+                                {
+                                    "aria-describedby": "helper-checkbox-text-#{unit_version.uuid}",
+                                    class: "w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600",
+                                    checked: selected_technologies.include?(unit_version.id) ? true : false
+                                },
+                                unit_version.id)
+                %>
+              </div>
+              <div class="ml-4 text-base">
+                <label for="improvement_<%=unit_version.uuid%>" class="font-medium text-gray-900 dark:text-gray-300"><%= unit_version.title %></label>
+                <p id="helper-checkbox-text-<%=unit_version.uuid%>" class="text-sm font-normal text-gray-500 dark:text-gray-300"><%= unit_version.title %></p>
+              </div>
+            </li>
+          <% end %>
         <% end %>
       <% end %>
     </ul>
@@ -83,13 +115,18 @@
 
   <br>
 
-  <%= f.hidden_field :unit_id, value: @unit.id %>
-
+  <% if @article.present? %>
+    <%= f.hidden_field :article_id, value: @article.uuid %>
+  <% elsif @unit.present? %>
+    <%= f.hidden_field :unit_id, value: @unit.uuid %>
+  <% elsif @algorithm.present? %>
+    <%= f.hidden_field :algorithm_id, value: @algorithm.uuid %>
+  <% end %>
 
   <div class="bg-gray-50 px-4 py-3 sm:px-6">
     <div class="text-end">
       <!--  TODO: Rewrite it to Back to technology depending on which improvent it is -->
-      <%= link_to "Back to method", unit_unit_versions_path(@unit.default_version), class: "py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" %>
+      <%#= link_to "Back to method", unit_unit_versions_path(@unit.default_version), class: "py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" %>
       <%= f.button :submit, "Submit improvement", class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
     </div>
   </div>

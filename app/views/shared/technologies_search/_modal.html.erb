@@ -4,7 +4,11 @@
 <div class="select-technology-modal">
   <div data-controller="select_instruction_modal"
        data-select_instruction_modal-allow-background-close="false"
-       data-target="remote_select_instruction.instructionModalInstance remote_select_attachment.instructionModalInstance remote_select_link_attachment.instructionModalInstance remote_select_cheat_sheet_group_section.instructionModalInstance">
+       data-target="remote_select_instruction.instructionModalInstance
+                    remote_select_attachment.instructionModalInstance
+                    remote_select_link_attachment.instructionModalInstance
+                    remote_select_cheat_sheet_group_section.instructionModalInstance"
+  >
     <!--      <a href="#" data-action="click->modal#open" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded">-->
     <!--        <span>Open Modal</span>-->
     <!--      </a>-->
@@ -24,6 +28,16 @@
                 Open Modal for Adding Wrapper Step Button
               </span>
       </button>
+    <% elsif type == "framework_members_addition_form_member_addition" %>
+        <button
+          type="button"
+          data-target="framework_member_addition.frameworkMemberAdditionButton"
+          data-action="click->select_instruction_modal#open"
+          class="hidden relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800">
+              <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                Open Modal for Adding Existing Decision Box in the form Button
+              </span>
+        </button>
     <% else %>
       <button
         data-action="click->select_instruction_modal#open"
@@ -66,7 +80,7 @@
     <!-- Modal Container -->
     <div data-select_instruction_modal-target="container"
          data-action="click->select_instruction_modal#closeBackground keyup@window->select_instruction_modal#closeWithKeyboard"
-         class="hidden animated fadeIn fixed inset-0 overflow-y-auto flex items-center justify-center" style="z-index: 9999;">
+         class="modal-container hidden animated fadeIn fixed inset-0 overflow-y-auto flex items-center justify-center" style="z-index: 9999;">
       <!-- Modal Inner Container -->
       <!--    <div id="instructionUnitsAutocompleteModal" class="fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">-->
       <div id="selectInstructionModal" class="fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full justify-center items-center flex">
@@ -104,6 +118,8 @@
                   Select Technology
                 <% elsif type == "cheat_sheet_group_version_section_addition" %>
                   Select Technology
+                <% elsif type == "framework_members_addition_form_member_addition" %>
+                  Add Decision Box
                 <% end %>
               </h3>
               <button type="button" data-action="click->select_instruction_modal#close" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
@@ -138,11 +154,13 @@
                 <% elsif type == "unit_version_attachment_addition"%>
                   In this popup you can select Article to add it as attachment to current Method
                 <% elsif type == "article_version_attachment_addition"%>
-                  In this popup you can select Article to add it as attachment to current Article
+                  In this popup you can search and select attachment for current Article
                 <% elsif type == "cheat_sheet_version_notes_link_attachment_addition" %>
                   In this popup you can select technology to add as Link to Note
                 <% elsif type == "cheat_sheet_group_version_section_addition" %>
                   In this popup you can select Articles, Methods, Cheat Sheets and Cheat Sheet Combos to add it as Section to Cheat Sheet Combo
+                <% elsif type == "framework_members_addition_form_member_addition" %>
+                  In this popup you can select Decision Box to add it to Framework
                 <% end %>
 
               </p>
@@ -151,10 +169,12 @@
 
             <% if type == "substep_addition" ||
                   type == "dpo_instruction_select" ||
-                  type == "interface_member_addition" ||
-                  type == "algorithm_form_wrapper_step_addition" %>
+                  type == "interface_member_addition"%>
               <%= render "shared/technologies_search/modal_bodies/instructions_search_modal_body" %>
-            <% elsif type == "container_member_addition" %>
+            <% elsif type == "algorithm_form_wrapper_step_addition" %>
+              <%= render "shared/technologies_search/modal_bodies/instructions_search_modal_body", scenario: "algorithm_form_wrapper_step_addition" %>
+            <% elsif type == "container_member_addition" ||
+                     type == "framework_members_addition_form_member_addition"%>
               <%= render "shared/technologies_search/modal_bodies/classes_search_modal_body" %>
             <% elsif type == "folder_item_addition" %>
               <%= render "shared/technologies_search/modal_bodies/technologies_search_modal_body" %>
@@ -170,7 +190,7 @@
             <% elsif type == "unit_version_attachment_addition" %>
               <%= render "shared/technologies_search/modal_bodies/articles_search_modal_body", scenario: "unit_version_attachment_addition" %>
             <% elsif type == "article_version_attachment_addition" %>
-              <%= render "shared/technologies_search/modal_bodies/articles_search_modal_body", scenario: "article_version_attachment_addition" %>
+              <%= render "shared/technologies_search/modal_bodies/technology_attachment_search_modal_body", scenario: "article_version_attachment_addition" %>
             <% elsif type == "cheat_sheet_version_notes_link_attachment_addition" %>
               <%= render "shared/technologies_search/modal_bodies/links_search_modal_body", scenario: "cheat_sheet_version_notes_link_attachment_addition" %>
             <% elsif type == "cheat_sheet_group_version_section_addition" %>

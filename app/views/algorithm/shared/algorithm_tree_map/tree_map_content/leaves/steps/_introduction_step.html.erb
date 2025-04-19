@@ -1,0 +1,55 @@
+<% if algorithm_version.introduction_step.id == current_step.try(:introduction_step_id) %>
+  <!--  DOC: mean this is a current step-->
+  <% leafe_style = "relative block p-2 overflow-hidden border bg-white rounded-lg ml-2 mr-6 max-w-4xl w-full border-2 border-indigo-600" %>
+<% else %>
+  <% leafe_style = "relative block p-2 overflow-hidden border bg-white rounded-lg ml-2 mr-6 max-w-4xl w-full hover:border-indigo-600 border-transparent border-2" %>
+<% end %>
+
+<div class="<%=leafe_style%>">
+
+  <span class="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-r from-green-300 via-blue-500 to-purple-600"></span>
+
+  <div class="justify-between sm:flex">
+
+    <div class="p-2 md:flex md:justify-center gap-2">
+      <div class="flex-shrink-0 ml-3 sm:block">
+        <img
+          class="object-cover w-8 h-8 rounded-lg shadow-sm"
+          src="https://github.com/creativetimofficial/argon-design-system/blob/master/assets/img/faces/team-2.jpg?raw=true"
+          alt=""
+          />
+      </div>
+
+      <div class="grid grid-cols-1">
+        <!--        <div class="flex items-center justify-center">-->
+        <div class="flex items-center">
+          <%= link_to algorithm_reports_algorithm_execution_initial_place_path(uuid: current_step.algorithm_report.uuid), :"data-action" => "click->algorithm_tree_map_content#handleRedirectToStep" do %>
+            <h5 class="text-lg font-bold text-slate-900 hover:underline hover:text-blue-600" style="white-space: normal;">
+              Introduction step: <%= truncate(algorithm_version.introduction_step.title, length: 220, omission: '...', :escape => false) %>
+            </h5>
+          <% end %>
+          <% if algorithm_version.introduction_step.id == current_step.try(:introduction_step_id) %>
+            <span class="inline-flex items-center bg-blue-100 text-sm font-bold text-slate-900 px-2.5 rounded-full dark:bg-green-900 dark:text-green-300">
+                  <span class="w-2 h-2 me-1 bg-blue-600 rounded-full"></span>
+                  Current Step
+            </span>
+          <% end %>
+        </div>
+
+        <div class="flex items-center">
+          <h5 class="text-sm text-gray-900" style="white-space: normal;">
+            Description: <%= truncate(strip_tags(algorithm_version.introduction_step.content), length: 500, omission: '...', :escape => false) %>
+            <%#= node.node_description %>
+          </h5>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!--  <div class="mt-4 sm:pr-8">-->
+  <!--    <p class="text-sm text-slate-500">-->
+  <%#= attribute.description.html_safe %>
+  <!--    </p>-->
+  <!--  </div>-->
+</div>

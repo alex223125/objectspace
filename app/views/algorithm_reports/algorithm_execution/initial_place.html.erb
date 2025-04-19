@@ -1,0 +1,21 @@
+<div id="top">
+  <div class="pt-8 pb-16 lg:pt-16 lg:pb-24 bg-white dark:bg-gray-900">
+    <%= render "shared/tech_show_partials/tech_breadcrumbs" %>
+    <%= render "shared/tech_show_partials/sourcepage_card", entity: @algorithm  %>
+
+    <!-- 2 columns -->
+    <div class="flex mb-4">
+      <div class="w-full">
+        <%= render "algorithm_reports/algorithm_execution/initial_place_partials/middle_bar",
+                   introduction_step: @introduction_step, algorithm_report: @algorithm_report %>
+      </div>
+      <div class="w-1/5 flex-shrink-0">
+        <%= render "algorithm_reports/algorithm_execution/initial_place_partials/right_bar" %>
+      </div>
+    </div>
+
+  </div>
+</div>
+<%= render "shared/scroll_to_top" %>
+
+

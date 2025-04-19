@@ -12,9 +12,17 @@
 
   <div class="mt-4 mb-6">
     <%= link_to cheat_sheet_version_path(ownername: cheat_sheet.ownerable.ownername, id: cheat_sheet.default_version), target: '_blank' do %>
-      <div class="hover:underline mb-3 text-xl font-bold"><%= truncate(cheat_sheet.title.html_safe, :length => 200, :omission => "..." , :escape => false) %></div>
+      <div class="hover:underline hover:text-blue-600 mb-3 text-xl font-bold break-words "><%= truncate(cheat_sheet.title.html_safe, :length => 200, :omission => "..." , :escape => false) %></div>
     <% end %>
-    <div class="text-sm text-neutral-600"><%= truncate(cheat_sheet.source_page_description.html_safe, :length => 500, :omission => "..." , :escape => false) %></div>
+    <div class="text-sm text-neutral-600 break-words "><%= truncate(cheat_sheet.source_page_description.html_safe, :length => 500, :omission => "..." , :escape => false) %></div>
+    <br>
+    <% cheat_sheet_versions = cheat_sheet.cheat_sheet_versions %>
+    Versions:
+    <% cheat_sheet_versions.each do |cheat_sheet_version| %>
+      <%= link_to cheat_sheet_version_path(ownername: cheat_sheet.ownerable.ownername, id: cheat_sheet.default_version), target: '_blank' do %>
+        <div class="hover:underline hover:text-blue-600 mb-3 text-xl font-bold break-words "><%= truncate(cheat_sheet_version.title.html_safe, :length => 100, :omission => "..." , :escape => false) %></div>
+      <% end %>
+    <% end %>
   </div>
 
   <div>
@@ -42,9 +50,31 @@
              data-sectionId="<%= cheat_sheet.id %>"
              data-sectionType="cheat_sheet"
         >
-          <button type="button"
-                  class="flex text-white right-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-            Select
+          <button type="button" class="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800">
+            <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+              Select
+            </span>
+          </button>
+        </div>
+      <% elsif scenario == "algorithm_form_wrapper_step_addition" %>
+        <div data-action="click->remote_select_instruction#selectInstruction"
+             data-instructionId="<%= cheat_sheet.id %>"
+             data-instructionType=cheat_sheet>
+          <button type="button" class="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800">
+            <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+              Select
+            </span>
+          </button>
+        </div>
+      <% elsif scenario == "article_version_attachment_addition" %>
+        <div data-action="click->remote_select_attachment#selectAttachment"
+             data-attachmentId="<%= cheat_sheet.id %>"
+             data-attachmentType="cheat_sheet"
+        >
+          <button type="button" class="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800">
+            <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+              Select
+            </span>
           </button>
         </div>
       <% end %>

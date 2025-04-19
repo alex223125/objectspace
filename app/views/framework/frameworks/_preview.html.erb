@@ -12,9 +12,9 @@
 
   <div class="mt-4 mb-6">
     <%= link_to framework_framework_path(@framework), target: '_blank' do %>
-      <div class="hover:underline mb-3 text-xl font-bold"><%= truncate(@framework.title.html_safe, :length => 200, :omission => "..." , :escape => false) %></div>
+      <div class="hover:underline mb-3 text-xl font-bold break-words "><%= truncate(@framework.title.html_safe, :length => 200, :omission => "..." , :escape => false) %></div>
     <% end %>
-    <div class="text-sm text-neutral-600"><%= truncate(@framework.description.html_safe, :length => 500, :omission => "..." , :escape => false) %></div>
+    <div class="text-sm text-neutral-600 break-words "><%= truncate(@framework.description.html_safe, :length => 500, :omission => "..." , :escape => false) %></div>
   </div>
 
   <div>

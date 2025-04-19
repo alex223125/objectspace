@@ -105,7 +105,7 @@
 
                 <div data-controller="remote_select_instruction algorithm_step_type_select steps_nested_form"
                      data-target="remote_select_instruction.stepsArea"
-                     data-remote_select_instruction-select-type-value="algorithm_form_wrapper_step_addition"
+                     data-remote_select_instruction-select-type-value="<%=remote_select_instruction_select_type(@functional_type)%>"
                 >
 
                   <!--  ghost-class means we will get template by get request from server-->
@@ -206,7 +206,19 @@
 
                   <%= render "algorithm/shared/partials/shared/control_structure_select_modal" %>
 
-                  <%= render "shared/technologies_search/modal", :type => "algorithm_form_wrapper_step_addition" %>
+                  <% if regular_functional_type?(@functional_type) %>
+                    <%= render "shared/technologies_search/modal", :type => "algorithm_form_wrapper_step_addition" %>
+                  <% elsif class_level_functional_type?(@functional_type) %>
+                    <div data-controller="remote_technology_pick">
+                      <%= render "shared/technology_pick/modal", :type => "algorithm_form_class_level_wrapper_step_addition",
+                                 :scope => "simple_class", :simple_class => @simple_class %>
+                    </div>
+                  <% elsif framework_level_functional_type?(@functional_type) %>
+                    <div data-controller="remote_technology_pick">
+                      <%= render "shared/technology_pick/modal", :type => "algorithm_form_framework_level_wrapper_step_addition",
+                                 :scope => "framework", :framework => @framework %>
+                    </div>
+                  <% end %>
 
                 </div>
 

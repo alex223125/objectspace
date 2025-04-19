@@ -17,17 +17,36 @@
 
           <div class="mt-2 flex items-center text-sm">
             <%= render "algorithm/algorithm_versions/partials/algorithm_content/submenu/copy_to_clipboard",
-                       algorithm: @algorithm %>
+                       algorithm_version: algorithm_version %>
+          </div>
+
+          <% if current_user.try(:has_resource_modify_permissions?, algorithm_version.algorithm)  %>
+            <div class="mt-2 flex items-center text-sm text-gray-500">
+              <%= render "algorithm/algorithm_versions/partials/algorithm_content/submenu/options_dropdown",
+                         algorithm_version: algorithm_version %>
+            </div>
+          <% end %>
+
+          <div class="mt-2 flex items-center text-sm text-gray-500">
+            <%= render "algorithm/algorithm_versions/partials/algorithm_content/submenu/execute_button",
+                       algorithm_version: algorithm_version %>
+          </div>
+
+        </div>
+
+
+        <div class="mt-1 flex flex-col space-x-4 sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+          <div class="mt-2 flex items-center text-sm text-gray-500">
+            <%= render "algorithm/shared/algorithm_tree_map/modal", algorithm_version: algorithm_version %>
           </div>
 
           <div class="mt-2 flex items-center text-sm text-gray-500">
-            <%= render "algorithm/algorithm_versions/partials/algorithm_content/submenu/options_dropdown",
-                       algorithm_version: algorithm_version %>
+            bookmark button
           </div>
         </div>
 
         <%= render "algorithm/algorithm_versions/partials/algorithm_content/toc",
-                   algorithm_version: algorithm_version %>
+                   algorithm_version: algorithm_version, toc_type: "toc_for_regular_page"%>
         <br>
 
       </div>

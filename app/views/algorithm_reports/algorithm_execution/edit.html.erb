@@ -1,0 +1,69 @@
+<%= simple_form_for @algorithm_step, :url => url_for(:action => 'update', :controller => 'algorithm_reports/algorithm_execution'), :method => 'patch' do |f| %>
+
+
+  <% [@algorithm_step, @algorithm_report].each do |entity| %>
+    <% if entity.try(:errors).present? %>
+      <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+        <h2><%= pluralize(entity.errors.count, "error") %> prohibited this Article from being saved:</h2>
+
+        <ul>
+          <% entity.errors.each do |error| %>
+            <li><%= error.full_message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+  <% end %>
+
+
+
+<!--  <br>-->
+  <%#= render "article_preview", article: @article %>
+<!--  <br>-->
+
+
+  <!--  Part 1.Show of the step-->
+  <% original_node = @algorithm_step.original_node %>
+  <%= render "algorithm_reports/algorithm_execution/edit_partials/main", step: original_node,
+             algorithm_version: original_node.algorithm_version, algorithm_report_step: @algorithm_step  %>
+
+
+  <!--  Part 2.Note filed -->
+  <div class="items-center">
+    <div class="group relative mx-auto overflow-hidden rounded-[16px] bg-gray-300 p-[1px] transition-all duration-300 ease-in-out hover:bg-gradient-to-r hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500">
+      <div class="group-hover:animate-spin-slow invisible absolute -top-40 -bottom-40 left-10 right-10 bg-gradient-to-r from-transparent via-white/90 to-transparent group-hover:visible"></div>
+      <div class="relative rounded-[15px] bg-white p-6">
+
+        <div class="form-inputs">
+          <div class="col-span-6 sm:col-span-3" data-controller="unit_instruction_tinymce">
+            <%= f.label "Notes", class: "block text-sm font-medium text-gray-700" %>
+            <%= f.hint 'Use this filed to write your ideas and notes realed to step of tutorial',
+                       class: "mt-2 text-sm text-gray-500" %>
+            <%= f.input_field :content,
+                              placeholder: "Template for notes related to step",
+                              data: { target: 'unit_instruction_tinymce.field' } %>
+          </div>
+          <br>
+        </div>
+        <br>
+
+
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-gray-50 px-4 py-3 sm:px-6">
+    <div class="text-end">
+      <% path_to_previous_step = path_to_previous_execution_step(@algorithm_step) %>
+      <% return_to_back_button_text = first_step_after_introduction?(@algorithm_step) ? "Back to introduction" : "Back to previous step" %>
+      <%= link_to return_to_back_button_text, path_to_previous_step, class: "py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" %>
+
+      <% next_step_button_text = last_algorithm_execution_step?(@algorithm_step) ? "Complete Algorithm" : "Save and Go to The Next Step" %>
+      <%= button_tag(type: 'submit', class: "relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800") do %>
+        <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+          <%= next_step_button_text %>
+        </span>
+      <% end %>
+    </div>
+  </div>
+<% end %>

@@ -31,8 +31,8 @@
   </div>
   <br>
 
-  <%= f.hidden_field :algorithm_id, value: @algorithm.id %>
-
+  <% binding.pry %>
+  <%= hidden_field_tag :algorithm_id, @algorithm.id %>
 
   <div class="bg-gray-50 px-4 py-3 sm:px-6">
     <div class="text-end">

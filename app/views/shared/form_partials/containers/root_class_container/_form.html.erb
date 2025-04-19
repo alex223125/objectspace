@@ -1,6 +1,7 @@
 <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Classes</h2>
 <div>
   <div>
+    <% binding.pry %>
     <%= form.fields_for :class_containers, @root_class_container do |t| %>
       <%= render "shared/form_partials/containers/root_class_container/fileds", :f => t %>
     <% end %>

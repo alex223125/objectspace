@@ -9,8 +9,8 @@
             </div>
             <div class="col-span-4 px-1 py-4">
               <div class="px-1 py-4">
-                <div class="font-bold text-xl mb-2"><%= usage_example.title %></div>
-                <p class="text-gray-700 text-base">
+                <div class="font-bold text-xl mb-2 break-words "><%= usage_example.title %></div>
+                <p class="text-gray-700 text-base break-words ">
                   <%= truncate(usage_example.content, length: 300, omission: '...', :escape => false) %>
                 </p>
               </div>

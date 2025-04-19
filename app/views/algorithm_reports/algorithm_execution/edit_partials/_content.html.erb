@@ -1,0 +1,95 @@
+<!--Content area-->
+<div class="max-w-8xl p-4 rounded-lg bg-gray-50 dark:bg-gray-800" data-controller="content_area" data-target="content_area.area">
+  <!--center -->
+  <div class="flex justify-between px-4 mx-auto max-w-screen-xl">
+    <div class="w-full format-sm sm:format-base lg:format-lg format-blue dark:format-invert">
+      <div class="mb-4 lg:mb-6 not-format p-3">
+
+        <div data-controller="step_show" data-target="step_show.stepTitle" data-action="load@window->step_show#focusOnTitle turbo:load@window->step_show#focusOnTitle">
+          <h1 class="break-words mb-4 text-3xl font-extrabold leading-tight text-gray-900 lg:mb-6 lg:text-4xl dark:text-white">
+            <%= step.title %>
+          </h1>
+        </div>
+
+        <!--     Whole algorithm version submenu options-->
+        <!-- submenu -->
+        <div class="mt-1 flex flex-col space-x-4 sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+
+          <div class="mt-2 flex items-center text-sm">
+            <%= render "algorithm/algorithm_versions/partials/algorithm_content/submenu/copy_to_clipboard",
+                       algorithm_version: algorithm_version %>
+          </div>
+
+          <div class="mt-2 items-center text-sm text-gray-500">
+            <%= render "algorithm/shared/algorithm_tree_map/modal",
+                       algorithm_version: algorithm_report_step.algorithm_report.duplicate_algorithm_version,
+                       current_step: algorithm_report_step, scenario: "algorithm_report_step_show_page" %>
+          </div>
+
+        </div>
+
+        <!--        <div class="mt-1 flex flex-col space-x-4 sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">-->
+        <!--          <div class="mt-2 flex items-center text-sm text-gray-500">-->
+        <%#= render "algorithm/shared/algorithm_tree_map/modal", algorithm_version: algorithm_version %>
+        <!--          </div>-->
+
+        <!--          <div class="mt-2 flex items-center text-sm text-gray-500">-->
+        <!--            bookmark button-->
+        <!--          </div>-->
+        <!--        </div>-->
+
+
+
+        <%#= render "algorithm/steps/show_partials/step_content/sections/algorithm_navigation", step: step, algorithm_version: algorithm_version %>
+
+        <!--        <div class="mt-1 flex flex-col space-x-4 sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">-->
+        <!--          <div class="mt-2 flex items-center text-sm text-gray-500">-->
+        <!--            bookmark button-->
+        <!--          </div>-->
+        <!--        </div>-->
+
+        <%= render "algorithm/steps/show_partials/step_content/tocs/regular_version_toc", step: step, toc_type: "toc_for_regular_page" %>
+        <br>
+
+      </div>
+
+      <% binding.pry %>
+      <!-- DOC: dispatch on view of specific type based on what kind of step we have -->
+      <% if step.step_type? %>
+        <% if step.regular_functional_type? %>
+          <%= render "algorithm/steps/show_partials/step_content/versions/regular_step", step: step, algorithm_version: algorithm_version %>
+        <% elsif step.wrapper_functional_type? %>
+          <%= render "algorithm/steps/show_partials/step_content/versions/wrapper_step", step: step, algorithm_version: algorithm_version %>
+        <% elsif step.container_functional_type? %>
+        <% end %>
+      <% end  %>
+
+      <%#= render "algorithm/steps/show_partials/step_content/sections/algorithm_navigation", step: step, algorithm_version: algorithm_version %>
+
+      <!-- contribute section -->
+      <!--      <div class="contribute-section" id="contribute-<%#= step.uuid %>">-->
+      <!--        <div class="mt-8">-->
+      <!--          <div class="w-full p-4 border border-gray-200 bg-gray-50 rounded-t-xl dark:border-gray-600 dark:bg-gray-700">-->
+      <!--            <div class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">Contribute</div>-->
+      <!--            Help us make Encyclopedia better, add improvements and examples.-->
+      <!--          </div>-->
+
+      <!--          <div class="code-preview-wrapper">-->
+      <!--            <div id="default-button-example" class="flex p-0 bg-white border-gray-200 bg-gradient-to-r code-preview dark:bg-gray-900 border-x dark:border-gray-600">-->
+      <!--              <div class="p-4 m-5 bg-white dark:bg-gray-900 ">-->
+      <!--                <div class="w-full h-0 mx-auto bg-white dark:bg-gray-900 iframe-code">-->
+      <%#= link_to "Add new improvement!", new_improvement_path(unit_id: unit_version.unit.id), style: "text-decoration: none", class: "no-underline	 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+      <%#= link_to "Add new usage example!", new_improvement_path, style: "text-decoration: none", class: "no-underline	 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+      <!--                </div>-->
+      <!--              </div>-->
+      <!--            </div>-->
+      <!--          </div>-->
+      <!--        </div>-->
+      <!--      </div>-->
+      <br>
+      Step comments
+
+
+    </div>
+  </div>
+</div>

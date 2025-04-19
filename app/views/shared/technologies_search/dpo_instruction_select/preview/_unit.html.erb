@@ -17,11 +17,18 @@
   </div>
 
   <div class="mt-4 mb-6">
-    <!--          <div data-select_instruction-target="instructionId" style="visibility: hidden;"><%#= unit.id %></div>-->
-    <!--          <div data-select_instruction-target="instructionType" style="visibility: hidden;"><%#= unit.class %></div>-->
-
-    <div class="mb-3 text-xl font-bold"><%= unit.title %></div>
-    <div class="text-sm text-neutral-600"><%= truncate(unit.source_page_description.html_safe, :length => 500, :omission => "" , :escape => false) %></div>
+    <%= link_to unit_version_path(ownername: unit.ownerable.ownername, id: unit.default_version.slug), target: '_blank' do %>
+      <div class="hover:underline hover:text-blue-600 mb-3 text-xl font-bold break-words "><%= truncate(unit.title.html_safe, :length => 200, :omission => "..." , :escape => false) %></div>
+    <% end %>
+    <div class="text-sm text-neutral-600 break-words "><%= truncate(unit.source_page_description.html_safe, :length => 500, :omission => "..." , :escape => false) %></div>
+    <br>
+    <% unit_versions = unit.unit_versions %>
+    Versions:
+    <% unit_versions.each do |unit_version| %>
+      <%= link_to unit_version_path(ownername: unit.ownerable.ownername, id: unit.default_version.slug), target: '_blank' do %>
+        <div class="hover:underline hover:text-blue-600 mb-3 text-xl font-bold break-words "><%= truncate(unit_version.title.html_safe, :length => 100, :omission => "..." , :escape => false) %></div>
+      <% end %>
+    <% end %>
   </div>
 
   <div>

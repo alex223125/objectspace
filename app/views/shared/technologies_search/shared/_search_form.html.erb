@@ -36,6 +36,10 @@
               <%= hidden_field_tag 'scenario', scenario, data: {target: "search_instructions.scenario"}  %>
             <% end %>
 
+            <p class="mt-2 text-sm text-gray-500">
+              *Use or unique identifier or text for better results
+            </p>
+            <br>
             <div class="flex flex-col">
               <!--        <label for="name" class="font-medium text-sm text-stone-600">Name</label>-->
               <!--        <input-->
@@ -53,7 +57,7 @@
                 <%= form.text_field :uuid_query,
                                     data: {target: "search_instructions.uuidQuery"},
                                     class: "block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500",
-                                    placeholder: "Search using unique identifier (question symbol on qa)",
+                                    placeholder: "Search using unique identifier",
                                     autocomplete: "off" %>
               </div>
 

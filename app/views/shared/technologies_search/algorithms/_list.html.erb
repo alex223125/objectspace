@@ -4,7 +4,8 @@
     <% @algorithms.each do |algorithm| %>
       <%= render partial: "shared/technologies_search/algorithms/single_preview", locals: {algorithm: algorithm, scenario: scenario} %>
     <% end %>
+  <% else %>
+    Nothing was found
   <% end %>
-
 </div>
 <br>

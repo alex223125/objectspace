@@ -1,0 +1,84 @@
+<div data-controller="algorithm_tree_map_content" data-target="algorithm_tree_map_content.treeMapArea" class="simple-class-dynamic-tree">
+
+  <!--          <link href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.1.1/themes/default/style.min.css" rel="stylesheet"/>-->
+  <!--          <link href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.1.1/themes/default-dark/style.min.css" rel="stylesheet"/>-->
+
+  <div class="container">
+
+    <!--    Part 1. Search field -->
+    <div class="row">
+      <div class="p-8 col-xs-12">
+        <div class="input-group">
+
+          <!--                  <span class="input-group-addon" id="search-addon"><span class="fa fa-th-list"></span></span>-->
+          <!--                  <input type="text"-->
+          <!--                         id="search-input"-->
+          <!--                         class="form-control"-->
+          <!--                         placeholder="Type here for search..."-->
+          <!--                         aria-describedby="search-addon"-->
+          <!--                         data-target="algorithm_tree_map_content.searchInput"-->
+          <!--                  >-->
+          <!--                  <span class="input-group-addon" id="search-addon"><span class="fa fa-search"></span></span>-->
+
+          <label for="jstree-search-input" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+              </svg>
+            </div>
+            <input type="text"
+                   id="jstree-search-input"
+                   class="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                   placeholder="Type here for search..."
+                   aria-describedby="search-addon"
+                   data-target="algorithm_tree_map_content.searchInput">
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!--    Part 2. Tree with steps -->
+    <div class="row">
+      <div class="col-xs-12" id="container-albero">
+        <div id="test" data-target="algorithm_tree_map_content.tree">
+          <div id="dynamic-tree" data-target="algorithm_tree_map_content.dynamicTree">
+
+            <ul>
+              <li class="jstree-open">
+                <% binding.pry %>
+                <!--   1.Header for all algorithm with stats -->
+                <%= render "algorithm_reports/algorithm_execution_tree_map/tree_map_content/root_node_menu",
+                           algorithm_version: algorithm_version %>
+                <ul>
+                  <li class="jstree-open">
+                    <% if scenario == "algorithm_report_step_show_page" %>
+                      <%= render "algorithm_reports/algorithm_execution_tree_map/tree_map_content/leaves/steps/introduction_step",
+                                 algorithm_version: algorithm_version, current_step: current_step %>
+                    <% end %>
+                  </li>
+                  <!-- 2.Iteration over steps to show each step of algorithm -->
+                  <li class="jstree-open">
+                    <%= render "algorithm_reports/algorithm_execution_tree_map/tree_map_content/steps_menu",
+                               algorithm_version: algorithm_version %>
+                    <ul>
+                      <% binding.pry %>
+                      <% tree_root = algorithm_version.algorithm_tree.tree_root %>
+                      <% tree_root.children.each do |leafe| %>
+                        <%= render "algorithm_reports/algorithm_execution_tree_map/tree_map_content/leaves_iterator",
+                                   leafe: leafe, current_leafe: current_step %>
+                        <%#= render "simple_class/simple_classes/partials/dynamic_tree_view/attribute_item", attribute: attribute %>
+                      <% end %>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

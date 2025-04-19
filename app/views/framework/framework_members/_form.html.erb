@@ -1,0 +1,46 @@
+<% path = @framework_member.new_record? ? framework_members_path : framework_member_path %>
+<% method = @framework_member.new_record? ? :post : :patch %>
+<%= simple_form_for(@framework_member, url: path, method: method) do |f| %>
+
+  <% if @framework_member.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+      <h2><%= pluralize(@framework_member.errors.count, "error") %> prohibited this algorithm_version from being saved:</h2>
+
+      <ul>
+        <% @framework_member.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<!--  <br>-->
+  <%#= render "algorithm_preview", algorithm: @algorithm %>
+<!--  <br>-->
+
+  <div class="form-inputs">
+    <%#= render "algorithm/shared/partials/algorithm_version/algorithm_version_fields", :f => f %>
+    <%#= render "algorithm/shared/partials/algorithm_version/algorithm_version_nested_form", :form => f %>
+
+    <%= render "framework/framework_members/form_partials/framework_members_newsted_form", :f => f %>
+    <br>
+    <%#= render "algorithm/shared/partials/steps_nested_form", :form => f %>
+
+    <%#= render "algorithm/shared/partials/control_structures_nested_form", :form => f %>
+
+  </div>
+  <br>
+
+  <%#= f.hidden_field :algorithm_id, value: @algorithm.id %>
+
+
+  <div class="bg-gray-50 px-4 py-3 sm:px-6">
+    <div class="text-end">
+      <%= link_to "Back to dashboard", framework_members_path, class: "py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" %>
+      <% button_text = @framework_member.new_record? ? "Create Algorithm" : "Submit changes" %>
+      <%= f.button :submit, button_text, class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+    </div>
+  </div>
+
+
+<% end %>

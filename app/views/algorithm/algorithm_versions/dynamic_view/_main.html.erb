@@ -14,7 +14,7 @@
           </div>
 
           <div class="mt-2 flex items-center text-sm">
-            <%= render "algorithm/algorithm_versions/partials/algorithm_content/submenu/copy_to_clipboard", algorithm: @algorithm %>
+            <%= render "algorithm/algorithm_versions/partials/algorithm_content/submenu/copy_to_clipboard", algorithm_version: algorithm_version %>
           </div>
 
           <div class="mt-2 flex items-center text-sm text-gray-500">
@@ -23,7 +23,7 @@
         </div>
 
 
-        <%= render "algorithm/algorithm_versions/partials/algorithm_content/toc", algorithm_version: algorithm_version %>
+        <%= render "algorithm/algorithm_versions/partials/algorithm_content/toc", algorithm_version: algorithm_version, toc_type: "toc_for_regular_page" %>
         <br>
 
       </div>

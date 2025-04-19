@@ -27,40 +27,45 @@
 <!--</div>-->
 <div class="steps-nested-form">
 
-  <% binding.pry %>
   <div data-controller="nodes_drag remote_select_instruction algorithm_step_type_select steps_nested_form"
        data-target="remote_select_instruction.stepsArea nodes_drag.nodesArea"
        data-remote_select_instruction-select-type-value="<%=remote_select_instruction_select_type(@functional_type)%>">
 
-    <!--    // Template 1 regular step-->
+    <!--    // Template 1 regular step template-->
     <template data-target='steps_nested_form.regularStepFieldsTemplate' class="step-fields-template">
       <%= form.fields_for :subnodes, Algorithms::Nodes::Step.new, child_index: 'TEMPLATE_RECORD' do |step| %>
         <%= render "algorithm/shared/partials/steps/regular_step_fields", :f => step %>
       <% end %>
     </template>
 
-    <!--    // Template 2 wrapper step-->
+    <!--    // Template 2 wrapper step template-->
     <template data-target='steps_nested_form.wrapperStepFieldsTemplate' class="step-fields-template">
       <%= form.fields_for :subnodes, Algorithms::Nodes::Step.new, child_index: 'TEMPLATE_RECORD' do |step| %>
         <%= render "algorithm/shared/partials/steps/wrapper_step_fields", :f => step %>
       <% end %>
     </template>
 
-    <!--    // Template 3 container step-->
+    <!--    // Template 3 container step template-->
     <template data-target='steps_nested_form.containerStepFieldsTemplate' class="step-fields-template">
       <%= form.fields_for :subnodes, Algorithms::Nodes::Step.new, child_index: 'TEMPLATE_RECORD' do |step| %>
         <%= render "algorithm/shared/partials/steps/container_step_fields", :f => step %>
       <% end %>
     </template>
 
-    <!--    // Template 4 container step-->
+    <!--    // Template 4 single alternative control structure template-->
     <template data-target='steps_nested_form.singleAlternativeControlStructureFieldsTemplate' class="step-fields-template">
       <%= form.fields_for :subnodes, Algorithms::Nodes::ControlStructure.new, child_index: 'TEMPLATE_RECORD' do |node| %>
         <%= render "algorithm/shared/partials/control_structures/single_alternative_cs_fields", :f => node %>
       <% end %>
     </template>
 
-    <%= form.fields_for :subnodes do |node| %>
+    <% binding.pry %>
+    <!--    DOC: Wen have form which reloaded after error in active record -->
+    <!--    .subnodes will not work, .children will work. When we have successfully saved algorithm -->
+    <!--    .children will also work the same as .subnodes -->
+    <!--    Update: They both work in form after error periodically. Check data model why it works that way.-->
+    <% subnodes = @control_structure.try(:children).present? ? @control_structure.try(:children) : @control_structure.try(:subnodes) %>
+    <%= form.fields_for :subnodes, subnodes do |node| %>
       <% binding.pry %>
       <% if Steps::FunctionalTypes.try(:[], node.object.functional_type_id) == "regular" %>
         <%= render "algorithm/shared/partials/steps/regular_step_fields", :f => node %>
@@ -153,16 +158,21 @@
 
     <%= render "algorithm/shared/partials/shared/control_structure_select_modal" %>
 
-
     <% binding.pry %>
     <% if regular_functional_type?(@functional_type) %>
+      <% binding.pry %>
       <%= render "shared/technologies_search/modal", :type => "algorithm_form_wrapper_step_addition" %>
-    <% else %>
+    <% elsif class_level_functional_type?(@functional_type) %>
       <% binding.pry %>
       <div data-controller="remote_technology_pick">
-        <%= render "shared/technology_pick/modal", :type => "algorithm_form_wrapper_step_addition",
-                   :scope => "simple_class", :simple_class => @simple_class
-        %>
+        <%= render "shared/technology_pick/modal", :type => "algorithm_form_class_level_wrapper_step_addition",
+                   :scope => "simple_class", :simple_class => @simple_class %>
+      </div>
+    <% elsif framework_level_functional_type?(@functional_type) %>
+      <% binding.pry %>
+      <div data-controller="remote_technology_pick">
+        <%= render "shared/technology_pick/modal", :type => "algorithm_form_framework_level_wrapper_step_addition",
+                   :scope => "framework", :framework => @framework %>
       </div>
     <% end %>
 

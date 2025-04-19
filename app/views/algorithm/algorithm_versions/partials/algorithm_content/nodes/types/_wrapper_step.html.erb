@@ -35,20 +35,27 @@
   <!--  content section-->
   <div id="accordion-collapse-body-<%= "node#{node.id}" %>" class="hidden" data-target="node_accordion.targetContentCard">
     <div class="p-5 border border-b-0 border-gray-200 dark:border-gray-700 dark:bg-gray-900 bg-white">
-
+      <div class="note-title break-words">
+        Note:
+      </div>
       <div class="note break-words">
-        <%= node.try(:note).try(:html_safe) %>
+         <%= node.try(:note).try(:html_safe) %>
       </div>
 
       <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
       <div class="text-center col-span-6 sm:col-span-3">
-        <% if node.technologiable_type == "Algorithms::Algorithm" %>
-          <p class="text-xl font-bold hover:text-gray-700">Included Algorithm:</p>
-        <% elsif node.technologiable_type == "Units::Unit" %>
+        <% if node.technologiable_type == "Units::Unit" %>
           <p class="text-xl font-bold hover:text-gray-700">Included Method:</p>
+        <% elsif node.technologiable_type == "Algorithms::Algorithm" %>
+          <p class="text-xl font-bold hover:text-gray-700">Included Algorithm:</p>
+        <% elsif node.technologiable_type == "CheatSheets::CheatSheet" %>
+          <p class="text-xl font-bold hover:text-gray-700">Included Cheat Sheet:</p>
+        <% elsif node.technologiable_type == "CheatSheetGroups::CheatSheetGroup" %>
+          <p class="text-xl font-bold hover:text-gray-700">Included Cheat Sheet Group:</p>
         <% end %>
       </div>
 
+      <% binding.pry %>
       <!--      asynch_loader seaction -->
       <div class="container-inner-technology"
            data-controller="technology_asynch_rendering"

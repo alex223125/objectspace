@@ -1,6 +1,7 @@
 <div class="simple-class-preview-card">
   <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-    <%= link_to simple_class_path(ownername: simple_class.owner, id: simple_class.id), target: '_blank' do %>
+    <% binding.pry %>
+    <%= link_to simple_class_path(ownername: simple_class.ownerable.ownername, id: simple_class.id), target: '_blank' do %>
       <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white hover:underline"><%=simple_class.title%></h5>
     <% end %>
     <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">

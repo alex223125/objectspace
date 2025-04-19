@@ -54,7 +54,6 @@
 
 
     <%= form.fields_for :steps do |step| %>
-      <% binding.pry %>
       <% if Steps::FunctionalTypes[step.object[:type]] == "regular" %>
         <%= render "algorithm/shared/partials/steps/regular_step_fields", :f => step %>
       <% elsif Steps::FunctionalTypes[step.object[:type]] == "wrapper" %>

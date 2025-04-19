@@ -7,27 +7,36 @@
           # <%= article_version.title %>
         </h1>
 
-        <!-- submenu -->
+
+        <!-- submenu 1 -->
         <div class="mt-1 flex flex-col space-x-4 sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
           <div class="mt-2 flex items-center text-sm">
             <%= render "article/article_versions/partials/article_content/submenu/version_select_bar", article_version: article_version %>
           </div>
 
           <div class="mt-2 flex items-center text-sm">
-            <%= render "article/article_versions/partials/article_content/submenu/copy_to_clipboard", article: article_version.article %>
-          </div>
-
-          <div class="mt-2 flex items-center text-sm text-gray-500">
-            <%= render "article/article_versions/partials/article_content/submenu/options_dropdown", article_version: article_version %>
-          </div>
-
-          <div class="mt-2 flex items-center text-sm text-gray-500">
-            (Link to source page)
+            <%= render "article/article_versions/partials/article_content/submenu/copy_to_clipboard", article_version: article_version %>
           </div>
         </div>
 
+        <!-- submenu 2 -->
+        <div class="mt-1 flex flex-col space-x-4 sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+          <div class="link-to-sourcepage mt-2 flex items-center text-sm">
+
+            <%= link_to technology_source_path(article_version.article) do %>
+              <button class="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800">
+                <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                  Open source page
+                </span>
+              </button>
+            <% end %>
+
+          </div>
+        </div>
+
+
         <!--      TOC-->
-        <%= render "article/article_versions/partials/article_content/toc", article_version: article_version %>
+        <%= render "article/article_versions/partials/article_content/toc", article_version: article_version, toc_type: "toc_for_regular_page" %>
         <br>
 
       </div>
@@ -54,7 +63,7 @@
         <br>
       <% end %>
 
-      <%= render "article/article_versions/partials/article_content/contribute" %>
+      <%= render "article/article_versions/partials/article_content/contribute", article_version: article_version %>
       <br>
 
       <!-- TODO: add link to disucssion -->

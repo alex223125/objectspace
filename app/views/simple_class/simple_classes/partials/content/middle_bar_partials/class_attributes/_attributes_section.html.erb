@@ -1,51 +1,94 @@
-<!--interface groups section -->
-<div class="interface-groups-section">
+<div class="class-attributes-section">
 
   <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
-  <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center" id="class-attributes">Class Attributes:</h2>
+  <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center" id="class-attributes">Characteristics:</h2>
   <br>
 
   <!--preview container -->
-  <div class="actions-preview-container" data-controller="add_action_options_modal">
+  <div class="class-attributes-preview-container-<%= simple_class.uuid %>">
     <div class="relative col-start-2 col-end-3 lg:col-end-3 row-start-2 row-end-3 lg:row-start-3 lg:row-end-4 self-center pl-8 sm:px-6 md:px-8 pt-6 md:pt-8 lg:px-0 lg:pt-0">
       <div class="relative z-10 bg-white rounded-tl-xl sm:rounded-t-xl lg:rounded-xl shadow-lg divide-y divide-gray-100">
 
         <!--tabs -->
         <nav class="p-4 text-sm font-medium">
-          <ul class="flex space-x-2" id="interface-group-tab-<%= simple_class.id %>"
-              data-tabs-toggle="#myTabContentInterfaceGroup<%= simple_class.id %>" role="tablist">
-            <li>
-              <div class="px-4 py-2 rounded-md bg-amber-100 text-amber-700 cursor-pointer"
-                   style="display:none"
-                   id="featured-tab-<%= simple_class.id %>"
-                   data-tabs-target="#featured-<%= simple_class.id %>"
-                   type="button"
-                   role="tab"
-                   aria-controls="featured-<%= simple_class.id %>"
-                   aria-selected="false">Featured
-              </div>
-            </li>
-            <li style="margin-left: auto;">
-              <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/class_attributes/manage_options_button",
-                         simple_class: simple_class %>
-            </li>
+          <ul class="flex space-x-2" id="class-attributes-tab-<%= simple_class.uuid %>"
+              data-tabs-toggle="#myTabContentClassContainer<%= simple_class.uuid %>" role="tablist">
+            <% if current_user.try(:has_resource_modify_permissions?, simple_class)  %>
+              <li style="margin-left: auto;">
+                <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/class_attributes/manage_options_button",
+                           simple_class: simple_class %>
+              </li>
+            <% end %>
+
+
+            <!--            <li>-->
+            <!--              <div class="px-4 py-2 rounded-md bg-amber-100 text-amber-700 cursor-pointer"-->
+            <!--                   id="featured-tab-<%#= class_container.uuid %>"-->
+            <!--                   data-tabs-target="#featured-<%#= class_container.uuid %>"-->
+            <!--                   type="button"-->
+            <!--                   role="tab"-->
+            <!--                   aria-controls="featured-<%#= class_container.uuid %>"-->
+            <!--                   aria-selected="false">Featured-->
+            <!--              </div>-->
+            <!--            </li>-->
+            <!--            <li>-->
+            <!--              <div class="px-4 py-2 cursor-pointer"-->
+            <!--                   id="popular-tab-<%#= class_container.uuid %>"-->
+            <!--                   data-tabs-target="#popular-<%#= class_container.uuid %>"-->
+            <!--                   type="button"-->
+            <!--                   role="tab"-->
+            <!--                   aria-controls="popular-<%#= class_container.uuid %>"-->
+            <!--                   aria-selected="false">Popular-->
+            <!--              </div>-->
+            <!--            </li>-->
+            <!--            <li>-->
+            <!--              <div class="px-4 py-2 cursor-pointer"-->
+            <!--                   id="recent-tab-<%#= class_container.uuid %>"-->
+            <!--                   data-tabs-target="#recent-<%#= class_container.uuid %>"-->
+            <!--                   type="button"-->
+            <!--                   role="tab"-->
+            <!--                   aria-controls="recent-<%#= class_container.uuid %>"-->
+            <!--                   aria-selected="false">Recent-->
+            <!--              </div>-->
+            <!--            </li>-->
           </ul>
         </nav>
 
-        <div id="myTabContentInterfaceGroup<%= simple_class.id %>">
-          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800 hidden"
-               id="featured-<%= simple_class.id %>"
+        <div id="myTabContentClassContainer<%= simple_class.uuid %>">
+          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800"
+               id="featured-<%= simple_class.uuid %>"
                role="tabpanel"
-               aria-labelledby="featured-tab-<%= simple_class.id %>">
+               aria-labelledby="featured-tab-<%= simple_class.uuid %>">
             <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/class_attributes/attributes_list",
                        simple_class: simple_class %>
           </div>
-        </div>
 
+          <!--          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800 hidden"-->
+          <!--               id="popular-<%#= class_container.uuid %>"-->
+          <!--               role="tabpanel"-->
+          <!--               aria-labelledby="popular-tab-<%#= class_container.uuid %>">-->
+          <%#= render "simple_class/simple_classes/partials/content/middle_bar_partials/class_containers/container_members_list", class_container: class_container %>
+          <!--          </div>-->
+          <!--          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800 hidden"-->
+          <!--               id="recent-<%#= class_container.uuid %>"-->
+          <!--               role="tabpanel"-->
+          <!--               aria-labelledby="recent-tab-<%#= class_container.uuid %>">-->
+          <%#= render "simple_class/simple_classes/partials/content/middle_bar_partials/class_containers/container_members_list", class_container: class_container %>
+          <!--          </div>-->
+
+
+          <!--          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">-->
+          <!--            <p class="text-gray-500 dark:text-gray-400 text-sm">This is some placeholder content the <strong class="font-medium text-gray-800 dark:text-white">Dashboard tab's associated content</strong>. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling.</p>-->
+          <!--          </div>-->
+          <!--          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800 hidden" id="settings" role="tabpanel" aria-labelledby="settings-tab">-->
+          <!--            <p class="text-gray-500 dark:text-gray-400 text-sm">This is some placeholder content the <strong class="font-medium text-gray-800 dark:text-white">Settings tab's associated content</strong>. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling.</p>-->
+          <!--          </div>-->
+          <!--          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800 hidden" id="contacts" role="tabpanel" aria-labelledby="contacts-tab">-->
+          <!--            <p class="text-gray-500 dark:text-gray-400 text-sm">This is some placeholder content the <strong class="font-medium text-gray-800 dark:text-white">Contacts tab's associated content</strong>. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling.</p>-->
+          <!--          </div>-->
+        </div>
 
       </div>
     </div>
-
   </div>
-
 </div>

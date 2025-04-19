@@ -1,0 +1,21 @@
+<div data-controller="reports_repository_items">
+  <!-- 1 filters and search features -->
+  1 filters and search features
+  <%#= render "dashboards/partials/technologies_header" %>
+
+  <!-- 2 breadcrumbs -->
+  <%= render "shared/tech_show_partials/tech_breadcrumbs" %>
+
+  <!-- 3 sourcepage descirotion -->
+  <%#= render "shared/tech_show_partials/sourcepage_card", entity: @reports_repository  %>
+
+  <!-- 4 actions -->
+  <%= render "reports_repositories/show_partials/actions_bar", reports_repository: @reports_repository %>
+
+  <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+    <!-- 4 folders and units -->
+    <div data-target="reports_repository_items.entries">
+
+    </div>
+  </div>
+</div>

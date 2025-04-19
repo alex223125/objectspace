@@ -1,0 +1,7 @@
+<% memberable = @framework_member.framework_memberable %>
+
+<% if memberable.class == SimpleClasses::SimpleClass %>
+  <%= render "simple_class/simple_classes/partials/show_partial",
+             entity: memberable,
+             simple_class: memberable %>
+<% end %>

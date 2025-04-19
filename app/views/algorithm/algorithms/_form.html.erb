@@ -1,19 +1,18 @@
 <%= simple_form_for(@algorithm, url: algorithm_algorithms_path) do |f| %>
 
+  <% [@algorithm, @algorithm_tree, @root_leafe, @permission].each do |entity| %>
+    <% if entity.try(:errors).present? %>
+      <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+        <h2><%= pluralize(entity.errors.count, "error") %> prohibited this Combo Tutorial from being saved:</h2>
 
-  <% binding.pry %>
-  <% if @algorithm.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-      <h2><%= pluralize(@algorithm.errors.count, "error") %> prohibited this Algorithm from being saved:</h2>
-
-      <ul>
-        <% @algorithm.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
+        <ul>
+          <% entity.errors.each do |error| %>
+            <li><%= error.full_message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
   <% end %>
-
 
   <div class="form-inputs">
     <div class="col-span-6 sm:col-span-3">
@@ -49,7 +48,12 @@
     </div>
     <br>
 
-    <%= f.hidden_field :functional_type, value: @functional_type %>
+    <%= f.hidden_field :functional_type, value: Algorithms::FunctionalTypes[@functional_type] %>
+
+    <%# binding.pry %>
+    <%#= f.hidden_field :simple_class_id, value: @simple_class.try(:id) %>
+
+
 
     <%= render "shared/form_partials/target_place" %>
 

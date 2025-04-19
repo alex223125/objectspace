@@ -1,0 +1,43 @@
+<div class="algorithm-navigation-section">
+  <div class="mt-2 items-center text-sm text-gray-500">
+    <%= render "algorithm/shared/algorithm_tree_map/modal",
+               algorithm_version: algorithm_version, current_step: step, scenario: "algorithm_step_show_page" %>
+  </div>
+
+  <% path_to_next_step = path_to_next_step(step) %>
+  <% path_to_previous_step = path_to_previous_step(step) %>
+  <div class="algorithm-navigation-buttons">
+    <div class="grid grid-cols-2 gap-4">
+
+      <% if path_to_previous_step.present? %>
+        <div>
+          <%= link_to path_to_previous_step do %>
+            <button class="w-full relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800">
+                  <span class="items-center justify-center flex justify-middle w-full px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                    <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12l4-4m-4 4 4 4"/>
+                    </svg>
+                    Previous Step
+                  </span>
+            </button>
+          <% end %>
+        </div>
+      <% end %>
+
+      <% if path_to_next_step.present? %>
+        <div>
+          <%= link_to path_to_next_step do %>
+            <button class="w-full relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800">
+                  <span class="items-center justify-center flex justify-middle w-full px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                    Next Step
+                    <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 12H5m14 0-4 4m4-4-4-4"/>
+                    </svg>
+                  </span>
+            </button>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

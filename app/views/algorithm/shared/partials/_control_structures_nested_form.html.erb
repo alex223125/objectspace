@@ -3,7 +3,8 @@
 <!--     data-remote_select_instruction-select-type-value="algorithm_form_wrapper_step_addition"-->
 
 
-  <%= form.fields_for :control_structures do |f| %>
+  <% binding.pry %>
+  <%= form.fields_for :control_structures, @control_structure do |f| %>
 
     <%= f.hidden_field :position, class: "node-position-hidden-field",
                        data: { target: 'nodes_drag.nodePositionHiddenField'},
@@ -14,7 +15,6 @@
 
     <%#= render "algorithm/shared/partials/steps/steps_nested_form", :form => f %>
 
-    <% binding.pry %>
     <%= render "algorithm/shared/partials/nodes_nested_form", :form => f %>
 
   <% end %>

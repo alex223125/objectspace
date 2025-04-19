@@ -1,0 +1,89 @@
+<!--content -->
+<section class="relative py-2 overflow-hidden">
+  <div class="relative container px-4 mx-auto">
+
+    <div class="max-w-5xl mx-auto">
+
+      <% if interface_group.content_present? %>
+
+          <section class="relative py-2 overflow-hidden">
+              <% if interface_group.root? %>
+                <!--          DOC: in case of root interface group we showing only technologies in the list on main decision object page -->
+              <% else %>
+                <div class="relative container px-4 mx-auto">
+                  <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Part 1.Current layer interface groups (actions groups):</h2>
+                  <% if interface_group.children.present? %>
+                    <div class="max-w-8xl mx-auto">
+                      <% interface_group.children.each do |interface_group| %>
+                        <%= render "shared_class_layer/interface_groups/interface_groups_section_partials/items/child_interface_group_preview", interface_group: interface_group %>
+                      <% end %>
+                    </div>
+                  <% else %>
+                    No container members (add new)
+                  <% end %>
+                </div>
+              <% end %>
+              <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Part 2.Current layer technologies:</h2>
+              <% if interface_group.interface_members.present? %>
+                <div class="max-w-8xl mx-auto">
+                  <% interface_group.interface_members.each do |interface_member| %>
+                    <%= render "shared_class_layer/interface_groups/interface_groups_section_partials/items/interface_member_preview", interface_member: interface_member %>
+                  <% end %>
+                </div>
+              <% else %>
+                No interface members (add new)
+              <% end %>
+          </section>
+
+        <!--         See more button -->
+        <div class="pt-12 border-t-2 border-gray-100 text-center">
+          <%= link_to interface_group_path(ownername: interface_group.related_simple_class.ownerable.ownername ,id: interface_group.slug), :target => "_blank", class: "relative group inline-block py-4 px-7 font-semibold text-orange-900 hover:text-orange-50 rounded-full bg-orange-50 transition duration-300 overflow-hidden" do %>
+            <div class="absolute top-0 right-full w-full h-full bg-gray-900 transform group-hover:translate-x-full group-hover:scale-102 transition duration-500"></div>
+            <span class="relative">See More Actions</span>
+          <% end %>
+        </div>
+
+
+        <!--          // Articles -->
+        <%# interface_group.interface_members.last(3).each do |interface_member| %>
+          <%#= render "simple_class/simple_classes/partials/content/middle_bar_partials/interface_groups/interface_member_preview", interface_member: interface_member %>
+        <%# end %>
+
+
+      <% else %>
+        <% if current_user.try(:has_resource_modify_permissions?, interface_group) %>
+          <!--  nothing found card for owner of class  -->
+          <!--  nothing found card -->
+          <div class="max-w-4xl p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+            <a href="#">
+              <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">This actions group doesnt have actions</h5>
+            </a>
+            <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">To add new actions use the button below.</p>
+            <div class="flex justify-center">
+              <% binding.pry %>
+              <% if interface_group.related_class_layer_entity.class == SimpleClasses::SimpleClass  %>
+                <%= render "shared_class_layer/interface_members/modals/add_new_action_options_modal",
+                           type: "no_actions_in_interface_group",
+                           target_interface_group: interface_group %>
+              <% elsif interface_group.related_class_layer_entity.class == Frameworks::Framework  %>
+                <%= render "shared_class_layer/interface_members/modals/add_new_action_to_framework_interface_group_options_modal",
+                           type: "no_actions_in_interface_group",
+                           target_interface_group: interface_group %>
+              <% end %>
+            </div>
+          </div>
+        <% else %>
+          <!--  nothing found card for visitors -->
+          <div class="max-w-4xl p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+            <a href="#">
+              <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Nothing found
+              </h5>
+            </a>
+            <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Owner of this Decision Box didn't added any actions yet.</p>
+          </div>
+        <% end %>
+      <% end %>
+
+    </div>
+  </div>
+</section>

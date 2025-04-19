@@ -1,0 +1,68 @@
+<!--Part 2.Reports cards -->
+<div class="report-card">
+  <div class="py-2 border-t-2 border-gray-100">
+    <div class="flex flex-wrap lg:flex-nowrap items-center">
+      <div class="w-full lg:w-auto px-4 mb-8 lg:mb-0">
+        <img src="/_next/static/media/jucy-beef-burger.346917d5ccb0b705233bb1665ffb63f6.jpg" loading="lazy" alt="" width="144" height="144" class="flex-none w-18 h-18 rounded-lg object-cover bg-gray-100">
+      </div>
+
+      <div class="card-content w-full lg:w-9/12 px-4 mb-10 lg:mb-0">
+
+        <div class="max-w-2xl">
+          <div class="repository-title">
+            <%= link_to report.title, algorithm_reports_algorithm_report_path(id: report.slug),
+                        class: "text-base sm:text-lg lg:text-base xl:text-lg font-semibold text-black mb-0.5 hover:underline hover:text-blue-600 dark:text-gray-400 dark:hover:text-white" %>
+          </div>
+
+          <% if report.description.present? %>
+            <div class="repository-description py-2">
+              <p class="text-sm	 text-gray-900"><%= truncate(report.description, length: 170, omission: '...', :escape => false) %></p>
+            </div>
+          <% end %>
+
+          <!-- tags -->
+<!--          <div class="py-2" style="cursor: auto;">-->
+<!--            <div class="items-center space-x-2" style="cursor: auto;">-->
+              <%# report.tags.each do |tag| %>
+<!--              <span class="hover:underline hover:text-blue-600 text-xs inline-flex items-center font-bold leading-sm px-3 py-1 rounded-full bg-white text-gray-700 border">-->
+<!--                <svg-->
+<!--                  xmlns="http://www.w3.org/2000/svg"-->
+<!--                  width="16"-->
+<!--                  height="16"-->
+<!--                  viewBox="0 0 24 24"-->
+<!--                  fill="none"-->
+<!--                  stroke="currentColor"-->
+<!--                  stroke-width="2"-->
+<!--                  stroke-linecap="round"-->
+<!--                  stroke-linejoin="round"-->
+<!--                  class="feather feather-hard-drive mr-2"-->
+<!--                >-->
+<!--                  <line x1="22" y1="12" x2="2" y2="12"></line>-->
+<!--                  <path-->
+<!--                    d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"-->
+<!--                  ></path>-->
+<!--                  <line x1="6" y1="16" x2="6.01" y2="16"></line>-->
+<!--                  <line x1="10" y1="16" x2="10.01" y2="16"></line>-->
+<!--                </svg>-->
+                <%#= tag.name %>
+<!--              </span>-->
+              <%# end %>
+<!--            </div>-->
+<!--          </div>-->
+
+          <div class="action-last-update-time">
+            <span class="block text-gray-400 mb-1"><%= report.updated_at.strftime("%B %d, %Y")%></span>
+          </div>
+        </div>
+      </div>
+      <div class="w-full lg:w-auto px-4 ml-auto text-right">
+        <%= link_to algorithm_reports_algorithm_report_path(id: report.slug),
+                    class: "relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800" do %>
+          <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+            Open
+          </span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

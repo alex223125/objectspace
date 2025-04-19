@@ -1,0 +1,77 @@
+<% if step.description.present? %>
+  <div class="break-words description-section" id="step-description-<%= step.uuid %>">
+    <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+    <div class="text-center col-span-6 sm:col-span-3">
+      <p class="text-xl font-bold hover:text-gray-700 hover:underline hover:text-blue-600"># Description:</p>
+    </div>
+    <div class="step-description-content bg-white rounded-xl p-5">
+      <%= step.description.html_safe %>
+    </div>
+  </div>
+  <br>
+<% end %>
+
+<% if step.solves_the_problem.present? %>
+  <div class="break-words solves-the-problem-section" id="step-instruction-<%= step.uuid %>">
+    <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+    <div class="text-center col-span-6 sm:col-span-3">
+      <p class="text-xl font-bold hover:text-gray-700 hover:underline hover:text-blue-600"># Solves the problem:</p>
+    </div>
+    <div class="step-solves-the-problem-content bg-white rounded-xl p-5">
+      <%= step.solves_the_problem.html_safe %>
+    </div>
+  </div>
+  <br>
+<% end %>
+
+<% if step.instruction.present? %>
+  <div class="break-words instruction-section" id="step-instruction-<%= step.uuid %>">
+    <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+    <div class="text-center col-span-6 sm:col-span-3">
+      <p class="text-xl font-bold hover:text-gray-700 hover:underline hover:text-blue-600"># Instruction:</p>
+    </div>
+    <div class="step-instruction-content bg-white rounded-xl p-5">
+      <%= step.instruction.html_safe %>
+    </div>
+  </div>
+  <br>
+<% end %>
+
+<% if step.step_finish_check.present? %>
+  <div class="break-words step-finish-check-section" id="step-finish-check-<%= step.uuid %>">
+    <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+    <div class="text-center col-span-6 sm:col-span-3">
+      <p class="text-xl font-bold hover:text-gray-700 hover:underline hover:text-blue-600"># Step finish check:</p>
+    </div>
+    <div class="step-finish-check-content bg-white rounded-xl p-5">
+      <%= step.step_finish_check.html_safe %>
+    </div>
+  </div>
+  <br>
+<% end %>
+
+<% if step.sources.present? %>
+  <div class="break-words step-sources-section" id="step-sources-<%= step.uuid %>">
+    <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+    <div class="text-center col-span-6 sm:col-span-3">
+      <p class="text-xl font-bold hover:text-gray-700 hover:underline hover:text-blue-600"># Sources:</p>
+    </div>
+    <div class="step-sources-content bg-white rounded-xl p-5">
+      <%= step.sources.html_safe %>
+    </div>
+  </div>
+  <br>
+<% end %>
+
+<% if step.additional_information.present? %>
+  <div class="break-words step-additional-information-section" id="step-additional-information-<%= step.uuid %>">
+    <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+    <div class="text-center col-span-6 sm:col-span-3">
+      <p class="text-xl font-bold hover:text-gray-700 hover:underline hover:text-blue-600"># Additional information:</p>
+    </div>
+    <div class="step-additional-information-content bg-white rounded-xl p-5">
+      <%= step.additional_information.html_safe %>
+    </div>
+  </div>
+  <br>
+<% end %>

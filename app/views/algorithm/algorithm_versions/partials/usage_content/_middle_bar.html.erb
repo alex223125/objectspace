@@ -9,27 +9,7 @@
         </h1>
       </div>
 
-      <% simple_classes = @algorithm_version.algorithm.simple_classes %>
-      <% interfacable_simple_classes = @algorithm_version.algorithm.interfacable_simple_classes %>
-      <% simple_classes = simple_classes.concat(interfacable_simple_classes) %>
 
-      <% binding.pry %>
-      <% if simple_classes.any? %>
-        <!-- List -->
-        <div class="list-of-classes">
-          <br>
-          <ul role="list" a="" class="space-y-3 text-base list-none sm:text-lg md:mt-5 md:text-xl">
-            <% simple_classes.each do |simple_class| %>
-              <li>
-                <%= technology_item_link_to simple_class, :target => "_blank",
-                                            class: "inline-flex items-center text-xl font-semibold text-orange-900 hover:text-gray-900" do %>
-                  Title: <%= simple_class.title %>, id: <%= simple_class.id %>
-                <% end %>
-              </li>
-            <% end %>
-          </ul>
-        </div>
-      <% end %>
 
     </div>
   </div>

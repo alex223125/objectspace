@@ -4,7 +4,8 @@
     <div class="w-full">
       <!--    <div class="w-full max-w-xl	">-->
       <div class="bg-white shadow-md rounded-lg px-3 py-2 mb-4">
-        <% title = Algorithms::FunctionalTypes[@functional_type] == "class_level" ? "New United Tutorial" : "New Combo Tutorial"  %>
+        <% binding.pry %>
+        <% title = Algorithms::FunctionalTypes[@functional_type] == "framework_level" ? "New Framework Tutorial" : "New Combo Tutorial"  %>
         <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight text-center"><%= title %></h2>
 
         <%= render "form", algorithm: @algorithm %>

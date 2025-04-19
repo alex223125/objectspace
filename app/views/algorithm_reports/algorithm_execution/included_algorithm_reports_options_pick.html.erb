@@ -1,0 +1,12 @@
+<!-- list is used for showing in different places -->
+<section class="relative py-2 overflow-hidden">
+  <div class="relative container px-4 mx-auto">
+
+    <div class="max-w-5xl mx-auto">
+      <% @included_algorithm_reports.each do |algorithm_report| %>
+        <%= render "algorithm_reports/algorithm_execution/reports_options_pick_partials/included_algorithm_report_preview", algorithm_report: algorithm_report %>
+      <% end %>
+
+    </div>
+  </div>
+</section>

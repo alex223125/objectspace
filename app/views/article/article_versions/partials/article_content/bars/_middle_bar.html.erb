@@ -14,46 +14,96 @@
           </div>
 
           <div class="mt-2 flex items-center text-sm">
-            <%= render "article/article_versions/partials/article_content/submenu/copy_to_clipboard", article: article_version.article %>
+            <%= render "article/article_versions/partials/article_content/submenu/copy_to_clipboard", article_version: article_version %>
           </div>
 
-          <div class="mt-2 flex items-center text-sm text-gray-500">
-            <%= render "article/article_versions/partials/article_content/submenu/options_dropdown", article_version: article_version %>
-          </div>
+          <% if current_user.try(:has_resource_modify_permissions?, article_version.article)  %>
+            <div class="mt-2 flex items-center text-sm text-gray-500">
+              <%= render "article/article_versions/partials/article_content/submenu/options_dropdown", article_version: article_version %>
+            </div>
+          <% end %>
         </div>
 
         <!--      TOC-->
-        <%= render "article/article_versions/partials/article_content/toc", article_version: article_version %>
+
+
+        <%= render "article/article_versions/partials/article_content/toc", article_version: article_version, toc_type: "toc_for_regular_page" %>
         <br>
 
       </div>
 
-      <div class="content-section" id="content">
-        # Instruction:
+      <div class="content-section break-words" id="content-<%=article_version.uuid%>">
+        <a href="#content-<%=article_version.uuid%>" >
+          <h3 class="hover:underline hover:text-blue-600 text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Content</h3>
+        </a>
         <%= article_version.content.html_safe %>
       </div>
       <br>
 
       <% if article_version.sources.present? %>
-        <div class="sources-section" id="sources">
-          # Sources:
+        <div class="sources-section break-words " id="sources-<%=article_version.uuid%>">
+          <a href="#sources-<%=article_version.uuid%>">
+            <h3 class="hover:underline hover:text-blue-600 text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Sources</h3>
+          </a>
           <%= article_version.sources.html_safe %>
         </div>
         <br>
       <% end %>
 
       <% if article_version.additional_information.present? %>
-        <div class="additional-information-section" id="additional-information">
-          # Additional information:
+        <div class="additional-information-section break-words " id="additional-information-<%=article_version.uuid%>">
+          <a href="#additional-information-<%=article_version.uuid%>">
+            <h3 class="hover:underline hover:text-blue-600 text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Additional information</h3>
+          </a>
           <%= article_version.additional_information.html_safe %>
         </div>
         <br>
       <% end %>
 
-      <%= render "article/article_versions/partials/article_content/contribute" %>
+
+      <% binding.pry %>
+      <% if article_version.attachments.present? %>
+        <div class="attachments break-words " id="attachments-<%=article_version.uuid%>">
+          <a href="#attachments-<%=article_version.uuid%>">
+            <h3 class="hover:underline hover:text-blue-600 text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Attachments</h3>
+          </a>
+
+          <div class="links">
+            <div data-controller="attachment_preview">
+              <div class="step-attachments">
+                <p class="text-xl font-bold hover:text-gray-700">Fast Links:</p>
+                <ul>
+                  <% article_version.attachments.each do |attachment| %>
+                    <li class="text-body-color mb-4 flex text-base">
+                          <span class="text-primary mr-2 flex items-center rounded-full text-base">
+                            <svg width="20" height="8" viewBox="0 0 20 8" class="fill-current">
+                              <path
+                                d="M19.2188 2.90626L17.0625 0.343758C16.875 0.125008 16.5312 0.0937583 16.2812 0.281258C16.0625 0.468758 16.0312 0.812508 16.2188 1.06251L18.25 3.46876H0.9375C0.625 3.46876 0.375 3.71876 0.375 4.03126C0.375 4.34376 0.625 4.59376 0.9375 4.59376H18.25L16.2188 7.00001C16.0312 7.21876 16.0625 7.56251 16.2812 7.78126C16.375 7.87501 16.5 7.90626 16.625 7.90626C16.7812 7.90626 16.9375 7.84376 17.0312 7.71876L19.1875 5.15626C19.75 4.46876 19.75 3.53126 19.2188 2.90626Z"
+                              ></path>
+                            </svg>
+                          </span>
+                      <button type="button"
+                              data-action="click->attachment_preview#openModal"
+                              data-attachment-uuid="<%= attachment.attachable.uuid %>"
+                              data-attachment-type="<%= attachment.type %>"
+                              class="break-all hover:underline inline-flex text-left font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
+                        <%= attachment.attachable.title %>
+                      </button>
+                    </li>
+                  <% end %>
+                </ul>
+              </div>
+              <%= render "shared/attachment_preview/modal", entity: article_version  %>
+            </div>
+          </div>
+        </div>
+        <br>
+      <% end %>
+
+      <%= render "article/article_versions/partials/article_content/contribute", article_version: article_version %>
       <br>
 
-      <%= render "article/article_versions/partials/article_content/comments" %>
+      <%= render "article/article_versions/partials/article_content/comments", article_version: article_version %>
 
     </div>
   </div>

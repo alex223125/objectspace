@@ -1,0 +1,14 @@
+<!--routing by type -->
+<% if logging_node.type == "AlgorithmReports::Nodes::LoggingStep" && logging_node.functional_type == "regular" %>
+  <%= render "algorithm_reports/algorithm_reports/show_partials/algorithm_report_content/nodes/types/regular_step", logging_node: logging_node %>
+
+<% elsif logging_node.type == "AlgorithmReports::Nodes::LoggingStep" && logging_node.functional_type == "wrapper" %>
+  <%= render "algorithm_reports/algorithm_reports/show_partials/algorithm_report_content/nodes/types/wrapper_step", logging_node: logging_node %>
+
+<% elsif logging_node.type == "AlgorithmReports::Nodes::LoggingStep" && logging_node.functional_type == "container" %>
+  <%= render "algorithm_reports/algorithm_reports/show_partials/algorithm_report_content/nodes/types/container_step", logging_node: logging_node %>
+
+<% elsif logging_node.type == "AlgorithmReports::Nodes::LoggingControlStructure" && logging_node.functional_type == "single_alternative"  %>
+  <%= render "algorithm_reports/algorithm_reports/show_partials/algorithm_report_content/nodes/types/single_alternative_cs", logging_node: logging_node %>
+<% end %>
+

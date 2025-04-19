@@ -1,0 +1,49 @@
+<hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+
+<!--<h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight text-center">Steps</h2>-->
+
+<div class="col-span-6 sm:col-span-3">
+  <p class="text-xl font-bold hover:text-gray-700">Actions:</p>
+  <p class="mt-2 text-sm text-gray-500">
+    Here you can add Methods and Algorithms as Actions for current Actions group.
+    Selected technologies will be linked with current class and will be available in it's folders.
+  </p>
+</div>
+<br>
+
+<div class="steps-nested-form">
+  <div data-controller="interface_members_drag remote_select_instruction interface_members_drag.interfaceMembersArea"
+       data-target="remote_select_instruction.interfaceMembersArea"
+       data-remote_select_instruction-select-type-value="interface_group_form_action_addition">
+
+    <%= form.fields_for :interface_members do |interface_member| %>
+      <%= render "shared_class_layer/interface_groups/partials/actions/interface_member_fields", :f => interface_member %>
+    <% end %>
+
+
+    <div>
+      <%= link_to_add_association "Add Action", form,
+                                  :interface_members,
+                                  style: "display:none;",
+                                  partial: 'shared_class_layer/interface_groups/partials/actions/interface_member_fields',
+                                  class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2",
+                                  data: {target: "remote_select_instruction.addActionsToInterfaceGroupOriginalButton"}
+      %>
+    </div>
+
+    <%= render "shared/technologies_search/modal", :type => "interface_group_form_action_addition", scenario: "regular" %>
+
+  </div>
+</div>
+
+<!--  <div data-controller="sortable" data-sortable-url="/recipes/:recipe_id/steps/:id/step_position">-->
+<%#= f.fields_for :steps, @recipe.steps.order(position: :asc) do |step| %>
+<!--      <div data-id="<%#= step.object.id %>">-->
+<%#= step.text_area :description %>
+<!--      </div>-->
+<%# end %>
+<!--  </div>-->
+
+<hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+
+

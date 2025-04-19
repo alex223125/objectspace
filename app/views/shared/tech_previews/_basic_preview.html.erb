@@ -30,18 +30,32 @@
       <!--  doc: works with cocoon gem because have 'remove_fields' class -->
       <% binding.pry %>
       <% if scenario == LinkAttachmentsHelper::CHEAT_SHEET_FORM_NOTES_LINK_ATTACHMENT_PREVIEW %>
-        <button class="border-2 border-gray-800 rounded-lg px-3 py-2 text-gray-400 cursor-pointer hover:bg-white hover:text-gray-200"
-                type="button"
-                data-action="click->link_attachments_nested_form#remove_association"
-        >
-          Delete
+        <button
+          data-action="click->link_attachments_nested_form#remove_association"
+          type="button"
+          class="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800">
+          <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+            Delete
+          </span>
         </button>
       <% elsif scenario == CheatSheetGroupsHelper::CHEAT_SHEET_GROUP_SECTION_PREVIEW %>
-        <button class="border-2 border-gray-800 rounded-lg px-3 py-2 text-gray-400 cursor-pointer hover:bg-white hover:text-gray-200"
-                type="button"
-                data-action="click->cheat_sheet_group_sections_nested_form#remove_association"
-        >
-          Delete
+        <button
+          data-action="click->cheat_sheet_group_sections_nested_form#remove_association"
+          type="button"
+          class="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800">
+          <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+            Delete
+          </span>
+        </button>
+      <% elsif scenario == ArticleVersionsHelper::ARTICLE_ATTACHMENT_PREVIEW %>
+        <!--  doc: works with cocoon gem because have 'remove_fields' class -->
+        <button
+          data-action="click->attachments_nested_form#remove_association"
+          type="button"
+          class="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800">
+          <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+            Delete
+          </span>
         </button>
       <% end %>
       <%# elsif scenario = CheatSheetGroupsHelper::CHEAT_SHEET_GROUP_SECTION_PREVIEW %>
@@ -55,15 +69,74 @@
     </div>
   </div>
 
-  <div class="mt-4 mb-6">
-    <!--          <div data-select_instruction-target="instructionId" style="visibility: hidden;"><%#= unit.id %></div>-->
-    <!--          <div data-select_instruction-target="instructionType" style="visibility: hidden;"><%#= unit.class %></div>-->
-
-    <%= link_to technology_item_path_to(technology), target: '_blank' do %>
-      <div class="hover:underline mb-3 text-xl font-bold"><%= truncate(technology.title.html_safe, :length => 200, :omission => "..." , :escape => false) %></div>
-    <% end %>
-    <div class="text-sm text-neutral-600"><%= truncate(technology.source_page_description.html_safe, :length => 500, :omission => "" , :escape => false) %></div>
-  </div>
+  <% if unit.present? %>
+    <div class="mt-4 mb-6">
+      <%= link_to unit_version_path(ownername: unit.ownerable.ownername, id: unit.default_version.slug), target: '_blank' do %>
+        <div class="hover:underline hover:text-blue-600 mb-3 text-xl font-bold break-words "><%= truncate(unit.title.html_safe, :length => 200, :omission => "..." , :escape => false) %></div>
+      <% end %>
+      <div class="text-sm text-neutral-600 break-words "><%= truncate(unit.source_page_description.html_safe, :length => 500, :omission => "..." , :escape => false) %></div>
+      <br>
+      <% unit_versions = unit.unit_versions %>
+      Versions:
+      <% unit_versions.each do |unit_version| %>
+        <%= link_to unit_version_path(ownername: unit.ownerable.ownername, id: unit.default_version.slug), target: '_blank' do %>
+          <div class="hover:underline hover:text-blue-600 mb-3 text-xl font-bold break-words "><%= truncate(unit_version.title.html_safe, :length => 100, :omission => "..." , :escape => false) %></div>
+        <% end %>
+      <% end %>
+    </div>
+  <% elsif algorithm.present? %>
+    <div class="mt-4 mb-6">
+      <%= link_to algorithm_version_path(ownername: algorithm.ownerable.ownername, id: algorithm.default_version.slug), target: '_blank' do %>
+        <div class="hover:underline hover:text-blue-600 mb-3 text-xl font-bold break-words "><%= truncate(algorithm.title.html_safe, :length => 200, :omission => "..." , :escape => false) %></div>
+      <% end %>
+      <div class="text-sm text-neutral-600 break-words "><%= truncate(algorithm.source_page_description.html_safe, :length => 500, :omission => "..." , :escape => false) %></div>
+      <br>
+      <% algorithm_versions = algorithm.algorithm_versions %>
+      Versions:
+      <% algorithm_versions.each do |algorithm_version| %>
+        <%= link_to algorithm_version_path(ownername: algorithm.ownerable.ownername, id: algorithm.default_version.slug), target: '_blank' do %>
+          <div class="hover:underline hover:text-blue-600 mb-3 text-xl font-bold break-words "><%= truncate(algorithm_version.title.html_safe, :length => 100, :omission => "..." , :escape => false) %></div>
+        <% end %>
+      <% end %>
+    </div>
+  <% elsif cheat_sheet.present? %>
+    <div class="mt-4 mb-6">
+      <%= link_to cheat_sheet_version_path(ownername: cheat_sheet.ownerable.ownername, id: cheat_sheet.default_version), target: '_blank' do %>
+        <div class="hover:underline hover:text-blue-600 mb-3 text-xl font-bold break-words "><%= truncate(cheat_sheet.title.html_safe, :length => 200, :omission => "..." , :escape => false) %></div>
+      <% end %>
+      <div class="text-sm text-neutral-600 break-words "><%= truncate(cheat_sheet.source_page_description.html_safe, :length => 500, :omission => "..." , :escape => false) %></div>
+      <br>
+      <% cheat_sheet_versions = cheat_sheet.cheat_sheet_versions %>
+      Versions:
+      <% cheat_sheet_versions.each do |cheat_sheet_version| %>
+        <%= link_to cheat_sheet_version_path(ownername: cheat_sheet.ownerable.ownername, id: cheat_sheet.default_version), target: '_blank' do %>
+          <div class="hover:underline hover:text-blue-600 mb-3 text-xl font-bold break-words "><%= truncate(cheat_sheet_version.title.html_safe, :length => 100, :omission => "..." , :escape => false) %></div>
+        <% end %>
+      <% end %>
+    </div>
+  <% elsif cheat_sheet_group.present? %>
+    <div class="mt-4 mb-6">
+      <%= link_to cheat_sheet_group_version_path(ownername: cheat_sheet_group.ownerable.ownername, id: cheat_sheet_group.default_version), target: '_blank' do %>
+        <div class="hover:underline hover:text-blue-600 mb-3 text-xl font-bold break-words "><%= truncate(cheat_sheet_group.title.html_safe, :length => 200, :omission => "..." , :escape => false) %></div>
+      <% end %>
+      <div class="text-sm text-neutral-600 break-words "><%= truncate(cheat_sheet_group.source_page_description.html_safe, :length => 500, :omission => "..." , :escape => false) %></div>
+      <br>
+      <% cheat_sheet_group_versions = cheat_sheet_group.cheat_sheet_group_versions %>
+      Versions:
+      <% cheat_sheet_group_versions.each do |cheat_sheet_group_version| %>
+        <%= link_to cheat_sheet_group_version_path(ownername: cheat_sheet_group.ownerable.ownername, id: cheat_sheet_group.default_version), target: '_blank' do %>
+          <div class="hover:underline hover:text-blue-600 mb-3 text-xl font-bold break-words "><%= truncate(cheat_sheet_group_version.title.html_safe, :length => 100, :omission => "..." , :escape => false) %></div>
+        <% end %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="mt-4 mb-6">
+      <%= link_to technology_item_path_to(technology), target: '_blank' do %>
+        <div class="hover:underline mb-3 text-xl font-bold break-words "><%= truncate(technology.title.html_safe, :length => 200, :omission => "..." , :escape => false) %></div>
+      <% end %>
+      <div class="text-sm text-neutral-600 break-words"><%= truncate(technology.source_page_description.html_safe, :length => 500, :omission => "" , :escape => false) %></div>
+    </div>
+  <% end %>
 
   <div>
     <div class="flex items-center justify-between text-slate-500">

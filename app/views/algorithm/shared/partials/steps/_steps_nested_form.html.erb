@@ -60,7 +60,6 @@
 
 
     <%= form.fields_for :subnodes, Algorithms::Nodes::Step.new do |step| %>
-      <% binding.pry %>
       <% if Steps::FunctionalTypes.try(:[], step.object[:type]) == "regular" %>
         <%= render "algorithm/shared/partials/steps/regular_step_fields", :f => step %>
       <% elsif Steps::FunctionalTypes.try(:[], step.object[:type]) == "wrapper" %>

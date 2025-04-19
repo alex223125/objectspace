@@ -1,0 +1,6 @@
+Respinsibility zone:
+Display tree of SimpleClass with all class containers, interface groups and technologies
+
+Additional feature:
+Ability to pick or select technologies in different context (for example in technology_pick modal during creation of algorithm)
+

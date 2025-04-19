@@ -1,0 +1,9 @@
+<!--<h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Classes</h2>-->
+<div>
+  <div>
+    <% binding.pry %>
+    <%= form.fields_for :framework_folders, @root_framework_folder do |t| %>
+      <%= render "framework/framework_folders/root_framework_folder/fileds", :f => t %>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,62 @@
+<% if current_leafe.try(:id) == leafe.referencable_id %>
+  <!--  DOC: mean this is a current step-->
+  <% leafe_style = "relative block p-2 overflow-hidden border bg-white rounded-lg ml-2 mr-6 max-w-4xl w-full border-2 border-indigo-600" %>
+<% else %>
+  <% leafe_style = "relative block p-2 overflow-hidden border bg-white rounded-lg ml-2 mr-6 max-w-4xl w-full hover:border-indigo-600 border-transparent border-2" %>
+<% end %>
+
+<div class="<%=leafe_style%>">
+  <span class="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-r from-green-300 via-blue-500 to-purple-600"></span>
+
+  <div class="justify-between sm:flex">
+
+    <div class="p-2 md:flex md:justify-center gap-2">
+      <div class="flex-shrink-0 ml-3 sm:block">
+        <img
+          class="object-cover w-8 h-8 rounded-lg shadow-sm"
+          src="https://github.com/creativetimofficial/argon-design-system/blob/master/assets/img/faces/team-2.jpg?raw=true"
+          alt=""
+          />
+      </div>
+
+      <div class="grid grid-cols-1">
+        <div class="flex items-center justify-center">
+          <h5 class="text-lg font-bold text-slate-900" style="white-space: normal;">
+            Position: <%= leafe.position %> Title: <%= truncate(leafe.node_title, length: 220, omission: '...', :escape => false) %>
+          </h5>
+        </div>
+
+        <div class="flex items-center">
+          <h5 class="text-sm text-gray-900" style="white-space: normal;">
+            Node: <%= truncate(strip_tags(leafe.node_note), length: 500, omission: '...', :escape => false) %>
+          </h5>
+          <% if current_leafe.try(:id) == leafe.referencable_id %>
+            <span class="inline-flex items-center bg-blue-100 text-sm font-bold text-slate-900 px-2.5 rounded-full dark:bg-green-900 dark:text-green-300">
+                  <span class="w-2 h-2 me-1 bg-blue-600 rounded-full"></span>
+                  Current Step
+            </span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <dl class="flex mt-4 ml-6 pb-4">
+    <div class="flex flex-col-reverse">
+      <dt class="text-base font-medium text-slate-600">Substeps</dt>
+      <dd class="text-base font-medium text-center"><%= leafe.children.length %></dd>
+    </div>
+
+    <div class="flex ml-3 flex-col-reverse">
+      <dt class="text-base font-medium text-slate-600">Actions groups</dt>
+      <dd class="text-base font-medium text-center"> 111 </dd>
+    </div>
+
+    <div class="flex ml-3 sm:ml-3 flex-col-reverse">
+      <dt class="text-base font-medium text-slate-600">Actions</dt>
+      <dd class="text-base font-medium text-center"> 222 </dd>
+    </div>
+  </dl>
+
+</div>

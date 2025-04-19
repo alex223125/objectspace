@@ -1,0 +1,21 @@
+<!-- list is used for showing in different places -->
+<section class="relative py-2 overflow-hidden">
+  <div class="relative container px-4 mx-auto">
+
+    <div class="max-w-5xl mx-auto">
+      <%# if reports_repositories.present? %>
+        <%# reports_repositories.each do |reports_repository| %>
+          <%#= render "reports/list_partials/reports_repository_preview", reports_repository: reports_repository %>
+        <%# end %>
+      <%# end %>
+
+      <% @child_folders.each do |folder| %>
+        <%= render "folders/list_partials/children_folder_preview", folder: folder %>
+      <% end %>
+
+      <% @reports.each do |report| %>
+        <%= render "reports/list_partials/report_preview", report: report %>
+      <% end %>
+    </div>
+  </div>
+</section>

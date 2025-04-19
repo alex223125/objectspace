@@ -1,0 +1,37 @@
+<li class="jstree-open">
+  <!--   1.1 Header of interface group-->
+  <%= render "shared_class_layer/simple_class_dynamic_tree_view/interface_group_item",
+             interface_group: interface_group, leaf_type: leaf_type %>
+  <ul>
+
+    <!--   1.2 Technologies of interface group-->
+    <li class="jstree-open">
+      <%= render "shared_class_layer/simple_class_dynamic_tree_view/technologies_menu",
+                 interface_group: interface_group %>
+
+      <ul>
+        <% interface_group.interface_members.each do |interface_member| %>
+          <li>
+            <%= render "shared_class_layer/simple_class_dynamic_tree_view/interface_member_item",
+                       interface_member: interface_member, leaf_type: leaf_type %>
+          </li>
+        <% end %>
+      </ul>
+    </li>
+
+    <!--   1.3 Child interface groups -->
+    <% if interface_group.groups.present? %>
+      <li class="jstree-open">
+        <%= render "shared_class_layer/simple_class_dynamic_tree_view/interface_groups_menu",
+                   interface_group: interface_group %>
+        <ul>
+          <% interface_group.groups.each do |child_interface_group| %>
+            <!-- WARNING: RECURSION-->
+            <%= render "shared_class_layer/simple_class_dynamic_tree_view/interface_group",
+                       interface_group: child_interface_group, leaf_type: leaf_type %>
+          <% end %>
+        </ul>
+      </li>
+    <% end %>
+  </ul>
+</li>

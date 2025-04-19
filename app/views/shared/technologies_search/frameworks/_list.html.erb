@@ -4,6 +4,8 @@
     <% @frameworks.each do |framework| %>
       <%= render partial: "shared/technologies_search/frameworks/single_preview", locals: {framework: framework} %>
     <% end %>
+  <% else %>
+    Nothing was found
   <% end %>
 
 </div>

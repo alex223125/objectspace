@@ -11,7 +11,7 @@
          data-action="click->toc_scrolling#scroll"
          data-anchor="#class-attributes"
       >
-        ↳ Attributes
+        ↳ Characteristics
       </a>
     </li>
 
@@ -29,17 +29,6 @@
       </li>
     <% end %>
 
-    <li>
-      <a class="hover:underline hover:text-blue-600 font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
-         onclick="return false;"
-         href=""
-         data-action="click->toc_scrolling#scroll"
-         data-anchor="#class-actions"
-      >
-        ↳ Actions
-      </a>
-    </li>
-
     <% if simple_class.functional_type_value == "decision_object_container_class" %>
       <li>
         <a class="hover:underline hover:text-blue-600 font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
@@ -53,6 +42,16 @@
       </li>
     <% end %>
 
+    <li>
+      <a class="hover:underline hover:text-blue-600 font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+         onclick="return false;"
+         href=""
+         data-action="click->toc_scrolling#scroll"
+         data-anchor="#class-actions"
+      >
+        ↳ Actions
+      </a>
+    </li>
 
   </ul>
 </div>

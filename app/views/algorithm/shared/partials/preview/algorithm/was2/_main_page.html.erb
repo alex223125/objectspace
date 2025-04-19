@@ -17,7 +17,7 @@
     <!--          <div data-select_instruction-target="instructionType" style="visibility: hidden;"><%#= unit.class %></div>-->
 
     <div class="mb-3 text-xl font-bold"><%= algorithm_version.title %></div>
-    <div class="text-sm text-neutral-600"><%= truncate(algorithm_version.solves_the_problem.html_safe, :length => 500, :omission => "" , :escape => false) %></div>
+    <div class="text-sm text-neutral-600 break-words "><%= truncate(algorithm_version.solves_the_problem.html_safe, :length => 500, :omission => "" , :escape => false) %></div>
   </div>
 
   <div>

@@ -1,0 +1,122 @@
+<div class="framework-interface-<%= framework_interface.uuid %>">
+  <!--title-->
+  <%#= link_to framework_framework_folder_path(ownername: folder.root.framework.ownerable.ownername, id: folder.slug), class: "hover:underline hover:text-blue-600 text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center" do %>
+<!--    <h2 id="framework-folder-<%#= folder.uuid %>">-->
+<!--      # <%#= folder.title %>:-->
+<!--    </h2>-->
+  <%# end %>
+
+
+<!--  <div class="hover:underline hover:text-blue-600 text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">-->
+<!--    <h2 id="framework-interface">-->
+<!--      # Framework interface:-->
+<!--    </h2>-->
+<!--  </div>-->
+
+  <% if framework_interface.note.present? %>
+    <!--actions group description-->
+    <div class="shadow-lg rounded-lg bg-white mx-auto m-8 p-4 notification-box">
+      <div class="text-sm text-gray-600  tracking-tight ">
+        <%= framework_interface.note.html_safe %>
+      </div>
+    </div>
+    <br>
+  <% end %>
+
+  <!--preview container -->
+  <div class="framework-interface-preview-container-<%= framework_interface.uuid %>">
+    <div class="relative col-start-2 col-end-3 lg:col-end-3 row-start-2 row-end-3 lg:row-start-3 lg:row-end-4 self-center pl-8 sm:px-6 md:px-8 pt-6 md:pt-8 lg:px-0 lg:pt-0">
+      <div class="relative z-7 bg-white rounded-tl-xl sm:rounded-t-xl lg:rounded-xl shadow-lg divide-y divide-gray-100">
+
+        <!--tabs -->
+        <nav class="p-4 text-sm font-medium">
+          <ul class="flex space-x-2" id="framework-folder-tab-<%= framework_interface.uuid %>"
+              data-tabs-toggle="#myTabContentFrameworkFolder<%= framework_interface.uuid %>" role="tablist">
+            <% if current_user.try(:has_resource_modify_permissions?, framework)  %>
+              <li style="margin-left: auto;">
+                <%= render "framework/frameworks/partials/content/framework_interface_partials/manage_options_button",
+                           framework_interface: framework_interface %>
+              </li>
+            <% end %>
+
+
+
+            <!--            <li>-->
+            <!--              <div class="px-4 py-2 rounded-md bg-amber-100 text-amber-700 cursor-pointer"-->
+            <!--                   id="featured-tab-<%#= class_container.uuid %>"-->
+            <!--                   data-tabs-target="#featured-<%#= class_container.uuid %>"-->
+            <!--                   type="button"-->
+            <!--                   role="tab"-->
+            <!--                   aria-controls="featured-<%#= class_container.uuid %>"-->
+            <!--                   aria-selected="false">Featured-->
+            <!--              </div>-->
+            <!--            </li>-->
+            <!--            <li>-->
+            <!--              <div class="px-4 py-2 cursor-pointer"-->
+            <!--                   id="popular-tab-<%#= class_container.uuid %>"-->
+            <!--                   data-tabs-target="#popular-<%#= class_container.uuid %>"-->
+            <!--                   type="button"-->
+            <!--                   role="tab"-->
+            <!--                   aria-controls="popular-<%#= class_container.uuid %>"-->
+            <!--                   aria-selected="false">Popular-->
+            <!--              </div>-->
+            <!--            </li>-->
+            <!--            <li>-->
+            <!--              <div class="px-4 py-2 cursor-pointer"-->
+            <!--                   id="recent-tab-<%#= class_container.uuid %>"-->
+            <!--                   data-tabs-target="#recent-<%#= class_container.uuid %>"-->
+            <!--                   type="button"-->
+            <!--                   role="tab"-->
+            <!--                   aria-controls="recent-<%#= class_container.uuid %>"-->
+            <!--                   aria-selected="false">Recent-->
+            <!--              </div>-->
+            <!--            </li>-->
+          </ul>
+        </nav>
+
+        <!--content of tabs -->
+        <div id="myTabContentFrameworkFolder<%= framework_interface.uuid %>">
+          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800"
+               id="featured-<%= framework_interface.uuid %>"
+               role="tabpanel"
+               aria-labelledby="featured-tab-<%= framework_interface.uuid %>">
+            <%= render "framework/frameworks/partials/content/framework_interface_partials/actions_list",
+                       framework_interface: framework_interface %>
+          </div>
+
+
+
+          <!--          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800 hidden"-->
+          <!--               id="popular-<%#= class_container.uuid %>"-->
+          <!--               role="tabpanel"-->
+          <!--               aria-labelledby="popular-tab-<%#= class_container.uuid %>">-->
+          <%#= render "simple_class/simple_classes/partials/content/middle_bar_partials/class_containers/container_members_list", class_container: class_container %>
+          <!--          </div>-->
+          <!--          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800 hidden"-->
+          <!--               id="recent-<%#= class_container.uuid %>"-->
+          <!--               role="tabpanel"-->
+          <!--               aria-labelledby="recent-tab-<%#= class_container.uuid %>">-->
+          <%#= render "simple_class/simple_classes/partials/content/middle_bar_partials/class_containers/container_members_list", class_container: class_container %>
+          <!--          </div>-->
+
+
+          <!--          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">-->
+          <!--            <p class="text-gray-500 dark:text-gray-400 text-sm">This is some placeholder content the <strong class="font-medium text-gray-800 dark:text-white">Dashboard tab's associated content</strong>. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling.</p>-->
+          <!--          </div>-->
+          <!--          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800 hidden" id="settings" role="tabpanel" aria-labelledby="settings-tab">-->
+          <!--            <p class="text-gray-500 dark:text-gray-400 text-sm">This is some placeholder content the <strong class="font-medium text-gray-800 dark:text-white">Settings tab's associated content</strong>. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling.</p>-->
+          <!--          </div>-->
+          <!--          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800 hidden" id="contacts" role="tabpanel" aria-labelledby="contacts-tab">-->
+          <!--            <p class="text-gray-500 dark:text-gray-400 text-sm">This is some placeholder content the <strong class="font-medium text-gray-800 dark:text-white">Contacts tab's associated content</strong>. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling.</p>-->
+          <!--          </div>-->
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+
+
+
+</div>
+<hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">

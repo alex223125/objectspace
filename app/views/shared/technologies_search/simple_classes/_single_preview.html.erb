@@ -12,9 +12,9 @@
 
   <div class="mt-4 mb-6">
     <%= link_to simple_class_simple_class_path(simple_class), target: '_blank' do %>
-      <div class="hover:underline mb-3 text-xl font-bold"><%= truncate(simple_class.title.html_safe, :length => 200, :omission => "..." , :escape => false) %></div>
+      <div class="hover:underline mb-3 text-xl font-bold break-words "><%= truncate(simple_class.title.html_safe, :length => 200, :omission => "..." , :escape => false) %></div>
     <% end %>
-    <div class="text-sm text-neutral-600"><%= truncate(simple_class.description.html_safe, :length => 500, :omission => "..." , :escape => false) %></div>
+    <div class="text-sm text-neutral-600 break-words "><%= truncate(simple_class.description.html_safe, :length => 500, :omission => "..." , :escape => false) %></div>
   </div>
 
   <div>
@@ -40,13 +40,15 @@
       <div data-action="click->remote_select_instruction#selectInstruction"
            data-instructionId="<%= simple_class.id %>"
            data-instructionType="simple_class">
-        <button type="button"
-                class="flex text-white right-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-          <% if simple_class.folder.user_id == current_user.id %>
-            Move to this folder
-          <% else %>
-            Copy to this folder
-          <% end %>
+        <button type="button" class="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800">
+          <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+            Select
+            <%# if simple_class.try(:folder).try(:user_id) == current_user.id %>
+<!--              Move to this folder-->
+            <%# else %>
+<!--              Copy to this folder-->
+            <%# end %>
+          </span>
         </button>
       </div>
 

@@ -1,16 +1,19 @@
 <%= simple_form_for(@unit, url: unit_units_path) do |f| %>
 
-  <% if unit.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-      <h2><%= pluralize(unit.errors.count, "error") %> prohibited this improvement from being saved:</h2>
+  <% [@unit, @permission].each do |entity| %>
+    <% if entity.try(:errors).present? %>
+      <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+        <h2><%= pluralize(entity.errors.count, "error") %> prohibited this Method from being saved:</h2>
 
-      <ul>
-        <% unit.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
+        <ul>
+          <% entity.errors.each do |error| %>
+            <li><%= error.full_message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
   <% end %>
+
 
   <div class="form-inputs">
     <div class="col-span-6 sm:col-span-3">
@@ -45,8 +48,6 @@
                         data: {target: "tags.output"}%>
     </div>
     <br>
-
-    <%= hidden_field_tag :target_interface_group, @target_interface_group.try(:id) %>
 
     <%= render "shared/form_partials/target_place" %>
 

@@ -5,32 +5,51 @@
     <div class="max-w-5xl mx-auto">
 
       <% if simple_class.simple_class_attributes.any? %>
-        <!--          // Articles -->
-        <% simple_class.simple_class_attributes.last(3).each do |simple_class_attribute| %>
-          <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/class_attributes/attribute_preview",
-                     simple_class_attribute: simple_class_attribute %>
-        <% end %>
 
+        <section class="relative py-2 overflow-hidden">
+          <div class="relative container px-4 mx-auto">
+            <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Part
+              1.Current layer interface groups (actions groups):</h2>
+            <div class="max-w-8xl mx-auto">
+              <% simple_class.simple_class_attributes.first(5).each do |simple_class_attribute| %>
+                <%= render "simple_class/simple_classes/partials/content/middle_bar_partials/class_attributes/attribute_preview", simple_class_attribute: simple_class_attribute %>
+              <% end %>
+            </div>
+          </div>
+        </section>
 
         <!--         See more button -->
         <div class="pt-12 border-t-2 border-gray-100 text-center">
           <%= link_to simple_class_simple_class_attributes_path(target_simple_class: simple_class.id), :target => "_blank", class: "relative group inline-block py-4 px-7 font-semibold text-orange-900 hover:text-orange-50 rounded-full bg-orange-50 transition duration-300 overflow-hidden" do %>
             <div class="absolute top-0 right-full w-full h-full bg-gray-900 transform group-hover:translate-x-full group-hover:scale-102 transition duration-500"></div>
-            <span class="relative">Open full list of attributes</span>
+            <span class="relative">Open full list of characteristics</span>
           <% end %>
         </div>
+
       <% else %>
-        <!--  nothing found card -->
-        <div class="max-w-4xl p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-          <a href="#">
-            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">This actions group doesnt have actions</h5>
-          </a>
-          <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">To add new actions use the button below.</p>
-          <div class="flex justify-center">
-            <%= render "simple_class/simple_classes/partials/add_new_attribute_options_modal",
-                       target_simple_class: simple_class %>
+        <% if current_user.try(:has_resource_modify_permissions?, simple_class)  %>
+          <!--  nothing found card for user with permission -->
+          <div class="max-w-4xl p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+            <a href="#">
+              <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">This actions group doesnt
+                have actions</h5>
+            </a>
+            <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">To add new actions use the button below.</p>
+            <div class="flex justify-center">
+              <%= render "simple_class/simple_classes/partials/add_new_attribute_options_modal",
+                         target_simple_class: simple_class %>
+            </div>
           </div>
-        </div>
+        <% else %>
+          <!--  nothing found card for visitors -->
+          <div class="max-w-4xl p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+            <a href="#">
+              <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Nothing found
+              </h5>
+            </a>
+            <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Owner of this Decision Box didn't added any characteristics yet.</p>
+          </div>
+        <% end %>
       <% end %>
 
     </div>

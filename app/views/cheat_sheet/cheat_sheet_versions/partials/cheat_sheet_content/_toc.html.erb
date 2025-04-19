@@ -1,12 +1,17 @@
 <!--TODO: make it work, at the moment toc for cheat sheets disabled -->
-<div class="cheat-sheet-toc" data-controller="toc_scrolling">
+<div class="cheat-sheet-toc" data-controller="toc_scrolling" data-toc_scrolling-type-value="<%=toc_type%>">
   <br>
   Table of content:
   <ul role="list" a="" class="space-y-3 text-base list-none sm:text-lg md:mt-5 md:text-xl">
 
     <% cheat_sheet_version.notes.each do |note| %>
       <li>
-        <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#note-<%=note.title%>">
+        <a class="hover:underline hover:text-blue-600 font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+           onclick="return false;"
+           href="#note-<%=note.title%>"
+           data-action="click->toc_scrolling#scroll"
+           data-anchor="#note-<%=note.title%>"
+        >
           ↳ <%= note.title %>
         </a>
       </li>
@@ -31,13 +36,23 @@
     <%# end %>
 
     <li>
-      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#contribute">
+      <a class="hover:underline hover:text-blue-600 font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+         onclick="return false;"
+         href="#contribute"
+         data-action="click->toc_scrolling#scroll"
+         data-anchor="#contribute"
+      >
         ↳ Contribute
       </a>
     </li>
 
     <li>
-      <a class="font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster" href="#comments">
+      <a class="hover:underline hover:text-blue-600 font-light text-waterloo dark:text-santa hover:text-oyster dark:hover:text-oyster"
+         onclick="return false;"
+         href="#comments"
+         data-action="click->toc_scrolling#scroll"
+         data-anchor="#comments"
+      >
         ↳ Comments
       </a>
     </li>

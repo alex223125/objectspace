@@ -1,0 +1,23 @@
+
+<li class="jstree-open">
+  <%= render "framework/framework_dynamic_tree_view/folder_item", framework_folder: framework_folder %>
+  <ul>
+
+
+
+    <!-- Part 1.Technologies -->
+    <li class="jstree-open">
+      <%= render "framework/framework_dynamic_tree_view/framework_folder_menu",
+                 framework_folder: framework_folder %>
+      <ul>
+        <% binding.pry %>
+        <% framework_folder.framework_members.each do |framework_member| %>
+          <%= render "framework/framework_dynamic_tree_view/framework_member_item",
+                     framework_member: framework_member, leaf_type: leaf_type %>
+        <% end %>
+      </ul>
+    </li>
+
+  </ul>
+</li>
+

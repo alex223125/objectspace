@@ -1,17 +1,20 @@
 <% path = @article_version.new_record? ? article_article_versions_path : article_article_version_path %>
 <% method = @article_version.new_record? ? :post : :patch %>
+<% binding.pry %>
 <%= simple_form_for(@article_version, url: path, method: method) do |f| %>
 
-  <% if @article_version.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-      <h2><%= pluralize(@article_version.errors.count, "error") %> prohibited this improvement from being saved:</h2>
+  <% [@article_version, @permission].each do |entity| %>
+    <% if entity.try(:errors).present? %>
+      <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+        <h2><%= pluralize(entity.errors.count, "error") %> prohibited this Article from being saved:</h2>
 
-      <ul>
-        <% @article_version.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
+        <ul>
+          <% entity.errors.each do |error| %>
+            <li><%= error.full_message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
   <% end %>
 
 
@@ -26,13 +29,15 @@
 
   <%= f.hidden_field :article_id, value: @article.id %>
 
-
-
   <div class="bg-gray-50 px-4 py-3 sm:px-6">
     <div class="text-end">
       <%= link_to "Back to dashboard", article_articles_path, class: "py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" %>
       <% button_text = @article_version.new_record? ? "Create Article" : "Submit changes" %>
-      <%= f.button :submit, button_text, class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+      <%= button_tag(type: 'submit', class: "relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800") do %>
+        <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+          <%= button_text %>
+        </span>
+      <% end %>
     </div>
   </div>
 

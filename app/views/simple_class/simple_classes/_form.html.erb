@@ -2,18 +2,21 @@
 <% method = @simple_class.new_record? ? :post : :patch %>
 <%= simple_form_for(@simple_class, url: path, method: method) do |f| %>
 
+  <% binding.pry %>
+  <% [@simple_class, @permission].each do |entity| %>
+    <% if entity.try(:errors).present? %>
+      <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+        <h2><%= pluralize(entity.errors.count, "error") %> prohibited this Class from being saved:</h2>
 
-  <% if @simple_class.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-      <h2><%= pluralize(@simple_class.errors.count, "error") %> prohibited this Class from being saved:</h2>
-
-      <ul>
-        <% @simple_class.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
+        <ul>
+          <% entity.errors.each do |error| %>
+            <li><%= error.full_message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
   <% end %>
+
 
   <div class="form-inputs">
     <div class="col-span-6 sm:col-span-3">

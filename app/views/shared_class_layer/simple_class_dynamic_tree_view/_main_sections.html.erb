@@ -1,0 +1,56 @@
+
+  <li class="jstree-open">
+    <%= render "shared_class_layer/simple_class_dynamic_tree_view/root_node_menu", class_layer_entity: class_layer_entity %>
+    <ul>
+
+
+      <% if class_layer_entity.class == SimpleClasses::SimpleClass %>
+        <!-- Part 1.Attributes -->
+        <li class="jstree-open">
+          <%= render "shared_class_layer/simple_class_dynamic_tree_view/attributes_menu", attributes: class_layer_entity.simple_class_attributes %>
+          <ul>
+            <% class_layer_entity.simple_class_attributes.each do |attribute| %>
+              <li>
+                <%= render "shared_class_layer/simple_class_dynamic_tree_view/attribute_item", attribute: attribute %>
+              </li>
+            <% end %>
+          </ul>
+        </li>
+      <% end %>
+
+      <!-- Part 2.Actions -->
+      <li class="jstree-open">
+        <%= render "shared_class_layer/simple_class_dynamic_tree_view/actions_menu", class_layer_entity: class_layer_entity %>
+        <ul>
+          <!-- 1.1 One iteration for default Main group -->
+          <%#= render "simple_class/simple_classes/partials/simple_class_dynamic_tree_view/interface_group_collection", interface_group: simple_class.root_interface_group, leaf_type: leaf_type %>
+          <%= render "shared_class_layer/simple_class_dynamic_tree_view/interface_group",
+                     interface_group: class_layer_entity.root_interface_group, leaf_type: leaf_type %>
+
+
+          <!-- 1.2 All children of main group -->
+          <% binding.pry %>
+          <% main_interface_group = class_layer_entity.root_interface_group  %>
+          <% if main_interface_group.children.count > 0 %>
+            <% main_interface_group.children.each do |interface_group| %>
+              <%= render "shared_class_layer/simple_class_dynamic_tree_view/interface_group",
+                         interface_group: interface_group, leaf_type: leaf_type %>
+            <% end %>
+          <% end %>
+        </ul>
+      </li>
+
+      <!--  Part 3.Class Containers -->
+      <li class="jstree-open">
+        <%= render "shared_class_layer/simple_class_dynamic_tree_view/class_containers_menu", attributes: class_layer_entity.class_containers %>
+        <ul>
+          <% main_container = class_layer_entity.class_containers.first %>
+          <% main_container.children.each do |container| %>
+            <%= render "shared_class_layer/simple_class_dynamic_tree_view/class_container",
+                       container: container, leaf_type: leaf_type  %>
+          <% end %>
+        </ul>
+      </li>
+
+    </ul>
+  </li>

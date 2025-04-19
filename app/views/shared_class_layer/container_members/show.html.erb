@@ -1,0 +1,31 @@
+<% memberable = @container_member.memberable %>
+<% if memberable.class == Articles::Article %>
+  <%= render "article/article_versions/partials/show_partial",
+             entity: memberable,
+             article_version: memberable.default_version  %>
+
+<% elsif memberable.class == Units::Unit %>
+  <%= render "unit/unit_versions/partials/show_partial",
+             entity: memberable,
+             unit_version: memberable.default_version  %>
+
+<% elsif memberable.class == Algorithms::Algorithm %>
+  <%= render "unit/unit_versions/partials/show_partial",
+             entity: memberable,
+             algorithm_version: memberable.default_version  %>
+
+<% elsif memberable.class == CheatSheets::CheatSheet %>
+  <%= render "cheat_sheet/cheat_sheet_versions/partials/show_partial",
+             entity: memberable,
+             cheat_sheet_version: memberable.default_version %>
+
+<% elsif memberable.class == CheatSheetGroups::CheatSheetGroup %>
+  <%= render "cheat_sheet_group/cheat_sheet_group_versions/partials/show_partial",
+             entity: memberable,
+             cheat_sheet_group_version: memberable.default_version %>
+
+<% elsif memberable.class == SimpleClasses::SimpleClass %>
+  <%= render "simple_class/simple_classes/partials/show_partial",
+             entity: memberable,
+             simple_class: memberable %>
+<% end %>

@@ -17,9 +17,11 @@
             <%= render "cheat_sheet_group/cheat_sheet_group_versions/partials/cheat_sheet_content/submenu/copy_to_clipboard", cheat_sheet_group_version: cheat_sheet_group_version %>
           </div>
 
-          <div class="mt-2 flex items-center text-sm text-gray-500">
-            <%= render "cheat_sheet_group/cheat_sheet_group_versions/partials/cheat_sheet_content/submenu/options_dropdown", cheat_sheet_group_version: cheat_sheet_group_version %>
-          </div>
+          <% if current_user.try(:has_resource_modify_permissions?, cheat_sheet_group_version.cheat_sheet_group)  %>
+            <div class="mt-2 flex items-center text-sm text-gray-500">
+              <%= render "cheat_sheet_group/cheat_sheet_group_versions/partials/cheat_sheet_content/submenu/options_dropdown", cheat_sheet_group_version: cheat_sheet_group_version %>
+            </div>
+          <% end %>
         </div>
 
         <!--      TOC-->
@@ -28,7 +30,7 @@
 
       </div>
 
-      <div class="content-section bg-gradient-to-bl from-blue-50 to-violet-50 p-4 rounded-lg">
+      <div class="content-section bg-gradient-to-bl from-blue-50 to-violet-50 p-4 rounded-lg break-words ">
           <%= cheat_sheet_group_version.description.html_safe %>
       </div>
 

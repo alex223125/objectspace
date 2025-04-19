@@ -1,0 +1,48 @@
+
+<li class="jstree-open">
+  <%= render "shared_class_layer/simple_class_dynamic_tree_view/container_item", container: container %>
+  <ul>
+
+    <!-- Part 1.Technologies -->
+    <li class="jstree-open">
+      <%= render "shared_class_layer/simple_class_dynamic_tree_view/technologies_menu",
+                 container: container %>
+      <ul>
+        <% container.container_members.each do |container_member| %>
+            <%= render "shared_class_layer/simple_class_dynamic_tree_view/container_member_item",
+                       container_member: container_member, leaf_type: leaf_type %>
+        <% end %>
+      </ul>
+    </li>
+
+
+    <!-- Part 2.Interface groups -->
+    <li class="jstree-open">
+      <%= render "shared_class_layer/simple_class_dynamic_tree_view/interface_groups_menu",
+                 container: container %>
+      <ul>
+        <% container.interface_groups.each do |interface_group| %>
+          <!-- WARNING: RECURSION-->
+          <%= render "shared_class_layer/simple_class_dynamic_tree_view/interface_group",
+                     interface_group: interface_group, leaf_type: leaf_type %>
+        <% end %>
+      </ul>
+    </li>
+
+    <!-- Part 3.Child containers -->
+    <li class="jstree-open">
+      <%= render "shared_class_layer/simple_class_dynamic_tree_view/class_containers_menu",
+                 container: container %>
+
+      <ul>
+        <% container.containers.each do |child_container| %>
+          <!-- interface group iterator-->
+          <%= render "shared_class_layer/simple_class_dynamic_tree_view/class_container",
+                     container: child_container, leaf_type: leaf_type %>
+        <% end %>
+      </ul>
+    </li>
+
+
+  </ul>
+</li>

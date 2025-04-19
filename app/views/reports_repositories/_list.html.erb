@@ -1,0 +1,13 @@
+<!-- list is used for showing in different places -->
+<section class="relative py-2 overflow-hidden">
+  <div class="relative container px-4 mx-auto">
+
+    <div class="max-w-5xl mx-auto">
+      <% reports_repositories.each do |reports_repository| %>
+        <%= render "reports_repositories/list_partials/reports_repository_preview", reports_repository: reports_repository %>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+

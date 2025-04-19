@@ -1,0 +1,26 @@
+<% if @interface_member.memberable.class == Articles::Article %>
+  <%= render "article/article_versions/partials/show_partial",
+             entity: @interface_member.memberable,
+             article_version: @interface_member.memberable.default_version  %>
+
+<% elsif @interface_member.memberable.class == Units::Unit %>
+  <%= render "unit/unit_versions/partials/show_partial",
+             entity: @interface_member.memberable,
+             unit_version: @interface_member.memberable.default_version  %>
+
+<% elsif @interface_member.memberable.class == Algorithms::Algorithm %>
+  <%= render "algorithm/algorithm_versions/partials/show_partial",
+             entity: @interface_member.memberable,
+             algorithm_version: @interface_member.memberable.default_version  %>
+
+<% elsif @interface_member.memberable.class == CheatSheets::CheatSheet %>
+  <%= render "cheat_sheet/cheat_sheet_versions/partials/show_partial",
+             entity: @interface_member.memberable,
+
+             cheat_sheet_version: @interface_member.memberable.default_version %>
+
+<% elsif @interface_member.memberable.class == CheatSheetGroups::CheatSheetGroup %>
+  <%= render "cheat_sheet_group/cheat_sheet_group_versions/partials/show_partial",
+             entity: @interface_member.memberable,
+             cheat_sheet_group_version: @interface_member.memberable.default_version %>
+<% end %>

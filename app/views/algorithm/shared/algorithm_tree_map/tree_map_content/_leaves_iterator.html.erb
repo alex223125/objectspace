@@ -1,0 +1,44 @@
+<!-- Part 1.Control structures -->
+<% if leafe.referenced_control_structure_functional_type.present? %>
+  <% if AlgorithmsNavigation::AlgorithmTrees::ReferencedControlStructureFunctionalTypes[leafe.referenced_control_structure_functional_type] == "initial_template" %>
+    <!-- continue with children records -->
+    <% leafe.children.each do |child_leafe| %>
+      <!--  DOC: Warning! Recursion-->
+      <%= render "algorithm/shared/algorithm_tree_map/tree_map_content/leaves_iterator", leafe: child_leafe, current_leafe: current_leafe %>
+    <% end %>
+  <% end  %>
+<% end %>
+
+<!-- Part 2.Steps -->
+<% if leafe.referenced_step_functional_type.present? %>
+
+  <!--    1.REGULAR STEP -->
+  <% if AlgorithmsNavigation::AlgorithmTrees::ReferencedStepFunctionalTypes[leafe.referenced_step_functional_type] == Algorithms::Nodes::Step::REGULAR_STEP_TYPE %>
+    <% binding.pry %>
+    <li>
+      <%= render "algorithm/shared/algorithm_tree_map/tree_map_content/leaves/steps/regular", leafe: leafe, current_leafe: current_leafe %>
+    </li>
+
+  <!--    2. WRAPPER STEP TYPE -->
+  <% elsif AlgorithmsNavigation::AlgorithmTrees::ReferencedStepFunctionalTypes[leafe.referenced_step_functional_type] == Algorithms::Nodes::Step::WRAPPER_STEP_TYPE %>
+    <li>
+    <%= render "algorithm/shared/algorithm_tree_map/tree_map_content/leaves/steps/wrapper", leafe: leafe, current_leafe: current_leafe %>
+    </li>
+
+  <!--    3. CONTAINER STEP TYPE -->
+  <% elsif AlgorithmsNavigation::AlgorithmTrees::ReferencedStepFunctionalTypes[leafe.referenced_step_functional_type] == Algorithms::Nodes::Step::CONTAINER_STEP_TYPE %>
+    <!--                  1.1 Show node with stats how much substeps it container, description -->
+    <!--                  1.2 iterate ower all children right from the start -->
+    <li class="jstree-open">
+      <%= render "algorithm/shared/algorithm_tree_map/tree_map_content/leaves/steps/container_header",
+                 leafe: leafe, current_leafe: current_leafe %>
+      <ul>
+        <% leafe.children.each do |child_leafe| %>
+          <!--  DOC: Warning! Recursion-->
+          <%= render "algorithm/shared/algorithm_tree_map/tree_map_content/leaves_iterator", leafe: child_leafe, current_leafe: current_leafe %>
+        <% end %>
+      </ul>
+    </li>
+  <% end  %>
+<% end %>
+

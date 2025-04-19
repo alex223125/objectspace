@@ -40,11 +40,22 @@
             </div>
             <br>
 
-            <div class="col-span-6 sm:col-span-3">
-              <%= f.label "Preview", class: "block text-sm font-medium text-gray-700" %>
-              <div class="instruction-preview">
-                <!-- place for injecting preview of tehcnology -->
+            <% binding.pry %>
+            <div class="" data-controller="step_technologiable_preview_load"
+                 data-step_technologiable_preview_load-select-type-value="<%=remote_select_instruction_select_type(@functional_type)%>">
+              <div class="col-span-6 sm:col-span-3">
+                <%= f.label "Preview", class: "block text-sm font-medium text-gray-700" %>
+                <div class="instruction-preview"
+                     data-target="step_technologiable_preview_load.previewContainer">
+                  <!-- place for injecting preview of tehcnology -->
+                </div>
               </div>
+              <%= f.hidden_field :technologiable_type,
+                                 class: "technologiable-type-hidden-field",
+                                 data: { target: 'step_technologiable_preview_load.technologiableType' }%>
+              <%= f.hidden_field :technologiable_id,
+                                 class: "technologiable-id-hidden-field",
+                                 data: { target: 'step_technologiable_preview_load.technologiableId' }%>
             </div>
             <br>
 
@@ -65,9 +76,6 @@
             <%= f.hidden_field :step_functional_type, value: Steps::FunctionalTypes[:wrapper] %>
 
             <%= f.hidden_field :_destroy %>
-
-            <%= f.hidden_field :technologiable_type, class: "technologiable-type-hidden-field" %>
-            <%= f.hidden_field :technologiable_id, class: "technologiable-id-hidden-field" %>
 
             <!-- actual only for dynamic substeps-->
             <%= f.hidden_field 'current_node_frontend_id', data: { target: 'dynamic_step_form.currentNodeFrontendId'}  %>

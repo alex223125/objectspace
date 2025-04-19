@@ -1,0 +1,11 @@
+<!--container member item-->
+
+<!--  <li class="jstree-open">-->
+    <%#= render "framework/framework_dynamic_tree_view/framework_folder_menu", framework_member: framework_member %>
+<!--    <ul>-->
+      <%# binding.pry %>
+      <%#= render "shared_class_layer/simple_class_dynamic_tree_view/main_sections", class_layer_entity: framework_member.framework_memberable, leaf_type: leaf_type %>
+<!--    </ul>-->
+<!--  </li>-->
+
+<%= render "shared_class_layer/simple_class_dynamic_tree_view/main_sections", class_layer_entity: framework_member.framework_memberable, leaf_type: leaf_type %>

@@ -4,6 +4,8 @@
     <% @simple_classes.each do |simple_class| %>
       <%= render partial: "shared/technologies_search/simple_classes/single_preview", locals: {simple_class: simple_class} %>
     <% end %>
+  <% else %>
+    Nothing was found
   <% end %>
 
 </div>
