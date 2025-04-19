@@ -1,4 +1,6 @@
 class RepositoriesController < ApplicationController
+  # before_action :authenticate_user!, only: [:new, :edit, :create, :update, :destroy]
+  before_action :authenticate_user!, only: [:create]
   before_action :set_repository, only: %i[ show edit update destroy ]
 
   # GET /repositories or /repositories.json
@@ -16,7 +18,10 @@ class RepositoriesController < ApplicationController
     binding.pry
     add_breadcrumb @repository_owner.ownername,
                    dashboard_path(username: @repository_owner.ownername),
-                   {link_type: "profile_page"}
+                   {link_type: "owner_page"}
+    add_breadcrumb "Technologies repositories",
+                   dashboard_path(username: @repository_owner.ownername),
+                   {link_type: "owner_page"}
     add_breadcrumb @target.name,
                    target_repository_path(ownername: @repository_owner.ownername, id: @target.slug),
                    {link_type: "repository_page"}
@@ -33,6 +38,8 @@ class RepositoriesController < ApplicationController
 
   # POST /repositories or /repositories.json
   def create
+    # binding.pry
+    # authenticate_user!
     binding.pry
     service = Services::Repositories::Create.new(repository_params, current_user)
     service.call
@@ -92,6 +99,9 @@ class RepositoriesController < ApplicationController
                                               id: @repository.slug),
                            :status => :moved_permanently
       end
+    rescue ActiveRecord::RecordNotFound
+      flash[:error] = "Model not found"
+      redirect_to :root
     end
 
     # Only allow a list of trusted parameters through.
