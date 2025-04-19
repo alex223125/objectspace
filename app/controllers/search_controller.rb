@@ -35,21 +35,29 @@ class SearchController < ApplicationController
   def index
     binding.pry
     # case 1. articles search
-    if params[:query] && params[:type] == ARTICLES_SEARCH_TYPE
-      binding.pry
-      # @articles = Articles::Article.search(params[:query], operator: "or",
-      #                                      fields: [:title, :source_page_description],
-      #                                      match: [:text_middle, :phrase])
+    if params[:type] == ARTICLES_SEARCH_TYPE
 
-      match_pattern = [{title: :text_start}, {title: :text_middle}, {title: :text_end}, {title: :exact},
-                       {source_page_description: :text_start}, {source_page_description: :text_middle}, {source_page_description: :text_end}]
-      @articles = Articles::Article.search(params[:query], operator: "or",
-                                           fields: match_pattern)
+      if params[:uuid].present? && params[:query].blank?
+        article_version = Articles::ArticleVersion.find_by(uuid: params[:uuid])
+        article = article_version.article
+        @articles = [article]
+        @pagy = nil
+      elsif params[:query].present?
+        binding.pry
+        # @articles = Articles::Article.search(params[:query], operator: "or",
+        #                                      fields: [:title, :source_page_description],
+        #                                      match: [:text_middle, :phrase])
 
-      # [{title: :text_start}, {title: :text_middle}, {title: :text_end},
-      #  {source_page_description: :text_start}, {source_page_description: :text_middle}, {source_page_description: :text_end}]
-      binding.pry
-      @pagy, @articles = pagy(@articles, page: params[:page], items: 3)
+        match_pattern = [{title: :text_start}, {title: :text_middle}, {title: :text_end}, {title: :exact},
+                         {source_page_description: :text_start}, {source_page_description: :text_middle}, {source_page_description: :text_end}]
+        @articles = Articles::Article.search(params[:query], operator: "or",
+                                             fields: match_pattern).includes(:article_versions)
+
+        # [{title: :text_start}, {title: :text_middle}, {title: :text_end},
+        #  {source_page_description: :text_start}, {source_page_description: :text_middle}, {source_page_description: :text_end}]
+        binding.pry
+        @pagy, @articles = pagy(@articles, page: params[:page], items: 3, count: 200)
+      end
 
       binding.pry
       if params[:scenario] == "step_attachment_addition"
@@ -64,11 +72,14 @@ class SearchController < ApplicationController
         locals = {scenario: "cheat_sheet_version_notes_link_attachment_addition"}
       elsif params[:scenario] == "cheat_sheet_group_version_section_addition"
         locals = {scenario: "cheat_sheet_group_version_section_addition"}
+      elsif params[:scenario] == "article_version_attachment_addition"
+        locals = {scenario: "article_version_attachment_addition"}
       else
         locals = {}
       end
 
 
+      binding.pry
       respond_to do |format|
         format.json {
           render json: { entries: render_to_string(partial: "shared/technologies_search/articles/list",
@@ -78,27 +89,40 @@ class SearchController < ApplicationController
         }
       end
 
+
       # case 2. units search
-    elsif params[:query] && params[:type] == UNITS_SEARCH_TYPE
-      binding.pry
-      # @unit_versions = Units::UnitVersion.english_global_search(params[:query])
-      # @units = Units::Unit.english_unit_search(params[:query])
-      # @units = Units::Unit.search(params[:query], operator: "or",
-      #                             fields: [:title, :source_page_description], match: :text_middle)
+    elsif params[:type] == UNITS_SEARCH_TYPE
 
-      match_pattern = [{title: :text_start}, {title: :text_middle}, {title: :text_end}, {title: :exact},
-                       {source_page_description: :text_start}, {source_page_description: :text_middle}, {source_page_description: :text_end}]
-      @units = Units::Unit.search(params[:query], operator: "or", fields: match_pattern)
+      if params[:uuid].present? && params[:query].blank?
+        unit_version = Units::UnitVersion.find_by(uuid: params[:uuid])
+        unit = unit_version.try(:unit)
+        @units = [unit]
+        @pagy = nil
+      elsif params[:query].present?
+        binding.pry
+        # @unit_versions = Units::UnitVersion.english_global_search(params[:query])
+        # @units = Units::Unit.english_unit_search(params[:query])
+        # @units = Units::Unit.search(params[:query], operator: "or",
+        #                             fields: [:title, :source_page_description], match: :text_middle)
 
-      binding.pry
-      if params[:scenario] == "cheat_sheet_version_notes_link_attachment_addition"
-        locals = {scenario: "cheat_sheet_version_notes_link_attachment_addition"}
-      elsif params[:scenario] == "cheat_sheet_group_version_section_addition"
-        locals = {scenario: "cheat_sheet_group_version_section_addition"}
+        match_pattern = [{title: :text_start}, {title: :text_middle}, {title: :text_end}, {title: :exact},
+                         {source_page_description: :text_start}, {source_page_description: :text_middle}, {source_page_description: :text_end}]
+        @units = Units::Unit.search(params[:query], operator: "or", fields: match_pattern).includes(:unit_versions)
+        @pagy, @units = pagy(@units, page: params[:page], items: 3, count: 200)
       end
 
       binding.pry
-      @pagy, @units = pagy(@units, page: params[:page], items: 3)
+      if params[:scenario] == "algorithm_form_wrapper_step_addition"
+        locals = {scenario: "algorithm_form_wrapper_step_addition"}
+      elsif params[:scenario] == "cheat_sheet_version_notes_link_attachment_addition"
+        locals = {scenario: "cheat_sheet_version_notes_link_attachment_addition"}
+      elsif params[:scenario] == "cheat_sheet_group_version_section_addition"
+        locals = {scenario: "cheat_sheet_group_version_section_addition"}
+      elsif params[:scenario] == "article_version_attachment_addition"
+        locals = {scenario: "article_version_attachment_addition"}
+      end
+
+      binding.pry
       respond_to do |format|
         format.json {
           render json: { entries: render_to_string(partial: "shared/technologies_search/units/list",
@@ -109,28 +133,40 @@ class SearchController < ApplicationController
       end
 
       # case 2. algorithms search
-    elsif params[:query] && params[:type] == ALGORITHMS_SEARCH_TYPE
+    elsif params[:type] == ALGORITHMS_SEARCH_TYPE
       binding.pry
-      # @algorithms = Algorithms::Algorithm.english_global_search(params[:query])
-      # @algorithms_versions = Algorithms::AlgorithmVersion.english_global_search(params[:query])
-      @algorithms = Algorithms::Algorithm.search(params[:query], operator: "or",
-                                                 fields:[{title: :text_middle}, {title: :word},
-                                                         {title: :word_start}, {title: :word_end},
-                                                         {source_page_description: :text_middle},
-                                                         {source_page_description: :word},
-                                                         {source_page_description: :word_start},
-                                                         {source_page_description: :word_end}])
-      binding.pry
-      # @algorithms = Algorithms::Algorithm.search(params[:query], operator: "or",
-      #                                            fields:[{name: :word_start}, ]
-      # fields: [:title, :source_page_description],
-      #   match: :word)
-      # match: [:text_middle, :word, :word_start, :word_end]	)
-      # @algorithms = @algorithms_groups + @algorithms_versions
-      @pagy, @algorithms = pagy(@algorithms, page: params[:page], items: 3)
 
-      if params[:scenario] == "cheat_sheet_version_notes_link_attachment_addition"
+      if params[:uuid].present? && params[:query].blank?
+        algorithm_version = Algorithms::AlgorithmVersion.find_by(uuid: params[:uuid])
+        algorithm = algorithm_version.try(:algorithm)
+        @algorithms = [algorithm]
+        @pagy = nil
+      elsif params[:query].present?
+        # @algorithms = Algorithms::Algorithm.english_global_search(params[:query])
+        # @algorithms_versions = Algorithms::AlgorithmVersion.english_global_search(params[:query])
+        @algorithms = Algorithms::Algorithm.search(params[:query], operator: "or",
+                                                   fields:[{title: :text_middle}, {title: :word},
+                                                           {title: :word_start}, {title: :word_end},
+                                                           {source_page_description: :text_middle},
+                                                           {source_page_description: :word},
+                                                           {source_page_description: :word_start},
+                                                           {source_page_description: :word_end}]).includes(:algorithm_versions)
+        binding.pry
+        # @algorithms = Algorithms::Algorithm.search(params[:query], operator: "or",
+        #                                            fields:[{name: :word_start}, ]
+        # fields: [:title, :source_page_description],
+        #   match: :word)
+        # match: [:text_middle, :word, :word_start, :word_end]	)
+        # @algorithms = @algorithms_groups + @algorithms_versions
+        @pagy, @algorithms = pagy(@algorithms, page: params[:page], items: 3, count: 200)
+      end
+
+      if params[:scenario] == "algorithm_form_wrapper_step_addition"
+        locals = {scenario: "algorithm_form_wrapper_step_addition"}
+      elsif params[:scenario] == "cheat_sheet_version_notes_link_attachment_addition"
         locals = {scenario: "cheat_sheet_version_notes_link_attachment_addition"}
+      elsif params[:scenario] == "article_version_attachment_addition"
+        locals = {scenario: "article_version_attachment_addition"}
       end
 
       binding.pry
@@ -145,20 +181,34 @@ class SearchController < ApplicationController
 
 
       # case 3. cheat sheet
-    elsif params[:query] && params[:type] == CHEAT_SHEET_SEARCH_TYPE
-      match_pattern = [{title: :text_start}, {title: :text_middle}, {title: :text_end}, {title: :exact},
-                       {source_page_description: :text_start}, {source_page_description: :text_middle}, {source_page_description: :text_end}]
-      @cheat_sheets = CheatSheets::CheatSheet.search(params[:query], operator: "or",
-                                                     fields: match_pattern)
+    elsif params[:type] == CHEAT_SHEET_SEARCH_TYPE
+      binding.pry
 
-      @pagy, @cheat_sheets = pagy(@cheat_sheets, page: params[:page], items: 3)
+      if params[:uuid].present? && params[:query].blank?
+        cheat_sheet_version = CheatSheets::CheatSheetVersion.find_by(uuid: params[:uuid])
+        cheat_sheet = cheat_sheet_version.try(:cheat_sheet)
+        @cheat_sheets = [cheat_sheet]
+        @pagy = nil
+      elsif params[:query].present?
+        match_pattern = [{title: :text_start}, {title: :text_middle}, {title: :text_end}, {title: :exact},
+                       {source_page_description: :text_start}, {source_page_description: :text_middle}, {source_page_description: :text_end}]
+        @cheat_sheets = CheatSheets::CheatSheet.search(params[:query], operator: "or",
+                                                       fields: match_pattern).includes(:cheat_sheet_versions)
+
+        @pagy, @cheat_sheets = pagy(@cheat_sheets, page: params[:page], items: 3, count: 200)
+      end
 
       if params[:scenario] == "cheat_sheet_group_version_section_addition"
         locals = {scenario: "cheat_sheet_group_version_section_addition"}
+      elsif params[:scenario] == "algorithm_form_wrapper_step_addition"
+        locals = {scenario: "algorithm_form_wrapper_step_addition"}
+      elsif params[:scenario] == "article_version_attachment_addition"
+        locals = {scenario: "article_version_attachment_addition"}
       else
         locals = {}
       end
 
+      binding.pry
       respond_to do |format|
         format.json {
           render json: { entries: render_to_string(partial: "shared/technologies_search/cheat_sheets/list",
@@ -169,20 +219,39 @@ class SearchController < ApplicationController
       end
 
       # case 4. cheat sheet group
-    elsif params[:query] && params[:type] == CHEAT_SHEET_GROUP_SEARCH_TYPE
-      match_pattern = [{title: :text_start}, {title: :text_middle}, {title: :text_end}, {title: :exact},
-                       {source_page_description: :text_start}, {source_page_description: :text_middle}, {source_page_description: :text_end}]
-      @cheat_sheet_groups = CheatSheetGroups::CheatSheetGroup.search(params[:query], operator: "or",
-                                                                    fields: match_pattern)
+    elsif params[:type] == CHEAT_SHEET_GROUP_SEARCH_TYPE
+      binding.pry
 
-      @pagy, @cheat_sheet_groups = pagy(@cheat_sheet_groups, page: params[:page], items: 3)
+      if params[:uuid].present? && params[:query].blank?
+        binding.pry
+        cheat_sheet_group_version = CheatSheetGroups::CheatSheetGroupVersion.find_by(uuid: params[:uuid])
+        cheat_sheet_group = cheat_sheet_group_version.try(:cheat_sheet_group)
+        @cheat_sheet_groups = [cheat_sheet_group]
+        @pagy = nil
+      elsif params[:query].present?
+        binding.pry
+        match_pattern = [{title: :text_start}, {title: :text_middle}, {title: :text_end}, {title: :exact},
+                         {source_page_description: :text_start}, {source_page_description: :text_middle}, {source_page_description: :text_end}]
+        binding.pry
+        @cheat_sheet_groups = CheatSheetGroups::CheatSheetGroup.search(params[:query],
+                                                                       operator: "or",
+                                                                       fields: match_pattern)
+                                                                .includes(:cheat_sheet_group_versions)
+
+        @pagy, @cheat_sheet_groups = pagy(@cheat_sheet_groups, page: params[:page], items: 3, count: 200)
+      end
 
       if params[:scenario] == "cheat_sheet_group_version_section_addition"
         locals = {scenario: "cheat_sheet_group_version_section_addition"}
+      elsif params[:scenario] == "algorithm_form_wrapper_step_addition"
+        locals = {scenario: "algorithm_form_wrapper_step_addition"}
+      elsif params[:scenario] == "article_version_attachment_addition"
+        locals = {scenario: "article_version_attachment_addition"}
       else
         locals = {}
       end
 
+      binding.pry
       respond_to do |format|
         format.json {
           render json: { entries: render_to_string(partial: "shared/technologies_search/cheat_sheet_groups/list",
@@ -236,7 +305,7 @@ class SearchController < ApplicationController
                                           fields: fields, models: models)
       binding.pry
       ###
-      @pagy, @search_results = pagy(@search_results, page: params[:page], items: 3)
+      @pagy, @search_results = pagy(@search_results, page: params[:page], items: 3, count: 500)
       respond_to do |format|
         format.json {
           render json: { entries: render_to_string(partial: "shared/technologies_search/mixed_tech_select/list",
@@ -250,7 +319,110 @@ class SearchController < ApplicationController
   def user_dashboard_technologies
   end
 
-  def folder_technologies
+  def folder_content
+    if params[:target].present? && params[:target_type] == "folder"
+      target_type = "folder"
+      # if params[:target].present?
+      #   # Case 1.Technologies based on folder we in
+      #   target_folder = Folder.friendly.find(params[:target])
+      #   @folder_owner = target_folder.user
+      # elsif params[:target_user].present?
+      #   # Case 2.Technologies for basic dashboard for user
+      #   @folder_owner = User.where(username: params[:target_user]).first
+      #   target_folder = @folder_owner.root_folder
+      # end
+
+      binding.pry
+      target_folder = Folder.friendly.find(params[:target])
+      repository = target_folder.root.parent_repository
+      @folder_owner = repository.ownerable
+
+      @child_folders = target_folder.subfolders
+
+      # Case 1. Technologies inside folder which is repository
+      if repository.class == Repository
+
+        # 1 technologies which in folder
+        models = [Articles::Article, Units::Unit,
+                  Algorithms::Algorithm, CheatSheets::CheatSheet, CheatSheetGroups::CheatSheetGroup,
+                  SimpleClasses::SimpleClass, Frameworks::Framework]
+
+        condition = {
+            folder_id: target_folder.id
+        }
+
+        find_all = '*'
+        search_results = Searchkick.search(find_all, where: condition, models: models)
+        @technologies = search_results
+
+        respond_to do |format|
+          format.json {
+            render json: { entries: render_to_string(partial: "technologies/list",
+                                                     formats: [:html],
+                                                     locals: {list_type: "all_mixed_entries",
+                                                              target_type: target_type }) }
+            # current_folder_id: target_folder.id }
+          }
+        end
+      elsif repository.class == ReportsRepository
+      # Case 2. Reports in ReportsRepository
+
+        # 1 reports which in folder or repository
+        models = [AlgorithmReports::AlgorithmReport]
+
+        condition = {
+            reports_repository_id: target_folder.id
+        }
+
+        find_all = '*'
+        search_results = Searchkick.search(find_all, where: condition, models: models)
+        @reports = search_results
+
+        respond_to do |format|
+          format.json {
+            render json: { entries: render_to_string(partial: "reports/list",
+                                                     formats: [:html],
+                                                     locals: {list_type: "all_mixed_entries",
+                                                              target_type: target_type }) }
+            # current_folder_id: target_folder.id }
+          }
+        end
+      end
+    end
+  end
+
+  def reports
+    binding.pry
+    if params[:target_type] == "reports_repository"
+      target_type = "reports_repository"
+      target = ReportsRepository.friendly.find(params[:target])
+      @folder_owner = target.ownerable
+
+      # 1.1 child folders
+      binding.pry
+      @child_folders = target.reports_repository_folders
+
+      # 1.2 reports which in folder or repository
+      models = [AlgorithmReports::AlgorithmReport]
+
+      condition = {
+          reports_repository_id: target.id
+      }
+
+      find_all = '*'
+      search_results = Searchkick.search(find_all, where: condition, models: models)
+      @reports = search_results
+    end
+
+    respond_to do |format|
+      format.json {
+        render json: { entries: render_to_string(partial: "reports/list",
+                                                 formats: [:html],
+                                                 locals: {list_type: "all_mixed_entries",
+                                                          target_type: target_type }) }
+        # current_folder_id: target_folder.id }
+      }
+    end
   end
 
   def technologies
@@ -263,7 +435,7 @@ class SearchController < ApplicationController
 
       # 1.1 child folders
       binding.pry
-      @child_folders = target.folders
+      @child_folders = target.repository_folders
 
       # 1.2 methods whih in folder
       models = [Articles::Article, Units::Unit,
@@ -278,38 +450,6 @@ class SearchController < ApplicationController
       search_results = Searchkick.search(find_all, where: condition, models: models)
       @technologies = search_results
 
-    # Case 2: technologies for folder
-    elsif params[:target].present? && params[:target_type] == "folder"
-      target_type = "folder"
-      # if params[:target].present?
-      #   # Case 1.Technologies based on folder we in
-      #   target_folder = Folder.friendly.find(params[:target])
-      #   @folder_owner = target_folder.user
-      # elsif params[:target_user].present?
-      #   # Case 2.Technologies for basic dashboard for user
-      #   @folder_owner = User.where(username: params[:target_user]).first
-      #   target_folder = @folder_owner.root_folder
-      # end
-
-      target_folder = Folder.friendly.find(params[:target])
-      @folder_owner = target_folder.root.repository.ownerable
-
-      # 1.1 child folders
-      binding.pry
-      @child_folders = target_folder.subfolders
-
-      # 1.2 methods whih in folder
-      models = [Articles::Article, Units::Unit,
-                Algorithms::Algorithm, CheatSheets::CheatSheet, CheatSheetGroups::CheatSheetGroup,
-                SimpleClasses::SimpleClass, Frameworks::Framework]
-
-      condition = {
-        folder_id: target_folder.id
-      }
-
-      find_all = '*'
-      search_results = Searchkick.search(find_all, where: condition, models: models)
-      @technologies = search_results
     elsif params[:tag].present?
       target_type = "search_by_tag"
       binding.pry
