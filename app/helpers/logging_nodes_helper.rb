@@ -1,0 +1,2 @@
+module LoggingNodesHelper
+end
