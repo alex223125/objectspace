@@ -1,4 +1,5 @@
-module ControlStructures
+#DOC: Same as module ControlStrcutures unless there will be changes
+module LoggingControlStructures
   class FunctionalTypes < ActiveEnum::Base
     value :id => 1, :name => :initial_template
 
