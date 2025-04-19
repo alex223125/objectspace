@@ -6,7 +6,8 @@ module Forms
       include ActiveModel::Validations
 
       TECH_TYPES_MAPPING = {
-        methods: "Units::UnitVersion"
+        methods: "Units::Unit",
+        articles: "Articles::Article"
       }.freeze
 
       SORT_BY_OPTIONS = ["newest", "oldest", "most_commented", "least_commented",
@@ -22,6 +23,7 @@ module Forms
       attribute :query, type: String
       attribute :status, type: String
       attribute :sort_by, type: String
+      # DOC: Version of one of technology, like Articles::ArticleVersion with id 1
       attribute :tech_version, type: String
       attribute :page, type: String
       attribute :items_per_page, type: Integer, default: 3
@@ -70,25 +72,33 @@ module Forms
       # def initialize(params= {})
       # end
 
+      FIRST_SEARCH_TYPE = "FIST_AUTOMATIC_SEARCH"
+
       def submit
         binding.pry
-        set_basic_scope
-        binding.pry
-        search if @improvements.present?
-        binding.pry
-        sort if @improvements.present?
+        if query == FIRST_SEARCH_TYPE
+          load_all_improvements
+        else
+          set_basic_scope
+          binding.pry
+          search if @improvements.present?
+          binding.pry
+          sort if @improvements.present?
+        end
       end
 
       private
 
+      def load_all_improvements
+        @improvements = find_technology_unit.improvements
+      end
+
       def set_basic_scope
         binding.pry
         if tech_version == "all"
-
           binding.pry
-          @improvements = find_current_technology_version.whole_unit.improvements.uniq
+          @improvements = find_technology_unit.improvements
         else
-
           binding.pry
           @improvements = find_technology_version.improvements
         end
@@ -96,9 +106,9 @@ module Forms
 
       def search
         binding.pry
-        searchkick_result = ::Improvements::Improvement.search(query, where: {id: @improvements.pluck(:id)},
+        @improvements = ::Improvements::Improvement.search(query, where: {id: @improvements.pluck(:id)},
                             operator: "or", fields: [:title, :content], match: :text_middle)
-        @improvements = ::Improvements::Improvement.where(id: searchkick_result.pluck(:id)) if searchkick_result.any?
+        # @improvements = ::Improvements::Improvement.where(id: searchkick_result.pluck(:id)) if searchkick_result.any?
       end
 
       def technology_type
@@ -106,7 +116,7 @@ module Forms
         TECH_TYPES_MAPPING[self.tech_type.to_sym].constantize
       end
 
-      def find_current_technology_version
+      def find_technology_unit
         binding.pry
         technology_type.find(self.tech_id)
       end
@@ -123,6 +133,20 @@ module Forms
         else
           binding.pry
           @improvements = @improvements.where(active_status: Improvements::ActiveStatusTypes[status])
+        end
+      end
+
+      def sort
+        binding.pry
+        if CREATED_AT_SORT_OPTIONS.include?(sort_by)
+          binding.pry
+          sort_by_created_at
+        elsif COMMENTS_SORT_OPTIONS.include?(sort_by)
+          binding.pry
+          sort_by_comments
+        elsif UPDATED_AT_SORT_OPTIONS.include?(sort_by)
+          binding.pry
+          sort_by_updated_at
         end
       end
 
@@ -157,19 +181,6 @@ module Forms
         end
       end
 
-      def sort
-        binding.pry
-        if CREATED_AT_SORT_OPTIONS.include?(sort_by)
-          binding.pry
-          sort_by_created_at
-        elsif COMMENTS_SORT_OPTIONS.include?(sort_by)
-          binding.pry
-          sort_by_comments
-        elsif UPDATED_AT_SORT_OPTIONS.include?(sort_by)
-          binding.pry
-          sort_by_updated_at
-        end
-      end
     end
   end
 end
