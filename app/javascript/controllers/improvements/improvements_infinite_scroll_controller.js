@@ -110,6 +110,7 @@ export default class extends Controller {
                 "tech_version": techVersionOption
             }
         }
+
         let params = $.param(improvementsSearchParams)
         // let params = `improvements_search%5Btech_id=${this.technologyId}&tech_type=${this.technologyType}
         // &page=${this.currentPage}&query=${searchQuery}&status=${statusFilter}&sort_by=${sortingOption}&tech_version=${techVersionOption}`
@@ -151,7 +152,34 @@ export default class extends Controller {
             return;
         }
 
-        let url = `/improvements?unit_version_id=${this.unitVersionId}&page=${this.currentPage}`
+        var searchQuery = this.searchQueryTarget.value
+        // DOC: When we just clicked on the tab with improvements
+        // we dont have any search query but we need to display
+        // all improvements by last time updated
+        const firstSearch = "FIST_AUTOMATIC_SEARCH"
+        if (searchQuery == "") {
+            searchQuery = firstSearch
+        }
+        var statusFilter = this.statusFilter
+        var sortingOption = this.sortingOption
+        var techVersionOption = this.techVersionOption
+
+        let improvementsSearchParams = {
+            "improvements_search": {
+                "tech_id": this.technologyId,
+                "tech_type": this.technologyType,
+                "page": this.currentPage,
+                "query": searchQuery,
+                "status": statusFilter,
+                "sort_by": sortingOption,
+                "tech_version": techVersionOption
+            }
+        }
+
+        let params = $.param(improvementsSearchParams)
+
+        let url = `/improvements?${params}`
+        // let url = `/improvements?unit_version_id=${this.unitVersionId}&page=${this.currentPage}`
         Rails.ajax({
             type: 'GET',
             url: url,

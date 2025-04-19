@@ -174,8 +174,9 @@ export default class extends Controller {
     }
 
     setSectionIdAndTypeBy(fieldsContainer){
-        let idFieldSelector = "linkable-id-hidden-field"
-        let typeFieldSelector = "linkable-type-hidden-field"
+        let idFieldSelector = "sectionable-id-hidden-field"
+        let typeFieldSelector = "sectionable-type-hidden-field"
+
 
         let sectionId = fieldsContainer.querySelector(`.${idFieldSelector}`).value
         let sectionType = fieldsContainer.querySelector(`.${typeFieldSelector}`).value

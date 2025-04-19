@@ -1,3 +1,4 @@
+// Doc: Responsibility zone: Open and Close modal
 import { Controller } from '@hotwired/stimulus'
 
 export default class extends Controller {
@@ -41,7 +42,7 @@ export default class extends Controller {
         }
 
         // Lock the scroll and save current scroll position
-        // this.lockScroll();
+        this.lockScroll();
 
         // Unhide the modal
         this.containerTarget.classList.remove(this.toggleClass);
@@ -57,10 +58,9 @@ export default class extends Controller {
         if (e && this.preventDefaultActionClosing) {
             e.preventDefault();
         }
-        console.log("select_instruction_modal_controller: close methods fired!")
 
         // Unlock the scroll and restore previous scroll position
-        // this.unlockScroll();
+        this.unlockScroll();
 
         // Hide the modal
         this.containerTarget.classList.add(this.toggleClass);
@@ -82,42 +82,43 @@ export default class extends Controller {
     }
 
     _backgroundHTML() {
-        return `<div id="${this.backgroundId}" class="fixed top-0 left-0 w-full h-full" style="background-color: ${this.backdropColorValue}; z-index: 9998;"></div>`;
+        // TODO: fix - works only with z-index 9, if more overlaps modal, wierd
+        return `<div id="${this.backgroundId}" class="fixed top-0 left-0 w-full h-full" style="background-color: ${this.backdropColorValue}; z-index: 11;"></div>`;
     }
 
-    // lockScroll() {
-    //     // Add right padding to the body so the page doesn't shift
-    //     // when we disable scrolling
-    //     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-    //     document.body.style.paddingRight = `${scrollbarWidth}px`;
-    //
-    //     // Add classes to body to fix its position
-    //     document.body.classList.add('fixed', 'inset-x-0', 'overflow-hidden');
-    //
-    //     if(this.restoreScrollValue) {
-    //         // Save the scroll position
-    //         this.saveScrollPosition();
-    //
-    //         // Add negative top position in order for body to stay in place
-    //         document.body.style.top = `-${this.scrollPosition}px`;
-    //     }
-    // }
-    //
-    // unlockScroll() {
-    //     // Remove tweaks for scrollbar
-    //     document.body.style.paddingRight = null;
-    //
-    //     // Remove classes from body to unfix position
-    //     document.body.classList.remove('fixed', 'inset-x-0', 'overflow-hidden');
-    //
-    //     // Restore the scroll position of the body before it got locked
-    //     if(this.restoreScrollValue) {
-    //         this.restoreScrollPosition();
-    //
-    //         // Remove the negative top inline style from body
-    //         document.body.style.top = null;
-    //     }
-    // }
+    lockScroll() {
+        // Add right padding to the body so the page doesn't shift
+        // when we disable scrolling
+        const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+        document.body.style.paddingRight = `${scrollbarWidth}px`;
+
+        // Add classes to body to fix its position
+        document.body.classList.add('fixed', 'inset-x-0', 'overflow-hidden');
+
+        if(this.restoreScrollValue) {
+            // Save the scroll position
+            this.saveScrollPosition();
+
+            // Add negative top position in order for body to stay in place
+            document.body.style.top = `-${this.scrollPosition}px`;
+        }
+    }
+
+    unlockScroll() {
+        // Remove tweaks for scrollbar
+        document.body.style.paddingRight = null;
+
+        // Remove classes from body to unfix position
+        document.body.classList.remove('fixed', 'inset-x-0', 'overflow-hidden');
+
+        // Restore the scroll position of the body before it got locked
+        if(this.restoreScrollValue) {
+            this.restoreScrollPosition();
+
+            // Remove the negative top inline style from body
+            document.body.style.top = null;
+        }
+    }
 
     saveScrollPosition() {
         this.scrollPosition = window.pageYOffset || document.body.scrollTop;

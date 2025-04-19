@@ -11,6 +11,18 @@ const articleVersionFormAttachmentAdditionCase = "article_version_form_attachmen
 const articleCase = "article";
 const articleClass = "Articles::Article"
 
+const unitCase = "unit";
+const unitClass = "Units::Unit"
+
+const algorithmCase = "algorithm";
+const algorithmClass = "Algorithms::Algorithm"
+
+const cheatSheetCase = "cheat_sheet";
+const cheatSheetClass = "CheatSheets::CheatSheet"
+
+const cheatSheetGroupCase = "cheat_sheet_group";
+const cheatSheetGroupClass = "CheatSheetGroups::CheatSheetGroup"
+
 export default class extends Controller {
     static targets = [
         'searchInstructionsInstance',
@@ -111,9 +123,16 @@ export default class extends Controller {
         this.resetSearchForm()
         this.removeModal()
 
-        this.prevent_from_adding_already_added_attachments()
+        if (this.prevent_from_adding_already_added_attachments()) {
+            return
+        }
 
-        if (this.attachmentType == "article") {
+        if (this.attachmentType == articleCase ||
+            this.attachmentType == unitCase ||
+            this.attachmentType == algorithmCase ||
+            this.attachmentType == cheatSheetCase ||
+            this.attachmentType == cheatSheetGroupCase
+        ) {
             this.addArticleAttachment()
         }
     }
@@ -172,6 +191,14 @@ export default class extends Controller {
         this.attachmentId = attachmentId
         if (attachmentType == articleClass) {
             this.attachmentType = articleCase
+        } else if (attachmentType == unitClass) {
+            this.attachmentType = unitCase
+        } else if (attachmentType == algorithmClass) {
+            this.attachmentType = algorithmCase
+        } else if (attachmentType == cheatSheetClass) {
+            this.attachmentType = cheatSheetCase
+        } else if (attachmentType == cheatSheetGroupClass) {
+            this.attachmentType = cheatSheetGroupCase
         }
     }
     //
@@ -181,8 +208,9 @@ export default class extends Controller {
         if (this.numberOfMatches() > 0) {
             console.log("Attachment was already added")
             // TODO: flash popup - article was already added
-            return
+            return true
         } else {
+            return false
             // do nothing
         }
     }
@@ -195,14 +223,22 @@ export default class extends Controller {
         let allAttachmentsArray = [...allAttachments]
         var that = this
         let matches = allAttachmentsArray.filter(function (attachment) {
-            if (that.attachmentType == articleCase){
-                let idFieldSelector = "attachable-id-hidden-field"
-                let typeFieldSelector = "attachable-type-hidden-field"
+            let idFieldSelector = "attachable-id-hidden-field"
+            let typeFieldSelector = "attachable-type-hidden-field"
 
-                let attachmentId = attachment.querySelector(`.${idFieldSelector}`).value
-                let attachmentType = attachment.querySelector(`.${typeFieldSelector}`).value
+            let attachmentId = attachment.querySelector(`.${idFieldSelector}`).value
+            let attachmentType = attachment.querySelector(`.${typeFieldSelector}`).value
 
+            if (that.attachmentType == articleCase) {
                 return (attachmentId == that.attachmentId) && (attachmentType == articleClass)
+            } else if (that.attachmentType == unitCase) {
+                return (attachmentId == that.attachmentId) && (attachmentType == unitClass)
+            } else if (that.attachmentType == algorithmCase) {
+                return (attachmentId == that.attachmentId) && (attachmentType == algorithmClass)
+            } else if (that.attachmentType == cheatSheetCase) {
+                return (attachmentId == that.attachmentId) && (attachmentType == cheatSheetClass)
+            } else if (that.attachmentType == cheatSheetGroupCase) {
+                return (attachmentId == that.attachmentId) && (attachmentType == cheatSheetGroupClass)
             }
         });
         let amount = matches.length
@@ -238,16 +274,23 @@ export default class extends Controller {
         let idField = "attachable-id-hidden-field"
         let typeField = "attachable-type-hidden-field"
 
+        this.fieldsContainer.querySelector(`.${idField}`).value = this.attachmentId
         if (this.attachmentType == articleCase) {
-            this.fieldsContainer.querySelector(`.${idField}`).value = this.attachmentId
             this.fieldsContainer.querySelector(`.${typeField}`).value = articleClass
-
-            console.log("this.fieldsContainer.querySelector(`.${idField}`).value")
-            console.log("this.fieldsContainer.querySelector(`.${typeField}`).value")
-            console.log(this.fieldsContainer.querySelector(`.${idField}`).value)
-            console.log(this.fieldsContainer.querySelector(`.${typeField}`).value)
+        } else if (this.attachmentType == unitCase) {
+            this.fieldsContainer.querySelector(`.${typeField}`).value = unitClass
+        } else if (this.attachmentType == algorithmCase) {
+            this.fieldsContainer.querySelector(`.${typeField}`).value = algorithmClass
+        } else if (this.attachmentType == cheatSheetCase) {
+            this.fieldsContainer.querySelector(`.${typeField}`).value = cheatSheetClass
+        } else if (this.attachmentType == cheatSheetGroupCase) {
+            this.fieldsContainer.querySelector(`.${typeField}`).value = cheatSheetGroupClass
         }
 
+        console.log("this.fieldsContainer.querySelector(`.${idField}`).value")
+        console.log("this.fieldsContainer.querySelector(`.${typeField}`).value")
+        console.log(this.fieldsContainer.querySelector(`.${idField}`).value)
+        console.log(this.fieldsContainer.querySelector(`.${typeField}`).value)
     }
 
     setAttachmentPreviewContainer(){
@@ -280,13 +323,23 @@ export default class extends Controller {
         console.log("remote_select_attachment: setLoadUrl triggered")
         console.log("remote_select_attachment: this.attachmentType")
         console.log(this.attachmentType)
+        const params = 'preview_type=article_attachment_preview'
         if (this.attachmentType == articleCase) {
-            const params = 'preview_type=algorithm_step_attachment_preview'
             this.previewUrl = `/article/articles/${this.attachmentId}/preview?${params}`
+        } if (this.attachmentType == unitCase) {
+            this.previewUrl = `/unit/units/${this.attachmentId}/preview?${params}`
+        } if (this.attachmentType == algorithmCase) {
+            this.previewUrl = `/algorithm/algorithms/${this.attachmentId}/preview?${params}`
+        } if (this.attachmentType == cheatSheetCase) {
+            this.previewUrl = `/cheat_sheet/cheat_sheets/${this.attachmentId}/preview?${params}`
+        } if (this.attachmentType == cheatSheetGroupCase) {
+            this.previewUrl = `/cheat_sheet_group/cheat_sheet_groups/${this.attachmentId}/preview?${params}`
         } else {
             console.log("Can not set load url, case not programmed")
         }
     }
+
+
 
     insertPreview(container){
         if (typeof container !== "undefined") {

@@ -1,47 +1,7 @@
-// TODO: rename from simple_class_tree_map_controller to simple_class_tree_map_cotent_controller
-// TODO: MOVE TO shared class layer (this controller both for frameworks and for classes
 // doc: responsibility zone - display small details of class in modal
 import { Controller } from '@hotwired/stimulus';
 import { jstree } from 'jstree';
 import jquery from 'jquery'
-// const data = [{
-//     id: "padre1",
-//     parent: "#",
-//     text: "Padre 1",
-//     icon: 'fa fa-star text-warning'
-// }, {
-//     id: "padre2",
-//     parent: "#",
-//     text: "Padre 2"
-// }, {
-//     id: "id3",
-//     parent: "padre1",
-//     text: "Figlio 1 di padre 1"
-// }, {
-//     id: "id4",
-//     parent: "padre1",
-//     text: "Figlio 2 di padre 1"
-// }, {
-//     id: "id5",
-//     parent: "padre2",
-//     text: "Figlio 1 di padre 2"
-// }, {
-//     id: "id6",
-//     parent: "id5",
-//     text: "Figlio 1 di figlio 1 di padre 2"
-// }, {
-//     id: "id7",
-//     parent: "id5",
-//     text: "Figlio 2 di figlio 1 di padre 2"
-// }, {
-//     id: "id8",
-//     parent: "id5",
-//     text: "Figlio 3 di figlio 1 di padre 2"
-// }, {
-//     id: "id9",
-//     parent: "#",
-//     text: "Figlio 3 di figlio 1 di padre 2"
-// }]
 
 // prevents hover css to appear on hover
 jquery.jstree.plugins.nohover = function () { this.hover_node = jQuery.noop; };
@@ -57,8 +17,8 @@ jquery.jstree.core.prototype._create_prototype_node = function () {
     _temp1.className = 'jstree-anchor';
 
     // data-target here:
-    _temp1.setAttribute('data-target', 'simple_class_tree_map.anchor');
-    _temp1.setAttribute('data-action', 'click->simple_class_tree_map#toggleNode');
+    _temp1.setAttribute('data-target', 'algorithm_tree_map_content.anchor');
+    _temp1.setAttribute('data-action', 'click->algorithm_tree_map_content#toggleNode');
     // we don't use it:
     // _temp1.setAttribute('href','#');
     _temp1.setAttribute('tabindex','-1');
@@ -92,9 +52,10 @@ export default class extends Controller {
     connect() {
         console.log("class tree map controller connected")
         var that = this
-        this.loadTreeTemplate(function() {
-            that.initializeTree();
-        });
+        // this.loadTreeTemplate(function() {
+        //     that.initializeTree();
+        // });
+        that.initializeTree();
     }
 
     disconnect() {
@@ -104,11 +65,6 @@ export default class extends Controller {
     initializeTree(){
         this.treeInstance = $(this.dynamicTreeTarget).jstree({
             plugins: ['search', 'types', 'nohover', 'themes', 'changed'],
-            // plugins: ['checkbox', 'search', 'changed', 'contextmenu'],
-            // contextmenu: {
-            //     select_node: false,
-            //     items: this.contextMenu
-            // },
             checkbox: {
                 three_state: false
             },
@@ -177,22 +133,6 @@ export default class extends Controller {
             $("li#"+data.node.id).find("a").replace("<a>", "<div>");
         });
 
-
-        // this.anchorTargets.map(anchor => {
-        //     $(anchor).on('click', () => {
-        //         console.log("11 click event happend")
-        //         var treeOpenCloseElement = 'jstree-icon jstree-ocl'
-        //         var previousSibling = anchor.previousSibling
-        //         if (previousSibling.className == treeOpenCloseElement){
-        //             previousSibling.click()
-        //         }
-        //     });
-        // })
-
-
-
-
-
         var to = false;
 
         var that = this
@@ -218,6 +158,12 @@ export default class extends Controller {
         }
     }
 
+    handleRedirectToStep(e){
+        console.log("algorithm_tree_map_content_controller: handleRedirectToStep fired")
+        var link = e.currentTarget.href
+        window.location = link
+    }
+
     // PRIVATE
 
     contextMenu(node) {
@@ -235,71 +181,60 @@ export default class extends Controller {
         return items;
     }
 
-    // TODO: add loading spinner and reload button and faulure case
-    loadTreeTemplate(){
-        const uuid = this.setUuid()
-        const params = this.setParams()
-        const url = this.setUrl(uuid, params)
+    // TODO: add loading spinner and reload button
+    // loadTreeTemplate(){
+    //     const uuid = this.setUuid()
+    //     const params = this.setParams()
+    //
+    //     var url = `/simple_class/simple_classes/${uuid}/tree_map?${params}`
+    //
+    //     // make request
+    //     Rails.ajax({
+    //         type: 'GET',
+    //         url: url,
+    //         dataType: 'json',
+    //         success: (data) => {
+    //             console.log("Tree template loaded!")
+    //             this.insert(data)
+    //         }
+    //     })
+    // }
+    //
+    // setParams(){
+    //     if (this.data.get("treeType") == "technology_pick"){
+    //         return 'map_type=technology_pick'
+    //     } else {
+    //         return 'map_type=regular_view'
+    //     }
+    // }
 
-        // make request
-        Rails.ajax({
-            type: 'GET',
-            url: url,
-            dataType: 'json',
-            success: (data) => {
-                console.log("Tree template loaded!")
-                this.insert(data)
-            }
-        })
-    }
+    // insert(data){
+    //     // this.instructionPreviewContainer.innerHTML = "";
+    //     this.treeTarget.insertAdjacentHTML('beforeend', data.tree)
+    //     // should be executed after tree got
+    //     // rendered on div
+    //     this.initializeTree();
+    // }
 
-    setUrl(uuid, params){
-        if (this.data.get("modalType") == "framework_actions"){
-            var url = `/framework/frameworks/${uuid}/tree_map?${params}`
-        } else if (this.data.get("modalType") == "simple_class_actions") {
-            var url = `/simple_class/simple_classes/${uuid}/tree_map?${params}`
-        }
-        return url
-    }
+    // setUuid(){
+    //     // technology pick case
+    //     if (typeof this.data.get("simpleClassUuid") !== "undefined" && this.data.get("simpleClassUuid") !== null  ) {
+    //         return this.data.get("simpleClassUuid")
+    //     } else {
+    //         var contentAreaController = this.contentAreaController()
+    //         console.log("contentAreaController:")
+    //         console.log(contentAreaController)
+    //         var value = contentAreaController.uuidInputTarget.value
+    //
+    //         console.log("contentAreaController.uuidInputTarget:")
+    //         console.log(contentAreaController.uuidInputTarget)
+    //
+    //         return value
+    //     }
+    // }
 
-
-    setParams(){
-        if (this.data.get("treeType") == "technology_pick"){
-            return 'map_type=technology_pick'
-        } else {
-            return 'map_type=regular_view'
-        }
-    }
-
-    insert(data){
-        // this.instructionPreviewContainer.innerHTML = "";
-        this.treeTarget.insertAdjacentHTML('beforeend', data.tree)
-        // should be executed after tree got
-        // rendered on div
-        this.initializeTree();
-    }
-
-    setUuid(){
-        // technology pick case
-        if (typeof this.data.get("simpleClassUuid") !== "undefined" && this.data.get("simpleClassUuid") !== null  ) {
-            return this.data.get("simpleClassUuid")
-        } else if (typeof this.data.get("frameworkUuid") !== "undefined" && this.data.get("frameworkUuid") !== null  ) {
-            return this.data.get("frameworkUuid")
-        } else {
-            var contentAreaController = this.contentAreaController()
-            console.log("contentAreaController:")
-            console.log(contentAreaController)
-            var value = contentAreaController.uuidInputTarget.value
-
-            console.log("contentAreaController.uuidInputTarget:")
-            console.log(contentAreaController.uuidInputTarget)
-
-            return value
-        }
-    }
-
-    contentAreaController(){
-        return this.element.closest("[data-controller~='content_area']").controller;
-    }
+    // contentAreaController(){
+    //     return this.element.closest("[data-controller~='content_area']").controller;
+    // }
 
 }

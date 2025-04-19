@@ -215,8 +215,8 @@ export default class extends Controller {
                         {title: 'Justify', icon: 'alignjustify', format: 'alignjustify'}
                     ]}
             ],
-            height : 200,
-            min_height: 200,
+            height : 400,
+            min_height: 400,
             max_height: 1000,
             promotion: false
         }

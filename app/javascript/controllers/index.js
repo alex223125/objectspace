@@ -97,6 +97,21 @@ application.register("dynamic_step_form", DynamicStepFormController)
 import ScrollToStepBeginningController from "./algorithms/scroll_to_step_beginning_controller.js"
 application.register("scroll_to_step_beginning", ScrollToStepBeginningController)
 
+import StepTechnologiablePreviewLoadController from "./algorithms/step_technologiable_preview_load_controller.js"
+application.register("step_technologiable_preview_load", StepTechnologiablePreviewLoadController)
+
+import StepShowController from "./algorithms/step_show_controller.js"
+application.register("step_show", StepShowController)
+
+
+
+// Algorithms Steps Map
+import AlgorithmTreeMapModalController from "./algorithms/tree_map/algorithm_tree_map_modal_controller.js"
+application.register("algorithm_tree_map_modal", AlgorithmTreeMapModalController)
+
+import AlgorithmTreeMapContentController from "./algorithms/tree_map/algorithm_tree_map_content_controller.js"
+application.register("algorithm_tree_map_content", AlgorithmTreeMapContentController)
+
 // Attachments
 import AttachmentsNestedFormController from "./attachments/attachments_nested_form_controller.js"
 application.register("attachments_nested_form", AttachmentsNestedFormController)
@@ -118,14 +133,12 @@ application.register("attachment_preview", AttachmentPreviewController)
 import SearchInstructionsController from "./instructions/search_instructions_controller"
 application.register("search_instructions", SearchInstructionsController)
 
-import RemoteSelectInstructionController from "./instructions/remote_select_instruction_controller"
-application.register("remote_select_instruction", RemoteSelectInstructionController)
-
 import SelectInstructionModalController from "./instructions/select_instruction_modal_controller"
 application.register("select_instruction_modal", SelectInstructionModalController)
 
 import SelectInstructionTabsController from "./instructions/select_instruction_tabs_controller"
 application.register("select_instruction_tabs", SelectInstructionTabsController)
+
 
 
 
@@ -184,6 +197,9 @@ application.register("dashboard_technologies", DashboardTechnologiesController)
 
 import DashboardRepositoriesController from "./dashboard/dashboard_repositories_controller"
 application.register("dashboard_repositories", DashboardRepositoriesController)
+
+import DashboardReportsController from "./dashboard/dashboard_reports_controller"
+application.register("dashboard_reports", DashboardReportsController)
 
 
 
@@ -282,4 +298,31 @@ application.register("remote_select_cheat_sheet_group_section", RemoteSelectChea
 
 import CheatSheetGroupSectionsNestedFormController from "./cheat_sheet_groups/cheat_sheet_group_sections_nested_form_controller"
 application.register("cheat_sheet_group_sections_nested_form", CheatSheetGroupSectionsNestedFormController)
+
+// SharedForms
+import SourcesOptionalInputController from "./shared_forms/sources_optional_input_controller"
+application.register("sources_optional_input", SourcesOptionalInputController)
+
+import AdditionalInformationOptionalInputController from "./shared_forms/additional_information_optional_input_controller"
+application.register("additional_information_optional_input", AdditionalInformationOptionalInputController)
+
+// Entities
+import RemoteSelectInstructionController from "./entities/remote_select_instruction_controller"
+application.register("remote_select_instruction", RemoteSelectInstructionController)
+
+// Framework Members
+import FrameworkMemberAdditionController from "./framework_members/framework_member_addition_controller"
+application.register("framework_member_addition", FrameworkMemberAdditionController)
+
+import FrameworkMembersNestedFormController from "./framework_members/framework_members_nested_form_controller"
+application.register("framework_members_nested_form", FrameworkMembersNestedFormController)
+
+import DeleteFrameworkMemberModalController from "./framework_members/delete_framework_member_modal_controller"
+application.register("delete_framework_member_modal", DeleteFrameworkMemberModalController)
+
+
+// Reports Repositories
+import ReportsRepositoryItemsController from "./reports_repositories/reports_repository_items_controller"
+application.register("reports_repository_items", ReportsRepositoryItemsController)
+
 

@@ -1,9 +1,13 @@
 // responsibility zone: load asynch-y articles, methods, algorithms on ui when we open specific accordion or pick attachment during algorithm reading
 // responsibility zone - addition of actins in differen places around simple clasees, container groups etc
 import { Controller } from '@hotwired/stimulus';
+import { initFlowbite } from "flowbite";
 
+const articleCase = "Articles::Article"
 const unitCase = "Units::Unit"
 const algorithmCase = "Algorithms::Algorithm"
+const cheatSheetCase = "CheatSheets::CheatSheet"
+const cheatSheetGroupCase = "CheatSheetGroups::CheatSheetGroup"
 
 export default class extends Controller {
 
@@ -59,7 +63,7 @@ export default class extends Controller {
             url: url,
             dataType: 'json',
             success: (data) => {
-                console.log("View loaded!")
+                console.log("technology asynch rendering controller: View loaded!")
                 // console.log(data.preview)
                 // 3.disable load animation
                 this.toggleLoadingIndicator("hide")
@@ -68,7 +72,7 @@ export default class extends Controller {
                 // this.entriesTarget.insertAdjacentHTML('beforeend', data.entries)
             },
             error: (response) => {
-                console.log("View not loaded!")
+                console.log("technology asynch rendering controller: View not loaded!")
                 console.log(response)
                 this.toggleLoadingIndicator("hide")
                 this.toggleRetryCard("show")
@@ -86,12 +90,19 @@ export default class extends Controller {
 
     setLoadUrl(){
         // 4.2 stet variables for substep inputs field
-        if (this.technologiableType == unitCase) {
-            var url = `/unit/units/${this.technologiableId}/view`
+        var params = "type=regular"
+        if (this.technologiableType == articleCase) {
+            var url = `/article/articles/${this.technologiableId}/view?${params}`
+        } else if (this.technologiableType == unitCase) {
+            var url = `/unit/units/${this.technologiableId}/view?${params}`
         } else if (this.technologiableType == algorithmCase) {
-            var url = `/algorithm/algorithms/${this.technologiableId}/view`
+            var url = `/algorithm/algorithms/${this.technologiableId}/view?${params}`
+        } else if (this.technologiableType == cheatSheetCase) {
+            var url = `/cheat_sheet/cheat_sheets/${this.technologiableId}/view?${params}`
+        } else if (this.technologiableType == cheatSheetGroupCase) {
+            var url = `/cheat_sheet_group/cheat_sheet_groups/${this.technologiableId}/view?${params}`
         } else {
-            console.log("Can not set load url, case not programmed")
+            console.log("technology asynch rendering controller: Can not set load url, case not programmed")
         }
         return url;
     }
@@ -99,6 +110,12 @@ export default class extends Controller {
     insertView(data){
         this.containerTarget.innerHTML = "";
         this.containerTarget.insertAdjacentHTML('beforeend', data.view)
+
+        // DOC: Some of the javascript doesnt work
+        // after creation of new algorithm and when we redirected on show page
+        // this workaround should initialize flowbite when we getting redirect
+        // and dropdowns should work
+        initFlowbite();
     }
 
 

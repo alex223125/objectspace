@@ -1,3 +1,5 @@
+// TODO: rename to remote_select_entity_controller and move to "entities" folder
+// we use this controller not only for Articles - CheatSheetGroups, but also to select Frameworks and SimpleClasses
 import { Controller } from '@hotwired/stimulus';
 import { useMutation } from 'stimulus-use'
 
@@ -8,7 +10,6 @@ import { useMutation } from 'stimulus-use'
 // TODO: REMOVE COMMENTS AFTER FIRST GOOD VERSION
 // TOOD: REMOVE SELECTOR WHICH ARE NOT IN USE
 // TODO: is there a possibility to refator it's to differnt files with includes?
-
 
 // Doc: Each place on UI where we use selection of different objects specified as
 // separate case, we pass this parameter during initialization of current controller
@@ -21,10 +22,11 @@ const folderItemAdditionCase = "folder_item_addition";
 const interfaceGroupActionAdditionCase = "interface_group_form_action_addition";
 const simpleClassAttributeAdditionCase = "simple_class_attribute_addition"
 const algorithmFormClassLevelWrapperStepAdditionCase = "algorithm_form_class_level_wrapper_step_addition"
+const algorithmFormFrameworkLevelWrapperStepAdditionCase = "algorithm_form_framework_level_wrapper_step_addition"
 const simpleClassFormArticleToAttributeAttachmentCase = "simple_class_form_article_to_attribute_attachment"
-
 // this case probably not in use, check it and remove if that's correct
 const simpleClassAttributeFormArticleAdditionCase = "simple_class_attribute_form_article_addition"
+const frameworkMembersFormFrameworkMembersAdditionCase = "framework_members_form_framework_members_addition"
 
 // Fields selectors
 // const substepAdditionCaseNestedFields = '.substeps-nested-fields'
@@ -36,15 +38,20 @@ const interfaceGroupActionAdditionCaseNestedFields = '.nested-fields-interface-g
 const simpleClassAttributeAdditionCaseNestedFields = '.attributes-nested-fields'
 const wrapperStepClassLevelAdditionCaseNestedFields = '.steps-nested-fields'
 const simpleClassFormArticleToAttributeAttachmentCaseNestedFields = '.article-attachment-nested-fields'
+const frameworkMembersFormFrameworkMembersAdditionCaseNestedFields = '.framework-members-addition-nested-fields'
 
 // 'select button' cases:
-const aticleCase = "article";
+const articleCase = "article";
 const unitCase = "unit";
 const algorithmCase = "algorithm";
+const cheatSheetCase = "cheat_sheet";
+const cheatSheetGroupCase = "cheat_sheet_group";
 const simpleClassCase = "simple_class";
 const frameworkCase = "framework";
 const MixedTechnologiesCase = "mixed_technologies";
 
+//
+const simpleClassClass = "SimpleClasses::SimpleClass"
 
 export default class extends Controller {
     static targets = ['instructionModalInstance',
@@ -79,14 +86,15 @@ export default class extends Controller {
                       'simpleClassAttributeFormArea',
                        // Case 9. addition of articles as attachments to attributes in simple class form
                        'simpleClassAttributeArticleAttahcmnetsArea',
-                       'addArticleToAttributeInSimpleClassFormOriginalButton'
+                       'addArticleToAttributeInSimpleClassFormOriginalButton',
+                       // Case 10. addition of framework members to framework folder
+                       'frameworkMembersFormFrameworkMembersArea',
+                       'addFrameworkMemberToFrameworkFolderInFrameworkMembersAdditionalFormOriginalButton'
                      ];
 
     static values = {
         selectType: String
     }
-
-
 
     // TODO: fix miscalculation of postmutation variable
     //  if we remove + add mixing begavior, see how it's done in attachments '
@@ -106,7 +114,8 @@ export default class extends Controller {
         //     this.currentSubstepsAmount = null
         //     this.postmutationSubstepsAmount = 0
         if ((this.selectTypeValue == algorithmFormWrapperStepAdditionCase)
-             || (this.selectTypeValue == algorithmFormClassLevelWrapperStepAdditionCase)) {
+             || (this.selectTypeValue == algorithmFormClassLevelWrapperStepAdditionCase)
+            || (this.selectTypeValue == algorithmFormFrameworkLevelWrapperStepAdditionCase)) {
             // mutation is used to check if new susbtep is added on ui side
             useMutation(this, {attributes: false, childList: true, characterData: false, subtree:true})
             this.afterclickStepsAmount = null
@@ -152,6 +161,12 @@ export default class extends Controller {
             this.postmutationArticleAttachmentsAmount = 0
         } else if (this.selectTypeValue == simpleClassAttributeFormArticleAdditionCase) {
             // do nothing
+        } else if (this.selectTypeValue == frameworkMembersFormFrameworkMembersAdditionCase) {
+            // mutation is used to check if new class is added on ui side
+            useMutation(this, {attributes: false, childList: true, characterData: false, subtree:true})
+            this.afterClickArticleAttachmentsAmount = null
+            this.currentArticleAttachmentsAmount = null
+            this.postmutationArticleAttachmentsAmount = 0
         }
     }
 
@@ -161,10 +176,11 @@ export default class extends Controller {
     }
 
 
-    // Callbacks
+    // Callbacks start
     mutate(entries) {
         if ((this.selectTypeValue == algorithmFormWrapperStepAdditionCase)
-             || (this.selectTypeValue == algorithmFormClassLevelWrapperStepAdditionCase)) {
+             || (this.selectTypeValue == algorithmFormClassLevelWrapperStepAdditionCase)
+             || (this.selectTypeValue == algorithmFormFrameworkLevelWrapperStepAdditionCase)) {
             console.log(`mutation for ${this.selectTypeValue} case triggered`)
             var nestedFields = wrapperStepAdditionCaseNestedFields
             this.afterclickStepsAmount = this.stepsAreaTarget.querySelectorAll(nestedFields).length
@@ -314,10 +330,31 @@ export default class extends Controller {
             } else {
                 console.log("Amount not changed or error");
             }
+        } else if (this.selectTypeValue == frameworkMembersFormFrameworkMembersAdditionCase) {
+            console.log(`mutation for ${frameworkMembersFormFrameworkMembersAdditionCase} case triggered`)
+            if (this.is_edit_form_field_display()) { return }
+
+            var nestedFields = frameworkMembersFormFrameworkMembersAdditionCaseNestedFields
+            this.afterClickFrameworkMembersAmount = this.frameworkMembersFormFrameworkMembersAreaTarget.querySelectorAll(nestedFields).length
+            console.log("this.currentFrameworkMembersAmount")
+            console.log(this.currentFrameworkMembersAmount)
+            console.log("this.afterClickFrameworkMembersAmount")
+            console.log(this.afterClickFrameworkMembersAmount)
+
+            var changedAmount = (this.currentFrameworkMembersAmount + 1)
+            if ((changedAmount == this.afterClickFrameworkMembersAmount) && (changedAmount != this.postmutationFrameworkMembersAmount)) {
+                console.log("New Article Attachment added to Attribute in Simple Class form!");
+                this.setFieldsContainer()
+                this.setInstructionValues()
+                this.setInstructionPreviewContainer()
+                this.loadPreview()
+                this.postmutationFrameworkMembersAmount = changedAmount
+            } else {
+                console.log("Amount not changed or error");
+            }
         }
-
     }
-
+    // Callbacks end
 
     // PUBLIC
 
@@ -330,13 +367,138 @@ export default class extends Controller {
         console.log(this.instructionId)
         console.log(this.instructionType)
 
-        this.resetModalState()
-        this.dispatchSelectCase()
+        // DOC: In case if we already added Decision Object in the form as Framework member
+        // we dont need to add it second time, so we checking if it was added in the form, and if added
+        // we ingonre selection of the same Decision Object
+        if (this.selectTypeValue == frameworkMembersFormFrameworkMembersAdditionCase) {
+            this.resetModalState()
+            if (this.frameworkMemberWasAlreadyAddedInForm()) return
+            this.checkThatFrameworkMemberExistsInTheFrameworkFolder(this.instructionId, this.instructionType)
+        } else {
+            this.resetModalState()
+            this.dispatchSelectCase()
+        }
+
     }
 
 
 
     // PRIVATE
+
+
+    loadListOfExistingFrameworkMembersInFrameworkFolder(){
+        var frameworkFolderUuid = $("#framework_folder")[0].value
+
+        var url = `/framework_folder_members_list?framework_folder=${frameworkFolderUuid}`
+
+        // 4.3 make request
+        return $.ajax({
+            type: 'GET',
+            url: url,
+            dataType: 'json',
+            success: function(response) {
+                console.log("Framework members")
+                console.log(response)
+                var data = response;
+            }
+        })
+    }
+
+
+    checkThatFrameworkMemberExistsInTheFrameworkFolder(memberId, memberType){
+        if (memberType == simpleClassCase ) {
+            var backendClass = simpleClassClass
+        }
+        // var ListOfExistingInFrameworkFolderMembers = this.loadListOfExistingFrameworkMembersInFrameworkFolder()
+
+        var that = this
+        this.loadListOfExistingFrameworkMembersInFrameworkFolder().done(function(response) {
+            var match = that.getMatch(response, memberId, backendClass)
+            if (match) {
+                console.log("Framework member already exists in the Framework Folder")
+            } else {
+                console.log("Framework member doesnt exists in the Framework Folder")
+                // DOC: Means that we adding framework member into form
+                that.resetModalState()
+                that.dispatchSelectCase()
+            }
+        });
+
+        // .then(function (response) {
+        //     var matches = this.getMatches(response, memberId, backendClass)
+        //     if (matches.length > 0) {
+        //         console.log("Framework member already exists in the Framework Folder")
+        //         return true
+        //     } else {
+        //         console.log("Framework member doesnt exists in the Framework Folder")
+        //         return false
+        //     }
+        // }).catch(function (errorMessage) {
+        //         // this function is called whenever an error occurs
+        //         // errorMessage contains the error message
+        // });
+    }
+
+    getMatch(data, memberId, backendClass){
+        return data.find(obj => obj.id == memberId && obj.class == backendClass )
+    }
+
+    frameworkMemberWasAlreadyAddedInForm(){
+        if (this.numberOfFrameworkMembersMatches() > 0) {
+            console.log("remote_select_instruction_controller: Selected Framework member already added in the form")
+            // TODO: flash popup - framework member was already added in the form
+            return true
+        } else {
+            return false
+        }
+    }
+
+    numberOfFrameworkMembersMatches(){
+        let addFrameworkMembers = this.frameworkMembersFormFrameworkMembersAreaTarget.querySelectorAll(frameworkMembersFormFrameworkMembersAdditionCaseNestedFields)
+        console.log("remote_select_instruction_controller: All Framework Members")
+        console.log(addFrameworkMembers)
+
+        let allFrameworkMembersArray = [...addFrameworkMembers]
+        var that = this
+        let matches = allFrameworkMembersArray.filter(function (frameworkMember) {
+            let idFieldSelector = "framework-memberable-id-hidden-field"
+            let typeFieldSelector = "framework-memberable-type-hidden-field"
+
+            let fieldFrameworkMemberId = frameworkMember.querySelector(`.${idFieldSelector}`).value
+            let fieldFrameworkMemberType = frameworkMember.querySelector(`.${typeFieldSelector}`).value
+            //
+            // if (that.sectionType == cheatSheetCase) {
+            //     that.correlatedSectionType = cheatSheetClass
+            // } else if (that.sectionType == cheatSheetGroupCase) {
+            //     that.correlatedSectionType = cheatSheetGroupClass
+            // }
+
+            // else if (that.linkAttachmentType == unitCase) {
+            //     let correlatedLinkAttachmentType = unitClass
+            // } else if (that.linkAttachmentType == algorithmCase) {
+            //     let correlatedLinkAttachmentType = algorithmClass
+            // }
+
+            if (that.instructionType == simpleClassCase) {
+                that.correlatedFrameworkMembmerType = simpleClassClass
+            }
+            console.log("fieldFrameworkMemberId")
+            console.log(fieldFrameworkMemberId)
+
+            console.log("that.instructionId")
+            console.log(that.instructionId)
+
+            console.log("fieldFrameworkMemberType")
+            console.log(fieldFrameworkMemberType)
+
+            console.log("that.instructionType")
+            console.log(that.instructionType)
+
+            return (fieldFrameworkMemberId == that.instructionId) && (fieldFrameworkMemberType == that.correlatedFrameworkMembmerType)
+        });
+        let amount = matches.length
+        return amount
+    }
 
     // doc: sometimes we have edit form where we show preview of attachment
     // with hidden field. If mutation runs it sets it value to blank string as
@@ -370,8 +532,9 @@ export default class extends Controller {
             console.log("folderItemAdditionCase triggered")
             this.addFolderItem()
         } else if ((this.selectTypeValue == algorithmFormWrapperStepAdditionCase)
-            || (this.selectTypeValue == algorithmFormClassLevelWrapperStepAdditionCase) ) {
-            console.log("algorithmFormWrapperStepAdditionCase or algorithmFormClassLevelWrapperStepAdditionCase triggered")
+            || (this.selectTypeValue == algorithmFormClassLevelWrapperStepAdditionCase)
+            || (this.selectTypeValue == algorithmFormFrameworkLevelWrapperStepAdditionCase)) {
+            console.log("algorithmFormWrapperStepAdditionCase or algorithmFormClassLevelWrapperStepAdditionCase or algorithmFormFrameworkLevelWrapperStepAdditionCase triggered")
             this.addWrapperStep()
         } else if (this.selectTypeValue == interfaceGroupActionAdditionCase) {
             console.log("interfaceGroupActionAdditionCase triggered")
@@ -385,11 +548,17 @@ export default class extends Controller {
         } else if (this.selectTypeValue == simpleClassFormArticleToAttributeAttachmentCase) {
             console.log("simpleClassFormArticleToAttributeAttachmentCase triggered")
             this.addArticleAttachmentToSimpleClassAttribute()
+        } else if (this.selectTypeValue == frameworkMembersFormFrameworkMembersAdditionCase) {
+            console.log("frameworkMembersFormFrameworkMembersAdditionCase triggered")
+            this.addFrameworkMemberToFrameworkFolder()
         }
+
+
     }
 
     resetModalState(){
-        if (this.selectTypeValue == algorithmFormClassLevelWrapperStepAdditionCase) {
+        if ((this.selectTypeValue == algorithmFormClassLevelWrapperStepAdditionCase)
+            || (this.selectTypeValue == algorithmFormFrameworkLevelWrapperStepAdditionCase)) {
             // 2.1 remove modal
             this.closeClassTreeModal()
         } else {
@@ -508,6 +677,18 @@ export default class extends Controller {
         this.addArticleToAttributeInSimpleClassFormOriginalButtonTarget.click()
     }
 
+    addFrameworkMemberToFrameworkFolder(){
+        //Calculate amount of attachments before adding new substep
+        this.currentFrameworkMembersAmount = this.frameworkMembersFormFrameworkMembersAreaTarget
+            .querySelectorAll(frameworkMembersFormFrameworkMembersAdditionCaseNestedFields).length
+        console.log("currentFrameworkMembersAmount")
+        console.log(this.currentFrameworkMembersAmount)
+
+        // 3.click hidden button under previous selected step
+        // console.log(this.addSubstepOriginalButtonTarget)
+        console.log("addFrameworkMemberToFrameworkFolderInFrameworkMembersAdditionalFormOriginalButtonTarget.click() fired")
+        this.addFrameworkMemberToFrameworkFolderInFrameworkMembersAdditionalFormOriginalButtonTarget.click()
+    }
 
     addArticleToSimpleClassAttribute(){
         this.setFieldsContainer()
@@ -529,8 +710,31 @@ export default class extends Controller {
     }
 
     removeModal(){
-        const selectInstructionModalController = this.application.getControllerForElementAndIdentifier(this.instructionModalInstanceTarget, 'select_instruction_modal')
+        let openedModal = this.instructionModalInstanceTargets.filter((element) => {
+            // Looking for one which is we see on ui at the current moment (there a lot of others for each step)
+            // if (!element.querySelector(".modal-container").classList.contains("hidden")) {
+            if (!element.classList.contains("hidden")) {
+                return true
+            } else {
+                return false
+            }
+        });
+        console.log("remote_select_instruction_controller: active modal found")
+        console.log(openedModal[0])
+
+        // DOC: For one selection on each case.
+        // In one case we dealing with select_instruction_modal
+        // In second case we dealing with technology_pick_modal
+        // WRONG! Currently it already handlend in the method above
+        const selectInstructionModalController = this.application.getControllerForElementAndIdentifier(openedModal[0], 'select_instruction_modal')
         selectInstructionModalController.close()
+
+        // if (selectInstructionModalController) {
+        //     selectInstructionModalController.close()
+        // } else {
+        //     this.closeClassTreeModal()
+        // }
+
         // data-action="remote_select_instruction:addSubstepRemoteButtonClick->select_instruction_modal#close">
     }
     ////////////////////
@@ -546,7 +750,8 @@ export default class extends Controller {
         //     var selector = substepAdditionCaseNestedFields
         //     this.fieldsContainer = [...this.substepsAreaTarget.querySelectorAll(selector)].pop()
         if ((this.selectTypeValue == algorithmFormWrapperStepAdditionCase)
-             || (this.selectTypeValue == algorithmFormClassLevelWrapperStepAdditionCase)) {
+             || (this.selectTypeValue == algorithmFormClassLevelWrapperStepAdditionCase)
+             || (this.selectTypeValue == algorithmFormFrameworkLevelWrapperStepAdditionCase)) {
             // stepsNestedFieldsTargets ?
             var selector = wrapperStepAdditionCaseNestedFields
             this.fieldsContainer = [...this.stepsAreaTarget.querySelectorAll(selector)].pop()
@@ -570,6 +775,12 @@ export default class extends Controller {
         } else if (this.selectTypeValue == simpleClassFormArticleToAttributeAttachmentCase) {
             var selector = simpleClassFormArticleToAttributeAttachmentCaseNestedFields
             this.fieldsContainer = [...this.simpleClassAttributeArticleAttahcmnetsAreaTarget.querySelectorAll(selector)].pop()
+        } else if (this.selectTypeValue == frameworkMembersFormFrameworkMembersAdditionCase) {
+            var selector = frameworkMembersFormFrameworkMembersAdditionCaseNestedFields
+            console.log("this.frameworkMembersFormFrameworkMembersAreaTarget")
+            console.log(this.frameworkMembersFormFrameworkMembersAreaTarget)
+
+            this.fieldsContainer = [...this.frameworkMembersFormFrameworkMembersAreaTarget.querySelectorAll(selector)].pop()
         }
         console.log("Last target or single target:")
         console.log(this.fieldsContainer)
@@ -581,7 +792,8 @@ export default class extends Controller {
         // if (this.selectTypeValue == substepAdditionCase) {
         //     this.instructionPreviewContainer = this.fieldsContainer.querySelector(".instruction-preview")
         if ((this.selectTypeValue == algorithmFormWrapperStepAdditionCase)
-            || (this.selectTypeValue == algorithmFormClassLevelWrapperStepAdditionCase)) {
+            || (this.selectTypeValue == algorithmFormClassLevelWrapperStepAdditionCase)
+            || (this.selectTypeValue == algorithmFormFrameworkLevelWrapperStepAdditionCase)) {
             this.instructionPreviewContainer = this.fieldsContainer.querySelector(".instruction-preview")
         } else if (this.selectTypeValue == dpoInstructionSelectCase) {
             this.instructionPreviewContainer = this.instructionableFieldsAreaTarget.querySelector(".instruction-preview")
@@ -594,8 +806,8 @@ export default class extends Controller {
         } else if (this.selectTypeValue == simpleClassAttributeAdditionCase
                    || this.selectTypeValue == simpleClassAttributeFormArticleAdditionCase) {
             this.instructionPreviewContainer = this.fieldsContainer.querySelector(".attribute-preview")
-        } else if (this.selectTypeValue == simpleClassFormArticleToAttributeAttachmentCase) {
-            this.instructionPreviewContainer = this.fieldsContainer.querySelector(".article-attachment-preview")
+        } else if (this.selectTypeValue == frameworkMembersFormFrameworkMembersAdditionCase) {
+            this.instructionPreviewContainer = this.fieldsContainer.querySelector(".framework-member-preview")
         }
     }
 
@@ -605,7 +817,8 @@ export default class extends Controller {
         // if (this.selectTypeValue == substepAdditionCase) {
         //     this.setSubstepableInstructionValues()
         if ((this.selectTypeValue == algorithmFormWrapperStepAdditionCase)
-             || (this.selectTypeValue == algorithmFormClassLevelWrapperStepAdditionCase)) {
+             || (this.selectTypeValue == algorithmFormClassLevelWrapperStepAdditionCase)
+             || (this.selectTypeValue == algorithmFormFrameworkLevelWrapperStepAdditionCase)) {
             this.setTechnologiableAlgorithmValues()
         } else if (this.selectTypeValue == dpoInstructionSelectCase) {
             this.setInstructionableInstructionValues()
@@ -622,6 +835,8 @@ export default class extends Controller {
             this.setAttributeValues()
         } else if (this.selectTypeValue == simpleClassFormArticleToAttributeAttachmentCase) {
             this.setArticleAttachmentValue()
+        } else if (this.selectTypeValue == frameworkMembersFormFrameworkMembersAdditionCase) {
+            this.setFrameworkMemberValue()
         }
     }
 
@@ -665,6 +880,7 @@ export default class extends Controller {
         this.fieldsContainer.querySelector(`.${typeField}`).value = "SimpleClasses::SimpleClass"
     }
 
+    // TODO: only units and algorithms, or also articles, cheatsheets and ect?
     setInterfaceMemberValues(){
         var idField = "memberable-id-hidden-field"
         var typeField = "memberable-type-hidden-field"
@@ -678,17 +894,36 @@ export default class extends Controller {
         }
     }
 
+
+    setFrameworkMemberValue(){
+        var idField = "framework-memberable-id-hidden-field"
+        var typeField = "framework-memberable-type-hidden-field"
+
+        this.fieldsContainer.querySelector(`.${idField}`).value = this.instructionId
+        this.fieldsContainer.querySelector(`.${typeField}`).value = "SimpleClasses::SimpleClass"
+    }
+
+
     setTechnologiableAlgorithmValues(){
         // define these 2 as targets
         var idField = "technologiable-id-hidden-field"
         var typeField = "technologiable-type-hidden-field"
 
-        if (this.instructionType == unitCase) {
+        if (this.instructionType == articleCase) {
+            this.fieldsContainer.querySelector(`.${idField}`).value = this.instructionId
+            this.fieldsContainer.querySelector(`.${typeField}`).value = "Articles::Article"
+        } else if (this.instructionType == unitCase) {
             this.fieldsContainer.querySelector(`.${idField}`).value = this.instructionId
             this.fieldsContainer.querySelector(`.${typeField}`).value = "Units::Unit"
         } else if (this.instructionType == algorithmCase) {
             this.fieldsContainer.querySelector(`.${idField}`).value = this.instructionId
             this.fieldsContainer.querySelector(`.${typeField}`).value = "Algorithms::Algorithm"
+        } else if (this.instructionType == cheatSheetCase) {
+            this.fieldsContainer.querySelector(`.${idField}`).value = this.instructionId
+            this.fieldsContainer.querySelector(`.${typeField}`).value = "CheatSheets::CheatSheet"
+        } else if (this.instructionType == cheatSheetGroupCase) {
+            this.fieldsContainer.querySelector(`.${idField}`).value = this.instructionId
+            this.fieldsContainer.querySelector(`.${typeField}`).value = "CheatSheetGroups::CheatSheetGroup"
         }
     }
 
@@ -719,7 +954,7 @@ export default class extends Controller {
     }
     ////
 
-
+    // TODO: add asych rendering of preview with message something went wrong and reload button
     // Load preview logic
     loadPreview(){
         var url = this.setLoadUrl()
@@ -740,14 +975,18 @@ export default class extends Controller {
 
     setLoadUrl(){
         // 4.2 stet variables for substep inputs field
-        if (this.instructionType == unitCase) {
+        if (this.instructionType == articleCase) {
+            var url = `/article/articles/${this.instructionId}/preview?preview_type=basic_preview`
+        } else if (this.instructionType == unitCase) {
             var url = `/unit/units/${this.instructionId}/preview?type=${this.selectTypeValue}`
         } else if (this.instructionType == algorithmCase) {
-            var url = `/algorithm/algorithms/${this.instructionId}/preview?case=${this.selectTypeValue}`
+            var url = `/algorithm/algorithms/${this.instructionId}/preview?preview_type=${this.selectTypeValue}`
+        } else if (this.instructionType == cheatSheetCase) {
+            var url = `/cheat_sheet/cheat_sheets/${this.instructionId}/preview?preview_type=${this.selectTypeValue}`
+        } else if (this.instructionType == cheatSheetGroupCase) {
+            var url = `/cheat_sheet_group/cheat_sheet_groups/${this.instructionId}/preview?preview_type=${this.selectTypeValue}`
         } else if (this.instructionType == simpleClassCase) {
             var url = `/simple_class/simple_classes/${this.instructionId}/preview`
-        } else if (this.instructionType == aticleCase) {
-            var url = `/article/articles/${this.instructionId}/preview?preview_type=basic_preview`
         } else if (this.instructionType == frameworkCase) {
             var url = `/framework/frameworks/${this.instructionId}/preview`
         } else {
@@ -759,12 +998,14 @@ export default class extends Controller {
     insertPreview(data){
         if (this.selectTypeValue == algorithmFormWrapperStepAdditionCase
             || this.selectTypeValue == algorithmFormClassLevelWrapperStepAdditionCase
+            || this.selectTypeValue == algorithmFormFrameworkLevelWrapperStepAdditionCase
             || this.selectTypeValue == interfaceMemberAdditionCase
             || this.selectTypeValue == containerMemberAdditionCase
             || this.selectTypeValue == folderItemAdditionCase
             || this.selectTypeValue == simpleClassAttributeAdditionCase
             || this.selectTypeValue == interfaceGroupActionAdditionCase
-            || this.selectTypeValue == simpleClassFormArticleToAttributeAttachmentCase) {
+            || this.selectTypeValue == simpleClassFormArticleToAttributeAttachmentCase
+            || this.selectTypeValue == frameworkMembersFormFrameworkMembersAdditionCase) {
             this.instructionPreviewContainer.insertAdjacentHTML('beforeend', data.preview)
         } else if (this.selectTypeValue == dpoInstructionSelectCase
                    || this.selectTypeValue == simpleClassAttributeFormArticleAdditionCase) {

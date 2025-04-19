@@ -7,12 +7,10 @@ export default class extends Controller {
 
 
     initialize() {
-        console.log("Folder items controller initialized")
+        console.log("Reports Repository items controller initialized")
+        this.initialRepositoryId = ''
 
-        // this.currentFolderId = ""
-        this.initialFolderId = ''
-
-        this.setInitialFolder()
+        this.setInitialRepository()
         // this.setPathForNewFolderAdditionButton()
 
         this.initialLoad()
@@ -24,34 +22,34 @@ export default class extends Controller {
     }
 
     connect() {
-        console.log("Folder items controller connected")
+        console.log("Reports Repository items controller connected")
         // this.username = ''
     }
 
 
     disconnect() {
-        console.log("Folder items controller disconnected")
+        console.log("Reports Repository items controller disconnected")
     }
 
     // PRIVATE
 
-    setInitialFolder(){
+    setInitialRepository(){
         // let queryString = window.location.search;
         // let urlParams = new URLSearchParams(queryString);
         // this.initialFolderId = urlParams.get('current_folder')
         // ['http:', '', '127.0.0.1:3000', 'username-sdfsdf-33-aaaa', '12']
         // http://127.0.0.1:3000/username-sdfsdf-33-aaaa/folder/12
-        this.initialFolderId = window.location.href.split('/')[5]
+        this.initialReportsRepositoryId = window.location.href.split('/')[5]
         // this.username = window.location.href.split('/')[3]
     }
 
-    // TODO: add message retry for folder items when search controller have error
     initialLoad() {
         console.log("initialLoad triggered")
         // let url = `/${this.username}/folder/${this.initialFolderId}`
 
-        let url = ''
-        url = `/folder_content?target=${this.initialFolderId}&target_type=folder`
+        let url = '/search_reports'
+        let params = `target=${this.initialReportsRepositoryId}&target_type=reports_repository`
+        let path = `${url}?${params}`
         // if (this.initialFolderId != '' && this.initialFolderId != null) {
         //     console.log("11111")
         //     url = `/search_technologies?target_folder=${this.initialFolderId}`
@@ -63,7 +61,7 @@ export default class extends Controller {
         // TODO: add load animation
         Rails.ajax({
             type: 'GET',
-            url: url,
+            url: path,
             dataType: 'json',
             success: (data) => {
                 console.log(data)
@@ -86,9 +84,9 @@ export default class extends Controller {
 
     // setPathForNewFolderAdditionButton(){
     //     let path =`/folders/new`
-    //     let params = `target=${this.initialRepositoryId}&target_type='folder'`
+    //     let params = `target=${this.initialRepositoryId}&target_type='repository'`
     //     let totalPath = `${path}?${params}`
-    //     this.newFolderAdditionButtonTarget.href = path
+    //     this.newFolderAdditionButtonTarget.href = totalPath
     // }
 
     // processIntersectionEntries(entries) {

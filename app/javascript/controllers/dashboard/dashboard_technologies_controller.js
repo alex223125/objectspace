@@ -74,6 +74,8 @@ export default class extends Controller {
     }
 
     insertFoldersAndTechnologies(data) {
+        // DOC: remove results which was before and put fresh results
+        this.entriesTarget.innerHTML = "";
         this.entriesTarget.insertAdjacentHTML('beforeend', data.entries)
     }
 

@@ -3,6 +3,8 @@
 // on click during reading of algorithm
 // responsibility zone #2 - load preview of articles,units,algorithms (link_attachments) on CheatSheet page
 import { Controller } from '@hotwired/stimulus';
+import { Modal } from 'flowbite';
+import { initFlowbite } from "flowbite";
 
 const articleCase = "article"
 const unitCase = "unit"
@@ -14,11 +16,13 @@ export default class extends Controller {
         'container',
         'loadingIndicator',
         'retryCard',
-        'modalHiddenButton'
+        'modalHiddenButton',
+        'modal'
     ]
 
     initialize() {
         console.log("attachment_preview_controller controller initialized")
+        this.modal = new Modal(this.modalTarget);
     }
 
     connect() {
@@ -31,8 +35,35 @@ export default class extends Controller {
 
     // PUBLIC
     openModal(event){
-        event.preventDefault()
+        // event.preventDefault()
+
+        // DOC: Problem: Modal not displayed as open in browser after close
+        // and at the same time we can not open new modal and load content of another technology
+        // This chunk of code should close all opened modals
+        // let allModals = document.querySelectorAll('[class^="attachment-preview"]');
+        // let allModalsArray = Object.values(allModals)
+        // let openedModals = allModalsArray.filter((element) => {
+        //     // Looking for one which is we see on ui at the current moment (there a lot of others for each step)
+        //     // if (!element.querySelector(".modal-container").classList.contains("hidden")) {
+        //     if (!element.classList.contains("hidden")) {
+        //         return true
+        //     } else {
+        //         return false
+        //     }
+        // });
+        // openedModals.forEach(function( index ) {
+        //     $(this).hide()
+        // });
+
         this.modalHiddenButtonTarget.click()
+
+        // DOC Note 1: When we creating new algorithm and getting redirected
+        // on "show" page, flowbite modal js somehow doesnt get loaded
+        // and modals are not getting opened by clicking on fast links.
+        // This "if" statement is workaround
+        if (this.modalTarget.classList.contains("hidden")){
+            this.modal.show()
+        }
 
         console.log("Attachment data:")
         console.log(event)
@@ -46,6 +77,11 @@ export default class extends Controller {
     retryLoad(){
         this.toggleRetryCard("hide")
         this.loadView()
+    }
+
+    closeModal(){
+        // See DOC Note 1
+        this.modal.hide()
     }
 
 
@@ -111,6 +147,11 @@ export default class extends Controller {
         this.containerTarget.innerHTML = ""
         this.containerTarget.insertAdjacentHTML('beforeend', data.view)
         // this.containerTarget.focus()
+
+        // DOC: Some of the javascript doesnt work
+        // when page is getting loaded,
+        // code below should reinit flowbite components
+        initFlowbite();
     }
 
 

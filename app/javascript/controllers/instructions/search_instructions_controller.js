@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
     // static targets = ["query", "cocktails"]
-    static targets = ["textQuery", "uuidQuery", "instructionType", "scenario", "entries"]
+    static targets = ["textQuery", "uuidQuery", "instructionType", "scenario", "entries", "loadMoreButton"]
 
     initialize() {
         let options = {
@@ -15,35 +15,30 @@ export default class extends Controller {
     }
 
     connect() {
-        console.log("Search controller connected")
+        console.log("search_instructions_controller: Search controller connected")
     }
 
     disconnect() {
-        console.log("Search controller disconnected")
+        console.log("search_instructions_controller: Search controller disconnected")
     }
 
 
+    // PUBLIC
 
-    // add methond load more
-    // submit only for first tme uniq esarch
-    // load more for loading more record in scope of pagination
-    //
     // right now bug
     // when we 2 times seatch same term
 
     submit() {
-        console.log("Search submit fired!")
+        console.log("search_instructions_controller: Search submit fired!")
 
         // 1.set request params
         const textQuery = this.textQueryTarget.value
         const uuidQuery = this.uuidQueryTarget.value
         const instructionType = this.instructionTypeTarget.value
-
         const scenario = this.scenario()
 
-        console.log("SCENARIO:")
+        console.log("search_instructions_controller: SCENARIO:")
         console.log(scenario)
-        console.log(this.scenario())
 
         this.page = 1
 
@@ -56,24 +51,12 @@ export default class extends Controller {
             uuidQuery == this.lastUuidQueryValue &&
             instructionType == this.lastInstructionType ) {
 
-            console.log("Same search request detected")
+            console.log("search_instructions_controller: Same search request detected")
             return;
         }
 
-
         // 3.clear past results
         this.clearEntries()
-
-
-
-        // // with each new query we make page to number 1 befor request
-        // if (textQuery == this.lastTextQueryValue && uuidQuery == this.lastUuidQueryValue) {
-        //     // do nothing
-        // } else {
-        //     this.page = 1
-        // }
-
-        // let url = `/search/?query=${value}`
 
         // 3.make request
         Rails.ajax({
@@ -83,49 +66,31 @@ export default class extends Controller {
             data: new URLSearchParams(postData).toString(),
             // data: {query: value, page: this.page},
             success: (data) => {
-                console.log("Search submit success!")
+                console.log("search_instructions_controller: Search submit success!")
 
                 // 4.1 place results in dom
                 this.entriesTarget.insertAdjacentHTML('beforeend', data.entries)
-
-                // if (textQuery == this.lastTextQueryValue && uuidQuery == this.lastUuidQueryValue) {
-                //     // add results to the end
-                //     this.entriesTarget.insertAdjacentHTML('beforeend', data.entries)
-                // } else {
-                //     // clear results
-                //     this.entriesTarget.innerHTML = "";
-                //     // add new result to the end
-                //     this.entriesTarget.insertAdjacentHTML('beforeend', data.entries)
-                // }
-
-                // this.page = this.page + 1
-                this.totalPages = data.pagination.pages
 
                 // 4.2 save history data
                 this.lastTextQueryValue = textQuery
                 this.lastUuidQueryValue = uuidQuery
                 this.lastInstructionType = instructionType
 
+                console.log("pagination")
+                console.log(data.pagination)
+                this.totalPages = data.pagination.pages
+                if (this.totalPages > 1) {
+                    console.log("search_instructions_controller: more then 1 page case")
+                    this.toggleLoadMoreButton()
+                }
 
-
-
-
-
-                // // create template for each item
-                // var cocktailHTML = "";
-                // var cocktailArray = Object.values(data)[0]
-                // cocktailArray.forEach(cocktail => {
-                //     cocktailHTML += this.cocktailTemplate(cocktail)
-                // });
-                //
-                // // assign results to list output
-                // this.itemsTarget.innerHTML = cocktailHTML;
             }
         })
 
     }
 
     loadMore(){
+        console.log("search_instructions_controller: LoadMore fired!")
         // 1.set request params
         this.page = this.page + 1
         if (this.page > this.totalPages) {
@@ -136,14 +101,50 @@ export default class extends Controller {
         const uuidQuery = this.uuidQueryTarget.value
         const instructionType = this.instructionTypeTarget.value
 
+        const scenario = this.scenario()
+        console.log("search_instructions_controller: SCENARIO:")
+        console.log(scenario)
+
+        let url = `/search`
+        let postData = {query: textQuery, uuid: uuidQuery,
+            page: this.page, type: instructionType, scenario: scenario}
+
+
+        // 2.make request
+        Rails.ajax({
+            type: 'POST',
+            url: url,
+            dataType: 'json',
+            data: new URLSearchParams(postData).toString(),
+            // data: {query: value, page: this.page},
+            success: (data) => {
+                console.log("search_instructions_controller: Search submit success!")
+
+                // 4.1 place results in dom
+                this.entriesTarget.insertAdjacentHTML('beforeend', data.entries)
+
+                // 4.2 save history data
+                this.lastTextQueryValue = textQuery
+                this.lastUuidQueryValue = uuidQuery
+                this.lastInstructionType = instructionType
+
+                this.totalPages = data.pagination.pages
+                if (this.page == this.totalPages) {
+                    this.toggleLoadMoreButton()
+                }
+
+            }
+        })
+
     }
 
 
     resetForm(){
-        console.log("resetForm triggered")
+        console.log("search_instructions_controller: resetForm triggered")
         this.resetQueryInputs()
         this.clearEntries()
         this.clearHistory()
+        this.hideLoadMoreButton()
     }
 
 
@@ -154,7 +155,7 @@ export default class extends Controller {
         if (this.hasScenarioTarget) {
             return this.scenarioTarget.value
         } else {
-            return "scenario_not_defined"
+            return "search_instructions_controller: scenario_not_defined"
         }
     }
 
@@ -171,6 +172,22 @@ export default class extends Controller {
         this.lastTextQueryValue = ""
         this.lastUuidQueryValue = ""
         this.lastInstructionType = ""
+    }
+
+    hideLoadMoreButton(){
+        if (this.loadMoreButtonTarget.classList.contains("hidden")){
+            // do nothing
+        } else {
+            this.loadMoreButtonTarget.classList.add("hidden")
+        }
+    }
+
+    toggleLoadMoreButton(){
+        if (this.loadMoreButtonTarget.classList.contains("hidden")){
+            this.loadMoreButtonTarget.classList.remove("hidden")
+        } else {
+            this.loadMoreButtonTarget.classList.add("hidden")
+        }
     }
 
 }

@@ -5,7 +5,7 @@ export default class extends Controller {
     static targets = ['entries', 'newFolderAdditionButton']
 
     initialize() {
-        console.log("Dashboard repositories controller initialized")
+        console.log("dashboard_reports_controller initialized")
         this.targetUser = ''
         this.setInitialFolder()
         this.initialLoad()
@@ -17,12 +17,12 @@ export default class extends Controller {
     }
 
     connect() {
-        console.log("Dashboard repositories controller connected")
+        console.log("dashboard_reports_controller connected")
     }
 
 
     disconnect() {
-        console.log("Dashboard repositories controller disconnected")
+        console.log("dashboard_reports_controller disconnected")
     }
 
     // PRIVATE
@@ -55,19 +55,19 @@ export default class extends Controller {
 
 
         // TODO: add auth key
-        let url = `/dashboard/repositories?target_user=${this.targetUser}`
+        let url = `/dashboard/reports?target_user=${this.targetUser}`
         Rails.ajax({
             type: 'GET',
             url: url,
             dataType: 'json',
             success: (data) => {
                 console.log(data)
-                this.insertRepositories(data)
+                this.insertReports(data)
             }
         })
     }
 
-    insertRepositories(data) {
+    insertReports(data) {
         // DOC: remove results which was before and put fresh results
         this.entriesTarget.innerHTML = "";
         this.entriesTarget.insertAdjacentHTML('beforeend', data.entries)
