@@ -1,7 +1,8 @@
+# DOC: we use this controller during creation of algorithm
 class Algorithm::NodesController < ApplicationController
 
   def template
-    # binding.pry
+    binding.pry
     if params[:type] == "regular_step"
       path = "algorithm/shared/partials/steps/regular_substep_dynamic_form"
       form_object = Algorithms::Nodes::Step.new
@@ -49,11 +50,4 @@ class Algorithm::NodesController < ApplicationController
       }
     end
   end
-
-  # def show
-  #   if params[:type] == params[:type] == "single_alternative_control_structure"
-  #     path =
-  #   end
-  # end
-
 end
