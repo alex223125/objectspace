@@ -1,4 +1,5 @@
 class FoldersController < ApplicationController
+  before_action :authenticate_user!, only: [:new, :edit, :create, :update, :destroy]
   before_action :set_folder, only: %i[ show edit update destroy ]
 
   # GET /folders or /folders.json
@@ -15,14 +16,21 @@ class FoldersController < ApplicationController
 
     # folders_tree_without_root = @target_folder.folders_tree_without_root.reverse
     folders_tree = @folder.self_and_ancestors.reverse
-    repository = @folder.root.repository
+    repository = @folder.root.parent_repository
 
 
     # breadcrumbs
     add_breadcrumb @folder_owner.ownername, dashboard_path(username: @folder_owner.ownername),
                    {link_type: "profile_page"}
-    add_breadcrumb repository.name, target_repository_path(ownername: @folder_owner.ownername, id: repository.slug),
-                   {link_type: "repository_page"}
+
+    if repository.class == Repository
+      add_breadcrumb repository.name, target_repository_path(ownername: @folder_owner.ownername, id: repository.slug),
+                     {link_type: "repository_page"}
+    elsif repository.class == ReportsRepository
+      add_breadcrumb repository.title, target_reports_repository_path(ownername: @folder_owner.ownername, id: repository.slug),
+                     {link_type: "repository_page"}
+    end
+
     folders_tree.each do |folder|
       add_breadcrumb folder.title, target_folder_path(ownername: @folder_owner.ownername, id: folder.slug),
                      {link_type: "folder_page"}
@@ -39,6 +47,9 @@ class FoldersController < ApplicationController
     elsif params[:target_type] == "repository"
       @target = Repository.friendly.find(params[:target])
       @target_type = "repository"
+    elsif params[:target_type] == "reports_repository"
+      @target = ReportsRepository.friendly.find(params[:target])
+      @target_type = "reports_repository"
     end
   end
 
@@ -55,6 +66,9 @@ class FoldersController < ApplicationController
     elsif params[:target_folder_id].present?
       target = params[:target_folder_id]
       target_type = "folder"
+    elsif params[:target_reports_repository_id].present?
+      target = params[:target_reports_repository_id]
+      target_type = "reports_repository"
     end
 
     owner = current_user
@@ -68,9 +82,12 @@ class FoldersController < ApplicationController
     if service.folder.parent.present?
       parent_folder = service.folder.parent
       path = target_folder_path(ownername: current_user.username, id: parent_folder.slug)
-    else
+    elsif service.folder.repository.present?
       repository = service.folder.repository
       path = target_repository_path(ownername: current_user.username, id: repository.slug)
+    elsif service.folder.reports_repository.present?
+      reports_repository = service.folder.reports_repository
+      path = target_reports_repository_path(ownername: current_user.username, id: reports_repository.slug)
     end
 
     binding.pry
@@ -126,6 +143,9 @@ class FoldersController < ApplicationController
                                              id: @folder.slug),
                            :status => :moved_permanently
       end
+    rescue ActiveRecord::RecordNotFound
+      flash[:error] = "Model not found"
+      redirect_to :root
     end
 
     # Only allow a list of trusted parameters through.
