@@ -1,8 +1,8 @@
 class Unit::UnitsController < ApplicationController
-  include Folderable
+  include Placeable
 
   before_action :set_unit, only: %i[ show edit update destroy preview view]
-  before_action :set_target_folder, only: %i[ new create ]
+  before_action :set_target_place, only: %i[ new create ]
   # before_action :set_target_interface_group, only: %i[ new create ]
 
   # GET /units or /units.json
@@ -21,18 +21,26 @@ class Unit::UnitsController < ApplicationController
     # TODO: remove subste_addition case, we don't have this case
     # TODO -more unit preview to units folder
     # TODO - create settings object
-    if params[:type] == "substep_addition"
-      path = "algorithm/shared/partials/preview/unit/main_page"
-    elsif params[:type] == "dpo_instruction_select" ||
+    # if params[:type] == "substep_addition"
+    #   path = "algorithm/shared/partials/preview/unit/main_page"
+    if params[:type] == "dpo_instruction_select" ||
           params[:type] == "interface_member_addition" ||
           params[:type] == "algorithm_form_wrapper_step_addition" ||
           params[:type] == "interface_group_form_action_addition" ||
           params[:type] == "algorithm_form_class_level_wrapper_step_addition" ||
+          params[:type] == "algorithm_form_framework_level_wrapper_step_addition" ||
           params[:type] == "basic_preview"
       path = "shared/technologies_search/dpo_instruction_select/preview/unit"
     elsif params[:preview_type] == "cheat_sheet_from_notes_link_attachment_preview" ||
           params[:preview_type] == "cheat_sheet_group_section_preview"
       path = "shared/tech_previews/basic_preview"
+      scenario = nil
+    elsif params[:preview_type] == "algorithm_form_class_level_wrapper_step_addition"
+      path = "shared/tech_previews/basic_preview"
+      scenario = nil
+    elsif params[:preview_type] == "article_attachment_preview"
+      path = "shared/tech_previews/basic_preview"
+      scenario = "article_attachment_preview"
     end
 
     binding.pry
@@ -40,7 +48,7 @@ class Unit::UnitsController < ApplicationController
       format.json {
         render json: { preview: render_to_string(partial: path,
                                                  formats: [:html],
-                                                 locals: {unit: @unit})}
+                                                 locals: {unit: @unit, scenario: scenario})}
       }
     end
   end
@@ -78,17 +86,16 @@ class Unit::UnitsController < ApplicationController
     binding.pry
     service = Services::Units::Units::Create.new(unit_params, target_place, current_user, current_user)
     service.call
-    @unit = service.unit
-    set_redirect_after_create_path
-
     respond_to do |format|
       binding.pry
       if service.errors.blank?
-        format.html { redirect_to @redirect_after_create_path, notice: "Unit was successfully created." }
-        format.json { render :show, status: :created, location: service.unit }
+        @unit = service.unit
+        set_redirect_after_success_create_path
+        format.html { redirect_to @redirect_after_success_create_path, notice: "Unit was successfully created." }
+        # format.json { render :show, status: :created, location: service.unit }
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @unit.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_entity,
+                             assigns: { unit: service.unit, permission: service.permission } }
       end
     end
   end
@@ -120,14 +127,14 @@ class Unit::UnitsController < ApplicationController
 
   private
 
-    def set_redirect_after_create_path
+    def set_redirect_after_success_create_path
       binding.pry
       if target_place.class == SimpleClasses::InterfaceGroup
         interface_member = @unit.interface_members.last
-        @redirect_after_create_path = interface_member_path(ownername: interface_member.simple_class.ownerable.ownername,
+        @redirect_after_success_create_path = interface_member_path(ownername: interface_member.closest_simple_class.ownerable.ownername,
                                                             id: interface_member.slug)
       else
-        @redirect_after_create_path = unit_version_path(ownername: @unit.ownerable.ownername,
+        @redirect_after_success_create_path = unit_version_path(ownername: @unit.ownerable.ownername,
                                                         id: @unit.default_version.slug)
 
       end

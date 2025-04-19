@@ -1,6 +1,7 @@
 class Unit::UnitVersionsController < ApplicationController
   include TechBreadcrumbable
   include Commentable
+  include Memberable
 
   before_action :set_unit_version, only: %i[ show edit update destroy preview ]
 
@@ -12,8 +13,14 @@ class Unit::UnitVersionsController < ApplicationController
   # GET /unit_versions/1 or /unit_versions/1.json
   def show
     binding.pry
-    technology_breadcrumbs(@unit_version)
-    @unit = @unit_version.unit
+    if container_members_present?(@unit_version) || interface_members_present?(@unit_version)
+      binding.pry
+      redirect_to_member(@unit_version)
+    else
+      binding.pry
+      technology_breadcrumbs(@unit_version)
+      @unit = @unit_version.unit
+    end
   end
 
   # GET /unit_versions/new
@@ -98,9 +105,12 @@ class Unit::UnitVersionsController < ApplicationController
       request_slug = params[:id]
       if request_slug != @unit_version.slug
         return redirect_to unit_version_path(ownername: @unit_version.owner.ownername,
-                                                id: @unit_version.slug),
+                                             id: @unit_version.slug),
                            :status => :moved_permanently
       end
+    rescue ActiveRecord::RecordNotFound
+      flash[:error] = "Model not found"
+      redirect_to :root
     end
 
     # Only allow a list of trusted parameters through.
