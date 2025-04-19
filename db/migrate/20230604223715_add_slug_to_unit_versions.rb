@@ -4,3 +4,4 @@ class AddSlugToUnitVersions < ActiveRecord::Migration[7.0]
     add_index :unit_versions, :slug, unique: true
   end
 end
+

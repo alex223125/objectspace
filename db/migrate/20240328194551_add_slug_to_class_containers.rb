@@ -4,3 +4,4 @@ class AddSlugToClassContainers < ActiveRecord::Migration[7.0]
     add_index :class_containers, :slug, unique: true
   end
 end
+
