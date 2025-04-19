@@ -1,4 +1,6 @@
 class SimpleClass::SimpleClassAttributesController < ApplicationController
+  include TechBreadcrumbable
+
   before_action :set_simple_class_attribute, only: %i[ show edit update destroy ]
 
   # GET /simple_class_attributes or /simple_class_attributes.json
@@ -6,13 +8,14 @@ class SimpleClass::SimpleClassAttributesController < ApplicationController
     set_target_simple_class
     binding.pry
     @simple_class_attributes = @target_simple_class.simple_class_attributes
-                                                   .includes(:actions, :article)
+                                                   .includes(:actions, :articles)
                                                    .preload(actions: :memberable)
-                                                   .includes(article: :default_version)
+                                                   .includes(articles: :default_version)
   end
 
   # GET /simple_class_attributes/1 or /simple_class_attributes/1.json
   def show
+    technology_breadcrumbs(@simple_class_attribute)
   end
 
   # GET /simple_class_attributes/new
@@ -30,19 +33,21 @@ class SimpleClass::SimpleClassAttributesController < ApplicationController
   # POST /simple_class_attributes or /simple_class_attributes.json
   def create
     binding.pry
+    # @simple_class_attribute = SimpleClasses::SimpleClassAttribute.new(simple_class_attribute_params)
+    service = Services::SimpleClasses::SimpleClassAttributes::Create.new(simple_class_attribute_params,
+                                                                         current_user, current_user)
+    service.call
+    @target_simple_class = service.simple_class_attribute.simple_class
 
-    @simple_class_attribute = SimpleClasses::SimpleClassAttribute.new(simple_class_attribute_params)
-
-    binding.pry
     respond_to do |format|
-      if @simple_class_attribute.save
-        format.html { redirect_to simple_class_path(ownername: @simple_class_attribute.simple_class.owner.username,
-                                                    id: @simple_class_attribute.simple_class.id),
+      if service.errors.blank?
+        format.html { redirect_to simple_class_path(ownername: service.simple_class_attribute.simple_class.owner.username,
+                                                    id: service.simple_class_attribute.simple_class.id),
                                   notice: "Attribute was successfully created." }
         format.json { render :show, status: :created, location: @simple_class_attribute }
       else
         format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @simple_class_attribute.errors, status: :unprocessable_entity }
+        format.json { render json: service.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -82,14 +87,30 @@ class SimpleClass::SimpleClassAttributesController < ApplicationController
     @target_simple_class = SimpleClasses::SimpleClass.find(params[:target_simple_class])
   end
 
-    # Use callbacks to share common setup or constraints between actions.
-    def set_simple_class_attribute
-      @simple_class_attribute = SimpleClasses::SimpleClassAttribute.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def simple_class_attribute_params
-      params.require(:simple_classes_simple_class_attribute).permit(:title, :description, :article_id, :simple_class_id, :actions)
+  def set_simple_class_attribute
+    binding.pry
+    @simple_class_attribute = SimpleClasses::SimpleClassAttribute.friendly.try(:find, params[:id])
+
+    # If an old id or a numeric id was used to find the record, then
+    # the request path will not match the post_path, and we should do
+    # a 301 redirect that uses the current friendly id.
+    request_slug = params[:id]
+    if request_slug != @simple_class_attribute.slug
+      simple_class = @simple_class_attribute.simple_class
+      return redirect_to simple_class_attribute_path(ownername: simple_class.owner.ownername,
+                                                     class_id: simple_class.slug, id: @simple_class_attribute.slug),
+                         :status => :moved_permanently
     end
+  rescue ActiveRecord::RecordNotFound
+    flash[:error] = "Model not found"
+    redirect_to :root
+  end
+
+
+  # Only allow a list of trusted parameters through.
+  def simple_class_attribute_params
+    params.require(:simple_classes_simple_class_attribute).permit(:title, :description, :article_id, :simple_class_id, :actions)
+  end
 
 end

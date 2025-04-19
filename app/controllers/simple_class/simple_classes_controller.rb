@@ -1,9 +1,12 @@
 class SimpleClass::SimpleClassesController < ApplicationController
-  include Folderable
+  include Placeable
   include TechBreadcrumbable
+  include Memberable
 
-  before_action :set_simple_class, only: %i[ show edit update destroy preview]
-  before_action :set_target_folder, only: %i[ new create ]
+  before_action :set_simple_class, only: %i[ show edit update destroy ]
+  before_action :set_target_place, only: %i[ new create ]
+  before_action :friendly_find_simple_class, only: %i[ preview ]
+
 
   # GET /simple_classes or /simple_classes.json
   def index
@@ -12,6 +15,17 @@ class SimpleClass::SimpleClassesController < ApplicationController
 
   # GET /simple_classes/1 or /simple_classes/1.json
   def show
+    binding.pry
+    # TODO: can simpleclass be inside container member or inside interface mamber?
+    # in models we only have memberable for framework, not for simple class
+
+    # if container_members_present?(@simple_class) || interface_members_present?(@simple_class)
+    #   binding.pry
+    #   redirect_to_member(@simple_class)
+    # else
+    #   binding.pry
+    #   technology_breadcrumbs(@simple_class)
+    # end
     technology_breadcrumbs(@simple_class)
   end
 
@@ -59,12 +73,12 @@ class SimpleClass::SimpleClassesController < ApplicationController
 
     binding.pry
     if params[:map_type] == "technology_pick"
-      locals = { simple_class: @simple_class, leaf_type: "technology_pick"}
+      locals = { class_layer_entity: @simple_class, leaf_type: "technology_pick"}
     else
-      locals = { simple_class: @simple_class, leaf_type: "regular_view"}
+      locals = { class_layer_entity: @simple_class, leaf_type: "regular_view"}
     end
 
-    path = "simple_class/simple_classes/partials/dynamic_tree_view/main"
+    path = "shared_class_layer/simple_class_dynamic_tree_view/main"
 
 
     respond_to do |format|
@@ -88,6 +102,7 @@ class SimpleClass::SimpleClassesController < ApplicationController
       @class_type = SimpleClasses::FunctionalTypes[:decision_object_container_class]
     end
 
+
     @simple_class = SimpleClasses::SimpleClass.new
 
     # 1.0 Default setup
@@ -100,7 +115,7 @@ class SimpleClass::SimpleClassesController < ApplicationController
 
     # 1.2 Default class container for DOC
     if @class_type == SimpleClasses::FunctionalTypes[:decision_object_container_class]
-      service = Services::SimpleClasses::ClassContainers::BuildRootContainer.new(current_user)
+      service = Services::SimpleClasses::ClassContainers::BuildRootContainer.new(current_user, @simple_class)
       service.call
       @root_class_container = service.class_container
     end
@@ -117,6 +132,7 @@ class SimpleClass::SimpleClassesController < ApplicationController
   def edit
     binding.pry
     @root_interface_group = @simple_class.root_interface_group
+    @root_class_container = @simple_class.root_class_container
     @class_type = @simple_class.functional_type
   end
 
@@ -125,17 +141,19 @@ class SimpleClass::SimpleClassesController < ApplicationController
     binding.pry
     service = Services::SimpleClasses::SimpleClasses::Create.new(simple_class_params, target_place, current_user, current_user)
     service.call
-
     binding.pry
     respond_to do |format|
       if service.errors.blank?
-        format.html { redirect_to simple_class_path(ownername: service.simple_class.owner.ownername,
-                                                         id: service.simple_class.slug),
-                                  notice: "Class was successfully created." }
-        format.json { render :show, status: :created, location: service.simple_class }
+        @simple_class = service.simple_class
+        set_redirect_after_success_create_path
+        binding.pry
+        format.html { redirect_to @redirect_after_success_create_path, notice: "Class was successfully created." }
+        # format.json { render :show, status: :created, location: service.simple_class }
       else
-        format.html { render :new, status: :unprocessable_entity, assigns: { simple_class: service.simple_class } }
-        format.json { render json: service.simple_class.errors, status: :unprocessable_entity }
+        binding.pry
+        format.html { render :new, status: :unprocessable_entity,
+                             assigns: { simple_class: service.simple_class, permission: service.permission } }
+        # format.json { render json: service.simple_class.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -173,8 +191,7 @@ class SimpleClass::SimpleClassesController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_simple_class
       binding.pry
-      @simple_class = SimpleClasses::SimpleClass.friendly.try(:find, params[:id])
-
+      friendly_find_simple_class
       # If an old id or a numeric id was used to find the record, then
       # the request path will not match the post_path, and we should do
       # a 301 redirect that uses the current friendly id.
@@ -184,10 +201,13 @@ class SimpleClass::SimpleClassesController < ApplicationController
                                              id: @simple_class.slug),
                            :status => :moved_permanently
       end
-      # TODO: add in all controller with friendly find rescue from not found case
     rescue ActiveRecord::RecordNotFound
       flash[:error] = "Model not found"
       redirect_to :root
+    end
+
+    def friendly_find_simple_class
+      @simple_class = SimpleClasses::SimpleClass.friendly.try(:find, params[:id])
     end
 
     # Only allow a list of trusted parameters through.
@@ -199,5 +219,21 @@ class SimpleClass::SimpleClassesController < ApplicationController
         simple_class_attributes_attributes: [:id, :title, :description, :_destroy,
                                              articles_simple_class_attributes_attributes: [:id, :article_id, :_destroy]]
       )
+    end
+
+    def set_redirect_after_success_create_path
+      if @simple_class.related_framework.present?
+        # container_member = @simple_class.framework_container_members.last
+        # closest_class_layer_entity = container_member.class_container.closest_class_layer_entity
+        # @redirect_after_success_create_path = container_member_path(ownername: closest_class_layer_entity.ownerable.ownername,
+        #                                                             id: container_member.slug)
+        framework_folder_member = @simple_class.framework_members.last
+        framework = framework_folder_member.closest_framework
+        @redirect_after_success_create_path = framework_member_path(ownername: framework.ownerable.ownername,
+                                                                    id: framework_folder_member.slug)
+
+      else
+        @redirect_after_success_create_path = simple_class_path(ownername: @simple_class.owner.ownername, id: @simple_class.slug)
+      end
     end
 end
