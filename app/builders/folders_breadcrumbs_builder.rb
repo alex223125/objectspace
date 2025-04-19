@@ -3,6 +3,7 @@ class FoldersBreadcrumbsBuilder < BreadcrumbsOnRails::Breadcrumbs::Builder
   include Rails.application.routes.url_helpers
   include ActionView::Helpers::UrlHelper
   include ActionView::Context
+  include ActionView::Helpers::TextHelper
 
   PROFILE_PAGE_BREADCRUMB_TYPE = "profile_page".freeze
   FOLDER_PAGE_BREADCRUMB_TYPE = "folder_page".freeze
@@ -78,6 +79,7 @@ class FoldersBreadcrumbsBuilder < BreadcrumbsOnRails::Breadcrumbs::Builder
   end
 
   def folder_page_breadcrumb(element, style)
+    binding.pry
     link_to element.path do
       @context.content_tag(:span, compute_full_name(element, nil), class: style).html_safe
     end
@@ -111,15 +113,17 @@ class FoldersBreadcrumbsBuilder < BreadcrumbsOnRails::Breadcrumbs::Builder
   # add technology breadcrumb
 
   def compute_full_name(element, page)
-    binding.pry
+    name = compute_name(element)
+    truncated_name = truncate(name, length: 70, omission: '...', :escape => false)
+
     if @context.breadcrumbs.first.name == element.name
-      home_icon + compute_name(element)
+      home_icon + truncated_name
     elsif page == SIMPLE_CLASS_PAGE_BREADCRUMB_TYPE
-      home_icon + compute_name(element)
+      home_icon + truncated_name
     elsif page == INTERFACE_GROUP_PAGE_BREADCRUMB_TYPE
-      home_icon + compute_name(element)
+      home_icon + truncated_name
     else
-      compute_name(element)
+      temporary_icon + truncated_name
     end
   end
 
@@ -133,6 +137,12 @@ class FoldersBreadcrumbsBuilder < BreadcrumbsOnRails::Breadcrumbs::Builder
   def home_icon
     @context.content_tag(:svg, "aria-hidden": "true", class: "w-4 h-4 mr-2", fill: "currentColor", "viewBox": "0 0 20 20", xmlns: "http://www.w3.org/2000/svg") do
       @context.content_tag(:path, nil, d: "M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z")
+    end.html_safe
+  end
+
+  def temporary_icon
+    @context.content_tag(:svg, "aria-hidden": "true", class: "w-4 h-4 mr-2", fill: "currentColor", "viewBox": "0 0 14 20", xmlns: "http://www.w3.org/2000/svg") do
+      @context.content_tag(:path, nil, d: "m13 19-6-5-6 5V2a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17Z")
     end.html_safe
   end
 
