@@ -1,18 +1,22 @@
 require "./app/services/concerns/technologies/taggable"
 require "./app/services/concerns/technologies/memberable"
+require "./app/services/concerns/shared/owner_permissionable"
+
 module Services
   module Articles
     module Articles
       class Create
         include ::Services::Concerns::Technologies::Taggable
         include ::Services::Concerns::Technologies::Memberable
+        include ::Services::Concerns::Shared::OwnerPermissionable
 
-        attr_reader :errors, :article
+        attr_reader :errors, :article, :permission
 
-        def initialize(params, target_place, current_user)
+        def initialize(params, target_place, creator, owner)
           @params = params
           @target_place = target_place
-          @current_user = current_user
+          @owner = owner
+          @creator = creator
         end
 
         def call
@@ -25,7 +29,10 @@ module Services
 
             binding.pry
             set_place
+
+            binding.pry
             set_owner
+            set_creator
 
             binding.pry
             set_tags
@@ -34,7 +41,13 @@ module Services
             set_default_version
 
             binding.pry
+            set_title_for_default_version
+
+            binding.pry
             @article.save!
+
+            binding.pry
+            create_resource_owner_permission
           end
         rescue ActiveRecord::RecordInvalid => e
 
@@ -44,6 +57,10 @@ module Services
         end
 
         def technology
+          @article
+        end
+
+        def entity
           @article
         end
 
@@ -83,12 +100,26 @@ module Services
 
         def set_default_version
           binding.pry
-          @article.default_version = @article.article_versions.first
+          @article.default_version = first_article_version
+        end
+
+        def set_title_for_default_version
+          article_version = first_article_version
+          article_version.title = @article.title
         end
 
         def set_owner
           binding.pry
-          @article.ownerable = @current_user
+          @article.ownerable = @owner
+        end
+
+        def set_creator
+          binding.pry
+          @article.creator = @creator
+        end
+
+        def first_article_version
+          @article.article_versions.first
         end
 
       end

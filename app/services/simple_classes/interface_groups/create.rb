@@ -60,7 +60,11 @@ module Services
 
         def set_related_simple_class
           binding.pry
-          @interface_group.related_simple_class = @target_place.related_simple_class || @target_place.simple_class
+          if @target_place.closest_simple_class.present?
+            @interface_group.related_simple_class = @target_place.closest_simple_class
+          elsif @target_place.closest_framework.present?
+            @interface_group.related_framework = @target_place.closest_framework
+          end
         end
 
         def set_related_class_container

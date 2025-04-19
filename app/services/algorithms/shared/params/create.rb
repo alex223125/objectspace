@@ -6,6 +6,7 @@ module Services
 
           TYPES_MAPPING = {
             algorithm_creation: {params_root_key: :algorithms_algorithm},
+            algorithm_version_create: {params_root_key: :algorithms_algorithm_version},
             algorithm_version_update: {params_root_key: :algorithms_algorithm_version}
           }.freeze
 

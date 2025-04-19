@@ -1,16 +1,22 @@
+require "./app/services/concerns/technologies/taggable"
 require "./app/services/concerns/technologies/memberable"
+require "./app/services/concerns/shared/owner_permissionable"
+
 module Services
   module CheatSheets
     module CheatSheets
       class Create
+        include ::Services::Concerns::Technologies::Taggable
         include ::Services::Concerns::Technologies::Memberable
+        include ::Services::Concerns::Shared::OwnerPermissionable
 
-        attr_reader :errors, :cheat_sheet
+        attr_reader :errors, :cheat_sheet, :permission
 
-        def initialize(params, target_place, current_user)
+        def initialize(params, target_place, owner, creator)
           @params = params
           @target_place = target_place
-          @current_user = current_user
+          @owner = owner
+          @creator = creator
         end
 
         def call
@@ -24,6 +30,7 @@ module Services
             binding.pry
             set_place
             set_owner
+            set_creator
 
             binding.pry
             set_tags
@@ -33,6 +40,9 @@ module Services
 
             binding.pry
             @cheat_sheet.save!
+
+            binding.pry
+            create_resource_owner_permission
           end
         rescue ActiveRecord::RecordInvalid => e
 
@@ -42,6 +52,10 @@ module Services
         end
 
         def technology
+          @cheat_sheet
+        end
+
+        def entity
           @cheat_sheet
         end
 
@@ -79,18 +93,11 @@ module Services
 
         def set_owner
           binding.pry
-          @cheat_sheet.ownerable = @current_user
+          @cheat_sheet.ownerable = @owner
         end
 
-        def set_tags
-          binding.pry
-          @cheat_sheet.tag_list = parse_tags
-        end
-
-        def parse_tags
-          if @params[:tag_list].present?
-            JSON.parse(@params[:tag_list]).map{|h| h.values}.join(",")
-          end
+        def set_creator
+          @cheat_sheet.creator = @creator
         end
 
       end

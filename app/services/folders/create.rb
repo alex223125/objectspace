@@ -20,6 +20,7 @@ module Services
           binding.pry
           create_folder
 
+          binding.pry
           link_owner_with_all_subfolders
 
           binding.pry
@@ -39,7 +40,9 @@ module Services
         if @target_type == "folder"
           @folder = @target_place.subfolders.new(@params)
         elsif @target_type == "repository"
-          @folder = @target_place.folders.new(@params)
+          @folder = @target_place.repository_folders.new(@params)
+        elsif @target_type == "reports_repository"
+          @folder = @target_place.reports_repository_folders.new(@params)
         end
       end
 
@@ -48,12 +51,14 @@ module Services
           @target_place = Folder.where(id: @target).first
         elsif @target_type == "repository"
           @target_place = Repository.where(id: @target).first
+        elsif @target_type == "reports_repository"
+          @target_place = ReportsRepository.where(id: @target).first
         end
       end
 
       def link_owner_with_all_subfolders
         binding.pry
-        return if @target_type == "repository"
+        # return if @target_type == "repository" || @target_type == "reports_repository"
         # why: folder.root.folder.ownerable not faster then folder.ownerable
         @folder.ownerable = @owner
         @folder.subfolders.each do |subfolder|

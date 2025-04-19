@@ -1,13 +1,16 @@
 require "./app/services/concerns/technologies/taggable"
 require "./app/services/concerns/technologies/memberable"
+require "./app/services/concerns/shared/owner_permissionable"
+
 module Services
   module CheatSheetGroups
     module CheatSheetGroups
       class Create
         include ::Services::Concerns::Technologies::Taggable
         include ::Services::Concerns::Technologies::Memberable
+        include ::Services::Concerns::Shared::OwnerPermissionable
 
-        attr_reader :errors, :cheat_sheet_group
+        attr_reader :errors, :cheat_sheet_group, :permission
 
         def initialize(params, target_place, creator, owner)
           @params = params
@@ -38,6 +41,9 @@ module Services
 
             binding.pry
             @cheat_sheet_group.save!
+
+            binding.pry
+            create_resource_owner_permission
           end
         rescue ActiveRecord::RecordInvalid => e
 
@@ -47,6 +53,10 @@ module Services
         end
 
         def technology
+          @cheat_sheet_group
+        end
+
+        def entity
           @cheat_sheet_group
         end
 
@@ -69,8 +79,12 @@ module Services
           elsif @target_place.class == Repository
             @cheat_sheet_group.repository = @target_place
           elsif @target_place.class == ::SimpleClasses::ClassContainer
+            binding.pry
             container_member = create_container_member
-            @cheat_sheet_group.class_containers << container_member
+
+            binding.pry
+            # @cheat_sheet_group.class_containers << container_member
+            @cheat_sheet_group.container_members << container_member
           elsif @target_place.class == ::SimpleClasses::InterfaceGroup
             interface_member = create_interface_member
             @cheat_sheet_group.interface_members << interface_member

@@ -1,13 +1,16 @@
 require "./app/services/concerns/technologies/taggable"
 require "./app/services/concerns/technologies/memberable"
+require "./app/services/concerns/shared/owner_permissionable"
+
 module Services
   module Units
     module Units
       class Create
         include ::Services::Concerns::Technologies::Taggable
         include ::Services::Concerns::Technologies::Memberable
+        include ::Services::Concerns::Shared::OwnerPermissionable
 
-        attr_reader :errors, :unit
+        attr_reader :errors, :unit, :permission
 
         def initialize(params, target_place, creator, owner)
           @params = params
@@ -41,6 +44,9 @@ module Services
 
             binding.pry
             set_default_version
+
+            binding.pry
+            create_resource_owner_permission
           end
         rescue ActiveRecord::RecordInvalid => e
 
@@ -50,6 +56,10 @@ module Services
         end
 
         def technology
+          @unit
+        end
+
+        def entity
           @unit
         end
 

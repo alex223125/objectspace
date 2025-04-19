@@ -27,6 +27,9 @@ module Services
             set_tags
 
             binding.pry
+            update_related_framework_members
+
+            binding.pry
             @simple_class.save!
           end
         rescue ActiveRecord::RecordInvalid => e
@@ -64,6 +67,16 @@ module Services
         def parse_tags
           if @params[:tag_list].present?
             JSON.parse(@params[:tag_list]).map{|h| h.values}.join(",")
+          end
+        end
+
+        def update_related_framework_members
+          binding.pry
+          @simple_class.framework_members.each do |framework_member|
+            binding.pry
+            framework_member.title = @simple_class.title
+            framework_member.description = @simple_class.description
+            framework_member.save!
           end
         end
 
