@@ -1,6 +1,6 @@
 module Services
   module Frameworks
-    module FrameworkFolders
+    module FrameworksFolders
       class Create
 
         attr_reader :errors, :framework_folder, :target
