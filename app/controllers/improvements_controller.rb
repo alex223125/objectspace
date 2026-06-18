@@ -6,7 +6,7 @@ class ImprovementsController < ApplicationController
 
   def index
     binding.pry
-    form = Forms::Improvements::TechnologyRelatedImprovementsSearchFrom.new(search_params)
+    form = Improvements::TechnologyRelatedImprovementsSearchFrom.new(search_params)
 
     binding.pry
     form.submit
