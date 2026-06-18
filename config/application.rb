@@ -26,6 +26,7 @@ module Objectspace
     # Add this line to bypass the Zeitwerk name checking error:
     Rails.autoloaders.main.ignore(Rails.root.join("app/controllers/not_in_use"))
     Rails.autoloaders.main.ignore(Rails.root.join("app/controllers/was"))
+    Rails.autoloaders.main.ignore(Rails.root.join("app/controllers/algorithm/not_in_use"))
 
     # Configuration for the application, engines, and railties goes here.
     #
