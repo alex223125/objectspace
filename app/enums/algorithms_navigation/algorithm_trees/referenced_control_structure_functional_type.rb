@@ -1,7 +1,7 @@
 # DOC: same as in ControlStructures::FunctionalTypes
 module AlgorithmsNavigation
   module AlgorithmTrees
-    class ReferencedControlStructureFunctionalTypes < ActiveEnum::Base
+    class ReferencedControlStructureFunctionalType < ActiveEnum::Base
       value :id => 1, :name => :initial_template
       value :id => 2, :name => :sequential_flow
       # if_end
