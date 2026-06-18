@@ -28,6 +28,7 @@ module Objectspace
     Rails.autoloaders.main.ignore(Rails.root.join("app/controllers/was"))
     Rails.autoloaders.main.ignore(Rails.root.join("app/controllers/algorithm/not_in_use"))
     Rails.autoloaders.main.ignore(Rails.root.join("app/controllers/cheat_sheet/not_in_use"))
+    Rails.autoloaders.main.ignore(Rails.root.join("app/controllers/cheat_sheet_group/not_in_use/"))
 
     # Configuration for the application, engines, and railties goes here.
     #
