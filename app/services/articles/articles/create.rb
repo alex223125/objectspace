@@ -8,7 +8,7 @@ module Services
       class Create
         include ::Services::Concerns::Technologies::Taggable
         include ::Services::Concerns::Technologies::Memberable
-        include Services::Concerns::Shared::OwnerPermissionable
+        include ::Services::Concerns::Shared::OwnerPermissionable
 
         attr_reader :errors, :article, :permission
 

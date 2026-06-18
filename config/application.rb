@@ -22,7 +22,7 @@ module Objectspace
 
 
     Dir[Rails.root.join('app/services/**/*.rb')].each{|rb| require rb}
-    Dir[Rails.root.join('app/services/concerns/**/*.rb')].each{|rb| require rb}
+    # Dir[Rails.root.join('app/services/concerns/**/*.rb')].each{|rb| require rb}
     Dir[Rails.root.join('app/services/simple_classes/simple_classes/*.rb')].each{|rb| require rb}
     Dir[Rails.root.join('app/builders/**/*.rb')].each{|rb| require rb}
     Dir[Rails.root.join('app/enums/**/*.rb')].each{|rb| require rb}

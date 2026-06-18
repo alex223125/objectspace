@@ -11,7 +11,7 @@ module Services
         include ::Services::Concerns::Technologies::Taggable
         include ::Services::Concerns::Technologies::Memberable
         include ::Services::Concerns::Technologies::NodesLinkable
-        include Services::Concerns::Shared::OwnerPermissionable
+        include ::Services::Concerns::Shared::OwnerPermissionable
 
         # DOC: This is version to track how much times algorithm version was
         # updated from one state to another state (differet description, amount of steps, content)

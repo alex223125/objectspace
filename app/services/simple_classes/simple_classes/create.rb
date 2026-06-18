@@ -5,7 +5,7 @@ module Services
   module SimpleClasses
     module SimpleClasses
       class Create
-        include Services::Concerns::Shared::OwnerPermissionable
+        include ::Services::Concerns::Shared::OwnerPermissionable
         include ::Services::Concerns::Technologies::Memberable
 
         CLASS_CONTAINER_ROOT_ASSOCIATION = "class_containers".freeze
