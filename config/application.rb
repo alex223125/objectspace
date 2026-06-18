@@ -30,6 +30,7 @@ module Objectspace
     Rails.autoloaders.main.ignore(Rails.root.join("app/controllers/cheat_sheet/not_in_use"))
     Rails.autoloaders.main.ignore(Rails.root.join("app/controllers/cheat_sheet_group/not_in_use/"))
     Rails.autoloaders.main.ignore(Rails.root.join("app/exceptions/not_in_use"))
+    Rails.autoloaders.main.ignore(Rails.root.join("app/models/not_in_use"))
 
     # Configuration for the application, engines, and railties goes here.
     #
