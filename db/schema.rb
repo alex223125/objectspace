@@ -95,7 +95,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_04_18_000003) do
     t.integer "backend_storage_type_id"
     t.integer "original_algorithm_version_id"
     t.integer "duplicate_algorithm_verion_version_number"
-    t.bigint "algorithm_tree_id", default: 123, null: false
+    t.bigint "algorithm_tree_id", default: 1, null: false
     t.index ["algorithm_tree_id"], name: "index_algorithm_versions_on_algorithm_tree_id"
     t.index ["searchable"], name: "index_algorithm_versions_on_searchable", using: :gin
     t.index ["slug"], name: "index_algorithm_versions_on_slug", unique: true
