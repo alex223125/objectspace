@@ -13,6 +13,13 @@ module Objectspace
 
     config.autoloader = :classic
 
+
+    # 1. Remove app/services from the automatic root paths
+    config.autoload_paths.delete(Rails.root.join("app/services").to_s)
+
+    # 2. Map it explicitly so it respects the Services:: namespace
+    config.autoload_paths << Rails.root.join("app")
+
     Dir[Rails.root.join('app/services/**/*.rb')].each{|rb| require rb}
     Dir[Rails.root.join('app/services/concerns/**/*.rb')].each{|rb| require rb}
     Dir[Rails.root.join('app/services/simple_classes/simple_classes/*.rb')].each{|rb| require rb}
