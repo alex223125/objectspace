@@ -1,11 +1,11 @@
-# require "./app/services/concerns/technologies/taggable"
-# require "./app/services/concerns/technologies/memberable"
-# require "./app/services/concerns/shared/owner_permissionable"
-#
-# module Services
-#   module Articles
-#     module ArticleVersions
-#       class Update
+require "./app/services/concerns/technologies/taggable"
+require "./app/services/concerns/technologies/memberable"
+require "./app/services/concerns/shared/owner_permissionable"
+
+module Services
+  module Articles
+    module ArticleVersions
+      class Update
 #         include ::Services::Concerns::Technologies::Taggable
 #         include ::Services::Concerns::Technologies::Memberable
 #         include ::Services::Concerns::Shared::OwnerPermissionable
@@ -46,7 +46,7 @@
 #           @article_version.update(@params)
 #         end
 #
-#       end
-#     end
-#   end
-# end
+      end
+    end
+  end
+end
