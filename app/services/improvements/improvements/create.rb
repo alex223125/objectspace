@@ -4,7 +4,7 @@ module Services
   module Improvements
     module Improvements
       class Create
-        include ::Services::Concerns::Shared::OwnerPermissionable
+        include Services::Concerns::Shared::OwnerPermissionable
 
         attr_reader :errors, :improvement, :permissions
 

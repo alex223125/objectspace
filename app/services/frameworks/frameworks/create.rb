@@ -6,7 +6,7 @@ module Services
     module Frameworks
       class Create
         include ::Services::Concerns::Technologies::Taggable
-        include ::Services::Concerns::Shared::OwnerPermissionable
+        include Services::Concerns::Shared::OwnerPermissionable
 
         CLASS_CONTAINER_ROOT_ASSOCIATION = "class_containers".freeze
         CLASS_CONTAINER_CHILD_ASSOCIATIONS = "containers".freeze
