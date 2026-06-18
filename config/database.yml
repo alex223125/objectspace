@@ -82,8 +82,12 @@ test:
 # Read https://guides.rubyonrails.org/configuring.html#configuring-a-database
 # for a full overview on how database connection configuration can be specified.
 #
+#production:
+#  <<: *default
+#  database: objectspace_production
+#  username: objectspace
+#  password: <%= ENV["OBJECTSPACE_DATABASE_PASSWORD"] %>
+
 production:
-  <<: *default
-  database: objectspace_production
-  username: objectspace
-  password: <%= ENV["OBJECTSPACE_DATABASE_PASSWORD"] %>
+  url: <%= ENV['DATABASE_URL'] %>
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
