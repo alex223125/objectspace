@@ -46,7 +46,7 @@ module Objectspace
     Rails.autoloaders.main.ignore(Rails.root.join("app/services/concerns/shared/owner_permissionable.rb"))
 
     Rails.autoloaders.main.ignore(Rails.root.join("app/services/concerns/technologies/doc.rb"))
-
+    Rails.autoloaders.main.ignore(Rails.root.join("app/services/concerns/technologies/memberable.rb"))
 
     # Configuration for the application, engines, and railties goes here.
     #
