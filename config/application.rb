@@ -45,6 +45,8 @@ module Objectspace
     ## TODO: Research whi its erroring name error zeitwekr
     Rails.autoloaders.main.ignore(Rails.root.join("app/services/concerns/shared/owner_permissionable.rb"))
 
+    Rails.autoloaders.main.ignore(Rails.root.join("app/services/concerns/technologies/doc.rb"))
+
 
     # Configuration for the application, engines, and railties goes here.
     #
