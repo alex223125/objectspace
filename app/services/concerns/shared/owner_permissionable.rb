@@ -2,8 +2,6 @@ module Services
   module Concerns
     module Shared
       module OwnerPermissionable
-        extend ActiveSupport::Concern
-
         def create_resource_owner_permission
           service = Services::Permissions::ResourceOwner::Create.new(entity, @owner)
           service.call
