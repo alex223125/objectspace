@@ -24,6 +24,7 @@ module Objectspace
     Dir[Rails.root.join('app/services/**/*.rb')].each{|rb| require rb}
     # Dir[Rails.root.join('app/services/concerns/**/*.rb')].each{|rb| require rb}
     Dir[Rails.root.join('app/services/simple_classes/simple_classes/*.rb')].each{|rb| require rb}
+    Dir[Rails.root.join('app/services/concerns/shared/*.rb')].each{|rb| require rb}
     Dir[Rails.root.join('app/builders/**/*.rb')].each{|rb| require rb}
     Dir[Rails.root.join('app/enums/**/*.rb')].each{|rb| require rb}
     Dir[Rails.root.join('app/queries/**/*.rb')].each{|rb| require rb}
@@ -40,6 +41,7 @@ module Objectspace
     Rails.autoloaders.main.ignore(Rails.root.join("app/exceptions/not_in_use"))
     Rails.autoloaders.main.ignore(Rails.root.join("app/models/not_in_use"))
     Rails.autoloaders.main.ignore(Rails.root.join("app/models/algorithms/not_in_use"))
+    
 
     # Configuration for the application, engines, and railties goes here.
     #
