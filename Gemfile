@@ -47,10 +47,6 @@ gem "tzinfo-data", platforms: %i[ mingw mswin x64_mingw jruby ]
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
 
-# Use Sass to process CSS
-# gem "sassc-rails"
-gem 'sassc', '~> 2.1.0'
-
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem "image_processing", "~> 1.2"
 
@@ -106,9 +102,19 @@ gem 'words_counted'
 
 
 group :development, :test do
+
+  # Use Sass to process CSS
+  # gem "sassc-rails"
+  gem 'sassc', '~> 2.1.0'
+
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri mingw x64_mingw ]
   gem 'pry'
+end
+
+group :production, :test do
+  # no sassc on render.com
+  # gem 'sassc', '~> 2.1.0'
 end
 
 group :development do
