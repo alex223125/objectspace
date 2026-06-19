@@ -32,6 +32,10 @@ yarn add flowbite-typography
 # to run elasticsearch
 elasticsearch-8.7.0-linux-x86_64/elasticsearch-8.7.0/bin$ ./elasticsearch
 
+## zeitwek files check
+SECRET_KEY_BASE_DUMMY=1 bundle exec rails zeitwerk:check
+
+
 # elsticsearch 
 In case of this error:
 ActionView::Template::Error (Failed to open TCP connection to localhost:9200 (Connection refused - connect(2) for "localhost" port 9200)):
