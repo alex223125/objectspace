@@ -4,11 +4,6 @@ module Services
       module NodesLinkable
 
         def link_nodes_with_algorithm_version
-          if entity.class == ::Algorithms::AlgorithmVersion
-            algorithm_version = entity
-          elsif entity.class == ::Algorithms::Algorithm
-            algorithm_version = entity.default_version
-          end
           binding.pry
           # base_control_structure = algorithm_version.base_control_structure
           initial_template_type = ControlStructures::FunctionalTypes[:initial_template]
@@ -26,7 +21,23 @@ module Services
           end
         end
 
+        def link_control_structures_with_algorithm_version
+          if entity.class == ::Algorithms::AlgorithmVersion
+            algorithm_version.control_structures.each do |control_structure|
+              control_structure.related_algorithm_version = algorithm_version
+            end
+          end
+        end
+
         private
+
+        def algorithm_version
+          if entity.class == ::Algorithms::AlgorithmVersion
+            entity
+          elsif entity.class == ::Algorithms::Algorithm
+            entity.default_version
+          end
+        end
 
         def collect_all_subnodes(node)
           all_nodes = []

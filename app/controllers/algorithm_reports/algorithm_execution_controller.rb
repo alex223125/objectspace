@@ -1,5 +1,6 @@
 class AlgorithmReports::AlgorithmExecutionController < ApplicationController
   include AlgorithmExecutionBreadcrumbable
+  include AlgorithmExecutionHelper
 
   before_action :set_algorithm_report, only: %i[ initial_place ]
   before_action :set_algorithm_step, only: %i[ edit update included_algorithm_reports_options_pick ]
@@ -42,6 +43,7 @@ class AlgorithmReports::AlgorithmExecutionController < ApplicationController
       binding.pry
       if @algorithm_step.errors.blank? && @algorithm_report.errors.blank?
 
+        binding.pry
         if next_step_present?(@algorithm_step)
           # DOC: Case 1: after changes made in edit form we commit and redirect to next step if next step exsits
           next_step = @algorithm_step.next_node

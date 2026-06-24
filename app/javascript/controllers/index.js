@@ -103,7 +103,8 @@ application.register("step_technologiable_preview_load", StepTechnologiablePrevi
 import StepShowController from "./algorithms/step_show_controller.js"
 application.register("step_show", StepShowController)
 
-
+import NewAlgorithmCreationStepsNestedFormValidationController from "./algorithms/new_algorithm_creation_steps_nested_form_validation_controller.js"
+application.register("new_algorithm_creation_steps_nested_form_validation", NewAlgorithmCreationStepsNestedFormValidationController)
 
 // Algorithms Steps Map
 import AlgorithmTreeMapModalController from "./algorithms/tree_map/algorithm_tree_map_modal_controller.js"

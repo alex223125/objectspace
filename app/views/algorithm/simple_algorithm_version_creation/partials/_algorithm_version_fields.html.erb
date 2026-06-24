@@ -1,3 +1,19 @@
+<h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Algorithm version main</h2>
+
+<% [@algorithm, @algorithm_version, @algorithm_tree, @root_leafe, @permission].each do |entity| %>
+  <% if entity.try(:errors).present? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+      <h2><%= pluralize(entity.errors.count, "error") %> prohibited this Combo Tutorial from being saved:</h2>
+
+      <ul>
+        <% entity.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+<% end %>
+
 <div class="col-span-6 sm:col-span-3">
   <%= f.label "Version title", class: "block text-sm font-medium text-gray-700" %>
   <div class="bg-yellow-50 border border-yellow-400 rounded text-yellow-800 text-sm p-4 flex items-start">
@@ -162,5 +178,3 @@
   <%= f.hint 'If you have something to add which does not fit in any of the above category you can add it here..', class: "mt-2 text-sm text-gray-500" %>
   <%= f.input_field :additional_information, data: { target: 'unit_additional_information_tinymce.field' } %>
 </div>
-
-<%= render "algorithm/shared/partials/algorithm_version/introduction_step_fields", :form => f %>

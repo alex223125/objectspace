@@ -14,6 +14,7 @@ class Algorithms::AlgorithmVersion < ApplicationRecord
 
   has_many :nodes, class_name: "Algorithms::Nodes::Node"
   accepts_nested_attributes_for :nodes, allow_destroy: true
+  validate :must_have_at_least_one_node
 
   # we need it to create initial control structure "following"
   has_many :control_structures, class_name: "Algorithms::Nodes::ControlStructure"
@@ -59,8 +60,19 @@ class Algorithms::AlgorithmVersion < ApplicationRecord
   validates :original_algorithm_version_version_number, presence: true, if: :backend_storage_type_original?
   validates :duplicate_algorithm_verion_version_number, presence: true, if: :backend_storage_type_duplicate?
   validates :original_algorithm_version_id, presence: true, if: :backend_storage_type_duplicate?
+  validates :interactivity_type_id, presence: true
 
   scope :ordered_by_created_at, -> { order(created_at: :desc) }
+
+  # SimpleStaticAlgorithmType enum
+  AlgorithmVersions::SimpleStaticAlgorithmType = "simple_static_algorithm".freeze
+  AlgorithmVersions::SimpleInteractiveAlgorithmType = "simple_interactive_algorithm".freeze
+
+  BASE_CONTROL_STRUCTURE_DEFAULT_POSITION = 1.freeze
+
+  def interactivity_type
+    AlgorithmVersions::InteractivityTypes[self.interactivity_type_id]
+  end
 
   def backend_storage_type_original?
     self.backend_storage_type_id == AlgorithmVersions::BackendStorageTypes[:original]
@@ -88,6 +100,10 @@ class Algorithms::AlgorithmVersion < ApplicationRecord
     self.control_structures.where(control_structure_functional_type: ControlStructures::FunctionalTypes[:initial_template]).first
   end
 
+  def before_save_base_control_structure
+    self.control_structures.first
+  end
+
   def first_step
     base_control_structure.children.where(position: 0).first
   end
@@ -98,6 +114,18 @@ class Algorithms::AlgorithmVersion < ApplicationRecord
     [ :title,
       [:title, :uuid]
     ]
+  end
+
+  def must_have_at_least_one_node
+    binding.pry
+    before_save_base_control_structure= self.before_save_base_control_structure
+    nodes = before_save_base_control_structure.subnodes
+    # Reject children that are marked for destruction by the nested form
+    active_nodes = nodes.reject(&:marked_for_destruction?)
+
+    if active_nodes.empty?
+      errors.add(:base, "An algorithm version must have at least one step configured.")
+    end
   end
 
 end

@@ -1,0 +1,139 @@
+<%# 1. High-fidelity 1.25x Scaled Timeline Header %>
+<%= render 'wizard_timeline', active_step: :introduction_content %>
+
+<%# 2. Unified Form Scope using your decoupled custom routing path matrix %>
+<%= simple_form_for(@algorithm_version,
+                    url: simple_algorithm_version_creation_path(
+                      @algorithm,
+                      wizard_id: step.to_s,
+                      algorithm_version_id: @algorithm_version.slug
+                    ),
+                    method: :put,
+                    html: { class: "max-w-5xl mx-auto space-y-8 my-10 p-2" }) do |form| %>
+
+  <!-- ========================================== -->
+  <!-- INTRODUCTORY COPYWRITING BLOCK             -->
+  <!-- ========================================== -->
+  <hr class="w-64 h-1.5 mx-auto my-6 bg-slate-100 border-0 rounded-full dark:bg-gray-700">
+
+  <div class="nodraggablesteps col-span-6 sm:col-span-3 max-w-4xl mx-auto px-4">
+    <p class="text-2xl font-black text-slate-900 tracking-tight uppercase font-serif">Introduction step:</p>
+    <p class="mt-2 text-base text-slate-500 font-medium leading-relaxed">
+      Here you can add content of combo tutorial and prepare user for diving into tutorial. Use this place to prepare users for using your core algorithm workflow.
+    </p>
+  </div>
+  <br>
+
+  <!-- ========================================== -->
+  <!-- CONFIGURATION INPUT LEDGER (1.25x Scaled)  -->
+  <!-- ========================================== -->
+  <div class="max-w-4xl mx-auto bg-white border-4 border-slate-900 rounded-[32px] p-8 md:p-10 shadow-xl space-y-6 relative overflow-hidden">
+
+    <!-- Title Area Decoration Header Badge -->
+    <div class="flex items-center justify-between border-b-2 border-slate-100 pb-4 mb-4">
+      <div class="flex items-center gap-3">
+        <span class="text-xl">📜</span>
+        <h3 class="font-serif text-base font-black tracking-wider text-slate-900 uppercase">
+          Quest Prologue Parameters
+        </h3>
+      </div>
+      <span class="text-[10px] font-mono font-bold tracking-widest text-slate-400 uppercase">STAGE-02</span>
+    </div>
+
+    <%# 3. Merged Nested Simple Fields Block %>
+    <%= form.simple_fields_for :introduction_step, @introduction_step do |f| %>
+
+      <!-- FIELD 1: TITLE -->
+      <div class="col-span-6 sm:col-span-3">
+        <%= f.label :title, "Invitation Milestone Label Header Title", class: "block text-sm font-black text-slate-700 uppercase tracking-wider mb-2" %>
+        <%= f.input_field :title,
+                          class: "mt-1 block w-full rounded-xl border-2 border-slate-200 bg-slate-50/50 p-4 text-base font-medium shadow-sm transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100/50 focus:bg-white",
+                          placeholder: "Enter the main campaign welcoming headline title..." %>
+      </div>
+      <br>
+
+      <!-- FIELD 2: CONTENT (Retained your exact data-controller and data-targets) -->
+      <div class="col-span-6 sm:col-span-3" data-controller="unit_instruction_tinymce">
+        <%= f.label :content, "Quest Prologue Guidelines Details", class: "block text-sm font-black text-slate-700 uppercase tracking-wider mb-1" %>
+        <%= f.hint 'Use this place to prepare users for using algorithm', class: "block text-xs text-slate-400 font-medium mb-3" %>
+
+        <%= f.input_field :content,
+                          as: :text,
+                          placeholder: "Template of description goes here (goals, principles, intro)...",
+                          class: "mt-1 block w-full rounded-xl border-2 border-slate-200 bg-slate-50/50 p-4 text-base font-medium shadow-sm min-h-[200px] transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100/50 focus:bg-white",
+                          data: { target: 'unit_instruction_tinymce.field' } %>
+      </div>
+      <br>
+
+    <% end %>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- WIZARD NAVIGATION CONTROL CONSOLE          -->
+  <!-- ========================================== -->
+  <div class="max-w-4xl mx-auto flex justify-between items-center pt-6 border-t-2 border-slate-100 px-4">
+    <%# 4. Keeps path routing token arguments aligned with your flat session/wizard_id layout %>
+    <%= link_to "⬅ Back to Metadata",
+                simple_algorithm_version_creation_path(@algorithm, wizard_id: :algorithm_main, algorithm_version_id: @algorithm_version.slug),
+                class: "text-sm font-black text-slate-400 uppercase tracking-widest hover:text-slate-900 transition duration-150" %>
+
+    <%= form.button :submit, "Proceed to Steps Matrix ➔",
+                    class: "bg-indigo-600 hover:bg-indigo-700 text-white font-black text-sm uppercase tracking-widest px-6 py-3.5 rounded-xl transition duration-150 shadow-md shadow-indigo-100 active:scale-95" %>
+  </div>
+
+<% end %>
+
+
+
+<!--<hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">-->
+
+<%# 1. High-fidelity 1.25x Scaled Timeline Header %>
+<%= render 'wizard_timeline', active_step: :introduction_content %>
+
+<div class="nodraggablesteps col-span-6 sm:col-span-3">
+  <p class="text-xl font-bold hover:text-gray-700">Introduction step:</p>
+  <p class="mt-2 text-sm text-gray-500">Here you can add content of combo tutorial and prepare user for diving into tutorial.</p>
+</div>
+<br>
+
+
+<%# 2. Unified Form Scope using your decoupled custom routing path matrix %>
+<%= simple_form_for(@introduction_step,
+                    url: simple_algorithm_version_creation_path(
+                      @algorithm,
+                      wizard_id: step.to_s,
+                      algorithm_version_id: @algorithm_version.slug
+                    ),
+                    method: :put,
+                    html: { class: "max-w-5xl mx-auto space-y-8 my-10 p-2" }) do |f| %>
+
+<%#= form.fields_for :introduction_step, @introduction_step do |f| %>
+
+  <div class="col-span-6 sm:col-span-3">
+    <%= f.label "Title", class: "block text-sm font-medium text-gray-700" %>
+    <%= f.input_field :title, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+  </div>
+  <br>
+
+  <div class="col-span-6 sm:col-span-3" data-controller="unit_instruction_tinymce">
+    <%= f.label "Content", class: "block text-sm font-medium text-gray-700" %>
+    <%= f.hint 'Use this place to prepare users for using algorithm', class: "mt-2 text-sm text-gray-500" %>
+    <%= f.input_field :content,
+                      placeholder: "Template of description goes here (goals, principles,intro)",
+                      data: { target: 'unit_instruction_tinymce.field' } %>
+  </div>
+  <br>
+
+  <!-- ========================================== -->
+  <!-- WIZARD NAVIGATION CONTROL CONSOLE          -->
+  <!-- ========================================== -->
+  <div class="max-w-4xl mx-auto flex justify-between items-center pt-6 border-t-2 border-slate-100 px-4">
+    <%# 4. Keeps path routing token arguments aligned with your flat session/wizard_id layout %>
+    <%= link_to "⬅ Back to Metadata",
+                simple_algorithm_version_creation_path(@algorithm, wizard_id: :algorithm_main, algorithm_version_id: @algorithm_version.slug),
+                class: "text-sm font-black text-slate-400 uppercase tracking-widest hover:text-slate-900 transition duration-150" %>
+
+    <%= f.button :submit, "Proceed to Steps Matrix ➔",
+                 class: "bg-indigo-600 hover:bg-indigo-700 text-white font-black text-sm uppercase tracking-widest px-6 py-3.5 rounded-xl transition duration-150 shadow-md shadow-indigo-100 active:scale-95" %>
+  </div>
+<% end %>

@@ -100,8 +100,12 @@ gem 'sass-rails'
 gem 'uuid', '~> 2.3', '>= 2.3.9'
 gem 'words_counted'
 
+gem 'wicked'
+
 
 group :development, :test do
+  # Erb code quality libraries
+  gem "erb_lint", require: false
 
   # Use Sass to process CSS
   # gem "sassc-rails"

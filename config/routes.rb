@@ -60,6 +60,11 @@ Rails.application.routes.draw do
         get :preview
         get :view
       end
+
+      # Wicked gem controller to make step by step
+      # resource :simple_algorithm_version_creation,
+      #          only: %i[update],
+      #          controller: 'simple_algorithm_version_creation'
     end
     resources :algorithm_versions, except: [:show]
     resources :control_structures
@@ -68,6 +73,21 @@ Rails.application.routes.draw do
   get "/node_template", to: "algorithm/nodes#template", as: 'node_template'
   get "/:ownername/algorithms/:id", to: "algorithm/algorithm_versions#show", as: 'algorithm_version'
   get "/:ownername/algorithms/:algorithm_version_id/steps/:id", to: "algorithm/steps#show", as: 'algorithm_version_step'
+
+  ### simple_algorithm_version_creation
+  # FLAT OPTIONAL ROUTE: Parentheses () make target_repository and target_folder optional siblings
+  get '/algorithm/simple_algorithm_version_creation/new(/:target_repository)(/:target_folder)',
+      to: 'algorithm/simple_algorithm_version_creation#new',
+      as: 'new_custom_simple_algorithm_version_creation'
+
+  # Custom Wizard Route Matrix mapping step tokens strictly onto :wizard_id
+  get '/algorithm/simple_algorithm_version_creation/:wizard_id',
+      to: 'algorithm/simple_algorithm_version_creation#show',
+      as: 'simple_algorithm_version_creation'
+
+  put '/algorithm/simple_algorithm_version_creation/:wizard_id',
+      to: 'algorithm/simple_algorithm_version_creation#update'
+  ### simple_algorithm_version_creation
 
   namespace :cheat_sheet do
     resources :cheat_sheets, except: [:show] do

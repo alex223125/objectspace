@@ -1,0 +1,43 @@
+<%#= simple_form_for(@algorithm_version, url: wizard_path(id: step, algorithm_version_id: @algorithm_version.slug), method: :put) do |f| %>
+<%#= simple_form_for(@algorithm_version, url: wizard_path(id: step, version_id: @algorithm_version.slug), method: :put) do |f| %>
+<%#= simple_form_for(@algorithm, url: wizard_path(id: step, version_id: @algorithm_version.slug), method: :put) do |f| %>
+
+
+<%#= simple_form_for(@algorithm, url: wizard_path(step.to_s, algorithm_version_id: @algorithm_version.slug), method: :put) do |f| %>
+
+<%= simple_form_for(@algorithm,
+                      url: simple_algorithm_version_creation_path(
+                        algorithm_id: @algorithm.id,
+                        wizard_id: step.to_s,
+                        algorithm_version_id: @algorithm_version.slug
+                      ),
+                      html: { data: { turbo: false } },
+                      method: :put) do |f| %>
+
+  <% if @algorithm.errors.any? %>
+    <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+      <div class="text-sm text-red-700 font-bold">
+        Form validation failed. Please correct the following errors:
+      </div>
+      <ul class="list-disc pl-5 mt-2 text-xs text-red-600">
+        <% @algorithm_version.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+
+
+  <%= f.fields_for :algorithm_versions do |form| %>
+
+
+    <%= render "algorithm/simple_algorithm_version_creation/partials/algorithm_version_fields", :f => form %>
+
+
+  <% end %>
+
+  <div class="mt-6 flex justify-end">
+    <%= f.button :submit, "Continue to Onboarding Invitation ➔", class: "bg-indigo-600 text-white font-bold px-5 py-2.5 rounded-xl hover:bg-indigo-700 transition" %>
+  </div>
+<% end %>

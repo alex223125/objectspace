@@ -1,80 +1,85 @@
+<div data-controller="new_algorithm_creation_steps_nested_form_validation"
+     data-action="submit->new_algorithm_creation_steps_nested_form_validation#validateForm">
+
 <%= simple_form_for(@algorithm, url: algorithm_algorithms_path) do |f| %>
 
-  <% [@algorithm, @algorithm_tree, @root_leafe, @permission].each do |entity| %>
-    <% if entity.try(:errors).present? %>
-      <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-        <h2><%= pluralize(entity.errors.count, "error") %> prohibited this Combo Tutorial from being saved:</h2>
+    <% [@algorithm, @algorithm_tree, @root_leafe, @permission].each do |entity| %>
+      <% if entity.try(:errors).present? %>
+        <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+          <h2><%= pluralize(entity.errors.count, "error") %> prohibited this Combo Tutorial from being saved:</h2>
 
-        <ul>
-          <% entity.errors.each do |error| %>
-            <li><%= error.full_message %></li>
-          <% end %>
-        </ul>
-      </div>
+          <ul>
+            <% entity.errors.each do |error| %>
+              <li><%= error.full_message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
     <% end %>
+
+    <div class="form-inputs">
+      <div class="col-span-6 sm:col-span-3">
+        <%= f.label "Title", class: "block text-sm font-medium text-gray-700" %>
+        <%= f.hint 'What this algorithm does? What this algorithm changes, modifies? What task this algorithm performs? This title should unite all versions of algorithm', class: "mt-2 text-sm text-gray-500" %>
+        <%= f.input_field :title,
+                          required: true,
+                          class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
+                          placeholder: "Ex: How to install Ruby on Rails on your Desktop" %>
+      </div>
+      <br>
+
+      <div class="col-span-6 sm:col-span-3">
+        <%= f.label "Source page description", class: "block text-sm font-medium text-gray-700" %>
+        <%= f.hint 'Thats the description which will be shown on the top of the source page',
+                   class: "mt-2 text-sm text-gray-500" %>
+        <%= f.input_field :source_page_description,
+                          required: false,
+                          class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
+                          placeholder: "Ex: Different versions on how you can install Ruby on Rails on different environments" %>
+      </div>
+      <br>
+
+      <div class="col-span-6 sm:col-span-3" data-controller="tags">
+        <%= f.label "Tags", class: "block text-sm font-medium text-gray-700" %>
+        <%= f.hint "It is recommended to use no more than 5 tags. The maximum number is 8. Tags are separated by a comma.",
+                   class: "mt-2 text-sm text-gray-500" %>
+        <%= f.input_field :tag_list,
+                          required: false,
+                          class: "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5",
+                          placeholder: "write some tags",
+                          data: {target: "tags.output"}%>
+      </div>
+      <br>
+
+      <%= f.hidden_field :functional_type, value: Algorithms::FunctionalTypes[@functional_type] %>
+
+      <%# binding.pry %>
+      <%#= f.hidden_field :simple_class_id, value: @simple_class.try(:id) %>
+
+
+
+      <%= render "shared/form_partials/target_place" %>
+
+  <!--    <div class="col-span-6 sm:col-span-3" data-controller="unit_instruction_tinymce">-->
+        <%#= f.label "Description", class: "block text-sm font-medium text-gray-700" %>
+        <%#= f.hint 'Describe algorithm', class: "mt-2 text-sm text-gray-500" %>
+        <%#= f.input_field :description, data: { target: 'unit_instruction_tinymce.field' } %>
+  <!--    </div>-->
+  <!--    <br>-->
+
+    </div>
+
+    <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Algorithm version fields</h2>
+    <%= render "algorithm/shared/partials/algorithm_version/algorithm_version_nested_form", :form => f %>
+
+    <div class="bg-gray-50 px-4 py-3 sm:px-6">
+      <div class="text-end">
+        <%= link_to "Back to dashboard", algorithm_algorithms_path, class: "py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" %>
+        <%= f.button :submit, "Create algorithm",
+                     class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+      </div>
+    </div>
+
   <% end %>
 
-  <div class="form-inputs">
-    <div class="col-span-6 sm:col-span-3">
-      <%= f.label "Title", class: "block text-sm font-medium text-gray-700" %>
-      <%= f.hint 'What this algorithm does? What this algorithm changes, modifies? What task this algorithm performs? This title should unite all versions of algorithm', class: "mt-2 text-sm text-gray-500" %>
-      <%= f.input_field :title,
-                        required: true,
-                        class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
-                        placeholder: "Ex: How to install Ruby on Rails on your Desktop" %>
-    </div>
-    <br>
-
-    <div class="col-span-6 sm:col-span-3">
-      <%= f.label "Source page description", class: "block text-sm font-medium text-gray-700" %>
-      <%= f.hint 'Thats the description which will be shown on the top of the source page',
-                 class: "mt-2 text-sm text-gray-500" %>
-      <%= f.input_field :source_page_description,
-                        required: false,
-                        class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
-                        placeholder: "Ex: Different versions on how you can install Ruby on Rails on different environments" %>
-    </div>
-    <br>
-
-    <div class="col-span-6 sm:col-span-3" data-controller="tags">
-      <%= f.label "Tags", class: "block text-sm font-medium text-gray-700" %>
-      <%= f.hint "It is recommended to use no more than 5 tags. The maximum number is 8. Tags are separated by a comma.",
-                 class: "mt-2 text-sm text-gray-500" %>
-      <%= f.input_field :tag_list,
-                        required: false,
-                        class: "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5",
-                        placeholder: "write some tags",
-                        data: {target: "tags.output"}%>
-    </div>
-    <br>
-
-    <%= f.hidden_field :functional_type, value: Algorithms::FunctionalTypes[@functional_type] %>
-
-    <%# binding.pry %>
-    <%#= f.hidden_field :simple_class_id, value: @simple_class.try(:id) %>
-
-
-
-    <%= render "shared/form_partials/target_place" %>
-
-<!--    <div class="col-span-6 sm:col-span-3" data-controller="unit_instruction_tinymce">-->
-      <%#= f.label "Description", class: "block text-sm font-medium text-gray-700" %>
-      <%#= f.hint 'Describe algorithm', class: "mt-2 text-sm text-gray-500" %>
-      <%#= f.input_field :description, data: { target: 'unit_instruction_tinymce.field' } %>
-<!--    </div>-->
-<!--    <br>-->
-
-  </div>
-
-  <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-1xl sm:tracking-tight text-center">Algorithm version fields</h2>
-  <%= render "algorithm/shared/partials/algorithm_version/algorithm_version_nested_form", :form => f %>
-
-  <div class="bg-gray-50 px-4 py-3 sm:px-6">
-    <div class="text-end">
-      <%= link_to "Back to dashboard", algorithm_algorithms_path, class: "py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" %>
-      <%= f.button :submit, "Create algorithm",
-                   class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
-    </div>
-  </div>
-
-<% end %>
+</div>

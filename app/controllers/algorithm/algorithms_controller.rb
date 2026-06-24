@@ -127,7 +127,9 @@ class Algorithm::AlgorithmsController < ApplicationController
                                         permission: service.permission,
                                         algorithm_tree: service.algorithm_tree,
                                         root_leafe: service.root_leafe,
-                                        simple_class: service.algorithm.simple_class_interface.simple_class} }
+                                        simple_class: service.algorithm.simple_class_interface.try(:simple_class)} }
+
+
         # format.json { render json: @algorithm.errors, status: :unprocessable_entity }
       end
     end
@@ -190,6 +192,8 @@ class Algorithm::AlgorithmsController < ApplicationController
                                                   algorithm_versions_attributes: [:id, :title, :solves_the_problem,
                                                                                   :sources, :additional_information,
                                                                                   :description,
+
+                                                                                  :interactivity_type_id,
 
                                                                                   introduction_step_attributes: [
                                                                                       :title, :content

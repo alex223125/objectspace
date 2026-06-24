@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_04_18_000003) do
+ActiveRecord::Schema[7.0].define(version: 2026_06_21_185204) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -96,6 +96,8 @@ ActiveRecord::Schema[7.0].define(version: 2025_04_18_000003) do
     t.integer "original_algorithm_version_id"
     t.integer "duplicate_algorithm_verion_version_number"
     t.bigint "algorithm_tree_id", default: 1, null: false
+    t.integer "interactivity_type_id", default: 1
+    t.integer "wizard_creation_stage_id", default: 1
     t.index ["algorithm_tree_id"], name: "index_algorithm_versions_on_algorithm_tree_id"
     t.index ["searchable"], name: "index_algorithm_versions_on_searchable", using: :gin
     t.index ["slug"], name: "index_algorithm_versions_on_slug", unique: true
@@ -118,6 +120,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_04_18_000003) do
     t.integer "creator_id"
     t.integer "framework_interface_id"
     t.integer "simple_class_interface_id"
+    t.integer "wizard_creation_stage_id", default: 1
     t.index ["ownerable_type", "ownerable_id"], name: "index_algorithms_on_ownerable"
     t.index ["searchable"], name: "index_algorithms_on_searchable", using: :gin
   end

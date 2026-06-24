@@ -1,0 +1,23 @@
+<div class="max-w-4xl mx-auto my-6 px-4">
+  <div class="flex items-center justify-between relative">
+    <!-- Connecting visual backdrop tracking bar vector -->
+    <div class="absolute inset-x-0 h-1 bg-gray-200 top-1/2 -translate-y-1/2 z-0"></div>
+    <div class="absolute left-0 h-1 bg-indigo-600 top-1/2 -translate-y-1/2 z-0 transition-all duration-300"
+         style="width: <%= case active_step; when :algorithm_main then '0%'; when :introduction_content then '33%'; when :performing_content then '66%'; else '100%'; end %>"></div>
+
+    <% [:algorithm_main, :algorithm_version_main, :introduction_content, :performing_content, :finishing_content].each_with_index do |s, idx| %>
+      <% is_done = wizard_steps.index(s) < wizard_steps.index(active_step) %>
+      <% is_current = s == active_step %>
+
+      <div class="relative z-10 flex flex-col items-center">
+        <div class="w-8 h-8 rounded-full border-4 flex items-center justify-center font-bold text-xs transition-colors
+          <%= is_done ? 'bg-indigo-600 border-indigo-600 text-white' : (is_current ? 'bg-white border-indigo-600 text-indigo-600 shadow-md shadow-indigo-100' : 'bg-white border-gray-200 text-gray-400') %>">
+          <%= is_done ? "✓" : (idx + 1) %>
+        </div>
+        <span class="text-[10px] font-black uppercase tracking-wider mt-1 <%= is_current ? 'text-indigo-600' : 'text-gray-400' %>">
+          <%= s.to_s.titleize %>
+        </span>
+      </div>
+    <% end %>
+  </div>
+</div>

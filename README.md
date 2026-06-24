@@ -35,6 +35,9 @@ elasticsearch-8.7.0-linux-x86_64/elasticsearch-8.7.0/bin$ ./elasticsearch
 ## zeitwek files check
 SECRET_KEY_BASE_DUMMY=1 bundle exec rails zeitwerk:check
 
+## Erb not close tag correction
+bundle exec erb_lint --format compact --autocorrect app/views/algorithm/shared/partials/algorithm_version/_algorithm_version_fields.html.erb
+
 
 # elsticsearch 
 In case of this error:

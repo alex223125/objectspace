@@ -4,6 +4,7 @@ module AlgorithmExecutionHelper
 
   def path_to_first_execution_step(current_step)
     step = current_step.algorithm_report.first_step
+    binding.pry
     algorithm_reports_algorithm_execution_path(logging_step_id: step.uuid)
   end
 

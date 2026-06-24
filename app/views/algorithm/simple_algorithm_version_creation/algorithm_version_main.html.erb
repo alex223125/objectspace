@@ -1,0 +1,23 @@
+<!-- component -->
+<div class="w-full max-w-screen-xl mx-auto px-6">
+  <div class="flex justify-center p-4 px-3 py-10">
+    <div class="w-full">
+      <div class="bg-white shadow-md rounded-lg px-3 py-2 mb-4">
+
+        <!-- Render Step 2 Timeline State -->
+        <%= render 'wizard_timeline', active_step: :algorithm_version_main %>
+
+        <!-- Dynamic Title Matcher Based on Type Mapping -->
+        <% title = Algorithms::FunctionalTypes[@functional_type] == "framework_level" ? "New Framework Version" : "New Combo Version" %>
+        <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight text-center mt-4">
+          <%= title %>
+        </h2>
+        <br>
+
+        <!-- Step Form Rendering Area -->
+        <%= render "algorithm/simple_algorithm_version_creation/partials/algorithm_version_main_form", algorithm_version: @algorithm_version %>
+        <br>
+      </div>
+    </div>
+  </div>
+</div>

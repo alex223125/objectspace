@@ -1,15 +1,33 @@
-<div class="relative inline-block text-left">
-  <%= link_to new_algorithm_reports_algorithm_report_path(algorithm_version_uuid: algorithm_version.uuid) do %>
-    <button id="createReportbutton"
-            class="relative inline-flex items-center justify-center p-0.5 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800"
-            type="button"
-    >
+<% binding.pry %>
+<% if algorithm_version.interactivity_type == AlgorithmVersions::InteractivityTypes.name_value_by_name(:simple_static_algorithm) %>
+  <!--  do nothing -->
+  <% binding.pry %>
+<% elsif algorithm_version.interactivity_type == AlgorithmVersions::InteractivityTypes.name_value_by_name(:simple_interactive_algorithm) %>
+  <div class="relative inline-block text-left">
+    <%= link_to new_algorithm_reports_algorithm_report_path(algorithm_version_uuid: algorithm_version.uuid) do %>
+      <button id="createReportbutton"
+              class="relative inline-flex items-center justify-center p-0.5 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800"
+              type="button"
+      >
+      <span class="flex items-center px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+        Launch Algorithm
+      </span>
+      </button>
+    <% end %>
+  </div>
+
+
+<% else %>
+  <div class="relative inline-block text-left">
+    <%= link_to new_algorithm_reports_algorithm_report_path(algorithm_version_uuid: algorithm_version.uuid) do %>
+      <button id="createReportbutton"
+              class="relative inline-flex items-center justify-center p-0.5 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800"
+              type="button"
+      >
       <span class="flex items-center px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
         Create Report
       </span>
-    </button>
-  <% end %>
-</div>
-
-
-
+      </button>
+    <% end %>
+  </div>
+<% end %>

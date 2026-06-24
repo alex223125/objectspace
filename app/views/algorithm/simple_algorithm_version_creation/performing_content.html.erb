@@ -1,0 +1,20 @@
+<!-- component -->
+<!-- UPDATED: Changed from max-w-screen-xl to max-w-screen-2xl for an extra wide container -->
+<div class="w-full max-w-screen-2xl mx-auto px-6">
+  <div class="flex justify-center p-4 px-3 py-10">
+    <div class="w-full">
+      <!--    <div class="w-full max-w-xl	">-->
+      <div class="bg-white shadow-md rounded-lg px-3 py-2 mb-4">
+        <!-- Render Step 2 Timeline State -->
+        <%= render 'wizard_timeline', active_step: :performing_content %>
+
+        <% binding.pry %>
+        <% title = Algorithms::FunctionalTypes[@functional_type] == "framework_level" ? "New Framework Tutorial" : "New Combo Tutorial"  %>
+        <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight text-center"><%= title %></h2>
+
+        <%= render "algorithm/simple_algorithm_version_creation/partials/performing_content_form", algorithm: @algorithm %>
+        <br>
+      </div>
+    </div>
+  </div>
+</div>
