@@ -1,0 +1,40 @@
+<!-- DYNAMIC ERB LOOP FOR WIZARD STEPS -->
+<% [:algorithm_main, :algorithm_version_main, :introduction_content, :performing_content, :finishing_content].each_with_index do |s, idx| %>
+  <% is_done = wizard_steps.index(s) < wizard_steps.index(active_step) %>
+  <% is_current = s == active_step %>
+
+  <div class="relative z-10 flex flex-col items-center">
+
+    <% if is_done %>
+      <!-- PASSED STATE (Done) -->
+      <div class="w-14 h-14 rounded-[22px] bg-emerald-50 border-[3px] border-emerald-300 flex items-center justify-center text-emerald-500 text-lg font-bold shadow-sm transition-all duration-200">
+        ★
+      </div>
+      <div class="mt-4 flex flex-col items-center space-y-1.5">
+        <span class="text-[14px] font-extrabold text-slate-600 text-center tracking-wide"><%= s.to_s.titleize %></span>
+        <span class="text-[11px] font-bold uppercase tracking-wider px-3 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100/50">Done!</span>
+      </div>
+
+    <% elsif is_current %>
+      <!-- ACTIVE STATE (Current) -->
+      <div class="w-14 h-14 rounded-[22px] bg-amber-50 border-[3px] border-amber-400 flex items-center justify-center text-amber-700 text-sm font-black shadow-md shadow-amber-200/60 ring-[5px] ring-amber-100/50 animate-pulse scale-105 transition-all duration-200">
+        <%= "%02d" % (idx + 1) %>
+      </div>
+      <div class="mt-4 flex flex-col items-center space-y-1.5">
+        <span class="text-[14px] font-black text-amber-700 text-center tracking-wide"><%= s.to_s.titleize %></span>
+        <span class="text-[11px] font-bold uppercase tracking-wider px-3 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200/30 shadow-sm">Current</span>
+      </div>
+
+    <% else %>
+      <!-- LOCKED STATE (Future) -->
+      <div class="w-14 h-14 rounded-[22px] bg-slate-50 border-[3px] border-slate-200 border-dotted flex items-center justify-center text-slate-400 text-sm font-bold transition-all duration-200">
+        <%= "%02d" % (idx + 1) %>
+      </div>
+      <div class="mt-4 flex flex-col items-center space-y-1.5">
+        <span class="text-[14px] font-medium text-slate-400 text-center tracking-wide"><%= s.to_s.titleize %></span>
+        <span class="text-[11px] font-bold uppercase tracking-wider px-3 py-0.5 rounded-full bg-slate-100 text-slate-400/80">Locked</span>
+      </div>
+    <% end %>
+
+  </div>
+<% end %>

@@ -1,20 +1,31 @@
 class Algorithm::SimpleAlgorithmVersionCreationController < ApplicationController
   include Wicked::Wizard
   include Algorithm::Concerns::Subnodable
+  include Placeable
 
   # Define the exact coherent 4-step sequence
   steps :algorithm_main, :algorithm_version_main, :introduction_content, :performing_content, :finishing_content
 
   before_action :authenticate_user!
+
+
   # before_action :set_algorithm
   before_action :set_algorithm, except: %i[new]
   # before_action :set_algorithm_version, remove: %i[new]
   before_action :set_algorithm_version, except: %i[new]
 
+  before_action :set_target_place, only: %i[ new ]
+
+  # This prevents 500 crashes on expired wizard tabs by safely nullifying the request session
+  protect_from_forgery with: :null_session, only: [:update]
+
   # GET /algorithm/algorithms/:algorithm_id/simple_algorithm_version_creation/new
   def new
     @algorithm = Algorithms::Algorithm.new
     @algorithm_version = @algorithm.algorithm_versions.new
+
+    binding.pry
+    @algorithm.default_version = @algorithm_version
 
     # # 1. Initialize a baseline version draft
     # @algorithm_version = @algorithm.algorithm_versions.new(
@@ -49,17 +60,23 @@ class Algorithm::SimpleAlgorithmVersionCreationController < ApplicationControlle
 
 
     # 3. Save draft without enforcing validations yet (validate: false)
-
     binding.pry
     # prepare draft version which is ready for next steps of creation of algorithm_version
     @algorithm_version.wizard_creation_stage_id = AlgorithmVersions::WizardCreationStagesTypes[:draft_created]
     # set default position for base control structure of algorithm
     @algorithm_version.control_structures.first.position = Algorithms::AlgorithmVersion::BASE_CONTROL_STRUCTURE_DEFAULT_POSITION
 
-    ### Algorithm draft creation
-    # prepare draft version which is ready for next steps of creation of algorithm_version
-    @algorithm.wizard_creation_stage_id = Algorithms::WizardCreationStagesTypes[:draft_created]
+    # ### Algorithm draft creation
+    # # prepare draft version which is ready for next steps of creation of algorithm_version
+    # @algorithm.wizard_creation_stage_id = Algorithms::WizardCreationStagesTypes[:draft_created]
+
+    ## From Algorithm.new service
     @algorithm.ownerable = current_user
+    @algorithm.creator = current_user
+
+    @target_place = set_target_place
+    set_place
+
     binding.pry
 
     if params[:functional_type].present?
@@ -68,10 +85,17 @@ class Algorithm::SimpleAlgorithmVersionCreationController < ApplicationControlle
       @functional_type = Algorithms::FunctionalTypes[:regular]
     end
     @algorithm.functional_type = @functional_type
-    ### 
+    ###
+
+    # do in transaction block
+    @algorithm.save(validate: false)
+    @algorithm_version.save(validate: false)
+    @algorithm.default_version_id = @algorithm_version.id
+    @algorithm.save(validate: false)
+    success = true
 
     binding.pry
-    if @algorithm.save(validate: false)
+    if success
       binding.pry
 
       # 4. Redirect straight to step 1 passing the new record ID
@@ -84,6 +108,46 @@ class Algorithm::SimpleAlgorithmVersionCreationController < ApplicationControlle
     else
       binding.pry
       redirect_to algorithm_algorithms_path, alert: "Failed to initialize creation wizard."
+    end
+  end
+
+
+  def set_place
+    binding.pry
+    if @target_place.class == Folder
+      @algorithm.folder = @target_place
+    elsif @target_place.class == Repository
+      @algorithm.repository = @target_place
+    elsif @target_place.class == ::SimpleClasses::ClassContainer
+      binding.pry
+      container_member = create_container_member
+      binding.pry
+      @algorithm.class_containers << container_member
+    elsif @target_place.class == ::SimpleClasses::InterfaceGroup
+      binding.pry
+      interface_member = create_interface_member
+      binding.pry
+      @algorithm.interface_members << interface_member
+    elsif @target_place.class == ::Frameworks::FrameworkInterface
+      @algorithm.framework_interface = @target_place
+    elsif @target_place.class == ::SimpleClasses::SimpleClassInterface
+      @algorithm.simple_class_interface = @target_place
+    end
+  end
+
+  def create_algorithm_version_algorithm_tree
+    binding.pry
+    algorithm_version = @algorithm.default_version
+    binding.pry
+    service = Services::Algorithms::Navigation::AlgorithmTrees::Create.new(algorithm_version)
+
+    binding.pry
+    service.call
+    binding.pry
+    if service.algorithm_tree.errors.present?
+      binding.pry
+      @algorithm_tree = service.algorithm_tree
+      raise ActiveRecord::RecordInvalid.new(service.algorithm_tree)
     end
   end
 
@@ -108,44 +172,10 @@ class Algorithm::SimpleAlgorithmVersionCreationController < ApplicationControlle
     Rails.logger.debug("WIZARD ERROR: #{@algorithm_version.errors.full_messages}")
     Rails.logger.debug("WIZARD ERROR: #{@algorithm.errors.full_messages}")
 
-    # respond_to do |format|
-    #   format.html { render_wizard }
-    #   format.turbo_stream { render_wizard }
-    # end
-
-    # respond_to do |format|
-    #   format.html { render_wizard }
-    #   format.turbo_stream do
-    #     render template: "algorithm/simple_algorithm_version_creation/#{step}",
-    #            formats: [:html],
-    #            layout: true
-    #   end
-    # end
-
+    # Calculate the highest step the user has successfully reached based on data presence
+    @max_accessible_step = determine_maximum_reached_step
 
     render_wizard
-    # redirect_to next_wizard_path(:introduction_content, algorithm_id: @algorithm.id, algorithm_version_id: @algorithm_version.slug)
-
-    # # binding.pry
-    # # render_wizard
-    # if setup_step_from(step) == :introduction_content
-    #   # binding.pry
-    #   # redirect_to wizard_path(
-    #   #               algorithm_id: @algorithm.id,
-    #   #               wizard_id: step.to_s,
-    #   #               algorithm_version_id: @algorithm_version.slug
-    #   #             )
-    #   # render_wizard nil, template: "algorithm/simple_algorithm_version_creation/introduction_content"
-    #   # redirect_to next_wizard_path
-    #   # redirect_to wizard_path(algorithm_id: @algorithm.id, algorithm_version_id: @algorithm_version.slug)
-    #   redirect_to wizard_path(:introduction_content, algorithm_id: @algorithm.id, algorithm_version_id: @algorithm_version.slug)
-    #
-    # else
-    #   binding.pry
-    #   Rails.logger.debug("WIZARD ERROR: #{@algorithm_version.errors.full_messages}")
-    #   Rails.logger.debug("WIZARD ERROR: #{@algorithm.errors.full_messages}")
-    #   render_wizard
-    # end
   end
 
   # PUT /algorithm/algorithms/:algorithm_id/simple_algorithm_version_creation/:id
@@ -183,12 +213,18 @@ class Algorithm::SimpleAlgorithmVersionCreationController < ApplicationControlle
       save_success = false
       binding.pry
 
+
+      # steps :algorithm_main, :algorithm_version_main, :introduction_content, :performing_content, :finishing_content
+
+
       case setup_step_from(step)
+
       when :algorithm_main
 
         binding.pry
         # Assign incoming form values to your parent model
         @algorithm.assign_attributes(current_params)
+        @algorithm_version.wizard_creation_stage_id = AlgorithmVersions::WizardCreationStagesTypes[:record_initiated]
 
         # 1. FORCE VALIDATION IN MEMORY: This populates @algorithm.errors for your ERB view failure blocks
         # @algorithm.valid?
@@ -196,39 +232,41 @@ class Algorithm::SimpleAlgorithmVersionCreationController < ApplicationControlle
         # 2. FORCE SAVE DRAFT: Commits parameters to DB bypassing validation rules
         save_success = @algorithm.save(validate: false)
 
-      when :introduction_content
-
-        binding.pry
-        introduction_step = @algorithm_version.introduction_step
-        introduction_step.assign_attributes(current_params)
-        # Populate the errors array for version objects
-        # @algorithm_version.valid?
-
-        save_success = @algorithm_version.save(validate: false)
-
       when :algorithm_version_main
-        binding.pry
         # if of algorithm_version exists
         # [5] pry(#<Algorithm::SimpleAlgorithmVersionCreationController>)> current_params[:algorithm_versions_attributes].values
         # => [#<ActionController::Parameters {"id"=>"82", "title"=>"agsagsag", "interactivity_type_id"=>"2", "description"=>"<p>gaagsags</p>", "solves_the_problem"=>"<p>sgaasgag</p>", "sources"=>"<p>gsaagas</p>", "additional_information"=>"<p>gsaaags</p>"} permitted: true>]
         # params = current_params[:algorithm_versions_attributes]
         algrithm_version_params = current_params[:algorithm_versions_attributes]["0"]
+
+        binding.pry
         @algorithm_version.assign_attributes(algrithm_version_params)
 
+        binding.pry
+        @algorithm_version.wizard_creation_stage_id = AlgorithmVersions::WizardCreationStagesTypes[:main_created]
+        # Populate the errors array for version objects
+        # @algorithm_version.valid?
+
+        save_success = @algorithm_version.save(validate: false)
+
+      when :introduction_content
+        binding.pry
+        introduction_step = @algorithm_version.introduction_step
+        introduction_step.assign_attributes(current_params)
+        @algorithm_version.wizard_creation_stage_id = AlgorithmVersions::WizardCreationStagesTypes[:introduction_created]
         # Populate the errors array for version objects
         # @algorithm_version.valid?
 
         save_success = @algorithm_version.save(validate: false)
 
       when :performing_content
-
-        # # DOC: 1.prepare parames
+        @algorithm_version.wizard_creation_stage_id = AlgorithmVersions::WizardCreationStagesTypes[:performing_content_created]
+        # DOC: 1.prepare parames
         # action_type = :algorithm_version_create
         # service = Services::Algorithms::Shared::Params::Create.new(params, action_type)
         # new_params = service.call
         # @structured_params = ActionController::Parameters.new(new_params)
         # params = algorithm_version_params
-
 
         ################################################################################################################
         binding.pry
@@ -245,10 +283,10 @@ class Algorithm::SimpleAlgorithmVersionCreationController < ApplicationControlle
         algorithm_version_params = algorithm_version_steps_params
         service = Services::Algorithms::AlgorithmVersions::Update.new(@algorithm_version, algorithm_version_params)
         service.call
-        #################################################################################################################
+        ################################################################################################################
 
-
-
+        binding.pry
+        create_algorithm_version_algorithm_tree
 
         # binding.pry
         # @algorithm_version.assign_attributes(params)
@@ -258,6 +296,12 @@ class Algorithm::SimpleAlgorithmVersionCreationController < ApplicationControlle
 
         # save_success = @algorithm_version.save(validate: false)
         save_success = service.errors.blank?
+      when :finishing_content
+        @algorithm_version.wizard_creation_stage_id = AlgorithmVersions::WizardCreationStagesTypes[:finishing_content_created]
+        save_success = @algorithm_version.save(validate: false)
+      else
+        @algorithm_version.wizard_creation_stage_id = AlgorithmVersions::WizardCreationStagesTypes[:complete_record_created]
+        save_success = @algorithm_version.save(validate: false)
       end
 
       # 3. CONTROLLING WIZARD NAVIGATION BASED ON ERRORS
@@ -328,6 +372,26 @@ class Algorithm::SimpleAlgorithmVersionCreationController < ApplicationControlle
 
   private
 
+  def determine_maximum_reached_step
+    # If the version is published or complete, everything is open
+    # return :finishing_content if @algorithm_version.searchable? || @algorithm.wizard_creation_stage_id == Algorithms::WizardCreationStagesTypes[:published]
+
+    # Check if they have reached the performing step (nested control structures exist)
+
+    binding.pry
+    if AlgorithmVersions::WizardCreationStagesTypes[@algorithm_version.wizard_creation_stage_id] == "finishing_content_created"
+      return :finishing_content
+    elsif AlgorithmVersions::WizardCreationStagesTypes[@algorithm_version.wizard_creation_stage_id] == "performing_content_created"
+      return :performing_content
+    elsif AlgorithmVersions::WizardCreationStagesTypes[@algorithm_version.wizard_creation_stage_id] == "introduction_created"
+      return :introduction_content
+    elsif AlgorithmVersions::WizardCreationStagesTypes[@algorithm_version.wizard_creation_stage_id] == "main_created"
+      return :algorithm_version_main
+    elsif AlgorithmVersions::WizardCreationStagesTypes[@algorithm_version.wizard_creation_stage_id] == "complete_record_created"
+      return :algorithm_main
+    end
+  end
+
 
   # BULLETPROOF WICKED PARAMETER DEC0UPLE OVERRIDE:
   # Intercepts the routing parameters chain and feeds Wicked the :wizard_id instead of :id
@@ -368,16 +432,38 @@ class Algorithm::SimpleAlgorithmVersionCreationController < ApplicationControlle
     @algorithm = Algorithms::Algorithm.find(params[:algorithm_id])
   end
 
+  # def set_algorithm_version
+  #   binding.pry
+  #   # Track either passed version token parameter mapping or fallback to step route id parameters
+  #   algorithm_version_id = params[:algorithm_version_id] || params[:id]
+  #
+  #   binding.pry
+  #   @algorithm_version = @algorithm.algorithm_versions.friendly.find(algorithm_version_id)
+  # rescue ActiveRecord::RecordNotFound
+  #
+  #   binding.pry
+  #   redirect_to root_path, alert: "Target draft not located."
+  # end
+
   def set_algorithm_version
-    binding.pry
-    # Track either passed version token parameter mapping or fallback to step route id parameters
-    algorithm_version_id = params[:algorithm_version_id] || params[:id]
+    # 1. Prioritize the explicit ID token key first
+    algorithm_version_id = params[:algorithm_version_id]
 
-    binding.pry
-    @algorithm_version = @algorithm.algorithm_versions.friendly.find(algorithm_version_id)
+    # 2. Fall back to params[:id] ONLY if it represents a database record and NOT a step name
+    if algorithm_version_id.blank? && params[:id].present?
+      unless steps.map(&:to_s).include?(params[:id].to_s)
+        algorithm_version_id = params[:id]
+      end
+    end
+
+    # 3. Secure execution extraction
+    if algorithm_version_id.present?
+      @algorithm_version = @algorithm.algorithm_versions.friendly.find(algorithm_version_id)
+    else
+      # Fallback to the latest active version draft under this parent container
+      @algorithm_version = @algorithm.algorithm_versions.last
+    end
   rescue ActiveRecord::RecordNotFound
-
-    binding.pry
     redirect_to root_path, alert: "Target draft not located."
   end
 

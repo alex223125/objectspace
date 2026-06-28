@@ -21,26 +21,32 @@
     <!-- DYNAMIC PROGRESS TRACKING BAR -->
     <div class="absolute left-0 h-2 bg-gradient-to-r from-emerald-400 via-sky-400 to-amber-400 rounded-full top-[26px] z-0 transition-all duration-500"
          style="width: <%= case active_step; when :algorithm_main then '0%'; when :introduction_content then '33%'; when :performing_content then '66%'; else '100%'; end %>;"></div>
+    <!-- DYNAMIC PROGRESS TRACKING BAR -->
+    <%
+      steps_list = [:algorithm_main, :algorithm_version_main, :introduction_content, :performing_content, :finishing_content]
+
+      # Base progress tracking on the max step reached, not the current active step view
+      max_idx = steps_list.index(@max_accessible_step) || 0
+      progress_percentage = (max_idx.to_f / (steps_list.size - 1) * 100).round
+    %>
+    <div class="absolute left-0 h-2 bg-gradient-to-r from-emerald-400 via-sky-400 to-amber-400 rounded-full top-[26px] z-0 transition-all duration-500"
+         style="width: <%= progress_percentage %>%;"></div>
 
     <!-- DYNAMIC ERB LOOP FOR WIZARD STEPS -->
-    <% [:algorithm_main, :algorithm_version_main, :introduction_content, :performing_content, :finishing_content].each_with_index do |s, idx| %>
-      <% is_done = wizard_steps.index(s) < wizard_steps.index(active_step) %>
+    <% steps_list.each_with_index do |s, idx| %>
+      <% current_idx = steps_list.index(s) %>
+      <% max_reached_idx = steps_list.index(@max_accessible_step) || 0 %>
+      <% active_step_idx = steps_list.index(active_step) || 0 %>
+
+      <%# A step is clickable/accessible if it is less than or equal to the furthest step ever saved %>
+      <% is_accessible = current_idx <= max_reached_idx %>
       <% is_current = s == active_step %>
+      <% is_done = current_idx < active_step_idx || (is_accessible && !is_current) %>
 
       <div class="relative z-10 flex flex-col items-center">
 
-        <% if is_done %>
-          <!-- PASSED STATE (Done) -->
-          <div class="w-14 h-14 rounded-[22px] bg-emerald-50 border-[3px] border-emerald-300 flex items-center justify-center text-emerald-500 text-lg font-bold shadow-sm transition-all duration-200">
-            ★
-          </div>
-          <div class="mt-4 flex flex-col items-center space-y-1.5">
-            <span class="text-[14px] font-extrabold text-slate-600 text-center tracking-wide"><%= s.to_s.titleize %></span>
-            <span class="text-[11px] font-bold uppercase tracking-wider px-3 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100/50">Done!</span>
-          </div>
-
-        <% elsif is_current %>
-          <!-- ACTIVE STATE (Current) -->
+        <% if is_current %>
+          <!-- ACTIVE STATE (Current View) -->
           <div class="w-14 h-14 rounded-[22px] bg-amber-50 border-[3px] border-amber-400 flex items-center justify-center text-amber-700 text-sm font-black shadow-md shadow-amber-200/60 ring-[5px] ring-amber-100/50 animate-pulse scale-105 transition-all duration-200">
             <%= "%02d" % (idx + 1) %>
           </div>
@@ -49,8 +55,21 @@
             <span class="text-[11px] font-bold uppercase tracking-wider px-3 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200/30 shadow-sm">Current</span>
           </div>
 
+        <% elsif is_accessible %>
+          <!-- ACCESSIBLE PAST / FUTURE STATE (Done & Clickable) -->
+          <%= link_to simple_algorithm_version_creation_path(wizard_id: s, algorithm_id: @algorithm.id, algorithm_version_id: @algorithm_version.slug.presence || @algorithm_version.id),
+                      class: "w-14 h-14 rounded-[22px] bg-emerald-50 border-[3px] border-emerald-300 flex items-center justify-center text-emerald-500 text-lg font-bold shadow-sm transition-all duration-200 hover:scale-105" do %>
+            ★
+          <% end %>
+          <div class="mt-4 flex flex-col items-center space-y-1.5">
+            <%= link_to s.to_s.titleize,
+                        simple_algorithm_version_creation_path(wizard_id: s, algorithm_id: @algorithm.id, algorithm_version_id: @algorithm_version.slug.presence || @algorithm_version.id),
+                        class: "text-[14px] font-extrabold text-slate-600 text-center tracking-wide hover:text-emerald-600 hover:underline transition-colors" %>
+            <span class="text-[11px] font-bold uppercase tracking-wider px-3 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100/50">Done!</span>
+          </div>
+
         <% else %>
-          <!-- LOCKED STATE (Future) -->
+          <!-- LOCKED STATE (Future - Non-clickable) -->
           <div class="w-14 h-14 rounded-[22px] bg-slate-50 border-[3px] border-slate-200 border-dotted flex items-center justify-center text-slate-400 text-sm font-bold transition-all duration-200">
             <%= "%02d" % (idx + 1) %>
           </div>
@@ -62,6 +81,7 @@
 
       </div>
     <% end %>
+
 
   </div>
 </div>

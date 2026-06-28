@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_06_21_185204) do
+ActiveRecord::Schema[7.0].define(version: 2026_06_26_053030) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -510,7 +510,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_06_21_185204) do
     t.datetime "updated_at", null: false
     t.integer "parent_id"
     t.integer "position", null: false
-    t.integer "algorithm_tree_id"
+    t.integer "algorithm_tree_id", null: false
     t.string "referencable_type"
     t.bigint "referencable_id"
     t.text "node_description"

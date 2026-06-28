@@ -22,10 +22,15 @@ module Services
 
           def create_algorithm_tree
             binding.pry
-            @algorithm_tree = @algorithm_version.build_algorithm_tree
+            # @algorithm_tree = @algorithm_version.build_algorithm_tree
+            @algorithm_tree = @algorithm_version.create_algorithm_tree
+
+            binding.pry
             # DOC: root leaf just to hold all structure in one
             @root_leafe = @algorithm_tree.build_leafe
             @root_leafe.node_title = @algorithm_version.title
+
+            binding.pry
             @root_leafe.position = 1
             @root_leafe.related_algorithm_version = @algorithm_version
             # TODO: Add this to separate root leafe and other leaves:
@@ -37,14 +42,99 @@ module Services
             binding.pry
             add_layer_to_tree_structure(@root_leafe, hash_tree)
 
+            ## Right order
             binding.pry
-            @algorithm_tree.save!
-            # @algorithm_version.algorithm_tree = @algorithm_tree
-
-            # DOC: We should save algorithm version
-            # after we saving algorithm tree to commit
-            # change of algorithm_tree_id from default value
+            @algorithm_version.algorithm_tree_id = @algorithm_tree.id
             @algorithm_version.save!
+            binding.pry
+
+            # # 1. Manually assign the algorithm_tree_id to all child leaves in memory
+            # @algorithm_version.algorithm_tree.leafe.children.each do |leaf|
+            #   leaf.algorithm_tree_id = @algorithm_tree.id
+            # end
+
+            # # 1. Define a quick block/lambda to recursively force the ID down the tree
+            # assign_tree_id = ->(leaf, tree_id) do
+            #   leaf.algorithm_tree_id = tree_id
+            #   # If your Leaf model has an association to its children (e.g., has_many :children / :subleaves)
+            #   # Loop through them in memory and apply the same tree_id
+            #   if leaf.respond_to?(:children) && leaf.children.any?
+            #     leaf.children.each { |child| assign_tree_id.call(child, tree_id) }
+            #   end
+            # end
+            #
+            # @algorithm_version.algorithm_tree.leafe.children do |top_leaf|
+            #   assign_tree_id.call(top_leaf, @algorithm_tree.id)
+            # end
+            #
+            # binding.pry
+            # @algorithm_version.algorithm_tree.tree_root.self_and_descendants.each do |a|
+            #   a.save!
+            # end
+            #
+            # binding.pry
+            #
+            # @algorithm_version.save!
+            #
+            # @algorithm_version.algorithm_tree.leafe.children.each do |a|
+            #   a.algorithm_tree_id = @algorithm_version.algorithm_tree.id
+            #   # a.save!
+            # end
+            #
+            # @algorithm_version.algorithm_tree.save!(validate: false)
+            #
+            # @algorithm_version.algorithm_tree.tree_root.save!
+            # @algorithm_version.algorithm_tree.save!
+
+
+            # 1. Define a robust depth-first recursive lambda to track and fix all nested nodes
+            assign_tree_id_recursively = ->(leaf, target_tree_id) do
+              return if leaf.nil?
+
+              # Inject the missing database constraint identifier
+              leaf.algorithm_tree_id = target_tree_id
+
+              # If this node contains child arrays initialized in memory, process them
+              if leaf.respond_to?(:children) && leaf.children.present?
+                leaf.children.each do |child_leaf|
+                  assign_tree_id_recursively.call(child_leaf, target_tree_id)
+                end
+              end
+            end
+
+            binding.pry
+            # 2. Extract the true root container node
+            root_leaf = @algorithm_version.algorithm_tree.tree_root
+
+
+            binding.pry
+            # 3. Fire the recursive assignment across the memory tree graph
+            if root_leaf
+              assign_tree_id_recursively.call(root_leaf, @algorithm_version.algorithm_tree.id)
+            end
+
+            binding.pry
+            # 4. Bind version mappings and save down the whole pipeline safely
+            # @algorithm_version.original_algorithm_version_id = @algorithm_version.algorithm_tree.id
+            @algorithm_version.algorithm_tree_id = @algorithm_tree.id
+
+
+            binding.pry
+            @algorithm_version.algorithm_tree.tree_root.save!
+
+            binding.pry
+            @algorithm_version.save!
+
+            binding.pry
+            # @algorithm_tree.save!
+
+
+            latest_duplicate_algorithm_version = @algorithm_version.latest_duplicate_algorithm_version
+            latest_duplicate_algorithm_version.algorithm_tree_id = @algorithm_tree.id
+            latest_duplicate_algorithm_version.save!
+            binding.pry
+
+
           rescue ActiveRecord::RecordInvalid => e
             binding.pry
             @errors = e.message

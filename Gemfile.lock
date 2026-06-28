@@ -444,7 +444,7 @@ DEPENDENCIES
   simple_form
   sprockets-rails (~> 3.0, >= 3.0.4)
   stimulus-rails
-  tailwindcss-rails
+  tailwindcss-rails (~> 2.0.21)
   turbo-rails (= 1.0.0)
   tzinfo-data
   uuid (~> 2.3, >= 2.3.9)

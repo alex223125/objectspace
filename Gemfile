@@ -58,7 +58,8 @@ gem 'acts_as_list'
 
 gem 'cocoon', '~> 1.2', '>= 1.2.9'
 
-gem 'tailwindcss-rails'
+# version hardcoded to prevent any ui changes depending on buinde install
+gem 'tailwindcss-rails', '~> 2.0.21'
 gem 'jquery-rails'
 
 gem 'pagy', '~> 6.0' # omit patch digit

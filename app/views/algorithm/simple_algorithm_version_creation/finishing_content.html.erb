@@ -1,25 +1,21 @@
-<%= render 'wizard_timeline', active_step: :finishing_content %>
+<!-- component -->
+<!-- UPDATED: Changed from max-w-screen-xl to max-w-screen-2xl for an extra wide container -->
+<div class="w-full max-w-screen-2xl mx-auto px-6">
+  <div class="flex justify-center p-4 px-3 py-10">
+    <div class="w-full">
+      <!--    <div class="w-full max-w-xl	">-->
+      <div class="bg-white shadow-md rounded-lg px-3 py-2 mb-4">
+        <!-- Render Step 2 Timeline State -->
+        <%= render 'wizard_timeline', active_step: :finishing_content %>
 
-<div class="max-w-4xl mx-auto space-y-6">
-  <!-- INSERT THE IMMERSIVE PANORAMIC SIGHTSEEING FLAG MAP VECTOR HERE -->
-  <%#= render "algorithm/shared/partials/gamification/panoramic_map" %>
+        <% binding.pry %>
+        <% title = Algorithms::FunctionalTypes[@functional_type] == "framework_level" ? "New Framework Tutorial" : "New Combo Tutorial"  %>
+        <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight text-center"><%= title %></h2>
+        <br>
 
-  <%= simple_form_for(@algorithm_version, url: wizard_path(version_id: @algorithm_version.slug), method: :put, html: { class: "bg-white border border-gray-200 p-8 rounded-2xl shadow-sm text-center" }) do |f| %>
-
-    <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-4 border border-emerald-200">
-      🚀
+        <%= render "algorithm/simple_algorithm_version_creation/partials/finishing_content_form", algorithm: @algorithm %>
+        <br>
+      </div>
     </div>
-
-    <h2 class="text-2xl font-black text-gray-900 uppercase tracking-tight">Venture Campaign Fully Prepared!</h2>
-    <p class="text-sm text-gray-500 max-w-md mx-auto mt-2 leading-relaxed">
-      All parameters compiled, subnodes validated successfully, and deployment configurations aligned. Launch your quest configuration onto the primary active public timeline index.
-    </p>
-
-    <div class="mt-8 pt-6 border-t border-gray-100 flex justify-between items-center">
-      <%= link_to "⬅ Back to Steps Configuration", previous_wizard_path(version_id: @algorithm_version.slug), class: "text-sm font-semibold text-gray-500 hover:text-gray-900" %>
-
-      <!-- Submission flags the finishing_content branch redirect out of the wizard -->
-      <%= f.button :submit, "Finalize Quest & Publish Blueprint 🏁", class: "bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-3 rounded-xl transition shadow-md shadow-emerald-100" %>
-    </div>
-  <% end %>
+  </div>
 </div>

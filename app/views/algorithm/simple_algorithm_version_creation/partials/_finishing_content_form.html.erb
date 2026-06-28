@@ -1,0 +1,22 @@
+<%= simple_form_for(@algorithm, url: simple_algorithm_version_creation_path(algorithm_id: @algorithm.id,
+                                                                            wizard_id: step.to_s,
+                                                                            algorithm_version_id: @algorithm_version.slug), method: :put,
+                    html: { data: { turbo: false }, id: "nested-steps-form-root", class: "max-w-5xl mx-auto space-y-6" }) do |f| %>
+
+
+  <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-4 border border-emerald-200">
+    🚀
+  </div>
+
+  <h2 class="text-2xl font-black text-gray-900 uppercase tracking-tight text-center">Venture Campaign Fully Prepared!</h2>
+  <p class="text-sm text-gray-500 max-w-md mx-auto mt-2 leading-relaxed">
+    All parameters compiled, subnodes validated successfully, and deployment configurations aligned. Launch your quest configuration onto the primary active public timeline index.
+  </p>
+
+  <div class="mt-8 pt-6 border-t border-gray-100 flex justify-between items-center">
+    <%= link_to "⬅ Back to Steps Configuration", previous_wizard_path(version_id: @algorithm_version.slug), class: "text-sm font-semibold text-gray-500 hover:text-gray-900" %>
+
+    <!-- Submission flags the finishing_content branch redirect out of the wizard -->
+    <%= f.button :submit, "Finalize Quest & Publish Blueprint 🏁", class: "bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-3 rounded-xl transition shadow-md shadow-emerald-100" %>
+  </div>
+<% end %>
