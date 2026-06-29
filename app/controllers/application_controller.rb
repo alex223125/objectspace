@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::Base
+  before_action :auto_login_staging, if: -> { Rails.env.staging? }
 
   include Pagy::Backend
 
@@ -48,5 +49,15 @@ class ApplicationController < ActionController::Base
     )
   end
 
+  private
 
+  def auto_login_staging
+    # Skip the standard authentication filter entirely if our middleware successfully populated the session/user
+    if User.first && (defined?(Current) && Current.user.present?)
+      # Bypasses the require_authentication! or authenticate_user! logic
+    else
+      # Fallback to standard authentication check if no test user is available
+      authenticate_user!
+    end
+  end
 end
