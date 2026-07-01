@@ -3,7 +3,7 @@
 
 @import 'prism';
 
-@import "@yaireo/tagify/src/tagify.scss";
+//@import "@yaireo/tagify/src/tagify.scss";
 
 @import "cropperjs/src/css/cropper.scss";
 
@@ -13,3 +13,10 @@
 
 @import 'treejs_customization';
 
+// app/assets/stylesheets/application.bootstrap.scss
+
+// FIX: Change the path from "src/tagify.scss" to the flat distribution entry point
+@import "@yaireo/tagify/dist/tagify.css";
+
+// Alternative fallback if dist is omitted inside your specific node release package:
+// @import "@yaireo/tagify/tagify.scss";

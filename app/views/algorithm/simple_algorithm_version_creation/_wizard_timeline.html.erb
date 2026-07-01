@@ -23,7 +23,8 @@
          style="width: <%= case active_step; when :algorithm_main then '0%'; when :introduction_content then '33%'; when :performing_content then '66%'; else '100%'; end %>;"></div>
     <!-- DYNAMIC PROGRESS TRACKING BAR -->
     <%
-      steps_list = [:algorithm_main, :algorithm_version_main, :introduction_content, :performing_content, :finishing_content]
+      steps_list = [:algorithm_main, :algorithm_version_main, :introduction_content,
+                    :performing_content, :qr_code_content, :finishing_content]
 
       # Base progress tracking on the max step reached, not the current active step view
       max_idx = steps_list.index(@max_accessible_step) || 0

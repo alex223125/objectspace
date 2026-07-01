@@ -2,6 +2,8 @@
 test@test.com
 123456@#%R@QT#Q#s
 
+### new
+npm install puppeteer --save
 
 ### user
 asfasafsfsafsafsaasf@gmail.com

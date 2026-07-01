@@ -14,6 +14,10 @@ Rails.application.configure do
   config.cache_store = :memory_store
   ########################################################################################
 
+  # Force Sprockets to completely bypass the corrupted 'tmp/cache/assets' disk sector
+  config.assets.configure do |env|
+    env.cache = Sprockets::Cache::FileStore.new(Rails.root.join('tmp/healthy_assets_cache'))
+  end
 
   # Settings specified here will take precedence over those in config/application.rb.
 

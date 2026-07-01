@@ -1,0 +1,154 @@
+<%# app/views/algorithm/simple_algorithm_version_creation/qr_code_content.html.erb %>
+
+<%# 1. Update your root data-controller div block to use your active record variables exactly like this: %>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans text-slate-800"
+     data-controller="qr_generator"
+     data-qr-generator-version-id-value="<%= @algorithm_version.id.to_s %>"
+     data-qr-generator-algorithm-id-value="<%= @algorithm.id.to_s %>">
+
+  <div class="flex flex-col lg:flex-row gap-8 items-start">
+
+    <!-- Right Layout Column: Isolated Light-Themed Asset Generator Drawer -->
+    <div class="tw-scoped w-full max-w-sm mx-auto lg:w-96 sticky top-8">
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5 h-fit font-sans text-slate-800">
+
+        <div>
+          <span class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest block">Physical Deployment Deck</span>
+          <h3 class="text-base font-black text-slate-900 tracking-tight mt-0.5">Print Asset Generator</h3>
+          <p class="text-[11px] text-slate-500 mt-1 leading-normal">Compile vector plaques, download high-fidelity printable blueprints, and launch zero-friction onboarding entryways.</p>
+        </div>
+
+        <%= render 'wizard_timeline', active_step: :qr_code_content if lookup_context.template_exists?('wizard_timeline', [], true) %>
+
+        <%= simple_form_for(@algorithm,
+                            url: simple_algorithm_version_creation_path(algorithm_id: @algorithm.id,
+                                                                        wizard_id: step.to_s,
+                                                                        algorithm_version_id: @algorithm_version.slug),
+                            method: :put,
+                            html: {
+                              data: {
+                                turbo: true,
+                                action: "submit->qr_generator#generateAndDownload"
+                              },
+                              id: "nested-steps-form-root",
+                              class: "space-y-4"
+                            }) do |f| %>
+
+          <!-- Scannable Matrix Preview Box -->
+          <div class="space-y-2">
+            <label class="block text-[10px] font-black uppercase text-slate-400 tracking-wider">Active Onboarding Matrix</label>
+            <div class="flex flex-col items-center justify-center bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-inner relative group mx-auto w-44 h-44">
+              <%= turbo_frame_tag "qr_preview_frame", data: { qr_generator_target: "previewFrame" } do %>
+                <% if @algorithm_version.qr_vector_blob.attached? %>
+                  <div class="w-36 h-36 flex items-center justify-center bg-white rounded shadow-sm border border-slate-100 p-2 transition-transform duration-300 hover:scale-105">
+                    <%= @algorithm_version.qr_vector_blob.download.html_safe %>
+                  </div>
+                <% else %>
+                  <div class="w-36 h-36 text-slate-400 flex items-center justify-center font-mono text-[10px] bg-white rounded border border-dashed border-slate-200 shadow-sm animate-pulse">
+                    [ Ready to Compile ]
+                  </div>
+                <% end %>
+              <% end %>
+            </div>
+          </div>
+
+          <%= f.fields_for :algorithm_versions, @algorithm_version do |form| %>
+
+            <div class="space-y-1.5">
+              <label class="block text-[10px] font-black uppercase text-slate-500 tracking-wider">Print Asset Display Title</label>
+              <%= form.text_field :print_title,
+                                  class: "w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl p-3 text-xs font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 transition-all shadow-inner",
+                                  placeholder: "e.g., The Enigma of the Louvre Colonnade",
+                                  data: { qr_generator_target: "titleInput" } %>
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="block text-[10px] font-black uppercase text-slate-500 tracking-wider">Short Print Summary Card Block</label>
+              <%= form.text_area :short_print_description,
+                                 rows: 3,
+                                 class: "w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl p-3 text-xs font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 transition-all shadow-inner",
+                                 placeholder: "Scan this physical QR gate to launch your interactive location quest loop instantly...",
+                                 data: { qr_generator_target: "descriptionInput" } %>
+            </div>
+
+            <div class="space-y-2">
+              <label class="block text-[10px] font-black uppercase text-slate-500 tracking-wider">Export Asset Core Dimensions</label>
+              <div class="grid grid-cols-2 gap-2 text-xs font-semibold text-slate-600">
+                <label class="flex items-center gap-2 bg-slate-50 border border-slate-200 p-2.5 rounded-xl cursor-pointer hover:border-slate-300 transition-colors shadow-sm">
+                  <input type="radio" name="export_format" value="svg" checked class="accent-indigo-600" data-qr-generator-target="formatSvg" />
+                  <span>Vector SVG</span>
+                </label>
+                <label class="flex items-center gap-2 bg-slate-50 border border-slate-200 p-2.5 rounded-xl cursor-pointer hover:border-slate-300 transition-colors shadow-sm">
+                  <input type="radio" name="export_format" value="pdf" class="accent-indigo-600" data-qr-generator-target="formatPdf" />
+                  <span>Document PDF</span>
+                </label>
+              </div>
+            </div>
+
+            <%= form.submit "📥 Download Print Manifest Sheet",
+                            class: "w-full py-3 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer",
+                            data: {
+                              qr_generator_target: "submitButton"
+                            } %>
+
+          <% end %>
+
+<!--          Continue here additional button to save state of algorithm version -->
+<!--          <div class="flex justify-between items-center">-->
+            <%#= link_to "⬅ Back to Story", previous_wizard_path(version_id: @algorithm_version.slug), class: "text-sm font-semibold text-gray-500 hover:text-gray-900" %>
+            <%#= f.button :submit, "Save qr code ➔", class: "bg-indigo-600 text-white font-bold px-5 py-2.5 rounded-xl hover:bg-indigo-700 transition" %>
+<!--          </div>-->
+
+        <% end %>
+
+
+        <!--        Second form-->
+        <%= simple_form_for(@algorithm,
+                            url: simple_algorithm_version_creation_path(algorithm_id: @algorithm.id,
+                                                                        wizard_id: step.to_s,
+                                                                        algorithm_version_id: @algorithm_version.slug),
+                            method: :put,
+                            html: {
+                              id: "isolated-save-state-form",
+                              data: { turbo: true, turbo_frame: "_top", turbo_action: "advance" }
+                            }) do |f| %>
+
+          <%# This hidden fields pull data dynamically from your controller instance variables %>
+          <%= f.fields_for :algorithm_versions, @algorithm_version do |version_form| %>
+            <%= version_form.hidden_field :print_title, id: "hidden_print_title" %>
+            <%= version_form.hidden_field :short_print_description, id: "hidden_short_description" %>
+          <% end %>
+
+          <div class="flex justify-between items-center pt-4">
+            <%= link_to "⬅ Back to Story", previous_wizard_path(version_id: @algorithm_version.slug), class: "text-sm font-semibold text-gray-500 hover:text-gray-900" %>
+
+            <%# This button physically lives in Form 1 layout, but commands Form 2 to submit %>
+
+
+
+            <%= f.button :submit, "Save qr code ➔",
+                         data: {
+                           action: "click->qr_generator#syncDataAndSubmit",
+                           wizard_id: step.to_s,
+                           algorithm_id: @algorithm.id,
+                           algorithm_version_id: @algorithm_version.slug
+                         },
+                         class: "bg-indigo-600 text-white font-bold px-5 py-2.5 rounded-xl hover:bg-indigo-700 transition"
+            %>
+          </div>
+
+        <% end %>
+
+
+
+
+        <div class="pt-3 border-t border-slate-100 flex justify-end">
+          <%= link_to "Skip to Final Review →", simple_algorithm_version_creation_path(algorithm_id: @algorithm.id,
+                                                                                       wizard_id: :finishing_content,
+                                                                                       algorithm_version_id: @algorithm_version.slug), class: "text-[11px] font-bold text-slate-400 hover:text-indigo-600 transition-colors" %>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

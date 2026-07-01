@@ -13,7 +13,8 @@ module AlgorithmVersions
     value :id => 3, :name => :main_created
     value :id => 4, :name => :introduction_created
     value :id => 5, :name => :performing_content_created
-    value :id => 6, :name => :finishing_content_created
-    value :id => 7, :name => :complete_record_created
+    value :id => 6, :name => :qr_code_content_created
+    value :id => 7, :name => :finishing_content_created
+    value :id => 8, :name => :complete_record_created
   end
 end

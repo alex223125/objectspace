@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_06_26_053030) do
+ActiveRecord::Schema[7.0].define(version: 2026_06_30_021516) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -98,7 +98,11 @@ ActiveRecord::Schema[7.0].define(version: 2026_06_26_053030) do
     t.bigint "algorithm_tree_id", default: 1, null: false
     t.integer "interactivity_type_id", default: 1
     t.integer "wizard_creation_stage_id", default: 1
+    t.string "print_title", limit: 60
+    t.string "short_print_description", limit: 160
+    t.string "cached_qr_short_token", limit: 12
     t.index ["algorithm_tree_id"], name: "index_algorithm_versions_on_algorithm_tree_id"
+    t.index ["cached_qr_short_token"], name: "index_algorithm_versions_on_cached_qr_short_token", unique: true
     t.index ["searchable"], name: "index_algorithm_versions_on_searchable", using: :gin
     t.index ["slug"], name: "index_algorithm_versions_on_slug", unique: true
   end
@@ -776,6 +780,17 @@ ActiveRecord::Schema[7.0].define(version: 2026_06_26_053030) do
     t.index ["name"], name: "index_tags_on_name", unique: true
   end
 
+  create_table "tenant_qr_assets", force: :cascade do |t|
+    t.bigint "algorithm_version_id", null: false
+    t.string "lookup_hash", null: false
+    t.text "cached_svg_matrix"
+    t.string "configured_foreground", default: "#4F46E5"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["algorithm_version_id"], name: "index_tenant_qr_assets_on_algorithm_version_id"
+    t.index ["lookup_hash"], name: "index_tenant_qr_assets_on_lookup_hash", unique: true
+  end
+
   create_table "unit_version_improvements", force: :cascade do |t|
     t.bigint "unit_version_id", null: false
     t.bigint "improvement_id", null: false
@@ -875,6 +890,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_06_26_053030) do
   add_foreign_key "articles_simple_class_attributes", "articles"
   add_foreign_key "articles_simple_class_attributes", "simple_class_attributes"
   add_foreign_key "taggings", "tags"
+  add_foreign_key "tenant_qr_assets", "algorithm_versions"
   add_foreign_key "unit_version_improvements", "improvements"
   add_foreign_key "unit_version_improvements", "unit_versions"
   add_foreign_key "unit_version_usage_examples", "unit_versions"

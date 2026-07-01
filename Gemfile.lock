@@ -115,9 +115,11 @@ GEM
       xpath (~> 3.2)
     case_transform (0.2)
       activesupport
+    chunky_png (1.4.0)
     closure_tree (7.4.0)
       activerecord (>= 4.2.10)
       with_advisory_lock (>= 4.0.0)
+    cmdparse (3.0.7)
     cocoon (1.2.15)
     coderay (1.1.3)
     concurrent-ruby (1.2.0)
@@ -160,9 +162,14 @@ GEM
     ffi (1.15.5)
     friendly_id (5.4.2)
       activerecord (>= 4.0.0)
+    geom2d (0.4.1)
     globalid (1.1.0)
       activesupport (>= 5.0)
     hashie (5.0.0)
+    hexapdf (0.38.0)
+      cmdparse (~> 3.0, >= 3.0.3)
+      geom2d (~> 0.4, >= 0.4.1)
+      openssl (>= 2.2.1)
     i18n (1.12.0)
       concurrent-ruby (~> 1.0)
     image_processing (1.12.2)
@@ -242,6 +249,7 @@ GEM
     omniauth-rails_csrf_protection (1.0.1)
       actionpack (>= 4.2)
       omniauth (~> 2.0)
+    openssl (4.0.2)
     orm_adapter (0.5.0)
     pagy (6.0.1)
     parallel (1.28.0)
@@ -301,6 +309,10 @@ GEM
       actionpack (>= 5.2)
       railties (>= 5.2)
     rexml (3.2.5)
+    rqrcode (2.2.0)
+      chunky_png (~> 1.0)
+      rqrcode_core (~> 1.0)
+    rqrcode_core (1.2.0)
     rubocop (1.69.0)
       json (~> 2.3)
       language_server-protocol (>= 3.17.0)
@@ -423,6 +435,7 @@ DEPENDENCIES
   elasticsearch (~> 7.17)
   erb_lint
   friendly_id (~> 5.4.0)
+  hexapdf (~> 0.38.0)
   image_processing (~> 1.2)
   jbuilder
   jquery-rails
@@ -437,6 +450,7 @@ DEPENDENCIES
   puma (~> 5.0)
   rails (~> 7.0.0)
   redis (~> 4.0)
+  rqrcode (~> 2.2)
   sass-rails
   sassc (~> 2.1.0)
   searchkick

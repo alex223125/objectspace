@@ -1,0 +1,52 @@
+<div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5 h-fit lg:w-96 sticky top-8 font-sans text-slate-800" id="qr_deployment_drawer">
+
+  <div>
+    <span class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest block">Physical Deployment Deck</span>
+    <h3 class="text-base font-black text-slate-900 tracking-tight mt-0.5">Print Asset Generator</h3>
+    <p class="text-[11px] text-slate-500 mt-1 leading-normal">Compile vector plaques, download high-fidelity printable blueprints, and launch zero-friction onboarding entryways.</p>
+  </div>
+
+  <%= render 'wizard_timeline', active_step: :qr_code_content %>
+
+  <%= simple_form_for(@algorithm, url: simple_algorithm_version_creation_path(algorithm_id: @algorithm.id, wizard_id: @step.to_s, algorithm_version_id: @algorithm_version.slug), method: :put, html: { data: { turbo: true }, turbo_frame: "qr_preview_frame", id: "nested-steps-form-root", class: "max-w-5xl mx-auto space-y-6" }) do |f| %>
+
+    <!-- Scannable Matrix Preview Box -->
+    <div class="space-y-2">
+      <label class="block text-[10px] font-black uppercase text-slate-400 tracking-wider">Active Onboarding Matrix</label>
+      <div class="flex flex-col items-center justify-center bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-inner relative group mx-auto w-44 h-44">
+        <%= turbo_frame_tag "qr_preview_frame" do %>
+          <!-- Inline SVG Vector Matrix Injection Placeholder -->
+          <div class="w-36 h-36 text-slate-400 flex items-center justify-center font-mono text-[10px] bg-white rounded border border-dashed border-slate-200 shadow-sm">
+            [ QR Code Matrix ]
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="space-y-1.5">
+      <label class="block text-[10px] font-black uppercase text-slate-500 tracking-wider">Print Asset Display Title</label>
+      <%= f.text_field :print_title, class: "w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl p-3 text-xs font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 transition-all shadow-inner", placeholder: "e.g., The Enigma of the Louvre Colonnade" %>
+    </div>
+
+    <div class="space-y-1.5">
+      <label class="block text-[10px] font-black uppercase text-slate-500 tracking-wider">Short Print Summary Card Block</label>
+      <%= f.text_area :short_print_description, rows: 3, class: "w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl p-3 text-xs font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 transition-all shadow-inner", placeholder: "Scan this physical QR gate to launch your interactive location quest loop instantly..." %>
+    </div>
+
+    <div class="space-y-2">
+      <label class="block text-[10px] font-black uppercase text-slate-500 tracking-wider">Export Asset Core Dimensions</label>
+      <div class="grid grid-cols-2 gap-2 text-xs font-semibold text-slate-600">
+        <label class="flex items-center gap-2 bg-slate-50 border border-slate-200 p-2.5 rounded-xl cursor-pointer hover:border-slate-300 transition-colors shadow-sm">
+          <input type="radio" name="export_format" value="svg" checked class="accent-indigo-600" />
+          <span>Vector SVG</span>
+        </label>
+        <label class="flex items-center gap-2 bg-slate-50 border border-slate-200 p-2.5 rounded-xl cursor-pointer hover:border-slate-300 transition-colors shadow-sm">
+          <input type="radio" name="export_format" value="pdf" class="accent-indigo-600" />
+          <span>Document PDF</span>
+        </label>
+      </div>
+    </div>
+
+    <%= f.submit "📥 Download Print Manifest Sheet", class: "w-full py-3 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer" %>
+  <% end %>
+</div>

@@ -1,0 +1,5 @@
+<%= turbo_stream.update "qr_preview_frame" do %>
+  <div class="w-36 h-36 flex items-center justify-center bg-white rounded shadow-sm border border-slate-100 p-2 transition-transform duration-300 hover:scale-105">
+    <%= @tenant_qr_asset.cached_svg_matrix.html_safe %>
+  </div>
+<% end %>

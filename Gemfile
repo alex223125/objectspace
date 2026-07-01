@@ -102,6 +102,9 @@ gem 'uuid', '~> 2.3', '>= 2.3.9'
 gem 'words_counted'
 
 gem 'wicked'
+gem 'rqrcode', '~> 2.2'
+# gem 'grover', '~> 1.0'
+gem 'hexapdf', '~> 0.38.0'
 
 
 group :development, :test do

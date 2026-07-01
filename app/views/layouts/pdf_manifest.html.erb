@@ -1,0 +1,15 @@
+<%# app/views/layouts/pdf_manifest.html.erb %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Verification Passport Print Module</title>
+  <style>
+      @page { size: A4 portrait; margin: 20mm; }
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: #FFFFFF !important; }
+  </style>
+</head>
+<body class="bg-white">
+<%= yield %>
+</body>
+</html>

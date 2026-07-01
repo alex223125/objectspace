@@ -123,6 +123,10 @@ application.register("remote_select_attachment", RemoteSelectAttachmentControlle
 import AttachmentPreviewController from "./attachments/attachment_preview_controller.js"
 application.register("attachment_preview", AttachmentPreviewController)
 
+import QrGeneratorController from "./algorithms/qr_generator_controller.js"
+application.register("qr_generator", QrGeneratorController)
+
+
 
 // Instructions
 

@@ -1,10 +1,11 @@
 class Algorithms::AlgorithmVersion < ApplicationRecord
   include Unitable
+  include ::Algorithms::Concerns::QrDeployable  # Mix in the QR printing capabilities
 
   extend FriendlyId
   friendly_id :slug_candidates, use: [:slugged, :finders, :history]
 
-  belongs_to :algorithm
+  belongs_to :algorithm, class_name: "Algorithms::Algorithm"
 
   # has_many :control_structures, class_name: "Algorithms::ControlStructure"
   # accepts_nested_attributes_for :control_structures

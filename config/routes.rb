@@ -1,4 +1,16 @@
 Rails.application.routes.draw do
+
+  ##### API ROUTES
+  namespace :api do
+    resources :algorithm_versions, only: [] do
+      member do
+        post :generate_passport
+      end
+    end
+  end
+
+
+  ##### REGULAR ROUTES
   resources :simple_class_interfaces
   resources :logging_nodes
   resources :permissions
