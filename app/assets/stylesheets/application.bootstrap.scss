@@ -20,3 +20,20 @@
 
 // Alternative fallback if dist is omitted inside your specific node release package:
 // @import "@yaireo/tagify/tagify.scss";
+
+
+//Loading of improvements asynch http://127.0.0.1:3000/Testusername/algorithms/agsag-0999751b-0229-403c-b15a-18d530c6452b#
+.live-buffer-sync { @apply text-[10px] font-mono font-black uppercase text-cyan-500 bg-cyan-500/10 border px-2.5 py-1 rounded-md; }
+
+@keyframes slideDownCard {
+  from { opacity: 0; transform: translateY(-8px); filter: blur(4px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+.animate-fade-in {
+  animation: slideDownCard 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Ensure your layout asset stylesheets accommodate running shadow depths */
+.shadow-cyan-glow {
+  box-shadow: 0 0 30px rgba(6,182,212,0.3);
+}

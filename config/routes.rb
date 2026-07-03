@@ -1,13 +1,22 @@
 Rails.application.routes.draw do
 
   ##### API ROUTES
-  namespace :api do
+  namespace :api, defaults: { format: :json } do
+    # resources :algorithm_versions, only: [] do
+    #   resources :improvements, only: [:index, :create], controller: 'algorithm_improvements'
+    # end
+    resources :improvements, only: [:index, :create], controller: 'improvements'
     resources :algorithm_versions, only: [] do
       member do
         post :generate_passport
       end
     end
   end
+
+
+  # namespace :api, defaults: { format: :json } do
+  #
+  # end
 
 
   ##### REGULAR ROUTES

@@ -7,15 +7,18 @@ class Improvements::Improvement < ApplicationRecord
   friendly_id :slug_candidates, use: [:slugged, :finders, :history]
 
   extend Pagy::Searchkick
-  searchkick callbacks: :async,
-             text_start: [:title, :content],
-             text_middle: [:title, :content],
-             text_end: [:title, :content],
-             word: [:title, :content],
-             word_start: [:title, :content],
-             word_end: [:title, :content]
-  scope :search_import, -> { includes(:tags) }
+  # searchkick callbacks: :async,
+  #            text_start: [:title, :content],
+  #            text_middle: [:title, :content],
+  #            text_end: [:title, :content],
+  #            word: [:title, :content],
+  #            word_start: [:title, :content],
+  #            word_end: [:title, :content]
+  # scope :search_import, -> { includes(:tags) }
   acts_as_taggable_on :tags
+
+  # ADD THIS LINE TO PREVENT INDEX CRASHES DURING FORM SAVES:
+  searchkick callbacks: false
 
   belongs_to :improvable, :polymorphic => true
 

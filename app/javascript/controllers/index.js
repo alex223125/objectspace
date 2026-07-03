@@ -35,8 +35,14 @@ application.register("usage_examples_display_infinity_scroll", UsageExamplesDisp
 //1.3 Improvement
 import ImprovementContentTinymceController from "./tinymce/improvements/improvement_content_tinymce_controller.js"
 application.register("improvement_content_tinymce", ImprovementContentTinymceController)
+
 import ImprovementSourcesTinymceController from "./tinymce/improvements/improvement_sources_tinymce_controller.js"
 application.register("improvement_sources_tinymce", ImprovementSourcesTinymceController)
+
+import ImprovementCollapsibleFormController from "./improvements/improvement_collapsible_form_controller.js"
+application.register("improvement_collapsible_form", ImprovementCollapsibleFormController)
+
+
 
 // 1.4 Repository
 import RepositoryDescriptionTinymceController from "./tinymce/repositories/repository_description_tinymce_controller.js"
@@ -105,6 +111,15 @@ application.register("step_show", StepShowController)
 
 import NewAlgorithmCreationStepsNestedFormValidationController from "./algorithms/new_algorithm_creation_steps_nested_form_validation_controller.js"
 application.register("new_algorithm_creation_steps_nested_form_validation", NewAlgorithmCreationStepsNestedFormValidationController)
+
+import AsyncImprovementsController from "./algorithms/async_improvements_controller.js"
+application.register("async_improvements", AsyncImprovementsController)
+
+import ExpandableLogController from "./algorithms/expandable_log_controller.js"
+application.register("expandable_log", ExpandableLogController)
+
+
+
 
 // Algorithms Steps Map
 import AlgorithmTreeMapModalController from "./algorithms/tree_map/algorithm_tree_map_modal_controller.js"

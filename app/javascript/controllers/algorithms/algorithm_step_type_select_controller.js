@@ -18,7 +18,6 @@ export default class extends Controller {
 
     connect() {
         console.log("Algorithm step type select controller connected")
-
     }
 
     disconnect() {
