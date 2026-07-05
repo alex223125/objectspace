@@ -17,13 +17,24 @@
     <% end %>
   <% end %>
 
+  <% binding.pry %>
   <br>
-    <% if @article.present? %>
-      <%= render "shared/form_partials/form_target_previews/article", article: @article %>
-    <% elsif @unit.present? %>
-      <%= render "shared/form_partials/form_target_previews/unit", unit: @unit %>
-    <% end %>
+  <%= render "improvements/partials/new_improvement_card", algorithm_version: @algorithm_version %>
+  
   <br>
+  <% if @article.present? %>
+    <%= render "shared/form_partials/form_target_previews/article", article: @article %>
+  <% elsif @algorithm_version.present? %>
+    <% binding.pry %>
+    <%= render "improvements/partials/algorithm_version_preview", algorithm_version: @algorithm_version %>
+  <% elsif @article_version.present? %>
+    <% binding.pry %>
+    <%= render "improvements/partials/article_version_preview", article_version: @article_version %>
+  <% elsif @unit.present? %>
+    <%= render "shared/form_partials/form_target_previews/unit", unit: @unit %>
+  <% end %>
+
+
 
   <div class="col-span-6 sm:col-span-3">
     <%= f.label "Title", class: "block text-sm font-medium text-gray-700" %>

@@ -4,6 +4,21 @@
   <div class="flex justify-between px-4 mx-auto max-w-screen-xl">
     <div class="w-full format-sm sm:format-base lg:format-lg format-blue dark:format-invert">
       <div class="mb-4 lg:mb-6 not-format p-3">
+
+        <div class="w-full max-w-screen-xl mx-auto px-6 py-6">
+          <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-6">
+
+            <!-- 16:9 COMPACT HORIZONTAL COVER BANNER AT TOP -->
+            <div class="w-full aspect-[21/7] max-h-[220px] bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden shadow-inner relative group">
+              <img src="https://unsplash.com" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]" />
+              <div class="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/10 to-slate-950/50"></div>
+              <span class="absolute bottom-4 left-4 bg-slate-900/90 text-white font-mono text-[10px] px-2.5 py-1 border border-slate-800 rounded font-black tracking-widest uppercase">// ARCHIVAL_IMAGE_LOCKED</span>
+            </div>
+          </div>
+        </div>
+
+
+
         <h1 class="break-words mb-4 text-3xl font-extrabold leading-tight text-gray-900 lg:mb-6 lg:text-4xl dark:text-white">
           <%= algorithm_version.title %>
         </h1>

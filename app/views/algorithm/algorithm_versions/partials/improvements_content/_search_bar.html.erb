@@ -1,0 +1,199 @@
+<div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
+  <!--<div class="bg-grey col-12 mt-3 align-middle justify-content-center flex" >-->
+  <!--  <input type="text" class="col-8 border-2 p-2 w-full" placeholder="Search for Startups..." id="search-filter">-->
+  <!--  <button type="button" class="btn btn-light mr-10 shadow-sm" data-toggle="collapse" data-target="#filters">Drop search query and filters <i class="fa fa-filter"></i></button>-->
+  <!--</div>-->
+
+
+  <!--<div class="bg-grey col-12 mt-3 align-middle justify-content-center flex" >-->
+  <!--  <input type="text" class="col-8 border-2 p-2 w-full" placeholder="Search for Startups..." id="search-filter">-->
+  <!--</div>-->
+
+  <!--Part 1: Search bar -->
+  <div class="search-bar" data-controller="improvements_infinite_scroll">
+
+    <form onsubmit="return false">
+      <label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+          <svg aria-hidden="true" class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+        <input type="search"
+               id="default-search"
+               data-improvements_infinite_scroll-target="searchQuery"
+               class="block w-full ..."
+               placeholder="Search Mockups, Logos...">
+        <button type="submit"
+                data-action="click->improvements_infinite_scroll#submit"
+                class="text-white absolute right-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Search</button>
+      </div>
+    </form>
+
+    <!--Part 2: Filter and Sorting bar-->
+    <div class="mt-6 md:flex md:items-center space-x-4">
+
+
+      <!--    Filter by open-closed -->
+      <div class="inline-flex overflow-hidden bg-white border divide-x rounded-lg dark:bg-gray-900 rtl:flex-row-reverse dark:border-gray-700 dark:divide-gray-700">
+        <button
+          data-target="improvements_infinite_scroll.openClosedOption"
+          data-action="click->improvements_infinite_scroll#selectOpenClosedOption"
+          class="px-5 py-2 text-xs font-medium text-gray-600 transition-colors duration-200 bg-gray-100 sm:text-sm dark:bg-gray-800 dark:text-gray-300">
+          View all
+        </button>
+
+        <button
+          data-target="improvements_infinite_scroll.openClosedOption"
+          data-action="click->improvements_infinite_scroll#selectOpenClosedOption"
+          class="px-5 py-2 text-xs font-medium text-gray-600 transition-colors duration-200 sm:text-sm dark:hover:bg-gray-800 dark:text-gray-300 hover:bg-gray-100">
+          Open
+        </button>
+
+        <button
+          data-target="improvements_infinite_scroll.openClosedOption"
+          data-action="click->improvements_infinite_scroll#selectOpenClosedOption"
+          class="px-5 py-2 text-xs font-medium text-gray-600 transition-colors duration-200 sm:text-sm dark:hover:bg-gray-800 dark:text-gray-300 hover:bg-gray-100">
+          Closed
+        </button>
+      </div>
+
+      <!--    Sorting -->
+      <button id="dropdownRadioHelperButtonSorting"
+              data-dropdown-toggle="dropdownRadioHelperSorting"
+              class="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+              type="button">Sort results <svg class="w-4 h-4 ml-2" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+      </button>
+
+      <!-- Dropdown menu -->
+      <div id="dropdownRadioHelperSorting" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-60 dark:bg-gray-700 dark:divide-gray-600">
+        <ul class="p-3 space-y-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownRadioHelperButtonSorting">
+
+          <li>
+            <div class="flex p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
+              <div class="flex items-center h-5">
+                <input id="helper-radio-1"
+                       name="helper-radio-sorting"
+                       type="radio"
+                       value="newest"
+                       data-target="improvements_infinite_scroll.sortingOption"
+                       data-action="click->improvements_infinite_scroll#selectSortingOption"
+                       checked="checked"
+                       class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+              </div>
+              <div class="ml-2 text-sm">
+                <label for="helper-radio-1" class="font-medium text-gray-900 dark:text-gray-300">
+                  <div>Newest</div>
+                  <p id="helper-radio-text-1" class="text-xs font-normal text-gray-500 dark:text-gray-300">Some helpful instruction goes over here.</p>
+                </label>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <div class="flex p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
+              <div class="flex items-center h-5">
+                <input id="helper-radio-2"
+                       name="helper-radio-sorting"
+                       type="radio"
+                       value="oldest"
+                       data-target="improvements_infinite_scroll.sortingOption"
+                       data-action="click->improvements_infinite_scroll#selectSortingOption"
+                       class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+              </div>
+              <div class="ml-2 text-sm">
+                <label for="helper-radio-2" class="font-medium text-gray-900 dark:text-gray-300">
+                  <div>Oldest</div>
+                  <p id="helper-radio-text-2" class="text-xs font-normal text-gray-500 dark:text-gray-300">Some helpful instruction goes over here.</p>
+                </label>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <div class="flex p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
+              <div class="flex items-center h-5">
+                <input id="helper-radio-3"
+                       name="helper-radio-sorting"
+                       type="radio"
+                       value="most_commented"
+                       data-target="improvements_infinite_scroll.sortingOption"
+                       data-action="click->improvements_infinite_scroll#selectSortingOption"
+                       class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+              </div>
+              <div class="ml-2 text-sm">
+                <label for="helper-radio-3" class="font-medium text-gray-900 dark:text-gray-300">
+                  <div>Most commented</div>
+                  <p id="helper-radio-text-3" class="text-xs font-normal text-gray-500 dark:text-gray-300">Some helpful instruction goes over here.</p>
+                </label>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <div class="flex p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
+              <div class="flex items-center h-5">
+                <input id="helper-radio-4"
+                       name="helper-radio-sorting"
+                       type="radio"
+                       value="least_commented"
+                       data-target="improvements_infinite_scroll.sortingOption"
+                       data-action="click->improvements_infinite_scroll#selectSortingOption"
+                       class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+              </div>
+              <div class="ml-2 text-sm">
+                <label for="helper-radio-4" class="font-medium text-gray-900 dark:text-gray-300">
+                  <div>Least commented</div>
+                  <p id="helper-radio-text-4" class="text-xs font-normal text-gray-500 dark:text-gray-300">Some helpful instruction goes over here.</p>
+                </label>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <div class="flex p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
+              <div class="flex items-center h-5">
+                <input id="helper-radio-5"
+                       name="helper-radio-sorting"
+                       type="radio"
+                       value="recently_updated"
+                       data-target="improvements_infinite_scroll.sortingOption"
+                       data-action="click->improvements_infinite_scroll#selectSortingOption"
+                       class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+              </div>
+              <div class="ml-2 text-sm">
+                <label for="helper-radio-5" class="font-medium text-gray-900 dark:text-gray-300">
+                  <div>Recently updated</div>
+                  <p id="helper-radio-text-5" class="text-xs font-normal text-gray-500 dark:text-gray-300">Some helpful instruction goes over here.</p>
+                </label>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <div class="flex p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
+              <div class="flex items-center h-5">
+                <input id="helper-radio-6"
+                       name="helper-radio-sorting"
+                       type="radio"
+                       value="least_recently_updated"
+                       data-target="improvements_infinite_scroll.sortingOption"
+                       data-action="click->improvements_infinite_scroll#selectSortingOption"
+                       class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+              </div>
+              <div class="ml-2 text-sm">
+                <label for="helper-radio-6" class="font-medium text-gray-900 dark:text-gray-300">
+                  <div>Least recently updated</div>
+                  <p id="helper-radio-text-6" class="text-xs font-normal text-gray-500 dark:text-gray-300">Some helpful instruction goes over here.</p>
+                </label>
+              </div>
+            </div>
+          </li>
+
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+<br>

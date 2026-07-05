@@ -1,0 +1,104 @@
+<%# app/views/algorithm/algorithm_versions/partials/improvements_content/_improvement_card.html.erb %>
+
+<!-- Interactive Item Container Mounted with the Standalone Expandable Log Controller -->
+<div data-controller="expandable_log"
+     class="group relative flex flex-col bg-gray-50/50 dark:bg-gray-950/40 border border-gray-200/60 dark:border-gray-800/60 rounded-md transition-all duration-300 hover:bg-white dark:hover:bg-gray-900/60 hover:border-cyan-500/40 shadow-sm overflow-hidden font-mono animate-fade-in">
+
+  <!-- Cyberpunk left status accent line on hover -->
+  <div class="absolute left-0 top-0 bottom-0 w-[2.5px] bg-cyan-500 scale-y-0 group-hover:scale-y-100 transition-transform duration-200 origin-top z-10"></div>
+
+  <!-- BASE TRIGGER HEADER LAYER (Always Visible - Triggers the Expand/Collapse Slide Action) -->
+  <div data-action="click->expandable_log#toggle"
+       class="flex items-center justify-between p-2.5 cursor-pointer select-none active:bg-cyan-500/[0.02] w-full">
+
+    <div class="flex items-center gap-3 pl-1 max-w-2xl">
+      <!-- Interactive Arrow Indicator targeting your rotation engine transformations -->
+      <span data-expandable_log-target="icon"
+            class="text-[10px] text-cyan-500/40 group-hover:text-cyan-500 transition-transform duration-300 inline-block transform rotate-0 select-none">▶</span>
+
+      <div class="flex flex-col space-y-0.5">
+        <h4 class="text-xs font-bold text-gray-800 dark:text-gray-200 tracking-tight group-hover:text-cyan-400 transition-colors uppercase">
+          # <%= item.title %>
+        </h4>
+        <span class="text-[10px] text-gray-400 dark:text-gray-500 font-sans line-clamp-1 truncate max-w-[320px] sm:max-w-xl">
+          <%= strip_tags(item.content.to_s).truncate(70) %>
+        </span>
+      </div>
+    </div>
+
+    <!-- Right side telemetry actions -->
+    <div class="flex items-center gap-2 shrink-0 pl-4 md:pl-0">
+      <!-- Location A: Tiny Header Tag Preview Matrix Container (Renders first two items safely) -->
+      <div class="flex items-center gap-1 mr-1">
+        <% if item.tag_list.present? %>
+          <% item.tag_list.slice(0, 2).each do |tag| %>
+            <span class="hidden md:inline-block text-[8px] font-mono tracking-tight text-cyan-500/60 dark:text-cyan-400/40 border border-cyan-500/10 dark:border-cyan-500/20 px-1.5 py-0.5 rounded-full bg-cyan-500/[0.02] select-none">
+              #<%= tag %>
+            </span>
+          <% end %>
+        <% end %>
+      </div>
+
+      <span class="text-[9px] font-semibold bg-gray-100 dark:bg-gray-900 text-gray-500 dark:text-gray-400 px-1.5 py-0.5 rounded border border-gray-200/40 dark:border-gray-800/40 whitespace-nowrap shadow-sm">
+        ● <span class="font-sans text-[10px] ml-0.5"><%= time_ago_in_words(item.created_at) %> ago</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- EXPANDABLE DRAWER SECTION (Hidden by default, slides down gracefully on target interaction) -->
+  <div data-expandable_log-target="drawer"
+       class="max-h-0 opacity-0 transition-all duration-300 ease-in-out bg-gray-50/30 dark:bg-gray-950/20 border-t border-transparent dark:border-transparent overflow-hidden w-full">
+
+    <div class="p-3.5 space-y-4 text-xs border-t border-gray-100 dark:border-gray-900/60">
+
+      <!-- Location B: Dedicated Interactive Tag Matrix Module Tray Layer -->
+      <div class="space-y-1.5">
+        <span class="text-[9px] uppercase font-black text-cyan-500/50 dark:text-cyan-400/30 tracking-widest block font-mono">// MATRIX_TAG_TOKENS</span>
+        <div class="flex flex-wrap gap-1.5 p-2 bg-white dark:bg-gray-900/20 rounded-md border border-gray-200/40 dark:border-gray-800/50 shadow-inner min-h-[38px] items-center">
+          <% if item.tag_list.present? %>
+            <% item.tag_list.each do |tag| %>
+              <span class="text-[9px] font-mono font-black tracking-wide text-cyan-600 dark:text-cyan-400 bg-cyan-500/5 border border-cyan-500/20 px-2.5 py-0.5 rounded-full transition-all hover:bg-cyan-500/10 hover:border-cyan-500/40 cursor-default select-none shadow-sm flex items-center gap-1">
+                <span class="text-cyan-400/40 text-[7px] select-none">●</span> <%= tag %>
+              </span>
+            <% end %>
+          <% else %>
+            <span class="text-[9px] font-mono font-black tracking-wide text-stone-600 dark:text-stone-500 bg-stone-500/5 border border-stone-500/10 px-2.5 py-0.5 rounded-full transition-all cursor-default select-none shadow-sm flex items-center gap-1">
+              <span class="text-stone-500/40 text-[7px] select-none">●</span> system-log
+            </span>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Detailed Content Documentation Fragment Layer -->
+      <div class="space-y-1.5">
+        <span class="text-[9px] uppercase font-black text-gray-400 dark:text-gray-500 tracking-widest block font-mono">// Content</span>
+        <div class="text-gray-600 dark:text-gray-400 font-sans leading-relaxed bg-white dark:bg-gray-900/40 border border-gray-200/50 dark:border-gray-800/60 p-3 rounded-md shadow-inner text-xs prose dark:prose-invert max-w-none">
+          <%= item.content.to_s.html_safe %>
+        </div>
+      </div>
+
+      <!-- Reference Sources Segment -->
+      <% if item.sources.present? && item.sources.to_s.strip != "<p></p>" %>
+        <div class="space-y-1.5">
+          <span class="text-[9px] uppercase font-black text-cyan-500/60 dark:text-cyan-500/40 tracking-widest block font-mono">// Sources</span>
+          <div class="text-gray-600 dark:text-gray-400 font-sans leading-relaxed bg-white dark:bg-gray-900/40 border border-gray-200/50 dark:border-gray-800/60 p-3 rounded-md shadow-inner text-xs prose dark:prose-invert max-w-none">
+            <%= item.sources.to_s.html_safe %>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Action Panel Footer Row -->
+      <div class="flex items-center justify-between pt-2.5 border-t border-gray-100 dark:border-gray-900/60 text-[10px] text-gray-400 dark:text-gray-500 font-mono">
+        <span>Improvement id: # <%= item.id %></span>
+
+        <button type="button"
+                data-action="click->expandable_log#toggle"
+                class="px-2 py-1 text-[9px] font-bold uppercase tracking-wide bg-gray-100 hover:bg-gray-200 dark:bg-gray-900 dark:hover:bg-gray-800 border border-gray-200/60 dark:border-gray-800/80 rounded transition-all cursor-pointer active:scale-95 text-gray-500 dark:text-gray-400 shadow-sm">
+          ✕ Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

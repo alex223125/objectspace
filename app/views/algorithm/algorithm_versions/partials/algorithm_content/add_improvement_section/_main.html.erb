@@ -3,7 +3,8 @@
 <!-- 1. MAIN ASYNC CONTROLLER WORKSPACE WRAPPER -->
 <!-- FIXED: Changed to underscore syntax to match your system naming metrics exactly -->
 <div data-controller="async_improvements"
-     data-async_improvements-endpoint-value="<%= api_improvements_path(algorithm_version_id: @algorithm_version) %>"
+     data-async_improvements-endpoint-value="<%= entity_view_index_api_improvements_path(algorithm_version_id: @algorithm_version) %>"
+     data-async_improvements-endpoint-post-value="<%= api_improvements_path(algorithm_version_id: @algorithm_version) %>"
      class="max-w-6xl mx-auto px-4 my-8">
 
   <!--  1.-->

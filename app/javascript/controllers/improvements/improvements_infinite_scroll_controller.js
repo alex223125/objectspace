@@ -31,13 +31,40 @@ export default class extends Controller {
     }
 
     connect() {
-        console.log("improvements_infinite_scroll connected")
-        this.intersectionObserver.observe(this.paginationTarget)
+        console.log("improvements_infinite_scroll connected");
+
+        // 1. SAFE WORKSPACE TARGET GUARD MAPPING
+        if (this.hasPaginationTarget) {
+            this.intersectionObserver.observe(this.paginationTarget);
+        } else {
+            console.warn("Telemetry warning: 'pagination' target node not found in current DOM fragment.");
+        }
+
+        // ====================================================================
+        // AUTOMATED BOOTSTRAP INITIAL LOAD TRIGGER
+        // ====================================================================
+        // If we are on page 1 and no requests have run yet, force an immediate
+        // network fetch to pre-populate the high-density grid rows.
+        if (this.currentPage === 1) {
+            console.log("Launching automated initial data stream fetch pass...");
+
+            // Re-use your search values extraction safely to query baseline data blocks
+            var searchQuery = this.hasSearchQueryTarget ? this.searchQueryTarget.value : "";
+            var statusFilter = this.statusFilter;
+            var sortingOption = this.sortingOption;
+            var techVersionOption = this.techVersionOption;
+
+            this.load(searchQuery, statusFilter, sortingOption, techVersionOption);
+        }
     }
 
     disconnect() {
         console.log("improvements_infinite_scroll disconnected")
-        this.intersectionObserver.unobserve(this.paginationTarget)
+
+        // Safely unobserve only if the target reference was successfully registered
+        if (this.hasPaginationTarget) {
+            this.intersectionObserver.unobserve(this.paginationTarget)
+        }
     }
 
     submit(){
@@ -74,10 +101,13 @@ export default class extends Controller {
     }
 
     // PRIVATE
+    // Inside your improvements_infinite_scroll_controller.js
     processIntersectionEntries(entries) {
         console.log("processIntersectionEntries triggered")
         entries.forEach(entry => {
-            if (entry.isIntersecting) {
+            // Only fire the infinite load sequence if the element is intersecting
+            // AND the essential searchQuery element target has loaded into view boundaries
+            if (entry.isIntersecting && this.hasSearchQueryTarget) {
                 this.loadMore()
             }
         })
@@ -97,36 +127,57 @@ export default class extends Controller {
     }
 
     load(searchQuery, statusFilter, sortingOption, techVersionOption) {
-        console.log("improvements_infinite_scroll_controller: load triggered")
+        console.log("improvements_infinite_scroll_controller: load triggered");
 
         let improvementsSearchParams = {
             "improvements_search": {
                 "tech_id": this.technologyId,
                 "tech_type": this.technologyType,
-                "page": this.currentPage,
+                "page": this.currentPage, // Pass page 1 natively
                 "query": searchQuery,
                 "status": statusFilter,
                 "sort_by": sortingOption,
                 "tech_version": techVersionOption
             }
-        }
+        };
 
-        let params = $.param(improvementsSearchParams)
-        // let params = `improvements_search%5Btech_id=${this.technologyId}&tech_type=${this.technologyType}
-        // &page=${this.currentPage}&query=${searchQuery}&status=${statusFilter}&sort_by=${sortingOption}&tech_version=${techVersionOption}`
-        let url = `/improvements?${params}`
+        let params = $.param(improvementsSearchParams);
+        let url = `/api/improvements?${params}`;
 
+        console.log("improvements_infinite_scroll_controller: before Rails.ajax");
         Rails.ajax({
             type: 'GET',
             url: url,
             dataType: 'json',
             success: (data) => {
-                this.entriesTarget.insertAdjacentHTML('beforeend', data.entries)
-                this.currentPage = this.currentPage + 1
-                this.totalPages = data.pagination.pages
-                // this.setLastSearchData(searchQuery, statusFilter, sortingOption, techVersionOption)
+                console.log("Initial load chunk response successfully received:", data);
+
+                // Safe guard fallback: Clear out any baseline loading placeholders inside your container list
+                if (this.hasEntriesTarget) {
+                    const placeholder = this.entriesTarget.querySelector(".animate-pulse, .border-dashed");
+                    if (placeholder || this.currentPage === 1) {
+                        this.entriesTarget.innerHTML = "";
+                    }
+                }
+
+                // Append the compiled partial HTML card string into the display feed container
+                if (data.entries && data.entries.trim().length > 0) {
+                    this.entriesTarget.insertAdjacentHTML('beforeend', data.entries);
+                } else {
+                    this.entriesTarget.innerHTML = `
+                        <div class="p-6 text-center border border-dashed border-slate-800 rounded-xl bg-slate-900/10 text-xs font-mono text-slate-500 uppercase tracking-widest">
+                          [ NO_ACTIVE_LOG_SEQUENCES_FOUND_IN_BUFFER_CACHE ]
+                        </div>`;
+                }
+
+                // Increment page indicators smoothly to page 2 to let subsequent scrolling take over
+                this.currentPage = this.currentPage + 1;
+                this.totalPages = data.pagination ? data.pagination.pages : 1;
+            },
+            error: (err) => {
+                console.error("Initial load pipeline error:", err);
             }
-        })
+        });
     }
 
 
@@ -146,20 +197,15 @@ export default class extends Controller {
     // TODO: add retry request in case of ajax failure
     loadMore() {
         console.log("improvements_infinite_scroll_controller: load more triggered")
-        console.log(this.currentPage)
-        if (this.totalPages == this.currentPage) {
+
+        if (this.totalPages > 0 && this.currentPage > this.totalPages) {
             console.log("All pages are displayed")
             return;
         }
 
-        var searchQuery = this.searchQueryTarget.value
-        // DOC: When we just clicked on the tab with improvements
-        // we dont have any search query but we need to display
-        // all improvements by last time updated
-        const firstSearch = "FIST_AUTOMATIC_SEARCH"
-        if (searchQuery == "") {
-            searchQuery = firstSearch
-        }
+        // 1. SAFE WORKSPACE GUARD MATRIX: Extract the clean search input string natively
+        var searchQuery = this.hasSearchQueryTarget ? this.searchQueryTarget.value : ""
+
         var statusFilter = this.statusFilter
         var sortingOption = this.sortingOption
         var techVersionOption = this.techVersionOption
@@ -169,7 +215,7 @@ export default class extends Controller {
                 "tech_id": this.technologyId,
                 "tech_type": this.technologyType,
                 "page": this.currentPage,
-                "query": searchQuery,
+                "query": searchQuery, // <-- FIX: Passes clean, native text strings or empty "" fields
                 "status": statusFilter,
                 "sort_by": sortingOption,
                 "tech_version": techVersionOption
@@ -177,17 +223,35 @@ export default class extends Controller {
         }
 
         let params = $.param(improvementsSearchParams)
-
         let url = `/improvements?${params}`
-        // let url = `/improvements?unit_version_id=${this.unitVersionId}&page=${this.currentPage}`
+
         Rails.ajax({
             type: 'GET',
             url: url,
             dataType: 'json',
             success: (data) => {
-                this.entriesTarget.insertAdjacentHTML('beforeend', data.entries)
+                console.log("Data packet received from endpoint matrix:", data)
+
+                // 2. DOM POPULATION AND RESET LOGIC
+                if (data.entries && data.entries.trim().length > 0) {
+                    // Wipe the baseline initial placeholder string when the first data packet lands safely
+                    if (this.currentPage === 1 && this.hasEntriesTarget) {
+                        this.entriesTarget.innerHTML = ""
+                    }
+                    this.entriesTarget.insertAdjacentHTML('beforeend', data.entries)
+                } else if (this.currentPage === 1 && this.hasEntriesTarget) {
+                    // Output a premium empty alert pane if zero records exist matching current query filters
+                    this.entriesTarget.innerHTML = `
+                        <div class="p-6 text-center border border-dashed border-slate-800 rounded-xl bg-slate-900/10 text-xs font-mono text-slate-500 uppercase tracking-widest">
+                          [ NO_ACTIVE_LOG_SEQUENCES_FOUND_IN_BUFFER_CACHE ]
+                        </div>`
+                }
+
                 this.currentPage = this.currentPage + 1
-                this.totalPages = data.pagination.pages
+                this.totalPages = data.pagination ? data.pagination.pages : 1
+            },
+            error: (error) => {
+                console.error("Telemetry AJAX pipeline exception trace:", error)
             }
         })
     }

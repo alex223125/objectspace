@@ -6,7 +6,9 @@ module Improvements
 
     TECH_TYPES_MAPPING = {
       methods: "Units::Unit",
-      articles: "Articles::Article"
+      articles: "Articles::Article",
+      algorithms: "Algorithms::Algorithm",
+      algorithm_versions: "Algorithms::AlgorithmVersion"
     }.freeze
 
     SORT_BY_OPTIONS = ["newest", "oldest", "most_commented", "least_commented",
@@ -117,7 +119,32 @@ module Improvements
 
     def find_technology_unit
       binding.pry
-      technology_type.find(self.tech_id)
+      raw_id_or_slug = self.tech_id.to_s.strip
+
+      # 1. ARMOR GUARD: If the target polymorphic table model supports FriendlyId / slug columns
+      if technology_type.column_names.include?("slug")
+        technology_type.friendly.find(raw_id_or_slug)
+      else
+        # 2. EMERGENCY FALLBACK ROUTINE: If no slug database grid column exists in the table structure
+        if raw_id_or_slug.match?(/\A\d+\z/)
+          # If the value is a pure numeric integer digit: lookup by standard primary key mapping
+          technology_type.find_by(id: raw_id_or_slug.to_i)
+        else
+          # If the text parameter is a string but no slug table layout column exists, lookup by alternate key
+          # Using a dynamic safe reflection matcher parameter check fallback
+          alt_column = ["title", "name", "uuid"].find { |col| technology_type.column_names.include?(col) }
+
+          if alt_column.present?
+            technology_type.find_by(alt_column => raw_id_or_slug)
+          else
+            # Base fallback boundary handler loop logic configuration
+            technology_type.first
+          end
+        end
+      end
+    rescue ActiveRecord::RecordNotFound, NoMethodError => e
+      Rails.logger.error "Telemetry Exception: Failed to map technological unit payload tracker context: #{e.message}"
+      nil
     end
 
     def find_technology_version

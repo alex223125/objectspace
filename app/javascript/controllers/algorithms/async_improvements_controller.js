@@ -6,6 +6,7 @@ export default class extends Controller {
     // Maps route string data and state trackers extracted from the view layer
     static values = {
         endpoint: String,
+        endpointPost: String,
         page: { type: Number, default: 1 },
         hasMore: { type: Boolean, default: true }
     }
@@ -446,7 +447,7 @@ export default class extends Controller {
         }
 
         try {
-            const response = await fetch(this.endpointValue, {
+            const response = await fetch(this.endpointPostValue, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

@@ -1,0 +1,74 @@
+<!-- ==================== BRIGHT ENCYCLOPEDIA ARTICLE BLUEPRINT PREVIEW CARD ==================== -->
+<div class="p-6 bg-white border-2 border-slate-100 rounded-[32px] shadow-xl relative overflow-hidden mb-8 group transition-all duration-300 hover:border-cyan-500/30 hover:shadow-2xl">
+
+  <!-- Subtle ambient glow lines anchoring the card blueprint context -->
+  <div class="absolute -right-20 -bottom-20 w-48 h-48 bg-cyan-400/5 rounded-full blur-2xl pointer-events-none group-hover:scale-125 transition-transform duration-500"></div>
+
+  <!-- Top Informational Context Tracking Row -->
+  <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100 select-none">
+    <div class="flex items-center space-x-2 text-[10px] font-mono font-black text-slate-400 uppercase tracking-widest">
+      <span class="text-cyan-500 animate-pulse">●</span>
+      <span>// Linked Quest Reference Node</span>
+    </div>
+    <span class="text-[9px] font-mono font-bold bg-slate-50 text-slate-500 border border-slate-200 px-2 py-0.5 rounded-md uppercase tracking-wider">
+      v2.4.1 Active Revision
+    </span>
+  </div>
+
+  <!-- Main Card Split Layout Flexbox Engine -->
+  <div class="flex flex-col md:flex-row gap-5 items-start">
+
+    <!-- A. IMAGE PREVIEW MODULE CONTAINER WITH INTEGRATED GLOW LAYER -->
+    <div class="w-full md:w-44 shrink-0 relative group/img rounded-2xl overflow-hidden aspect-[4/3] md:aspect-square bg-slate-50 border border-slate-100 shadow-inner flex items-center justify-center">
+
+      <!-- Ambient background decoration placeholder matching look -->
+      <div class="absolute inset-0 bg-gradient-to-tr from-cyan-500/10 via-indigo-500/5 to-transparent mix-blend-multiply opacity-100 z-10"></div>
+
+      <!-- Actual Graphic Layer Content Image -->
+      <img src="https://unsplash.com"
+           alt="Article Source Matrix"
+           class="w-full h-full object-cover transition-transform duration-500 transform group-hover/img:scale-105" />
+
+      <!-- Floating Map Icon Indicator Badge overlay -->
+      <div class="absolute bottom-2.5 right-2.5 w-7 h-7 bg-white/90 border border-slate-200 backdrop-blur-sm rounded-lg flex items-center justify-center text-sm shadow-md z-20 transition-transform duration-300 group-hover/img:rotate-12">
+        🗺️
+      </div>
+    </div>
+
+    <!-- B. DYNAMIC METADATA INFORMATION COMPONENT AREA -->
+    <div class="flex-1 space-y-2.5 pt-0.5">
+      <div class="space-y-1">
+        <h4 class="text-xs font-mono font-black uppercase text-cyan-600 tracking-wider">// Master Blueprint Source</h4>
+        <!-- Interactive Article Title Link Anchor -->
+        <%= link_to @algorithm_version.title,
+                    algorithm_version_path(ownername: @algorithm_version.algorithm.ownerable.ownername, id: algorithm_version.slug),
+                    class: "inline-block text-lg font-black text-slate-800 tracking-tight leading-tight hover:text-cyan-600 transition-colors uppercase select-text no-underline" %>
+      </div>
+
+      <!-- Truncated Description Preview String Block -->
+      <p class="text-xs text-slate-400 font-medium leading-relaxed select-text">
+        Analyze and document foundational structures within lookup database loop layers. This manual maps memory allocation configurations, namespace paths, and sequential execution blocks into an open-source engine module profile layout.
+      </p>
+
+      <!-- Bottom Interactive Action Anchor Trigger Controls -->
+      <div class="pt-2 flex items-center justify-between">
+
+        <!-- Gamification Stat Helpers Tracker Node -->
+        <div class="flex items-center gap-1.5 text-[10px] font-mono text-slate-500 select-none">
+          <span class="text-xs">📖</span> Read Duration: <strong class="text-slate-700 font-black">12 min</strong>
+        </div>
+
+        <!-- Action Button redirecting cleanly to active document -->
+        <a href="#" class="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-50 hover:bg-cyan-500/5 border border-slate-200 hover:border-cyan-500/40 rounded-xl text-xs font-mono font-black text-slate-700 hover:text-cyan-600 transition-all active:scale-[0.98] shadow-sm no-underline group/btn">
+          <span>Inspect Reference Codex</span>
+          <span class="text-[10px] transform group-hover/btn:translate-x-0.5 transition-transform duration-200">➔</span>
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+<!-- ======================================================================================= -->

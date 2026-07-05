@@ -104,6 +104,8 @@ class ImprovementsController < ApplicationController
         @unit = Units::Unit.find_by(uuid: params[:unit_id])
       elsif params[:algorithm_id].present?
         @algorithm = Algorithms::Algorithm.find_by(uuid: params[:algorithm_id])
+      elsif params[:algorithm_version_id].present?
+        @algorithm_version = Algorithms::AlgorithmVersion.find_by(slug: params[:algorithm_version_id])
       end
     end
 

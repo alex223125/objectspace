@@ -5,7 +5,12 @@ Rails.application.routes.draw do
     # resources :algorithm_versions, only: [] do
     #   resources :improvements, only: [:index, :create], controller: 'algorithm_improvements'
     # end
-    resources :improvements, only: [:index, :create], controller: 'improvements'
+    resources :improvements, only: [:index, :create], controller: 'improvements' do
+      collection do
+        # Generates: GET /api/improvements/entity_view_index
+        get :entity_view_index
+      end
+    end
     resources :algorithm_versions, only: [] do
       member do
         post :generate_passport
