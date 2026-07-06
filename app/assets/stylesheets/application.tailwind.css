@@ -11,3 +11,22 @@
 }
 
 */
+
+
+/*app/views/algorithm/simple_algorithm_version_creation/partials/_algorithm_version_fields.html.erb*/
+/*styles for cover for article version */
+/* Custom CSS extensions backing the interactive cropper image adjustments module */
+.grayscale { filter: grayscale(100%); }
+.sepia { filter: sepia(100%); }
+.invert { filter: invert(100%); }
+.saturate-150 { filter: saturate(1.7); }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+    animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+

@@ -31,3 +31,8 @@ window.Alpine = Alpine
 $(() => {
     Alpine.start();
 });
+
+
+
+// REPLACE WITH THIS Standard Clean Module Export:
+import 'cropperjs';

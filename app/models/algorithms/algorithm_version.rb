@@ -5,6 +5,9 @@ class Algorithms::AlgorithmVersion < ApplicationRecord
   extend FriendlyId
   friendly_id :slug_candidates, use: [:slugged, :finders, :history]
 
+  # Mount the single binary image storage file anchor
+  has_one_attached :cover_image
+
   belongs_to :algorithm, class_name: "Algorithms::Algorithm"
 
   # has_many :control_structures, class_name: "Algorithms::ControlStructure"

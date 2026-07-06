@@ -15,7 +15,7 @@
     "bootstrap": "^5.2.3",
     "bootstrap-icons": "^1.10.3",
     "cocoon-js": "^0.0.5",
-    "cropperjs": "1.5.11",
+    "cropperjs": "^2.1.1",
     "d3": "^7.8.5",
     "esbuild": "^0.28.1",
     "flowbite": "^1.7.0",
@@ -39,7 +39,7 @@
     "puppeteer-core": "19.11.1"
   },
   "scripts": {
-    "build": "esbuild app/javascript/*.* --bundle --sourcemap --outdir=app/assets/builds --public-path=assets ",
+    "build": "esbuild app/javascript/*.* --bundle --sourcemap --outdir=app/assets/builds --public-path=assets",
     "build:css": "sass ./app/assets/stylesheets/application.bootstrap.scss:./app/assets/builds/application.css --no-source-map --load-path=node_modules --quiet-deps"
   },
   "devDependencies": {

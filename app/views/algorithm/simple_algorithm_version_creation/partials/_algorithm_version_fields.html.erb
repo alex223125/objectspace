@@ -61,6 +61,362 @@
 </div>
 <br>
 
+
+<!-- DYNAMIC ALGORITHM COVER QUEST MANAGEMENT COMPONENT MODULE -->
+<div data-controller="algorithm_cover_upload" class="space-y-4 bg-slate-50/40 p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+
+  <div class="flex items-center justify-between select-none">
+    <%= f.label :cover_image, "Blueprint Cover Canvas Node", class: "block text-xs font-mono font-black uppercase tracking-wider text-slate-800" %>
+    <span class="text-[9px] font-mono text-cyan-600 uppercase tracking-widest bg-cyan-50 border border-cyan-200/50 px-2 py-0.5 rounded-md font-bold animate-pulse">
+      ✨ Active Upload Protocol
+    </span>
+  </div>
+  <p class="text-xs text-slate-400 font-medium leading-relaxed">Select, crop, apply artifact matrix overlays, and watermark your algorithm metadata parameters live before committal repository lock.</p>
+
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-center pt-2">
+
+    <!-- Left Module Side Element: Instant rendering thumbnail preview anchor box -->
+    <div class="md:col-span-1">
+      <div data-algorithm_cover_upload-target="preview" class="w-full aspect-[21/7] md:aspect-square bg-white border border-slate-200 rounded-xl overflow-hidden shadow-inner flex flex-col items-center justify-center p-4 text-center select-none text-slate-400 font-mono text-[9px] font-black tracking-widest uppercase">
+        <% if f.object.cover_image.attached? %>
+          <%= image_tag f.object.cover_image, class: "w-full h-full object-cover rounded-xl" %>
+        <% else %>
+          <div class="space-y-1">
+            <span class="text-xl block">🖼️</span>
+            <span>[ COVER_NULL ]</span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Right Module Side Element: Drag, Drop, Browse Trigger Handle Container Zone -->
+    <div class="md:col-span-3 relative h-28 border-2 border-dashed border-slate-200 hover:border-cyan-500/50 bg-white rounded-xl flex flex-col items-center justify-center text-center cursor-pointer group transition-all duration-200">
+      <!-- Active input file controller target catcher hook links directly back to Stimulus event framework tracking loops -->
+      <%= f.file_field :cover_image,
+                          class: "absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10",
+                          data: {
+                            algorithm_cover_upload_target: "input",
+                            action: "change->algorithm_cover_upload#handleSelection"
+                          } %>
+
+      <div class="pointer-events-none space-y-1.5 relative z-0 select-none">
+        <div class="w-9 h-9 mx-auto bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-center text-base text-slate-500 group-hover:scale-105 transition-transform duration-200">📁</div>
+        <div>
+          <p class="text-xs font-sans font-bold text-slate-800">Choose custom algorithm cover illustration file</p>
+          <p class="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Formats: PNG, JPG, WEBP // MAX size load allowance: 4 Megabytes</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- INTERACTIVE OVERLAY LIGHT MODAL -->
+  <!-- INTERACTIVE OVERLAY LIGHT MODAL -->
+  <div data-algorithm_cover_upload-target="cropperContainer" class="hidden border-2 border-slate-200 bg-white rounded-3xl p-6 shadow-2xl space-y-4 animate-fade-in relative z-30 mt-4 max-w-7xl mx-auto w-full">
+
+    <div class="pb-2 border-b border-slate-100 flex items-center justify-between select-none">
+      <span class="text-[10px] font-mono font-black text-cyan-600 tracking-widest uppercase">// Chronicle Crafting Canvas Editor Workspace</span>
+      <span class="text-[9px] font-mono font-bold text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">Scale Grid Expanded</span>
+    </div>
+
+    <!-- FIXED WORKSPACE: Force absolute layout heights and inject dynamic custom layout override traits -->
+<!--    <div class="w-full bg-slate-950 rounded-xl overflow-hidden min-h-[500px] h-[550px] flex items-center justify-center p-2 shadow-inner relative" style="content-visibility: auto;">-->
+
+<!--       FIXED IMAGE EMBED LAYER: Remove aspect/contain layout constraints so CropperJS v2 reads the base64 data natively -->
+<!--      <img data-algorithm_cover_upload-target="cropImage"-->
+<!--           src=""-->
+<!--           class="block max-w-full max-h-full"-->
+<!--           style="display: block; width: 100%; height: 100%; min-height: 500px; object-fit: contain;"-->
+<!--           alt="Crop Core Target Source" />-->
+
+      <!-- Ensure class has 'w-full h-full flex block relative' parameters -->
+<!--      <div class="w-full bg-slate-950 rounded-xl overflow-hidden min-h-[500px] h-[550px] flex items-center justify-center p-2 shadow-inner relative">-->
+<!--        <img data-algorithm_cover_upload-target="cropImage" src="" class="block max-w-full max-h-full" alt="Source" />-->
+<!--      </div>-->
+
+<!--    </div>-->
+
+    <!-- Cropping Interactive Viewport Center Frame Box -->
+    <div class="w-full bg-slate-950 rounded-xl overflow-hidden h-[750px] flex items-center justify-center p-4 shadow-2xl relative">
+      <!-- Keep this tag clean and isolated so CropperJS v2 handles state nodes updates directly -->
+      <img data-algorithm_cover_upload-target="cropImage" src="" class="max-w-full block" alt="Crop Target Core" />
+    </div>
+  </div>
+
+
+
+
+
+  <!-- DYNAMIC EXPOSURE & CALIBRATION SLIDERS ROW -->
+  <div class="pt-4 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 gap-4 select-none">
+
+    <!-- Brightness Control Slider -->
+    <div class="space-y-1">
+      <div class="flex items-center justify-between text-[11px] font-mono font-black text-slate-500 uppercase tracking-wider">
+        <span>// Exposure Matrix (Brightness):</span>
+        <span data-algorithm_cover_upload-target="brightnessVal">100%</span>
+      </div>
+      <input type="range" min="50" max="175" value="100"
+             data-algorithm_cover_upload-target="brightnessSlider"
+             data-action="input->algorithm_cover_upload#tuneImageAdjustments"
+             class="w-full accent-cyan-500 h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer shadow-inner border border-slate-200">
+    </div>
+
+    <!-- Contrast Control Slider -->
+    <div class="space-y-1">
+      <div class="flex items-center justify-between text-[11px] font-mono font-black text-slate-500 uppercase tracking-wider">
+        <span>// Clarity Coeff (Contrast):</span>
+        <span data-algorithm_cover_upload-target="contrastVal">100%</span>
+      </div>
+      <input type="range" min="50" max="175" value="100"
+             data-algorithm_cover_upload-target="contrastSlider"
+             data-action="input->algorithm_cover_upload#tuneImageAdjustments"
+             class="w-full accent-cyan-500 h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer shadow-inner border border-slate-200">
+    </div>
+
+  </div>
+
+
+
+
+
+
+
+    <!-- Interactive Artifact Filters Matrix Controls & Actions -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+
+      <!-- Filter matrix selector dropdown element tag input -->
+      <div class="flex items-center gap-2 w-full sm:w-auto">
+        <label class="text-[10px] font-mono font-black text-slate-500 uppercase tracking-wider whitespace-nowrap">Apply Matrix Filter:</label>
+        <select data-algorithm_cover_upload-target="filterSelect"
+                data-action="change->algorithm_cover_upload#applyFilter"
+                class="bg-slate-50 border border-slate-200 text-slate-800 text-xs font-mono font-bold rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all cursor-pointer">
+          <option value="none">✦ Raw Core Profile (Default)</option>
+          <option value="grayscale">✦ Monochromatic Archival Ledger (Grayscale)</option>
+          <option value="sepia">✦ Ancient Historical Codex (Sepia)</option>
+          <option value="invert">✦ Cryptography Inverse Matrix (Invert)</option>
+          <option value="saturate-150">✦ High-Density Fluid Mana Node (Saturated)</option>
+        </select>
+      </div>
+
+      <!-- Action Confirmation Triggers Area row panel -->
+      <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+        <button type="button"
+                data-action="click->algorithm_cover_upload#discardModifications"
+                class="px-4 py-2 bg-white hover:bg-rose-50 border border-slate-200 hover:border-rose-200 rounded-xl text-xs font-mono font-black text-slate-500 hover:text-rose-600 transition-all cursor-pointer active:scale-95 shadow-sm">
+          ✕ Discard
+        </button>
+        <button type="button"
+                data-action="click->algorithm_cover_upload#applyModifications"
+                class="px-5 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-mono font-black text-xs uppercase tracking-widest rounded-xl transition-all cursor-pointer active:scale-95 shadow-md border border-cyan-400/20">
+          ⚙️ Render & Lock Cover
+        </button>
+      </div>
+
+    </div>
+
+
+    <!-- DYNAMIC GEOMETRY MANIPULATION TOOLBAR ROW -->
+    <!-- DYNAMIC GEOMETRY MANIPULATION TOOLBAR ROW -->
+    <!-- DYNAMIC GEOMETRY MANIPULATION TOOLBAR ROW -->
+    <div class="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 select-none">
+      <div class="flex items-center space-x-2">
+        <span class="text-xs font-mono font-black text-slate-500 uppercase tracking-wider">// Geometric Orientation Nodes:</span>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <!-- Rotate Counter-Clockwise -->
+        <button type="button"
+                data-action="click->algorithm_cover_upload#rotateLeft"
+                class="px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-mono font-black text-slate-700 rounded-xl transition-all active:scale-95 shadow-sm flex items-center gap-1.5">
+          <span>🔄</span> -90°
+        </button>
+
+        <!-- Rotate Clockwise -->
+        <button type="button"
+                data-action="click->algorithm_cover_upload#rotateRight"
+                class="px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-mono font-black text-slate-700 rounded-xl transition-all active:scale-95 shadow-sm flex items-center gap-1.5">
+          <span>🔄</span> +90°
+        </button>
+
+        <div class="w-px h-4 bg-slate-200 mx-1"></div>
+
+        <!-- Flip Horizontal -->
+        <button type="button"
+                data-action="click->algorithm_cover_upload#flipHorizontal"
+                class="px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-mono font-black text-slate-700 rounded-xl transition-all active:scale-95 shadow-sm flex items-center gap-1.5">
+          <span>↔️</span> Flip Horizontally
+        </button>
+
+        <!-- Flip Vertical -->
+        <button type="button"
+                data-action="click->algorithm_cover_upload#flipVertical"
+                class="px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-mono font-black text-slate-700 rounded-xl transition-all active:scale-95 shadow-sm flex items-center gap-1.5">
+          <span>↕️</span> Flip Vertically
+        </button>
+      </div>
+    </div>
+
+
+
+
+    <!-- DYNAMIC GEOMETRY MANIPULATION TOOLBAR ROW -->
+    <!-- DYNAMIC GEOMETRY MANIPULATION TOOLBAR ROW -->
+    <!-- DYNAMIC GEOMETRY MANIPULATION TOOLBAR ROW -->
+    <div class="space-y-1.5">
+      <label class="text-[10px] font-mono font-black text-slate-500 uppercase tracking-wider whitespace-nowrap block">
+        // Select Matrix Filter Core Override:
+      </label>
+      <select data-algorithm_cover_upload-target="filterSelect"
+              data-action="change->algorithm_cover_upload#applyFilter"
+              class="w-full bg-slate-50 border-2 border-slate-200 text-slate-800 text-xs font-mono font-bold rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all cursor-pointer shadow-inner">
+
+        <optgroup label="── STANDARD CORE CHRONICLES ──">
+          <option value="none">✦ 01. Raw Core Profile (Default)</option>
+          <option value="grayscale">✦ 02. Monochromatic Ledger (Grayscale)</option>
+          <option value="sepia">✦ 03. Ancient Scholar Codex (Sepia)</option>
+          <option value="invert">✦ 04. Cryptography Inverse Matrix (Invert)</option>
+          <option value="saturate-150">✦ 05. High-Density Fluid Mana (Saturate)</option>
+        </optgroup>
+
+        <optgroup label="── ARCHIVAL & HISTORICAL TEXTBOOKS ──">
+          <option value="vintage">✦ 06. 1990 Cybernetic Terminal (Vintage)</option>
+          <option value="parchment">✦ 07. Royal Imperial Parchment (Warm Wash)</option>
+          <option value="faded-log">✦ 08. Bleached Archival Log (High Exposure)</option>
+          <option value="dim-manuscript">✦ 09. Dim Scriptorium Vault (Low Light)</option>
+          <option value="high-contrast-monorail">✦ 10. Stark Ink Blueprint (High Contrast B&W)</option>
+        </optgroup>
+
+        <optgroup label="── TECHNICAL SPECTROMETRY LOGS ──">
+          <option value="night-vision">✦ 11. Tactical Night Vision (Phosphor Green)</option>
+          <option value="thermal-sensor">✦ 12. Thermal Radiation Array (Infrared Matrix)</option>
+          <option value="amber-cathode">✦ 13. 1980 Cathode Tube Terminal (Amber CRT)</option>
+          <option value="cyan-laser">✦ 14. Quantum Laser Scan (Deep Cyan Tone)</option>
+          <option value="glitch-ghost">✦ 15. Spectral Phase Shift (Ghostly X-Ray)</option>
+        </optgroup>
+
+        <optgroup label="── HIGH-COMPUTATIONAL TELEMETRY ──">
+          <option value="overclocked">✦ 16. Overclocked Core Flux (Ultra Saturation)</option>
+          <option value="dark-matter">✦ 17. Sub-Zero Cooling Array (Cool Low-Contrast)</option>
+          <option value="solar-flare">✦ 18. Gamma Ray Burst (Solarized Hot Burn)</option>
+          <option value="neon-cyber">✦ 19. Cyberpunk Grid Node (High Contrast Pink/Teal Tint)</option>
+          <option value="toxic-waste">✦ 20. Corrupted System Logic (Acid Nuclear Glow)</option>
+        </optgroup>
+
+        <optgroup label="── EXTRA-TERRESTRIAL CARTOGRAPHY ──">
+          <option value="martian-soil">✦ 21. Martian Surface Vector (Deep Oxide Red)</option>
+          <option value="deep-space">✦ 22. Void Nebula Abyss (High Shadows Cold Blue)</option>
+          <option value="aurora">✦ 23. Northern Lights Spectrum (Ethereal Emerald Filter)</option>
+          <option value="supernova">✦ 24. Hyper-Nova Exposure (Extreme Bright Bleed)</option>
+          <option value="pulsar">✦ 25. Cosmic Pulsar Echo (Strobe High Shadows)</option>
+        </optgroup>
+
+        <optgroup label="── GUILD ALCHEMY & REFINERY ──">
+          <option value="golden-ratio">✦ 26. Pure Alchemical Gold (Midas Touch 24k)</option>
+          <option value="quicksilver">✦ 27. Liquid Quicksilver Ledger (Chrome Metallic)</option>
+          <option value="copper-rust">✦ 28. Oxidized Copper Plate (Patina Teal-Green)</option>
+          <option value="charcoal-ash">✦ 29. Scorched Crucible Code (Burnt Charcoal)</option>
+          <option value="amethyst">✦ 30. Forbidden Sorcery Core (Deep Amethyst Violet)</option>
+        </optgroup>
+
+        <optgroup label="── OPTICAL ANALYTICAL FIELDS ──">
+          <option value="blueprint-cyan">✦ 31. Engineering Blueprint (Technical Line Tint)</option>
+          <option value="xray-spectre">✦ 32. Quantum X-Ray Spectre (B&W Inverse Radiant)</option>
+          <option value="high-shadows">✦ 33. Deep Archival Shadows (Dramatic Noir Contrast)</option>
+          <option value="monochrome-glow">✦ 34. Cybernetic Phosphorus (Glowing Green Monochromatic)</option>
+          <option value="high-dynamic">✦ 35. High Dynamic Range (HDR Computational Boost)</option>
+        </optgroup>
+
+      </select>
+    </div>
+
+
+
+
+    <!-- DYNAMIC CROP MASK ASPECT RATIO TOGGLE ROW -->
+    <div class="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 select-none">
+      <div class="flex items-center space-x-2">
+        <span class="text-xs font-mono font-black text-slate-500 uppercase tracking-wider">// Crop Mask Dimensions:</span>
+      </div>
+
+      <!-- Active Navigation Configuration Tabs -->
+      <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200/60 shadow-inner">
+        <!-- Widescreen Panoramic Header Button (Your Default Site Standard Layout) -->
+        <button type="button"
+                data-action="click->algorithm_cover_upload#changeAspectRatio"
+                data-ratio="3"
+                class="px-3 py-1.5 bg-white border border-slate-200 text-[11px] font-mono font-black text-cyan-600 rounded-lg shadow-sm transition-all cursor-pointer transform active:scale-95">
+          📐 21:7 Panoramic Header
+        </button>
+
+        <!-- Standard Card Grid Layout Button -->
+        <button type="button"
+                data-action="click->algorithm_cover_upload#changeAspectRatio"
+                data-ratio="1.777"
+                class="px-3 py-1.5 hover:bg-slate-50 text-[11px] font-mono font-black text-slate-600 rounded-lg transition-all cursor-pointer transform active:scale-95">
+          📺 16:9 Grid Card
+        </button>
+
+        <!-- Compact Catalog Square Avatar Button -->
+        <button type="button"
+                data-action="click->algorithm_cover_upload#changeAspectRatio"
+                data-ratio="1"
+                class="px-3 py-1.5 hover:bg-slate-50 text-[11px] font-mono font-black text-slate-600 rounded-lg transition-all cursor-pointer transform active:scale-95">
+          ▢ 1:1 Catalog Item
+        </button>
+      </div>
+    </div>
+
+
+
+
+    <!-- DYNAMIC CANVAS ZOOM-IN & ZOOM-OUT SLIDER ROW -->
+    <div class="pt-4 border-t border-slate-100 grid grid-cols-1 gap-4 select-none">
+
+      <div class="space-y-1">
+        <div class="flex items-center justify-between text-[11px] font-mono font-black text-slate-500 uppercase tracking-wider">
+          <span>// Viewport Zoom Matrix (Scale):</span>
+          <!-- Dynamic live tracking badge node link -->
+          <span data-algorithm_cover_upload-target="zoomVal">100%</span>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <!-- Fast Step Zoom Out Button -->
+          <button type="button" data-action="click->algorithm_cover_upload#zoomOutStep" class="w-7 h-7 bg-white border border-slate-200 hover:border-slate-300 rounded-lg text-xs font-mono font-bold flex items-center justify-center cursor-pointer shadow-sm active:scale-90 select-none">
+            -
+          </button>
+
+          <!-- Continuous Range Tracking Zoom Input Node -->
+          <input type="range" min="50" max="200" value="100"
+                 data-algorithm_cover_upload-target="zoomSlider"
+                 data-action="input->algorithm_cover_upload#scaleCanvasZoom"
+                 class="w-full accent-cyan-500 h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer shadow-inner border border-slate-200">
+
+          <!-- Fast Step Zoom In Button -->
+          <button type="button" data-action="click->algorithm_cover_upload#zoomInStep" class="w-7 h-7 bg-white border border-slate-200 hover:border-slate-300 rounded-lg text-xs font-mono font-bold flex items-center justify-center cursor-pointer shadow-sm active:scale-90 select-none">
+            +
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+</div>
+
+
 <div class="mb-6">
   <!-- Main Label -->
   <label class="block text-base font-semibold text-gray-900 mb-3">

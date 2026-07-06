@@ -1,4 +1,32 @@
 <div class="col-span-6 sm:col-span-3">
+
+  <!-- ALGORITHM BLUEPRINT COVER UPLOAD COMPONENT MODULE -->
+  <div class="space-y-2 bg-slate-50/50 p-5 rounded-2xl border border-slate-200 shadow-sm transition-all duration-300 hover:border-cyan-500/20">
+    <div class="flex items-center justify-between select-none">
+      <%= f.label :cover_image, "Blueprint Cover Canvas Asset", class: "block text-xs font-mono font-black uppercase tracking-wider text-slate-700" %>
+      <span class="text-[9px] font-mono text-cyan-600 uppercase tracking-widest bg-cyan-50 border border-cyan-200/50 px-2 py-0.5 rounded-md font-bold">
+      Asset // Multipart File
+    </span>
+    </div>
+    <p class="text-xs text-slate-400 font-medium">Upload a design matrix cover image to bind onto active registry cards and thumbnails.</p>
+
+    <div class="relative mt-2 group/upload border-2 border-dashed border-slate-200 bg-white hover:border-cyan-500/50 rounded-xl p-6 transition-all flex flex-col items-center justify-center text-center cursor-pointer">
+      <!-- Active Rails File Field Wrapper mapping parameters -->
+      <%= f.file_field :cover_image, class: "absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" %>
+
+      <div class="space-y-2 relative z-10 pointer-events-none flex flex-col items-center select-none">
+        <div class="w-10 h-10 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center text-lg text-slate-500 transition-transform group-hover/upload:scale-105">
+          🖼️
+        </div>
+        <div>
+          <p class="text-xs font-sans font-bold text-slate-800">Click to choose or drop blueprint file</p>
+          <p class="text-[10px] font-mono text-slate-400 uppercase">Formats: PNG, JPG, WEBP // Max 4MB Capacity</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
   <%= f.label "Version title", class: "block text-sm font-medium text-gray-700" %>
   <div class="bg-yellow-50 border border-yellow-400 rounded text-yellow-800 text-sm p-4 flex items-start">
     <div>

@@ -118,6 +118,9 @@ application.register("async_improvements", AsyncImprovementsController)
 import ExpandableLogController from "./algorithms/expandable_log_controller.js"
 application.register("expandable_log", ExpandableLogController)
 
+import AlgorithmCoverUploadController from "./algorithms/algorithm_cover_upload_controller"
+application.register("algorithm_cover_upload", AlgorithmCoverUploadController)
+
 
 
 

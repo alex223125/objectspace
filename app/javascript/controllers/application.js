@@ -15,4 +15,5 @@ import Rails from '@rails/ujs';
 window.Rails = Rails;
 Rails.start();
 
-import 'cropperjs/src/index.js'
+// import 'cropperjs/src/index.js'
+import 'cropperjs';

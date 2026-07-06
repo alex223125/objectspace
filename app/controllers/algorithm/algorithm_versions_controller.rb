@@ -175,7 +175,7 @@ class Algorithm::AlgorithmVersionsController < ApplicationController
       binding.pry
       @structured_params.require(:algorithms_algorithm_version).permit(:title, :solves_the_problem,
                                                            :sources, :additional_information,
-                                                           :description,
+                                                           :description, :cover_image,
 
                                                            introduction_step_attributes: [
                                                                :title, :content

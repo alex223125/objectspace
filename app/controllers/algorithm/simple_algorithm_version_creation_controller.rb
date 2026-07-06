@@ -475,8 +475,10 @@ class Algorithm::SimpleAlgorithmVersionCreationController < ApplicationControlle
   end
 
   def algorithm_version_main_params
-    params.require(:algorithms_algorithm).permit(algorithm_versions_attributes: [:id, :title, :interactivity_type_id, :description, :solves_the_problem,
-                                                                                         :sources, :additional_information] )
+    params.require(:algorithms_algorithm).permit(algorithm_versions_attributes: [:id, :title, :interactivity_type_id,
+                                                                                 :description, :solves_the_problem,
+                                                                                 :sources, :additional_information,
+                                                                                 :cover_image] )
   end
 
 
