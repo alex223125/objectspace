@@ -315,6 +315,11 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@panzoom/panzoom@^4.6.2":
+  version "4.6.2"
+  resolved "https://registry.yarnpkg.com/@panzoom/panzoom/-/panzoom-4.6.2.tgz#7104b5f1d67aac3aec83c3bd2c42b33ffd0b4125"
+  integrity sha512-Zn3B5/hwa6eYIPRSKX0xf2clv8nviTX8AnAU5kU/EugiTDhG41ya2wlBqYrZJYCWQROr/5XkWObZhIkepi89qw==
+
 "@parcel/watcher-android-arm64@2.5.6":
   version "2.5.6"
   resolved "https://registry.yarnpkg.com/@parcel/watcher-android-arm64/-/watcher-android-arm64-2.5.6.tgz#5f32e0dba356f4ac9a11068d2a5c134ca3ba6564"
@@ -1227,6 +1232,11 @@ get-stream@^5.1.0:
   integrity sha512-nBF+F1rAZVCu/p7rjzgA+Yb4lfYXrpl7a6VmJrU8wF9I1CKvP/QwPNZHnOlwbTkY6dvtFIzFMSyQXbLoTQPRpA==
   dependencies:
     pump "^3.0.0"
+
+glfx@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/glfx/-/glfx-0.0.4.tgz#1b776dc748c081994624b0af3b5638403de78f4d"
+  integrity sha512-CmcUjZP/DARqtOC+MoNqClu2wKGWFbEGqAuiGsTZaZTLDC8a/VW/nqtcLfpPimC8ihgv60tGHRV4O3SmFYneRw==
 
 glob-parent@^5.1.2, glob-parent@~5.1.2:
   version "5.1.2"

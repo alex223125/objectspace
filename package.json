@@ -4,6 +4,7 @@
   "dependencies": {
     "@hotwired/stimulus": "^3.2.1",
     "@hotwired/turbo-rails": "^8.0.23",
+    "@panzoom/panzoom": "^4.6.2",
     "@popperjs/core": "^2.11.6",
     "@rails/ujs": "^7.0.4-2",
     "@tailwindcss/aspect-ratio": "^0.4.2",
@@ -20,6 +21,7 @@
     "esbuild": "^0.28.1",
     "flowbite": "^1.7.0",
     "flowbite-typography": "^1.0.3",
+    "glfx": "^0.0.4",
     "jstree": "^3.3.15",
     "puppeteer": "^25.2.1",
     "puppeteer-core": "^25.2.1",

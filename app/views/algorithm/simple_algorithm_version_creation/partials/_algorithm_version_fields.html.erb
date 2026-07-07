@@ -119,37 +119,81 @@
       <span class="text-[9px] font-mono font-bold text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">Scale Grid Expanded</span>
     </div>
 
-    <!-- FIXED WORKSPACE: Force absolute layout heights and inject dynamic custom layout override traits -->
-<!--    <div class="w-full bg-slate-950 rounded-xl overflow-hidden min-h-[500px] h-[550px] flex items-center justify-center p-2 shadow-inner relative" style="content-visibility: auto;">-->
+    <!-- Cropping Interactive Viewport Center Frame Box -->
+    <!-- CHANGED: Replaced overflow-hidden with overflow-auto so zoomed images can scroll smoothly -->
+<!--    <div class="w-full bg-slate-950 rounded-xl overflow-auto h-[600px] flex items-center justify-center p-4 shadow-2xl relative">-->
 
-<!--       FIXED IMAGE EMBED LAYER: Remove aspect/contain layout constraints so CropperJS v2 reads the base64 data natively -->
-<!--      <img data-algorithm_cover_upload-target="cropImage"-->
-<!--           src=""-->
-<!--           class="block max-w-full max-h-full"-->
-<!--           style="display: block; width: 100%; height: 100%; min-height: 500px; object-fit: contain;"-->
-<!--           alt="Crop Core Target Source" />-->
-
-      <!-- Ensure class has 'w-full h-full flex block relative' parameters -->
-<!--      <div class="w-full bg-slate-950 rounded-xl overflow-hidden min-h-[500px] h-[550px] flex items-center justify-center p-2 shadow-inner relative">-->
-<!--        <img data-algorithm_cover_upload-target="cropImage" src="" class="block max-w-full max-h-full" alt="Source" />-->
-<!--      </div>-->
+      <!-- CHANGED: Replaced <img> with an explicit HTML5 <canvas> element using proper underscore data attributes -->
+<!--      <canvas data-algorithm_cover_upload-target="canvas"-->
+<!--              width="800"-->
+<!--              height="500"-->
+<!--              class="mx-auto block bg-transparent transition-all duration-75 shadow-lg border border-slate-800">-->
+<!--      </canvas>-->
 
 <!--    </div>-->
 
+
     <!-- Cropping Interactive Viewport Center Frame Box -->
-    <div class="w-full bg-slate-950 rounded-xl overflow-hidden h-[750px] flex items-center justify-center p-4 shadow-2xl relative">
-      <!-- Keep this tag clean and isolated so CropperJS v2 handles state nodes updates directly -->
-      <img data-algorithm_cover_upload-target="cropImage" src="" class="max-w-full block" alt="Crop Target Core" />
+    <!-- CHANGED: Replaced overflow-hidden with overflow-auto to handle overflow bounds seamlessly -->
+    <div class="w-full bg-slate-950 rounded-xl overflow-auto h-[600px] flex items-center justify-center p-4 shadow-2xl relative">
+
+      <!-- NEW PANZOOM WRAPPER LAYER NODE -->
+      <div data-algorithm_cover_upload-target="panzoomContainer" class="w-full h-full flex items-center justify-center transition-all duration-75">
+
+        <!-- RESTORED: Standard clean <img> tag using proper underscore targets attributes matching your controller -->
+        <img data-algorithm_cover_upload-target="cropImage"
+             src=""
+             class="max-w-full max-h-full block bg-transparent shadow-lg"
+             alt="Crop Target Core">
+
+      </div>
+    </div>
+
+
+<!--    <div class="w-full bg-slate-950 rounded-xl overflow-hidden h-[600px] flex items-center justify-center p-4 shadow-2xl relative">-->
+
+<!--      <img data-algorithm_cover_upload-target="cropImage"-->
+<!--           src="data:image/jpeg;base64,/9j/4AAQ..."-->
+<!--           class="max-w-full block bg-transparent shadow-lg"-->
+<!--           alt="Crop Target Core">-->
+
+<!--    </div>-->
+
+  </div>
+
+
+  <!-- DYNAMIC CANVAS ZOOM-IN & ZOOM-OUT SLIDER ROW -->
+  <div class="pt-4 border-t border-slate-100 grid grid-cols-1 gap-4 select-none">
+    <div class="space-y-1">
+      <div class="flex items-center justify-between text-[11px] font-mono font-black text-slate-500 uppercase tracking-wider">
+        <span>// Viewport Zoom Matrix (Scale):</span>
+        <!-- Dynamic live tracking badge node link -->
+        <span data-algorithm_cover_upload-target="zoomVal">100%</span>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <!-- Fast Step Zoom Out Button -->
+        <button type="button" data-action="click->algorithm_cover_upload#zoomOutStep" class="w-7 h-7 bg-white border border-slate-200 hover:border-slate-300 rounded-lg text-xs font-mono font-bold flex items-center justify-center cursor-pointer shadow-sm active:scale-90 select-none">
+          -
+        </button>
+
+        <!-- Continuous Range Tracking Zoom Input Node -->
+        <input type="range" min="50" max="200" value="100"
+               data-algorithm_cover_upload-target="zoomSlider"
+               data-action="input->algorithm_cover_upload#scaleCanvasZoom"
+               class="w-full accent-cyan-500 h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer shadow-inner border border-slate-200">
+
+        <!-- Fast Step Zoom In Button -->
+        <button type="button" data-action="click->algorithm_cover_upload#zoomInStep" class="w-7 h-7 bg-white border border-slate-200 hover:border-slate-300 rounded-lg text-xs font-mono font-bold flex items-center justify-center cursor-pointer shadow-sm active:scale-90 select-none">
+          +
+        </button>
+      </div>
     </div>
   </div>
 
 
-
-
-
   <!-- DYNAMIC EXPOSURE & CALIBRATION SLIDERS ROW -->
   <div class="pt-4 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 gap-4 select-none">
-
     <!-- Brightness Control Slider -->
     <div class="space-y-1">
       <div class="flex items-center justify-between text-[11px] font-mono font-black text-slate-500 uppercase tracking-wider">
@@ -161,7 +205,6 @@
              data-action="input->algorithm_cover_upload#tuneImageAdjustments"
              class="w-full accent-cyan-500 h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer shadow-inner border border-slate-200">
     </div>
-
     <!-- Contrast Control Slider -->
     <div class="space-y-1">
       <div class="flex items-center justify-between text-[11px] font-mono font-black text-slate-500 uppercase tracking-wider">
@@ -173,47 +216,7 @@
              data-action="input->algorithm_cover_upload#tuneImageAdjustments"
              class="w-full accent-cyan-500 h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer shadow-inner border border-slate-200">
     </div>
-
   </div>
-
-
-
-
-
-
-
-    <!-- Interactive Artifact Filters Matrix Controls & Actions -->
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
-
-      <!-- Filter matrix selector dropdown element tag input -->
-      <div class="flex items-center gap-2 w-full sm:w-auto">
-        <label class="text-[10px] font-mono font-black text-slate-500 uppercase tracking-wider whitespace-nowrap">Apply Matrix Filter:</label>
-        <select data-algorithm_cover_upload-target="filterSelect"
-                data-action="change->algorithm_cover_upload#applyFilter"
-                class="bg-slate-50 border border-slate-200 text-slate-800 text-xs font-mono font-bold rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all cursor-pointer">
-          <option value="none">✦ Raw Core Profile (Default)</option>
-          <option value="grayscale">✦ Monochromatic Archival Ledger (Grayscale)</option>
-          <option value="sepia">✦ Ancient Historical Codex (Sepia)</option>
-          <option value="invert">✦ Cryptography Inverse Matrix (Invert)</option>
-          <option value="saturate-150">✦ High-Density Fluid Mana Node (Saturated)</option>
-        </select>
-      </div>
-
-      <!-- Action Confirmation Triggers Area row panel -->
-      <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-        <button type="button"
-                data-action="click->algorithm_cover_upload#discardModifications"
-                class="px-4 py-2 bg-white hover:bg-rose-50 border border-slate-200 hover:border-rose-200 rounded-xl text-xs font-mono font-black text-slate-500 hover:text-rose-600 transition-all cursor-pointer active:scale-95 shadow-sm">
-          ✕ Discard
-        </button>
-        <button type="button"
-                data-action="click->algorithm_cover_upload#applyModifications"
-                class="px-5 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-mono font-black text-xs uppercase tracking-widest rounded-xl transition-all cursor-pointer active:scale-95 shadow-md border border-cyan-400/20">
-          ⚙️ Render & Lock Cover
-        </button>
-      </div>
-
-    </div>
 
 
     <!-- DYNAMIC GEOMETRY MANIPULATION TOOLBAR ROW -->
@@ -327,8 +330,42 @@
           <option value="high-dynamic">✦ 35. High Dynamic Range (HDR Computational Boost)</option>
         </optgroup>
 
+
+        <optgroup label="── ARCHIVAL & HISTORICAL TEXTBOOKS ──">
+          <!-- Add this line directly beneath your existing options inside this optgroup -->
+          <option value="noir-graphic-novel">✦ 10b. Noir Graphic Novel Sketch (Stark Ink Shading)</option>
+        </optgroup>
+
+
+        <optgroup label="── STANDARD CORE CHRONICLES ──">
+          <!-- Add this line directly beneath your existing standard options -->
+          <option value="comic-halftone">✦ 05b. Pop-Art Comic Halftone (Retro Dot Matrix)</option>
+        </optgroup>
+
       </select>
     </div>
+
+    <!-- DURAL ARTISTIC COMIC DESIGN OVERLAY SELECTOR -->
+    <div class="flex items-center gap-2 w-full sm:w-auto mt-4 pt-4 border-t border-slate-100">
+      <label class="text-[10px] font-mono font-black text-cyan-600 uppercase tracking-wider whitespace-nowrap">✦ Choose Comic Art Style:</label>
+      <select data-algorithm_cover_upload-target="comicStyleSelect"
+              data-action="change->algorithm_cover_upload#applyComicStyle"
+              class="bg-white border-2 border-slate-200 text-slate-800 text-xs font-mono font-bold rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all cursor-pointer shadow-sm">
+        <option value="none">── No Artistic Overlay Applied ──</option>
+        <option value="pop-dots">🎨 01. Classic Retro Pop-Art (Coarse Dot Matrix)</option>
+        <option value="ink-sketch">✒️ 02. Graphic Novel Ink Sketch (High Density Shading)</option>
+        <option value="oil-comic">🖌️ 03. Manga Cel Shading (Vibrant Oil Comic)</option>
+        <option value="vintage-print">📰 04. 1950s Newspaper Comic (Bleached Faded Dots)</option>
+        <option value="cyber-punk">⚡ 05. Cyberpunk Neon Edge (Glowing Ink Vector)</option>
+        <option value="charcoal-novel">✏️ 06. Charcoal Graphic Novel (Soft Edge Sketch)</option>
+        <option value="noir-shadows">🕶️ 07. Sin City Noir (Extreme Shadow Ink Print)</option>
+        <option value="acid-glow">🧪 08. Toxic Waste Radiance (Acid Fluorescent Glow)</option>
+        <option value="void-abyss">🌌 09. Space Odyssey Abyss (Deep Blue Comic Wash)</option>
+        <option value="quantum-glitch">📺 10. Quantum Laser Glitch (Cathode Screen Scan)</option>
+      </select>
+    </div>
+
+
 
 
 
@@ -367,51 +404,22 @@
       </div>
     </div>
 
-
-
-
-    <!-- DYNAMIC CANVAS ZOOM-IN & ZOOM-OUT SLIDER ROW -->
-    <div class="pt-4 border-t border-slate-100 grid grid-cols-1 gap-4 select-none">
-
-      <div class="space-y-1">
-        <div class="flex items-center justify-between text-[11px] font-mono font-black text-slate-500 uppercase tracking-wider">
-          <span>// Viewport Zoom Matrix (Scale):</span>
-          <!-- Dynamic live tracking badge node link -->
-          <span data-algorithm_cover_upload-target="zoomVal">100%</span>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <!-- Fast Step Zoom Out Button -->
-          <button type="button" data-action="click->algorithm_cover_upload#zoomOutStep" class="w-7 h-7 bg-white border border-slate-200 hover:border-slate-300 rounded-lg text-xs font-mono font-bold flex items-center justify-center cursor-pointer shadow-sm active:scale-90 select-none">
-            -
-          </button>
-
-          <!-- Continuous Range Tracking Zoom Input Node -->
-          <input type="range" min="50" max="200" value="100"
-                 data-algorithm_cover_upload-target="zoomSlider"
-                 data-action="input->algorithm_cover_upload#scaleCanvasZoom"
-                 class="w-full accent-cyan-500 h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer shadow-inner border border-slate-200">
-
-          <!-- Fast Step Zoom In Button -->
-          <button type="button" data-action="click->algorithm_cover_upload#zoomInStep" class="w-7 h-7 bg-white border border-slate-200 hover:border-slate-300 rounded-lg text-xs font-mono font-bold flex items-center justify-center cursor-pointer shadow-sm active:scale-90 select-none">
-            +
-          </button>
-        </div>
+    <!-- Interactive Artifact Filters Matrix Controls & Actions -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+      <!-- Action Confirmation Triggers Area row panel -->
+      <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+        <button type="button"
+                data-action="click->algorithm_cover_upload#discardModifications"
+                class="px-4 py-2 bg-white hover:bg-rose-50 border border-slate-200 hover:border-rose-200 rounded-xl text-xs font-mono font-black text-slate-500 hover:text-rose-600 transition-all cursor-pointer active:scale-95 shadow-sm">
+          ✕ Discard
+        </button>
+        <button type="button"
+                data-action="click->algorithm_cover_upload#applyModifications"
+                class="px-5 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-mono font-black text-xs uppercase tracking-widest rounded-xl transition-all cursor-pointer active:scale-95 shadow-md border border-cyan-400/20">
+          ⚙️ Render & Lock Cover
+        </button>
       </div>
-
     </div>
-
-
-
-
-
-
-
-
-
-
-
-
 
   </div>
 </div>
