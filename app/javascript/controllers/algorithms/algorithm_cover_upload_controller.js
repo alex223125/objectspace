@@ -159,179 +159,357 @@ export default class extends Controller {
     }
 
     // B. Commit & Seal current parameters into standard form upload parameters
+    // async applyModifications(event) {
+    //     event.preventDefault()
+    //     if (!this.cropper) return
+    //
+    //
+    //
+    //     try {
+    //
+    //         //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //         // Add this rotation burn sequence inside your applyModifications() try block:
+    //         const cropperImage = this.element.querySelector("cropper-image");
+    //         if (cropperImage) {
+    //             const finalRotate = parseFloat(cropperImage.getAttribute("rotate")) || 0;
+    //             const finalScaleX = parseFloat(cropperImage.getAttribute("scale-x")) || 1;
+    //             const finalScaleY = parseFloat(cropperImage.getAttribute("scale-y")) || 1;
+    //
+    //             if (finalRotate !== 0 || finalScaleX !== 1 || finalScaleY !== 1) {
+    //                 // Translate center coordinates to pivot the image array correctly on final save
+    //                 ctx.translate(canvas.width / 2, canvas.height / 2);
+    //                 ctx.scale(finalScaleX, finalScaleY);
+    //                 ctx.rotate((finalRotate * Math.PI) / 180);
+    //                 ctx.translate(-canvas.width / 2, -canvas.height / 2);
+    //             }
+    //         }
+    //         //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //
+    //         //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //         // 1.Fine-Tuned Brightness & Contrast Calibration Controls
+    //         // Update inside your applyModifications() try block:
+    //         const brightness = this.brightnessSliderTarget.value;
+    //         const contrast = this.contrastSliderTarget.value;
+    //
+    //         // Inject combined values right into the canvas drawing engine context before generating blobs
+    //         tempCtx.filter = `${filterMap[filterValue] || "none"} brightness(${brightness}%) contrast(${contrast}%)`;
+    //         //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //         // Locate this exact section inside your applyModifications() method and modify as follows:
+    //         const cropperSelection = this.element.querySelector("cropper-selection")
+    //         if (!cropperSelection) return
+    //
+    //         // FIXED FOR V2 DYNAMIC RATIOS: Let Cropper calculate dimensions automatically based on selected aspect ratio box
+    //         const canvas = await cropperSelection.$toCanvas({
+    //             maxWidth: 2000,
+    //             maxHeight: 2000
+    //         })
+    //
+    //         // Safely reference our filterSelect target element properties
+    //         const filterValue = this.hasFilterSelectTarget ? this.filterSelectTarget.value : "none"
+    //
+    //         if (!canvas) return
+    //
+    //         const ctx = canvas.getContext("2d")
+    //
+    //         // =======================================================================
+    //         // pixel matrix into canvas file
+    //         if (filterValue !== "none") {
+    //             const tempCanvas = document.createElement("canvas");
+    //             tempCanvas.width = canvas.width;
+    //             tempCanvas.height = canvas.height;
+    //             const tempCtx = tempCanvas.getContext("2d");
+    //
+    //
+    //
+    //
+    //             // Compile standard filter configurations strings
+    //             const activeBaseFilter = filterMap[filterValue] || "";
+    //             tempCtx.filter = `${activeBaseFilter} brightness(${brightness}%) contrast(${contrast}%)`.trim();
+    //
+    //             // Repaint the base cropped image onto the temp buffer layer
+    //             tempCtx.drawImage(canvas, 0, 0);
+    //
+    //             // =======================================================================
+    //             // NEW HALFTONE INTEGRATION INTERCEPT LOOP
+    //             // If the user selected the halftone option, intercept and burn pixels directly
+    //             if (filterValue === "comic-halftone") {
+    //                 this.applyComicHalftone(tempCanvas, tempCtx);
+    //             }
+    //             // =======================================================================
+    //
+    //             // Wipe out original clean canvas context frames data
+    //             ctx.clearRect(0, 0, canvas.width, canvas.height);
+    //
+    //             // Draw the final manipulated temp canvas data back onto primary canvas file
+    //             ctx.drawImage(tempCanvas, 0, 0);
+    //
+    //
+    //
+    //
+    //
+    //             // passing details CSS-matrix of filtration to context of  Canvas API [POST]
+    //             const filterMap = {
+    //                 "vintage": "sepia(40%) saturate(120%) contrast(90%) hue-rotate(-10deg)",
+    //                 "parchment": "sepia(30%) contrast(95%) brightness(105%) saturate(80%)",
+    //                 "faded-log": "brightness(130%) contrast(85%) saturate(70%)",
+    //                 "dim-manuscript": "brightness(75%) contrast(110%) saturate(60%)",
+    //                 "high-contrast-monorail": "grayscale(100%) contrast(200%) brightness(90%)",
+    //                 "night-vision": "sepia(100%) hue-rotate(85deg) saturate(200%) contrast(140%)",
+    //                 "thermal-sensor": "invert(100%) hue-rotate(180deg) saturate(300%) contrast(150%)",
+    //                 "amber-cathode": "grayscale(100%) sepia(100%) hue-rotate(5deg) saturate(400%) contrast(120%) brightness(95%)",
+    //                 "cyan-laser": "grayscale(100%) sepia(100%) hue-rotate(145deg) saturate(350%) contrast(120%)",
+    //                 "glitch-ghost": "invert(80%) hue-rotate(90deg) contrast(150%) saturate(50%)",
+    //                 "overclocked": "saturate(300%) contrast(130%) brightness(105%)",
+    //                 "dark-matter": "hue-rotate(30deg) brightness(85%) contrast(90%) saturate(50%)",
+    //                 "solar-flare": "contrast(180%) invert(15%) hue-rotate(-30deg) saturate(200%)",
+    //                 "neon-cyber": "hue-rotate(290deg) saturate(180%) contrast(125%)",
+    //                 "toxic-waste": "hue-rotate(60deg) saturate(250%) contrast(160%) brightness(110%)",
+    //                 "martian-soil": "sepia(100%) hue-rotate(-30deg) saturate(250%) contrast(110%)",
+    //                 "deep-space": "hue-rotate(200deg) brightness(80%) contrast(120%) saturate(60%)",
+    //                 "aurora": "hue-rotate(100deg) saturate(160%) brightness(95%) contrast(115%)",
+    //                 "supernova": "brightness(180%) contrast(150%) saturate(140%)",
+    //                 "pulsar": "contrast(150%) brightness(60%) saturate(110%) hue-rotate(45deg)",
+    //                 "golden-ratio": "sepia(100%) hue-rotate(15deg) saturate(250%) contrast(105%) brightness(105%)",
+    //                 "quicksilver": "grayscale(100%) brightness(115%) contrast(130%)",
+    //                 "copper-rust": "sepia(80%) hue-rotate(110deg) saturate(200%) contrast(110%)",
+    //                 "charcoal-ash": "grayscale(100%) brightness(50%) contrast(140%)",
+    //                 "amethyst": "sepia(100%) hue-rotate(240deg) saturate(250%) contrast(115%)",
+    //                 // Basic standarts
+    //                 "grayscale": "grayscale(100%)",
+    //                 "sepia": "sepia(100%)",
+    //                 "invert": "invert(100%)",
+    //                 "saturate-150": "saturate(170%)",
+    //                 // Optical
+    //                 "blueprint-cyan": "contrast(140%) brightness(95%) sepia(100%) hue-rotate(160deg) saturate(250%) opacity(90%)",
+    //                 "xray-spectre": "grayscale(100%) invert(100%) brightness(110%) contrast(150%)",
+    //                 "high-shadows": "contrast(160%) brightness(85%) saturate(90%)",
+    //                 "monochrome-glow": "grayscale(100%) brightness(120%) contrast(130%) sepia(100%) hue-rotate(75deg) saturate(300%)",
+    //                 "high-dynamic": "contrast(135%) saturate(160%) brightness(110%)",
+    //                 // Optical
+    //                 "comic-halftone": "grayscale(100%) contrast(300%) brightness(100%) opacity(95%)"
+    //             };
+    //
+    //             tempCtx.filter = filterMap[filterValue] || "none";
+    //             tempCtx.drawImage(canvas, 0, 0);
+    //
+    //             ctx.clearRect(0, 0, canvas.width, canvas.height);
+    //             ctx.drawImage(tempCanvas, 0, 0);
+    //         }
+    //         // =======================================================================
+    //
+    //         // Your existing watermark drawing sequence continues cleanly right underneath:
+    //         ctx.font = "bold 14px monospace"
+    //         ctx.fillStyle = "rgba(6, 182, 212, 0.4)"
+    //         ctx.fillText("// OBJECTSPACE_SECURE_COGNITIVE_REVISION", 24, canvas.height - 24)
+    //
+    //         // Convert canvas map to high-fidelity DataURL blob string data payload
+    //         const dataUrl = canvas.toDataURL("image/jpeg", 0.92)
+    //
+    //         // Inject the modified base64 data stream straight into a preview thumbnail card element
+    //         this.previewTarget.innerHTML = `
+    //             <div class="relative w-full h-full aspect-[21/7] md:aspect-square">
+    //               <img src="${dataUrl}" class="w-full h-full object-cover rounded-xl" />
+    //               <span class="absolute top-2 left-2 bg-emerald-500/90 text-white font-mono text-[8px] px-1.5 py-0.5 rounded border border-emerald-400 font-black tracking-widest uppercase animate-pulse">✓ Ready to Inscribe</span>
+    //             </div>
+    //         `
+    //
+    //         // Generate a file transmission blob to override the native file selection parameters array input structure
+    //         canvas.toBlob((blob) => {
+    //             const croppedFile = new File([blob], "algorithm_cover_processed.jpg", { type: "image/jpeg" })
+    //
+    //             // Programmatically patch the file array parameter list inside your actual file field tag
+    //             const dataTransfer = new DataTransfer()
+    //             dataTransfer.items.add(croppedFile)
+    //             this.inputTarget.files = dataTransfer.files
+    //
+    //             // Gracefully collapse the cropper tool frame workspace overlay array
+    //             this.cropperContainerTarget.classList.add("hidden")
+    //         }, "image/jpeg", 0.92)
+    //
+    //     } catch (error) {
+    //         console.error("Error executing dynamic canvas crop parameters pipeline:", error)
+    //     }
+    // }
+
+
+    // B. Commit & Seal current parameters into standard form upload parameters
     async applyModifications(event) {
         event.preventDefault()
         if (!this.cropper) return
 
-
-
         try {
-
-            //////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // Add this rotation burn sequence inside your applyModifications() try block:
-            const cropperImage = this.element.querySelector("cropper-image");
-            if (cropperImage) {
-                const finalRotate = parseFloat(cropperImage.getAttribute("rotate")) || 0;
-                const finalScaleX = parseFloat(cropperImage.getAttribute("scale-x")) || 1;
-                const finalScaleY = parseFloat(cropperImage.getAttribute("scale-y")) || 1;
-
-                if (finalRotate !== 0 || finalScaleX !== 1 || finalScaleY !== 1) {
-                    // Translate center coordinates to pivot the image array correctly on final save
-                    ctx.translate(canvas.width / 2, canvas.height / 2);
-                    ctx.scale(finalScaleX, finalScaleY);
-                    ctx.rotate((finalRotate * Math.PI) / 180);
-                    ctx.translate(-canvas.width / 2, -canvas.height / 2);
-                }
-            }
-            //////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-            //////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // 1.Fine-Tuned Brightness & Contrast Calibration Controls
-            // Update inside your applyModifications() try block:
-            const brightness = this.brightnessSliderTarget.value;
-            const contrast = this.contrastSliderTarget.value;
-
-            // Inject combined values right into the canvas drawing engine context before generating blobs
-            tempCtx.filter = `${filterMap[filterValue] || "none"} brightness(${brightness}%) contrast(${contrast}%)`;
-            //////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-            // Locate this exact section inside your applyModifications() method and modify as follows:
+            // 1. Locate Cropper v2 selection box workspace node
             const cropperSelection = this.element.querySelector("cropper-selection")
             if (!cropperSelection) return
 
-            // FIXED FOR V2 DYNAMIC RATIOS: Let Cropper calculate dimensions automatically based on selected aspect ratio box
+            // 2. Generate clean baseline crop box canvas file mapping properties
             const canvas = await cropperSelection.$toCanvas({
                 maxWidth: 2000,
                 maxHeight: 2000
             })
-
-            // Safely reference our filterSelect target element properties
-            const filterValue = this.hasFilterSelectTarget ? this.filterSelectTarget.value : "none"
-
             if (!canvas) return
 
             const ctx = canvas.getContext("2d")
 
-            // =======================================================================
-            // pixel matrix into canvas file
-            if (filterValue !== "none") {
-                const tempCanvas = document.createElement("canvas");
-                tempCanvas.width = canvas.width;
-                tempCanvas.height = canvas.height;
-                const tempCtx = tempCanvas.getContext("2d");
+            // 3. Read interactive controls state properties layout adjustments
+            const brightness = this.hasBrightnessSliderTarget ? this.brightnessSliderTarget.value : 100
+            const contrast = this.hasContrastSliderTarget ? this.contrastSliderTarget.value : 100
+            const activeFilterValue = this.hasFilterSelectTarget ? this.filterSelectTarget.value : "none"
+            const activeComicStyle = this.hasComicStyleSelectTarget ? this.comicStyleSelectTarget.value : "none"
 
+            // 4. Geometry Orientation Matrix Transformations (Rotation & Flips Burn Loop)
+            const cropperImage = this.element.querySelector("cropper-image")
+            if (cropperImage) {
+                const finalRotate = parseFloat(cropperImage.getAttribute("rotate")) || 0
+                const finalScaleX = parseFloat(cropperImage.getAttribute("scale-x")) || 1
+                const finalScaleY = parseFloat(cropperImage.getAttribute("scale-y")) || 1
 
+                if (finalRotate !== 0 || finalScaleX !== 1 || finalScaleY !== 1) {
+                    const transCanvas = document.createElement("canvas")
+                    transCanvas.width = canvas.width
+                    transCanvas.height = canvas.height
+                    const transCtx = transCanvas.getContext("2d")
 
+                    // Shift tracking space origin points straight around center core pivot
+                    transCtx.translate(canvas.width / 2, canvas.height / 2)
+                    transCtx.scale(finalScaleX, finalScaleY)
+                    transCtx.rotate((finalRotate * Math.PI) / 180)
+                    transCtx.translate(-canvas.width / 2, -canvas.height / 2)
 
-                // Compile standard filter configurations strings
-                const activeBaseFilter = filterMap[filterValue] || "";
-                tempCtx.filter = `${activeBaseFilter} brightness(${brightness}%) contrast(${contrast}%)`.trim();
+                    transCtx.drawImage(canvas, 0, 0)
 
-                // Repaint the base cropped image onto the temp buffer layer
-                tempCtx.drawImage(canvas, 0, 0);
-
-                // =======================================================================
-                // NEW HALFTONE INTEGRATION INTERCEPT LOOP
-                // If the user selected the halftone option, intercept and burn pixels directly
-                if (filterValue === "comic-halftone") {
-                    this.applyComicHalftone(tempCanvas, tempCtx);
+                    ctx.clearRect(0, 0, canvas.width, canvas.height)
+                    ctx.drawImage(transCanvas, 0, 0)
                 }
-                // =======================================================================
-
-                // Wipe out original clean canvas context frames data
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                // Draw the final manipulated temp canvas data back onto primary canvas file
-                ctx.drawImage(tempCanvas, 0, 0);
-
-
-
-
-
-                // passing details CSS-matrix of filtration to context of  Canvas API [POST]
-                const filterMap = {
-                    "vintage": "sepia(40%) saturate(120%) contrast(90%) hue-rotate(-10deg)",
-                    "parchment": "sepia(30%) contrast(95%) brightness(105%) saturate(80%)",
-                    "faded-log": "brightness(130%) contrast(85%) saturate(70%)",
-                    "dim-manuscript": "brightness(75%) contrast(110%) saturate(60%)",
-                    "high-contrast-monorail": "grayscale(100%) contrast(200%) brightness(90%)",
-                    "night-vision": "sepia(100%) hue-rotate(85deg) saturate(200%) contrast(140%)",
-                    "thermal-sensor": "invert(100%) hue-rotate(180deg) saturate(300%) contrast(150%)",
-                    "amber-cathode": "grayscale(100%) sepia(100%) hue-rotate(5deg) saturate(400%) contrast(120%) brightness(95%)",
-                    "cyan-laser": "grayscale(100%) sepia(100%) hue-rotate(145deg) saturate(350%) contrast(120%)",
-                    "glitch-ghost": "invert(80%) hue-rotate(90deg) contrast(150%) saturate(50%)",
-                    "overclocked": "saturate(300%) contrast(130%) brightness(105%)",
-                    "dark-matter": "hue-rotate(30deg) brightness(85%) contrast(90%) saturate(50%)",
-                    "solar-flare": "contrast(180%) invert(15%) hue-rotate(-30deg) saturate(200%)",
-                    "neon-cyber": "hue-rotate(290deg) saturate(180%) contrast(125%)",
-                    "toxic-waste": "hue-rotate(60deg) saturate(250%) contrast(160%) brightness(110%)",
-                    "martian-soil": "sepia(100%) hue-rotate(-30deg) saturate(250%) contrast(110%)",
-                    "deep-space": "hue-rotate(200deg) brightness(80%) contrast(120%) saturate(60%)",
-                    "aurora": "hue-rotate(100deg) saturate(160%) brightness(95%) contrast(115%)",
-                    "supernova": "brightness(180%) contrast(150%) saturate(140%)",
-                    "pulsar": "contrast(150%) brightness(60%) saturate(110%) hue-rotate(45deg)",
-                    "golden-ratio": "sepia(100%) hue-rotate(15deg) saturate(250%) contrast(105%) brightness(105%)",
-                    "quicksilver": "grayscale(100%) brightness(115%) contrast(130%)",
-                    "copper-rust": "sepia(80%) hue-rotate(110deg) saturate(200%) contrast(110%)",
-                    "charcoal-ash": "grayscale(100%) brightness(50%) contrast(140%)",
-                    "amethyst": "sepia(100%) hue-rotate(240deg) saturate(250%) contrast(115%)",
-                    // Basic standarts
-                    "grayscale": "grayscale(100%)",
-                    "sepia": "sepia(100%)",
-                    "invert": "invert(100%)",
-                    "saturate-150": "saturate(170%)",
-                    // Optical
-                    "blueprint-cyan": "contrast(140%) brightness(95%) sepia(100%) hue-rotate(160deg) saturate(250%) opacity(90%)",
-                    "xray-spectre": "grayscale(100%) invert(100%) brightness(110%) contrast(150%)",
-                    "high-shadows": "contrast(160%) brightness(85%) saturate(90%)",
-                    "monochrome-glow": "grayscale(100%) brightness(120%) contrast(130%) sepia(100%) hue-rotate(75deg) saturate(300%)",
-                    "high-dynamic": "contrast(135%) saturate(160%) brightness(110%)",
-                    // Optical
-                    "comic-halftone": "grayscale(100%) contrast(300%) brightness(100%) opacity(95%)"
-                };
-
-                tempCtx.filter = filterMap[filterValue] || "none";
-                tempCtx.drawImage(canvas, 0, 0);
-
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(tempCanvas, 0, 0);
             }
-            // =======================================================================
 
-            // Your existing watermark drawing sequence continues cleanly right underneath:
+            // 5. Complete Dictionaries Synchronized Mapping Layout properties
+            const filterMap = {
+                "none": "", "grayscale": "grayscale(100%)", "sepia": "sepia(100%)", "invert": "invert(100%)", "saturate-150": "saturate(1.7)",
+                "vintage": "sepia(40%) saturate(120%) contrast(90%) hue-rotate(-10deg)", "parchment": "sepia(30%) contrast(95%) brightness(105%) saturate(80%)",
+                "faded-log": "brightness(130%) contrast(85%) saturate(70%)", "dim-manuscript": "brightness(75%) contrast(110%) saturate(60%)",
+                "high-contrast-monorail": "grayscale(100%) contrast(200%) brightness(90%)",
+                "night-vision": "sepia(100%) hue-rotate(85deg) saturate(200%) contrast(140%)",
+                "thermal-sensor": "invert(100%) hue-rotate(180deg) saturate(300%) contrast(150%)",
+                "amber-cathode": "grayscale(100%) sepia(100%) hue-rotate(5deg) saturate(400%) contrast(120%) brightness(95%)",
+                "cyan-laser": "grayscale(100%) sepia(100%) hue-rotate(145deg) saturate(350%) contrast(120%)",
+                "glitch-ghost": "invert(80%) hue-rotate(90deg) contrast(150%) saturate(50%)",
+                "overclocked": "saturate(300%) contrast(130%) brightness(105%)",
+                "dark-matter": "hue-rotate(30deg) brightness(85%) contrast(90%) saturate(50%)",
+                "solar-flare": "contrast(180%) invert(15%) hue-rotate(-30deg) saturate(200%)",
+                "neon-cyber": "hue-rotate(290deg) saturate(180%) contrast(125%)",
+                "toxic-waste": "hue-rotate(60deg) saturate(250%) contrast(160%) brightness(110%)",
+                "martian-soil": "sepia(100%) hue-rotate(-30deg) saturate(250%) contrast(110%)",
+                "deep-space": "hue-rotate(200deg) brightness(80%) contrast(120%) saturate(60%)",
+                "aurora": "hue-rotate(100deg) saturate(160%) brightness(95%) contrast(115%)",
+                "supernova": "brightness(180%) contrast(150%) saturate(140%)",
+                "pulsar": "contrast(150%) brightness(60%) saturate(110%) hue-rotate(45deg)",
+                "golden-ratio": "sepia(100%) hue-rotate(15deg) saturate(250%) contrast(105%) brightness(105%)",
+                "quicksilver": "grayscale(100%) brightness(115%) contrast(130%)",
+                "copper-rust": "sepia(80%) hue-rotate(110deg) saturate(200%) contrast(110%)",
+                "charcoal-ash": "grayscale(100%) brightness(50%) contrast(140%)",
+                "amethyst": "sepia(100%) hue-rotate(240deg) saturate(250%) contrast(115%)",
+                "blueprint-cyan": "contrast(140%) brightness(95%) sepia(100%) hue-rotate(160deg) saturate(250%) opacity(90%)",
+                "xray-spectre": "grayscale(100%) invert(100%) brightness(110%) contrast(150%)",
+                "high-shadows": "contrast(160%) brightness(85%) saturate(90%)",
+                "monochrome-glow": "grayscale(100%) brightness(120%) contrast(130%) sepia(100%) hue-rotate(75deg) saturate(300%)",
+                "high-dynamic": "contrast(135%) saturate(160%) brightness(110%)",
+                "noir-graphic-novel": "grayscale(100%) contrast(500%) brightness(90%) drop-shadow(2px 2px 0px #000000)"
+            }
+
+            const comicStylesMap = {
+                "none": "",
+                "pop-dots": "contrast(350%) brightness(100%) saturate(150%) hue-rotate(-5deg)",
+                "ink-sketch": "grayscale(100%) contrast(500%) brightness(95%)",
+                "oil-comic": "saturate(250%) contrast(140%) brightness(105%) opacity(95%)",
+                "vintage-print": "sepia(30%) contrast(120%) brightness(98%) saturate(90%)",
+                "cyber-punk": "hue-rotate(290deg) saturate(400%) contrast(160%) brightness(110%)",
+                "charcoal-novel": "grayscale(100%) brightness(120%) contrast(180%)",
+                "noir-shadows": "grayscale(100%) contrast(600%) brightness(80%)",
+                "acid-glow": "hue-rotate(65deg) saturate(500%) contrast(200%) brightness(115%)",
+                "void-abyss": "hue-rotate(190deg) contrast(150%) brightness(75%) saturate(80%)",
+                "quantum-glitch": "invert(100%) hue-rotate(180deg) contrast(400%) saturate(0%) brightness(130%)"
+            }
+
+            // Decide filter preset visibility hierarchy logic tracking dependencies smoothly
+            let chosenBaseMatrix = ""
+            if (activeComicStyle !== "none") {
+                chosenBaseMatrix = comicStylesMap[activeComicStyle] || ""
+            } else {
+                chosenBaseMatrix = filterMap[activeFilterValue] || ""
+            }
+
+            // 6. Hard-bake exposure pixels matrix via secure proxy layer context
+            const hasCustomStyles = chosenBaseMatrix !== "" || parseInt(brightness) !== 100 || parseInt(contrast) !== 100
+
+            if (hasCustomStyles) {
+                const tempCanvas = document.createElement("canvas")
+                tempCanvas.width = canvas.width
+                tempCanvas.height = canvas.height
+                const tempCtx = tempCanvas.getContext("2d")
+
+                // CRITICAL FIX: Ensure tempCtx configurations execution order is synchronous
+                tempCtx.filter = `${chosenBaseMatrix} brightness(${brightness}%) contrast(${contrast}%)`.trim()
+                tempCtx.drawImage(canvas, 0, 0)
+
+                // Intercept execution process loop to safely process comic dot matrix structures
+                if (activeFilterValue === "comic-halftone" && typeof this.applyComicHalftone === "function") {
+                    this.applyComicHalftone(tempCanvas, tempCtx)
+                }
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height)
+                ctx.drawImage(tempCanvas, 0, 0)
+            }
+
+            // 7. Inject high-fidelity technical textual watermark overlay structures properties
             ctx.font = "bold 14px monospace"
             ctx.fillStyle = "rgba(6, 182, 212, 0.4)"
             ctx.fillText("// OBJECTSPACE_SECURE_COGNITIVE_REVISION", 24, canvas.height - 24)
 
-            // Convert canvas map to high-fidelity DataURL blob string data payload
+            // 8. Output complete payload straight onto user preview card component element layout grids
             const dataUrl = canvas.toDataURL("image/jpeg", 0.92)
 
-            // Inject the modified base64 data stream straight into a preview thumbnail card element
-            this.previewTarget.innerHTML = `
-                <div class="relative w-full h-full aspect-[21/7] md:aspect-square">
-                  <img src="${dataUrl}" class="w-full h-full object-cover rounded-xl" />
-                  <span class="absolute top-2 left-2 bg-emerald-500/90 text-white font-mono text-[8px] px-1.5 py-0.5 rounded border border-emerald-400 font-black tracking-widest uppercase animate-pulse">✓ Ready to Inscribe</span>
-                </div>
-            `
+            if (this.hasPreviewTarget) {
+                this.previewTarget.innerHTML = `
+                    <div class="relative w-full h-full flex justify-center items-center bg-slate-900 rounded-xl overflow-hidden">
+                      <img src="${dataUrl}" class="w-full h-full object-contain rounded-xl" />
+                      <span class="absolute top-2 left-2 bg-emerald-500/90 text-white font-mono text-[8px] px-1.5 py-0.5 rounded border border-emerald-400 font-black tracking-widest uppercase animate-pulse">✓ Ready</span>
+                    </div>    `
+            }
 
-            // Generate a file transmission blob to override the native file selection parameters array input structure
+            // 9. Compress canvas back into a clean transmission binary file blob packet
             canvas.toBlob((blob) => {
+                if (!blob) return
                 const croppedFile = new File([blob], "algorithm_cover_processed.jpg", { type: "image/jpeg" })
 
-                // Programmatically patch the file array parameter list inside your actual file field tag
                 const dataTransfer = new DataTransfer()
                 dataTransfer.items.add(croppedFile)
-                this.inputTarget.files = dataTransfer.files
 
-                // Gracefully collapse the cropper tool frame workspace overlay array
-                this.cropperContainerTarget.classList.add("hidden")
+                if (this.hasInputTarget) {
+                    this.inputTarget.files = dataTransfer.files
+                }
+
+                // Gracefully lock out overlay layout windows worksp
+                // Programmatically dispatch a native change event so Rails UJS / Turbo knows the file input was updated
+                this.inputTarget.dispatchEvent(new Event("change", { bubbles: true }))
+
+                // Gracefully collapse workspace editor container view layer grids
+                if (this.hasCropperContainerTarget) {
+                    this.cropperContainerTarget.classList.add("hidden")
+                }
+
+                // Explicitly clear original memory caches stream to avoid leaks
+                this.originalUploadedImageBase64 = null
+                console.log("Transmission array patched: Algorithm cover payload successfully locked into form matrix.")
             }, "image/jpeg", 0.92)
 
         } catch (error) {
             console.error("Error executing dynamic canvas crop parameters pipeline:", error)
         }
     }
+
 
 
     /**
@@ -447,27 +625,6 @@ export default class extends Controller {
         cropperCanvas.style.filter = `${filterMap[filterValue] || "none"} brightness(${brightness}%) contrast(${contrast}%)`;
         console.log(`Live screen spectrometry filter successfully applied: ${filterValue}`);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -823,47 +980,4 @@ export default class extends Controller {
         // Apply style stacking rules back to layout
         cropperCanvas.style.filter = `${chosenBaseMatrix} brightness(${brightness}%) contrast(${contrast}%)`.trim();
     }
-
-
-    /**
-     * Core Pixel Manipulation Engine: Burns an archival comic book halftone grid
-     * into the final rendered canvas matrix array.
-     */
-    // applyComicHalftone(canvas, ctx) {
-    //     try {
-    //         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    //         const data = imageData.data;
-    //
-    //         // Wipe canvas base layer completely to prepare for dot matrix painting
-    //         ctx.clearRect(0, 0, canvas.width, canvas.height);
-    //         ctx.fillStyle = '#000000'; // Pure ink printing dot parameters
-    //
-    //         const dotSpacing = 6; // Space between dot coordinate nodes grid
-    //
-    //         for (let y = 0; y < canvas.height; y += dotSpacing) {
-    //             for (let x = 0; x < canvas.width; x += dotSpacing) {
-    //                 const index = (y * canvas.width + x) * 4;
-    //                 const r = data[index];
-    //                 const g = data[index + 1];
-    //                 const b = data[index + 2];
-    //
-    //                 // Standard luminance conversion formula to determine pixel brightness
-    //                 const luma = 0.299 * r + 0.587 * g + 0.114 * b;
-    //
-    //                 // Darker pixels yield larger radius sizes; brighter pixels yield smaller dots
-    //                 const radius = (dotSpacing / 2) * (1 - luma / 255);
-    //
-    //                 if (radius > 0.5) {
-    //                     ctx.beginPath();
-    //                     ctx.arc(x, y, radius, 0, Math.PI * 2);
-    //                     ctx.fill();
-    //                 }
-    //             }
-    //         }
-    //         console.log("Comic book halftone pixel matrix burned successfully.");
-    //     } catch (error) {
-    //         console.error("Halftone engine processing interrupted:", error);
-    //     }
-    // }
-
 }

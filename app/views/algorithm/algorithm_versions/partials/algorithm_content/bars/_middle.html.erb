@@ -4,24 +4,8 @@
   <div class="flex justify-between px-4 mx-auto max-w-screen-xl">
     <div class="w-full format-sm sm:format-base lg:format-lg format-blue dark:format-invert">
       <div class="mb-4 lg:mb-6 not-format p-3">
-
-
+        
         <!-- ###################################################### -->
-
-        <div class="w-full max-w-screen-xl mx-auto px-6 py-6">
-          <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-6">
-
-            <!-- 16:9 COMPACT HORIZONTAL COVER BANNER AT TOP -->
-            <div class="w-full aspect-[21/7] max-h-[220px] bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden shadow-inner relative group">
-              <img src="https://unsplash.com" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]" />
-              <div class="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/10 to-slate-950/50"></div>
-              <span class="absolute bottom-4 left-4 bg-slate-900/90 text-white font-mono text-[10px] px-2.5 py-1 border border-slate-800 rounded font-black tracking-widest uppercase">// ARCHIVAL_IMAGE_LOCKED</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- ###################################################### -->
-
         <div class="w-full max-w-screen-xl mx-auto px-6 py-4">
           <div class="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm space-y-6">
 
@@ -45,28 +29,7 @@
                   </div>
                 </div>
               <% end %>
-
             </div>
-
-            <!-- TITLE & BUTTON ALIGNMENT UNDER COVER -->
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
-              <div class="space-y-1">
-                <span class="text-[10px] font-mono font-black text-cyan-600 tracking-widest uppercase block">// Algorithm Ledger Node</span>
-                <h1 class="text-xl md:text-2xl font-black text-slate-900 uppercase tracking-tight">
-                  <%= @algorithm_version.title %>
-                </h1>
-                <p class="text-xs text-slate-400 font-mono">
-                  ID: <span class="text-slate-600 font-semibold"><%= @algorithm_version.uuid || @algorithm_version.id %></span>
-                </p>
-              </div>
-
-              <!-- Interactive Operations Deck Row -->
-              <div class="flex items-center gap-3 shrink-0">
-                <%= link_to "Launch Algorithm", "#",
-                            class: "px-4 py-2.5 bg-cyan-500 hover:bg-cyan-600 text-white text-xs font-mono font-black uppercase tracking-wider rounded-xl transition-all shadow-md hover:shadow-lg active:scale-[0.98] no-underline inline-block text-center" %>
-              </div>
-            </div>
-
           </div>
         </div>
 
