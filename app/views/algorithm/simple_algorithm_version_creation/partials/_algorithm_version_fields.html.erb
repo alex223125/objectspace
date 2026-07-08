@@ -63,7 +63,6 @@
 
 
 <!-- DYNAMIC ALGORITHM COVER QUEST MANAGEMENT COMPONENT MODULE -->
-<!-- DYNAMIC ALGORITHM COVER QUEST MANAGEMENT COMPONENT MODULE -->
 <div data-controller="algorithm_cover_upload" class="space-y-6 bg-slate-50/40 p-6 rounded-2xl border border-slate-200/80 shadow-sm">
 
   <div class="flex items-center justify-between select-none">
@@ -77,7 +76,6 @@
   <!-- 1:1 REPLICA BANNER PREVIEW SLOT FROM #SHOW PAGE (Full Width Matrix Frame) -->
   <div class="w-full">
     <div id="algorithm_cover_preview_box" data-algorithm_cover_upload-target="preview" class="w-full aspect-[21/7] max-h-[220px] bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden shadow-inner relative group select-none flex items-center justify-center">
-
       <% if f.object.cover_image.attached? %>
         <!-- Render ActiveStorage attached image file -->
         <img src="<%= url_for(f.object.cover_image) %>" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]" alt="Preview Output Workspace" />
@@ -93,7 +91,46 @@
           </div>
         </div>
       <% end %>
+    </div>
+  </div>
 
+
+  <!-- DYNAMIC GEOMETRY MANIPULATION TOOLBAR ROW -->
+  <div class="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 select-none">
+    <div class="flex items-center space-x-2">
+      <span class="text-xs font-mono font-black text-slate-500 uppercase tracking-wider">// Geometric Orientation Nodes:</span>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <!-- Rotate Counter-Clockwise -->
+      <button type="button"
+              data-action="click->algorithm_cover_upload#rotateLeft"
+              class="px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-mono font-black text-slate-700 rounded-xl transition-all active:scale-95 shadow-sm flex items-center gap-1.5">
+        <span>🔄</span> -90°
+      </button>
+
+      <!-- Rotate Clockwise -->
+      <button type="button"
+              data-action="click->algorithm_cover_upload#rotateRight"
+              class="px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-mono font-black text-slate-700 rounded-xl transition-all active:scale-95 shadow-sm flex items-center gap-1.5">
+        <span>🔄</span> +90°
+      </button>
+
+      <div class="w-px h-4 bg-slate-200 mx-1"></div>
+
+      <!-- Flip Horizontal -->
+      <button type="button"
+              data-action="click->algorithm_cover_upload#flipHorizontal"
+              class="px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-mono font-black text-slate-700 rounded-xl transition-all active:scale-95 shadow-sm flex items-center gap-1.5">
+        <span>↔️</span> Flip Horizontally
+      </button>
+
+      <!-- Flip Vertical -->
+      <button type="button"
+              data-action="click->algorithm_cover_upload#flipVertical"
+              class="px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-mono font-black text-slate-700 rounded-xl transition-all active:scale-95 shadow-sm flex items-center gap-1.5">
+        <span>↕️</span> Flip Vertically
+      </button>
     </div>
   </div>
 
@@ -118,8 +155,6 @@
     </div>
   </div>
 
-
-  <!-- INTERACTIVE OVERLAY LIGHT MODAL -->
   <!-- INTERACTIVE OVERLAY LIGHT MODAL -->
   <div data-algorithm_cover_upload-target="cropperContainer" class="hidden border-2 border-slate-200 bg-white rounded-3xl p-6 shadow-2xl space-y-4 animate-fade-in relative z-30 mt-4 max-w-7xl mx-auto w-full">
 
@@ -129,54 +164,17 @@
     </div>
 
     <!-- Cropping Interactive Viewport Center Frame Box -->
-    <!-- CHANGED: Replaced overflow-hidden with overflow-auto to handle overflow bounds seamlessly -->
-<!--    <div class="w-full bg-slate-950 rounded-xl overflow-auto h-[600px] flex items-center justify-center p-4 shadow-2xl relative">-->
-
-<!--       NEW PANZOOM WRAPPER LAYER NODE -->
-<!--      <div data-algorithm_cover_upload-target="panzoomContainer" class="w-full h-full flex items-center justify-center transition-all duration-75">-->
-
-<!--         RESTORED: Standard clean <img> tag using proper underscore targets attributes matching your controller -->
-<!--        <img data-algorithm_cover_upload-target="cropImage"-->
-<!--             src=""-->
-<!--             class="max-w-full max-h-full block bg-transparent shadow-lg"-->
-<!--             alt="Crop Target Core">-->
-
-<!--      </div>-->
-<!--    </div>-->
-
-
-
-    <!-- Cropping Interactive Viewport Center Frame Box -->
-    <!-- FIX: Cleaned inline rules to let CropperJS capture mouse events freely -->
     <div class="w-full bg-slate-950 rounded-xl h-[600px] flex items-center justify-center p-4 shadow-2xl relative overflow-hidden">
-
       <!-- THE PANZOOM CONTAINER LAYER -->
       <div data-algorithm_cover_upload-target="panzoomContainer" class="w-full h-full block transition-all duration-75">
-
         <!-- Core Image Asset Hook -->
         <img data-algorithm_cover_upload-target="cropImage"
              src=""
              class="max-w-full max-h-full block bg-transparent"
              alt="Crop Target Core">
-
       </div>
     </div>
-
-
-
   </div>
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -235,49 +233,6 @@
              class="w-full accent-cyan-500 h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer shadow-inner border border-slate-200">
     </div>
   </div>
-
-
-    <!-- DYNAMIC GEOMETRY MANIPULATION TOOLBAR ROW -->
-    <!-- DYNAMIC GEOMETRY MANIPULATION TOOLBAR ROW -->
-    <!-- DYNAMIC GEOMETRY MANIPULATION TOOLBAR ROW -->
-    <div class="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 select-none">
-      <div class="flex items-center space-x-2">
-        <span class="text-xs font-mono font-black text-slate-500 uppercase tracking-wider">// Geometric Orientation Nodes:</span>
-      </div>
-
-      <div class="flex items-center gap-2">
-        <!-- Rotate Counter-Clockwise -->
-        <button type="button"
-                data-action="click->algorithm_cover_upload#rotateLeft"
-                class="px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-mono font-black text-slate-700 rounded-xl transition-all active:scale-95 shadow-sm flex items-center gap-1.5">
-          <span>🔄</span> -90°
-        </button>
-
-        <!-- Rotate Clockwise -->
-        <button type="button"
-                data-action="click->algorithm_cover_upload#rotateRight"
-                class="px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-mono font-black text-slate-700 rounded-xl transition-all active:scale-95 shadow-sm flex items-center gap-1.5">
-          <span>🔄</span> +90°
-        </button>
-
-        <div class="w-px h-4 bg-slate-200 mx-1"></div>
-
-        <!-- Flip Horizontal -->
-        <button type="button"
-                data-action="click->algorithm_cover_upload#flipHorizontal"
-                class="px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-mono font-black text-slate-700 rounded-xl transition-all active:scale-95 shadow-sm flex items-center gap-1.5">
-          <span>↔️</span> Flip Horizontally
-        </button>
-
-        <!-- Flip Vertical -->
-        <button type="button"
-                data-action="click->algorithm_cover_upload#flipVertical"
-                class="px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-mono font-black text-slate-700 rounded-xl transition-all active:scale-95 shadow-sm flex items-center gap-1.5">
-          <span>↕️</span> Flip Vertically
-        </button>
-      </div>
-    </div>
-
 
 
 
