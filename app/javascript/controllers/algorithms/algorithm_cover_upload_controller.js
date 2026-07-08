@@ -32,16 +32,22 @@ export default class extends Controller {
      * Fully optimized for CropperJS v2 Web Components and Form inputs tracking
      */
     handleSelection(event) {
-        const file = event.target.files[0]
+        // =======================================================================
+        // CRITICAL LOOP BREAKER: If the controller generated this event, EXIT EARLY!
+        // This completely prevents the auto-zoom/re-initialization glitch.
+        // =======================================================================
+        if (this.isProcessingCrop) {
+            console.log("[Cropper Matrix Guard] Ignored echo change event. Auto-zoom aborted.");
+            return;
+        }
+
+        const file = event.target.files[0] // Ensure accurate indexing array check
         if (!file) return
 
         const reader = new FileReader()
         reader.onload = (e) => {
-            // Unhide the main editor workspace view layout panels
             this.cropperContainerTarget.classList.remove("hidden")
             this.cropImageTarget.src = e.target.result
-
-            // Store clean baseline parameters for image reset features
             this.originalUploadedImageBase64 = e.target.result;
 
             if (this.hasZoomSliderTarget) {
@@ -49,7 +55,6 @@ export default class extends Controller {
                 this.zoomValTarget.textContent = "100%"
             }
 
-            // Clean up old active library memory instances to prevent event collisions
             if (this.cropper) {
                 this.cropper.destroy()
                 this.cropper = null
@@ -57,37 +62,15 @@ export default class extends Controller {
 
             console.log("[Cropper v2] Initializing dynamic 3:1 aspect ratio banner workspace...");
 
-            // Instantiate CropperJS v2 on your plain ERB <img> tag target
-            // We pass a custom template string to overwrite the internal shadow DOM markup
             this.cropper = new Cropper(this.cropImageTarget, {
                 container: this.panzoomContainerTarget,
-
-                // Overrides the default layout inside the web component's shadow root
-                // action="crop" allows box mutation scaling actions
-                // translatable and scalable allow background image transformation panning
                 template: `
         <cropper-canvas action="crop" background="false" style="width: 100%; height: 100%;">
-          <cropper-image 
-            translatable="true" 
-            scalable="true" 
-            rotatable="false"
-            skewable="false">
-          </cropper-image>
-          
+          <cropper-image translatable="true" scalable="true" rotatable="false" skewable="false"></cropper-image>
           <cropper-shade></cropper-shade>
-          
-          <!-- Box is highly interactive but locked strictly onto the 3:1 geometry scale matching aspect-[21/7] -->
-          <cropper-selection 
-            aspect-ratio="3" 
-            initial-coverage="0.8" 
-            movable="true" 
-            resizable="true"
-            keyboard="true">
-            
+          <cropper-selection aspect-ratio="3" initial-coverage="0.8" movable="true" resizable="true" keyboard="true">
             <cropper-grid covered></cropper-grid>
             <cropper-crosshair centered></cropper-crosshair>
-            
-            <!-- CRITICAL FOR V2: These explicit handle definitions map the mouse gestures to the bounding corners -->
             <cropper-handle action="move" theme-color="rgba(255, 255, 255, 0.5)"></cropper-handle>
             <cropper-handle action="e-resize"></cropper-handle>
             <cropper-handle action="w-resize"></cropper-handle>
@@ -100,16 +83,11 @@ export default class extends Controller {
           </cropper-selection>
         </cropper-canvas>
       `,
-
-                // Lifecycle hook executed immediately after the Web Components finish mounting
                 ready: () => {
-                    console.log("[Cropper v2] 3:1 Interactive layout handles mapped successfully.");
-
                     const canvas = this.cropper.getCropperCanvas();
                     if (canvas) {
                         const selection = canvas.querySelector('cropper-selection');
                         if (selection) {
-                            // Hard force the mathematical 3:1 geometry scales parameters
                             selection.aspectRatio = 3;
                             selection.resizable = true;
                             selection.movable = true;
@@ -203,361 +181,6 @@ export default class extends Controller {
         this.cropper.setAspectRatio(ratio)
     }
 
-    // B. Commit & Seal current parameters into standard form upload parameters
-    // async applyModifications(event) {
-    //     event.preventDefault()
-    //     if (!this.cropper) return
-    //
-    //
-    //
-    //     try {
-    //
-    //         //////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //         // Add this rotation burn sequence inside your applyModifications() try block:
-    //         const cropperImage = this.element.querySelector("cropper-image");
-    //         if (cropperImage) {
-    //             const finalRotate = parseFloat(cropperImage.getAttribute("rotate")) || 0;
-    //             const finalScaleX = parseFloat(cropperImage.getAttribute("scale-x")) || 1;
-    //             const finalScaleY = parseFloat(cropperImage.getAttribute("scale-y")) || 1;
-    //
-    //             if (finalRotate !== 0 || finalScaleX !== 1 || finalScaleY !== 1) {
-    //                 // Translate center coordinates to pivot the image array correctly on final save
-    //                 ctx.translate(canvas.width / 2, canvas.height / 2);
-    //                 ctx.scale(finalScaleX, finalScaleY);
-    //                 ctx.rotate((finalRotate * Math.PI) / 180);
-    //                 ctx.translate(-canvas.width / 2, -canvas.height / 2);
-    //             }
-    //         }
-    //         //////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //
-    //         //////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //         // 1.Fine-Tuned Brightness & Contrast Calibration Controls
-    //         // Update inside your applyModifications() try block:
-    //         const brightness = this.brightnessSliderTarget.value;
-    //         const contrast = this.contrastSliderTarget.value;
-    //
-    //         // Inject combined values right into the canvas drawing engine context before generating blobs
-    //         tempCtx.filter = `${filterMap[filterValue] || "none"} brightness(${brightness}%) contrast(${contrast}%)`;
-    //         //////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //         // Locate this exact section inside your applyModifications() method and modify as follows:
-    //         const cropperSelection = this.element.querySelector("cropper-selection")
-    //         if (!cropperSelection) return
-    //
-    //         // FIXED FOR V2 DYNAMIC RATIOS: Let Cropper calculate dimensions automatically based on selected aspect ratio box
-    //         const canvas = await cropperSelection.$toCanvas({
-    //             maxWidth: 2000,
-    //             maxHeight: 2000
-    //         })
-    //
-    //         // Safely reference our filterSelect target element properties
-    //         const filterValue = this.hasFilterSelectTarget ? this.filterSelectTarget.value : "none"
-    //
-    //         if (!canvas) return
-    //
-    //         const ctx = canvas.getContext("2d")
-    //
-    //         // =======================================================================
-    //         // pixel matrix into canvas file
-    //         if (filterValue !== "none") {
-    //             const tempCanvas = document.createElement("canvas");
-    //             tempCanvas.width = canvas.width;
-    //             tempCanvas.height = canvas.height;
-    //             const tempCtx = tempCanvas.getContext("2d");
-    //
-    //
-    //
-    //
-    //             // Compile standard filter configurations strings
-    //             const activeBaseFilter = filterMap[filterValue] || "";
-    //             tempCtx.filter = `${activeBaseFilter} brightness(${brightness}%) contrast(${contrast}%)`.trim();
-    //
-    //             // Repaint the base cropped image onto the temp buffer layer
-    //             tempCtx.drawImage(canvas, 0, 0);
-    //
-    //             // =======================================================================
-    //             // NEW HALFTONE INTEGRATION INTERCEPT LOOP
-    //             // If the user selected the halftone option, intercept and burn pixels directly
-    //             if (filterValue === "comic-halftone") {
-    //                 this.applyComicHalftone(tempCanvas, tempCtx);
-    //             }
-    //             // =======================================================================
-    //
-    //             // Wipe out original clean canvas context frames data
-    //             ctx.clearRect(0, 0, canvas.width, canvas.height);
-    //
-    //             // Draw the final manipulated temp canvas data back onto primary canvas file
-    //             ctx.drawImage(tempCanvas, 0, 0);
-    //
-    //
-    //
-    //
-    //
-    //             // passing details CSS-matrix of filtration to context of  Canvas API [POST]
-    //             const filterMap = {
-    //                 "vintage": "sepia(40%) saturate(120%) contrast(90%) hue-rotate(-10deg)",
-    //                 "parchment": "sepia(30%) contrast(95%) brightness(105%) saturate(80%)",
-    //                 "faded-log": "brightness(130%) contrast(85%) saturate(70%)",
-    //                 "dim-manuscript": "brightness(75%) contrast(110%) saturate(60%)",
-    //                 "high-contrast-monorail": "grayscale(100%) contrast(200%) brightness(90%)",
-    //                 "night-vision": "sepia(100%) hue-rotate(85deg) saturate(200%) contrast(140%)",
-    //                 "thermal-sensor": "invert(100%) hue-rotate(180deg) saturate(300%) contrast(150%)",
-    //                 "amber-cathode": "grayscale(100%) sepia(100%) hue-rotate(5deg) saturate(400%) contrast(120%) brightness(95%)",
-    //                 "cyan-laser": "grayscale(100%) sepia(100%) hue-rotate(145deg) saturate(350%) contrast(120%)",
-    //                 "glitch-ghost": "invert(80%) hue-rotate(90deg) contrast(150%) saturate(50%)",
-    //                 "overclocked": "saturate(300%) contrast(130%) brightness(105%)",
-    //                 "dark-matter": "hue-rotate(30deg) brightness(85%) contrast(90%) saturate(50%)",
-    //                 "solar-flare": "contrast(180%) invert(15%) hue-rotate(-30deg) saturate(200%)",
-    //                 "neon-cyber": "hue-rotate(290deg) saturate(180%) contrast(125%)",
-    //                 "toxic-waste": "hue-rotate(60deg) saturate(250%) contrast(160%) brightness(110%)",
-    //                 "martian-soil": "sepia(100%) hue-rotate(-30deg) saturate(250%) contrast(110%)",
-    //                 "deep-space": "hue-rotate(200deg) brightness(80%) contrast(120%) saturate(60%)",
-    //                 "aurora": "hue-rotate(100deg) saturate(160%) brightness(95%) contrast(115%)",
-    //                 "supernova": "brightness(180%) contrast(150%) saturate(140%)",
-    //                 "pulsar": "contrast(150%) brightness(60%) saturate(110%) hue-rotate(45deg)",
-    //                 "golden-ratio": "sepia(100%) hue-rotate(15deg) saturate(250%) contrast(105%) brightness(105%)",
-    //                 "quicksilver": "grayscale(100%) brightness(115%) contrast(130%)",
-    //                 "copper-rust": "sepia(80%) hue-rotate(110deg) saturate(200%) contrast(110%)",
-    //                 "charcoal-ash": "grayscale(100%) brightness(50%) contrast(140%)",
-    //                 "amethyst": "sepia(100%) hue-rotate(240deg) saturate(250%) contrast(115%)",
-    //                 // Basic standarts
-    //                 "grayscale": "grayscale(100%)",
-    //                 "sepia": "sepia(100%)",
-    //                 "invert": "invert(100%)",
-    //                 "saturate-150": "saturate(170%)",
-    //                 // Optical
-    //                 "blueprint-cyan": "contrast(140%) brightness(95%) sepia(100%) hue-rotate(160deg) saturate(250%) opacity(90%)",
-    //                 "xray-spectre": "grayscale(100%) invert(100%) brightness(110%) contrast(150%)",
-    //                 "high-shadows": "contrast(160%) brightness(85%) saturate(90%)",
-    //                 "monochrome-glow": "grayscale(100%) brightness(120%) contrast(130%) sepia(100%) hue-rotate(75deg) saturate(300%)",
-    //                 "high-dynamic": "contrast(135%) saturate(160%) brightness(110%)",
-    //                 // Optical
-    //                 "comic-halftone": "grayscale(100%) contrast(300%) brightness(100%) opacity(95%)"
-    //             };
-    //
-    //             tempCtx.filter = filterMap[filterValue] || "none";
-    //             tempCtx.drawImage(canvas, 0, 0);
-    //
-    //             ctx.clearRect(0, 0, canvas.width, canvas.height);
-    //             ctx.drawImage(tempCanvas, 0, 0);
-    //         }
-    //         // =======================================================================
-    //
-    //         // Your existing watermark drawing sequence continues cleanly right underneath:
-    //         ctx.font = "bold 14px monospace"
-    //         ctx.fillStyle = "rgba(6, 182, 212, 0.4)"
-    //         ctx.fillText("// OBJECTSPACE_SECURE_COGNITIVE_REVISION", 24, canvas.height - 24)
-    //
-    //         // Convert canvas map to high-fidelity DataURL blob string data payload
-    //         const dataUrl = canvas.toDataURL("image/jpeg", 0.92)
-    //
-    //         // Inject the modified base64 data stream straight into a preview thumbnail card element
-    //         this.previewTarget.innerHTML = `
-    //             <div class="relative w-full h-full aspect-[21/7] md:aspect-square">
-    //               <img src="${dataUrl}" class="w-full h-full object-cover rounded-xl" />
-    //               <span class="absolute top-2 left-2 bg-emerald-500/90 text-white font-mono text-[8px] px-1.5 py-0.5 rounded border border-emerald-400 font-black tracking-widest uppercase animate-pulse">✓ Ready to Inscribe</span>
-    //             </div>
-    //         `
-    //
-    //         // Generate a file transmission blob to override the native file selection parameters array input structure
-    //         canvas.toBlob((blob) => {
-    //             const croppedFile = new File([blob], "algorithm_cover_processed.jpg", { type: "image/jpeg" })
-    //
-    //             // Programmatically patch the file array parameter list inside your actual file field tag
-    //             const dataTransfer = new DataTransfer()
-    //             dataTransfer.items.add(croppedFile)
-    //             this.inputTarget.files = dataTransfer.files
-    //
-    //             // Gracefully collapse the cropper tool frame workspace overlay array
-    //             this.cropperContainerTarget.classList.add("hidden")
-    //         }, "image/jpeg", 0.92)
-    //
-    //     } catch (error) {
-    //         console.error("Error executing dynamic canvas crop parameters pipeline:", error)
-    //     }
-    // }
-
-
-    // B. Commit & Seal current parameters into standard form upload parameters
-    async applyModifications(event) {
-        event.preventDefault()
-        if (!this.cropper) return
-
-        try {
-            // 1. Locate Cropper v2 selection box workspace node
-            const cropperSelection = this.element.querySelector("cropper-selection")
-            if (!cropperSelection) return
-
-            // 2. Generate clean baseline crop box canvas file mapping properties
-            const canvas = await cropperSelection.$toCanvas({
-                maxWidth: 2000,
-                maxHeight: 2000
-            })
-            if (!canvas) return
-
-            const ctx = canvas.getContext("2d")
-
-            // 3. Read interactive controls state properties layout adjustments
-            const brightness = this.hasBrightnessSliderTarget ? this.brightnessSliderTarget.value : 100
-            const contrast = this.hasContrastSliderTarget ? this.contrastSliderTarget.value : 100
-            const activeFilterValue = this.hasFilterSelectTarget ? this.filterSelectTarget.value : "none"
-            const activeComicStyle = this.hasComicStyleSelectTarget ? this.comicStyleSelectTarget.value : "none"
-
-            // 4. Geometry Orientation Matrix Transformations (Rotation & Flips Burn Loop)
-            const cropperImage = this.element.querySelector("cropper-image")
-            if (cropperImage) {
-                const finalRotate = parseFloat(cropperImage.getAttribute("rotate")) || 0
-                const finalScaleX = parseFloat(cropperImage.getAttribute("scale-x")) || 1
-                const finalScaleY = parseFloat(cropperImage.getAttribute("scale-y")) || 1
-
-                if (finalRotate !== 0 || finalScaleX !== 1 || finalScaleY !== 1) {
-                    const transCanvas = document.createElement("canvas")
-                    transCanvas.width = canvas.width
-                    transCanvas.height = canvas.height
-                    const transCtx = transCanvas.getContext("2d")
-
-                    // Shift tracking space origin points straight around center core pivot
-                    transCtx.translate(canvas.width / 2, canvas.height / 2)
-                    transCtx.scale(finalScaleX, finalScaleY)
-                    transCtx.rotate((finalRotate * Math.PI) / 180)
-                    transCtx.translate(-canvas.width / 2, -canvas.height / 2)
-
-                    transCtx.drawImage(canvas, 0, 0)
-
-                    ctx.clearRect(0, 0, canvas.width, canvas.height)
-                    ctx.drawImage(transCanvas, 0, 0)
-                }
-            }
-
-            // 5. Complete Dictionaries Synchronized Mapping Layout properties
-            const filterMap = {
-                "none": "", "grayscale": "grayscale(100%)", "sepia": "sepia(100%)", "invert": "invert(100%)", "saturate-150": "saturate(1.7)",
-                "vintage": "sepia(40%) saturate(120%) contrast(90%) hue-rotate(-10deg)", "parchment": "sepia(30%) contrast(95%) brightness(105%) saturate(80%)",
-                "faded-log": "brightness(130%) contrast(85%) saturate(70%)", "dim-manuscript": "brightness(75%) contrast(110%) saturate(60%)",
-                "high-contrast-monorail": "grayscale(100%) contrast(200%) brightness(90%)",
-                "night-vision": "sepia(100%) hue-rotate(85deg) saturate(200%) contrast(140%)",
-                "thermal-sensor": "invert(100%) hue-rotate(180deg) saturate(300%) contrast(150%)",
-                "amber-cathode": "grayscale(100%) sepia(100%) hue-rotate(5deg) saturate(400%) contrast(120%) brightness(95%)",
-                "cyan-laser": "grayscale(100%) sepia(100%) hue-rotate(145deg) saturate(350%) contrast(120%)",
-                "glitch-ghost": "invert(80%) hue-rotate(90deg) contrast(150%) saturate(50%)",
-                "overclocked": "saturate(300%) contrast(130%) brightness(105%)",
-                "dark-matter": "hue-rotate(30deg) brightness(85%) contrast(90%) saturate(50%)",
-                "solar-flare": "contrast(180%) invert(15%) hue-rotate(-30deg) saturate(200%)",
-                "neon-cyber": "hue-rotate(290deg) saturate(180%) contrast(125%)",
-                "toxic-waste": "hue-rotate(60deg) saturate(250%) contrast(160%) brightness(110%)",
-                "martian-soil": "sepia(100%) hue-rotate(-30deg) saturate(250%) contrast(110%)",
-                "deep-space": "hue-rotate(200deg) brightness(80%) contrast(120%) saturate(60%)",
-                "aurora": "hue-rotate(100deg) saturate(160%) brightness(95%) contrast(115%)",
-                "supernova": "brightness(180%) contrast(150%) saturate(140%)",
-                "pulsar": "contrast(150%) brightness(60%) saturate(110%) hue-rotate(45deg)",
-                "golden-ratio": "sepia(100%) hue-rotate(15deg) saturate(250%) contrast(105%) brightness(105%)",
-                "quicksilver": "grayscale(100%) brightness(115%) contrast(130%)",
-                "copper-rust": "sepia(80%) hue-rotate(110deg) saturate(200%) contrast(110%)",
-                "charcoal-ash": "grayscale(100%) brightness(50%) contrast(140%)",
-                "amethyst": "sepia(100%) hue-rotate(240deg) saturate(250%) contrast(115%)",
-                "blueprint-cyan": "contrast(140%) brightness(95%) sepia(100%) hue-rotate(160deg) saturate(250%) opacity(90%)",
-                "xray-spectre": "grayscale(100%) invert(100%) brightness(110%) contrast(150%)",
-                "high-shadows": "contrast(160%) brightness(85%) saturate(90%)",
-                "monochrome-glow": "grayscale(100%) brightness(120%) contrast(130%) sepia(100%) hue-rotate(75deg) saturate(300%)",
-                "high-dynamic": "contrast(135%) saturate(160%) brightness(110%)",
-                "noir-graphic-novel": "grayscale(100%) contrast(500%) brightness(90%) drop-shadow(2px 2px 0px #000000)"
-            }
-
-            const comicStylesMap = {
-                "none": "",
-                "pop-dots": "contrast(350%) brightness(100%) saturate(150%) hue-rotate(-5deg)",
-                "ink-sketch": "grayscale(100%) contrast(500%) brightness(95%)",
-                "oil-comic": "saturate(250%) contrast(140%) brightness(105%) opacity(95%)",
-                "vintage-print": "sepia(30%) contrast(120%) brightness(98%) saturate(90%)",
-                "cyber-punk": "hue-rotate(290deg) saturate(400%) contrast(160%) brightness(110%)",
-                "charcoal-novel": "grayscale(100%) brightness(120%) contrast(180%)",
-                "noir-shadows": "grayscale(100%) contrast(600%) brightness(80%)",
-                "acid-glow": "hue-rotate(65deg) saturate(500%) contrast(200%) brightness(115%)",
-                "void-abyss": "hue-rotate(190deg) contrast(150%) brightness(75%) saturate(80%)",
-                "quantum-glitch": "invert(100%) hue-rotate(180deg) contrast(400%) saturate(0%) brightness(130%)"
-            }
-
-            // Decide filter preset visibility hierarchy logic tracking dependencies smoothly
-            let chosenBaseMatrix = ""
-            if (activeComicStyle !== "none") {
-                chosenBaseMatrix = comicStylesMap[activeComicStyle] || ""
-            } else {
-                chosenBaseMatrix = filterMap[activeFilterValue] || ""
-            }
-
-            // 6. Hard-bake exposure pixels matrix via secure proxy layer context
-            const hasCustomStyles = chosenBaseMatrix !== "" || parseInt(brightness) !== 100 || parseInt(contrast) !== 100
-
-            if (hasCustomStyles) {
-                const tempCanvas = document.createElement("canvas")
-                tempCanvas.width = canvas.width
-                tempCanvas.height = canvas.height
-                const tempCtx = tempCanvas.getContext("2d")
-
-                // CRITICAL FIX: Ensure tempCtx configurations execution order is synchronous
-                tempCtx.filter = `${chosenBaseMatrix} brightness(${brightness}%) contrast(${contrast}%)`.trim()
-                tempCtx.drawImage(canvas, 0, 0)
-
-                // Intercept execution process loop to safely process comic dot matrix structures
-                if (activeFilterValue === "comic-halftone" && typeof this.applyComicHalftone === "function") {
-                    this.applyComicHalftone(tempCanvas, tempCtx)
-                }
-
-                ctx.clearRect(0, 0, canvas.width, canvas.height)
-                ctx.drawImage(tempCanvas, 0, 0)
-            }
-
-            // 7. Inject high-fidelity technical textual watermark overlay structures properties
-            ctx.font = "bold 14px monospace"
-            ctx.fillStyle = "rgba(6, 182, 212, 0.4)"
-            ctx.fillText("// OBJECTSPACE_SECURE_COGNITIVE_REVISION", 24, canvas.height - 24)
-
-            // 8. Output complete payload straight onto user preview card component element layout grids
-            const dataUrl = canvas.toDataURL("image/jpeg", 0.92)
-
-            if (this.hasPreviewTarget) {
-                this.previewTarget.innerHTML = `
-                    <div class="relative w-full h-full flex justify-center items-center bg-slate-900 rounded-xl overflow-hidden">
-                      <img src="${dataUrl}" class="w-full h-full object-contain rounded-xl" />
-                      <span class="absolute top-2 left-2 bg-emerald-500/90 text-white font-mono text-[8px] px-1.5 py-0.5 rounded border border-emerald-400 font-black tracking-widest uppercase animate-pulse">✓ Ready</span>
-                    </div>    `
-            }
-
-            // 9. Compress canvas back into a clean transmission binary file blob packet
-            canvas.toBlob((blob) => {
-                if (!blob) return
-                const croppedFile = new File([blob], "algorithm_cover_processed.jpg", { type: "image/jpeg" })
-
-                const dataTransfer = new DataTransfer()
-                dataTransfer.items.add(croppedFile)
-
-                // BYPASS STIMULUS LOOKUPS: Find the element directly via the browser DOM tree
-                const fileInput = document.getElementById("algorithm_cover_file_input")
-
-                if (fileInput) {
-                    fileInput.files = dataTransfer.files
-
-                    // Dispatched change event so Rails / Turbo notices the alteration
-                    fileInput.dispatchEvent(new Event("change", { bubbles: true }))
-                    console.log("Transmission array patched: Form payload successfully updated.");
-                } else {
-                    console.error("[Cropper Error] Native file input element not found in DOM.");
-                }
-
-                // Gracefully collapse workspace editor container view layer grids
-                if (this.hasCropperContainerTarget) {
-                    this.cropperContainerTarget.classList.add("hidden")
-                }
-
-                this.originalUploadedImageBase64 = null
-            }, "image/jpeg", 0.92)
-
-        } catch (error) {
-            console.error("Error executing dynamic canvas crop parameters pipeline:", error)
-        }
-    }
-
 
 
     /**
@@ -604,23 +227,18 @@ export default class extends Controller {
                     // 8. Output complete payload straight onto user preview card component element layout grids
                     const dataUrl = canvas.toDataURL("image/jpeg", 0.92)
 
-                    // DUAL-LAYER LOOKUP: Try using the Stimulus target first, fallback to direct element selector if empty
                     const previewContainer = this.hasPreviewTarget ? this.previewTarget : document.getElementById("algorithm_cover_preview_box");
-
                     if (previewContainer) {
-                        // Hard-inject the new image layout frame directly into the container element
+                        // FIXED: Changed all internal string double-quotes to clean single-quotes to satisfy the bundler parsing loop
                         previewContainer.innerHTML = `
-                    <div class="relative w-full h-full flex justify-center items-center bg-slate-900 rounded-xl overflow-hidden">
-                      <img src="${dataUrl}" class="w-full h-full object-contain rounded-xl" />
-                      <span class="absolute top-2 left-2 bg-emerald-500/90 text-white font-mono text-[8px] px-1.5 py-0.5 rounded border border-emerald-400 font-black tracking-widest uppercase animate-pulse">✓ Ready</span>
-                    </div>
-                `;
+                    <div class='relative w-full h-full flex justify-center items-center bg-slate-900 rounded-xl overflow-hidden'>
+                      <img src='${dataUrl}' class='w-full h-full object-contain rounded-xl' />
+                      <span class='absolute top-2 left-2 bg-emerald-500/90 text-white font-mono text-[8px] px-1.5 py-0.5 rounded border border-emerald-400 font-black tracking-widest uppercase animate-pulse'>✓ Ready</span>
+                    </div>`;
                         console.log("[Cropper Viewport] Live thumbnail successfully refreshed on interface panel grid.");
                     } else {
                         console.error("[Cropper Error] Target workspace 'preview' element could not be located in the layout DOM.");
                     }
-
-
 
                     // CRITICAL FIX: Fetch the inner nodes directly inside the promise scope block
                     const innerCanvas = this.element.querySelector("cropper-canvas");
@@ -1053,4 +671,411 @@ export default class extends Controller {
         // Apply style stacking rules back to layout
         cropperCanvas.style.filter = `${chosenBaseMatrix} brightness(${brightness}%) contrast(${contrast}%)`.trim();
     }
-}
+
+
+
+
+
+
+    // async applyModifications(event) {
+    //     event.preventDefault()
+    //     if (!this.cropper) return
+    //
+    //     try {
+    //         console.log("[Cropper v2] Safe static extraction triggered. Viewport isolation active.");
+    //
+    //         const cropperCanvas = this.cropper.getCropperCanvas()
+    //         if (!cropperCanvas) return
+    //
+    //         const cropperSelection = cropperCanvas.querySelector("cropper-selection")
+    //         const cropperImage = cropperCanvas.querySelector("cropper-image")
+    //         if (!cropperSelection || !cropperImage) return
+    //
+    //         // 1. EXTRACT RAW COORDINATES ONLY
+    //         // We use standard attributes to get numbers. This is 100% passive and never changes the visible image.
+    //         const x = parseFloat(cropperSelection.getAttribute("x")) || 0;
+    //         const y = parseFloat(cropperSelection.getAttribute("y")) || 0;
+    //         const width = parseFloat(cropperSelection.getAttribute("width")) || 300;
+    //         const height = parseFloat(cropperSelection.getAttribute("height")) || 100;
+    //
+    //         // 2. CREATE AN ISOLATED BACKGROUND CANVAS
+    //         const canvas = document.createElement("canvas");
+    //         canvas.width = width;
+    //         canvas.height = height;
+    //         const ctx = canvas.getContext("2d");
+    //
+    //         // 3. LOAD THE SOURCE IMAGE SEPARATELY IN MEMORY
+    //         const rawImageElement = new Image();
+    //         rawImageElement.src = this.cropImageTarget.src;
+    //
+    //         await new Promise((resolve) => {
+    //             if (rawImageElement.complete) resolve();
+    //             else rawImageElement.onload = () => resolve();
+    //         });
+    //
+    //         // 4. DRAW ONLY THE SELECTION PORTION ON THE ISOLATED CANVAS
+    //         ctx.drawImage(rawImageElement, x, y, width, height, 0, 0, width, height);
+    //
+    //         // 5. READ SLIDER SETTINGS FOR THE FINAL OUTPUT
+    //         const brightness = this.hasBrightnessSliderTarget ? this.brightnessSliderTarget.value : 100
+    //         const contrast = this.hasContrastSliderTarget ? this.contrastSliderTarget.value : 100
+    //         const activeFilterValue = this.hasFilterSelectTarget ? this.filterSelectTarget.value : "none"
+    //         const activeComicStyle = this.hasComicStyleSelectTarget ? this.comicStyleSelectTarget.value : "none"
+    //
+    //         // 6. APPLY ROTATION AND FLIPS ONLY TO THE DETACHED CANVAS
+    //         const finalRotate = parseFloat(cropperImage.getAttribute("rotate")) || 0
+    //         const finalScaleX = parseFloat(cropperImage.getAttribute("scale-x")) || 1
+    //         const finalScaleY = parseFloat(cropperImage.getAttribute("scale-y")) || 1
+    //
+    //         if (finalRotate !== 0 || finalScaleX !== 1 || finalScaleY !== 1) {
+    //             const transCanvas = document.createElement("canvas")
+    //             transCanvas.width = canvas.width
+    //             transCanvas.height = canvas.height
+    //             const transCtx = transCanvas.getContext("2d")
+    //
+    //             transCtx.translate(canvas.width / 2, canvas.height / 2)
+    //             transCtx.scale(finalScaleX, finalScaleY)
+    //             transCtx.rotate((finalRotate * Math.PI) / 180)
+    //             transCtx.translate(-canvas.width / 2, -canvas.height / 2)
+    //
+    //             transCtx.drawImage(canvas, 0, 0)
+    //
+    //             ctx.clearRect(0, 0, canvas.width, canvas.height)
+    //             ctx.drawImage(transCanvas, 0, 0)
+    //         }
+    //
+    //         // 7. DICTIONARY MATRICES
+    //         const filterMap = {
+    //             "none": "", "grayscale": "grayscale(100%)", "sepia": "sepia(100%)", "invert": "invert(100%)", "saturate-150": "saturate(1.7)",
+    //             "vintage": "sepia(40%) saturate(120%) contrast(90%) hue-rotate(-10deg)", "parchment": "sepia(30%) contrast(95%) brightness(105%) saturate(80%)",
+    //             "faded-log": "brightness(130%) contrast(85%) saturate(70%)", "dim-manuscript": "brightness(75%) contrast(110%) saturate(60%)",
+    //             "high-contrast-monorail": "grayscale(100%) contrast(200%) brightness(90%)",
+    //             "night-vision": "sepia(100%) hue-rotate(85deg) saturate(200%) contrast(140%)",
+    //             "thermal-sensor": "invert(100%) hue-rotate(180deg) saturate(300%) contrast(150%)",
+    //             "amber-cathode": "grayscale(100%) sepia(100%) hue-rotate(5deg) saturate(400%) contrast(120%) brightness(95%)",
+    //             "cyan-laser": "grayscale(100%) sepia(100%) hue-rotate(145deg) saturate(350%) contrast(120%)",
+    //             "glitch-ghost": "invert(80%) hue-rotate(90deg) contrast(150%) saturate(50%)",
+    //             "overclocked": "saturate(300%) contrast(130%) brightness(105%)",
+    //             "dark-matter": "hue-rotate(30deg) brightness(85%) contrast(90%) saturate(50%)",
+    //             "solar-flare": "contrast(180%) invert(15%) hue-rotate(-30deg) saturate(200%)",
+    //             "neon-cyber": "hue-rotate(290deg) saturate(180%) contrast(125%)",
+    //             "toxic-waste": "hue-rotate(60deg) saturate(250%) contrast(160%) brightness(110%)",
+    //             "martian-soil": "sepia(100%) hue-rotate(-30deg) saturate(250%) contrast(110%)",
+    //             "deep-space": "hue-rotate(200deg) brightness(80%) contrast(120%) saturate(60%)",
+    //             "aurora": "hue-rotate(100deg) saturate(160%) brightness(95%) contrast(115%)",
+    //             "supernova": "brightness(180%) contrast(150%) saturate(140%)",
+    //             "pulsar": "contrast(150%) brightness(60%) saturate(110%) hue-rotate(45deg)",
+    //             "golden-ratio": "sepia(100%) hue-rotate(15deg) saturate(250%) contrast(105%) brightness(105%)",
+    //             "quicksilver": "grayscale(100%) brightness(115%) contrast(130%)",
+    //             "copper-rust": "sepia(80%) hue-rotate(110deg) saturate(200%) contrast(110%)",
+    //             "charcoal-ash": "grayscale(100%) brightness(50%) contrast(140%)",
+    //             "amethyst": "sepia(100%) hue-rotate(240deg) saturate(250%) contrast(115%)",
+    //             "blueprint-cyan": "contrast(140%) brightness(95%) sepia(100%) hue-rotate(160deg) saturate(250%) opacity(90%)",
+    //             "xray-spectre": "grayscale(100%) invert(100%) brightness(110%) contrast(150%)",
+    //             "high-shadows": "contrast(160%) brightness(85%) saturate(90%)",
+    //             "monochrome-glow": "grayscale(100%) brightness(120%) contrast(130%) sepia(100%) hue-rotate(75deg) saturate(300%)",
+    //             "high-dynamic": "contrast(135%) saturate(160%) brightness(110%)",
+    //             "noir-graphic-novel": "grayscale(100%) contrast(500%) brightness(90%) drop-shadow(2px 2px 0px #000000)"
+    //         }
+    //
+    //         const comicStylesMap = {
+    //             "none": "",
+    //             "pop-dots": "contrast(350%) brightness(100%) saturate(150%) hue-rotate(-5deg)",
+    //             "ink-sketch": "grayscale(100%) contrast(500%) brightness(95%)",
+    //             "oil-comic": "saturate(250%) contrast(140%) brightness(105%) opacity(95%)",
+    //             "vintage-print": "sepia(30%) contrast(120%) brightness(98%) saturate(90%)",
+    //             "cyber-punk": "hue-rotate(290deg) saturate(400%) contrast(160%) brightness(110%)",
+    //             "charcoal-novel": "grayscale(100%) brightness(120%) contrast(180%)",
+    //             "noir-shadows": "grayscale(100%) contrast(600%) brightness(80%)",
+    //             "acid-glow": "hue-rotate(65deg) saturate(500%) contrast(200%) brightness(115%)",
+    //             "void-abyss": "hue-rotate(190deg) contrast(150%) brightness(75%) saturate(80%)",
+    //             "quantum-glitch": "invert(100%) hue-rotate(180deg) contrast(400%) saturate(0%) brightness(130%)"
+    //         }
+    //
+    //         let chosenBaseMatrix = ""
+    //         if (activeComicStyle !== "none") {
+    //             chosenBaseMatrix = comicStylesMap[activeComicStyle] || ""
+    //         } else {
+    //             chosenBaseMatrix = filterMap[activeFilterValue] || ""
+    //         }
+    //
+    //         const hasCustomStyles = chosenBaseMatrix !== "" || parseInt(brightness) !== 100 || parseInt(contrast) !== 100
+    //
+    //         if (hasCustomStyles) {
+    //             const tempCanvas = document.createElement("canvas")
+    //             tempCanvas.width = canvas.width
+    //             tempCanvas.height = canvas.height
+    //             const tempCtx = tempCanvas.getContext("2d")
+    //
+    //             tempCtx.filter = `${chosenBaseMatrix} brightness(${brightness}%) contrast(${contrast}%)`.trim()
+    //             tempCtx.drawImage(canvas, 0, 0)
+    //
+    //             if (activeFilterValue === "comic-halftone" && typeof this.applyComicHalftone === "function") {
+    //                 this.applyComicHalftone(tempCanvas, tempCtx)
+    //             }
+    //
+    //             ctx.clearRect(0, 0, canvas.width, canvas.height)
+    //             ctx.drawImage(tempCanvas, 0, 0)
+    //         }
+    //
+    //         // 8. WATERMARK ADDITION
+    //         ctx.font = "bold 14px monospace"
+    //         ctx.fillStyle = "rgba(6, 182, 212, 0.4)"
+    //         ctx.fillText("// OBJECTSPACE_SECURE_COGNITIVE_REVISION", 24, canvas.height - 24)
+    //
+    //         // 9. REFRESH PREVIEW CARD WINDOW
+    //         const dataUrl = canvas.toDataURL("image/jpeg", 0.92)
+    //
+    //         const previewContainer = this.hasPreviewTarget ? this.previewTarget : document.getElementById("algorithm_cover_preview_box");
+    //         if (previewContainer) {
+    //             previewContainer.innerHTML = `
+    //                 <div class="relative w-full h-full flex justify-center items-center bg-slate-900 rounded-xl overflow-hidden">
+    //                   <img src="${dataUrl}" class="w-full h-full object-contain rounded-xl" />
+    //                   <span class="absolute top-2 left-2 bg-emerald-500/90 text-white font-mono text-[8px] px-1.5 py-0.5 rounded border border-emerald-400 font-black tracking-widest uppercase animate-pulse">✓ Ready</span>
+    //                 </div>`;
+    //         }
+    //
+    //         // 10. SEND BINARY PACKET TO RAILS INPUT FIELD
+    //         canvas.toBlob((blob) => {
+    //             if (!blob) return
+    //             const croppedFile = new File([blob], "algorithm_cover_processed.jpg", { type: "image/jpeg" })
+    //
+    //             const dataTransfer = new DataTransfer()
+    //             dataTransfer.items.add(croppedFile)
+    //
+    //             // Safe direct lookup to securely map binary array payload to Rails input matrix element
+    //             const fileInput = document.getElementById("algorithm_cover_file_input")
+    //             if (fileInput) {
+    //                 fileInput.files = dataTransfer.files
+    //
+    //                 // Programmatically dispatch a native change event so Rails UJS / Turbo knows the file input was updated
+    //                 fileInput.dispatchEvent(new Event("change", { bubbles: true }))
+    //                 console.log("Transmission array patched: Algorithm cover payload successfully locked into form matrix.")
+    //             } else {
+    //                 console.error("[Cropper Error] Target element '#algorithm_cover_file_input' was not detected in the DOM workspace tree.");
+    //             }
+    //
+    //             // 10. GRACEFUL COLLAPSE: Hide workspace ONLY after the binary data transfer completes smoothly
+    //             // This ensures you can re-open, adjust, and move the selected area 2-3 times continuously
+    //             if (this.hasCropperContainerTarget) {
+    //                 this.cropperContainerTarget.classList.add("hidden")
+    //             }
+    //
+    //             // Explicitly clear original image base64 cache stream from browser memory to avoid leaks
+    //             this.originalUploadedImageBase64 = null
+    //
+    //         }, "image/jpeg", 0.92)
+    //
+    //     } catch (error) {
+    //         console.error("Error executing dynamic canvas crop parameters pipeline:", error)
+    //     }
+    // }
+
+
+
+    async applyModifications(event) {
+        event.preventDefault()
+        if (!this.cropper) return
+
+        try {
+            console.log("[Cropper v2] Executing static, non-mutating canvas slice extraction...");
+
+            const cropperCanvas = this.cropper.getCropperCanvas()
+            if (!cropperCanvas) return
+
+            const cropperSelection = cropperCanvas.querySelector("cropper-selection")
+            const cropperImage = cropperCanvas.querySelector("cropper-image")
+            if (!cropperSelection || !cropperImage) return
+
+            // =======================================================================
+            // CRITICAL FIX: Pull numeric properties natively from the web component.
+            // In Cropper v2, these are reactive getter fields on <cropper-selection>.
+            // Reading them is completely passive and will NEVER zoom in or shift the view.
+            // =======================================================================
+            const x = cropperSelection.x || 0;
+            const y = cropperSelection.y || 0;
+            const width = cropperSelection.width || 300;
+            const height = cropperSelection.height || 100;
+
+            console.log(`[Cropper Data Extracted] X: ${x}, Y: ${y}, W: ${width}, H: ${height}`);
+
+            // Instantiate a clean, isolated background canvas matching your crop size exactly
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d");
+
+            // Load the raw source image in memory to slice pixels safely
+            const rawImageElement = new Image();
+            rawImageElement.src = this.cropImageTarget.src;
+
+            await new Promise((resolve) => {
+                if (rawImageElement.complete) resolve();
+                else rawImageElement.onload = () => resolve();
+            });
+
+            // Paint the precise selected slice onto our off-screen canvas container
+            ctx.drawImage(rawImageElement, x, y, width, height, 0, 0, width, height);
+
+            // 3. Read interactive controls adjustments state properties live
+            const brightness = this.hasBrightnessSliderTarget ? this.brightnessSliderTarget.value : 100
+            const contrast = this.hasContrastSliderTarget ? this.contrastSliderTarget.value : 100
+            const activeFilterValue = this.hasFilterSelectTarget ? this.filterSelectTarget.value : "none"
+            const activeComicStyle = this.hasComicStyleSelectTarget ? this.comicStyleSelectTarget.value : "none"
+
+            // 4. Geometry Orientation Matrix Transformations (Rotation & Flips Balance Loop)
+            const finalRotate = parseFloat(cropperImage.getAttribute("rotate")) || 0
+            const finalScaleX = parseFloat(cropperImage.getAttribute("scale-x")) || 1
+            const finalScaleY = parseFloat(cropperImage.getAttribute("scale-y")) || 1
+
+            if (finalRotate !== 0 || finalScaleX !== 1 || finalScaleY !== 1) {
+                const transCanvas = document.createElement("canvas")
+                transCanvas.width = canvas.width
+                transCanvas.height = canvas.height
+                const transCtx = transCanvas.getContext("2d")
+
+                transCtx.translate(canvas.width / 2, canvas.height / 2)
+                transCtx.scale(finalScaleX, finalScaleY)
+                transCtx.rotate((finalRotate * Math.PI) / 180)
+                transCtx.translate(-canvas.width / 2, -canvas.height / 2)
+
+                transCtx.drawImage(canvas, 0, 0)
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height)
+                ctx.drawImage(transCanvas, 0, 0)
+            }
+
+            // 5. Complete Dictionaries Synchronized Mapping Layout properties
+            const filterMap = {
+                "none": "", "grayscale": "grayscale(100%)", "sepia": "sepia(100%)", "invert": "invert(100%)", "saturate-150": "saturate(1.7)",
+                "vintage": "sepia(40%) saturate(120%) contrast(90%) hue-rotate(-10deg)", "parchment": "sepia(30%) contrast(95%) brightness(105%) saturate(80%)",
+                "faded-log": "brightness(130%) contrast(85%) saturate(70%)", "dim-manuscript": "brightness(75%) contrast(110%) saturate(60%)",
+                "high-contrast-monorail": "grayscale(100%) contrast(200%) brightness(90%)",
+                "night-vision": "sepia(100%) hue-rotate(85deg) saturate(200%) contrast(140%)",
+                "thermal-sensor": "invert(100%) hue-rotate(180deg) saturate(300%) contrast(150%)",
+                "amber-cathode": "grayscale(100%) sepia(100%) hue-rotate(5deg) saturate(400%) contrast(120%) brightness(95%)",
+                "cyan-laser": "grayscale(100%) sepia(100%) hue-rotate(145deg) saturate(350%) contrast(120%)",
+                "glitch-ghost": "invert(80%) hue-rotate(90deg) contrast(150%) saturate(50%)",
+                "overclocked": "saturate(300%) contrast(130%) brightness(105%)",
+                "dark-matter": "hue-rotate(30deg) brightness(85%) contrast(90%) saturate(50%)",
+                "solar-flare": "contrast(180%) invert(15%) hue-rotate(-30deg) saturate(200%)",
+                "neon-cyber": "hue-rotate(290deg) saturate(180%) contrast(125%)",
+                "toxic-waste": "hue-rotate(60deg) saturate(250%) contrast(160%) brightness(110%)",
+                "martian-soil": "sepia(100%) hue-rotate(-30deg) saturate(250%) contrast(110%)",
+                "deep-space": "hue-rotate(200deg) brightness(80%) contrast(120%) saturate(60%)",
+                "aurora": "hue-rotate(100deg) saturate(160%) brightness(95%) contrast(115%)",
+                "supernova": "brightness(180%) contrast(150%) saturate(140%)",
+                "pulsar": "contrast(150%) brightness(60%) saturate(110%) hue-rotate(45deg)",
+                "golden-ratio": "sepia(100%) hue-rotate(15deg) saturate(250%) contrast(105%) brightness(105%)",
+                "quicksilver": "grayscale(100%) brightness(115%) contrast(130%)",
+                "copper-rust": "sepia(80%) hue-rotate(110deg) saturate(200%) contrast(110%)",
+                "charcoal-ash": "grayscale(100%) brightness(50%) contrast(140%)",
+                "amethyst": "sepia(100%) hue-rotate(240deg) saturate(250%) contrast(115%)",
+                "blueprint-cyan": "contrast(140%) brightness(95%) sepia(100%) hue-rotate(160deg) saturate(250%) opacity(90%)",
+                "xray-spectre": "grayscale(100%) invert(100%) brightness(110%) contrast(150%)",
+                "high-shadows": "contrast(160%) brightness(85%) saturate(90%)",
+                "monochrome-glow": "grayscale(100%) brightness(120%) contrast(130%) sepia(100%) hue-rotate(75deg) saturate(300%)",
+                "high-dynamic": "contrast(135%) saturate(160%) brightness(110%)",
+                "noir-graphic-novel": "grayscale(100%) contrast(500%) brightness(90%) drop-shadow(2px 2px 0px #000000)"
+            }
+
+            const comicStylesMap = {
+                "none": "",
+                "pop-dots": "contrast(350%) brightness(100%) saturate(150%) hue-rotate(-5deg)",
+                "ink-sketch": "grayscale(100%) contrast(500%) brightness(95%)",
+                "oil-comic": "saturate(250%) contrast(140%) brightness(105%) opacity(95%)",
+                "vintage-print": "sepia(30%) contrast(120%) brightness(98%) saturate(90%)",
+                "cyber-punk": "hue-rotate(290deg) saturate(400%) contrast(160%) brightness(110%)",
+                "charcoal-novel": "grayscale(100%) brightness(120%) contrast(180%)",
+                "noir-shadows": "grayscale(100%) contrast(600%) brightness(80%)",
+                "acid-glow": "hue-rotate(65deg) saturate(500%) contrast(200%) brightness(115%)",
+                "void-abyss": "hue-rotate(190deg) contrast(150%) brightness(75%) saturate(80%)",
+                "quantum-glitch": "invert(100%) hue-rotate(180deg) contrast(400%) saturate(0%) brightness(130%)"
+            }
+
+            let chosenBaseMatrix = ""
+            if (activeComicStyle !== "none") {
+                chosenBaseMatrix = comicStylesMap[activeComicStyle] || ""
+            } else {
+                chosenBaseMatrix = filterMap[activeFilterValue] || ""
+            }
+
+            const hasCustomStyles = chosenBaseMatrix !== "" || parseInt(brightness) !== 100 || parseInt(contrast) !== 100
+
+            if (hasCustomStyles) {
+                const tempCanvas = document.createElement("canvas")
+                tempCanvas.width = canvas.width
+                tempCanvas.height = canvas.height
+                const tempCtx = tempCanvas.getContext("2d")
+
+                tempCtx.filter = `${chosenBaseMatrix} brightness(${brightness}%) contrast(${contrast}%)`.trim()
+                tempCtx.drawImage(canvas, 0, 0)
+
+                if (activeFilterValue === "comic-halftone" && typeof this.applyComicHalftone === "function") {
+                    this.applyComicHalftone(tempCanvas, tempCtx)
+                }
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height)
+                ctx.drawImage(tempCanvas, 0, 0)
+            }
+
+            // 7. Inject high-fidelity technical textual watermark overlay
+            ctx.font = "bold 14px monospace"
+            ctx.fillStyle = "rgba(6, 182, 212, 0.4)"
+            ctx.fillText("// OBJECTSPACE_SECURE_COGNITIVE_REVISION", 24, canvas.height - 24)
+
+            // 8. Output complete payload straight onto user preview card component element layout grids
+            const dataUrl = canvas.toDataURL("image/jpeg", 0.92)
+
+            const previewContainer = this.hasPreviewTarget ? this.previewTarget : document.getElementById("algorithm_cover_preview_box");
+            if (previewContainer) {
+                // FIXED SINGLE QUOTES: Satisfies compiler asset builders perfectly without quote conflicts
+                previewContainer.innerHTML = `
+                    <div class='relative w-full h-full flex justify-center items-center bg-slate-900 rounded-xl overflow-hidden'>
+                      <img src='${dataUrl}' class='w-full h-full object-contain rounded-xl' />
+                      <span class='absolute top-2 left-2 bg-emerald-500/90 text-white font-mono text-[8px] px-1.5 py-0.5 rounded border border-emerald-400 font-black tracking-widest uppercase animate-pulse'>✓ Ready</span>
+                    </div>`;
+            }
+
+            // 9. Compress canvas back into a clean transmission binary file blob packet
+            canvas.toBlob((blob) => {
+                if (!blob) return
+                const croppedFile = new File([blob], "algorithm_cover_processed.jpg", { type: "image/jpeg" })
+
+                const dataTransfer = new DataTransfer()
+                dataTransfer.items.add(croppedFile)
+
+                const fileInput = document.getElementById("algorithm_cover_file_input")
+                if (fileInput) {
+                    // SECURE LOCK ON: Halts event loops from triggering an auto-zoom restart
+                    this.isProcessingCrop = true;
+
+                    fileInput.files = dataTransfer.files
+                    fileInput.dispatchEvent(new Event("change", { bubbles: true }))
+
+                    console.log("Transmission array patched: Selection dimensions preserved perfectly.");
+
+                    // Safely release the lock after propagation finishes cleanly
+                    setTimeout(() => {
+                        this.isProcessingCrop = false;
+                    }, 100);
+                } else {
+                    console.error("[Cropper Error] Target file input element not detected.");
+                }
+
+                // =======================================================================
+                // FIXED: REMOVED THE AUTOMATIC HIDE ACTIONS FROM THIS BLOCK
+                // The workspace now stays 100% visible, allowing you to select different
+                // zones 2-3 times while keeping your active canvas and caches intact.
+                // =======================================================================
+
+                console.log("[Cropper Viewport] Workspace window kept open for continuous adjustments.");
+
+            }, "image/jpeg", 0.92)
+
+        } catch (error) {
+            console.error("Error executing dynamic canvas crop parameters pipeline:", error)
+        }
+    }
+};
+
