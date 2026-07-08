@@ -56,3 +56,46 @@ cropper-canvas {
 cropper-selection {
   border: 2px solid #06b6d4 !important; /* Premium cyan neon line indicator overlay */
 }
+
+
+
+
+
+
+
+
+
+
+
+/* Core Layout Override Rules for CropperJS v1 Preview Syncing */
+.algorithm-live-preview-banner {
+  overflow: hidden !important;
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/*
+  CRITICAL FIX: Cropper.js wraps the preview image in a container with dynamic inline widths.
+  We force this wrapper to expand to 100% width and height of our banner div,
+  which eliminates the 30% white/blank spot entirely.
+*/
+.algorithm-live-preview-banner .cropper-preview {
+  width: 100% !important;
+  height: 100% !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+}
+
+/* Forces the live image stream clone to act as a full-bleed cover background */
+.algorithm-live-preview-banner img {
+  max-width: none !important;
+  max-height: none !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+  position: absolute !important;
+}
