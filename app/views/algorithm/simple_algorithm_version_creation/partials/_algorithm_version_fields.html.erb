@@ -63,7 +63,8 @@
 
 
 <!-- DYNAMIC ALGORITHM COVER QUEST MANAGEMENT COMPONENT MODULE -->
-<div data-controller="algorithm_cover_upload" class="space-y-4 bg-slate-50/40 p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+<!-- DYNAMIC ALGORITHM COVER QUEST MANAGEMENT COMPONENT MODULE -->
+<div data-controller="algorithm_cover_upload" class="space-y-6 bg-slate-50/40 p-6 rounded-2xl border border-slate-200/80 shadow-sm">
 
   <div class="flex items-center justify-between select-none">
     <%= f.label :cover_image, "Blueprint Cover Canvas Node", class: "block text-xs font-mono font-black uppercase tracking-wider text-slate-800" %>
@@ -73,44 +74,50 @@
   </div>
   <p class="text-xs text-slate-400 font-medium leading-relaxed">Select, crop, apply artifact matrix overlays, and watermark your algorithm metadata parameters live before committal repository lock.</p>
 
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-center pt-2">
+  <!-- 1:1 REPLICA BANNER PREVIEW SLOT FROM #SHOW PAGE (Full Width Matrix Frame) -->
+  <div class="w-full">
+    <div id="algorithm_cover_preview_box" data-algorithm_cover_upload-target="preview" class="w-full aspect-[21/7] max-h-[220px] bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden shadow-inner relative group select-none flex items-center justify-center">
 
-    <!-- Left Module Side Element: Instant rendering fluid thumbnail preview anchor box -->
-    <div class="md:col-span-1">
-      <!-- FIXED: Converted hyphens to underscores in target attribute and added a clear fallback ID -->
-      <div id="algorithm_cover_preview_box" data-algorithm_cover_upload-target="preview" class="w-full h-28 bg-white border border-slate-200 rounded-xl overflow-hidden shadow-inner flex flex-col items-center justify-center p-2 text-center select-none text-slate-400 font-mono text-[9px] font-black tracking-widest uppercase">
-        <% if f.object.cover_image.attached? %>
-          <img src="<%= url_for(f.object.cover_image) %>" class="w-full h-full object-contain rounded-xl" />
-        <% else %>
-          <div class="space-y-1">
-            <span class="text-xl block">🖼️</span>
-            <span>[ COVER_NULL ]</span>
+      <% if f.object.cover_image.attached? %>
+        <!-- Render ActiveStorage attached image file -->
+        <img src="<%= url_for(f.object.cover_image) %>" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]" alt="Preview Output Workspace" />
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/10 to-slate-950/50"></div>
+        <span class="absolute bottom-4 left-4 bg-slate-900/90 text-white font-mono text-[10px] px-2.5 py-1 border border-slate-800 rounded font-black tracking-widest uppercase z-10">// PREVIEW_ACTIVE_STREAM</span>
+      <% else %>
+        <!-- Gamified abstract fallback canvas if image placeholder is empty -->
+        <div class="w-full h-full bg-gradient-to-tr from-slate-50 via-cyan-500/[0.02] to-indigo-500/[0.04] flex flex-col items-center justify-center p-6 text-center relative">
+          <div class="absolute inset-0 border border-dashed border-slate-200/60 rounded-xl m-3 pointer-events-none"></div>
+          <div class="space-y-1 text-slate-400 relative z-10 font-mono">
+            <span class="text-2xl block animate-pulse">🗺️</span>
+            <span class="text-[9px] font-black tracking-widest uppercase block text-slate-400/80">// MATRIX_IMAGE_FALLBACK</span>
           </div>
-        <% end %>
-      </div>
-    </div>
-
-    <!-- Right Module Side Element: Drag, Drop, Browse Trigger Handle Container Zone -->
-    <div class="md:col-span-3 relative h-28 border-2 border-dashed border-slate-200 hover:border-cyan-500/50 bg-white rounded-xl flex flex-col items-center justify-center text-center cursor-pointer group transition-all duration-200">
-      <!-- Active input file controller target catcher hook links directly back to Stimulus event framework tracking loops -->
-      <%= f.file_field :cover_image,
-                       id: "algorithm_cover_file_input",
-                       class: "absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10",
-                       data: {
-                         action: "change->algorithm_cover_upload#handleSelection"
-                       } %>
-
-
-      <div class="pointer-events-none space-y-1.5 relative z-0 select-none">
-        <div class="w-9 h-9 mx-auto bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-center text-base text-slate-500 group-hover:scale-105 transition-transform duration-200">📁</div>
-        <div>
-          <p class="text-xs font-sans font-bold text-slate-800">Choose custom algorithm cover illustration file</p>
-          <p class="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Formats: PNG, JPG, WEBP // MAX size load allowance: 4 Megabytes</p>
         </div>
+      <% end %>
+
+    </div>
+  </div>
+
+  <!-- Selection Controls Handler Box Row -->
+  <!-- Right Module Side Element: Drag, Drop, Browse Trigger Handle Container Zone -->
+  <div class="md:col-span-3 relative h-28 border-2 border-dashed border-slate-200 hover:border-cyan-500/50 bg-white rounded-xl flex flex-col items-center justify-center text-center cursor-pointer group transition-all duration-200">
+    <!-- Active input file controller target catcher hook links directly back to Stimulus event framework tracking loops -->
+    <%= f.file_field :cover_image,
+                     id: "algorithm_cover_file_input",
+                     class: "absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10",
+                     data: {
+                       action: "change->algorithm_cover_upload#handleSelection"
+                     } %>
+
+
+    <div class="pointer-events-none space-y-1.5 relative z-0 select-none">
+      <div class="w-9 h-9 mx-auto bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-center text-base text-slate-500 group-hover:scale-105 transition-transform duration-200">📁</div>
+      <div>
+        <p class="text-xs font-sans font-bold text-slate-800">Choose custom algorithm cover illustration file</p>
+        <p class="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Formats: PNG, JPG, WEBP // MAX size load allowance: 4 Megabytes</p>
       </div>
     </div>
-
   </div>
+
 
   <!-- INTERACTIVE OVERLAY LIGHT MODAL -->
   <!-- INTERACTIVE OVERLAY LIGHT MODAL -->

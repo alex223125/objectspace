@@ -1,0 +1,14 @@
+<!-- Left Module Side Element: Instant rendering fluid thumbnail preview anchor box -->
+<div class="md:col-span-1">
+  <!-- FIXED: Converted hyphens to underscores in target attribute and added a clear fallback ID -->
+  <div id="algorithm_cover_preview_box" data-algorithm_cover_upload-target="preview" class="w-full h-28 bg-white border border-slate-200 rounded-xl overflow-hidden shadow-inner flex flex-col items-center justify-center p-2 text-center select-none text-slate-400 font-mono text-[9px] font-black tracking-widest uppercase">
+    <% if f.object.cover_image.attached? %>
+      <img src="<%= url_for(f.object.cover_image) %>" class="w-full h-full object-contain rounded-xl" />
+    <% else %>
+      <div class="space-y-1">
+        <span class="text-xl block">🖼️</span>
+        <span>[ COVER_NULL ]</span>
+      </div>
+    <% end %>
+  </div>
+</div>
