@@ -532,22 +532,25 @@ export default class extends Controller {
                 const dataTransfer = new DataTransfer()
                 dataTransfer.items.add(croppedFile)
 
-                if (this.hasInputTarget) {
-                    this.inputTarget.files = dataTransfer.files
-                }
+                // BYPASS STIMULUS LOOKUPS: Find the element directly via the browser DOM tree
+                const fileInput = document.getElementById("algorithm_cover_file_input")
 
-                // Gracefully lock out overlay layout windows worksp
-                // Programmatically dispatch a native change event so Rails UJS / Turbo knows the file input was updated
-                this.inputTarget.dispatchEvent(new Event("change", { bubbles: true }))
+                if (fileInput) {
+                    fileInput.files = dataTransfer.files
+
+                    // Dispatched change event so Rails / Turbo notices the alteration
+                    fileInput.dispatchEvent(new Event("change", { bubbles: true }))
+                    console.log("Transmission array patched: Form payload successfully updated.");
+                } else {
+                    console.error("[Cropper Error] Native file input element not found in DOM.");
+                }
 
                 // Gracefully collapse workspace editor container view layer grids
                 if (this.hasCropperContainerTarget) {
                     this.cropperContainerTarget.classList.add("hidden")
                 }
 
-                // Explicitly clear original memory caches stream to avoid leaks
                 this.originalUploadedImageBase64 = null
-                console.log("Transmission array patched: Algorithm cover payload successfully locked into form matrix.")
             }, "image/jpeg", 0.92)
 
         } catch (error) {
@@ -591,8 +594,33 @@ export default class extends Controller {
                     // Fire your custom high-computational dot matrix method live!
                     this.applyComicHalftone(canvas, ctx);
 
-                    // Inject the processed dot matrix data URL back onto the display layer node
-                    const processedDataUrl = canvas.toDataURL("image/png");
+                    // // Inject the processed dot matrix data URL back onto the display layer node
+                    // const processedDataUrl = canvas.toDataURL("image/png");
+
+
+
+
+
+                    // 8. Output complete payload straight onto user preview card component element layout grids
+                    const dataUrl = canvas.toDataURL("image/jpeg", 0.92)
+
+                    // DUAL-LAYER LOOKUP: Try using the Stimulus target first, fallback to direct element selector if empty
+                    const previewContainer = this.hasPreviewTarget ? this.previewTarget : document.getElementById("algorithm_cover_preview_box");
+
+                    if (previewContainer) {
+                        // Hard-inject the new image layout frame directly into the container element
+                        previewContainer.innerHTML = `
+                    <div class="relative w-full h-full flex justify-center items-center bg-slate-900 rounded-xl overflow-hidden">
+                      <img src="${dataUrl}" class="w-full h-full object-contain rounded-xl" />
+                      <span class="absolute top-2 left-2 bg-emerald-500/90 text-white font-mono text-[8px] px-1.5 py-0.5 rounded border border-emerald-400 font-black tracking-widest uppercase animate-pulse">✓ Ready</span>
+                    </div>
+                `;
+                        console.log("[Cropper Viewport] Live thumbnail successfully refreshed on interface panel grid.");
+                    } else {
+                        console.error("[Cropper Error] Target workspace 'preview' element could not be located in the layout DOM.");
+                    }
+
+
 
                     // CRITICAL FIX: Fetch the inner nodes directly inside the promise scope block
                     const innerCanvas = this.element.querySelector("cropper-canvas");

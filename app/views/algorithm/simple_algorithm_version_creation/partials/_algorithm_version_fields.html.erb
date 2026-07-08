@@ -77,7 +77,8 @@
 
     <!-- Left Module Side Element: Instant rendering fluid thumbnail preview anchor box -->
     <div class="md:col-span-1">
-      <div data-algorithm-cover-upload-target="preview" class="w-full h-28 bg-white border border-slate-200 rounded-xl overflow-hidden shadow-inner flex flex-col items-center justify-center p-2 text-center select-none text-slate-400 font-mono text-[9px] font-black tracking-widest uppercase">
+      <!-- FIXED: Converted hyphens to underscores in target attribute and added a clear fallback ID -->
+      <div id="algorithm_cover_preview_box" data-algorithm_cover_upload-target="preview" class="w-full h-28 bg-white border border-slate-200 rounded-xl overflow-hidden shadow-inner flex flex-col items-center justify-center p-2 text-center select-none text-slate-400 font-mono text-[9px] font-black tracking-widest uppercase">
         <% if f.object.cover_image.attached? %>
           <img src="<%= url_for(f.object.cover_image) %>" class="w-full h-full object-contain rounded-xl" />
         <% else %>
@@ -93,11 +94,12 @@
     <div class="md:col-span-3 relative h-28 border-2 border-dashed border-slate-200 hover:border-cyan-500/50 bg-white rounded-xl flex flex-col items-center justify-center text-center cursor-pointer group transition-all duration-200">
       <!-- Active input file controller target catcher hook links directly back to Stimulus event framework tracking loops -->
       <%= f.file_field :cover_image,
-                          class: "absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10",
-                          data: {
-                            algorithm_cover_upload_target: "input",
-                            action: "change->algorithm_cover_upload#handleSelection"
-                          } %>
+                       id: "algorithm_cover_file_input",
+                       class: "absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10",
+                       data: {
+                         action: "change->algorithm_cover_upload#handleSelection"
+                       } %>
+
 
       <div class="pointer-events-none space-y-1.5 relative z-0 select-none">
         <div class="w-9 h-9 mx-auto bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-center text-base text-slate-500 group-hover:scale-105 transition-transform duration-200">📁</div>
