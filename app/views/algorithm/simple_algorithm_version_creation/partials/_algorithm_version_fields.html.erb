@@ -121,20 +121,54 @@
 
     <!-- Cropping Interactive Viewport Center Frame Box -->
     <!-- CHANGED: Replaced overflow-hidden with overflow-auto to handle overflow bounds seamlessly -->
-    <div class="w-full bg-slate-950 rounded-xl overflow-auto h-[600px] flex items-center justify-center p-4 shadow-2xl relative">
+<!--    <div class="w-full bg-slate-950 rounded-xl overflow-auto h-[600px] flex items-center justify-center p-4 shadow-2xl relative">-->
 
-      <!-- NEW PANZOOM WRAPPER LAYER NODE -->
-      <div data-algorithm_cover_upload-target="panzoomContainer" class="w-full h-full flex items-center justify-center transition-all duration-75">
+<!--       NEW PANZOOM WRAPPER LAYER NODE -->
+<!--      <div data-algorithm_cover_upload-target="panzoomContainer" class="w-full h-full flex items-center justify-center transition-all duration-75">-->
 
-        <!-- RESTORED: Standard clean <img> tag using proper underscore targets attributes matching your controller -->
+<!--         RESTORED: Standard clean <img> tag using proper underscore targets attributes matching your controller -->
+<!--        <img data-algorithm_cover_upload-target="cropImage"-->
+<!--             src=""-->
+<!--             class="max-w-full max-h-full block bg-transparent shadow-lg"-->
+<!--             alt="Crop Target Core">-->
+
+<!--      </div>-->
+<!--    </div>-->
+
+
+
+    <!-- Cropping Interactive Viewport Center Frame Box -->
+    <!-- FIX: Cleaned inline rules to let CropperJS capture mouse events freely -->
+    <div class="w-full bg-slate-950 rounded-xl h-[600px] flex items-center justify-center p-4 shadow-2xl relative overflow-hidden">
+
+      <!-- THE PANZOOM CONTAINER LAYER -->
+      <div data-algorithm_cover_upload-target="panzoomContainer" class="w-full h-full block transition-all duration-75">
+
+        <!-- Core Image Asset Hook -->
         <img data-algorithm_cover_upload-target="cropImage"
              src=""
-             class="max-w-full max-h-full block bg-transparent shadow-lg"
+             class="max-w-full max-h-full block bg-transparent"
              alt="Crop Target Core">
 
       </div>
     </div>
+
+
+
   </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   <!-- DYNAMIC CANVAS ZOOM-IN & ZOOM-OUT SLIDER ROW -->

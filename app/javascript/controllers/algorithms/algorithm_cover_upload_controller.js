@@ -29,6 +29,7 @@ export default class extends Controller {
 
     /**
      * 1. Handles Image Data Streams Selection
+     * Fully optimized for CropperJS v2 Web Components and Form inputs tracking
      */
     handleSelection(event) {
         const file = event.target.files[0]
@@ -36,10 +37,11 @@ export default class extends Controller {
 
         const reader = new FileReader()
         reader.onload = (e) => {
+            // Unhide the main editor workspace view layout panels
             this.cropperContainerTarget.classList.remove("hidden")
             this.cropImageTarget.src = e.target.result
 
-            // CRITICAL: Reset the cache property so new file uploads store their own clean baseline parameters
+            // Store clean baseline parameters for image reset features
             this.originalUploadedImageBase64 = e.target.result;
 
             if (this.hasZoomSliderTarget) {
@@ -47,31 +49,74 @@ export default class extends Controller {
                 this.zoomValTarget.textContent = "100%"
             }
 
-            // Clean up old active library memory instances footprints to prevent collisions
-            if (this.cropper) this.cropper.destroy()
-            if (this.panzoomInstance) this.panzoomInstance.destroy()
+            // Clean up old active library memory instances to prevent event collisions
+            if (this.cropper) {
+                this.cropper.destroy()
+                this.cropper = null
+            }
 
-            // 1. Initialize Cropper on your image target element
+            console.log("[Cropper v2] Initializing dynamic 3:1 aspect ratio banner workspace...");
+
+            // Instantiate CropperJS v2 on your plain ERB <img> tag target
+            // We pass a custom template string to overwrite the internal shadow DOM markup
             this.cropper = new Cropper(this.cropImageTarget, {
-                aspectRatio: 21 / 7,
-                viewMode: 1,
-                autoCropArea: 1.0,
-                dragMode: 'none', // ⬅️ CRITICAL CHANGE: Disables Cropper mouse drags so Panzoom handles layouts resizing
-                responsive: true,
-                checkOrientation: false,
-                modal: true,
-                ready: () => {
-                    console.log("Cropper engine boundary upscaled successfully.")
-                }
-            })
+                container: this.panzoomContainerTarget,
 
-            // 2. NEW LOGIC: Bind Panzoom directly to the wrapping element node container
-            this.panzoomInstance = Panzoom(this.panzoomContainerTarget, {
-                maxScale: 2.5,
-                minScale: 0.5,
-                contain: 'outside', // Restricts layout framing boundaries securely
-                startScale: 1.0
-            })
+                // Overrides the default layout inside the web component's shadow root
+                // action="crop" allows box mutation scaling actions
+                // translatable and scalable allow background image transformation panning
+                template: `
+        <cropper-canvas action="crop" background="false" style="width: 100%; height: 100%;">
+          <cropper-image 
+            translatable="true" 
+            scalable="true" 
+            rotatable="false"
+            skewable="false">
+          </cropper-image>
+          
+          <cropper-shade></cropper-shade>
+          
+          <!-- Box is highly interactive but locked strictly onto the 3:1 geometry scale matching aspect-[21/7] -->
+          <cropper-selection 
+            aspect-ratio="3" 
+            initial-coverage="0.8" 
+            movable="true" 
+            resizable="true"
+            keyboard="true">
+            
+            <cropper-grid covered></cropper-grid>
+            <cropper-crosshair centered></cropper-crosshair>
+            
+            <!-- CRITICAL FOR V2: These explicit handle definitions map the mouse gestures to the bounding corners -->
+            <cropper-handle action="move" theme-color="rgba(255, 255, 255, 0.5)"></cropper-handle>
+            <cropper-handle action="e-resize"></cropper-handle>
+            <cropper-handle action="w-resize"></cropper-handle>
+            <cropper-handle action="n-resize"></cropper-handle>
+            <cropper-handle action="s-resize"></cropper-handle>
+            <cropper-handle action="ne-resize"></cropper-handle>
+            <cropper-handle action="nw-resize"></cropper-handle>
+            <cropper-handle action="se-resize"></cropper-handle>
+            <cropper-handle action="sw-resize"></cropper-handle>
+          </cropper-selection>
+        </cropper-canvas>
+      `,
+
+                // Lifecycle hook executed immediately after the Web Components finish mounting
+                ready: () => {
+                    console.log("[Cropper v2] 3:1 Interactive layout handles mapped successfully.");
+
+                    const canvas = this.cropper.getCropperCanvas();
+                    if (canvas) {
+                        const selection = canvas.querySelector('cropper-selection');
+                        if (selection) {
+                            // Hard force the mathematical 3:1 geometry scales parameters
+                            selection.aspectRatio = 3;
+                            selection.resizable = true;
+                            selection.movable = true;
+                        }
+                    }
+                }
+            });
         }
         reader.readAsDataURL(file)
     }
