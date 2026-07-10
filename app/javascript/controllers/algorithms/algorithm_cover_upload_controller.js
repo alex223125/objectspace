@@ -197,22 +197,6 @@ export default class extends Controller {
 
 
     /**
-     * 4. Dynamic Aspect Ratio Modifier Action Triggers Panel Tabs
-     * data-action="click->algorithm_cover_upload#changeAspectRatio"
-     */
-    changeAspectRatio(event) {
-        event.preventDefault()
-        if (!this.cropper) return
-
-        const ratio = parseFloat(event.currentTarget.dataset.ratio)
-
-        // CRITICAL FIX: Use Cropper's setAspectRatio method to live-morph dimensions grids
-        this.cropper.setAspectRatio(ratio)
-    }
-
-
-
-    /**
      * Live Preview Filter Matrix Mapping (Fixed Scope for Cropper v2 Shadow DOM)
      * Connected to: change->algorithm_cover_upload#applyFilter
      */
@@ -475,31 +459,29 @@ export default class extends Controller {
     // Add this method into your Stimulus controller class architecture:
     // app/javascript/controllers/algorithms/algorithm_cover_upload_controller.js
 
+    /**
+     * Updates the crop grid proportions and locks resizing completely.
+     */
     changeAspectRatio(event) {
         event.preventDefault();
-        if (!this.cropper) return;
-
-        const targetRatio = parseFloat(event.currentTarget.dataset.ratio);
-        const cropperCanvas = this.cropper.getCropperCanvas();
+        const targetRatio = parseFloat(event.currentTarget.dataset.ratio) || 3; // Defaults to 3 (21:7)
+        const cropperCanvas = this.element.querySelector("cropper-canvas");
         if (!cropperCanvas) return;
 
         const cropperSelection = cropperCanvas.querySelector("cropper-selection");
         if (cropperSelection) {
             cropperSelection.aspectRatio = targetRatio;
-            cropperSelection.resizable = true;
-            cropperSelection.movable = true;
 
-            // Restyle dashboard tab layout items active state
+            // LOCKS SELECTION DIMENSIONS: Disable manual corner handle resize modifications
+            cropperSelection.resizable = false;
+            cropperSelection.movable = true; // Allows moving the frame around, but keeps shape static
+
+            // Restyle tab selections state layouts
             const buttons = event.currentTarget.parentElement.querySelectorAll("button");
-            buttons.forEach(btn => {
-                btn.className = "px-3 py-1.5 text-[11px] font-mono font-black rounded-lg transition-all cursor-pointer text-slate-600 hover:bg-slate-50";
-            });
+            buttons.forEach(btn => btn.className = "px-3 py-1.5 text-[11px] font-mono font-black rounded-lg transition-all cursor-pointer text-slate-600 hover:bg-slate-50");
             event.currentTarget.className = "px-3 py-1.5 bg-white border border-slate-200 text-[11px] font-mono font-black text-cyan-600 rounded-lg shadow-sm transition-all cursor-pointer";
 
-            console.log(`Proportions updated to: ${targetRatio}`);
-
-            // TRIGGER LIVE SYNC PIPELINE
-            this.renderLivePreview();
+            this.handleLiveSelectionChange(null);
         }
     }
 
