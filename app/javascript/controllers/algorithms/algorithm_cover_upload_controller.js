@@ -32,10 +32,14 @@ export default class extends Controller {
      * 1. Handles Image Data Streams Selection
      * Fully optimized for Cropper.js v1 native live preview streaming pipelines with null-blob firewall guards
      */
+    /**
+     * 1. Handles Image Data Streams Selection
+     * Fully optimized for Cropper v2. Employs trusted native checks to break programmatic loops.
+     */
     handleSelection(event) {
-        // CRITICAL LOOP BREAKER: If the file change event was fired by our own background crop loop, EXIT EARLY!
-        if (this.isProcessingCrop) {
-            console.log("[Cropper Matrix Guard] Ignored echo change event. Auto-zoom aborted.");
+        // CRITICAL LOOP BREAKER: If this event was fired programmatically by code, EXIT IMMEDIATELY!
+        if (!event.isTrusted) {
+            console.log("[Cropper Matrix Guard] Ignored programmatic echo change event. Loop broken.");
             return;
         }
 
@@ -53,7 +57,19 @@ export default class extends Controller {
         reader.onload = (e) => {
             // Unhide the interactive workspace editor workspace modal layer
             this.cropperContainerTarget.classList.remove("hidden");
-            this.cropImageTarget.src = e.target.result;
+
+            // Locate the underlying image element inside Cropper v2 components safely
+            const cropperImageElement = this.element.querySelector("cropper-canvas cropper-image img") ||
+                this.element.querySelector("cropper-image img") ||
+                this.element.querySelector("cropper-image");
+
+            if (cropperImageElement) {
+                // Pipe the Base64 stream right into the component image source property
+                cropperImageElement.src = e.target.result;
+                console.log("[Cropper v2] Injected source matrix pipeline successfully.");
+            } else {
+                console.error("[Cropper Guard] Could not locate the target image element node inside template.");
+            }
 
             // Caching original base64 layout to prevent image loss between multi-move selections
             this.originalUploadedImageBase64 = e.target.result;
@@ -63,70 +79,18 @@ export default class extends Controller {
                 this.zoomValTarget.textContent = "100%";
             }
 
-            // Clean up old active library memory instances to prevent event collisions
-            if (this.cropper) {
-                this.cropper.destroy();
-                this.cropper = null;
-            }
+            // FIX: Assign the instance reference straight to the custom <cropper-canvas> container node.
+            // DO NOT use "new Cropper()" here! Cropper v2 initializes natively via custom HTML elements.
+            this.cropper = this.element.querySelector("cropper-canvas");
 
-            console.log("[Cropper v1] Initializing high-utility native live preview streaming engine...");
+            console.log("[Cropper v2] Core attached cleanly. No legacy v1 instances created.");
 
-            // Instantiate native Cropper v1 on your standard ERB <img> form tag
-            this.cropper = new Cropper(this.cropImageTarget, {
-                // AUTOMATICALLY STREAMS CHOSEN BOUNDS DIRECTLY TO PREVIEW BANNER
-                preview: '.algorithm-live-preview-banner',
-
-                // 3:1 geometry scale constraint parameters matching aspect-[21/7]
-                aspectRatio: 3,
-
-                // Restricts selection box transformations within real asset dimensions
-                viewMode: 1,
-
-                autoCropArea: 0.9,
-                responsive: true,
-                background: false,
-                movable: true,
-                resizable: true,
-                zoomable: true,
-
-                // Built-in crop event callback fires natively on every single drag gesture
-                crop: (cropEvent) => {
-                    // Prevent processing loops if background transmissions are actively locking the fields
-                    if (this.isProcessingCrop) return;
-
-                    // =======================================================================
-                    // AUTOMATED REAL-TIME BINARY SELECTION FILE PERSISTENCE
-                    // Automatically updates your hidden input files payload list continuously
-                    // behind the scenes without dropping image caches or closing panels.
-                    // =======================================================================
-                    const croppedCanvas = this.cropper.getCroppedCanvas();
-                    if (!croppedCanvas) return;
-
-                    croppedCanvas.toBlob((blob) => {
-                        if (!blob) return;
-                        const croppedFile = new File([blob], "algorithm_cover_processed.jpg", { type: "image/jpeg" });
-                        const dataTransfer = new DataTransfer();
-                        dataTransfer.items.add(croppedFile);
-
-                        const fileInput = document.getElementById("algorithm_cover_file_input");
-                        if (fileInput) {
-                            // Turn loop lock ON to block handleSelection re-triggers
-                            this.isProcessingCrop = true;
-
-                            fileInput.files = dataTransfer.files;
-
-                            // Programmatically dispatch a native change event so Rails UJS / Turbo knows the file input was updated
-                            fileInput.dispatchEvent(new Event("change", { bubbles: true }));
-
-                            // Turn loop lock OFF immediately after event propagation finishes
-                            this.isProcessingCrop = false;
-                        }
-                    }, "image/jpeg", 0.90);
-                }
-            });
+            // Sync current configuration style matrix layers once elements mount
+            setTimeout(() => this.tuneImageAdjustments(), 60);
         };
         reader.readAsDataURL(file);
     }
+
 
 
     /**
