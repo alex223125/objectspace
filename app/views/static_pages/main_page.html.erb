@@ -1,1 +1,727 @@
-dashboard with different objects
+<style>
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+
+    @keyframes slow-spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    @keyframes reverse-spin {
+        from { transform: rotate(360deg); }
+        to { transform: rotate(0deg); }
+    }
+
+    @keyframes pulse-soft {
+        0%, 100% {
+            opacity: .35;
+            transform: scale(.9);
+        }
+        50% {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+    }
+
+    @keyframes flow {
+        0% {
+            stroke-dashoffset: 1000;
+        }
+        100% {
+            stroke-dashoffset: 0;
+        }
+    }
+
+    .float {
+        animation: float 5s ease-in-out infinite;
+    }
+
+    .float-delay {
+        animation: float 6s ease-in-out 1.5s infinite;
+    }
+
+    .slow-spin {
+        animation: slow-spin 80s linear infinite;
+    }
+
+    .reverse-spin {
+        animation: reverse-spin 60s linear infinite;
+    }
+
+    .pulse-soft {
+        animation: pulse-soft 3s ease-in-out infinite;
+    }
+
+    .flow-line {
+        stroke-dasharray: 12 10;
+        animation: flow 25s linear infinite;
+    }
+
+    .grid-bg {
+        background-image:
+                linear-gradient(rgba(59,130,246,.07) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59,130,246,.07) 1px, transparent 1px);
+        background-size: 40px 40px;
+    }
+</style>
+
+
+
+<main class="relative min-h-screen overflow-hidden bg-gradient-to-b from-sky-100 via-white to-sky-50">
+
+  <!-- Atmosphere -->
+
+  <div class="pointer-events-none absolute inset-0 overflow-hidden">
+    <div class="absolute -top-48 left-1/2 h-[650px] w-[650px]
+            -translate-x-1/2 rounded-full bg-amber-200/30 blur-3xl">
+    </div>
+    <div class="absolute inset-0 grid-bg opacity-40"></div>
+    <div class="absolute left-1/2 top-[30%] h-[600px] w-[900px]
+            -translate-x-1/2 rounded-full bg-blue-400/10 blur-[120px]">
+    </div>
+  </div>
+  <!-- HERO CONTENT -->
+
+  <!-- ========================================================== -->
+
+  <section class="relative z-20 mx-auto max-w-7xl px-6
+                  pb-24 pt-16 lg:px-10">
+    <div class="grid items-center gap-14 lg:grid-cols-2">
+
+
+      <!-- LEFT -->
+
+      <div class="max-w-2xl">
+
+        <div class="mb-6 inline-flex items-center gap-2 rounded-full
+                border border-blue-200 bg-white/80 px-3 py-1.5
+                text-[10px] font-bold uppercase tracking-[0.16em]
+                text-blue-600 shadow-sm">
+
+          <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+
+          Living activity ecosystem
+
+        </div>
+
+
+        <h1 class="text-5xl font-black leading-[.98]
+               tracking-[-0.04em] sm:text-6xl lg:text-7xl">
+
+          Every activity has
+
+          <span class="block bg-gradient-to-r from-blue-600
+                   via-sky-500 to-emerald-500
+                   bg-clip-text text-transparent">
+        an ecosystem.
+      </span>
+
+        </h1>
+
+
+        <p class="mt-7 max-w-xl text-base font-medium
+              leading-7 text-slate-600 sm:text-lg">
+
+          Discover the problems, methods, algorithms and architectures
+          surrounding the activities that matter — and continuously improve
+          how those activities are performed.
+
+        </p>
+
+
+        <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+
+          <button class="rounded-2xl bg-slate-900 px-6 py-3.5
+                     text-sm font-bold text-white shadow-xl
+                     hover:-translate-y-1 hover:bg-blue-600 transition">
+
+            Explore activities →
+
+          </button>
+
+          <button class="rounded-2xl border border-slate-200
+                     bg-white/80 px-6 py-3.5 text-sm font-bold
+                     text-slate-700 hover:border-blue-200
+                     hover:text-blue-600 transition">
+
+            Explore methods
+
+          </button>
+
+        </div>
+
+
+        <!-- Concept -->
+
+        <div class="mt-10 border-t border-slate-200 pt-6">
+
+          <div class="text-[10px] font-bold uppercase
+                  tracking-[0.2em] text-slate-400">
+            The fundamental idea
+          </div>
+
+          <p class="mt-3 max-w-lg text-sm font-semibold
+                leading-6 text-slate-700">
+
+            Activities are the center.
+            Everything around them helps people understand,
+            perform and improve those activities.
+
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <!-- ====================================================== -->
+      <!-- HERO ECOSYSTEM VISUAL -->
+      <!-- ====================================================== -->
+
+      <div id="activities"
+           class="relative mx-auto h-[570px] w-full max-w-[620px]">
+
+
+        <!-- Outer ecosystem -->
+
+        <div class="absolute left-1/2 top-1/2 h-[500px] w-[500px]
+                -translate-x-1/2 -translate-y-1/2
+                rounded-full border border-blue-200/40">
+        </div>
+
+
+        <div class="reverse-spin absolute left-1/2 top-1/2
+                h-[570px] w-[570px]
+                -translate-x-1/2 -translate-y-1/2
+                rounded-full border border-dashed
+                border-blue-200/40">
+        </div>
+
+
+        <!-- Activity center -->
+
+        <div class="absolute left-1/2 top-1/2 z-30
+                flex h-48 w-48 -translate-x-1/2 -translate-y-1/2
+                flex-col items-center justify-center
+                rounded-full border-8 border-white
+                bg-gradient-to-br from-blue-600
+                via-blue-500 to-emerald-500
+                text-center text-white
+                shadow-[0_30px_80px_rgba(37,99,235,.35)]">
+
+          <div class="text-[9px] font-bold uppercase
+                  tracking-[0.25em] text-blue-100">
+            Activity
+          </div>
+
+          <div class="mt-2 text-2xl font-black">
+            Privacy<br />Engineering
+          </div>
+
+          <div class="mt-2 text-[9px] font-semibold text-blue-100">
+            247 active practitioners
+          </div>
+
+        </div>
+
+
+        <!-- ==================================================== -->
+        <!-- PROBLEM -->
+        <!-- ==================================================== -->
+
+        <div class="float absolute left-0 top-4 z-40 w-[190px]
+                rounded-2xl border border-rose-100
+                bg-white/95 p-4 shadow-xl backdrop-blur">
+
+          <div class="flex items-center gap-3">
+
+            <div class="flex h-9 w-9 items-center justify-center
+                    rounded-xl bg-rose-50 text-rose-500">
+              ⚠
+            </div>
+
+            <div>
+
+              <div class="text-[9px] font-bold uppercase
+                      tracking-widest text-rose-500">
+                Problems
+              </div>
+
+              <div class="text-xs font-black">
+                Data exposure
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="mt-3 text-[9px] text-slate-400">
+            18 open problems
+          </div>
+
+        </div>
+
+
+        <!-- ==================================================== -->
+        <!-- METHOD -->
+        <!-- ==================================================== -->
+
+        <div class="float-delay absolute right-0 top-16 z-40 w-[200px]
+                rounded-2xl border border-blue-100
+                bg-white/95 p-4 shadow-xl backdrop-blur">
+
+          <div class="flex items-center gap-3">
+
+            <div class="flex h-9 w-9 items-center justify-center
+                    rounded-xl bg-blue-50 text-blue-600">
+              ◈
+            </div>
+
+            <div>
+
+              <div class="text-[9px] font-bold uppercase
+                      tracking-widest text-blue-500">
+                Methods
+              </div>
+
+              <div class="text-xs font-black">
+                Privacy assessment
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="mt-3 flex justify-between
+                  text-[9px] font-semibold">
+
+        <span class="text-slate-400">
+          12 versions
+        </span>
+
+            <span class="text-emerald-500">
+          94% score
+        </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- ==================================================== -->
+        <!-- ALGORITHM -->
+        <!-- ==================================================== -->
+
+        <div class="float absolute bottom-16 left-0 z-40 w-[200px]
+                rounded-2xl border border-violet-100
+                bg-white/95 p-4 shadow-xl backdrop-blur">
+
+          <div class="flex items-center gap-3">
+
+            <div class="flex h-9 w-9 items-center justify-center
+                    rounded-xl bg-violet-50 text-violet-600">
+              ⌘
+            </div>
+
+            <div>
+
+              <div class="text-[9px] font-bold uppercase
+                      tracking-widest text-violet-500">
+                Algorithms
+              </div>
+
+              <div class="text-xs font-black">
+                Risk analysis
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="mt-3 text-[9px] text-slate-400">
+            Step-by-step execution
+          </div>
+
+        </div>
+
+
+        <!-- ==================================================== -->
+        <!-- ARCHITECTURE -->
+        <!-- ==================================================== -->
+
+        <div class="float-delay absolute bottom-6 right-0 z-40 w-[205px]
+                rounded-2xl border border-amber-100
+                bg-white/95 p-4 shadow-xl backdrop-blur">
+
+          <div class="flex items-center gap-3">
+
+            <div class="flex h-9 w-9 items-center justify-center
+                    rounded-xl bg-amber-50 text-amber-600">
+              ◫
+            </div>
+
+            <div>
+
+              <div class="text-[9px] font-bold uppercase
+                      tracking-widest text-amber-500">
+                Architectures
+              </div>
+
+              <div class="text-xs font-black">
+                Privacy-by-design
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="mt-3 text-[9px] text-slate-400">
+            7 implementation patterns
+          </div>
+
+        </div>
+
+
+        <!-- ==================================================== -->
+        <!-- PRACTICE -->
+        <!-- ==================================================== -->
+
+        <div class="absolute left-1/2 top-[7%] z-40
+                -translate-x-1/2 rounded-full
+                border border-emerald-100 bg-white/95
+                px-4 py-2 shadow-lg backdrop-blur">
+
+          <div class="flex items-center gap-2">
+
+        <span class="flex h-5 w-5 items-center justify-center
+                     rounded-full bg-emerald-100 text-[10px]
+                     font-black text-emerald-600">
+          ✓
+        </span>
+
+            <span class="text-[9px] font-black
+                     uppercase tracking-wider text-emerald-600">
+          1,842 practices
+        </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- ==================================================== -->
+        <!-- IMPROVEMENT -->
+        <!-- ==================================================== -->
+
+        <div class="absolute bottom-[7%] left-1/2 z-40
+                -translate-x-1/2 rounded-full
+                border border-sky-100 bg-white/95
+                px-4 py-2 shadow-lg backdrop-blur">
+
+          <div class="flex items-center gap-2">
+
+        <span class="text-blue-500">
+          ↗
+        </span>
+
+            <span class="text-[9px] font-black
+                     uppercase tracking-wider text-blue-600">
+          34 improvements this month
+        </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- ==================================================== -->
+        <!-- CONNECTIONS -->
+        <!-- ==================================================== -->
+
+        <svg class="pointer-events-none absolute inset-0 z-10
+                h-full w-full" viewBox="0 0 620 570"
+             fill="none">
+
+          <!-- Problem → Activity -->
+
+          <path
+            d="M100 90 C180 150 210 230 240 280"
+            stroke="#fb7185"
+            stroke-width="2"
+            stroke-opacity=".35"
+            stroke-dasharray="8 8"
+            class="flow-line"
+            />
+
+          <!-- Method → Activity -->
+
+          <path
+            d="M520 120 C450 170 430 230 385 275"
+            stroke="#60a5fa"
+            stroke-width="2"
+            stroke-opacity=".4"
+            stroke-dasharray="8 8"
+            class="flow-line"
+            />
+
+          <!-- Algorithm → Activity -->
+
+          <path
+            d="M105 475 C180 420 220 370 245 330"
+            stroke="#a78bfa"
+            stroke-width="2"
+            stroke-opacity=".35"
+            stroke-dasharray="8 8"
+            class="flow-line"
+            />
+
+          <!-- Architecture → Activity -->
+
+          <path
+            d="M510 470 C450 420 420 370 380 330"
+            stroke="#fbbf24"
+            stroke-width="2"
+            stroke-opacity=".35"
+            stroke-dasharray="8 8"
+            class="flow-line"
+            />
+
+        </svg>
+
+
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ========================================================== -->
+  <%= render "static_pages/one_ecosystem_has_many_worlds" %>
+
+  <!-- ========================================================== -->
+
+  <!-- ACTIVITY ECOSYSTEM EXPLANATION -->
+
+  <!-- ========================================================== -->
+
+  <section id="ecosystem"
+           class="relative z-30 border-t border-slate-200/60
+                  bg-white">
+    <div class="mx-auto max-w-7xl px-6 py-20 lg:px-10">
+      <div class="grid gap-14 lg:grid-cols-[.8fr_1.2fr]
+              lg:items-center">
+        <!-- Text -->
+        <div>
+          <div class="text-[10px] font-bold uppercase
+                  tracking-[0.2em] text-blue-500">
+            Activity ecosystem
+          </div>
+          <h2 class="mt-4 text-4xl font-black
+                 tracking-tight text-slate-900">
+
+            Activities are not isolated.
+          </h2>
+          <p class="mt-5 text-sm leading-7 text-slate-500">
+            Every meaningful activity exists inside a larger environment.
+            Problems emerge around it. Methods are developed to solve them.
+            Algorithms turn methods into repeatable processes.
+            Architectures make those processes possible at scale.
+          </p>
+          <p class="mt-4 text-sm leading-7 text-slate-500">
+            The ecosystem connects all of these elements so people can
+            understand the activity from multiple levels — from the
+            problem that created the need to the architecture that
+            enables the solution.
+          </p>
+          <button class="mt-7 rounded-xl bg-slate-900 px-5 py-3
+                     text-sm font-bold text-white
+                     hover:bg-blue-600 transition">
+            Explore an activity →
+          </button>
+        </div>
+
+        <!-- Ecosystem diagram -->
+        <div class="relative rounded-3xl border border-slate-200
+                bg-slate-50 p-8 shadow-sm">
+          <!-- Center -->
+          <div class="relative mx-auto flex h-36 w-36
+                  items-center justify-center rounded-full
+                  bg-gradient-to-br from-blue-600
+                  to-emerald-500 text-center text-white
+                  shadow-xl">
+
+            <div>
+              <div class="text-[8px] font-bold uppercase
+                      tracking-widest text-blue-100">
+                Activity
+              </div>
+              <div class="mt-1 text-lg font-black">
+                Privacy
+              </div>
+            </div>
+          </div>
+
+
+          <!-- Rings -->
+          <div class="pointer-events-none absolute left-1/2
+                  top-1/2 h-56 w-56 -translate-x-1/2
+                  -translate-y-1/2 rounded-full
+                  border border-blue-200">
+          </div>
+          <div class="pointer-events-none absolute left-1/2
+                  top-1/2 h-80 w-80 -translate-x-1/2
+                  -translate-y-1/2 rounded-full
+                  border border-dashed border-slate-200">
+          </div>
+          <!-- Nodes -->
+
+          <div class="absolute left-6 top-8 rounded-xl border
+                  border-rose-100 bg-white px-4 py-3 shadow-sm">
+
+            <div class="text-[9px] font-bold uppercase
+                    tracking-wider text-rose-500">
+              Problems
+            </div>
+
+            <div class="mt-1 text-xs font-black">
+              Data exposure
+            </div>
+          </div>
+
+
+          <div class="absolute right-6 top-8 rounded-xl border
+                  border-blue-100 bg-white px-4 py-3 shadow-sm">
+            <div class="text-[9px] font-bold uppercase
+                    tracking-wider text-blue-500">
+              Methods
+            </div>
+            <div class="mt-1 text-xs font-black">
+              Assessment
+            </div>
+          </div>
+
+
+          <div class="absolute bottom-8 left-6 rounded-xl border
+                  border-violet-100 bg-white px-4 py-3 shadow-sm">
+
+            <div class="text-[9px] font-bold uppercase
+                    tracking-wider text-violet-500">
+              Algorithms
+            </div>
+
+            <div class="mt-1 text-xs font-black">
+              Risk analysis
+            </div>
+
+          </div>
+
+
+          <div class="absolute bottom-8 right-6 rounded-xl border
+                  border-amber-100 bg-white px-4 py-3 shadow-sm">
+
+            <div class="text-[9px] font-bold uppercase
+                    tracking-wider text-amber-500">
+              Architectures
+            </div>
+
+            <div class="mt-1 text-xs font-black">
+              Privacy-by-design
+            </div>
+
+          </div>
+
+
+          <!-- Practice -->
+
+          <div class="absolute left-1/2 top-4
+                  -translate-x-1/2 rounded-full
+                  bg-emerald-50 px-3 py-1.5
+                  text-[8px] font-black uppercase
+                  tracking-wider text-emerald-600">
+
+            Practice
+
+          </div>
+
+
+          <!-- Improvement -->
+
+          <div class="absolute bottom-4 left-1/2
+                  -translate-x-1/2 rounded-full
+                  bg-sky-50 px-3 py-1.5
+                  text-[8px] font-black uppercase
+                  tracking-wider text-sky-600">
+
+            Improvements
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <%= render "static_pages/one_activity_multiple_layers" %>
+
+  <!-- ========================================================== -->
+
+  <!-- EVOLUTION -->
+
+  <!-- ========================================================== -->
+
+  <%= render "static_pages/ecosystem_learns_from_activity" %>
+
+  <!-- ========================================================== -->
+
+  <!-- FINAL CTA -->
+
+  <!-- ========================================================== -->
+
+  <section class="relative overflow-hidden
+                  bg-gradient-to-br from-blue-600
+                  via-sky-500 to-emerald-500">
+    <div class="absolute inset-0 grid-bg opacity-20"></div>
+    <div class="relative mx-auto max-w-4xl px-6 py-20 text-center">
+      <h2 class="text-4xl font-black tracking-tight text-white sm:text-5xl">
+
+        Build the ecosystem
+        around the activity.
+
+      </h2>
+      <p class="mx-auto mt-5 max-w-xl text-sm leading-6 text-blue-50">
+
+        Discover problems.
+        Build methods.
+        Create algorithms.
+        Design architectures.
+        Practice.
+        Improve.
+      </p>
+      <button class="mt-8 rounded-2xl bg-white px-7 py-4
+                 text-sm font-black text-blue-600
+                 shadow-2xl transition
+                 hover:-translate-y-1">
+
+        Enter the ecosystem →
+      </button>
+    </div>
+  </section>
+
+
+
+  <%= render "static_pages/equipped_with_best_of_the_best" %>
+
+
+  <%= render "static_pages/win_for_you_win_for_community" %>
+
+  <%= render "static_pages/the_world_is_your_to_build" %>
+
+  <%= render "static_pages/good_ready_to_create" %>
+</main>
+
