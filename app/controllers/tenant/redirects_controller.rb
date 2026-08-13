@@ -1,6 +1,6 @@
 module Tenant
   class RedirectsController < ApplicationController
-    skip_before_action :authenticate_user!
+    skip_before_action :authenticate_user!, raise: false
 
     def show
       asset = TenantQrAsset.find_by!(lookup_hash: params[:token])
