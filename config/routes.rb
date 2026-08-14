@@ -251,6 +251,7 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   root "static_pages#main_page"
+  get "/support_page", to: "static_pages#support_page"
 
   # resources :dashboards
   # get 'dashboard', to: 'dashboards#show', as: 'dashboard'
