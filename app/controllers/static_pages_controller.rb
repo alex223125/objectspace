@@ -6,4 +6,7 @@ class StaticPagesController < ApplicationController
   def support_page
   end
 
+  def financial_page
+  end
+
 end
