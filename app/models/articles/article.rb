@@ -10,7 +10,8 @@ class Articles::Article < ApplicationRecord
              text_start: [:title, :source_page_description],
              text_middle: [:title, :source_page_description],
              text_end: [:title, :source_page_description],
-             word: [:list_of_tags, :ownerable_id]
+             word: [:list_of_tags, :ownerable_id],
+             word_start: [:title, :slug, :description]
   scope :search_import, -> { includes(:tags) }
   acts_as_taggable_on :tags
 
@@ -60,15 +61,28 @@ class Articles::Article < ApplicationRecord
   # doc: mapping for searchkick
   def search_data
     {
-        title: title,
+        # title: title,
         source_page_description: source_page_description,
         list_of_tags: tag_list,
-        ownerable_id: ownerable_id,
+        # ownerable_id: ownerable_id,
+        # folder_id: folder_id,
+        # repository_id: repository_id,
+
+        title: title,
+        slug: slug,
+        visibility_status: visibility_status,
+        default_version_id: default_version_id,
         folder_id: folder_id,
-        repository_id: repository_id
+        repository_id: repository_id,
+        creator_id: creator_id,
+        ownerable_type: ownerable_type,
+        ownerable_id: ownerable_id,
+        uuid: uuid,
+        created_at: created_at,
+        updated_at: updated_at,
+        latest_version_title: article_versions.last&.title
     }
   end
-
   def slug_candidates
     [ :title,
       [:title, :uuid]

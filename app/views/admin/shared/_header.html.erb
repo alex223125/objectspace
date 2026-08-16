@@ -1,0 +1,237 @@
+<header
+  class="
+    sticky top-0 z-30
+    flex w-full
+    border-b border-slate-200
+    bg-white/90
+    backdrop-blur-xl
+  "
+>
+
+  <div
+    class="
+      flex w-full flex-grow
+      items-center justify-between
+      px-4 py-3
+      md:px-6
+      2xl:px-10
+    "
+  >
+
+    <!-- ======================================================= -->
+    <!-- LEFT -->
+    <!-- ======================================================= -->
+
+    <div class="flex items-center gap-4">
+
+      <!-- Mobile menu button -->
+
+      <button
+        type="button"
+        class="
+          flex h-10 w-10
+          items-center justify-center
+          rounded-xl
+          border border-slate-200
+          bg-white
+          text-slate-500
+          shadow-sm
+          hover:bg-slate-50
+          lg:hidden
+        "
+      >
+        ☰
+      </button>
+
+
+      <div>
+
+        <div
+          class="
+            hidden text-[9px]
+            font-black uppercase
+            tracking-[0.2em]
+            text-amber-500
+            sm:block
+          "
+        >
+          Admin Command Center
+        </div>
+
+        <div class="text-sm font-black text-slate-700 sm:mt-0.5">
+          Workspace Management
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================================= -->
+    <!-- RIGHT -->
+    <!-- ======================================================= -->
+
+    <div class="flex items-center gap-3">
+
+
+      <!-- SYSTEM STATUS -->
+
+      <div
+        class="
+          hidden items-center gap-2
+          rounded-full
+          border border-emerald-100
+          bg-emerald-50
+          px-3 py-1.5
+          md:flex
+        "
+      >
+
+        <span
+          class="
+            h-2 w-2
+            animate-pulse
+            rounded-full
+            bg-emerald-400
+            shadow-[0_0_8px_rgba(52,211,153,0.6)]
+          "
+        ></span>
+
+        <span class="text-[9px] font-black uppercase tracking-wider text-emerald-600">
+          System Online
+        </span>
+
+      </div>
+
+
+      <!-- XP -->
+
+      <div
+        class="
+          hidden items-center gap-2
+          rounded-xl
+          border border-violet-100
+          bg-violet-50
+          px-3 py-2
+          sm:flex
+        "
+      >
+
+        <span class="text-sm">
+          ⚡
+        </span>
+
+        <div>
+
+          <div class="text-[9px] font-black uppercase tracking-wider text-violet-400">
+            XP
+          </div>
+
+          <div class="text-xs font-black text-violet-600">
+            6,800
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- USER -->
+
+      <div class="flex items-center gap-3">
+
+        <div class="hidden text-right sm:block">
+
+          <div class="text-xs font-black text-slate-700">
+            <%= current_admin_user&.name ||
+                  current_admin_user&.username ||
+                  "Admin Account" %>
+          </div>
+
+          <div class="mt-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-400">
+            System Administrator
+          </div>
+
+        </div>
+
+
+        <!-- AVATAR -->
+
+        <div
+          class="
+            flex h-10 w-10
+            items-center justify-center
+            overflow-hidden
+            rounded-2xl
+            border-2 border-white
+            bg-gradient-to-br
+            from-violet-400
+            to-sky-400
+            text-white
+            shadow-md
+            shadow-violet-100
+          "
+        >
+
+          <% if current_admin_user.respond_to?(:avatar) &&
+            current_admin_user.avatar&.attached? %>
+
+            <%= image_tag current_admin_user.avatar,
+                          class: "h-full w-full object-cover" %>
+
+          <% else %>
+
+            <span class="text-sm font-black">
+              <%= (
+                    current_admin_user&.name ||
+                      current_admin_user&.username ||
+                      "A"
+                  ).to_s.first.upcase %>
+            </span>
+
+          <% end %>
+
+        </div>
+
+
+        <!-- SIGN OUT -->
+
+        <%= link_to destroy_admin_user_session_path,
+                    data: { turbo_method: :delete },
+                    title: "Sign out",
+                    class: "
+              group
+              flex h-10 w-10
+              items-center justify-center
+              rounded-xl
+              border border-rose-100
+              bg-rose-50
+              text-rose-500
+              transition
+              hover:bg-rose-100
+              hover:text-rose-600
+            " do %>
+
+          <svg
+            class="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h5a2 2 0 012 2v1"
+              />
+          </svg>
+
+        <% end %>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</header>

@@ -1,5 +1,8 @@
 class ApplicationController < ActionController::Base
   before_action :auto_login_staging, if: -> { Rails.env.staging? }
+  before_action :configure_permitted_parameters, if: :devise_controller?
+
+
 
   include Pagy::Backend
 
@@ -59,5 +62,13 @@ class ApplicationController < ActionController::Base
       # Fallback to standard authentication check if no test user is available
       authenticate_user!
     end
+  end
+
+  protected
+
+  def configure_permitted_parameters
+    # Added :tos_agreement to the allowed keys array
+    devise_parameter_sanitizer.permit(:sign_up, keys: [:name, :username, :tos_agreement])
+    devise_parameter_sanitizer.permit(:account_update, keys: [:name, :username])
   end
 end

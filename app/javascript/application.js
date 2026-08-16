@@ -36,3 +36,12 @@ $(() => {
 
 // REPLACE WITH THIS Standard Clean Module Export:
 import 'cropperjs';
+
+// ---
+// 2. Expose ApexCharts for admin dashboard widgets
+import ApexCharts from "apexcharts"
+window.ApexCharts = ApexCharts
+
+// 3. Expose jsVectorMap for dashboard analytics tracking maps
+import jsVectorMap from "jsvectormap"
+window.jsVectorMap = jsVectorMap

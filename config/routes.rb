@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  # devise_for :admin_users
 
   ##### API ROUTES
   namespace :api, defaults: { format: :json } do
@@ -261,5 +262,18 @@ Rails.application.routes.draw do
   get "/dashboard/reports", to: "dashboards#reports"
 
   # should be last in list of all routes
-  get "/:username(/:target_folder)", to: "dashboards#show", as: 'dashboard'
+  get "/user/:username(/:target_folder)", to: "dashboards#show", as: 'dashboard'
+
+
+  # This tells Devise to map routes for AdminUser but use standard Devise controllers
+  devise_for :admin_users, controllers: {
+    registrations: 'admin_users/registrations',
+    sessions: 'admin_users/sessions'
+  }
+
+  namespace :admin do
+    # resources :articles, only: [:index]
+    resources :articles
+    root to: "articles#index"
+  end
 end

@@ -12,6 +12,22 @@
 
 */
 
+---------------------------------------------------------------------------
+/* Import bundled style sheets directly out of node_modules */
+@import "apexcharts/dist/apexcharts.css";
+@import "jsvectormap/dist/jsvectormap.css";
+
+/* Layer utility fixes required by TailAdmin layouts */
+@layer utilities {
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+}
+/*---------------------------------------------------------------------------*/
 
 /*app/views/algorithm/simple_algorithm_version_creation/partials/_algorithm_version_fields.html.erb*/
 /*styles for cover for article version */

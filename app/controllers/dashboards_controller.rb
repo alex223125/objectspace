@@ -28,8 +28,6 @@ class DashboardsController < ApplicationController
       # breadcrumbs
       add_breadcrumb @target_user.username, dashboard_path(username: @target_user.username), {link_type: "profile_page"}
     end
-
-
   end
 
   def repositories

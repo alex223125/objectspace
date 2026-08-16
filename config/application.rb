@@ -21,6 +21,7 @@ module Objectspace
 
 
 
+
     Dir[Rails.root.join('app/services/**/*.rb')].each{|rb| require rb}
     Dir[Rails.root.join('app/services/concerns/**/*.rb')].each{|rb| require rb}
     Dir[Rails.root.join('app/services/concerns/*.rb')].each{|rb| require rb}
@@ -61,6 +62,7 @@ module Objectspace
     config.i18n.default_locale = :en
 
     config.assets.paths << Rails.root.join('node_modules')
+
 
     config.active_storage.variant_processor = :mini_magick
 

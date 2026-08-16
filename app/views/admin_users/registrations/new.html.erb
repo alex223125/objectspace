@@ -1,0 +1,219 @@
+<div class="bg-gray-200 w-full min-h-screen flex items-center justify-center rounded">
+  <div class="w-full py-8">
+
+    <!-- Branding Top Logo Group -->
+    <div class="flex items-center justify-center space-x-2">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-16 w-16 text-blue-600"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
+      </svg>
+
+      <h1 class="text-3xl font-bold text-blue-600 tracking-wider">
+        Template
+      </h1>
+    </div>
+
+    <!-- Main Card Body -->
+    <div class="bg-white w-5/6 md:w-3/4 lg:w-2/4 xl:w-[500px] 2xl:w-[550px] mt-8 mx-auto px-16 py-8 rounded-lg shadow-2xl">
+
+      <h2 class="text-center text-2xl font-bold tracking-wide text-gray-800">
+        Sign Up
+      </h2>
+
+      <p class="text-center text-sm text-gray-600 mt-2">
+        Already have an account?
+        <%= link_to "Sign in here",
+                    new_session_path(resource_name),
+                    class: "text-blue-600 hover:text-blue-700 hover:underline" %>
+      </p>
+
+      <%= simple_form_for(
+            resource,
+            as: resource_name,
+            url: registration_path(resource_name),
+            html: { multipart: true }
+          ) do |f| %>
+
+        <div class="my-8 text-sm">
+
+          <!-- Validation Errors -->
+          <% if resource.errors.any? %>
+            <div class="bg-red-50 border-l-8 border-red-900 mb-4">
+              <div class="p-4">
+
+                <div class="flex items-center">
+                  <svg
+                    class="h-8 w-8 text-red-900 mr-2"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+
+                  <p class="text-red-900 font-semibold text-lg">
+                    Please fix the following errors.
+                  </p>
+                </div>
+
+                <div class="ml-10 mt-2">
+                  <ul class="list-disc pl-5 text-red-500 text-sm">
+                    <% resource.errors.full_messages.each do |msg| %>
+                      <li><%= msg %></li>
+                    <% end %>
+                  </ul>
+                </div>
+
+              </div>
+            </div>
+          <% end %>
+
+          <!-- Full Name -->
+          <div class="flex flex-col my-4">
+            <label for="admin_user_name" class="text-gray-700">
+              First and Second name
+            </label>
+
+            <%= f.input_field :name,
+                              required: true,
+                              placeholder: "Enter your First and Second name",
+                              class: "mt-2 p-2 border border-gray-300 focus:outline-none focus:ring-0 focus:border-gray-300 rounded text-sm text-gray-900" %>
+          </div>
+
+          <!-- Username -->
+          <div class="flex flex-col my-4">
+            <label for="admin_user_username" class="text-gray-700">
+              User name
+            </label>
+
+            <%= f.hint "A username allows capital and lowercase English letters, digits, should contain at least 1 character. Can not start or end with hyphen or underscore. Consecutively there can be only 1 hyphen or underscore.",
+                       class: "mt-2 text-sm text-gray-500" %>
+
+            <%= f.input_field :username,
+                              required: true,
+                              placeholder: "Enter your Username",
+                              class: "mt-2 p-2 border border-gray-300 focus:outline-none focus:ring-0 focus:border-gray-300 rounded text-sm text-gray-900" %>
+          </div>
+
+          <!-- Email -->
+          <div class="flex flex-col my-4">
+            <label for="admin_user_email" class="text-gray-700">
+              Email Address
+            </label>
+
+            <%= f.input_field :email,
+                              required: true,
+                              placeholder: "Enter your email",
+                              class: "mt-2 p-2 border border-gray-300 focus:outline-none focus:ring-0 focus:border-gray-300 rounded text-sm text-gray-900" %>
+          </div>
+
+          <!-- Password -->
+          <div class="flex flex-col my-4">
+            <label for="admin_user_password" class="text-gray-700">
+              Password
+            </label>
+
+            <%= f.hint "Password must include at least one lowercase letter, one uppercase letter, and one digit.",
+                       class: "mt-2 text-sm text-gray-500" %>
+
+            <div x-data="{ show: false }" class="relative mt-2">
+
+              <%= f.input_field :password,
+                                required: true,
+                                placeholder: "Enter your password",
+                                class: "w-full p-2 pr-10 border border-gray-300 focus:outline-none focus:ring-0 focus:border-gray-300 rounded text-sm text-gray-900",
+                                ":type" => "show ? 'text' : 'password'" %>
+
+              <button type="button"
+              <%= f.input_field :password_confirmation,
+                                required: true,
+                                placeholder: "Enter your password again",
+                                class: "w-full p-2 pr-10 border border-gray-300 focus:outline-none focus:ring-0 focus:border-gray-300 rounded text-sm text-gray-900",
+                                ":type" => "show ? 'text' : 'password'" %>
+            <%= f.file_field :avatar,
+                             required: true,
+                             class: "mt-2 p-2 w-full border border-gray-300 focus:outline-none focus:ring-0 focus:border-gray-300 rounded text-sm text-gray-900 bg-white" %>
+
+          <!-- Terms of Service -->
+          <div class="flex items-center my-6">
+            <%= f.input_field :tos_agreement,
+                              as: :boolean,
+                              required: true,
+                              class: "mr-2 h-4 w-4 focus:ring-0 rounded text-blue-600 border-gray-300 cursor-pointer" %>
+
+            <label
+              for="admin_user_tos_agreement"
+              class="text-sm text-gray-700 select-none">
+              I accept the
+              <a href="#" class="text-blue-600 hover:text-blue-700 hover:underline font-medium">
+                terms
+              </a>
+              and
+              <a href="#" class="text-blue-600 hover:text-blue-700 hover:underline font-medium">
+                privacy policy
+              </a>
+            </label>
+          </div>
+
+          <!-- Submit -->
+          <div class="my-4 flex items-center justify-end space-x-4">
+            <%= f.button :submit,
+                         "Sign up",
+                         class: "bg-blue-600 hover:bg-blue-700 rounded-lg px-8 py-2 text-gray-100 hover:shadow-xl transition duration-150 uppercase font-semibold tracking-wide cursor-pointer" %>
+          </div>
+
+        </div>
+      <% end %>
+
+      <!-- Divider -->
+      <div class="flex items-center justify-between my-6">
+        <div class="w-full h-[1px] bg-gray-300"></div>
+
+        <span class="text-sm uppercase mx-6 text-gray-400 font-semibold select-none">
+          Or
+        </span>
+
+        <div class="w-full h-[1px] bg-gray-300"></div>
+      </div>
+
+      <!-- OmniAuth -->
+      <div class="text-sm mt-4">
+
+        <% if devise_mapping.omniauthable? %>
+          <% resource_class.omniauth_providers.each do |provider| %>
+
+            <%= form_for "Login",
+                         url: omniauth_authorize_path(resource_name, provider),
+                         method: :post,
+                         data: { turbo: false } do |form| %>
+
+              <%= form.button :submit,
+                              class: "w-full flex items-center justify-center space-x-2 text-gray-600 my-2 py-2 bg-gray-100 hover:bg-gray-200 rounded cursor-pointer transition duration-150 font-medium" do %>
+
+                <span>
+                  Sign up with <%= provider.to_s.titleize %>
+                </span>
+
+              <% end %>
+
+            <% end %>
+          <% end %>
+        <% end %>
+
+      </div>
+
+    </div>
+  </div>
+</div>
