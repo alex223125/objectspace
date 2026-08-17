@@ -25,56 +25,59 @@ export default class extends Controller {
     }
 
     connect() {
-        console.log(
-            "Algorithm versions admin dashboard infinity scroll connected"
-        )
+        console.log("Algorithm versions admin dashboard infinity scroll connected")
 
         this.loadingMore = false
         this.observer = null
         this.toastTimer = null
 
+        // Explicitly bind contextual references for window event trees
+        this.handleScrollFallback = this.handleScrollFallback.bind(this)
+
         this.setupIntersectionObserver()
         this.hidePaginationIfPossible()
         this.updateEndState()
+
+        // Fallback safety engine: Trigger loading sequences if the Intersection Observer misses layout bounds
+        window.addEventListener("scroll", this.handleScrollFallback, { passive: true })
+
+        // Immediate baseline scan: Populate canvas layout view gaps on high-resolution landscape screen configs
+        window.setTimeout(() => {
+            this.checkIfMoreLoadingNeeded()
+        }, 400)
     }
 
     disconnect() {
-        console.log(
-            "Algorithm versions admin dashboard infinity scroll disconnected"
-        )
+        console.log("Algorithm versions admin dashboard infinity scroll disconnected")
 
         this.disconnectObserver()
         this.clearToastTimer()
+        window.removeEventListener("scroll", this.handleScrollFallback)
     }
 
 
     // ============================================================
-    // INTERSECTION OBSERVER
+    // INTERSECTION OBSERVER SETUP
     // ============================================================
 
     setupIntersectionObserver() {
         if (!this.hasSentinelTarget) {
-            console.warn(
-                "Infinity scroll sentinel target was not found"
-            )
+            console.warn("Infinity scroll sentinel target was not found")
             return
         }
 
         this.disconnectObserver()
 
-        // FIX: Replaced "(entries) => { const entry = entries }" with array destructuring
-        // This extracts the first Entry object out of the observer batch cleanly.
         this.observer = new IntersectionObserver(
             ([entry]) => {
                 if (!entry || !entry.isIntersecting) {
                     return
                 }
-
                 this.loadNextPage()
             },
             {
                 root: null,
-                rootMargin: "0px 0px 700px 0px",
+                rootMargin: "0px 0px 800px 0px", // Generous threshold boundary to load content ahead of schedule
                 threshold: 0
             }
         )
@@ -86,14 +89,36 @@ export default class extends Controller {
         if (!this.observer) {
             return
         }
-
         this.observer.disconnect()
         this.observer = null
     }
 
 
     // ============================================================
-    // LOAD NEXT PAGE
+    // FAIL-SAFE ACCELERATION SYSTEM (Prevents Stuck Loops)
+    // ============================================================
+
+    handleScrollFallback() {
+        this.checkIfMoreLoadingNeeded()
+    }
+
+    checkIfMoreLoadingNeeded() {
+        if (this.loadingMore || !this.hasNextPage()) {
+            return
+        }
+
+        if (this.hasSentinelTarget) {
+            const rect = this.sentinelTarget.getBoundingClientRect()
+            // Pull files early if the target sentinel element approaches the visible view threshold bounds
+            if (rect.top <= window.innerHeight + 1000) {
+                this.loadNextPage()
+            }
+        }
+    }
+
+
+    // ============================================================
+    // DYNAMIC AJAX REQUEST HANDLER
     // ============================================================
 
     async loadNextPage() {
@@ -107,11 +132,11 @@ export default class extends Controller {
         }
 
         this.loadingMore = true
+        this.showLoadingState()
 
         const nextPage = this.currentPageValue + 1
 
-        this.showLoadingState()
-
+        // Issue real-time gamified loading toast alerts over top HUD frames
         this.showToast(
             `Loading articles from page ${nextPage}...`,
             "loading"
@@ -120,10 +145,7 @@ export default class extends Controller {
         try {
             const url = this.buildPageUrl(nextPage)
 
-            console.log(
-                `Loading article versions page ${nextPage}:`,
-                url
-            )
+            console.log(`Loading article versions page ${nextPage}:`, url)
 
             const response = await fetch(url, {
                 method: "GET",
@@ -135,9 +157,7 @@ export default class extends Controller {
             })
 
             if (!response.ok) {
-                throw new Error(
-                    `HTTP error ${response.status}`
-                )
+                throw new Error(`HTTP error ${response.status}`)
             }
 
             const html = await response.text()
@@ -147,22 +167,11 @@ export default class extends Controller {
                 return
             }
 
-            /*
-             * IMPORTANT:
-             *
-             * The server must return ONLY the <tr> elements
-             * for an infinite-scroll request.
-             */
             const parser = new DOMParser()
-            const documentFragment = parser.parseFromString(
-                html,
-                "text/html"
-            )
+            const documentFragment = parser.parseFromString(html, "text/html")
 
             const rows = Array.from(
-                documentFragment.querySelectorAll(
-                    "tr[data-infinite-scroll-row]"
-                )
+                documentFragment.querySelectorAll("tr[data-infinite-scroll-row]")
             )
 
             if (rows.length === 0) {
@@ -171,37 +180,28 @@ export default class extends Controller {
             }
 
             this.appendRows(rows)
-
             this.currentPageValue = nextPage
-
             this.updatePageLabels()
-
             this.updateVisibleCount(rows.length)
-
             this.hideLoadingState()
 
+            // Update heads-up dashboard toast layout frame with loaded records confirmation data
             this.showToast(
-                `${rows.length} ${
-                    rows.length === 1 ? "article" : "articles"
-                } loaded`,
+                `${rows.length} ${rows.length === 1 ? "article" : "articles"} successfully loaded`,
                 "success"
             )
 
             this.updateEndState()
 
+            // Re-verify layouts after element insertion loops to see if more records are immediately needed
+            window.setTimeout(() => {
+                this.checkIfMoreLoadingNeeded()
+            }, 200)
+
         } catch (error) {
-            console.error(
-                "Failed to load more article versions:",
-                error
-            )
-
+            console.error("Failed to load more article versions:", error)
             this.hideLoadingState()
-
-            this.showToast(
-                "Unable to load more articles. Please try again.",
-                "error"
-            )
-
+            this.showToast("Unable to load more articles. Please try again.", "error")
         } finally {
             this.loadingMore = false
         }
@@ -209,32 +209,20 @@ export default class extends Controller {
 
 
     // ============================================================
-    // URL & PAGINATION LOGIC
+    // ENGINE UTILITY MAPS & URL BUILDERS
     // ============================================================
 
     buildPageUrl(page) {
-        const url = new URL(
-            this.urlValue,
-            window.location.origin
-        )
+        const url = new URL(this.urlValue, window.location.origin)
+        const currentParams = new URLSearchParams(window.location.search)
 
-        const currentParams = new URLSearchParams(
-            window.location.search
-        )
-
+        // Seamlessly clone existing live parameters (search query bounds, visibility filtering states, sorts)
         currentParams.forEach((value, key) => {
-            if (key === "page") {
-                return
-            }
+            if (key === "page") return
             url.searchParams.set(key, value)
         })
 
         url.searchParams.set("page", page)
-
-        /*
-         * Tell Rails that this request is specifically
-         * for the infinite-scroll fragment.
-         */
         url.searchParams.set("infinite_scroll", "true")
 
         return url.toString()
@@ -266,16 +254,14 @@ export default class extends Controller {
 
 
     // ============================================================
-    // DOM UPDATES & LABELS
+    // INFRASTRUCTURE DOM WRITERS
     // ============================================================
 
     appendRows(rows) {
         const fragment = document.createDocumentFragment()
 
         rows.forEach((row) => {
-            fragment.appendChild(
-                document.importNode(row, true)
-            )
+            fragment.appendChild(document.importNode(row, true))
         })
 
         this.articlesTarget.appendChild(fragment)
@@ -319,14 +305,13 @@ export default class extends Controller {
 
 
     // ============================================================
-    // LOADING UI STATES
+    // LOADING INTERFACE DISPLAY ENGINE (Centered Progress Animation)
     // ============================================================
 
     showLoadingState() {
         if (this.hasLoadingTarget) {
             this.loadingTarget.classList.remove("hidden")
-            // Forces flex re-alignment if you are utilizing flex alignments
-            this.loadingTarget.classList.add("flex")
+            this.loadingTarget.classList.add("flex") // Forces flex alignment architectures to execute correctly
         }
 
         if (this.hasSentinelTarget) {
@@ -336,8 +321,8 @@ export default class extends Controller {
 
     hideLoadingState() {
         if (this.hasLoadingTarget) {
-            this.loadingTarget.classList.add("hidden")
             this.loadingTarget.classList.remove("flex")
+            this.loadingTarget.classList.add("hidden")
         }
 
         if (this.hasSentinelTarget && this.hasNextPage()) {
@@ -346,8 +331,8 @@ export default class extends Controller {
     }
 
 
-    // ============================================================
-    // TOAST SYSTEM (Tailwind Theme Integration)
+// ============================================================
+    // INTERACTIVE HEADS-UP TOAST DECK (Tailwind UI Core Themes)
     // ============================================================
 
     showToast(message, type = "loading") {
@@ -356,14 +341,13 @@ export default class extends Controller {
         }
 
         this.clearToastTimer()
-
         this.toastMessageTarget.textContent = message
 
-        // Animate state visibility to active frame
+        // Animate visibility profiles out of hiding into active position frames
         this.toastTarget.classList.remove("-translate-y-5", "opacity-0")
         this.toastTarget.classList.add("translate-y-0", "opacity-100")
 
-        // Thoroughly purge old state utility bounds
+        // Thoroughly purge old state visibility utility color bounds
         this.toastContentTarget.classList.remove(
             "border-sky-200", "text-sky-600", "dark:border-sky-500/30", "dark:text-sky-400",
             "border-emerald-200", "text-emerald-600", "dark:border-emerald-500/30", "dark:text-emerald-400",
@@ -372,7 +356,8 @@ export default class extends Controller {
 
         if (type === "loading") {
             this.toastContentTarget.classList.add(
-                "border-sky-200", "text-sky-600", "dark:border-sky-500/30", "dark:text-sky-400"            )
+                "border-sky-200", "text-sky-600", "dark:border-sky-500/30", "dark:text-sky-400"
+            )
 
             if (this.hasToastIconTarget) this.toastIconTarget.classList.add("hidden")
             if (this.hasToastSpinnerTarget) this.toastSpinnerTarget.classList.remove("hidden")
@@ -426,4 +411,3 @@ export default class extends Controller {
         this.toastTimer = null
     }
 }
-

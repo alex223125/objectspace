@@ -70,7 +70,7 @@
 
 
   <!-- ========================================================= -->
-  <!-- TOAST -->
+  <!-- GAMIFIED HEADS-UP DISPLAY / TOAST NOTIFICATION (FIXED) -->
   <!-- ========================================================= -->
 
   <div
@@ -120,14 +120,14 @@
 
 
   <!-- ========================================================= -->
-  <!-- MAIN -->
+  <!-- MAIN DISPLAY HUB -->
   <!-- ========================================================= -->
 
   <div class="relative mx-auto max-w-7xl px-5 py-10 sm:px-7 lg:px-10">
 
 
     <!-- ======================================================= -->
-    <!-- HERO -->
+    <!-- HERO TITLE & ACTION CONTROLS -->
     <!-- ======================================================= -->
 
     <div
@@ -176,7 +176,6 @@
                  sm:text-5xl"
         >
           Article
-
           <span
             class="bg-gradient-to-r from-amber-500
                    via-sky-500 to-violet-500
@@ -195,7 +194,6 @@
         </p>
 
       </div>
-
 
       <div class="shrink-0">
 
@@ -237,14 +235,13 @@
 
 
     <!-- ======================================================= -->
-    <!-- STATS -->
+    <!-- ECOSYSTEM STATS METRICS -->
     <!-- ======================================================= -->
 
     <div class="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
 
 
-      <!-- Total Articles -->
-
+      <!-- Metric Block 1: Total Library -->
       <div
         class="group rounded-[26px]
                border-2 border-rose-100
@@ -304,8 +301,7 @@
       </div>
 
 
-      <!-- Search -->
-
+      <!-- Metric Block 2: Active Search Query -->
       <div
         class="group rounded-[26px]
                border-2 border-sky-100
@@ -519,7 +515,7 @@
 
 
     <!-- ======================================================= -->
-    <!-- SEARCH -->
+    <!-- SEARCH & FILTER FORM -->
     <!-- ======================================================= -->
 
     <div
@@ -677,10 +673,10 @@
               Start Date
             </label>
 
-            <%= f.date_field :start_date,
-                             value: params[:start_date],
-                             class: "w-full rounded-2xl border-2 border-slate-100
-                                     bg-slate-50 px-4 py-3.5 text-sm
+<%= f.date_field :start_date,
+                 value: params[:start_date],
+                 class: "w-full rounded-2xl border-2 border-slate-100
+bg-slate-50 px-4 py-3.5 text-sm
                                      text-slate-700 outline-none transition
                                      focus:border-amber-300
                                      focus:bg-white focus:ring-4
@@ -716,7 +712,6 @@
           </div>
 
         </div>
-
 
         <%= f.hidden_field :direction,
                            value: params[:direction].presence || "desc" %>
@@ -951,8 +946,7 @@
                      collection: @articles,
                      as: :article,
                      locals: {
-                       offset: (@articles.current_page - 1) *
-                         @articles.limit_value
+                       offset: (@articles.current_page - 1) * @articles.limit_value
                      } %>
 
           </tbody>
@@ -963,7 +957,7 @@
 
 
       <!-- ===================================================== -->
-      <!-- LOADING -->
+      <!-- LOADING STATE CONTROLS -->
       <!-- ===================================================== -->
 
       <div
@@ -973,7 +967,7 @@
         aria-live="polite"
       >
 
-        <div class="flex flex-col items-center justify-center">
+        <div class="flex flex-col items-center justify-center w-full">
 
           <div class="relative h-12 w-12">
 
@@ -1011,7 +1005,7 @@
 
 
       <!-- ===================================================== -->
-      <!-- END -->
+      <!-- END QUEST CONTENT NOTIFICATION -->
       <!-- ===================================================== -->
 
       <div
@@ -1118,7 +1112,6 @@
           </div>
 
         </div>
-
 
         <div
           class="flex shrink-0 items-center gap-2
