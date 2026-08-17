@@ -1,0 +1,838 @@
+<div class="relative min-h-screen overflow-hidden bg-white dark:bg-boxdark">
+
+  <div class="">
+    <div class="relative mx-auto max-w-7xl px-5 py-10 sm:px-7 lg:px-10">
+      <div class="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-end">
+
+        <div>
+
+          <div class="flex items-center gap-3">
+
+            <div
+              class="
+          flex h-11 w-11 items-center justify-center
+          rounded-2xl
+          border border-amber-200
+          bg-amber-50
+          text-xl
+          shadow-sm shadow-amber-100
+        "
+            >
+              📖
+            </div>
+
+            <div>
+
+              <div
+                class="
+            text-[9px]
+            font-black
+            uppercase
+            tracking-[0.2em]
+            text-amber-500
+          "
+              >
+                Knowledge Quest
+              </div>
+
+              <div class="mt-1 text-xs font-medium text-slate-400">
+                Article command center
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <h1
+            class="
+        mt-5
+        max-w-4xl
+        text-3xl
+        font-black
+        tracking-tight
+        text-slate-800
+        sm:text-4xl
+      "
+          >
+            <%= @article.title %>
+          </h1>
+
+
+          <p class="mt-2 text-sm leading-6 text-slate-500">
+            Review and manage this knowledge quest.
+          </p>
+
+        </div>
+
+
+        <div class="flex flex-wrap items-center gap-3">
+
+          <%= link_to admin_article_versions_path,
+                      class: "
+                  inline-flex items-center gap-2
+                  rounded-xl
+                  border border-slate-200
+                  bg-white
+                  px-4 py-3
+                  text-xs font-black
+                  text-slate-500
+                  shadow-sm
+                  transition
+                  hover:bg-slate-50
+                " do %>
+
+            <span>←</span>
+            Back to Articles
+
+          <% end %>
+
+
+          <%= link_to edit_admin_article_version_path(@article),
+                      class: "
+                  inline-flex items-center gap-2
+                  rounded-xl
+                  border border-violet-200
+                  bg-violet-50
+                  px-4 py-3
+                  text-xs font-black
+                  text-violet-600
+                  transition
+                  hover:bg-violet-100
+                " do %>
+
+            ✏️
+            Edit Article
+
+          <% end %>
+
+        </div>
+
+      </div>
+
+
+      <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+
+        <!-- STATUS -->
+
+        <div
+          class="
+      rounded-[24px]
+      border border-emerald-100
+      bg-white
+      p-5
+      shadow-[0_12px_35px_rgba(16,185,129,0.06)]
+    "
+        >
+
+          <div class="flex items-center justify-between">
+
+      <span
+        class="
+          flex h-11 w-11
+          items-center justify-center
+          rounded-2xl
+          bg-emerald-50
+          text-emerald-500
+        "
+      >
+        🌎
+      </span>
+
+            <span
+              class="
+          text-[9px]
+          font-black
+          uppercase
+          tracking-wider
+          text-emerald-400
+        "
+            >
+        Status
+      </span>
+
+          </div>
+
+
+          <div class="mt-5">
+
+            <% if @article.article.visibility_status == 1 %>
+
+        <span
+          class="
+            inline-flex items-center gap-2
+            rounded-full
+            border border-emerald-100
+            bg-emerald-50
+            px-3 py-1.5
+            text-[9px]
+            font-black
+            uppercase
+            tracking-wider
+            text-emerald-600
+          "
+        >
+
+          <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+
+          Public
+
+        </span>
+
+            <% else %>
+
+        <span
+          class="
+            inline-flex items-center gap-2
+            rounded-full
+            border border-violet-100
+            bg-violet-50
+            px-3 py-1.5
+            text-[9px]
+            font-black
+            uppercase
+            tracking-wider
+            text-violet-600
+          "
+        >
+
+          <span class="h-1.5 w-1.5 rounded-full bg-violet-400"></span>
+
+          Draft
+
+        </span>
+
+            <% end %>
+
+          </div>
+
+          <div class="mt-2 text-xs font-medium text-slate-400">
+            Visibility level
+          </div>
+
+        </div>
+
+
+        <!-- CREATED -->
+
+        <div
+          class="
+      rounded-[24px]
+      border border-sky-100
+      bg-white
+      p-5
+      shadow-[0_12px_35px_rgba(14,165,233,0.06)]
+    "
+        >
+
+          <div class="flex items-center justify-between">
+
+      <span
+        class="
+          flex h-11 w-11
+          items-center justify-center
+          rounded-2xl
+          bg-sky-50
+          text-sky-500
+        "
+      >
+        📅
+      </span>
+
+            <span
+              class="
+          text-[9px]
+          font-black
+          uppercase
+          tracking-wider
+          text-sky-400
+        "
+            >
+        Timeline
+      </span>
+
+          </div>
+
+          <div class="mt-5 text-lg font-black text-slate-800">
+            <%= @article.created_at.strftime("%Y-%m-%d") %>
+          </div>
+
+          <div class="mt-1 text-xs font-medium text-slate-400">
+            Created <%= @article.created_at.strftime("%H:%M") %>
+          </div>
+
+        </div>
+
+
+        <!-- UPDATED -->
+
+        <div
+          class="
+      rounded-[24px]
+      border border-violet-100
+      bg-white
+      p-5
+      shadow-[0_12px_35px_rgba(139,92,246,0.06)]
+    "
+        >
+
+          <div class="flex items-center justify-between">
+
+      <span
+        class="
+          flex h-11 w-11
+          items-center justify-center
+          rounded-2xl
+          bg-violet-50
+          text-violet-500
+        "
+      >
+        ⚡
+      </span>
+
+            <span
+              class="
+          text-[9px]
+          font-black
+          uppercase
+          tracking-wider
+          text-violet-400
+        "
+            >
+        Progress
+      </span>
+
+          </div>
+
+          <div class="mt-5 text-lg font-black text-slate-800">
+            <%= @article.updated_at.strftime("%Y-%m-%d") %>
+          </div>
+
+          <div class="mt-1 text-xs font-medium text-slate-400">
+            Last updated <%= @article.updated_at.strftime("%H:%M") %>
+          </div>
+
+        </div>
+
+
+        <!-- XP -->
+
+        <div
+          class="
+      rounded-[24px]
+      border border-amber-100
+      bg-white
+      p-5
+      shadow-[0_12px_35px_rgba(245,158,11,0.06)]
+    "
+        >
+
+          <div class="flex items-center justify-between">
+
+      <span
+        class="
+          flex h-11 w-11
+          items-center justify-center
+          rounded-2xl
+          bg-amber-50
+          text-amber-500
+        "
+      >
+        🏆
+      </span>
+
+            <span
+              class="
+          text-[9px]
+          font-black
+          uppercase
+          tracking-wider
+          text-amber-400
+        "
+            >
+        XP
+      </span>
+
+          </div>
+
+          <div class="mt-5 text-2xl font-black text-slate-800">
+            +100
+          </div>
+
+          <div class="mt-1 text-xs font-medium text-slate-400">
+            Article quest reward
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ARTICLE DETAILS -->
+
+      <div
+        class="
+    overflow-hidden
+    rounded-[26px]
+    border border-slate-200
+    bg-white
+    shadow-sm
+  "
+      >
+
+        <div
+          class="
+      border-b border-slate-100
+      bg-gradient-to-r
+      from-white
+      via-slate-50
+      to-white
+      px-6 py-5
+    "
+        >
+
+          <div class="flex items-center gap-3">
+
+            <div
+              class="
+          flex h-10 w-10
+          items-center justify-center
+          rounded-xl
+          bg-gradient-to-br
+          from-amber-50
+          to-orange-50
+          text-amber-500
+        "
+            >
+              📚
+            </div>
+
+            <div>
+
+              <h2 class="text-base font-black text-slate-700">
+                Article Details
+              </h2>
+
+              <p class="mt-1 text-xs text-slate-400">
+                Knowledge quest information
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="grid grid-cols-1 gap-6 p-6 md:grid-cols-2">
+
+          <div>
+
+            <div
+              class="
+          text-[9px]
+          font-black
+          uppercase
+          tracking-widest
+          text-slate-400
+        "
+            >
+              Title
+            </div>
+
+            <div
+              class="
+          mt-2
+          rounded-xl
+          border border-slate-100
+          bg-slate-50
+          px-4 py-3
+          text-sm
+          font-bold
+          text-slate-700
+        "
+            >
+              <%= @article.title %>
+            </div>
+
+          </div>
+
+
+          <div>
+
+            <div
+              class="
+          text-[9px]
+          font-black
+          uppercase
+          tracking-widest
+          text-slate-400
+        "
+            >
+              UUID
+            </div>
+
+            <div
+              class="
+          mt-2
+          overflow-hidden
+          rounded-xl
+          border border-slate-100
+          bg-slate-50
+          px-4 py-3
+          font-mono
+          text-xs
+          text-slate-500
+        "
+            >
+              <%= @article.uuid %>
+            </div>
+
+          </div>
+
+
+          <div>
+
+            <div
+              class="
+          text-[9px]
+          font-black
+          uppercase
+          tracking-widest
+          text-slate-400
+        "
+            >
+              Folder
+            </div>
+
+            <div
+              class="
+          mt-2
+          rounded-xl
+          border border-slate-100
+          bg-slate-50
+          px-4 py-3
+          text-sm
+          text-slate-600
+        "
+            >
+              <%= @article.article.folder_id.presence || "Not assigned" %>
+            </div>
+
+          </div>
+
+
+          <div>
+
+            <div
+              class="
+          text-[9px]
+          font-black
+          uppercase
+          tracking-widest
+          text-slate-400
+        "
+            >
+              Repository
+            </div>
+
+            <div
+              class="
+          mt-2
+          rounded-xl
+          border border-slate-100
+          bg-slate-50
+          px-4 py-3
+          text-sm
+          text-slate-600
+        "
+            >
+              <%= @article.article.repository_id.presence || "Not assigned" %>
+            </div>
+
+          </div>
+
+
+          <div>
+
+            <div
+              class="
+          text-[9px]
+          font-black
+          uppercase
+          tracking-widest
+          text-slate-400
+        "
+            >
+              Creator
+            </div>
+
+            <div
+              class="
+          mt-2
+          rounded-xl
+          border border-slate-100
+          bg-slate-50
+          px-4 py-3
+          text-sm
+          text-slate-600
+        "
+            >
+              <%= @article.article.creator_id.presence || "Not assigned" %>
+            </div>
+
+          </div>
+
+
+          <div>
+
+            <div
+              class="
+          text-[9px]
+          font-black
+          uppercase
+          tracking-widest
+          text-slate-400
+        "
+            >
+              Owner
+            </div>
+
+            <div
+              class="
+          mt-2
+          rounded-xl
+          border border-slate-100
+          bg-slate-50
+          px-4 py-3
+          text-sm
+          text-slate-600
+        "
+            >
+
+              <% if @article.article.ownerable_type.present? %>
+
+                <%= @article.article.ownerable_type %>
+
+                <% if @article.article.ownerable_id.present? %>
+                  #<%= @article.article.ownerable_id %>
+                <% end %>
+
+              <% else %>
+
+                Not assigned
+
+              <% end %>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- QUEST PROGRESS -->
+
+      <div
+        class="
+    mt-6
+    rounded-[26px]
+    border-2 border-slate-100
+    bg-gradient-to-r
+    from-white
+    via-slate-50
+    to-white
+    p-6
+    shadow-sm
+  "
+      >
+
+        <div
+          class="
+      flex flex-col gap-5
+      md:flex-row
+      md:items-center
+      md:justify-between
+    "
+        >
+
+          <div class="flex items-center gap-4">
+
+            <div
+              class="
+          flex h-12 w-12
+          shrink-0
+          items-center justify-center
+          rounded-2xl
+          border-2 border-emerald-200
+          bg-emerald-50
+          text-lg
+          shadow-sm
+          shadow-emerald-100
+        "
+            >
+              🏆
+            </div>
+
+            <div>
+
+              <div class="text-sm font-black text-slate-700">
+                Article quest is active.
+              </div>
+
+              <p class="mt-1 text-xs leading-5 text-slate-400">
+                Continue improving this article to increase its knowledge value.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="flex items-center gap-3">
+
+            <%= link_to edit_admin_article_version_path(@article),
+                        class: "
+                    inline-flex items-center gap-2
+                    rounded-xl
+                    bg-gradient-to-r
+                    from-violet-500
+                    to-fuchsia-500
+                    px-5 py-3
+                    text-xs font-black
+                    text-white
+                    shadow-md
+                    shadow-violet-100
+                    transition
+                    hover:-translate-y-0.5
+                  " do %>
+
+              ✏️
+              Edit Quest
+
+            <% end %>
+
+          </div>
+
+        </div>
+
+
+        <div class="mt-6">
+
+          <div class="mb-2 flex items-center justify-between">
+
+      <span
+        class="
+          text-[9px]
+          font-black
+          uppercase
+          tracking-widest
+          text-slate-400
+        "
+      >
+        Knowledge Progress
+      </span>
+
+            <span
+              class="
+          text-[10px]
+          font-black
+          text-emerald-500
+        "
+            >
+        Level 01 · 72%
+      </span>
+
+          </div>
+
+
+          <div
+            class="
+        h-2.5
+        overflow-hidden
+        rounded-full
+        bg-slate-100
+      "
+          >
+
+            <div
+              class="
+          h-full
+          w-[72%]
+          rounded-full
+          bg-gradient-to-r
+          from-emerald-400
+          via-sky-400
+          to-violet-400
+          shadow-sm
+        "
+            >
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- DANGER ZONE -->
+
+      <div
+        class="
+    mt-6
+    flex flex-col gap-4
+    rounded-[24px]
+    border border-rose-100
+    bg-rose-50/50
+    p-5
+    md:flex-row
+    md:items-center
+    md:justify-between
+  "
+      >
+
+        <div>
+
+          <div class="text-xs font-black text-rose-600">
+            Remove article
+          </div>
+
+          <p class="mt-1 text-[10px] text-rose-400">
+            This action cannot be undone.
+          </p>
+
+        </div>
+
+
+        <%= button_to admin_article_version_path(@article),
+                      method: :delete,
+                      data: {
+                        turbo_confirm: "Are you sure you want to delete this article?"
+                      },
+                      class: "
+                  inline-flex
+                  items-center
+                  justify-center
+                  rounded-xl
+                  border
+                  border-rose-200
+                  bg-white
+                  px-4 py-2.5
+                  text-xs
+                  font-black
+                  text-rose-500
+                  transition
+                  hover:bg-rose-100
+                " do %>
+
+          Delete Article
+
+        <% end %>
+
+      </div>
+    </div>
+  </div>
+</div>

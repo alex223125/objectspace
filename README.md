@@ -9,9 +9,15 @@ npm install puppeteer --save
 asfasafsfsafsafsaasf@gmail.com
 123456
 
+### admin test user
+localtestadmin@test.com
+localtestadmin@test.com
+localtestadmin@test.com
 
-testeamiladress1@gmail.com
 123456
+123456
+123456
+
 
 # work with server
 lsof -i :3000

@@ -293,12 +293,12 @@
 
       <!-- Articles -->
 
-      <%= link_to admin_articles_path,
+      <%= link_to admin_article_versions_path,
                   class: "group flex items-center gap-3
                   rounded-2xl px-3 py-3
                   text-sm font-bold
                   transition-all duration-200
-                  #{current_page?(admin_articles_path) ?
+                  #{current_page?(admin_article_versions_path) ?
                                                 'bg-rose-50 text-rose-600 shadow-sm' :
                                                 'text-slate-600 hover:bg-rose-50 hover:text-rose-600'}" do %>
 
@@ -357,7 +357,7 @@
 
       <!-- Articles CMS -->
 
-      <%= link_to admin_articles_path,
+      <%= link_to admin_article_versions_path,
                   class: "group flex items-center gap-3
                   rounded-2xl px-3 py-3
                   text-sm font-bold
@@ -387,7 +387,7 @@
 
       <!-- Search -->
 
-      <%= link_to admin_articles_path,
+      <%= link_to admin_article_versions_path,
                   class: "group flex items-center gap-3
                   rounded-2xl px-3 py-3
                   text-sm font-bold

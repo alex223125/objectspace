@@ -273,7 +273,7 @@ Rails.application.routes.draw do
 
   namespace :admin do
     # resources :articles, only: [:index]
-    resources :articles
-    root to: "articles#index"
+    resources :article_versions
+    root to: "article_versions#index"
   end
 end

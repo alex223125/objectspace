@@ -1,4 +1,4 @@
-class Admin::ArticlesController < AdminController
+class Admin::ArticleVersionsController < AdminController
   before_action :set_article, only: %i[show edit update destroy]
 
   # GET /admin/articles
@@ -151,7 +151,7 @@ class Admin::ArticlesController < AdminController
     @article = Articles::Article.new(article_params)
 
     if @article.save
-      redirect_to admin_article_path(@article),
+      redirect_to admin_article_version_path(@article),
                   notice: "Article was successfully created."
     else
       flash.now[:alert] = "Unable to create article."
@@ -168,7 +168,7 @@ class Admin::ArticlesController < AdminController
   # PATCH/PUT /admin/articles/:id
   def update
     if @article.update(article_params)
-      redirect_to admin_article_path(@article),
+      redirect_to admin_article_version_path(@article),
                   notice: "Article was successfully updated."
     else
       flash.now[:alert] = "Unable to update article."
@@ -181,7 +181,7 @@ class Admin::ArticlesController < AdminController
   def destroy
     @article.destroy
 
-    redirect_to admin_articles_path,
+    redirect_to admin_article_versions_path,
                 notice: "Article was successfully deleted."
   end
 
@@ -190,7 +190,7 @@ class Admin::ArticlesController < AdminController
 
 
   def set_article
-    @article = Articles::Article.find(params[:id])
+    @article = Articles::ArticleVersion.find(params[:id])
   end
 
 

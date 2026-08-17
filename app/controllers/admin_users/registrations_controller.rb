@@ -5,7 +5,7 @@ class AdminUsers::RegistrationsController < Devise::RegistrationsController
 
   # Перанакіраванне пасля паспяховай рэгістрацыі (напрыклад, у панэль артыкулаў)
   def after_sign_up_path_for(resource)
-    admin_articles_path
+    admin_article_versions_path
   end
 
   # Перанакіраванне, калі ўліковы запіс чакае пацверджання
