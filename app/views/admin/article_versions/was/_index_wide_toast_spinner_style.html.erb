@@ -9,47 +9,55 @@
 >
 
   <!-- ========================================================= -->
-  <!-- 2. GAMIFIED HEADS-UP DISPLAY (FORCE OVERLAY VIEW ENGINE) -->
+  <!-- 2. GAMIFIED HEADS-UP DISPLAY (WIDE SYSTEM NOTIFICATION)   -->
   <!-- ========================================================= -->
   <div
     data-algorithm-versions-admin-dashboard-infinity-scroll-target="toast"
-    class="pointer-events-none fixed opacity-0 transition-all duration-300"
-    style="top: 20px; left: 50%; transform: translate(-50%, -20px); z-index: 99999;"
+    class="pointer-events-none fixed opacity-0 transition-all duration-300 sm:px-4"
+    style="top: 20px; left: 50%; transform: translate(-50%, -20px); z-index: 99999; width: 100%; max-w: 480px;"
     aria-live="polite"
     aria-atomic="true"
   >
     <div
       data-algorithm-versions-admin-dashboard-infinity-scroll-target="toastContent"
-      class="flex items-center gap-3 rounded-2xl
+      class="mx-auto flex w-full items-center justify-between gap-4 rounded-2xl
              border-2 border-sky-200
-             bg-white px-5 py-3
+             bg-white px-6 py-3.5
              text-sm font-black text-sky-600
              shadow-[0_20px_50px_rgba(14,165,233,0.3)]
              dark:border-sky-500/30
              dark:bg-boxdark
              dark:text-sky-400"
     >
-      <span
-        data-algorithm-versions-admin-dashboard-infinity-scroll-target="toastSpinner"
-        class="hidden h-4 w-4 animate-spin rounded-full
-               border-2 border-sky-200
-               border-t-sky-500"
-      ></span>
 
-      <span
-        data-algorithm-versions-admin-dashboard-infinity-scroll-target="toastIcon"
-        class="text-base"
-      >
-        ⟳
-      </span>
+      <!-- Left side: Spinner & Icon wrapper -->
+      <div class="flex items-center gap-3 min-w-0 flex-1">
+        <span
+          data-algorithm-versions-admin-dashboard-infinity-scroll-target="toastSpinner"
+          class="hidden h-4 w-4 shrink-0 animate-spin rounded-full
+                 border-2 border-sky-200
+                 border-t-sky-500"
+        ></span>
 
-      <span
-        data-algorithm-versions-admin-dashboard-infinity-scroll-target="toastMessage"
-      >
-        Loading more articles...
-      </span>
+        <span
+          data-algorithm-versions-admin-dashboard-infinity-scroll-target="toastIcon"
+          class="text-base shrink-0"
+        >
+          ⟳
+        </span>
+
+        <!-- Full Dynamic Message Text -->
+        <span
+          data-algorithm-versions-admin-dashboard-infinity-scroll-target="toastMessage"
+          class="whitespace-nowrap truncate tracking-wide"
+        >
+          Loading more articles...
+        </span>
+      </div>
+
     </div>
   </div>
+
 
 
   <!-- ========================================================= -->
@@ -719,9 +727,9 @@
               Start Date
             </label>
 
-<%= f.date_field :start_date,
-                 value: params[:start_date],
-                 class: "w-full rounded-2xl border-2 border-slate-100
+            <%= f.date_field :start_date,
+                             value: params[:start_date],
+                             class: "w-full rounded-2xl border-2 border-slate-100
 bg-slate-50 px-4 py-3.5 text-sm
                                      text-slate-700 outline-none transition
                                      focus:border-amber-300
