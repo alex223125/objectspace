@@ -38,4 +38,20 @@ class Articles::ArticleVersion < ApplicationRecord
     ]
   end
 
+  def search_data
+    {
+      id: id,
+      uuid: uuid,
+      title: title,
+      content: content,
+      sources: sources,
+      additional_information: additional_information,
+      slug: slug,
+      article_id: article_id,
+      article_title: article&.title,
+      created_at: created_at,
+      updated_at: updated_at
+    }
+  end
+
 end

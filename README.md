@@ -211,6 +211,9 @@ sudo systemctl restart postgresql
 https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-elasticsearch-on-ubuntu-20-04
 
 
+## rubocop
+bundle exec rubocop -a db/snippets_for_test_database/article_versions/create_200_copies_from_given_article_version.rb
+
 # when setting up project
 rails db:migrate
 rails db:create

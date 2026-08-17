@@ -349,3 +349,10 @@ import ReportsRepositoryItemsController from "./reports_repositories/reports_rep
 application.register("reports_repository_items", ReportsRepositoryItemsController)
 
 
+// ============================================================
+// Algorithm Versions Admin Dashboard
+// ============================================================
+import AlgorithmVersionsAdminDashboardInfinityScrollController from "./admin_dashboard/algorithm_versions/algorithm_versions_admin_dashboard_infinity_scroll_controller"
+application.register("algorithm-versions-admin-dashboard-infinity-scroll", AlgorithmVersionsAdminDashboardInfinityScrollController)
+
+

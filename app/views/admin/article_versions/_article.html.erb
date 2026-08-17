@@ -1,0 +1,218 @@
+<%
+  # Dynamic thematic color palette loop matching your gaming admin dashboard style
+  colors = [
+    {
+      border: "border-rose-100 dark:border-rose-500/20",
+      bg: "bg-rose-50 dark:bg-rose-500/10",
+      text: "text-rose-500",
+      gradient: "from-rose-400 to-pink-400"
+    },
+    {
+      border: "border-sky-100 dark:border-sky-500/20",
+      bg: "bg-sky-50 dark:bg-sky-500/10",
+      text: "text-sky-500",
+      gradient: "from-sky-400 to-cyan-400"
+    },
+    {
+      border: "border-violet-100 dark:border-violet-500/20",
+      bg: "bg-violet-50 dark:bg-violet-500/10",
+      text: "text-violet-500",
+      gradient: "from-violet-400 to-fuchsia-400"
+    },
+    {
+      border: "border-amber-100 dark:border-amber-500/20",
+      bg: "bg-amber-50 dark:bg-amber-500/10",
+      text: "text-amber-500",
+      gradient: "from-amber-400 to-yellow-300"
+    }
+  ]
+
+  # Safe fallbacks for index calculation through pagination offsets
+  article_index = local_assigns.fetch(:article_index, 0)
+  offset = local_assigns.fetch(:offset, 0)
+  display_index = offset + article_index + 1
+  color = colors[display_index % colors.length]
+%>
+
+<!--
+  CRITICAL FOR INFINITE SCROLL:
+  The [data-infinite-scroll-row] attribute below allows JavaScript's DOMParser
+  to cleanly scrape and isolate these rows from the incoming HTML stream.
+-->
+<tr
+  data-infinite-scroll-row
+  class="group border-b border-slate-100
+         transition-all duration-300
+         hover:bg-slate-50/70
+         dark:border-strokedark
+         dark:hover:bg-meta-4/40"
+>
+
+  <!-- ================================================= -->
+  <!-- ARTICLE / QUEST -->
+  <!-- ================================================= -->
+  <td class="px-6 py-5">
+    <div class="flex items-center gap-4">
+
+      <!-- Dynamic Level/Index Badge -->
+      <div
+        class="flex h-12 w-12 shrink-0 items-center
+               justify-center rounded-2xl border-2
+               <%= color[:border] %>
+               <%= color[:bg] %>
+               text-xs font-black <%= color[:text] %>
+               shadow-sm transition-transform duration-300
+               group-hover:scale-110"
+      >
+        <%= format("%02d", display_index) %>
+      </div>
+
+      <div class="min-w-0">
+        <%= link_to admin_article_version_path(article),
+                    class: "block max-w-[350px] truncate
+                           text-sm font-black
+                           text-slate-800
+                           transition hover:text-sky-500
+                           dark:text-white" do %>
+          <%= article.title.presence || "Untitled Article" %>
+        <% end %>
+
+        <div class="mt-2 flex items-center gap-2">
+          <span
+            class="h-1.5 w-1.5 rounded-full
+                   <%= color[:text].gsub('text-', 'bg-') %>"
+          ></span>
+          <span class="text-[10px] font-bold text-slate-400">
+            Knowledge Quest
+          </span>
+        </div>
+      </div>
+
+    </div>
+  </td>
+
+  <!-- ================================================= -->
+  <!-- UUID -->
+  <!-- ================================================= -->
+  <td class="px-6 py-5">
+    <% if article.respond_to?(:uuid) && article.uuid.present? %>
+      <code
+        class="rounded-xl border border-slate-100
+               bg-slate-50 px-3 py-2
+               text-[10px] font-bold text-slate-500
+               dark:border-strokedark
+               dark:bg-meta-4 dark:text-gray-400"
+      >
+        <%= article.uuid %>
+      </code>
+    <% else %>
+      <span class="text-xs text-slate-300">
+        No UUID
+      </span>
+    <% end %>
+  </td>
+
+  <!-- ================================================= -->
+  <!-- STATUS -->
+  <!-- ================================================= -->
+  <td class="px-6 py-5">
+    <% if article.visibility_status.to_i == 1 %>
+      <div class="flex flex-col gap-2">
+        <span
+          class="inline-flex w-fit items-center gap-2
+                 rounded-full border border-emerald-100
+                 bg-emerald-50 px-3 py-1.5
+                 text-[9px] font-black uppercase
+                 tracking-wider text-emerald-600
+                 dark:border-emerald-500/20
+                 dark:bg-emerald-500/10"
+        >
+          <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          Public
+        </span>
+
+        <div class="h-1.5 w-24 overflow-hidden rounded-full bg-emerald-50 dark:bg-emerald-500/10">
+          <div class="h-full w-full rounded-full bg-gradient-to-r from-emerald-400 to-green-400"></div>
+        </div>
+      </div>
+    <% else %>
+      <div class="flex flex-col gap-2">
+        <span
+          class="inline-flex w-fit items-center gap-2
+                 rounded-full border border-amber-100
+                 bg-amber-50 px-3 py-1.5
+                 text-[9px] font-black uppercase
+                 tracking-wider text-amber-600
+                 dark:border-amber-500/20
+                 dark:bg-amber-500/10"
+        >
+          <span class="h-1.5 w-1.5 rounded-full bg-amber-400"></span>
+          Draft
+        </span>
+
+        <div class="h-1.5 w-24 overflow-hidden rounded-full bg-amber-50 dark:bg-amber-500/10">
+          <div class="h-full w-[45%] rounded-full bg-gradient-to-r from-amber-400 to-yellow-300"></div>
+        </div>
+      </div>
+    <% end %>
+  </td>
+
+  <!-- ================================================= -->
+  <!-- CREATED -->
+  <!-- ================================================= -->
+  <td class="px-6 py-5">
+    <div>
+      <p class="text-sm font-black text-slate-700 dark:text-white">
+        <%= article.created_at.strftime("%b %d, %Y") %>
+      </p>
+      <p class="mt-1 text-[10px] font-medium text-slate-400">
+        <%= article.created_at.strftime("%H:%M") %>
+      </p>
+    </div>
+  </td>
+
+  <!-- ================================================= -->
+  <!-- ACTIONS -->
+  <!-- ================================================= -->
+  <td class="px-6 py-5">
+    <div class="flex items-center justify-end gap-2">
+
+      <!-- View Link -->
+      <%= link_to admin_article_version_path(article),
+                  title: "View article",
+                  class: "flex h-9 w-9 items-center justify-center
+                          rounded-xl border-2 border-sky-100
+                          bg-sky-50 text-sky-500 transition-all duration-200
+                          hover:-translate-y-0.5 hover:border-sky-200 hover:bg-sky-100
+                          dark:border-sky-500/20 dark:bg-sky-500/10" do %>
+        👁
+      <% end %>
+
+      <!-- Edit Link -->
+      <%= link_to edit_admin_article_version_path(article),
+                  title: "Edit article",
+                  class: "flex h-9 w-9 items-center justify-center
+                          rounded-xl border-2 border-violet-100
+                          bg-violet-50 text-violet-500 transition-all duration-200
+                          hover:-translate-y-0.5 hover:border-violet-200 hover:bg-violet-100
+                          dark:border-violet-500/20 dark:bg-violet-500/10" do %>
+        ✏️
+      <% end %>
+
+      <!-- Delete Button (Turbo Frame/Stream Compliant) -->
+      <%= button_to admin_article_version_path(article),
+                    method: :delete,
+                    data: { turbo_confirm: "Are you sure you want to delete this article?" },
+                    title: "Delete article",
+                    class: "flex h-9 w-9 cursor-pointer items-center justify-center
+                            rounded-xl border-2 border-rose-100
+                            bg-rose-50 text-rose-500 transition-all duration-200
+                            hover:-translate-y-0.5 hover:border-rose-200 hover:bg-rose-100
+                            dark:border-rose-500/20 dark:bg-rose-500/10" do %>
+        🗑️
+      <% end %>
+
+    </div>
+  </td>
+
+</tr>

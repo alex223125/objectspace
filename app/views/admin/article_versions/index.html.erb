@@ -1,12 +1,16 @@
-<div class="relative min-h-screen overflow-hidden bg-white dark:bg-boxdark">
+<div
+  class="relative min-h-screen overflow-hidden bg-white dark:bg-boxdark"
+  data-controller="algorithm-versions-admin-dashboard-infinity-scroll"
+  data-algorithm-versions-admin-dashboard-infinity-scroll-current-page-value="<%= @articles.current_page %>"
+  data-algorithm-versions-admin-dashboard-infinity-scroll-total-pages-value="<%= @articles.total_pages %>"
+  data-algorithm-versions-admin-dashboard-infinity-scroll-url-value="<%= admin_article_versions_path %>"
+>
 
   <!-- ========================================================= -->
-  <!-- GAMIFICATION ATMOSPHERE -->
+  <!-- BACKGROUND ATMOSPHERE -->
   <!-- ========================================================= -->
 
   <div class="pointer-events-none absolute inset-0 overflow-hidden">
-
-    <!-- Large colorful background glows -->
 
     <div
       class="absolute -left-40 -top-40 h-[500px] w-[500px]
@@ -32,52 +36,106 @@
              dark:bg-violet-500/10">
     </div>
 
-
-    <!-- Floating particles -->
-
     <div
       class="absolute left-[8%] top-[18%] h-2 w-2 rounded-full
-             bg-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.6)]
+             bg-amber-400
+             shadow-[0_0_15px_rgba(251,191,36,0.6)]
              animate-bounce">
     </div>
 
     <div
       class="absolute left-[24%] top-[10%] h-1.5 w-1.5 rounded-full
-             bg-sky-400 shadow-[0_0_15px_rgba(56,189,248,0.6)]
+             bg-sky-400
+             shadow-[0_0_15px_rgba(56,189,248,0.6)]
              animate-pulse">
     </div>
 
     <div
       class="absolute right-[17%] top-[28%] h-2 w-2 rounded-full
-             bg-violet-400 shadow-[0_0_15px_rgba(139,92,246,0.6)]
-             animate-bounce [animation-delay:700ms]">
+             bg-violet-400
+             shadow-[0_0_15px_rgba(139,92,246,0.6)]
+             animate-bounce
+             [animation-delay:700ms]">
     </div>
 
     <div
       class="absolute right-[7%] bottom-[20%] h-1.5 w-1.5 rounded-full
-             bg-emerald-400 shadow-[0_0_15px_rgba(52,211,153,0.6)]
-             animate-pulse [animation-delay:1200ms]">
+             bg-emerald-400
+             shadow-[0_0_15px_rgba(52,211,153,0.6)]
+             animate-pulse
+             [animation-delay:1200ms]">
     </div>
 
   </div>
 
 
   <!-- ========================================================= -->
-  <!-- MAIN CONTAINER -->
+  <!-- TOAST -->
+  <!-- ========================================================= -->
+
+  <div
+    data-algorithm-versions-admin-dashboard-infinity-scroll-target="toast"
+    class="pointer-events-none fixed left-1/2 top-5 z-[9999]
+           -translate-x-1/2 -translate-y-5
+           opacity-0 transition-all duration-300"
+    aria-live="polite"
+    aria-atomic="true"
+  >
+
+    <div
+      data-algorithm-versions-admin-dashboard-infinity-scroll-target="toastContent"
+      class="flex items-center gap-3 rounded-2xl
+             border-2 border-sky-200
+             bg-white px-5 py-3
+             text-sm font-black text-sky-600
+             shadow-[0_15px_45px_rgba(14,165,233,0.18)]
+             dark:border-sky-500/30
+             dark:bg-boxdark
+             dark:text-sky-400"
+    >
+
+      <span
+        data-algorithm-versions-admin-dashboard-infinity-scroll-target="toastSpinner"
+        class="hidden h-4 w-4 animate-spin rounded-full
+               border-2 border-sky-200
+               border-t-sky-500"
+      ></span>
+
+      <span
+        data-algorithm-versions-admin-dashboard-infinity-scroll-target="toastIcon"
+        class="text-base"
+      >
+        ⟳
+      </span>
+
+      <span
+        data-algorithm-versions-admin-dashboard-infinity-scroll-target="toastMessage"
+      >
+        Loading more articles...
+      </span>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- MAIN -->
   <!-- ========================================================= -->
 
   <div class="relative mx-auto max-w-7xl px-5 py-10 sm:px-7 lg:px-10">
 
 
     <!-- ======================================================= -->
-    <!-- HERO HEADER -->
+    <!-- HERO -->
     <!-- ======================================================= -->
 
-    <div class="mb-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+    <div
+      class="mb-10 flex flex-col gap-6
+             lg:flex-row lg:items-end lg:justify-between"
+    >
 
       <div class="max-w-3xl">
-
-        <!-- Quest label -->
 
         <div class="flex items-center gap-3">
 
@@ -87,69 +145,57 @@
                    bg-amber-50 text-xl
                    shadow-sm shadow-amber-100
                    dark:border-amber-500/20
-                   dark:bg-amber-500/10">
-
+                   dark:bg-amber-500/10"
+          >
             📚
-
           </div>
 
           <div>
 
             <div
               class="text-[10px] font-black uppercase
-                     tracking-[0.22em] text-amber-600">
-
+                     tracking-[0.22em] text-amber-600"
+            >
               Knowledge Quest
-
             </div>
 
             <div
               class="mt-1 text-xs font-medium text-slate-400
-                     dark:text-gray-500">
-
+                     dark:text-gray-500"
+            >
               Manage your content ecosystem
-
             </div>
 
           </div>
 
         </div>
 
-
-        <!-- Title -->
-
         <h1
           class="mt-6 text-4xl font-black tracking-tight
                  text-slate-800 dark:text-white
-                 sm:text-5xl">
-
+                 sm:text-5xl"
+        >
           Article
 
           <span
             class="bg-gradient-to-r from-amber-500
                    via-sky-500 to-violet-500
-                   bg-clip-text text-transparent">
-
+                   bg-clip-text text-transparent"
+          >
             Command Center
-
           </span>
-
         </h1>
-
 
         <p
           class="mt-4 max-w-2xl text-sm leading-6
-                 text-slate-500 dark:text-gray-400">
-
+                 text-slate-500 dark:text-gray-400"
+        >
           Search, organize and evolve your knowledge base.
           Every article is another building block in your learning ecosystem.
-
         </p>
 
       </div>
 
-
-      <!-- New Article -->
 
       <div class="shrink-0">
 
@@ -157,17 +203,18 @@
                     class: "group inline-flex items-center gap-3
                            rounded-2xl border-2 border-amber-200
                            bg-gradient-to-r from-amber-400 to-orange-400
-                           px-6 py-3.5
-                           text-sm font-black text-white
+                           px-6 py-3.5 text-sm font-black text-white
                            shadow-lg shadow-amber-200/40
                            transition-all duration-300
                            hover:-translate-y-1
-                           hover:from-amber-500
-                           hover:to-orange-500
+                           hover:from-amber-500 hover:to-orange-500
                            hover:shadow-xl hover:shadow-amber-200/60
                            dark:border-amber-500/30" do %>
 
-          <span class="text-lg transition-transform duration-300 group-hover:rotate-90">
+          <span
+            class="text-lg transition-transform duration-300
+                   group-hover:rotate-90"
+          >
             +
           </span>
 
@@ -175,7 +222,10 @@
             Create Article
           </span>
 
-          <span class="text-white/70 transition-transform duration-300 group-hover:translate-x-1">
+          <span
+            class="text-white/70 transition-transform duration-300
+                   group-hover:translate-x-1"
+          >
             →
           </span>
 
@@ -187,13 +237,13 @@
 
 
     <!-- ======================================================= -->
-    <!-- QUEST STATS -->
+    <!-- STATS -->
     <!-- ======================================================= -->
 
     <div class="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
 
 
-      <!-- Articles -->
+      <!-- Total Articles -->
 
       <div
         class="group rounded-[26px]
@@ -203,9 +253,9 @@
                transition-all duration-300
                hover:-translate-y-1
                hover:border-rose-200
-               hover:shadow-[0_20px_40px_rgba(244,63,94,0.13)]
                dark:border-rose-500/20
-               dark:bg-boxdark">
+               dark:bg-boxdark"
+      >
 
         <div class="flex items-center justify-between">
 
@@ -215,10 +265,9 @@
                    bg-rose-50 text-lg
                    shadow-sm shadow-rose-100
                    dark:border-rose-500/20
-                   dark:bg-rose-500/10">
-
+                   dark:bg-rose-500/10"
+          >
             📖
-
           </div>
 
           <span
@@ -227,21 +276,26 @@
                    text-[9px] font-black uppercase
                    tracking-wider text-rose-500
                    dark:border-rose-500/20
-                   dark:bg-rose-500/10">
-
+                   dark:bg-rose-500/10"
+          >
             Library
-
           </span>
 
         </div>
 
         <div class="mt-5">
 
-          <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">
+          <p
+            class="text-[10px] font-black uppercase
+                   tracking-widest text-slate-400"
+          >
             Total Articles
           </p>
 
-          <p class="mt-1 text-3xl font-black text-slate-800 dark:text-white">
+          <p
+            data-algorithm-versions-admin-dashboard-infinity-scroll-target="totalCount"
+            class="mt-1 text-3xl font-black text-slate-800 dark:text-white"
+          >
             <%= @articles.respond_to?(:total_count) ? @articles.total_count : @articles.count %>
           </p>
 
@@ -261,7 +315,8 @@
                hover:-translate-y-1
                hover:border-sky-200
                dark:border-sky-500/20
-               dark:bg-boxdark">
+               dark:bg-boxdark"
+      >
 
         <div class="flex items-center justify-between">
 
@@ -271,10 +326,9 @@
                    bg-sky-50 text-lg
                    shadow-sm shadow-sky-100
                    dark:border-sky-500/20
-                   dark:bg-sky-500/10">
-
+                   dark:bg-sky-500/10"
+          >
             🔎
-
           </div>
 
           <span
@@ -283,21 +337,26 @@
                    text-[9px] font-black uppercase
                    tracking-wider text-sky-500
                    dark:border-sky-500/20
-                   dark:bg-sky-500/10">
-
+                   dark:bg-sky-500/10"
+          >
             Discovery
-
           </span>
 
         </div>
 
         <div class="mt-5">
 
-          <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">
+          <p
+            class="text-[10px] font-black uppercase
+                   tracking-widest text-slate-400"
+          >
             Current Quest
           </p>
 
-          <p class="mt-1 truncate text-lg font-black text-slate-800 dark:text-white">
+          <p
+            class="mt-1 truncate text-lg font-black
+                   text-slate-800 dark:text-white"
+          >
             <%= params[:q].presence || "Explore the library" %>
           </p>
 
@@ -317,7 +376,8 @@
                hover:-translate-y-1
                hover:border-emerald-200
                dark:border-emerald-500/20
-               dark:bg-boxdark">
+               dark:bg-boxdark"
+      >
 
         <div class="flex items-center justify-between">
 
@@ -327,10 +387,9 @@
                    bg-emerald-50 text-lg
                    shadow-sm shadow-emerald-100
                    dark:border-emerald-500/20
-                   dark:bg-emerald-500/10">
-
+                   dark:bg-emerald-500/10"
+          >
             🚀
-
           </div>
 
           <span
@@ -339,17 +398,19 @@
                    text-[9px] font-black uppercase
                    tracking-wider text-emerald-500
                    dark:border-emerald-500/20
-                   dark:bg-emerald-500/10">
-
+                   dark:bg-emerald-500/10"
+          >
             Publishing
-
           </span>
 
         </div>
 
         <div class="mt-5">
 
-          <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">
+          <p
+            class="text-[10px] font-black uppercase
+                   tracking-widest text-slate-400"
+          >
             Visibility
           </p>
 
@@ -379,7 +440,8 @@
                hover:-translate-y-1
                hover:border-violet-200
                dark:border-violet-500/20
-               dark:bg-boxdark">
+               dark:bg-boxdark"
+      >
 
         <div class="flex items-center justify-between">
 
@@ -389,10 +451,9 @@
                    bg-violet-50 text-lg
                    shadow-sm shadow-violet-100
                    dark:border-violet-500/20
-                   dark:bg-violet-500/10">
-
+                   dark:bg-violet-500/10"
+          >
             🏆
-
           </div>
 
           <span
@@ -401,10 +462,9 @@
                    text-[9px] font-black uppercase
                    tracking-wider text-violet-500
                    dark:border-violet-500/20
-                   dark:bg-violet-500/10">
-
+                   dark:bg-violet-500/10"
+          >
             Level Up
-
           </span>
 
         </div>
@@ -415,11 +475,17 @@
 
             <div>
 
-              <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">
+              <p
+                class="text-[10px] font-black uppercase
+                       tracking-widest text-slate-400"
+              >
                 Knowledge XP
               </p>
 
-              <p class="mt-1 text-2xl font-black text-slate-800 dark:text-white">
+              <p
+                class="mt-1 text-2xl font-black
+                       text-slate-800 dark:text-white"
+              >
                 +1,850 XP
               </p>
 
@@ -431,14 +497,17 @@
 
           </div>
 
-          <div class="mt-3 h-2 overflow-hidden rounded-full bg-violet-50 dark:bg-violet-500/10">
+          <div
+            class="mt-3 h-2 overflow-hidden rounded-full
+                   bg-violet-50 dark:bg-violet-500/10"
+          >
 
             <div
               class="h-full w-[68%] rounded-full
                      bg-gradient-to-r from-violet-400 to-fuchsia-400
                      transition-all duration-700
-                     group-hover:w-[82%]">
-            </div>
+                     group-hover:w-[82%]"
+            ></div>
 
           </div>
 
@@ -450,7 +519,7 @@
 
 
     <!-- ======================================================= -->
-    <!-- SEARCH QUEST -->
+    <!-- SEARCH -->
     <!-- ======================================================= -->
 
     <div
@@ -459,7 +528,8 @@
              bg-white p-6
              shadow-[0_12px_35px_rgba(15,23,42,0.05)]
              dark:border-strokedark
-             dark:bg-boxdark">
+             dark:bg-boxdark"
+    >
 
       <div class="mb-6 flex items-center gap-4">
 
@@ -468,15 +538,16 @@
                  rounded-2xl border-2 border-sky-200
                  bg-sky-50 text-lg
                  dark:border-sky-500/20
-                 dark:bg-sky-500/10">
-
+                 dark:bg-sky-500/10"
+        >
           🧭
-
         </div>
 
         <div>
 
-          <h2 class="text-lg font-black text-slate-800 dark:text-white">
+          <h2
+            class="text-lg font-black text-slate-800 dark:text-white"
+          >
             Article Discovery Quest
           </h2>
 
@@ -493,29 +564,27 @@
                     method: :get,
                     local: true do |f| %>
 
-        <div class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-5">
-
-
-          <!-- Search -->
+        <div
+          class="grid grid-cols-1 gap-5
+                 md:grid-cols-2 xl:grid-cols-5"
+        >
 
           <div class="xl:col-span-2">
 
             <label
               class="mb-2 block text-[10px] font-black uppercase
-                     tracking-widest text-slate-400">
-
+                     tracking-widest text-slate-400"
+            >
               Search Quest
-
             </label>
 
             <div class="relative">
 
               <span
                 class="absolute left-4 top-1/2
-                       -translate-y-1/2 text-sky-400">
-
+                       -translate-y-1/2 text-sky-400"
+              >
                 🔎
-
               </span>
 
               <%= f.text_field :q,
@@ -537,16 +606,13 @@
           </div>
 
 
-          <!-- Visibility -->
-
           <div>
 
             <label
               class="mb-2 block text-[10px] font-black uppercase
-                     tracking-widest text-slate-400">
-
+                     tracking-widest text-slate-400"
+            >
               Visibility
-
             </label>
 
             <%= f.select :visibility_status,
@@ -571,16 +637,13 @@
           </div>
 
 
-          <!-- Sort -->
-
           <div>
 
             <label
               class="mb-2 block text-[10px] font-black uppercase
-                     tracking-widest text-slate-400">
-
+                     tracking-widest text-slate-400"
+            >
               Sort
-
             </label>
 
             <%= f.select :sort,
@@ -605,16 +668,13 @@
           </div>
 
 
-          <!-- Start Date -->
-
           <div>
 
             <label
               class="mb-2 block text-[10px] font-black uppercase
-                     tracking-widest text-slate-400">
-
+                     tracking-widest text-slate-400"
+            >
               Start Date
-
             </label>
 
             <%= f.date_field :start_date,
@@ -632,16 +692,13 @@
           </div>
 
 
-          <!-- End Date -->
-
           <div>
 
             <label
               class="mb-2 block text-[10px] font-black uppercase
-                     tracking-widest text-slate-400">
-
+                     tracking-widest text-slate-400"
+            >
               End Date
-
             </label>
 
             <%= f.date_field :end_date,
@@ -665,13 +722,12 @@
                            value: params[:direction].presence || "desc" %>
 
 
-        <!-- Quest Actions -->
-
         <div
-          class="mt-6 flex flex-col gap-3 border-t-2
-                 border-slate-50 pt-5
+          class="mt-6 flex flex-col gap-3
+                 border-t-2 border-slate-50 pt-5
                  sm:flex-row sm:justify-end
-                 dark:border-strokedark">
+                 dark:border-strokedark"
+        >
 
           <%= link_to admin_article_versions_path,
                       class: "inline-flex items-center justify-center gap-2
@@ -681,13 +737,9 @@
                              hover:bg-slate-50
                              dark:border-strokedark
                              dark:bg-boxdark dark:text-gray-400" do %>
-
             ↺
-
             Reset Quest
-
           <% end %>
-
 
           <%= f.submit "🚀 Explore Articles",
                        class: "cursor-pointer rounded-2xl
@@ -707,7 +759,7 @@
 
 
     <!-- ======================================================= -->
-    <!-- ARTICLES QUEST PATH -->
+    <!-- ARTICLE LIST -->
     <!-- ======================================================= -->
 
     <div
@@ -716,18 +768,20 @@
              bg-white
              shadow-[0_15px_45px_rgba(15,23,42,0.06)]
              dark:border-strokedark
-             dark:bg-boxdark">
+             dark:bg-boxdark"
+    >
 
-
-      <!-- ===================================================== -->
-      <!-- TABLE HEADER -->
-      <!-- ===================================================== -->
+      <!-- HEADER -->
 
       <div
         class="border-b-2 border-slate-50 px-6 py-6
-               dark:border-strokedark sm:px-8">
+               dark:border-strokedark sm:px-8"
+      >
 
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div
+          class="flex flex-col gap-4
+                 sm:flex-row sm:items-center sm:justify-between"
+        >
 
           <div class="flex items-center gap-4">
 
@@ -736,15 +790,16 @@
                      rounded-2xl border-2 border-violet-200
                      bg-violet-50 text-lg
                      dark:border-violet-500/20
-                     dark:bg-violet-500/10">
-
+                     dark:bg-violet-500/10"
+            >
               🗺️
-
             </div>
 
             <div>
 
-              <h2 class="text-xl font-black text-slate-800 dark:text-white">
+              <h2
+                class="text-xl font-black text-slate-800 dark:text-white"
+              >
                 Knowledge Quest
               </h2>
 
@@ -757,8 +812,6 @@
           </div>
 
 
-          <!-- Count -->
-
           <div
             class="inline-flex w-fit items-center gap-2
                    rounded-full border border-emerald-100
@@ -766,20 +819,28 @@
                    text-[10px] font-black uppercase
                    tracking-wider text-emerald-600
                    dark:border-emerald-500/20
-                   dark:bg-emerald-500/10">
+                   dark:bg-emerald-500/10"
+          >
 
-            <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span
+              class="h-2 w-2 rounded-full
+                     bg-emerald-400 animate-pulse"
+            ></span>
 
-            <%= @articles.respond_to?(:total_count) ? @articles.total_count : @articles.count %>
+            <span
+              data-algorithm-versions-admin-dashboard-infinity-scroll-target="visibleCount"
+            >
+              <%= @articles.count %>
+            </span>
 
-            Articles Found
+            Articles Loaded
 
           </div>
 
         </div>
 
 
-        <!-- Progress line -->
+        <!-- Progress -->
 
         <div class="mt-6">
 
@@ -787,10 +848,9 @@
 
             <span
               class="text-[9px] font-black uppercase
-                     tracking-widest text-slate-400">
-
+                     tracking-widest text-slate-400"
+            >
               Knowledge Ecosystem
-
             </span>
 
             <span class="text-[10px] font-black text-violet-500">
@@ -799,13 +859,16 @@
 
           </div>
 
-          <div class="h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-meta-4">
+          <div
+            class="h-2 overflow-hidden rounded-full
+                   bg-slate-100 dark:bg-meta-4"
+          >
 
             <div
               class="h-full w-[68%] rounded-full
                      bg-gradient-to-r from-emerald-400
-                     via-sky-400 to-violet-400">
-            </div>
+                     via-sky-400 to-violet-400"
+            ></div>
 
           </div>
 
@@ -815,7 +878,7 @@
 
 
       <!-- ===================================================== -->
-      <!-- DESKTOP TABLE -->
+      <!-- TABLE -->
       <!-- ===================================================== -->
 
       <div class="max-w-full overflow-x-auto">
@@ -827,63 +890,48 @@
           <tr class="bg-slate-50 dark:bg-meta-4">
 
             <th class="px-6 py-4 text-left">
-
                 <span
                   class="text-[9px] font-black uppercase
-                         tracking-widest text-slate-400">
-
+                         tracking-widest text-slate-400"
+                >
                   Quest
-
                 </span>
-
             </th>
 
             <th class="px-6 py-4 text-left">
-
                 <span
                   class="text-[9px] font-black uppercase
-                         tracking-widest text-slate-400">
-
+                         tracking-widest text-slate-400"
+                >
                   Identity
-
                 </span>
-
             </th>
 
             <th class="px-6 py-4 text-left">
-
                 <span
                   class="text-[9px] font-black uppercase
-                         tracking-widest text-slate-400">
-
+                         tracking-widest text-slate-400"
+                >
                   Status
-
                 </span>
-
             </th>
 
             <th class="px-6 py-4 text-left">
-
                 <span
                   class="text-[9px] font-black uppercase
-                         tracking-widest text-slate-400">
-
+                         tracking-widest text-slate-400"
+                >
                   Created
-
                 </span>
-
             </th>
 
             <th class="px-6 py-4 text-right">
-
                 <span
                   class="text-[9px] font-black uppercase
-                         tracking-widest text-slate-400">
-
+                         tracking-widest text-slate-400"
+                >
                   Quest Actions
-
                 </span>
-
             </th>
 
           </tr>
@@ -891,412 +939,21 @@
           </thead>
 
 
-          <tbody>
-
-          <% if @articles.any? %>
-
-            <% @articles.each_with_index do |article, index| %>
-
-              <% colors = [
-                {
-                  border: "border-rose-100 dark:border-rose-500/20",
-                  bg: "bg-rose-50 dark:bg-rose-500/10",
-                  text: "text-rose-500",
-                  gradient: "from-rose-400 to-pink-400"
-                },
-                {
-                  border: "border-sky-100 dark:border-sky-500/20",
-                  bg: "bg-sky-50 dark:bg-sky-500/10",
-                  text: "text-sky-500",
-                  gradient: "from-sky-400 to-cyan-400"
-                },
-                {
-                  border: "border-violet-100 dark:border-violet-500/20",
-                  bg: "bg-violet-50 dark:bg-violet-500/10",
-                  text: "text-violet-500",
-                  gradient: "from-violet-400 to-fuchsia-400"
-                },
-                {
-                  border: "border-amber-100 dark:border-amber-500/20",
-                  bg: "bg-amber-50 dark:bg-amber-500/10",
-                  text: "text-amber-500",
-                  gradient: "from-amber-400 to-yellow-300"
-                }
-              ] %>
-
-              <% color = colors[index % colors.length] %>
-
-
-              <tr
-                class="group border-b border-slate-100
-                         transition-all duration-300
-                         hover:bg-slate-50/70
-                         dark:border-strokedark
-                         dark:hover:bg-meta-4/40">
-
-
-                <!-- ================================================= -->
-                <!-- ARTICLE / QUEST -->
-                <!-- ================================================= -->
-
-                <td class="px-6 py-5">
-
-                  <div class="flex items-center gap-4">
-
-                    <!-- Quest number -->
-
-                    <div
-                      class="flex h-12 w-12 shrink-0 items-center
-                               justify-center rounded-2xl border-2
-                               <%= color[:border] %>
-                               <%= color[:bg] %>
-                               text-xs font-black <%= color[:text] %>
-                               shadow-sm
-                               transition-transform duration-300
-                               group-hover:scale-110">
-
-                      <%= format("%02d", index + 1) %>
-
-                    </div>
-
-
-                    <div class="min-w-0">
-
-                      <%= link_to admin_article_version_path(article),
-                                  class: "block max-w-[350px] truncate
-                                           text-sm font-black
-                                           text-slate-800
-                                           transition hover:text-sky-500
-                                           dark:text-white" do %>
-
-                        <%= article.title.presence || "Untitled Article" %>
-
-                      <% end %>
-
-
-                      <div class="mt-2 flex items-center gap-2">
-
-                          <span
-                            class="h-1.5 w-1.5 rounded-full
-                                   <%= color[:text].gsub('text-', 'bg-') %>">
-                          </span>
-
-                        <span class="text-[10px] font-bold text-slate-400">
-                            Knowledge Quest
-                          </span>
-
-                      </div>
-
-                    </div>
-
-                  </div>
-
-                </td>
-
-
-                <!-- ================================================= -->
-                <!-- UUID -->
-                <!-- ================================================= -->
-
-                <td class="px-6 py-5">
-
-                  <% if article.uuid.present? %>
-
-                    <code
-                      class="rounded-xl border border-slate-100
-                               bg-slate-50 px-3 py-2
-                               text-[10px] font-bold text-slate-500
-                               dark:border-strokedark
-                               dark:bg-meta-4 dark:text-gray-400">
-
-                      <%= article.uuid %>
-
-                    </code>
-
-                  <% else %>
-
-                      <span class="text-xs text-slate-300">
-                        No UUID
-                      </span>
-
-                  <% end %>
-
-                </td>
-
-
-                <!-- ================================================= -->
-                <!-- STATUS -->
-                <!-- ================================================= -->
-
-                <td class="px-6 py-5">
-
-                  <% if article.visibility_status.to_i == 1 %>
-
-                    <div class="flex flex-col gap-2">
-
-                        <span
-                          class="inline-flex w-fit items-center gap-2
-                                 rounded-full border border-emerald-100
-                                 bg-emerald-50 px-3 py-1.5
-                                 text-[9px] font-black uppercase
-                                 tracking-wider text-emerald-600
-                                 dark:border-emerald-500/20
-                                 dark:bg-emerald-500/10">
-
-                          <span
-                            class="h-1.5 w-1.5 rounded-full
-                                   bg-emerald-400 animate-pulse">
-                          </span>
-
-                          Public
-
-                        </span>
-
-                      <div class="h-1.5 w-24 overflow-hidden rounded-full bg-emerald-50 dark:bg-emerald-500/10">
-
-                        <div
-                          class="h-full w-full rounded-full
-                                   bg-gradient-to-r
-                                   from-emerald-400 to-green-400">
-                        </div>
-
-                      </div>
-
-                    </div>
-
-                  <% else %>
-
-                    <div class="flex flex-col gap-2">
-
-                        <span
-                          class="inline-flex w-fit items-center gap-2
-                                 rounded-full border border-amber-100
-                                 bg-amber-50 px-3 py-1.5
-                                 text-[9px] font-black uppercase
-                                 tracking-wider text-amber-600
-                                 dark:border-amber-500/20
-                                 dark:bg-amber-500/10">
-
-                          <span
-                            class="h-1.5 w-1.5 rounded-full
-                                   bg-amber-400">
-                          </span>
-
-                          Draft
-
-                        </span>
-
-                      <div class="h-1.5 w-24 overflow-hidden rounded-full bg-amber-50 dark:bg-amber-500/10">
-
-                        <div
-                          class="h-full w-[45%] rounded-full
-                                   bg-gradient-to-r
-                                   from-amber-400 to-yellow-300">
-                        </div>
-
-                      </div>
-
-                    </div>
-
-                  <% end %>
-
-                </td>
-
-
-                <!-- ================================================= -->
-                <!-- CREATED -->
-                <!-- ================================================= -->
-
-                <td class="px-6 py-5">
-
-                  <div>
-
-                    <p class="text-sm font-black text-slate-700 dark:text-white">
-
-                      <%= article.created_at.strftime("%b %d, %Y") %>
-
-                    </p>
-
-                    <p class="mt-1 text-[10px] font-medium text-slate-400">
-
-                      <%= article.created_at.strftime("%H:%M") %>
-
-                    </p>
-
-                  </div>
-
-                </td>
-
-
-                <!-- ================================================= -->
-                <!-- ACTIONS -->
-                <!-- ================================================= -->
-
-                <td class="px-6 py-5">
-
-                  <div class="flex items-center justify-end gap-2">
-
-
-                    <!-- View -->
-
-                    <%= link_to admin_article_version_path(article),
-                                title: "View article",
-                                class: "group/action flex h-9 w-9
-                                          items-center justify-center
-                                          rounded-xl border-2
-                                          border-sky-100
-                                          bg-sky-50 text-sky-500
-                                          transition-all duration-200
-                                          hover:-translate-y-0.5
-                                          hover:border-sky-200
-                                          hover:bg-sky-100
-                                          dark:border-sky-500/20
-                                          dark:bg-sky-500/10" do %>
-
-                      👁
-
-                    <% end %>
-
-
-                    <!-- Edit -->
-
-                    <%= link_to edit_admin_article_version_path(article),
-                                title: "Edit article",
-                                class: "flex h-9 w-9
-                                          items-center justify-center
-                                          rounded-xl border-2
-                                          border-violet-100
-                                          bg-violet-50 text-violet-500
-                                          transition-all duration-200
-                                          hover:-translate-y-0.5
-                                          hover:border-violet-200
-                                          hover:bg-violet-100
-                                          dark:border-violet-500/20
-                                          dark:bg-violet-500/10" do %>
-
-                      ✏️
-
-                    <% end %>
-
-
-                    <!-- Delete -->
-
-                    <%= button_to admin_article_version_path(article),
-                                  method: :delete,
-                                  data: {
-                                    turbo_confirm: "Are you sure you want to delete this article?"
-                                  },
-                                  title: "Delete article",
-                                  class: "flex h-9 w-9
-                                            items-center justify-center
-                                            rounded-xl border-2
-                                            border-rose-100
-                                            bg-rose-50 text-rose-500
-                                            transition-all duration-200
-                                            hover:-translate-y-0.5
-                                            hover:border-rose-200
-                                            hover:bg-rose-100
-                                            dark:border-rose-500/20
-                                            dark:bg-rose-500/10" do %>
-
-                      🗑️
-
-                    <% end %>
-
-                  </div>
-
-                </td>
-
-              </tr>
-
-            <% end %>
-
-
-          <% else %>
-
-
-            <!-- ================================================= -->
-            <!-- EMPTY QUEST -->
-            <!-- ================================================= -->
-
-            <tr>
-
-              <td colspan="5" class="px-6 py-20 text-center">
-
-                <div class="mx-auto max-w-md">
-
-                  <div
-                    class="mx-auto flex h-20 w-20 items-center
-                             justify-center rounded-[26px]
-                             border-2 border-amber-200
-                             bg-amber-50 text-3xl
-                             shadow-md shadow-amber-100
-                             dark:border-amber-500/20
-                             dark:bg-amber-500/10">
-
-                    🗺️
-
-                  </div>
-
-
-                  <h3
-                    class="mt-6 text-xl font-black
-                             text-slate-800 dark:text-white">
-
-                    Quest area is empty
-
-                  </h3>
-
-
-                  <p
-                    class="mt-2 text-sm leading-6
-                             text-slate-400">
-
-                    No articles were found matching your current quest.
-                    Try changing the filters or create a new article.
-
-                  </p>
-
-
-                  <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
-
-                    <%= link_to admin_article_versions_path,
-                                class: "rounded-2xl border-2
-                                          border-slate-100 bg-white
-                                          px-5 py-3 text-xs font-black
-                                          text-slate-500
-                                          transition hover:bg-slate-50
-                                          dark:border-strokedark
-                                          dark:bg-boxdark" do %>
-
-                      ↺ Clear Quest
-
-                    <% end %>
-
-
-                    <%= link_to new_admin_article_version_path,
-                                class: "rounded-2xl
-                                          bg-gradient-to-r
-                                          from-amber-400 to-orange-400
-                                          px-5 py-3 text-xs font-black
-                                          text-white shadow-md
-                                          transition hover:-translate-y-0.5
-                                          hover:from-amber-500
-                                          hover:to-orange-500" do %>
-
-                      + Create Article
-
-                    <% end %>
-
-                  </div>
-
-                </div>
-
-              </td>
-
-            </tr>
-
-          <% end %>
+          <!-- ================================================= -->
+          <!-- IMPORTANT: ONLY <tr> ELEMENTS GO HERE -->
+          <!-- ================================================= -->
+
+          <tbody
+            data-algorithm-versions-admin-dashboard-infinity-scroll-target="articles"
+          >
+
+          <%= render partial: "article",
+                     collection: @articles,
+                     as: :article,
+                     locals: {
+                       offset: (@articles.current_page - 1) *
+                         @articles.limit_value
+                     } %>
 
           </tbody>
 
@@ -1305,72 +962,107 @@
       </div>
 
 
-      <!-- ======================================================= -->
-      <!-- PAGINATION / QUEST FOOTER -->
-      <!-- ======================================================= -->
+      <!-- ===================================================== -->
+      <!-- LOADING -->
+      <!-- ===================================================== -->
 
-      <% if @articles.respond_to?(:total_pages) && @articles.total_pages > 1 %>
+      <div
+        data-algorithm-versions-admin-dashboard-infinity-scroll-target="loading"
+        class="hidden border-t-2 border-slate-50
+               px-6 py-12 dark:border-strokedark"
+        aria-live="polite"
+      >
 
-        <div
-          class="border-t-2 border-slate-50 px-6 py-5
-                 dark:border-strokedark sm:px-8">
+        <div class="flex flex-col items-center justify-center">
 
-          <div
-            class="flex flex-col gap-4
-                   sm:flex-row sm:items-center
-                   sm:justify-between">
-
-            <div>
-
-              <div
-                class="text-[9px] font-black uppercase
-                       tracking-widest text-slate-400">
-
-                Quest Progress
-
-              </div>
-
-              <p class="mt-1 text-xs font-bold text-slate-500 dark:text-gray-400">
-
-                Page
-
-                <span class="font-black text-slate-800 dark:text-white">
-                  <%= @articles.current_page %>
-                </span>
-
-                of
-
-                <span class="font-black text-slate-800 dark:text-white">
-                  <%= @articles.total_pages %>
-                </span>
-
-              </p>
-
-            </div>
-
+          <div class="relative h-12 w-12">
 
             <div
-              class="rounded-2xl border border-slate-100
-                     bg-slate-50 px-4 py-2
-                     dark:border-strokedark
-                     dark:bg-meta-4">
+              class="absolute inset-0 rounded-full
+                     border-4 border-sky-100
+                     dark:border-sky-500/10"
+            ></div>
 
-              <%= paginate @articles %>
+            <div
+              class="absolute inset-0 animate-spin rounded-full
+                     border-4 border-transparent
+                     border-t-sky-500
+                     border-r-violet-500"
+            ></div>
 
-            </div>
+          </div>
 
+          <div
+            class="mt-4 text-sm font-black
+                   text-slate-600 dark:text-gray-300"
+          >
+            Loading more articles...
+          </div>
+
+          <div
+            class="mt-1 text-xs text-slate-400"
+          >
+            Expanding your knowledge quest
           </div>
 
         </div>
 
-      <% end %>
+      </div>
 
+
+      <!-- ===================================================== -->
+      <!-- END -->
+      <!-- ===================================================== -->
+
+      <div
+        data-algorithm-versions-admin-dashboard-infinity-scroll-target="endMessage"
+        class="hidden border-t-2 border-slate-50 px-6 py-10
+               dark:border-strokedark"
+      >
+
+        <div class="flex flex-col items-center justify-center">
+
+          <div
+            class="flex h-14 w-14 items-center justify-center
+                   rounded-2xl border-2 border-emerald-100
+                   bg-emerald-50 text-xl
+                   dark:border-emerald-500/20
+                   dark:bg-emerald-500/10"
+          >
+            🏆
+          </div>
+
+          <p
+            class="mt-4 text-sm font-black
+                   text-slate-700 dark:text-white"
+          >
+            You've reached the end of the quest.
+          </p>
+
+          <p class="mt-1 text-xs text-slate-400">
+            All available articles have been loaded.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <!-- ===================================================== -->
+      <!-- SENTINEL -->
+      <!-- ===================================================== -->
+
+      <div
+        data-algorithm-versions-admin-dashboard-infinity-scroll-target="sentinel"
+        class="h-4 w-full"
+        aria-hidden="true"
+      ></div>
 
     </div>
 
 
     <!-- ======================================================= -->
-    <!-- BOTTOM GAMIFICATION STATUS -->
+    <!-- FOOTER STATUS -->
     <!-- ======================================================= -->
 
     <div
@@ -1382,13 +1074,14 @@
              dark:border-strokedark
              dark:from-boxdark
              dark:via-meta-4
-             dark:to-boxdark">
+             dark:to-boxdark"
+    >
 
       <div
         class="flex flex-col gap-5
                md:flex-row md:items-center
-               md:justify-between">
-
+               md:justify-between"
+      >
 
         <div class="flex items-center gap-4">
 
@@ -1400,29 +1093,26 @@
                    bg-emerald-50 text-lg
                    shadow-sm shadow-emerald-100
                    dark:border-emerald-500/20
-                   dark:bg-emerald-500/10">
-
+                   dark:bg-emerald-500/10"
+          >
             🏆
-
           </div>
-
 
           <div>
 
             <div
-              class="text-sm font-black text-slate-700 dark:text-white">
-
+              class="text-sm font-black
+                     text-slate-700 dark:text-white"
+            >
               Knowledge ecosystem connected.
-
             </div>
 
             <p
               class="mt-1 max-w-2xl text-xs leading-5
-                     text-slate-400">
-
+                     text-slate-400"
+            >
               Every article contributes to the growth of your
               knowledge base. Keep building, publishing and evolving.
-
             </p>
 
           </div>
@@ -1435,7 +1125,8 @@
                  rounded-2xl border-2 border-emerald-100
                  bg-emerald-50 px-4 py-3
                  dark:border-emerald-500/20
-                 dark:bg-emerald-500/10">
+                 dark:bg-emerald-500/10"
+        >
 
           <span class="text-lg">
             ⚡
@@ -1445,10 +1136,9 @@
 
             <div
               class="text-[9px] font-black uppercase
-                     tracking-widest text-emerald-500">
-
+                     tracking-widest text-emerald-500"
+            >
               Current Level
-
             </div>
 
             <div class="text-sm font-black text-emerald-600">
@@ -1462,33 +1152,29 @@
       </div>
 
 
-      <!-- Overall progress -->
-
       <div class="mt-6">
 
         <div class="mb-2 flex items-center justify-between">
 
           <span
             class="text-[9px] font-black uppercase
-                   tracking-widest text-slate-400">
-
+                   tracking-widest text-slate-400"
+          >
             Ecosystem Progress
-
           </span>
 
           <span
-            class="text-[10px] font-black text-emerald-500">
-
+            class="text-[10px] font-black text-emerald-500"
+          >
             68%
-
           </span>
 
         </div>
 
-
         <div
           class="h-2.5 overflow-hidden rounded-full
-                 bg-slate-100 dark:bg-meta-4">
+                 bg-slate-100 dark:bg-meta-4"
+        >
 
           <div
             class="h-full w-[68%] rounded-full
@@ -1496,15 +1182,14 @@
                    from-emerald-400
                    via-sky-400
                    to-violet-400
-                   shadow-sm">
-          </div>
+                   shadow-sm"
+          ></div>
 
         </div>
 
       </div>
 
     </div>
-
 
   </div>
 

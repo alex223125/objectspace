@@ -125,9 +125,35 @@ class Admin::ArticleVersionsController < AdminController
       end
 
       @articles = @articles
+        .includes(:article)
         .order(sort_column => sort_direction)
         .page(params[:page])
         .per(20)
+
+      if params[:infinity_scroll].present?
+        render partial: "article",
+               collection: @articles,
+               as: :article
+      end
+
+      # respond_to do |format|
+      #   format.html
+      #
+      #   format.json do
+      #     render json: {
+      #       html: render_to_string(
+      #         partial: "article/article_versions/article_row",
+      #         formats: [:html],
+      #         locals: {
+      #           articles: @articles
+      #         }
+      #       ),
+      #       next_page: @articles.next_page,
+      #       has_more: @articles.next_page.present?,
+      #       loaded_count: @articles.size
+      #     }
+      #   end
+      # end
 
       flash.now[:alert] =
         "Live search is currently offline. Showing database records."
