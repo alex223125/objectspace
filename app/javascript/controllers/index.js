@@ -355,4 +355,11 @@ application.register("reports_repository_items", ReportsRepositoryItemsControlle
 import AlgorithmVersionsAdminDashboardInfinityScrollController from "./admin_dashboard/algorithm_versions/algorithm_versions_admin_dashboard_infinity_scroll_controller"
 application.register("algorithm-versions-admin-dashboard-infinity-scroll", AlgorithmVersionsAdminDashboardInfinityScrollController)
 
+import SupportMessagesAdminDashboardInfinityScrollController from "./admin_dashboard/support_messages/support_messages_admin_dashboard_infinity_scroll_controller"
+application.register("support_messages_admin_dashboard_infinity_scroll", SupportMessagesAdminDashboardInfinityScrollController)
+
+import HumanVerificationController from "./admin_dashboard/support_messages/human_verification_controller"
+application.register("human_verification", HumanVerificationController)
+
+
 

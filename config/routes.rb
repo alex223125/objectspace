@@ -275,5 +275,15 @@ Rails.application.routes.draw do
     # resources :articles, only: [:index]
     resources :article_versions
     root to: "article_versions#index"
+
+    resources :support_messages, only: [:index, :show, :update]
   end
+
+  resources :support_messages,
+            only: [:new, :create],
+            path: "financial-support"
+
+  get "support-messages/confirm/:token",
+      to: "support_messages#confirm",
+      as: :confirm_support_message
 end

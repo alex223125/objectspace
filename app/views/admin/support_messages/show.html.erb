@@ -1,0 +1,475 @@
+<%# ============================================================ %>
+<%# FILE: app/views/admin/support_messages/show.html.erb       %>
+<%# ============================================================ %>
+
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+
+  <!-- ========================================================= -->
+  <!-- PAGE HEADER                                               -->
+  <!-- ========================================================= -->
+
+  <div class="mb-8">
+
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
+      <div>
+
+        <div class="flex items-center gap-3">
+
+          <div
+            class="flex h-12 w-12 items-center justify-center
+                   rounded-2xl border-2 border-sky-200
+                   bg-sky-50 text-xl
+                   dark:border-sky-500/20
+                   dark:bg-sky-500/10"
+          >
+            💬
+          </div>
+
+          <div>
+
+            <h1 class="text-2xl font-black text-slate-800 dark:text-white">
+              Support Message
+            </h1>
+
+            <p class="mt-1 text-xs text-slate-400">
+              Message details and visitor communication.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <%= link_to admin_support_messages_path,
+                  class: "inline-flex items-center justify-center gap-2
+                          rounded-2xl border-2 border-slate-100
+                          bg-white px-5 py-3 text-xs font-black
+                          text-slate-600 transition
+                          hover:border-slate-200
+                          hover:bg-slate-50
+                          dark:border-strokedark
+                          dark:bg-boxdark
+                          dark:text-gray-300" do %>
+
+        ← Back to Messages
+
+      <% end %>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- MESSAGE INFORMATION                                      -->
+  <!-- ========================================================= -->
+
+  <div
+    class="mb-6 rounded-[28px]
+           border-2 border-slate-100
+           bg-white p-6
+           shadow-[0_12px_35px_rgba(15,23,42,0.05)]
+           dark:border-strokedark
+           dark:bg-boxdark"
+  >
+
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+
+      <!-- First Name -->
+
+      <div>
+
+        <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">
+          First Name
+        </div>
+
+        <div class="mt-2 text-sm font-bold text-slate-700 dark:text-white">
+          <%= @message.first_name.presence || "—" %>
+        </div>
+
+      </div>
+
+
+      <!-- Last Name -->
+
+      <div>
+
+        <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">
+          Last Name
+        </div>
+
+        <div class="mt-2 text-sm font-bold text-slate-700 dark:text-white">
+          <%= @message.last_name.presence || "—" %>
+        </div>
+
+      </div>
+
+
+      <!-- Email -->
+
+      <div>
+
+        <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">
+          Email
+        </div>
+
+        <div class="mt-2 text-sm font-bold text-slate-700 dark:text-white">
+          <%= @message.email.presence || "—" %>
+        </div>
+
+      </div>
+
+
+      <!-- Organisation -->
+
+      <div>
+
+        <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">
+          Organisation
+        </div>
+
+        <div class="mt-2 text-sm font-bold text-slate-700 dark:text-white">
+          <%= @message.organisation.presence || "—" %>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- SUPPORT / SOURCE INFORMATION                             -->
+  <!-- ========================================================= -->
+
+  <div
+    class="mb-6 rounded-[28px]
+           border-2 border-slate-100
+           bg-white p-6
+           shadow-[0_12px_35px_rgba(15,23,42,0.05)]
+           dark:border-strokedark
+           dark:bg-boxdark"
+  >
+
+    <h2 class="text-lg font-black text-slate-800 dark:text-white">
+      Support Information
+    </h2>
+
+    <div class="mt-6 grid gap-6 md:grid-cols-3">
+
+      <!-- Support Category -->
+
+      <div>
+
+        <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">
+          Support Category
+        </div>
+
+        <div class="mt-2 text-sm font-bold text-slate-700 dark:text-white">
+          <%= @message.support_category.presence || "—" %>
+        </div>
+
+      </div>
+
+
+      <!-- How They Heard About Project -->
+
+      <div>
+
+        <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">
+          Heard About Project
+        </div>
+
+        <div class="mt-2 text-sm font-bold text-slate-700 dark:text-white">
+          <%= @message.source.presence || "—" %>
+        </div>
+
+      </div>
+
+
+      <!-- Status -->
+
+      <div>
+
+        <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">
+          Status
+        </div>
+
+        <div class="mt-2">
+
+          <span
+            class="inline-flex rounded-full
+                   border border-sky-100
+                   bg-sky-50 px-3 py-1
+                   text-[10px] font-black uppercase
+                   tracking-wider text-sky-600
+                   dark:border-sky-500/20
+                   dark:bg-sky-500/10
+                   dark:text-sky-400"
+          >
+            <%= @message.status.humanize %>
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- MESSAGE BODY                                             -->
+  <!-- ========================================================= -->
+
+  <div
+    class="mb-6 rounded-[28px]
+           border-2 border-slate-100
+           bg-white p-6
+           shadow-[0_12px_35px_rgba(15,23,42,0.05)]
+           dark:border-strokedark
+           dark:bg-boxdark"
+  >
+
+    <div class="mb-5">
+
+      <h2 class="text-lg font-black text-slate-800 dark:text-white">
+        Message
+      </h2>
+
+      <p class="mt-1 text-xs text-slate-400">
+        Message submitted by the visitor.
+      </p>
+
+    </div>
+
+
+    <div
+      class="prose prose-slate max-w-none
+             dark:prose-invert"
+    >
+
+      <%= sanitize(
+            @message.message,
+            tags: %w[
+              p br strong em ul ol li
+              h2 h3 blockquote
+              a
+            ],
+            attributes: %w[
+              href target rel
+            ]
+          )
+      %>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- ATTACHMENTS                                               -->
+  <!-- ========================================================= -->
+
+  <% if @message.attachments.attached? %>
+
+    <div
+      class="mb-6 rounded-[28px]
+             border-2 border-slate-100
+             bg-white p-6
+             shadow-[0_12px_35px_rgba(15,23,42,0.05)]
+             dark:border-strokedark
+             dark:bg-boxdark"
+    >
+
+      <!-- Attachment Header -->
+
+      <div class="mb-6 flex items-center gap-4">
+
+        <div
+          class="flex h-11 w-11 items-center justify-center
+                 rounded-2xl border-2 border-violet-200
+                 bg-violet-50 text-lg
+                 dark:border-violet-500/20
+                 dark:bg-violet-500/10"
+        >
+          📎
+        </div>
+
+        <div>
+
+          <h2 class="text-lg font-black text-slate-800 dark:text-white">
+            Attachments
+          </h2>
+
+          <p class="mt-1 text-xs text-slate-400">
+            Screenshots and files submitted with this message.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <!-- Attachment Grid -->
+
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+        <% @message.attachments.each do |attachment| %>
+
+          <div
+            class="overflow-hidden rounded-2xl
+                   border-2 border-slate-100
+                   bg-slate-50
+                   dark:border-strokedark
+                   dark:bg-meta-4"
+          >
+
+            <!-- IMAGE PREVIEW -->
+
+            <% if attachment.image? %>
+
+              <%= image_tag attachment,
+                            class: "h-48 w-full object-cover" %>
+
+            <% else %>
+
+              <!-- NON-IMAGE FILE -->
+
+              <div
+                class="flex h-48 items-center justify-center
+                       bg-slate-100
+                       dark:bg-meta-4"
+              >
+
+                <div class="text-center">
+
+                  <div class="text-4xl">
+                    📄
+                  </div>
+
+                  <div
+                    class="mt-2 text-[10px] font-black
+                           uppercase tracking-wider
+                           text-slate-400"
+                  >
+                    File
+                  </div>
+
+                </div>
+
+              </div>
+
+            <% end %>
+
+
+            <!-- FILE INFORMATION -->
+
+            <div class="p-4">
+
+              <div
+                class="truncate text-xs font-black
+                       text-slate-600
+                       dark:text-gray-200"
+                title="<%= attachment.filename %>"
+              >
+                <%= attachment.filename %>
+              </div>
+
+
+              <div class="mt-1 text-[10px] text-slate-400">
+
+                <%= number_to_human_size(attachment.byte_size) %>
+
+              </div>
+
+
+              <!-- DOWNLOAD -->
+
+              <div class="mt-4">
+
+                <%= link_to "Open attachment",
+                            rails_blob_path(
+                              attachment,
+                              disposition: "inline"
+                            ),
+                            target: "_blank",
+                            rel: "noopener",
+                            class: "inline-flex items-center gap-2
+                                    rounded-xl border border-slate-200
+                                    bg-white px-3 py-2
+                                    text-[10px] font-black
+                                    text-slate-600
+                                    transition
+                                    hover:border-violet-200
+                                    hover:bg-violet-50
+                                    hover:text-violet-600
+                                    dark:border-strokedark
+                                    dark:bg-boxdark
+                                    dark:text-gray-300" %>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        <% end %>
+
+      </div>
+
+    </div>
+
+  <% end %>
+
+
+  <!-- ========================================================= -->
+  <!-- MESSAGE DATES                                             -->
+  <!-- ========================================================= -->
+
+  <div
+    class="rounded-[28px]
+           border-2 border-slate-100
+           bg-white p-6
+           shadow-[0_12px_35px_rgba(15,23,42,0.05)]
+           dark:border-strokedark
+           dark:bg-boxdark"
+  >
+
+    <div class="grid gap-6 sm:grid-cols-2">
+
+      <div>
+
+        <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">
+          Received
+        </div>
+
+        <div class="mt-2 text-sm font-bold text-slate-700 dark:text-white">
+          <%= l(@message.created_at, format: :long) %>
+        </div>
+
+      </div>
+
+
+      <div>
+
+        <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">
+          Last Updated
+        </div>
+
+        <div class="mt-2 text-sm font-bold text-slate-700 dark:text-white">
+          <%= l(@message.updated_at, format: :long) %>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

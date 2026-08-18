@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_08_16_051433) do
+ActiveRecord::Schema[7.0].define(version: 2026_08_18_023658) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -761,6 +761,28 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_16_051433) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["substepable_type", "substepable_id"], name: "index_substeps_on_substepable"
+  end
+
+  create_table "support_messages", force: :cascade do |t|
+    t.string "first_name"
+    t.string "last_name"
+    t.string "organization_name"
+    t.string "support_category"
+    t.string "referral_source"
+    t.text "message"
+    t.string "email"
+    t.string "email_confirmation_token"
+    t.datetime "email_confirmed_at"
+    t.datetime "human_verified_at"
+    t.string "ip_address"
+    t.text "user_agent"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "status", default: "pending_confirmation", null: false
+    t.index ["created_at"], name: "index_support_messages_on_created_at"
+    t.index ["email_confirmation_token"], name: "index_support_messages_on_email_confirmation_token", unique: true
+    t.index ["email_confirmed_at"], name: "index_support_messages_on_email_confirmed_at"
+    t.index ["status"], name: "index_support_messages_on_status"
   end
 
   create_table "taggings", force: :cascade do |t|

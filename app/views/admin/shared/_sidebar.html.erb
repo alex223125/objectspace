@@ -290,6 +290,32 @@
 
       <% end %>
 
+      <!-- Messages about Support -->
+      <%= link_to admin_support_messages_path,
+                  class: "group relative flex items-center gap-3
+              rounded-xl px-4 py-3
+              text-sm font-semibold
+              text-slate-500 transition
+              hover:bg-sky-50 hover:text-sky-600
+              dark:text-gray-400
+              dark:hover:bg-meta-4" do %>
+
+        <span
+          class="flex h-9 w-9 items-center justify-center
+                 rounded-xl border border-sky-200
+                 bg-sky-50 text-base
+                 dark:border-sky-500/20
+                 dark:bg-sky-500/10"
+        >
+          💬
+        </span>
+
+        <span>
+          Messages about Support
+        </span>
+
+      <% end %>
+
 
       <!-- Articles -->
 

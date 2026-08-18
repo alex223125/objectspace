@@ -1,0 +1,411 @@
+<%# ============================================================ %>
+<%# FILE: app/views/static_pages/financial_page/_support_message_form.html.erb %>
+<%# SECTION: HUMAN VERIFICATION PUZZLE %>
+<%# ============================================================ %>
+
+<div
+  data-controller="human_verification"
+  data-human_verification-success-value="false"
+  class="mt-8"
+>
+
+  <div
+    class="rounded-3xl border-2 border-slate-100
+           bg-slate-50 p-5
+           dark:border-strokedark
+           dark:bg-form-input"
+  >
+
+    <div class="flex items-start gap-4">
+
+      <div
+        class="flex h-11 w-11 shrink-0 items-center
+               justify-center rounded-2xl
+               bg-violet-100 text-xl
+               dark:bg-violet-500/10"
+      >
+        🧩
+      </div>
+
+      <div class="min-w-0 flex-1">
+
+        <div
+          class="text-xs font-black uppercase
+                 tracking-widest text-slate-700
+                 dark:text-white"
+        >
+          Verify that you are human
+        </div>
+
+        <p class="mt-1 text-xs leading-5 text-slate-400">
+          Complete the small puzzle before sending your message.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================================== -->
+    <!-- OPEN PUZZLE BUTTON                                       -->
+    <!-- ======================================================== -->
+
+    <button
+      type="button"
+      data-action="click->human_verification#open"
+      data-human_verification-target="openButton"
+      class="mt-5 flex w-full items-center
+             justify-center gap-3 rounded-2xl
+             border-2 border-violet-200
+             bg-white px-5 py-4
+             text-xs font-black
+             text-violet-600
+             shadow-sm
+             transition-all duration-300
+             hover:-translate-y-0.5
+             hover:border-violet-300
+             hover:bg-violet-50
+             dark:border-violet-500/20
+             dark:bg-boxdark
+             dark:text-violet-400"
+    >
+
+      <span class="text-lg">
+        🧩
+      </span>
+
+      <span>
+        Click to verify you're human
+      </span>
+
+    </button>
+
+
+    <!-- ======================================================== -->
+    <!-- SUCCESS STATE                                            -->
+    <!-- ======================================================== -->
+
+    <div
+      data-human_verification-target="success"
+      class="mt-4 hidden rounded-2xl
+             border-2 border-emerald-200
+             bg-emerald-50 px-4 py-4
+             dark:border-emerald-500/20
+             dark:bg-emerald-500/10"
+    >
+
+      <div class="flex items-center gap-3">
+
+        <div
+          class="flex h-9 w-9 items-center justify-center
+                 rounded-full bg-emerald-500
+                 text-white"
+        >
+          ✓
+        </div>
+
+        <div>
+
+          <div
+            class="text-xs font-black text-emerald-700
+                   dark:text-emerald-400"
+          >
+            Human verification completed
+          </div>
+
+          <div
+            class="mt-1 text-[10px] text-emerald-600
+                   dark:text-emerald-500"
+          >
+            You can now send your message.
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================================== -->
+    <!-- HIDDEN VALUE SUBMITTED WITH FORM                         -->
+    <!-- ======================================================== -->
+
+    <input
+      type="hidden"
+      name="human_verification_token"
+      value=""
+      data-human_verification-target="token"
+    >
+
+
+    <!-- ======================================================== -->
+    <!-- PUZZLE MODAL                                             -->
+    <!-- ======================================================== -->
+
+    <div
+      data-human_verification-target="modal"
+      class="fixed inset-0 z-[9999] hidden
+             items-center justify-center
+             bg-slate-950/70 p-5 backdrop-blur-sm"
+    >
+
+      <div
+        data-human_verification-target="dialog"
+        class="w-full max-w-lg overflow-hidden
+               rounded-[30px]
+               border-2 border-white/10
+               bg-white shadow-2xl
+               dark:bg-boxdark"
+      >
+
+        <!-- HEADER -->
+
+        <div
+          class="flex items-center justify-between
+                 border-b border-slate-100
+                 px-6 py-5
+                 dark:border-strokedark"
+        >
+
+          <div>
+
+            <div
+              class="text-[10px] font-black uppercase
+                     tracking-widest text-violet-500"
+            >
+              Human verification
+            </div>
+
+            <h3
+              class="mt-1 text-lg font-black
+                     text-slate-800
+                     dark:text-white"
+            >
+              Complete the puzzle
+            </h3>
+
+          </div>
+
+
+          <button
+            type="button"
+            data-action="click->human_verification#close"
+            class="flex h-9 w-9 items-center
+                   justify-center rounded-xl
+                   bg-slate-100 text-slate-500
+                   transition hover:bg-slate-200
+                   dark:bg-form-input"
+          >
+            ✕
+          </button>
+
+        </div>
+
+
+        <!-- INSTRUCTIONS -->
+
+        <div class="px-6 pt-5">
+
+          <p
+            class="text-xs leading-5 text-slate-500
+                   dark:text-gray-400"
+          >
+            Drag the puzzle piece into the missing
+            area of the picture.
+          </p>
+
+        </div>
+
+
+        <!-- ==================================================== -->
+        <!-- PUZZLE CANVAS                                        -->
+        <!-- ==================================================== -->
+
+        <div class="px-6 pt-5">
+
+          <div
+            data-human_verification-target="puzzle"
+            class="relative mx-auto aspect-[16/9]
+                   max-w-md overflow-hidden
+                   rounded-2xl
+                   border-2 border-slate-200
+                   bg-slate-900
+                   select-none
+                   dark:border-strokedark"
+          >
+
+            <!-- BACKGROUND IMAGE -->
+
+            <img
+              data-human_verification-target="background"
+              src="/images/human-verification/puzzle-1.jpg"
+              alt=""
+              draggable="false"
+              class="absolute inset-0 h-full w-full
+                     select-none object-cover"
+            >
+
+
+            <!-- MISSING AREA -->
+
+            <div
+              data-human_verification-target="hole"
+              class="absolute h-16 w-16
+                     rounded-xl
+                     border-2 border-white
+                     bg-slate-950/30
+                     shadow-[0_0_0_9999px_rgba(0,0,0,0.18)]"
+            ></div>
+
+
+            <!-- PUZZLE PIECE -->
+
+            <div
+              data-human_verification-target="piece"
+              class="absolute h-16 w-16
+                     cursor-grab rounded-xl
+                     border-2 border-white
+                     bg-cover bg-center
+                     shadow-2xl
+                     active:cursor-grabbing"
+            ></div>
+
+
+            <!-- SUCCESS OVERLAY -->
+
+            <div
+              data-human_verification-target="puzzleSuccess"
+              class="absolute inset-0 hidden
+                     items-center justify-center
+                     bg-emerald-500/80
+                     backdrop-blur-sm"
+            >
+
+              <div
+                class="flex flex-col items-center
+                       text-white"
+              >
+
+                <div class="text-5xl">
+                  ✓
+                </div>
+
+                <div
+                  class="mt-2 text-sm font-black"
+                >
+                  Verification successful
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- ==================================================== -->
+        <!-- SLIDER                                               -->
+        <!-- ==================================================== -->
+
+        <div class="px-6 pt-6">
+
+          <div
+            class="mb-3 flex items-center
+                   justify-between"
+          >
+
+            <span
+              class="text-[10px] font-black uppercase
+                     tracking-widest text-slate-400"
+            >
+              Puzzle position
+            </span>
+
+            <span
+              data-human_verification-target="status"
+              class="text-[10px] font-black
+                     text-slate-400"
+            >
+              Drag the slider
+            </span>
+
+          </div>
+
+
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value="0"
+            data-human_verification-target="slider"
+            data-action="input->human_verification#move"
+            class="w-full cursor-grab
+                   accent-violet-500
+                   active:cursor-grabbing"
+          >
+
+        </div>
+
+
+        <!-- ERROR -->
+
+        <div
+          data-human_verification-target="error"
+          class="mx-6 mt-4 hidden rounded-xl
+                 bg-rose-50 px-4 py-3
+                 text-xs font-bold text-rose-600
+                 dark:bg-rose-500/10
+                 dark:text-rose-400"
+        >
+          The puzzle piece is not in the correct position.
+          Please try again.
+        </div>
+
+
+        <!-- FOOTER -->
+
+        <div
+          class="flex items-center justify-between
+                 gap-3 border-t border-slate-100
+                 px-6 py-5
+                 dark:border-strokedark"
+        >
+
+          <button
+            type="button"
+            data-action="click->human_verification#reset"
+            class="rounded-xl px-4 py-2
+                   text-xs font-black
+                   text-slate-500
+                   hover:bg-slate-100
+                   dark:hover:bg-form-input"
+          >
+            Reset
+          </button>
+
+
+          <button
+            type="button"
+            data-action="click->human_verification#check"
+            class="rounded-xl
+                   bg-violet-500 px-6 py-3
+                   text-xs font-black text-white
+                   shadow-lg shadow-violet-500/20
+                   transition
+                   hover:bg-violet-600"
+          >
+            Verify
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

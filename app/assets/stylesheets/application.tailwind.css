@@ -12,7 +12,7 @@
 
 */
 
----------------------------------------------------------------------------
+/*---------------------------------------------------------------------------*/
 /* Import bundled style sheets directly out of node_modules */
 @import "apexcharts/dist/apexcharts.css";
 @import "jsvectormap/dist/jsvectormap.css";
@@ -46,3 +46,42 @@
 }
 
 
+
+
+/*---------------------------------------------------------------------------------------------------------------------*/
+/*http://127.0.0.1:3000/financial_page*/
+/* ============================================================
+   FILE:
+   app/assets/stylesheets/application.tailwind.css
+   ============================================================ */
+
+@keyframes humanVerificationShake {
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    20% {
+        transform: translateX(-8px);
+    }
+
+    40% {
+        transform: translateX(8px);
+    }
+
+    60% {
+        transform: translateX(-6px);
+    }
+
+    80% {
+        transform: translateX(6px);
+    }
+}
+
+.human-verification-shake {
+    animation:
+            humanVerificationShake
+            0.45s
+            ease-in-out;
+}
+/*---------------------------------------------------------------------------------------------------------------------*/

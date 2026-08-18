@@ -1,0 +1,1325 @@
+<%# ============================================================ %>
+<%# FILE: app/views/admin/support_messages/index.html.erb       %>
+<%# ============================================================ %>
+<%# Admin Support Messages — Dashboard / Search / Filters / List %>
+<%# ============================================================ %>
+
+
+<%# ============================================================ %>
+<%# PAGE HEADER                                                   %>
+<%# ============================================================ %>
+
+<div class="mx-auto max-w-7xl px-5 pt-8 sm:px-7 lg:px-10">
+
+  <div class="mb-8">
+
+    <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+
+      <div class="flex items-center gap-4">
+
+        <div
+          class="flex h-14 w-14 shrink-0 items-center justify-center
+                 rounded-2xl border-2 border-sky-200
+                 bg-gradient-to-br from-sky-50 to-violet-50
+                 text-2xl shadow-sm
+                 dark:border-sky-500/20
+                 dark:from-sky-500/10
+                 dark:to-violet-500/10"
+        >
+          💬
+        </div>
+
+        <div>
+
+          <div
+            class="text-[10px] font-black uppercase
+                   tracking-[0.22em] text-sky-600
+                   dark:text-sky-400"
+          >
+            Support Communication
+          </div>
+
+          <h1
+            class="mt-1 text-3xl font-black tracking-tight
+                   text-slate-800 dark:text-white sm:text-4xl"
+          >
+            Support
+            <span
+              class="bg-gradient-to-r from-sky-500
+                     via-violet-500 to-emerald-500
+                     bg-clip-text text-transparent"
+            >
+              Messages
+            </span>
+          </h1>
+
+          <p class="mt-2 text-xs text-slate-400 sm:text-sm">
+            Questions, donations, financial support, recommendations and feedback.
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <%# ========================================================== %>
+  <%# STATISTICS                                                  %>
+  <%# ========================================================== %>
+
+  <div class="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+
+
+    <%# ======================================================== %>
+    <%# TOTAL                                                     %>
+    <%# ======================================================== %>
+
+    <div
+      class="group rounded-[26px]
+             border-2 border-sky-100
+             bg-white p-5
+             shadow-[0_12px_35px_rgba(14,165,233,0.07)]
+             transition-all duration-300
+             hover:-translate-y-1
+             hover:border-sky-200
+             dark:border-sky-500/20
+             dark:bg-boxdark"
+    >
+
+      <div class="flex items-center justify-between">
+
+        <div
+          class="flex h-12 w-12 items-center justify-center
+                 rounded-2xl border-2 border-sky-200
+                 bg-sky-50 text-lg
+                 dark:border-sky-500/20
+                 dark:bg-sky-500/10"
+        >
+          💬
+        </div>
+
+        <span
+          class="rounded-full border border-sky-100
+                 bg-sky-50 px-3 py-1
+                 text-[9px] font-black uppercase
+                 tracking-wider text-sky-500
+                 dark:border-sky-500/20
+                 dark:bg-sky-500/10"
+        >
+          All Messages
+        </span>
+
+      </div>
+
+      <div class="mt-5">
+
+        <p
+          class="text-[10px] font-black uppercase
+                 tracking-widest text-slate-400"
+        >
+          Total Messages
+        </p>
+
+        <p
+          class="mt-1 text-3xl font-black
+                 text-slate-800 dark:text-white"
+        >
+          <%= number_with_delimiter(@total_messages) %>
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <%# ======================================================== %>
+    <%# CONFIRMED                                                  %>
+    <%# ======================================================== %>
+
+    <div
+      class="group rounded-[26px]
+             border-2 border-emerald-100
+             bg-white p-5
+             shadow-[0_12px_35px_rgba(16,185,129,0.07)]
+             transition-all duration-300
+             hover:-translate-y-1
+             hover:border-emerald-200
+             dark:border-emerald-500/20
+             dark:bg-boxdark"
+    >
+
+      <div class="flex items-center justify-between">
+
+        <div
+          class="flex h-12 w-12 items-center justify-center
+                 rounded-2xl border-2 border-emerald-200
+                 bg-emerald-50 text-lg
+                 shadow-sm
+                 dark:border-emerald-500/20
+                 dark:bg-emerald-500/10"
+        >
+          ✓
+        </div>
+
+        <span
+          class="rounded-full border border-emerald-100
+                 bg-emerald-50 px-3 py-1
+                 text-[9px] font-black uppercase
+                 tracking-wider text-emerald-500
+                 dark:border-emerald-500/20
+                 dark:bg-emerald-500/10"
+        >
+          Verified
+        </span>
+
+      </div>
+
+      <div class="mt-5">
+
+        <p
+          class="text-[10px] font-black uppercase
+                 tracking-widest text-slate-400"
+        >
+          Confirmed
+        </p>
+
+        <p
+          class="mt-1 text-3xl font-black
+                 text-slate-800 dark:text-white"
+        >
+          <%= number_with_delimiter(@confirmed_messages) %>
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <%# ======================================================== %>
+    <%# PENDING                                                     %>
+    <%# ======================================================== %>
+
+    <div
+      class="group rounded-[26px]
+             border-2 border-amber-100
+             bg-white p-5
+             shadow-[0_12px_35px_rgba(245,158,11,0.07)]
+             transition-all duration-300
+             hover:-translate-y-1
+             hover:border-amber-200
+             dark:border-amber-500/20
+             dark:bg-boxdark"
+    >
+
+      <div class="flex items-center justify-between">
+
+        <div
+          class="flex h-12 w-12 items-center justify-center
+                 rounded-2xl border-2 border-amber-200
+                 bg-amber-50 text-lg
+                 dark:border-amber-500/20
+                 dark:bg-amber-500/10"
+        >
+          ⏳
+        </div>
+
+        <span
+          class="rounded-full border border-amber-100
+                 bg-amber-50 px-3 py-1
+                 text-[9px] font-black uppercase
+                 tracking-wider text-amber-500
+                 dark:border-amber-500/20
+                 dark:bg-amber-500/10"
+        >
+          Waiting
+        </span>
+
+      </div>
+
+      <div class="mt-5">
+
+        <p
+          class="text-[10px] font-black uppercase
+                 tracking-widest text-slate-400"
+        >
+          Awaiting Confirmation
+        </p>
+
+        <p
+          class="mt-1 text-3xl font-black
+                 text-slate-800 dark:text-white"
+        >
+          <%= number_with_delimiter(@pending_messages) %>
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <%# ======================================================== %>
+    <%# FINANCIAL SUPPORT                                           %>
+    <%# ======================================================== %>
+
+    <div
+      class="group rounded-[26px]
+             border-2 border-violet-100
+             bg-white p-5
+             shadow-[0_12px_35px_rgba(139,92,246,0.07)]
+             transition-all duration-300
+             hover:-translate-y-1
+             hover:border-violet-200
+             dark:border-violet-500/20
+             dark:bg-boxdark"
+    >
+
+      <div class="flex items-center justify-between">
+
+        <div
+          class="flex h-12 w-12 items-center justify-center
+                 rounded-2xl border-2 border-violet-200
+                 bg-violet-50 text-lg
+                 dark:border-violet-500/20
+                 dark:bg-violet-500/10"
+        >
+          💰
+        </div>
+
+        <span
+          class="rounded-full border border-violet-100
+                 bg-violet-50 px-3 py-1
+                 text-[9px] font-black uppercase
+                 tracking-wider text-violet-500
+                 dark:border-violet-500/20
+                 dark:bg-violet-500/10"
+        >
+          Support
+        </span>
+
+      </div>
+
+      <div class="mt-5">
+
+        <p
+          class="text-[10px] font-black uppercase
+                 tracking-widest text-slate-400"
+        >
+          Financial Support
+        </p>
+
+        <p
+          class="mt-1 text-3xl font-black
+                 text-slate-800 dark:text-white"
+        >
+          <%= number_with_delimiter(@financial_support_messages) %>
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <%# ========================================================== %>
+  <%# SEARCH AND FILTERS                                          %>
+  <%# ========================================================== %>
+
+  <div
+    class="mb-8 rounded-[30px]
+           border-2 border-slate-100
+           bg-white p-6
+           shadow-[0_12px_35px_rgba(15,23,42,0.05)]
+           dark:border-strokedark
+           dark:bg-boxdark"
+  >
+
+    <%# FILTER HEADER %>
+
+    <div
+      class="mb-6 flex flex-col gap-4
+             sm:flex-row sm:items-center
+             sm:justify-between"
+    >
+
+      <div class="flex items-center gap-4">
+
+        <div
+          class="flex h-12 w-12 items-center justify-center
+                 rounded-2xl border-2 border-sky-200
+                 bg-sky-50 text-lg
+                 dark:border-sky-500/20
+                 dark:bg-sky-500/10"
+        >
+          🔎
+        </div>
+
+        <div>
+
+          <h2
+            class="text-xl font-black
+                   text-slate-800 dark:text-white"
+          >
+            Message Discovery
+          </h2>
+
+          <p class="mt-1 text-xs text-slate-400">
+            Search, filter and explore support requests.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <% if @active_filter_count.to_i > 0 %>
+
+        <div
+          class="inline-flex w-fit items-center gap-2
+                 rounded-full border border-sky-100
+                 bg-sky-50 px-4 py-2
+                 text-[10px] font-black uppercase
+                 tracking-wider text-sky-600
+                 dark:border-sky-500/20
+                 dark:bg-sky-500/10
+                 dark:text-sky-400"
+        >
+
+          <span
+            class="flex h-5 w-5 items-center justify-center
+                   rounded-full bg-sky-500
+                   text-[9px] text-white"
+          >
+            <%= @active_filter_count %>
+          </span>
+
+          Active Filters
+
+        </div>
+
+      <% end %>
+
+    </div>
+
+
+    <%= form_with url: admin_support_messages_path,
+                  method: :get,
+                  local: true do |f| %>
+
+
+      <%# ====================================================== %>
+      <%# GLOBAL SEARCH                                            %>
+      <%# ====================================================== %>
+
+      <div class="mb-6">
+
+        <label
+          class="mb-2 block text-[10px] font-black uppercase
+                 tracking-widest text-slate-400"
+        >
+          Search Everything
+        </label>
+
+        <div class="relative">
+
+          <span
+            class="absolute left-4 top-1/2
+                   -translate-y-1/2 text-sky-400"
+          >
+            🔎
+          </span>
+
+          <%= f.text_field :q,
+                           value: params[:q],
+                           placeholder:
+                             "Name, email, organisation or message...",
+                           autocomplete: "off",
+                           class: "w-full rounded-2xl
+                                   border-2 border-slate-100
+                                   bg-slate-50
+                                   py-4 pl-11 pr-4
+                                   text-sm text-slate-700
+                                   outline-none transition
+                                   focus:border-sky-300
+                                   focus:bg-white
+                                   focus:ring-4
+                                   focus:ring-sky-50
+                                   dark:border-strokedark
+                                   dark:bg-form-input
+                                   dark:text-white
+                                   dark:focus:border-sky-500" %>
+
+        </div>
+
+      </div>
+
+
+      <%# ====================================================== %>
+      <%# FILTER GRID                                              %>
+      <%# ====================================================== %>
+
+      <div
+        class="grid grid-cols-1 gap-5
+               md:grid-cols-2
+               xl:grid-cols-4"
+      >
+
+
+        <%# STATUS %>
+
+        <div>
+
+          <label
+            class="mb-2 block text-[10px] font-black uppercase
+                   tracking-widest text-slate-400"
+          >
+            Message Status
+          </label>
+
+          <%= f.select :status,
+                       SupportMessage::STATUSES.map {
+                         |key, label|
+                         [label, key]
+                       },
+                       {
+                         include_blank: "All Statuses",
+                         selected: params[:status]
+                       },
+                       class: "w-full rounded-2xl
+                               border-2 border-slate-100
+                               bg-slate-50
+                               px-4 py-3.5
+                               text-sm text-slate-700
+                               outline-none transition
+                               focus:border-violet-300
+                               focus:bg-white
+                               focus:ring-4
+                               focus:ring-violet-50
+                               dark:border-strokedark
+                               dark:bg-form-input
+                               dark:text-white" %>
+
+        </div>
+
+
+        <%# EMAIL CONFIRMATION %>
+
+        <div>
+
+          <label
+            class="mb-2 block text-[10px] font-black uppercase
+                   tracking-widest text-slate-400"
+          >
+            Email Verification
+          </label>
+
+          <%= f.select :email_confirmation,
+                       [
+                         ["Confirmed Human", "confirmed"],
+                         ["Awaiting Confirmation", "pending"]
+                       ],
+                       {
+                         include_blank: "All Verification States",
+                         selected: params[:email_confirmation]
+                       },
+                       class: "w-full rounded-2xl
+                               border-2 border-slate-100
+                               bg-slate-50
+                               px-4 py-3.5
+                               text-sm text-slate-700
+                               outline-none transition
+                               focus:border-emerald-300
+                               focus:bg-white
+                               focus:ring-4
+                               focus:ring-emerald-50
+                               dark:border-strokedark
+                               dark:bg-form-input
+                               dark:text-white" %>
+
+        </div>
+
+
+        <%# SUPPORT CATEGORY %>
+
+        <div>
+
+          <label
+            class="mb-2 block text-[10px] font-black uppercase
+                   tracking-widest text-slate-400"
+          >
+            Support Category
+          </label>
+
+          <%= f.select :support_category,
+                       SupportMessage::SUPPORT_CATEGORIES.map {
+                         |key, label|
+                         [label, key]
+                       },
+                       {
+                         include_blank: "All Categories",
+                         selected: params[:support_category]
+                       },
+                       class: "w-full rounded-2xl
+                               border-2 border-slate-100
+                               bg-slate-50
+                               px-4 py-3.5
+                               text-sm text-slate-700
+                               outline-none transition
+                               focus:border-amber-300
+                               focus:bg-white
+                               focus:ring-4
+                               focus:ring-amber-50
+                               dark:border-strokedark
+                               dark:bg-form-input
+                               dark:text-white" %>
+
+        </div>
+
+
+        <%# DISCOVERY SOURCE %>
+
+        <div>
+
+          <label
+            class="mb-2 block text-[10px] font-black uppercase
+                   tracking-widest text-slate-400"
+          >
+            How They Found Us
+          </label>
+
+          <%= f.select :source,
+                       SupportMessage::DISCOVERY_SOURCES.map {
+                         |key, label|
+                         [label, key]
+                       },
+                       {
+                         include_blank: "All Sources",
+                         selected: params[:source]
+                       },
+                       class: "w-full rounded-2xl
+                               border-2 border-slate-100
+                               bg-slate-50
+                               px-4 py-3.5
+                               text-sm text-slate-700
+                               outline-none transition
+                               focus:border-fuchsia-300
+                               focus:bg-white
+                               focus:ring-4
+                               focus:ring-fuchsia-50
+                               dark:border-strokedark
+                               dark:bg-form-input
+                               dark:text-white" %>
+
+        </div>
+
+
+        <%# ATTACHMENTS %>
+
+        <div>
+
+          <label
+            class="mb-2 block text-[10px] font-black uppercase
+                   tracking-widest text-slate-400"
+          >
+            Attachments
+          </label>
+
+          <%= f.select :attachments,
+                       [
+                         ["Has Attachments", "has"],
+                         ["No Attachments", "none"]
+                       ],
+                       {
+                         include_blank: "All Messages",
+                         selected: params[:attachments]
+                       },
+                       class: "w-full rounded-2xl
+                               border-2 border-slate-100
+                               bg-slate-50
+                               px-4 py-3.5
+                               text-sm text-slate-700
+                               outline-none transition
+                               focus:border-rose-300
+                               focus:bg-white
+                               focus:ring-4
+                               focus:ring-rose-50
+                               dark:border-strokedark
+                               dark:bg-form-input
+                               dark:text-white" %>
+
+        </div>
+
+
+        <%# SORT %>
+
+        <div>
+
+          <label
+            class="mb-2 block text-[10px] font-black uppercase
+                   tracking-widest text-slate-400"
+          >
+            Sort By
+          </label>
+
+          <%= f.select :sort,
+                       [
+                         ["Newest First", "newest"],
+                         ["Oldest First", "oldest"],
+                         ["Recently Updated", "recently_updated"],
+                         ["Least Recently Updated", "least_recently_updated"],
+                         ["First Name", "first_name"],
+                         ["Last Name", "last_name"],
+                         ["Email", "email"],
+                         ["Organisation", "organisation"]
+                       ],
+                       {
+                         selected:
+                           params[:sort].presence || "newest"
+                       },
+                       class: "w-full rounded-2xl
+                               border-2 border-slate-100
+                               bg-slate-50
+                               px-4 py-3.5
+                               text-sm text-slate-700
+                               outline-none transition
+                               focus:border-violet-300
+                               focus:bg-white
+                               focus:ring-4
+                               focus:ring-violet-50
+                               dark:border-strokedark
+                               dark:bg-form-input
+                               dark:text-white" %>
+
+        </div>
+
+
+        <%# DIRECTION %>
+
+        <div>
+
+          <label
+            class="mb-2 block text-[10px] font-black uppercase
+                   tracking-widest text-slate-400"
+          >
+            Direction
+          </label>
+
+          <%= f.select :direction,
+                       [
+                         ["Descending", "desc"],
+                         ["Ascending", "asc"]
+                       ],
+                       {
+                         selected:
+                           params[:direction].presence || "desc"
+                       },
+                       class: "w-full rounded-2xl
+                               border-2 border-slate-100
+                               bg-slate-50
+                               px-4 py-3.5
+                               text-sm text-slate-700
+                               outline-none transition
+                               focus:border-sky-300
+                               focus:bg-white
+                               focus:ring-4
+                               focus:ring-sky-50
+                               dark:border-strokedark
+                               dark:bg-form-input
+                               dark:text-white" %>
+
+        </div>
+
+
+        <%# PER PAGE %>
+
+        <div>
+
+          <label
+            class="mb-2 block text-[10px] font-black uppercase
+                   tracking-widest text-slate-400"
+          >
+            Messages Per Page
+          </label>
+
+          <%= f.select :per_page,
+                       [
+                         ["10 messages", 10],
+                         ["20 messages", 20],
+                         ["30 messages", 30],
+                         ["50 messages", 50],
+                         ["100 messages", 100]
+                       ],
+                       {
+                         selected: @per_page || 20
+                       },
+                       class: "w-full rounded-2xl
+                               border-2 border-slate-100
+                               bg-slate-50
+                               px-4 py-3.5
+                               text-sm text-slate-700
+                               outline-none transition
+                               focus:border-emerald-300
+                               focus:bg-white
+                               focus:ring-4
+                               focus:ring-emerald-50
+                               dark:border-strokedark
+                               dark:bg-form-input
+                               dark:text-white" %>
+
+        </div>
+
+      </div>
+
+
+      <%# ====================================================== %>
+      <%# CREATED DATE RANGE                                       %>
+      <%# ====================================================== %>
+
+      <div
+        class="mt-6 rounded-2xl
+               border-2 border-slate-100
+               bg-slate-50 p-5
+               dark:border-strokedark
+               dark:bg-form-input"
+      >
+
+        <div class="mb-4 flex items-center gap-3">
+
+          <div
+            class="flex h-9 w-9 items-center justify-center
+                   rounded-xl bg-sky-100 text-sm
+                   dark:bg-sky-500/10"
+          >
+            📅
+          </div>
+
+          <div>
+
+            <div
+              class="text-[10px] font-black uppercase
+                     tracking-widest text-slate-500
+                     dark:text-gray-300"
+            >
+              Created Date Range
+            </div>
+
+            <div class="mt-1 text-[10px] text-slate-400">
+              Find messages received during a specific period.
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+
+          <div>
+
+            <label
+              class="mb-2 block text-[10px] font-black uppercase
+                     tracking-widest text-slate-400"
+            >
+              From
+            </label>
+
+            <%= f.date_field :created_from,
+                             value: params[:created_from],
+                             class: "w-full rounded-2xl
+                                     border-2 border-slate-100
+                                     bg-white px-4 py-3.5
+                                     text-sm text-slate-700
+                                     outline-none transition
+                                     focus:border-sky-300
+                                     focus:ring-4
+                                     focus:ring-sky-50
+                                     dark:border-strokedark
+                                     dark:bg-boxdark
+                                     dark:text-white" %>
+
+          </div>
+
+          <div>
+
+            <label
+              class="mb-2 block text-[10px] font-black uppercase
+                     tracking-widest text-slate-400"
+            >
+              To
+            </label>
+
+            <%= f.date_field :created_to,
+                             value: params[:created_to],
+                             class: "w-full rounded-2xl
+                                     border-2 border-slate-100
+                                     bg-white px-4 py-3.5
+                                     text-sm text-slate-700
+                                     outline-none transition
+                                     focus:border-sky-300
+                                     focus:ring-4
+                                     focus:ring-sky-50
+                                     dark:border-strokedark
+                                     dark:bg-boxdark
+                                     dark:text-white" %>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <%# ====================================================== %>
+      <%# UPDATED DATE RANGE                                       %>
+      <%# ====================================================== %>
+
+      <div
+        class="mt-4 rounded-2xl
+               border-2 border-slate-100
+               bg-slate-50 p-5
+               dark:border-strokedark
+               dark:bg-form-input"
+      >
+
+        <div class="mb-4 flex items-center gap-3">
+
+          <div
+            class="flex h-9 w-9 items-center justify-center
+                   rounded-xl bg-violet-100 text-sm
+                   dark:bg-violet-500/10"
+          >
+            🔄
+          </div>
+
+          <div>
+
+            <div
+              class="text-[10px] font-black uppercase
+                     tracking-widest text-slate-500
+                     dark:text-gray-300"
+            >
+              Last Updated Range
+            </div>
+
+            <div class="mt-1 text-[10px] text-slate-400">
+              Find messages changed during a specific period.
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+
+          <div>
+
+            <label
+              class="mb-2 block text-[10px] font-black uppercase
+                     tracking-widest text-slate-400"
+            >
+              From
+            </label>
+
+            <%= f.date_field :updated_from,
+                             value: params[:updated_from],
+                             class: "w-full rounded-2xl
+                                     border-2 border-slate-100
+                                     bg-white px-4 py-3.5
+                                     text-sm text-slate-700
+                                     outline-none transition
+                                     focus:border-violet-300
+                                     focus:ring-4
+                                     focus:ring-violet-50
+                                     dark:border-strokedark
+                                     dark:bg-boxdark
+                                     dark:text-white" %>
+
+          </div>
+
+          <div>
+
+            <label
+              class="mb-2 block text-[10px] font-black uppercase
+                     tracking-widest text-slate-400"
+            >
+              To
+            </label>
+
+            <%= f.date_field :updated_to,
+                             value: params[:updated_to],
+                             class: "w-full rounded-2xl
+                                     border-2 border-slate-100
+                                     bg-white px-4 py-3.5
+                                     text-sm text-slate-700
+                                     outline-none transition
+                                     focus:border-violet-300
+                                     focus:ring-4
+                                     focus:ring-violet-50
+                                     dark:border-strokedark
+                                     dark:bg-boxdark
+                                     dark:text-white" %>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <%# ====================================================== %>
+      <%# ACTIONS                                                   %>
+      <%# ====================================================== %>
+
+      <div
+        class="mt-6 flex flex-col gap-3
+               border-t-2 border-slate-50 pt-5
+               sm:flex-row sm:justify-end
+               dark:border-strokedark"
+      >
+
+        <%= link_to admin_support_messages_path,
+                    class: "inline-flex items-center
+                            justify-center gap-2
+                            rounded-2xl
+                            border-2 border-slate-100
+                            bg-white px-5 py-3
+                            text-xs font-black
+                            text-slate-500
+                            transition
+                            hover:border-slate-200
+                            hover:bg-slate-50
+                            dark:border-strokedark
+                            dark:bg-boxdark
+                            dark:text-gray-400" do %>
+
+          ↺
+          Reset Filters
+
+        <% end %>
+
+
+        <%= f.submit "🔎 Search Messages",
+                     class: "cursor-pointer
+                             rounded-2xl
+                             border-2 border-sky-200
+                             bg-gradient-to-r
+                             from-sky-400
+                             to-cyan-400
+                             px-7 py-3
+                             text-xs font-black text-white
+                             shadow-md
+                             shadow-sky-200/40
+                             transition-all duration-300
+                             hover:-translate-y-0.5
+                             hover:from-sky-500
+                             hover:to-cyan-500" %>
+
+      </div>
+
+    <% end %>
+
+  </div>
+
+
+  <%# ========================================================== %>
+  <%# MESSAGE LIST + INFINITE SCROLL                               %>
+  <%# ========================================================== %>
+
+  <div
+    data-controller="admin-dashboard-support-messages-infinity-scroll"
+    data-admin-dashboard-support-messages-infinity-scroll-current-page-value="<%= @messages.current_page %>"
+    data-admin-dashboard-support-messages-infinity-scroll-total-pages-value="<%= @messages.total_pages %>"
+    data-admin-dashboard-support-messages-infinity-scroll-url-value="<%= admin_support_messages_path %>"
+  >
+
+
+    <%# ======================================================== %>
+    <%# LIST HEADER                                               %>
+    <%# ======================================================== %>
+
+    <div
+      class="mb-4 flex flex-col gap-3
+             sm:flex-row sm:items-center sm:justify-between"
+    >
+
+      <div>
+
+        <h2
+          class="text-xl font-black
+                 text-slate-800 dark:text-white"
+        >
+          Messages
+        </h2>
+
+        <p class="mt-1 text-xs text-slate-400">
+          Showing
+          <span class="font-bold text-slate-600 dark:text-gray-300">
+            <%= @messages.length %>
+          </span>
+          of
+          <span class="font-bold text-slate-600 dark:text-gray-300">
+            <%= number_with_delimiter(@messages.total_count) %>
+          </span>
+          matching messages
+        </p>
+
+      </div>
+
+
+      <div
+        class="inline-flex w-fit items-center gap-2
+               rounded-full border border-slate-100
+               bg-white px-4 py-2
+               text-[10px] font-black uppercase
+               tracking-wider text-slate-500
+               dark:border-strokedark
+               dark:bg-boxdark
+               dark:text-gray-400"
+      >
+
+        <span
+          class="h-2 w-2 rounded-full bg-emerald-400"
+        ></span>
+
+        <span data-admin-dashboard-support-messages-infinity-scroll-target="visibleCount">
+          <%= @messages.length %>
+        </span>
+
+        Loaded
+
+      </div>
+
+    </div>
+
+
+    <%# ======================================================== %>
+    <%# TABLE                                                       %>
+    <%# ======================================================== %>
+
+    <div
+      class="overflow-hidden rounded-[28px]
+             border-2 border-slate-100
+             bg-white
+             shadow-[0_12px_35px_rgba(15,23,42,0.05)]
+             dark:border-strokedark
+             dark:bg-boxdark"
+    >
+
+      <div class="overflow-x-auto">
+
+        <table class="w-full min-w-[1000px] text-left">
+
+          <thead>
+
+          <tr
+            class="border-b-2 border-slate-100
+                     bg-slate-50/80
+                     dark:border-strokedark
+                     dark:bg-form-input"
+          >
+
+            <th
+              class="px-6 py-4
+                       text-[9px] font-black uppercase
+                       tracking-[0.16em] text-slate-400"
+            >
+              Visitor
+            </th>
+
+            <th
+              class="px-6 py-4
+                       text-[9px] font-black uppercase
+                       tracking-[0.16em] text-slate-400"
+            >
+              Support
+            </th>
+
+            <th
+              class="px-6 py-4
+                       text-[9px] font-black uppercase
+                       tracking-[0.16em] text-slate-400"
+            >
+              Verification
+            </th>
+
+            <th
+              class="px-6 py-4
+                       text-[9px] font-black uppercase
+                       tracking-[0.16em] text-slate-400"
+            >
+              Status
+            </th>
+
+            <th
+              class="px-6 py-4
+                       text-[9px] font-black uppercase
+                       tracking-[0.16em] text-slate-400"
+            >
+              Received
+            </th>
+
+            <th
+              class="px-6 py-4 text-right
+                       text-[9px] font-black uppercase
+                       tracking-[0.16em] text-slate-400"
+            >
+              Action
+            </th>
+
+          </tr>
+
+          </thead>
+
+
+          <%# ================================================== %>
+          <%# IMPORTANT: INFINITE SCROLL TARGET IS THE TBODY      %>
+          <%# ================================================== %>
+
+          <tbody
+            data-admin-dashboard-support-messages-infinity-scroll-target="messages"
+          >
+
+          <% if @messages.any? %>
+
+            <%= render partial: "message",
+                       collection: @messages,
+                       as: :message %>
+
+          <% else %>
+
+            <tr>
+
+              <td colspan="6" class="px-6 py-20">
+
+                <div class="flex flex-col items-center text-center">
+
+                  <div
+                    class="flex h-20 w-20 items-center justify-center
+                             rounded-3xl bg-slate-50 text-3xl
+                             dark:bg-form-input"
+                  >
+                    🔎
+                  </div>
+
+                  <h3
+                    class="mt-5 text-lg font-black
+                             text-slate-700 dark:text-white"
+                  >
+                    No support messages found
+                  </h3>
+
+                  <p class="mt-2 max-w-md text-sm text-slate-400">
+                    No messages match the current search and filter
+                    combination. Try removing one or more filters.
+                  </p>
+
+                  <%= link_to "Clear all filters",
+                              admin_support_messages_path,
+                              class: "mt-5 inline-flex items-center
+                                        rounded-xl bg-sky-500
+                                        px-5 py-2.5
+                                        text-xs font-black text-white
+                                        transition hover:bg-sky-600" %>
+
+                </div>
+
+              </td>
+
+            </tr>
+
+          <% end %>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+
+      <%# ====================================================== %>
+      <%# LOADING                                                    %>
+      <%# ====================================================== %>
+
+      <div
+        data-admin-dashboard-support-messages-infinity-scroll-target="loading"
+        class="hidden border-t-2 border-slate-50
+               px-6 py-12 dark:border-strokedark"
+      >
+
+        <div class="flex flex-col items-center">
+
+          <div
+            class="h-12 w-12 animate-spin rounded-full
+                   border-4 border-sky-100
+                   border-t-sky-500
+                   dark:border-sky-500/20
+                   dark:border-t-sky-400"
+          ></div>
+
+          <div
+            class="mt-4 text-sm font-black
+                   text-slate-600 dark:text-gray-300"
+          >
+            Loading more support messages...
+          </div>
+
+          <div class="mt-1 text-[10px] text-slate-400">
+            Please wait
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <%# ====================================================== %>
+      <%# END MESSAGE                                               %>
+      <%# ====================================================== %>
+
+      <div
+        data-admin-dashboard-support-messages-infinity-scroll-target="endMessage"
+        class="hidden border-t-2 border-slate-50
+               px-6 py-10 dark:border-strokedark"
+      >
+
+        <div class="text-center">
+
+          <div class="text-2xl">
+            🏆
+          </div>
+
+          <div
+            class="mt-3 text-sm font-black
+                   text-slate-700 dark:text-white"
+          >
+            All support messages have been loaded.
+          </div>
+
+          <div class="mt-1 text-xs text-slate-400">
+            You have reached the end of the current result set.
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <%# ====================================================== %>
+      <%# INFINITE SCROLL SENTINEL                                  %>
+      <%# ====================================================== %>
+
+      <div
+        data-admin-dashboard-support-messages-infinity-scroll-target="sentinel"
+        class="h-4"
+        aria-hidden="true"
+      ></div>
+
+    </div>
+
+  </div>
+
+</div>

@@ -1,0 +1,49 @@
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+
+  <h1>
+    Thank you for contacting us
+  </h1>
+
+  <p>
+    Hello <%= @support_message.first_name %>,
+  </p>
+
+  <p>
+    We received your message regarding
+    <strong>
+      <%= @support_message.support_category_label %>
+    </strong>.
+  </p>
+
+  <p>
+    To confirm that this message was submitted by a real person
+    using this email address, please confirm your email address.
+  </p>
+
+  <p>
+    <a
+      href="<%= @confirmation_url %>"
+      style="
+      display:inline-block;
+        padding:14px 22px;
+        background:#0ea5e9;
+        color:white;
+        text-decoration:none;
+        border-radius:10px;
+        font-weight:bold;
+      "
+    >
+      Confirm my email address
+    </a>
+  </p>
+
+  <p>
+    Once confirmed, your message will become available to our
+    project administration team.
+  </p>
+
+  <p>
+    If you did not submit this message, you can safely ignore this email.
+  </p>
+
+</div>
