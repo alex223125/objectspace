@@ -60,6 +60,8 @@ gem 'cocoon', '~> 1.2', '>= 1.2.9'
 
 # version hardcoded to prevent any ui changes depending on buinde install
 gem 'tailwindcss-rails', '~> 2.0.21'
+# TailAdmin: Free Tailwind CSS Admin Dashboard Template
+
 gem 'jquery-rails'
 
 gem 'pagy', '~> 6.0' # omit patch digit
