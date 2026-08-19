@@ -34,7 +34,8 @@ export default class extends Controller {
         "error",
         "puzzleSuccess",
         "success",
-        "token"
+        "token",
+        "puzzleOrder"
     ]
 
 
@@ -438,28 +439,106 @@ export default class extends Controller {
     // SLIDER MOVEMENT
     // ==========================================================
 
-    move(event) {
+    // move(event) {
+    //
+    //     if (this.successValue) {
+    //         return
+    //     }
+    //
+    //     const value =
+    //         Number(
+    //             event.target.value
+    //         )
+    //
+    //     const position =
+    //         this.sliderToPosition(
+    //             value
+    //         )
+    //
+    //     this.pieceTarget.style.left =
+    //         `${position}px`
+    //
+    //     this.statusTarget.textContent =
+    //         `${Math.round(value)}%`
+    // }
 
+
+    // move(event) {
+    //     if (this.successValue) return
+    //
+    //     const value = Number(event.target.value)
+    //     const position = this.sliderToPosition(value)
+    //
+    //     // Рухаем кавалак пазла на экране
+    //     this.pieceTarget.style.left = `${position}px`
+    //     this.statusTarget.textContent = `${Math.round(value)}%`
+    //
+    //     /*
+    //      * КРЫТЫЧНАЕ ВЫПРАЎЛЕННЕ: Запісваем бягучае значэнне ў скрытае поле
+    //      * ПРАМА ПАДЧАС РУХУ, каб Rails заўсёды бачыў актуальную лічбу!
+    //      */
+    //     if (this.hasPuzzleOrderTarget) {
+    //         this.puzzleOrderTarget.value = Math.round(value)
+    //     }
+    // }
+
+    // move(event) {
+    //     if (this.successValue) return
+    //
+    //     const value = Number(event.target.value)
+    //     const position = this.sliderToPosition(value)
+    //
+    //     this.pieceTarget.style.left = `${position}px`
+    //     this.statusTarget.textContent = `${Math.round(value)}%`
+    //
+    //     // Імгненны запіс значэння ў input пры кожным руху мышы
+    //     if (this.hasPuzzleOrderTarget) {
+    //         this.puzzleOrderTarget.value = Math.round(value)
+    //     }
+    // }
+
+    // move(event) {
+    //     if (this.successValue) return
+    //
+    //     const value = Number(event.target.value)
+    //     const position = this.sliderToPosition(value)
+    //
+    //     this.pieceTarget.style.left = `${position}px`
+    //     this.statusTarget.textContent = `${Math.round(value)}%`
+    //
+    //     // Імгненны запіс значэння ў input пры кожным руху мышы
+    //     if (this.hasPuzzleOrderTarget) {
+    //         this.puzzleOrderTarget.value = Math.round(value)
+    //     }
+    // }
+
+
+    // ==========================================================
+    // СІНХРАНІЗАВАНЫ РУХ СЛАЙДЭРА
+    // ==========================================================
+    move(event) {
         if (this.successValue) {
             return
         }
 
-        const value =
-            Number(
-                event.target.value
-            )
+        const value = Number(event.target.value)
+        const position = this.sliderToPosition(value)
 
-        const position =
-            this.sliderToPosition(
-                value
-            )
+        // Рухаем кавалак пазла на экране па пікселях
+        this.pieceTarget.style.left = `${position}px`
+        this.statusTarget.textContent = `${Math.round(value)}%`
 
-        this.pieceTarget.style.left =
-            `${position}px`
-
-        this.statusTarget.textContent =
-            `${Math.round(value)}%`
+        /*
+         * Замест адпраўкі чыстага значэння слайдэра,
+         * мы адпраўляем працэнт адносна максімальнай даўжыні трэка (maxPosition).
+         * Гэта дасць ідэальнае супадзенне з чаканнямі Rails!
+         */
+        if (this.hasPuzzleOrderTarget && this.maxPosition > 0) {
+            const dynamicPercent = (position / this.maxPosition) * 100
+            this.puzzleOrderTarget.value = Math.round(dynamicPercent)
+        }
     }
+
 
 
     // ==========================================================
@@ -479,49 +558,102 @@ export default class extends Controller {
     // VERIFY PUZZLE
     // ==========================================================
 
+    // check() {
+    //
+    //     if (this.successValue) {
+    //         return
+    //     }
+    //
+    //     const value =
+    //         Number(
+    //             this.sliderTarget.value
+    //         )
+    //
+    //     const position =
+    //         this.sliderToPosition(
+    //             value
+    //         )
+    //
+    //     const difference =
+    //         Math.abs(
+    //             position -
+    //             this.targetPosition
+    //         )
+    //
+    //
+    //     /*
+    //      * Allow a small amount of movement.
+    //      */
+    //
+    //     const tolerance = 14
+    //
+    //
+    //     if (
+    //         difference <= tolerance
+    //     ) {
+    //
+    //         this.verificationSucceeded()
+    //
+    //     } else {
+    //
+    //         this.verificationFailed()
+    //
+    //     }
+    // }
+
+
+    // ==========================================================
+    // UPDATED CHECK METHOD SYNCHRONIZING REAL INT COORDINATES
+    // ==========================================================
+    // check() {
+    //     if (this.successValue) return
+    //
+    //     const percentage = parseFloat(this.sliderTarget.value)
+    //     const currentX = percentage * (this.maxPosition / 100)
+    //
+    //     // Calculate direct relative pixel position offset distance maps
+    //     const distanceDifference = Math.abs(currentX - this.targetPosition)
+    //     const tolerance = 12 // Pixel margin precision gap filter
+    //
+    //     if (distanceDifference <= tolerance) {
+    //
+    //         // Map the successful selection location value right into your hidden tracking parameter node before submitting
+    //         if (this.hasTokenTarget) {
+    //             // Synchronizes with the input[name="puzzle_position"] parameter field
+    //             this.tokenTarget.value = Math.round(percentage)
+    //         }
+    //
+    //         this.verificationSucceeded()
+    //
+    //     } else {
+    //         this.verificationFailed()
+    //     }
+    // }
+
+
     check() {
+        if (this.successValue) return
 
-        if (this.successValue) {
-            return
-        }
-
-        const value =
-            Number(
-                this.sliderTarget.value
-            )
-
-        const position =
-            this.sliderToPosition(
-                value
-            )
-
-        const difference =
-            Math.abs(
-                position -
-                this.targetPosition
-            )
-
+        const value = Number(this.sliderTarget.value)
+        const position = this.sliderToPosition(value)
+        const difference = Math.abs(position - this.targetPosition)
 
         /*
-         * Allow a small amount of movement.
+         * Забяспечваем запіс значэння яшчэ раз перад валідацыяй
          */
+        if (this.hasPuzzleOrderTarget) {
+            this.puzzleOrderTarget.value = Math.round(value)
+        }
 
+        // Дапушчальная хібнасць супастаўлення (у пікселях)
         const tolerance = 14
 
-
-        if (
-            difference <= tolerance
-        ) {
-
+        if (difference <= tolerance) {
             this.verificationSucceeded()
-
         } else {
-
             this.verificationFailed()
-
         }
     }
-
 
     // ==========================================================
     // SUCCESS

@@ -1,18 +1,14 @@
 <%# ============================================================ %>
 <%# FILE: app/views/admin/support_messages/index.html.erb       %>
 <%# ============================================================ %>
-<%# Admin Support Messages — Dashboard / Search / Filters / List %>
-<%# ============================================================ %>
-
-
-<%# ============================================================ %>
-<%# PAGE HEADER                                                   %>
-<%# ============================================================ %>
 
 <div class="mx-auto max-w-7xl px-5 pt-8 sm:px-7 lg:px-10">
 
-  <div class="mb-8">
+  <%# ========================================================== %>
+  <%# PAGE HEADER                                                 %>
+  <%# ========================================================== %>
 
+  <div class="mb-8">
     <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
 
       <div class="flex items-center gap-4">
@@ -24,31 +20,26 @@
                  text-2xl shadow-sm
                  dark:border-sky-500/20
                  dark:from-sky-500/10
-                 dark:to-violet-500/10"
-        >
+                 dark:to-violet-500/10">
           💬
         </div>
 
         <div>
-
           <div
             class="text-[10px] font-black uppercase
                    tracking-[0.22em] text-sky-600
-                   dark:text-sky-400"
-          >
+                   dark:text-sky-400">
             Support Communication
           </div>
 
           <h1
             class="mt-1 text-3xl font-black tracking-tight
-                   text-slate-800 dark:text-white sm:text-4xl"
-          >
+                   text-slate-800 dark:text-white sm:text-4xl">
             Support
             <span
               class="bg-gradient-to-r from-sky-500
                      via-violet-500 to-emerald-500
-                     bg-clip-text text-transparent"
-            >
+                     bg-clip-text text-transparent">
               Messages
             </span>
           </h1>
@@ -56,13 +47,11 @@
           <p class="mt-2 text-xs text-slate-400 sm:text-sm">
             Questions, donations, financial support, recommendations and feedback.
           </p>
-
         </div>
 
       </div>
 
     </div>
-
   </div>
 
 
@@ -72,11 +61,7 @@
 
   <div class="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
 
-
-    <%# ======================================================== %>
-    <%# TOTAL                                                     %>
-    <%# ======================================================== %>
-
+    <%# TOTAL %>
     <div
       class="group rounded-[26px]
              border-2 border-sky-100
@@ -86,8 +71,7 @@
              hover:-translate-y-1
              hover:border-sky-200
              dark:border-sky-500/20
-             dark:bg-boxdark"
-    >
+             dark:bg-boxdark">
 
       <div class="flex items-center justify-between">
 
@@ -96,8 +80,7 @@
                  rounded-2xl border-2 border-sky-200
                  bg-sky-50 text-lg
                  dark:border-sky-500/20
-                 dark:bg-sky-500/10"
-        >
+                 dark:bg-sky-500/10">
           💬
         </div>
 
@@ -107,8 +90,7 @@
                  text-[9px] font-black uppercase
                  tracking-wider text-sky-500
                  dark:border-sky-500/20
-                 dark:bg-sky-500/10"
-        >
+                 dark:bg-sky-500/10">
           All Messages
         </span>
 
@@ -118,15 +100,13 @@
 
         <p
           class="text-[10px] font-black uppercase
-                 tracking-widest text-slate-400"
-        >
+                 tracking-widest text-slate-400">
           Total Messages
         </p>
 
         <p
           class="mt-1 text-3xl font-black
-                 text-slate-800 dark:text-white"
-        >
+                 text-slate-800 dark:text-white">
           <%= number_with_delimiter(@total_messages) %>
         </p>
 
@@ -135,10 +115,7 @@
     </div>
 
 
-    <%# ======================================================== %>
-    <%# CONFIRMED                                                  %>
-    <%# ======================================================== %>
-
+    <%# CONFIRMED %>
     <div
       class="group rounded-[26px]
              border-2 border-emerald-100
@@ -148,8 +125,7 @@
              hover:-translate-y-1
              hover:border-emerald-200
              dark:border-emerald-500/20
-             dark:bg-boxdark"
-    >
+             dark:bg-boxdark">
 
       <div class="flex items-center justify-between">
 
@@ -159,8 +135,7 @@
                  bg-emerald-50 text-lg
                  shadow-sm
                  dark:border-emerald-500/20
-                 dark:bg-emerald-500/10"
-        >
+                 dark:bg-emerald-500/10">
           ✓
         </div>
 
@@ -170,8 +145,7 @@
                  text-[9px] font-black uppercase
                  tracking-wider text-emerald-500
                  dark:border-emerald-500/20
-                 dark:bg-emerald-500/10"
-        >
+                 dark:bg-emerald-500/10">
           Verified
         </span>
 
@@ -181,15 +155,13 @@
 
         <p
           class="text-[10px] font-black uppercase
-                 tracking-widest text-slate-400"
-        >
+                 tracking-widest text-slate-400">
           Confirmed
         </p>
 
         <p
           class="mt-1 text-3xl font-black
-                 text-slate-800 dark:text-white"
-        >
+                 text-slate-800 dark:text-white">
           <%= number_with_delimiter(@confirmed_messages) %>
         </p>
 
@@ -198,10 +170,7 @@
     </div>
 
 
-    <%# ======================================================== %>
-    <%# PENDING                                                     %>
-    <%# ======================================================== %>
-
+    <%# PENDING %>
     <div
       class="group rounded-[26px]
              border-2 border-amber-100
@@ -211,8 +180,7 @@
              hover:-translate-y-1
              hover:border-amber-200
              dark:border-amber-500/20
-             dark:bg-boxdark"
-    >
+             dark:bg-boxdark">
 
       <div class="flex items-center justify-between">
 
@@ -221,8 +189,7 @@
                  rounded-2xl border-2 border-amber-200
                  bg-amber-50 text-lg
                  dark:border-amber-500/20
-                 dark:bg-amber-500/10"
-        >
+                 dark:bg-amber-500/10">
           ⏳
         </div>
 
@@ -232,8 +199,7 @@
                  text-[9px] font-black uppercase
                  tracking-wider text-amber-500
                  dark:border-amber-500/20
-                 dark:bg-amber-500/10"
-        >
+                 dark:bg-amber-500/10">
           Waiting
         </span>
 
@@ -243,15 +209,13 @@
 
         <p
           class="text-[10px] font-black uppercase
-                 tracking-widest text-slate-400"
-        >
+                 tracking-widest text-slate-400">
           Awaiting Confirmation
         </p>
 
         <p
           class="mt-1 text-3xl font-black
-                 text-slate-800 dark:text-white"
-        >
+                 text-slate-800 dark:text-white">
           <%= number_with_delimiter(@pending_messages) %>
         </p>
 
@@ -260,10 +224,7 @@
     </div>
 
 
-    <%# ======================================================== %>
-    <%# FINANCIAL SUPPORT                                           %>
-    <%# ======================================================== %>
-
+    <%# FINANCIAL SUPPORT %>
     <div
       class="group rounded-[26px]
              border-2 border-violet-100
@@ -273,8 +234,7 @@
              hover:-translate-y-1
              hover:border-violet-200
              dark:border-violet-500/20
-             dark:bg-boxdark"
-    >
+             dark:bg-boxdark">
 
       <div class="flex items-center justify-between">
 
@@ -283,8 +243,7 @@
                  rounded-2xl border-2 border-violet-200
                  bg-violet-50 text-lg
                  dark:border-violet-500/20
-                 dark:bg-violet-500/10"
-        >
+                 dark:bg-violet-500/10">
           💰
         </div>
 
@@ -294,8 +253,7 @@
                  text-[9px] font-black uppercase
                  tracking-wider text-violet-500
                  dark:border-violet-500/20
-                 dark:bg-violet-500/10"
-        >
+                 dark:bg-violet-500/10">
           Support
         </span>
 
@@ -305,15 +263,13 @@
 
         <p
           class="text-[10px] font-black uppercase
-                 tracking-widest text-slate-400"
-        >
+                 tracking-widest text-slate-400">
           Financial Support
         </p>
 
         <p
           class="mt-1 text-3xl font-black
-                 text-slate-800 dark:text-white"
-        >
+                 text-slate-800 dark:text-white">
           <%= number_with_delimiter(@financial_support_messages) %>
         </p>
 
@@ -334,16 +290,12 @@
            bg-white p-6
            shadow-[0_12px_35px_rgba(15,23,42,0.05)]
            dark:border-strokedark
-           dark:bg-boxdark"
-  >
-
-    <%# FILTER HEADER %>
+           dark:bg-boxdark">
 
     <div
       class="mb-6 flex flex-col gap-4
              sm:flex-row sm:items-center
-             sm:justify-between"
-    >
+             sm:justify-between">
 
       <div class="flex items-center gap-4">
 
@@ -352,8 +304,7 @@
                  rounded-2xl border-2 border-sky-200
                  bg-sky-50 text-lg
                  dark:border-sky-500/20
-                 dark:bg-sky-500/10"
-        >
+                 dark:bg-sky-500/10">
           🔎
         </div>
 
@@ -361,8 +312,7 @@
 
           <h2
             class="text-xl font-black
-                   text-slate-800 dark:text-white"
-          >
+                   text-slate-800 dark:text-white">
             Message Discovery
           </h2>
 
@@ -374,9 +324,7 @@
 
       </div>
 
-
       <% if @active_filter_count.to_i > 0 %>
-
         <div
           class="inline-flex w-fit items-center gap-2
                  rounded-full border border-sky-100
@@ -385,21 +333,18 @@
                  tracking-wider text-sky-600
                  dark:border-sky-500/20
                  dark:bg-sky-500/10
-                 dark:text-sky-400"
-        >
+                 dark:text-sky-400">
 
           <span
             class="flex h-5 w-5 items-center justify-center
                    rounded-full bg-sky-500
-                   text-[9px] text-white"
-          >
+                   text-[9px] text-white">
             <%= @active_filter_count %>
           </span>
 
           Active Filters
 
         </div>
-
       <% end %>
 
     </div>
@@ -409,17 +354,13 @@
                   method: :get,
                   local: true do |f| %>
 
-
-      <%# ====================================================== %>
-      <%# GLOBAL SEARCH                                            %>
-      <%# ====================================================== %>
+      <%# SEARCH %>
 
       <div class="mb-6">
 
         <label
           class="mb-2 block text-[10px] font-black uppercase
-                 tracking-widest text-slate-400"
-        >
+                 tracking-widest text-slate-400">
           Search Everything
         </label>
 
@@ -427,8 +368,7 @@
 
           <span
             class="absolute left-4 top-1/2
-                   -translate-y-1/2 text-sky-400"
-          >
+                   -translate-y-1/2 text-sky-400">
             🔎
           </span>
 
@@ -457,16 +397,12 @@
       </div>
 
 
-      <%# ====================================================== %>
-      <%# FILTER GRID                                              %>
-      <%# ====================================================== %>
+      <%# FILTER GRID %>
 
       <div
         class="grid grid-cols-1 gap-5
                md:grid-cols-2
-               xl:grid-cols-4"
-      >
-
+               xl:grid-cols-4">
 
         <%# STATUS %>
 
@@ -474,14 +410,12 @@
 
           <label
             class="mb-2 block text-[10px] font-black uppercase
-                   tracking-widest text-slate-400"
-          >
+                   tracking-widest text-slate-400">
             Message Status
           </label>
 
           <%= f.select :status,
-                       SupportMessage::STATUSES.map {
-                         |key, label|
+                       SupportMessage::STATUSES.map { |key, label|
                          [label, key]
                        },
                        {
@@ -511,8 +445,7 @@
 
           <label
             class="mb-2 block text-[10px] font-black uppercase
-                   tracking-widest text-slate-400"
-          >
+                   tracking-widest text-slate-400">
             Email Verification
           </label>
 
@@ -548,14 +481,12 @@
 
           <label
             class="mb-2 block text-[10px] font-black uppercase
-                   tracking-widest text-slate-400"
-          >
+                   tracking-widest text-slate-400">
             Support Category
           </label>
 
           <%= f.select :support_category,
-                       SupportMessage::SUPPORT_CATEGORIES.map {
-                         |key, label|
+                       SupportMessage::SUPPORT_CATEGORIES.map { |key, label|
                          [label, key]
                        },
                        {
@@ -585,14 +516,12 @@
 
           <label
             class="mb-2 block text-[10px] font-black uppercase
-                   tracking-widest text-slate-400"
-          >
+                   tracking-widest text-slate-400">
             How They Found Us
           </label>
 
           <%= f.select :source,
-                       SupportMessage::DISCOVERY_SOURCES.map {
-                         |key, label|
+                       SupportMessage::DISCOVERY_SOURCES.map { |key, label|
                          [label, key]
                        },
                        {
@@ -622,8 +551,7 @@
 
           <label
             class="mb-2 block text-[10px] font-black uppercase
-                   tracking-widest text-slate-400"
-          >
+                   tracking-widest text-slate-400">
             Attachments
           </label>
 
@@ -659,8 +587,7 @@
 
           <label
             class="mb-2 block text-[10px] font-black uppercase
-                   tracking-widest text-slate-400"
-          >
+                   tracking-widest text-slate-400">
             Sort By
           </label>
 
@@ -702,8 +629,7 @@
 
           <label
             class="mb-2 block text-[10px] font-black uppercase
-                   tracking-widest text-slate-400"
-          >
+                   tracking-widest text-slate-400">
             Direction
           </label>
 
@@ -739,8 +665,7 @@
 
           <label
             class="mb-2 block text-[10px] font-black uppercase
-                   tracking-widest text-slate-400"
-          >
+                   tracking-widest text-slate-400">
             Messages Per Page
           </label>
 
@@ -774,25 +699,21 @@
       </div>
 
 
-      <%# ====================================================== %>
-      <%# CREATED DATE RANGE                                       %>
-      <%# ====================================================== %>
+      <%# CREATED DATE RANGE %>
 
       <div
         class="mt-6 rounded-2xl
                border-2 border-slate-100
                bg-slate-50 p-5
                dark:border-strokedark
-               dark:bg-form-input"
-      >
+               dark:bg-form-input">
 
         <div class="mb-4 flex items-center gap-3">
 
           <div
             class="flex h-9 w-9 items-center justify-center
                    rounded-xl bg-sky-100 text-sm
-                   dark:bg-sky-500/10"
-          >
+                   dark:bg-sky-500/10">
             📅
           </div>
 
@@ -801,8 +722,7 @@
             <div
               class="text-[10px] font-black uppercase
                      tracking-widest text-slate-500
-                     dark:text-gray-300"
-            >
+                     dark:text-gray-300">
               Created Date Range
             </div>
 
@@ -814,15 +734,13 @@
 
         </div>
 
-
         <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
 
           <div>
 
             <label
               class="mb-2 block text-[10px] font-black uppercase
-                     tracking-widest text-slate-400"
-            >
+                     tracking-widest text-slate-400">
               From
             </label>
 
@@ -846,8 +764,7 @@
 
             <label
               class="mb-2 block text-[10px] font-black uppercase
-                     tracking-widest text-slate-400"
-            >
+                     tracking-widest text-slate-400">
               To
             </label>
 
@@ -872,25 +789,21 @@
       </div>
 
 
-      <%# ====================================================== %>
-      <%# UPDATED DATE RANGE                                       %>
-      <%# ====================================================== %>
+      <%# UPDATED DATE RANGE %>
 
       <div
         class="mt-4 rounded-2xl
                border-2 border-slate-100
                bg-slate-50 p-5
                dark:border-strokedark
-               dark:bg-form-input"
-      >
+               dark:bg-form-input">
 
         <div class="mb-4 flex items-center gap-3">
 
           <div
             class="flex h-9 w-9 items-center justify-center
                    rounded-xl bg-violet-100 text-sm
-                   dark:bg-violet-500/10"
-          >
+                   dark:bg-violet-500/10">
             🔄
           </div>
 
@@ -899,8 +812,7 @@
             <div
               class="text-[10px] font-black uppercase
                      tracking-widest text-slate-500
-                     dark:text-gray-300"
-            >
+                     dark:text-gray-300">
               Last Updated Range
             </div>
 
@@ -912,15 +824,13 @@
 
         </div>
 
-
         <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
 
           <div>
 
             <label
               class="mb-2 block text-[10px] font-black uppercase
-                     tracking-widest text-slate-400"
-            >
+                     tracking-widest text-slate-400">
               From
             </label>
 
@@ -944,8 +854,7 @@
 
             <label
               class="mb-2 block text-[10px] font-black uppercase
-                     tracking-widest text-slate-400"
-            >
+                     tracking-widest text-slate-400">
               To
             </label>
 
@@ -970,16 +879,13 @@
       </div>
 
 
-      <%# ====================================================== %>
-      <%# ACTIONS                                                   %>
-      <%# ====================================================== %>
+      <%# ACTIONS %>
 
       <div
         class="mt-6 flex flex-col gap-3
                border-t-2 border-slate-50 pt-5
                sm:flex-row sm:justify-end
-               dark:border-strokedark"
-      >
+               dark:border-strokedark">
 
         <%= link_to admin_support_messages_path,
                     class: "inline-flex items-center
@@ -995,12 +901,9 @@
                             dark:border-strokedark
                             dark:bg-boxdark
                             dark:text-gray-400" do %>
-
           ↺
           Reset Filters
-
         <% end %>
-
 
         <%= f.submit "🔎 Search Messages",
                      class: "cursor-pointer
@@ -1026,32 +929,27 @@
 
 
   <%# ========================================================== %>
-  <%# MESSAGE LIST + INFINITE SCROLL                               %>
+  <%# MESSAGE LIST                                                %>
   <%# ========================================================== %>
 
   <div
     data-controller="admin-dashboard-support-messages-infinity-scroll"
     data-admin-dashboard-support-messages-infinity-scroll-current-page-value="<%= @messages.current_page %>"
     data-admin-dashboard-support-messages-infinity-scroll-total-pages-value="<%= @messages.total_pages %>"
-    data-admin-dashboard-support-messages-infinity-scroll-url-value="<%= admin_support_messages_path %>"
-  >
+    data-admin-dashboard-support-messages-infinity-scroll-url-value="<%= admin_support_messages_path %>">
 
-
-    <%# ======================================================== %>
-    <%# LIST HEADER                                               %>
-    <%# ======================================================== %>
+    <%# LIST HEADER %>
 
     <div
       class="mb-4 flex flex-col gap-3
-             sm:flex-row sm:items-center sm:justify-between"
-    >
+             sm:flex-row sm:items-center
+             sm:justify-between">
 
       <div>
 
         <h2
           class="text-xl font-black
-                 text-slate-800 dark:text-white"
-        >
+                 text-slate-800 dark:text-white">
           Messages
         </h2>
 
@@ -1069,7 +967,6 @@
 
       </div>
 
-
       <div
         class="inline-flex w-fit items-center gap-2
                rounded-full border border-slate-100
@@ -1078,12 +975,9 @@
                tracking-wider text-slate-500
                dark:border-strokedark
                dark:bg-boxdark
-               dark:text-gray-400"
-      >
+               dark:text-gray-400">
 
-        <span
-          class="h-2 w-2 rounded-full bg-emerald-400"
-        ></span>
+        <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
 
         <span data-admin-dashboard-support-messages-infinity-scroll-target="visibleCount">
           <%= @messages.length %>
@@ -1096,9 +990,7 @@
     </div>
 
 
-    <%# ======================================================== %>
-    <%# TABLE                                                       %>
-    <%# ======================================================== %>
+    <%# TABLE %>
 
     <div
       class="overflow-hidden rounded-[28px]
@@ -1106,8 +998,7 @@
              bg-white
              shadow-[0_12px_35px_rgba(15,23,42,0.05)]
              dark:border-strokedark
-             dark:bg-boxdark"
-    >
+             dark:bg-boxdark">
 
       <div class="overflow-x-auto">
 
@@ -1119,54 +1010,47 @@
             class="border-b-2 border-slate-100
                      bg-slate-50/80
                      dark:border-strokedark
-                     dark:bg-form-input"
-          >
+                     dark:bg-form-input">
 
             <th
               class="px-6 py-4
                        text-[9px] font-black uppercase
-                       tracking-[0.16em] text-slate-400"
-            >
+                       tracking-[0.16em] text-slate-400">
               Visitor
             </th>
 
             <th
               class="px-6 py-4
                        text-[9px] font-black uppercase
-                       tracking-[0.16em] text-slate-400"
-            >
+                       tracking-[0.16em] text-slate-400">
               Support
             </th>
 
             <th
               class="px-6 py-4
                        text-[9px] font-black uppercase
-                       tracking-[0.16em] text-slate-400"
-            >
+                       tracking-[0.16em] text-slate-400">
               Verification
             </th>
 
             <th
               class="px-6 py-4
                        text-[9px] font-black uppercase
-                       tracking-[0.16em] text-slate-400"
-            >
+                       tracking-[0.16em] text-slate-400">
               Status
             </th>
 
             <th
               class="px-6 py-4
                        text-[9px] font-black uppercase
-                       tracking-[0.16em] text-slate-400"
-            >
+                       tracking-[0.16em] text-slate-400">
               Received
             </th>
 
             <th
               class="px-6 py-4 text-right
                        text-[9px] font-black uppercase
-                       tracking-[0.16em] text-slate-400"
-            >
+                       tracking-[0.16em] text-slate-400">
               Action
             </th>
 
@@ -1175,13 +1059,8 @@
           </thead>
 
 
-          <%# ================================================== %>
-          <%# IMPORTANT: INFINITE SCROLL TARGET IS THE TBODY      %>
-          <%# ================================================== %>
-
           <tbody
-            data-admin-dashboard-support-messages-infinity-scroll-target="messages"
-          >
+            data-admin-dashboard-support-messages-infinity-scroll-target="messages">
 
           <% if @messages.any? %>
 
@@ -1200,15 +1079,13 @@
                   <div
                     class="flex h-20 w-20 items-center justify-center
                              rounded-3xl bg-slate-50 text-3xl
-                             dark:bg-form-input"
-                  >
+                             dark:bg-form-input">
                     🔎
                   </div>
 
                   <h3
                     class="mt-5 text-lg font-black
-                             text-slate-700 dark:text-white"
-                  >
+                             text-slate-700 dark:text-white">
                     No support messages found
                   </h3>
 
@@ -1240,15 +1117,12 @@
       </div>
 
 
-      <%# ====================================================== %>
-      <%# LOADING                                                    %>
-      <%# ====================================================== %>
+      <%# LOADING %>
 
       <div
         data-admin-dashboard-support-messages-infinity-scroll-target="loading"
         class="hidden border-t-2 border-slate-50
-               px-6 py-12 dark:border-strokedark"
-      >
+               px-6 py-12 dark:border-strokedark">
 
         <div class="flex flex-col items-center">
 
@@ -1257,13 +1131,12 @@
                    border-4 border-sky-100
                    border-t-sky-500
                    dark:border-sky-500/20
-                   dark:border-t-sky-400"
-          ></div>
+                   dark:border-t-sky-400">
+          </div>
 
           <div
             class="mt-4 text-sm font-black
-                   text-slate-600 dark:text-gray-300"
-          >
+                   text-slate-600 dark:text-gray-300">
             Loading more support messages...
           </div>
 
@@ -1276,15 +1149,12 @@
       </div>
 
 
-      <%# ====================================================== %>
-      <%# END MESSAGE                                               %>
-      <%# ====================================================== %>
+      <%# END MESSAGE %>
 
       <div
         data-admin-dashboard-support-messages-infinity-scroll-target="endMessage"
         class="hidden border-t-2 border-slate-50
-               px-6 py-10 dark:border-strokedark"
-      >
+               px-6 py-10 dark:border-strokedark">
 
         <div class="text-center">
 
@@ -1294,8 +1164,7 @@
 
           <div
             class="mt-3 text-sm font-black
-                   text-slate-700 dark:text-white"
-          >
+                   text-slate-700 dark:text-white">
             All support messages have been loaded.
           </div>
 
@@ -1308,15 +1177,13 @@
       </div>
 
 
-      <%# ====================================================== %>
-      <%# INFINITE SCROLL SENTINEL                                  %>
-      <%# ====================================================== %>
+      <%# INFINITE SCROLL SENTINEL %>
 
       <div
         data-admin-dashboard-support-messages-infinity-scroll-target="sentinel"
         class="h-4"
-        aria-hidden="true"
-      ></div>
+        aria-hidden="true">
+      </div>
 
     </div>
 

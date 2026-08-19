@@ -132,7 +132,7 @@
         </div>
 
         <div class="mt-2 text-sm font-bold text-slate-700 dark:text-white">
-          <%= @message.organisation.presence || "—" %>
+          <%= @message.organization_name.presence || "—" %>
         </div>
 
       </div>
@@ -185,7 +185,7 @@
         </div>
 
         <div class="mt-2 text-sm font-bold text-slate-700 dark:text-white">
-          <%= @message.source.presence || "—" %>
+          <%= @message.referral_source.presence || "—" %>
         </div>
 
       </div>
