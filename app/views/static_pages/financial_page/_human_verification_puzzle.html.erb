@@ -237,14 +237,34 @@
 
             <!-- BACKGROUND IMAGE -->
 
+<!--            <img-->
+<!--              data-human_verification-target="background"-->
+<!--              src="https://random.imagecdn.app/1600/900"-->
+<!--              alt=""-->
+<!--              draggable="false"-->
+<!--              class="absolute inset-0 h-full w-full-->
+<!--         select-none object-cover">-->
+
+            <!-- Locate this specific image tag frame layer inside your view and clean it down to look exactly like this: -->
             <img
               data-human_verification-target="background"
               src="https://random.imagecdn.app/1600/900"
-              alt=""
-              draggable="false"
-              class="absolute inset-0 h-full w-full
-         select-none object-cover"
-            >
+              class="w-full h-full object-cover absolute inset-0 filter brightness-95"
+              alt="Dynamic Network Captcha Security Verification Grid"
+              />
+
+            <!-- Ensure the puzzle tracking order template array includes tag updates before form closures -->
+            <%#= hidden_field_tag :puzzle_position, "0", data: { human_verification_target: "puzzleOrder" } %>
+<!--            <input type="hidden" name="verification_token" data-human_verification-target="token" />-->
+
+            <!-- Ensure these token elements sit comfortably right before your parent div closes -->
+            <input type="hidden" name="puzzle_position" data-human-verification-target="puzzleOrder" value="0" />
+            <input type="hidden" name="verification_token" data-human-verification-target="token" value="" />
+
+
+            <!-- Replace the static <img> element with the asset pipeline compilation tag -->
+            <%#= image_tag "project-puzzle.jpg", class: "w-full h-full object-cover absolute inset-0 hidden", data: { human_verification_target: "background" } %>
+
 
 
             <!-- MISSING AREA -->
