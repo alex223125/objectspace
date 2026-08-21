@@ -8,13 +8,10 @@ class SupportMessagesController < ApplicationController
   end
 
   def create
-    binding.pry
     unless human_puzzle_valid?
 
-      binding.pry
       @support_message = SupportMessage.new(support_message_params)
 
-      binding.pry
       prepare_puzzle
 
       flash.now[:alert] =
