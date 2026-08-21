@@ -286,4 +286,5 @@ Rails.application.routes.draw do
   get "support-messages/confirm/:token",
       to: "support_messages#confirm",
       as: :confirm_support_message
+
 end

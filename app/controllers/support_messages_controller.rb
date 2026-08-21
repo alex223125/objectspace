@@ -17,9 +17,81 @@ class SupportMessagesController < ApplicationController
       binding.pry
       prepare_puzzle
 
-      binding.pry
       flash.now[:alert] =
-        "Please complete the human verification puzzle correctly."
+        # if @current_puzzle.blank?
+        #   "Human verification session is missing. Please try again."
+        # elsif @current_puzzle["expires_at"].to_i < Time.current.to_i
+        #   "Human verification has expired. Please try again."
+        # elsif params[:puzzle_position].blank?
+        #   "Please move the slider to complete human verification."
+        # else
+        #   "Human verification failed. Please try again."
+        # end
+
+      # 1. No puzzle in session
+      if @current_puzzle.blank?
+        @human_puzzle_error =
+          "Human verification could not be found. Please refresh the page and try again."
+        return false
+      end
+
+      # 2. Puzzle expired
+      if @current_puzzle["expires_at"].blank?
+        @human_puzzle_error =
+          "Human verification has no expiration time. Please refresh the page and try again."
+        return false
+      end
+
+      if @current_puzzle["expires_at"].to_i < Time.current.to_i
+        session.delete(:support_puzzle)
+
+        @human_puzzle_error =
+          "Your human verification has expired. Please complete the new verification."
+        return false
+      end
+
+      # 3. Target position missing
+      if @current_puzzle["target_position"].blank?
+        @human_puzzle_error =
+          "Human verification is incomplete. Please refresh the page and try again."
+        return false
+      end
+
+      # 4. Slider parameter missing
+      if params[:puzzle_position].blank?
+        @human_puzzle_error =
+          "Please move the verification slider before submitting the form."
+        return false
+      end
+
+      # 5. Slider parameter is not numeric
+      unless params[:puzzle_position].to_s.match?(/\A\d+\z/)
+        @human_puzzle_error =
+          "The verification slider contains an invalid value. Please try again."
+        return false
+      end
+
+      submitted = params[:puzzle_position].to_i
+      expected = @current_puzzle["target_position"].to_i
+
+      # 6. Submitted value outside reasonable slider range
+      if submitted < 0 || submitted > 100
+        @human_puzzle_error =
+          "The verification slider position is invalid. Please try again."
+        return false
+      end
+
+      difference = (submitted - expected).abs
+
+      # 7. Incorrect position
+      unless difference <= 30
+        @human_puzzle_error =
+          "Human verification failed. Please move the slider closer to the target."
+        return false
+      end
+
+      # 8. Everything is correct
+      true
 
       binding.pry
       render :new, status: :unprocessable_entity
@@ -98,11 +170,6 @@ class SupportMessagesController < ApplicationController
   #   ).merge(referral_source: incoming_source) # Map the value down explicitly to match the ActiveRecord schema model
   # end
 
-  private
-
-  # ============================================================
-  # FIXED STRONG PARAMETERS DISCOVERY LAYER
-  # ============================================================
   private
 
   # def support_message_params
@@ -205,13 +272,13 @@ class SupportMessagesController < ApplicationController
   # ============================================================
   def prepare_puzzle
     binding.pry
-    current_puzzle = session[:support_puzzle]
+    @current_puzzle = session[:support_puzzle]
 
 
     binding.pry
     # Калі сесія існуе, змяшчае новы ключ і час яшчэ не выйшаў — выкарыстоўваем яе
-    if current_puzzle.present? && current_puzzle["target_position"].present? && current_puzzle["expires_at"].to_i > Time.current.to_i
-      @puzzle_target_position = current_puzzle["target_position"].to_i
+    if @current_puzzle.present? && @current_puzzle["target_position"].present? && @current_puzzle["expires_at"].to_i > Time.current.to_i
+      @puzzle_target_position = @current_puzzle["target_position"].to_i
     else
       binding.pry
       # У адваротным выпадку (няма сесіі, яна састарэла або гэта стары фармат 3x3) — ствараем наваку

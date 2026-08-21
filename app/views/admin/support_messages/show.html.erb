@@ -77,68 +77,49 @@
   >
 
     <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-
       <!-- First Name -->
-
       <div>
-
         <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">
           First Name
         </div>
-
         <div class="mt-2 text-sm font-bold text-slate-700 dark:text-white">
           <%= @message.first_name.presence || "—" %>
         </div>
-
       </div>
-
 
       <!-- Last Name -->
 
       <div>
-
         <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">
           Last Name
         </div>
-
         <div class="mt-2 text-sm font-bold text-slate-700 dark:text-white">
           <%= @message.last_name.presence || "—" %>
         </div>
-
       </div>
 
 
       <!-- Email -->
-
       <div>
-
         <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">
           Email
         </div>
-
         <div class="mt-2 text-sm font-bold text-slate-700 dark:text-white">
           <%= @message.email.presence || "—" %>
         </div>
-
       </div>
 
 
       <!-- Organisation -->
-
       <div>
-
         <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">
           Organisation
         </div>
-
         <div class="mt-2 text-sm font-bold text-slate-700 dark:text-white">
           <%= @message.organization_name.presence || "—" %>
         </div>
-
       </div>
-
     </div>
-
   </div>
 
 
@@ -160,37 +141,26 @@
     </h2>
 
     <div class="mt-6 grid gap-6 md:grid-cols-3">
-
       <!-- Support Category -->
-
       <div>
-
         <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">
           Support Category
         </div>
-
         <div class="mt-2 text-sm font-bold text-slate-700 dark:text-white">
           <%= @message.support_category.presence || "—" %>
         </div>
-
       </div>
 
 
       <!-- How They Heard About Project -->
-
       <div>
-
         <div class="text-[9px] font-black uppercase tracking-widest text-slate-400">
           Heard About Project
         </div>
-
         <div class="mt-2 text-sm font-bold text-slate-700 dark:text-white">
           <%= @message.referral_source.presence || "—" %>
         </div>
-
       </div>
-
-
       <!-- Status -->
 
       <div>
