@@ -86,42 +86,31 @@ class SupportMessagesController < ApplicationController
           "Human verification failed. Please move the slider closer to the target."
         return false
       end
-
       # 8. Everything is correct
       true
-
-      binding.pry
       render :new, status: :unprocessable_entity
       return
     end
 
-    binding.pry
     @support_message = SupportMessage.new(support_message_params)
 
-    binding.pry
     @support_message.ip_address = request.remote_ip
     @support_message.user_agent = request.user_agent
     @support_message.human_verified_at = Time.current
 
-    binding.pry
     if @support_message.save
 
-      binding.pry
       SupportMessageMailer.email_confirmation(
         @support_message
       ).deliver_later
 
-      binding.pry
       session.delete(:support_puzzle)
 
-      binding.pry
       redirect_to financial_page_path,
                   notice: "Your message has been received. Please check your email to confirm it."
     else
-      binding.pry
       prepare_puzzle
 
-      binding.pry
       render :new, status: :unprocessable_entity
     end
   end
@@ -247,7 +236,6 @@ class SupportMessagesController < ApplicationController
   # СТРАНГ-ПАРАМЕТРЫ З АЎТАМАЦЫЧНЫМ МАПІНГAM КАЛОНАК
   # ============================================================
   def support_message_params
-    binding.pry
     permitted = params.require(:support_message).permit(
       :first_name,
       :last_name,
@@ -268,16 +256,13 @@ class SupportMessagesController < ApplicationController
   # НАДЗЕЙНАЯ ПАДРЫХТОЎКА СЕСІІ ПАЗЛА (ПЕРАЗАПІС ПРАТЭРМІНАВАНАГА)
   # ============================================================
   def prepare_puzzle
-    binding.pry
     @current_puzzle = session[:support_puzzle]
 
 
-    binding.pry
     # Калі сесія існуе, змяшчае новы ключ і час яшчэ не выйшаў — выкарыстоўваем яе
     if @current_puzzle.present? && @current_puzzle["target_position"].present? && @current_puzzle["expires_at"].to_i > Time.current.to_i
       @puzzle_target_position = @current_puzzle["target_position"].to_i
     else
-      binding.pry
       # У адваротным выпадку (няма сесіі, яна састарэла або гэта стары фармат 3x3) — ствараем наваку
       target_position = rand(35..75)
 
@@ -293,31 +278,23 @@ class SupportMessagesController < ApplicationController
   # ВАЛІДАЦЫЯ ДЛЯ СЛАЙДЭРА З АБНАЎЛЕННЕМ ЧАСУ СЕСІІ
   # ============================================================
   def human_puzzle_valid?
-    binding.pry
     puzzle = session[:support_puzzle]
 
-    binding.pry
     return false if puzzle.blank?
 
-    binding.pry
     # Калі час выйшаў — выдаляем сесію і вяртаем false, каб выклікаць перазапуск капчы
     # if puzzle["expires_at"].to_i < Time.current.to_i
     if puzzle["expires_at"].to_i < Time.current.to_i
-      binding.pry
       session.delete(:support_puzzle)
       return false
     end
 
-    binding.pry
     # Бяспечная праверка: калі па нейкай прычыне ключа няма (старая сесія), не пускаем бота
     return false if puzzle["target_position"].blank?
 
-    binding.pry
     submitted = params[:puzzle_position].to_i
-    binding.pry
     expected = puzzle["target_position"].to_i
 
-    binding.pry
     # Хібнасць у +/- 8 адзінак для камфортнага перацягвання
     (submitted - expected).abs <= 30
   end
