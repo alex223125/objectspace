@@ -6,14 +6,14 @@
   data-admin_entity_types-search-url-value="<%= admin_ecosystems_load_sources_entity_types_entity_types_path %>"
 >
 
-  <!-- HEADER -->
+  <%# ================================================================ %>
+  <%# PAGE HEADER %>
+  <%# ================================================================ %>
 
   <div class="mb-8">
-
     <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
 
       <div>
-
         <div class="flex items-center gap-3">
 
           <div
@@ -25,72 +25,42 @@
           </div>
 
           <div>
-
-            <h1
-              class="text-3xl font-bold text-gray-900
-                     dark:text-white"
-            >
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
               Entity Types
             </h1>
 
             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
               Manage the types used by your entity templates.
             </p>
-
           </div>
 
         </div>
 
-
-        <!-- BREADCRUMB -->
-
-        <div
-          class="mt-4 flex flex-wrap items-center gap-2
-                 text-xs text-gray-400"
-        >
-
-          <span>
-            Encyclopedia
-          </span>
-
-          <span>
-            ›
-          </span>
-
-          <span>
-            Ecosystems
-          </span>
-
-          <span>
-            ›
-          </span>
-
-          <span>
-            Load Sources
-          </span>
-
-          <span>
-            ›
-          </span>
+        <%# Breadcrumb %>
+        <div class="mt-4 flex flex-wrap items-center gap-2 text-xs text-gray-400">
+          <span>Encyclopedia</span>
+          <span>›</span>
+          <span>Ecosystems</span>
+          <span>›</span>
+          <span>Load Sources</span>
+          <span>›</span>
 
           <span class="font-medium text-indigo-500">
             Entity Types
           </span>
-
         </div>
-
       </div>
 
 
-      <!-- CREATE -->
+      <%# CREATE BUTTON %>
 
       <%= link_to(
             new_admin_ecosystems_load_sources_entity_types_entity_type_path,
             data: {
-              turbo_frame: "_top"
+              turbo_frame: "entity_types_content"
             },
-            class: "inline-flex shrink-0 items-center justify-center
-                    gap-2 rounded-xl bg-indigo-600 px-5 py-3
+            class: "inline-flex shrink-0 items-center justify-center gap-2
+                    rounded-xl bg-indigo-600 px-5 py-3
                     text-sm font-semibold text-white shadow-sm
                     transition hover:bg-indigo-700
                     focus:outline-none focus:ring-2
@@ -101,60 +71,47 @@
           +
         </span>
 
-        <span>
-          Create Entity Type
-        </span>
+        Create Entity Type
 
       <% end %>
 
     </div>
-
   </div>
 
 
-  <!-- STATISTICS -->
+  <%# ================================================================ %>
+  <%# STATISTICS %>
+  <%# ================================================================ %>
 
   <div class="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
 
-    <!-- TOTAL -->
+    <%# TOTAL %>
 
     <div
       class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm
              dark:border-gray-800 dark:bg-gray-800"
     >
-
-      <div
-        class="text-xs font-semibold uppercase tracking-wider
-               text-gray-400"
-      >
+      <div class="text-xs font-semibold uppercase tracking-wider text-gray-400">
         Total Entity Types
       </div>
 
-      <div
-        class="mt-2 text-3xl font-bold text-gray-900
-               dark:text-white"
-      >
+      <div class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
         <%= @entity_types.count %>
       </div>
 
       <div class="mt-1 text-xs text-gray-400">
         Available entity types
       </div>
-
     </div>
 
 
-    <!-- ACTIVE -->
+    <%# ACTIVE %>
 
     <div
       class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm
              dark:border-gray-800 dark:bg-gray-800"
     >
-
-      <div
-        class="text-xs font-semibold uppercase tracking-wider
-               text-gray-400"
-      >
+      <div class="text-xs font-semibold uppercase tracking-wider text-gray-400">
         Active
       </div>
 
@@ -165,21 +122,16 @@
       <div class="mt-1 text-xs text-gray-400">
         Currently available
       </div>
-
     </div>
 
 
-    <!-- INACTIVE -->
+    <%# INACTIVE %>
 
     <div
       class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm
              dark:border-gray-800 dark:bg-gray-800"
     >
-
-      <div
-        class="text-xs font-semibold uppercase tracking-wider
-               text-gray-400"
-      >
+      <div class="text-xs font-semibold uppercase tracking-wider text-gray-400">
         Inactive
       </div>
 
@@ -190,27 +142,28 @@
       <div class="mt-1 text-xs text-gray-400">
         Currently disabled
       </div>
-
     </div>
 
   </div>
 
 
-  <!-- SEARCH / SORT -->
+  <%# ================================================================ %>
+  <%# SEARCH / SORT %>
+  <%# ================================================================ %>
 
   <div
-    class="mb-8 rounded-2xl border border-gray-200 bg-white p-5
-           shadow-sm dark:border-gray-800 dark:bg-gray-800"
+    class="mb-8 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm
+           dark:border-gray-800 dark:bg-gray-800"
   >
 
     <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
 
-      <!-- SEARCH -->
+      <%# SEARCH %>
 
       <div class="md:col-span-2">
 
         <label
-          for="entity-types-search"
+          for="entity_types_search"
           class="mb-2 block text-sm font-medium
                  text-gray-700 dark:text-gray-300"
         >
@@ -220,10 +173,10 @@
         <div class="relative">
 
           <input
-            id="entity-types-search"
+            id="entity_types_search"
             type="search"
             name="q"
-            value="<%= params[:q].to_s %>"
+            value="<%= params[:q] %>"
             placeholder="Search by name, slug or description..."
             autocomplete="off"
             data-admin_entity_types-target="search"
@@ -231,15 +184,11 @@
             class="block w-full rounded-xl border border-gray-300
                    bg-gray-50 px-4 py-3 pl-11 text-sm
                    text-gray-900
-                   focus:border-indigo-500
-                   focus:ring-indigo-500
-                   dark:border-gray-700
-                   dark:bg-gray-900
+                   focus:border-indigo-500 focus:outline-none
+                   focus:ring-2 focus:ring-indigo-500
+                   dark:border-gray-700 dark:bg-gray-900
                    dark:text-white"
           >
-
-
-          <!-- SEARCH ICON -->
 
           <div
             class="pointer-events-none absolute left-4 top-1/2
@@ -249,20 +198,18 @@
           </div>
 
 
-          <!-- SPINNER -->
+          <%# SPINNER %>
 
           <div
             data-admin_entity_types-target="spinner"
             class="absolute right-4 top-1/2 hidden
                    -translate-y-1/2"
           >
-
             <div
               class="h-5 w-5 animate-spin rounded-full
                      border-2 border-gray-300
                      border-t-indigo-600"
             ></div>
-
           </div>
 
         </div>
@@ -270,12 +217,12 @@
       </div>
 
 
-      <!-- SORT -->
+      <%# SORT %>
 
       <div>
 
         <label
-          for="entity-types-sort"
+          for="entity_types_sort"
           class="mb-2 block text-sm font-medium
                  text-gray-700 dark:text-gray-300"
         >
@@ -283,24 +230,22 @@
         </label>
 
         <select
-          id="entity-types-sort"
+          id="entity_types_sort"
           name="sort"
           data-admin_entity_types-target="sort"
           data-action="change->admin_entity_types#sort"
           class="block w-full rounded-xl border border-gray-300
                  bg-gray-50 px-4 py-3 text-sm
                  text-gray-900
-                 focus:border-indigo-500
-                 focus:ring-indigo-500
-                 dark:border-gray-700
-                 dark:bg-gray-900
+                 focus:border-indigo-500 focus:outline-none
+                 focus:ring-2 focus:ring-indigo-500
+                 dark:border-gray-700 dark:bg-gray-900
                  dark:text-white"
         >
 
           <option
             value="name_asc"
-            <%= "selected" if params[:sort].blank? ||
-              params[:sort] == "name_asc" %>
+            <%= "selected" if params[:sort].blank? || params[:sort] == "name_asc" %>
           >
             Name A–Z
           </option>
@@ -335,7 +280,22 @@
   </div>
 
 
-  <!-- RESULTS -->
+  <%# ================================================================ %>
+  <%# RESULTS FRAME %>
+  <%# ================================================================ %>
+  <%#
+      IMPORTANT:
+
+      The Stimulus controller expects:
+
+        data-admin-entity-types-target="results"
+
+      and the JS loads:
+
+        #entity_types_results
+
+      Therefore this MUST be a Turbo Frame with this exact ID.
+  %>
 
   <%= turbo_frame_tag "entity_types_results" do %>
 
@@ -344,15 +304,200 @@
       class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3"
     >
 
-      <%= render(
-            "results",
-            entity_types: @entity_types,
-            pagy: nil
-          ) %>
+      <% if @entity_types.present? %>
+
+        <% @entity_types.each do |entity_type| %>
+
+          <div
+            class="rounded-2xl border border-gray-200
+                   bg-white p-6 shadow-sm
+                   transition hover:-translate-y-0.5 hover:shadow-md
+                   dark:border-gray-800 dark:bg-gray-800"
+          >
+
+            <%# CARD HEADER %>
+
+            <div class="flex items-start justify-between gap-4">
+
+              <div class="min-w-0">
+
+                <h2
+                  class="truncate text-lg font-bold
+                         text-gray-900 dark:text-white"
+                >
+                  <%= entity_type.name %>
+                </h2>
+
+                <div class="mt-1 font-mono text-xs text-indigo-500">
+                  <%= entity_type.slug %>
+                </div>
+
+              </div>
+
+
+              <%# STATUS %>
+
+              <% if entity_type.active? %>
+
+                <span
+                  class="shrink-0 rounded-full bg-green-100
+                         px-3 py-1 text-xs font-semibold
+                         text-green-700
+                         dark:bg-green-900/30
+                         dark:text-green-400"
+                >
+                  Active
+                </span>
+
+              <% else %>
+
+                <span
+                  class="shrink-0 rounded-full bg-gray-100
+                         px-3 py-1 text-xs font-semibold
+                         text-gray-600
+                         dark:bg-gray-900
+                         dark:text-gray-400"
+                >
+                  Inactive
+                </span>
+
+              <% end %>
+
+            </div>
+
+
+            <%# DESCRIPTION %>
+
+            <% if entity_type.description.present? %>
+
+              <p
+                class="mt-4 line-clamp-3 text-sm
+                       text-gray-500 dark:text-gray-400"
+              >
+                <%= entity_type.description %>
+              </p>
+
+            <% else %>
+
+              <p
+                class="mt-4 text-sm italic
+                       text-gray-400"
+              >
+                No description.
+              </p>
+
+            <% end %>
+
+
+            <%# ACTIONS %>
+
+            <div
+              class="mt-6 flex items-center justify-between
+                     border-t border-gray-100 pt-4
+                     dark:border-gray-700"
+            >
+
+              <%= link_to(
+                    "View",
+                    admin_ecosystems_load_sources_entity_types_entity_type_path(
+                      entity_type
+                    ),
+                    data: {
+                      turbo_frame: "entity_types_content"
+                    },
+                    class: "text-sm font-semibold
+                            text-indigo-600 hover:text-indigo-700
+                            dark:text-indigo-400"
+                  ) %>
+
+
+              <%= link_to(
+                    "Edit",
+                    edit_admin_ecosystems_load_sources_entity_types_entity_type_path(
+                      entity_type
+                    ),
+                    data: {
+                      turbo_frame: "entity_types_content"
+                    },
+                    class: "text-sm font-semibold
+                            text-gray-600 hover:text-indigo-600
+                            dark:text-gray-400"
+                  ) %>
+
+            </div>
+
+          </div>
+
+        <% end %>
+
+      <% else %>
+
+        <%# EMPTY STATE %>
+
+        <div class="md:col-span-2 xl:col-span-3">
+
+          <div
+            class="rounded-2xl border border-dashed
+                   border-gray-300 bg-white p-12
+                   text-center
+                   dark:border-gray-700
+                   dark:bg-gray-800"
+          >
+
+            <div
+              class="mx-auto mb-5 flex h-16 w-16
+                     items-center justify-center
+                     rounded-2xl bg-indigo-50
+                     text-3xl
+                     dark:bg-indigo-900/30"
+            >
+              🧩
+            </div>
+
+            <h3
+              class="text-lg font-bold
+                     text-gray-900 dark:text-white"
+            >
+              No entity types found
+            </h3>
+
+            <p
+              class="mt-2 text-sm
+                     text-gray-500 dark:text-gray-400"
+            >
+              Try changing your search or create a new entity type.
+            </p>
+
+            <%= link_to(
+                  "Create Entity Type",
+                  new_admin_ecosystems_load_sources_entity_types_entity_type_path,
+                  data: {
+                    turbo_frame: "entity_types_content"
+                  },
+                  class: "mt-6 inline-flex rounded-xl
+                          bg-indigo-600 px-5 py-3
+                          text-sm font-semibold text-white
+                          hover:bg-indigo-700"
+                ) %>
+
+          </div>
+
+        </div>
+
+      <% end %>
 
     </div>
 
   <% end %>
 
+
+  <%# ================================================================ %>
+  <%# OPTIONAL MESSAGE TARGET %>
+  <%# ================================================================ %>
+
+  <div
+    data-admin_entity_types-target="message"
+    class="mt-4"
+  ></div>
 
 </div>

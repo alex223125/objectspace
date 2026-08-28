@@ -8,18 +8,15 @@ module Admin
                         only: %i[show edit update destroy]
 
           def index
-            @entity_types =
-              ::Ecosystems::LoadSources::EntityTypes::EntityType
-                .includes(:parent)
+            @entity_types = ::Ecosystems::LoadSources::EntityTypes::EntityType.includes(:parent)
 
             if params[:q].present?
               query = "%#{params[:q].strip}%"
 
-              @entity_types =
-                @entity_types.where(
-                  "name ILIKE :query OR slug ILIKE :query OR description ILIKE :query",
-                  query: query
-                )
+              @entity_types = @entity_types.where(
+                "name ILIKE :query OR slug ILIKE :query OR description ILIKE :query",
+                query: query
+              )
             end
 
             case params[:sort]
@@ -44,7 +41,6 @@ module Admin
                   pagy: nil
                 }
               )
-
               return
             end
 

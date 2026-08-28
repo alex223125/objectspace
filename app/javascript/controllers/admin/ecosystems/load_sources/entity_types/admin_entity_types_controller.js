@@ -36,59 +36,56 @@ export default class extends Controller {
     }
 
     loadResults() {
+        if (!this.hasResultsTarget) {
+            console.error("admin_entity_types: results target is missing")
+            this.hideSpinner()
+            return
+        }
+
+        const params = new URLSearchParams()
+
+        if (this.hasSearchTarget && this.searchTarget.value.trim() !== "") {
+            params.set("q", this.searchTarget.value.trim())
+        }
+
+        if (this.hasSortTarget && this.sortTarget.value !== "") {
+            params.set("sort", this.sortTarget.value)
+        }
+
+        const url = `${this.searchUrlValue}?${params.toString()}`
+
         const frame = document.getElementById("entity_types_results")
 
         if (!frame) {
             console.error(
-                "admin_entity_types: #entity_types_results Turbo Frame not found"
+                "admin_entity_types: entity_types_results frame is missing"
             )
 
             this.hideSpinner()
             return
         }
 
-        const url = new URL(
-            this.searchUrlValue,
-            window.location.origin
-        )
-
-        if (this.hasSearchTarget) {
-            const query = this.searchTarget.value.trim()
-
-            if (query !== "") {
-                url.searchParams.set("q", query)
-            }
-        }
-
-        if (this.hasSortTarget) {
-            const sort = this.sortTarget.value
-
-            if (sort !== "") {
-                url.searchParams.set("sort", sort)
-            }
-        }
-
-        const handleLoad = () => {
-            this.hideSpinner()
-        }
-
-        const handleError = () => {
-            this.hideSpinner()
-        }
+        frame.src = url
 
         frame.addEventListener(
             "turbo:frame-load",
-            handleLoad,
+            () => {
+                this.hideSpinner()
+            },
             { once: true }
         )
 
         frame.addEventListener(
-            "turbo:frame-error",
-            handleError,
+            "turbo:frame-missing",
+            () => {
+                console.error(
+                    "admin_entity_types: server response did not contain entity_types_results frame"
+                )
+
+                this.hideSpinner()
+            },
             { once: true }
         )
-
-        frame.src = url.toString()
     }
 
     showSpinner() {
