@@ -1,0 +1,92 @@
+<%= form_with model: @entity_type,
+              url: @entity_type.persisted? ?
+                     ecosystems_load_sources_entity_types_entity_type_path(@entity_type) :
+                     ecosystems_load_sources_entity_types_entity_types_path,
+              method: @entity_type.persisted? ? :patch : :post,
+              local: true do |form| %>
+
+  <% if @entity_type.errors.any? %>
+    <div class="mb-6 p-4 rounded-lg bg-red-50 border border-red-200">
+
+      <h2 class="font-semibold text-red-800">
+        <%= pluralize(@entity_type.errors.count, "error") %>
+        prevented this entity type from being saved:
+      </h2>
+
+      <ul class="mt-2 list-disc list-inside text-red-700">
+        <% @entity_type.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+
+    </div>
+  <% end %>
+
+  <div class="space-y-6">
+
+    <div>
+      <%= form.label :name,
+                     class: "block text-sm font-medium text-gray-700 mb-2" %>
+
+      <%= form.text_field :name,
+                          class: "w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500",
+                          placeholder: "Organisation" %>
+    </div>
+
+    <div>
+      <%= form.label :slug,
+                     class: "block text-sm font-medium text-gray-700 mb-2" %>
+
+      <%= form.text_field :slug,
+                          class: "w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500",
+                          placeholder: "organisation" %>
+    </div>
+
+    <div>
+      <%= form.label :parent_id,
+                     "Parent Entity Type",
+                     class: "block text-sm font-medium text-gray-700 mb-2" %>
+
+      <%= form.collection_select :parent_id,
+                                 @parent_entity_types,
+                                 :id,
+                                 :name,
+                                 { include_blank: "No parent — root type" },
+                                 class: "w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+    </div>
+
+    <div>
+      <%= form.label :description,
+                     class: "block text-sm font-medium text-gray-700 mb-2" %>
+
+      <%= form.text_area :description,
+                         rows: 6,
+                         class: "w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500",
+                         placeholder: "Describe what this entity type represents..." %>
+    </div>
+
+    <div class="flex items-center gap-3">
+
+      <%= form.check_box :active,
+                         class: "rounded border-gray-300 text-blue-600 focus:ring-blue-500" %>
+
+      <%= form.label :active,
+                     "Active",
+                     class: "text-sm font-medium text-gray-700" %>
+
+    </div>
+
+    <div class="flex items-center gap-3 pt-4">
+
+      <%= form.submit @entity_type.persisted? ? "Update Entity Type" : "Create Entity Type",
+                      class: "px-5 py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition" %>
+
+      <%= link_to "Cancel",
+                  ecosystems_load_sources_entity_types_entity_types_path,
+                  class: "px-5 py-3 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50" %>
+
+    </div>
+
+  </div>
+
+<% end %>

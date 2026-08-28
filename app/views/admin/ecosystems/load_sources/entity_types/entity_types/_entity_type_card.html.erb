@@ -1,0 +1,101 @@
+<div
+  class="group rounded-2xl border border-gray-200 bg-white p-6 shadow-sm
+         transition hover:-translate-y-0.5 hover:shadow-md
+         dark:border-gray-800 dark:bg-gray-900"
+>
+
+  <div class="flex items-start justify-between">
+
+    <div
+      class="flex h-11 w-11 items-center justify-center
+             rounded-xl bg-indigo-100 text-xl
+             dark:bg-indigo-900/40"
+    >
+      🧩
+    </div>
+
+
+    <% if entity_type.active? %>
+
+      <span
+        class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold
+               text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+      >
+        Active
+      </span>
+
+    <% else %>
+
+      <span
+        class="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold
+               text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+      >
+        Inactive
+      </span>
+
+    <% end %>
+
+  </div>
+
+
+  <div class="mt-5">
+
+    <h3 class="text-lg font-bold text-gray-900 dark:text-white">
+      <%= entity_type.name %>
+    </h3>
+
+    <p class="mt-1 font-mono text-xs text-indigo-500">
+      <%= entity_type.slug %>
+    </p>
+
+    <% if entity_type.description.present? %>
+
+      <p class="mt-4 line-clamp-3 text-sm text-gray-500 dark:text-gray-400">
+        <%= entity_type.description %>
+      </p>
+
+    <% else %>
+
+      <p class="mt-4 text-sm italic text-gray-400">
+        No description
+      </p>
+
+    <% end %>
+
+  </div>
+
+
+  <div class="mt-6 flex items-center justify-between border-t
+              border-gray-100 pt-4 dark:border-gray-800">
+
+    <%= link_to(
+          "View",
+          admin_ecosystems_load_sources_entity_types_entity_type_path(entity_type),
+          class: "text-sm font-semibold text-indigo-600 hover:text-indigo-700"
+        ) %>
+
+
+    <div class="flex items-center gap-3">
+
+      <%= link_to(
+            "Edit",
+            edit_admin_ecosystems_load_sources_entity_types_entity_type_path(entity_type),
+            class: "text-sm font-medium text-gray-500 hover:text-indigo-600"
+          ) %>
+
+
+      <%= button_to(
+            "Delete",
+            admin_ecosystems_load_sources_entity_types_entity_type_path(entity_type),
+            method: :delete,
+            data: {
+              turbo_confirm: "Delete #{entity_type.name}?"
+            },
+            class: "text-sm font-medium text-red-500 hover:text-red-700"
+          ) %>
+
+    </div>
+
+  </div>
+
+</div>

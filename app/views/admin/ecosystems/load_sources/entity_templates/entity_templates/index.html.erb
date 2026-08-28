@@ -1,0 +1,490 @@
+<%# ============================================================ %>
+<%# FILE: app/views/admin/ecosystems/load_sources/entity_templates/entity_templates/index.html.erb %>
+<%# ============================================================ %>
+
+<div
+  class="mx-auto w-full max-w-7xl px-5 pt-8 sm:px-7 lg:px-10"
+  data-controller="admin-entity_templates"
+  data-admin-entity_templates-search-url-value="<%= admin_ecosystems_load_sources_entity_templates_entity_templates_path %>"
+>
+
+  <%# ========================================================== %>
+  <%# PAGE HEADER                                                  %>
+  <%# ========================================================== %>
+
+  <div class="mb-8">
+
+    <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+
+      <div>
+
+        <div class="mb-2 flex items-center gap-3">
+
+          <span
+            class="flex h-11 w-11 shrink-0 items-center justify-center
+                   rounded-xl bg-indigo-100 text-indigo-600
+                   dark:bg-indigo-900/40 dark:text-indigo-300">
+
+            <svg
+              class="h-6 w-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.8"
+                d="M12 6V4m0 16v-2M6 12H4m16 0h-2M7.05 7.05 5.64 5.64m12.72 12.72-1.41-1.41M7.05 16.95l-1.41 1.41m12.72-12.72-1.41 1.41"
+                />
+            </svg>
+
+          </span>
+
+          <div>
+
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+              Entity Templates
+            </h1>
+
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              Configure the structures used to build encyclopedia entities.
+            </p>
+
+          </div>
+
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 text-xs text-gray-400">
+
+          <span>Encyclopedia</span>
+          <span>›</span>
+          <span>Ecosystems</span>
+          <span>›</span>
+          <span>Load Sources</span>
+          <span>›</span>
+
+          <span class="font-medium text-indigo-500">
+            Entity Templates
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <%# NEW TEMPLATE %>
+
+      <%= link_to(
+            new_admin_ecosystems_load_sources_entity_templates_entity_template_path,
+            data: {
+              turbo_frame: "entity_templates_results"
+            },
+            class: "inline-flex shrink-0 items-center justify-center gap-2
+              rounded-xl bg-indigo-600 px-5 py-3
+              text-sm font-semibold text-white shadow-sm
+              transition hover:-translate-y-0.5 hover:bg-indigo-700"
+          ) do %>
+
+        <span class="text-lg leading-none">+</span>
+
+        New Template
+
+      <% end %>
+
+    </div>
+
+  </div>
+
+
+  <%# ========================================================== %>
+  <%# STATISTICS                                                   %>
+  <%# ========================================================== %>
+
+  <div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+
+    <%# TOTAL TEMPLATES %>
+
+    <div
+      class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm
+             dark:border-gray-800 dark:bg-gray-800">
+
+      <div class="text-xs font-semibold uppercase tracking-wider text-gray-400">
+        Templates
+      </div>
+
+      <div class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
+        <%= @entity_templates.respond_to?(:count) ? @entity_templates.count : "-" %>
+      </div>
+
+      <div class="mt-1 text-xs text-gray-400">
+        Available entity structures
+      </div>
+
+    </div>
+
+
+    <%# CURRENT FILTER %>
+
+    <div
+      class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm
+             dark:border-gray-800 dark:bg-gray-800">
+
+      <div class="text-xs font-semibold uppercase tracking-wider text-gray-400">
+        Active Filter
+      </div>
+
+      <div class="mt-2 text-lg font-bold text-indigo-600 dark:text-indigo-400">
+        <%= @status.present? ? @status.titleize : "All templates" %>
+      </div>
+
+      <div class="mt-1 text-xs text-gray-400">
+        Current result filter
+      </div>
+
+    </div>
+
+
+    <%# ENTITY TYPES %>
+
+    <div
+      class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm
+             dark:border-gray-800 dark:bg-gray-800">
+
+      <div class="text-xs font-semibold uppercase tracking-wider text-gray-400">
+        Current Taxonomy
+      </div>
+
+      <div class="mt-2 text-lg font-bold text-gray-900 dark:text-white">
+        <%= @entity_types.respond_to?(:count) ? @entity_types.count : 0 %>
+        active types
+      </div>
+
+      <div class="mt-1 text-xs text-gray-400">
+        Available entity types
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <%# ========================================================== %>
+  <%# SEARCH AND FILTERS                                           %>
+  <%# ========================================================== %>
+
+  <div
+    class="mb-8 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm
+           dark:border-gray-800 dark:bg-gray-800">
+
+    <%= form_with(
+          url: admin_ecosystems_load_sources_entity_templates_entity_templates_path,
+          method: :get,
+          data: {
+            turbo_frame: "entity_templates_results",
+            action: "submit->admin-entity_templates#submitSearch"
+          },
+          class: "space-y-4"
+        ) do |form| %>
+
+
+      <div class="grid grid-cols-1 gap-4 lg:grid-cols-12">
+
+        <%# SEARCH %>
+
+        <div class="lg:col-span-5">
+
+          <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Search templates
+          </label>
+
+          <div class="relative">
+
+            <%= form.search_field(
+                  :q,
+                  value: @query,
+                  placeholder: "Search by name, slug or description...",
+                  autocomplete: "off",
+                  data: {
+                    action: "input->admin-entity_templates#search"
+                  },
+                  class: "block w-full rounded-xl border border-gray-300
+                          bg-gray-50 px-4 py-3 pl-11 text-sm
+                          focus:border-indigo-500 focus:ring-indigo-500
+                          dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                ) %>
+
+
+            <div
+              class="pointer-events-none absolute left-4 top-1/2
+                     -translate-y-1/2 text-gray-400">
+
+              <svg
+                class="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"
+                  />
+              </svg>
+
+            </div>
+
+
+            <div
+              data-admin-entity_templates-target="spinner"
+              class="absolute right-4 top-1/2 hidden -translate-y-1/2">
+
+              <div
+                class="h-5 w-5 animate-spin rounded-full
+                       border-2 border-gray-300 border-t-indigo-600">
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <%# ENTITY TYPE %>
+
+        <div class="lg:col-span-3">
+
+          <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Entity Type
+          </label>
+
+          <%= form.select(
+                :entity_type_id,
+                options_from_collection_for_select(
+                  @entity_types,
+                  :id,
+                  :name,
+                  @entity_type_id
+                ),
+                {
+                  include_blank: "All entity types"
+                },
+                {
+                  data: {
+                    action: "change->admin-entity_templates#filterChanged"
+                  },
+                  class: "block w-full rounded-xl border border-gray-300
+                          bg-gray-50 px-4 py-3 text-sm
+                          focus:border-indigo-500 focus:ring-indigo-500
+                          dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                }
+              ) %>
+
+        </div>
+
+
+        <%# STATUS %>
+
+        <div class="lg:col-span-2">
+
+          <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Status
+          </label>
+
+          <%= form.select(
+                :status,
+                [
+                  ["All statuses", ""],
+                  ["Active", "active"],
+                  ["Inactive", "inactive"]
+                ],
+                {
+                  selected: @status
+                },
+                {
+                  data: {
+                    action: "change->admin-entity_templates#filterChanged"
+                  },
+                  class: "block w-full rounded-xl border border-gray-300
+                          bg-gray-50 px-4 py-3 text-sm
+                          focus:border-indigo-500 focus:ring-indigo-500
+                          dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                }
+              ) %>
+
+        </div>
+
+
+        <%# SORT %>
+
+        <div class="lg:col-span-2">
+
+          <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Sort
+          </label>
+
+          <%= form.select(
+                :sort,
+                [
+                  ["Name A–Z", "name_asc"],
+                  ["Name Z–A", "name_desc"],
+                  ["Newest", "newest"],
+                  ["Oldest", "oldest"],
+                  ["Recently updated", "updated"]
+                ],
+                {
+                  selected: @sort.presence || "name_asc"
+                },
+                {
+                  data: {
+                    action: "change->admin-entity_templates#filterChanged"
+                  },
+                  class: "block w-full rounded-xl border border-gray-300
+                          bg-gray-50 px-4 py-3 text-sm
+                          focus:border-indigo-500 focus:ring-indigo-500
+                          dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                }
+              ) %>
+
+        </div>
+
+      </div>
+
+
+      <%# SEARCH STATUS / RESET %>
+
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+        <div
+          data-admin-entity_templates-target="message"
+          class="text-sm text-gray-500 dark:text-gray-400">
+
+          <% if @query.present? %>
+
+            Searching for
+            <span class="font-medium text-gray-700 dark:text-gray-200">
+              "<%= @query %>"
+            </span>
+
+          <% elsif @entity_type_id.present? %>
+
+            Filtering by selected entity type
+
+          <% elsif @status.present? %>
+
+            Showing
+            <%= @status.titleize %>
+            templates
+
+          <% else %>
+
+            Showing available entity templates
+
+          <% end %>
+
+        </div>
+
+
+        <%= link_to(
+              "Reset",
+              admin_ecosystems_load_sources_entity_templates_entity_templates_path,
+              data: {
+                turbo_frame: "entity_templates_results"
+              },
+              class: "text-sm font-medium text-gray-500
+                      transition hover:text-indigo-600
+                      dark:text-gray-400 dark:hover:text-indigo-400"
+            ) %>
+
+      </div>
+
+    <% end %>
+
+  </div>
+
+
+  <%# ========================================================== %>
+  <%# RESULTS                                                       %>
+  <%# ========================================================== %>
+
+  <%= turbo_frame_tag "entity_templates_results" do %>
+
+    <div
+      data-admin-entity_templates-target="results"
+      class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3"
+    >
+
+      <% if @entity_templates.present? && @entity_templates.any? %>
+
+        <% @entity_templates.each do |entity_template| %>
+
+          <%= render(
+                "entity_template_card",
+                entity_template: entity_template
+              ) %>
+
+        <% end %>
+
+      <% else %>
+
+        <div class="md:col-span-2 xl:col-span-3">
+
+          <div
+            class="rounded-2xl border border-dashed border-gray-300
+                 bg-white p-12 text-center
+                 dark:border-gray-700 dark:bg-gray-800"
+          >
+
+            <div
+              class="mx-auto mb-5 flex h-16 w-16 items-center justify-center
+                   rounded-2xl bg-indigo-50 text-3xl
+                   dark:bg-indigo-900/30"
+            >
+              🧩
+            </div>
+
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white">
+              No templates found
+            </h3>
+
+            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              Try changing your search or create your first entity template.
+            </p>
+
+            <%= link_to(
+                  "Create Template",
+                  new_admin_ecosystems_load_sources_entity_templates_entity_template_path,
+                  data: {
+                    turbo_frame: "entity_templates_results"
+                  },
+                  class: "mt-6 inline-flex rounded-xl bg-indigo-600
+                        px-5 py-3 text-sm font-semibold text-white
+                        transition hover:bg-indigo-700"
+                ) %>
+
+          </div>
+
+        </div>
+
+      <% end %>
+
+    </div>
+
+  <% end %>
+
+
+
+  <%# ========================================================== %>
+  <%# ASYNC TOAST                                                  %>
+  <%# ========================================================== %>
+
+  <div
+    data-admin-entity_templates-target="toast"
+    class="fixed bottom-6 right-6 z-50 hidden max-w-sm
+           rounded-xl bg-gray-900 px-5 py-4 text-sm font-medium
+           text-white shadow-xl">
+  </div>
+
+</div>

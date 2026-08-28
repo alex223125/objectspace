@@ -1,0 +1,283 @@
+<%# app/views/admin/ecosystems/load_sources/entity_types/entity_types/new.html.erb %>
+
+<%= turbo_frame_tag "entity_types_content" do %>
+
+  <div class="mx-auto w-full max-w-4xl px-5 py-8 sm:px-7 lg:px-10">
+
+    <!-- HEADER -->
+    <div class="mb-8">
+
+      <div class="flex items-center gap-3">
+
+        <div
+          class="flex h-12 w-12 items-center justify-center
+                 rounded-xl bg-indigo-100 text-2xl
+                 dark:bg-indigo-900/40"
+        >
+          🧩
+        </div>
+
+        <div>
+
+          <h1
+            class="text-3xl font-bold text-gray-900
+                   dark:text-white"
+          >
+            Create Entity Type
+          </h1>
+
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Define a new type that can be used by entity templates.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <!-- BREADCRUMB -->
+      <div
+        class="mt-4 flex flex-wrap items-center gap-2
+               text-xs text-gray-400"
+      >
+
+        <span>Encyclopedia</span>
+        <span>›</span>
+        <span>Ecosystems</span>
+        <span>›</span>
+        <span>Load Sources</span>
+        <span>›</span>
+        <span>Entity Types</span>
+        <span>›</span>
+
+        <span class="font-medium text-indigo-500">
+          New
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <!-- FORM CARD -->
+    <div
+      class="rounded-2xl border border-gray-200
+             bg-white p-6 shadow-sm
+             dark:border-gray-800 dark:bg-gray-800
+             sm:p-8"
+    >
+
+      <%= form_with(
+            model: @entity_type,
+            url: admin_ecosystems_load_sources_entity_types_entity_types_path,
+            method: :post,
+            data: {
+              turbo_frame: "_top"
+            },
+            class: "space-y-6"
+          ) do |form| %>
+
+
+        <!-- ERRORS -->
+        <% if @entity_type.errors.any? %>
+
+          <div
+            class="rounded-xl border border-red-200
+                   bg-red-50 p-4
+                   dark:border-red-900/50
+                   dark:bg-red-900/20"
+          >
+
+            <div class="font-semibold text-red-700 dark:text-red-400">
+              Please correct the following errors:
+            </div>
+
+            <ul
+              class="mt-2 list-disc space-y-1 pl-5
+                     text-sm text-red-600 dark:text-red-400"
+            >
+
+              <% @entity_type.errors.full_messages.each do |message| %>
+
+                <li>
+                  <%= message %>
+                </li>
+
+              <% end %>
+
+            </ul>
+
+          </div>
+
+        <% end %>
+
+
+        <!-- NAME -->
+        <div>
+
+          <%= form.label(
+                :name,
+                "Name",
+                class: "block text-sm font-semibold
+                        text-gray-700 dark:text-gray-300"
+              ) %>
+
+          <%= form.text_field(
+                :name,
+                autofocus: true,
+                placeholder: "e.g. Person",
+                class: "mt-2 block w-full rounded-xl
+                        border border-gray-300 bg-gray-50
+                        px-4 py-3 text-sm
+                        focus:border-indigo-500
+                        focus:ring-indigo-500
+                        dark:border-gray-700
+                        dark:bg-gray-900
+                        dark:text-white"
+              ) %>
+
+          <p class="mt-2 text-xs text-gray-400">
+            Human-readable name of the entity type.
+          </p>
+
+        </div>
+
+
+        <!-- SLUG -->
+        <div>
+
+          <%= form.label(
+                :slug,
+                "Slug",
+                class: "block text-sm font-semibold
+                        text-gray-700 dark:text-gray-300"
+              ) %>
+
+          <%= form.text_field(
+                :slug,
+                placeholder: "e.g. person",
+                class: "mt-2 block w-full rounded-xl
+                        border border-gray-300 bg-gray-50
+                        px-4 py-3 font-mono text-sm
+                        focus:border-indigo-500
+                        focus:ring-indigo-500
+                        dark:border-gray-700 dark:bg-gray-900
+                        dark:text-white"
+              ) %>
+
+          <p class="mt-2 text-xs text-gray-400">
+            Unique identifier used internally.
+          </p>
+
+        </div>
+
+
+        <!-- DESCRIPTION -->
+        <div>
+
+          <%= form.label(
+                :description,
+                "Description",
+                class: "block text-sm font-semibold
+                        text-gray-700 dark:text-gray-300"
+              ) %>
+
+          <%= form.text_area(
+                :description,
+                rows: 5,
+                placeholder: "Describe what this entity type represents...",
+                class: "mt-2 block w-full rounded-xl
+                        border border-gray-300 bg-gray-50
+                        px-4 py-3 text-sm
+                        focus:border-indigo-500
+                        focus:ring-indigo-500
+                        dark:border-gray-700 dark:bg-gray-900
+                        dark:text-white"
+              ) %>
+
+        </div>
+
+
+        <!-- ACTIVE -->
+        <div
+          class="rounded-xl border border-gray-200
+                 bg-gray-50 p-4
+                 dark:border-gray-700
+                 dark:bg-gray-900"
+        >
+
+          <div class="flex items-start gap-3">
+
+            <%= form.check_box(
+                  :active,
+                  {
+                    class: "mt-1 h-4 w-4 rounded border-gray-300
+                            text-indigo-600 focus:ring-indigo-500"
+                  },
+                  true,
+                  false
+                ) %>
+
+            <div>
+
+              <%= form.label(
+                    :active,
+                    "Active",
+                    class: "font-semibold text-gray-800
+                            dark:text-gray-200"
+                  ) %>
+
+              <p class="mt-1 text-xs text-gray-400">
+                Active entity types can be selected when creating templates.
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- ACTIONS -->
+        <div
+          class="flex flex-col-reverse gap-3 border-t
+                 border-gray-200 pt-6
+                 dark:border-gray-700
+                 sm:flex-row sm:justify-end"
+        >
+
+          <%= link_to(
+                "Cancel",
+                admin_ecosystems_load_sources_entity_types_entity_types_path,
+                data: {
+                  turbo_frame: "_top"
+                },
+                class: "inline-flex items-center justify-center
+                        rounded-xl border border-gray-300
+                        bg-white px-5 py-3 text-sm font-semibold
+                        text-gray-700 hover:bg-gray-50
+                        dark:border-gray-700
+                        dark:bg-gray-900
+                        dark:text-gray-300"
+              ) %>
+
+
+          <%= form.submit(
+                "Create Entity Type",
+                class: "inline-flex cursor-pointer
+                        items-center justify-center rounded-xl
+                        bg-indigo-600 px-5 py-3 text-sm
+                        font-semibold text-white shadow-sm
+                        hover:bg-indigo-700"
+              ) %>
+
+        </div>
+
+
+      <% end %>
+
+    </div>
+
+  </div>
+
+<% end %>

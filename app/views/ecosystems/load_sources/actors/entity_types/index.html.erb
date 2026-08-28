@@ -1,0 +1,108 @@
+<div class="max-w-7xl mx-auto my-10 px-4 sm:px-6 lg:px-8">
+
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <div class="text-sm text-gray-500 mb-2">
+        Ecosystems → Load Sources → Entity Types
+      </div>
+
+      <h1 class="text-3xl font-bold text-gray-900">
+        Entity Types
+      </h1>
+
+      <p class="mt-2 text-gray-600">
+        Configure the taxonomy used by the encyclopedia.
+      </p>
+    </div>
+
+    <%= link_to "New Entity Type",
+                new_ecosystems_load_sources_entity_types_entity_type_path,
+                class: "px-5 py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition" %>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+
+    <div class="px-6 py-4 border-b border-gray-200">
+      <div class="font-semibold text-gray-900">
+        Taxonomy
+      </div>
+
+      <div class="text-sm text-gray-500">
+        <%= @entity_types.count %> entity types
+      </div>
+    </div>
+
+    <div class="divide-y divide-gray-100">
+
+      <% @entity_types.each do |entity_type| %>
+
+        <div class="p-6 hover:bg-gray-50 transition">
+
+          <div class="flex items-center justify-between">
+
+            <div>
+
+              <div class="flex items-center gap-3">
+
+                <h2 class="text-lg font-semibold text-gray-900">
+                  <%= link_to entity_type.name,
+                              ecosystems_load_sources_entity_types_entity_type_path(entity_type),
+                              class: "hover:text-blue-600" %>
+                </h2>
+
+                <% if entity_type.active? %>
+                  <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">
+                    Active
+                  </span>
+                <% else %>
+                  <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-500">
+                    Inactive
+                  </span>
+                <% end %>
+
+              </div>
+
+              <div class="text-sm text-gray-500 mt-1">
+                <%= entity_type.slug %>
+              </div>
+
+              <% if entity_type.parent.present? %>
+                <div class="text-sm text-gray-500 mt-2">
+                  Parent:
+                  <span class="font-medium text-gray-700">
+                    <%= entity_type.parent.name %>
+                  </span>
+                </div>
+              <% end %>
+
+              <% if entity_type.description.present? %>
+                <p class="mt-3 text-gray-600">
+                  <%= entity_type.description %>
+                </p>
+              <% end %>
+
+            </div>
+
+            <div class="flex items-center gap-2">
+
+              <%= link_to "View",
+                          ecosystems_load_sources_entity_types_entity_type_path(entity_type),
+                          class: "px-3 py-2 text-sm rounded-lg border border-gray-300 hover:bg-gray-100" %>
+
+              <%= link_to "Edit",
+                          edit_ecosystems_load_sources_entity_types_entity_type_path(entity_type),
+                          class: "px-3 py-2 text-sm rounded-lg border border-gray-300 hover:bg-gray-100" %>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      <% end %>
+
+    </div>
+
+  </div>
+
+</div>

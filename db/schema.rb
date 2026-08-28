@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_08_28_053745) do
+ActiveRecord::Schema[7.0].define(version: 2026_08_28_081659) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -350,6 +350,42 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_28_053745) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["slug"], name: "index_ecosystems_load_sources_actors_actors_on_slug", unique: true
+  end
+
+  create_table "ecosystems_load_sources_entity_template_versions", force: :cascade do |t|
+    t.bigint "entity_template_id", null: false
+    t.integer "version", null: false
+    t.string "status", default: "draft", null: false
+    t.jsonb "definition", default: {}, null: false
+    t.datetime "published_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["entity_template_id", "version"], name: "idx_entity_template_versions_template_version", unique: true
+    t.index ["entity_template_id"], name: "idx_entity_template_versions_template"
+  end
+
+  create_table "ecosystems_load_sources_entity_templates", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.text "description"
+    t.bigint "entity_type_id", null: false
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["entity_type_id"], name: "idx_entity_templates_entity_type"
+    t.index ["slug"], name: "idx_entity_templates_slug", unique: true
+  end
+
+  create_table "ecosystems_load_sources_entity_types", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.text "description"
+    t.bigint "parent_id"
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["parent_id"], name: "index_ecosystems_load_sources_entity_types_on_parent_id"
+    t.index ["slug"], name: "index_ecosystems_load_sources_entity_types_on_slug", unique: true
   end
 
   create_table "folder_hierarchies", id: false, force: :cascade do |t|
@@ -935,6 +971,9 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_28_053745) do
   add_foreign_key "article_version_improvements", "improvements"
   add_foreign_key "articles_simple_class_attributes", "articles"
   add_foreign_key "articles_simple_class_attributes", "simple_class_attributes"
+  add_foreign_key "ecosystems_load_sources_entity_template_versions", "ecosystems_load_sources_entity_templates", column: "entity_template_id"
+  add_foreign_key "ecosystems_load_sources_entity_templates", "ecosystems_load_sources_entity_types", column: "entity_type_id"
+  add_foreign_key "ecosystems_load_sources_entity_types", "ecosystems_load_sources_entity_types", column: "parent_id"
   add_foreign_key "taggings", "tags"
   add_foreign_key "tenant_qr_assets", "algorithm_versions"
   add_foreign_key "unit_version_improvements", "improvements"

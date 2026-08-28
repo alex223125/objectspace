@@ -367,4 +367,15 @@ import ActorDiscoveryController from "./ecosystems/load_sources/actors/actor_dis
 application.register("actor_discovery", ActorDiscoveryController)
 
 
+// Admin - Ecosystems - Load Sources - Entity Templates
+import EntityTemplatesAdminController from "./admin/ecosystems/load_sources/entity_templates/entity_templates_admin_controller"
+application.register("admin_entity_templates", EntityTemplatesAdminController)
+
+import AdminEntityTypesController from "./admin/ecosystems/load_sources/entity_types/admin_entity_types_controller"
+application.register("admin_entity_types", AdminEntityTypesController)
+
+
+
+
+
 

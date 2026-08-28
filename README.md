@@ -73,7 +73,8 @@ User.reindex
 
 
 Ecosystems::LoadSources::Actors::Actor.reindex
-
+Ecosystems::LoadSources::EntityTemplates::EntityTemplate.reindex
+Ecosystems::LoadSources::EntityTypes::EntityType.reindex
 
 
 # to redo slugs

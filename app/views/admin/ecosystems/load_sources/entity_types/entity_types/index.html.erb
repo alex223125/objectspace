@@ -1,0 +1,358 @@
+<%# app/views/admin/ecosystems/load_sources/entity_types/entity_types/index.html.erb %>
+
+<div
+  class="mx-auto w-full max-w-7xl px-5 py-8 sm:px-7 lg:px-10"
+  data-controller="admin_entity_types"
+  data-admin_entity_types-search-url-value="<%= admin_ecosystems_load_sources_entity_types_entity_types_path %>"
+>
+
+  <!-- HEADER -->
+
+  <div class="mb-8">
+
+    <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+
+      <div>
+
+        <div class="flex items-center gap-3">
+
+          <div
+            class="flex h-12 w-12 items-center justify-center
+                   rounded-xl bg-indigo-100 text-2xl
+                   dark:bg-indigo-900/40"
+          >
+            🧩
+          </div>
+
+          <div>
+
+            <h1
+              class="text-3xl font-bold text-gray-900
+                     dark:text-white"
+            >
+              Entity Types
+            </h1>
+
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              Manage the types used by your entity templates.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <!-- BREADCRUMB -->
+
+        <div
+          class="mt-4 flex flex-wrap items-center gap-2
+                 text-xs text-gray-400"
+        >
+
+          <span>
+            Encyclopedia
+          </span>
+
+          <span>
+            ›
+          </span>
+
+          <span>
+            Ecosystems
+          </span>
+
+          <span>
+            ›
+          </span>
+
+          <span>
+            Load Sources
+          </span>
+
+          <span>
+            ›
+          </span>
+
+          <span class="font-medium text-indigo-500">
+            Entity Types
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- CREATE -->
+
+      <%= link_to(
+            new_admin_ecosystems_load_sources_entity_types_entity_type_path,
+            data: {
+              turbo_frame: "_top"
+            },
+            class: "inline-flex shrink-0 items-center justify-center
+                    gap-2 rounded-xl bg-indigo-600 px-5 py-3
+                    text-sm font-semibold text-white shadow-sm
+                    transition hover:bg-indigo-700
+                    focus:outline-none focus:ring-2
+                    focus:ring-indigo-500 focus:ring-offset-2"
+          ) do %>
+
+        <span class="text-lg leading-none">
+          +
+        </span>
+
+        <span>
+          Create Entity Type
+        </span>
+
+      <% end %>
+
+    </div>
+
+  </div>
+
+
+  <!-- STATISTICS -->
+
+  <div class="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+
+    <!-- TOTAL -->
+
+    <div
+      class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm
+             dark:border-gray-800 dark:bg-gray-800"
+    >
+
+      <div
+        class="text-xs font-semibold uppercase tracking-wider
+               text-gray-400"
+      >
+        Total Entity Types
+      </div>
+
+      <div
+        class="mt-2 text-3xl font-bold text-gray-900
+               dark:text-white"
+      >
+        <%= @entity_types.count %>
+      </div>
+
+      <div class="mt-1 text-xs text-gray-400">
+        Available entity types
+      </div>
+
+    </div>
+
+
+    <!-- ACTIVE -->
+
+    <div
+      class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm
+             dark:border-gray-800 dark:bg-gray-800"
+    >
+
+      <div
+        class="text-xs font-semibold uppercase tracking-wider
+               text-gray-400"
+      >
+        Active
+      </div>
+
+      <div class="mt-2 text-3xl font-bold text-green-600">
+        <%= @entity_types.where(active: true).count %>
+      </div>
+
+      <div class="mt-1 text-xs text-gray-400">
+        Currently available
+      </div>
+
+    </div>
+
+
+    <!-- INACTIVE -->
+
+    <div
+      class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm
+             dark:border-gray-800 dark:bg-gray-800"
+    >
+
+      <div
+        class="text-xs font-semibold uppercase tracking-wider
+               text-gray-400"
+      >
+        Inactive
+      </div>
+
+      <div class="mt-2 text-3xl font-bold text-gray-500">
+        <%= @entity_types.where(active: false).count %>
+      </div>
+
+      <div class="mt-1 text-xs text-gray-400">
+        Currently disabled
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- SEARCH / SORT -->
+
+  <div
+    class="mb-8 rounded-2xl border border-gray-200 bg-white p-5
+           shadow-sm dark:border-gray-800 dark:bg-gray-800"
+  >
+
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+
+      <!-- SEARCH -->
+
+      <div class="md:col-span-2">
+
+        <label
+          for="entity-types-search"
+          class="mb-2 block text-sm font-medium
+                 text-gray-700 dark:text-gray-300"
+        >
+          Search entity types
+        </label>
+
+        <div class="relative">
+
+          <input
+            id="entity-types-search"
+            type="search"
+            name="q"
+            value="<%= params[:q].to_s %>"
+            placeholder="Search by name, slug or description..."
+            autocomplete="off"
+            data-admin_entity_types-target="search"
+            data-action="input->admin_entity_types#search"
+            class="block w-full rounded-xl border border-gray-300
+                   bg-gray-50 px-4 py-3 pl-11 text-sm
+                   text-gray-900
+                   focus:border-indigo-500
+                   focus:ring-indigo-500
+                   dark:border-gray-700
+                   dark:bg-gray-900
+                   dark:text-white"
+          >
+
+
+          <!-- SEARCH ICON -->
+
+          <div
+            class="pointer-events-none absolute left-4 top-1/2
+                   -translate-y-1/2 text-gray-400"
+          >
+            🔍
+          </div>
+
+
+          <!-- SPINNER -->
+
+          <div
+            data-admin_entity_types-target="spinner"
+            class="absolute right-4 top-1/2 hidden
+                   -translate-y-1/2"
+          >
+
+            <div
+              class="h-5 w-5 animate-spin rounded-full
+                     border-2 border-gray-300
+                     border-t-indigo-600"
+            ></div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- SORT -->
+
+      <div>
+
+        <label
+          for="entity-types-sort"
+          class="mb-2 block text-sm font-medium
+                 text-gray-700 dark:text-gray-300"
+        >
+          Sort
+        </label>
+
+        <select
+          id="entity-types-sort"
+          name="sort"
+          data-admin_entity_types-target="sort"
+          data-action="change->admin_entity_types#sort"
+          class="block w-full rounded-xl border border-gray-300
+                 bg-gray-50 px-4 py-3 text-sm
+                 text-gray-900
+                 focus:border-indigo-500
+                 focus:ring-indigo-500
+                 dark:border-gray-700
+                 dark:bg-gray-900
+                 dark:text-white"
+        >
+
+          <option
+            value="name_asc"
+            <%= "selected" if params[:sort].blank? ||
+              params[:sort] == "name_asc" %>
+          >
+            Name A–Z
+          </option>
+
+          <option
+            value="name_desc"
+            <%= "selected" if params[:sort] == "name_desc" %>
+          >
+            Name Z–A
+          </option>
+
+          <option
+            value="newest"
+            <%= "selected" if params[:sort] == "newest" %>
+          >
+            Newest
+          </option>
+
+          <option
+            value="oldest"
+            <%= "selected" if params[:sort] == "oldest" %>
+          >
+            Oldest
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- RESULTS -->
+
+  <%= turbo_frame_tag "entity_types_results" do %>
+
+    <div
+      data-admin_entity_types-target="results"
+      class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3"
+    >
+
+      <%= render(
+            "results",
+            entity_types: @entity_types,
+            pagy: nil
+          ) %>
+
+    </div>
+
+  <% end %>
+
+
+</div>

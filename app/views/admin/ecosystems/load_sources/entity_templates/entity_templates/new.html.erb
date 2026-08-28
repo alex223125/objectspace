@@ -1,0 +1,138 @@
+<%= turbo_frame_tag "entity_templates_results" do %>
+
+  <div class="mx-auto w-full">
+
+    <div class="mb-8">
+
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        Create Entity Template
+      </h1>
+
+      <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+        Create a new structure for encyclopedia entities.
+      </p>
+
+    </div>
+
+
+    <%= form_with(
+          model: @entity_template,
+          url: admin_ecosystems_load_sources_entity_templates_entity_templates_path,
+          method: :post,
+          class: "space-y-6"
+        ) do |form| %>
+
+      <div>
+
+        <%= form.label(
+              :name,
+              class: "block text-sm font-medium text-gray-700 dark:text-gray-300"
+            ) %>
+
+        <%= form.text_field(
+              :name,
+              class: "mt-1 block w-full rounded-xl border border-gray-300
+                      bg-white px-4 py-3
+                      dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+            ) %>
+
+      </div>
+
+
+      <div>
+
+        <%= form.label(
+              :slug,
+              class: "block text-sm font-medium text-gray-700 dark:text-gray-300"
+            ) %>
+
+        <%= form.text_field(
+              :slug,
+              class: "mt-1 block w-full rounded-xl border border-gray-300
+                      bg-white px-4 py-3
+                      dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+            ) %>
+
+      </div>
+
+
+      <div>
+
+        <%= form.label(
+              :description,
+              class: "block text-sm font-medium text-gray-700 dark:text-gray-300"
+            ) %>
+
+        <%= form.text_area(
+              :description,
+              rows: 5,
+              class: "mt-1 block w-full rounded-xl border border-gray-300
+                      bg-white px-4 py-3
+                      dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+            ) %>
+
+      </div>
+
+
+      <div>
+
+        <%= form.label(
+              :entity_type_id,
+              "Entity Type",
+              class: "block text-sm font-medium text-gray-700 dark:text-gray-300"
+            ) %>
+
+        <%= form.collection_select(
+              :entity_type_id,
+              @entity_types,
+              :id,
+              :name,
+              { prompt: "Select entity type" },
+              class: "mt-1 block w-full rounded-xl border border-gray-300
+                      bg-white px-4 py-3
+                      dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+            ) %>
+
+      </div>
+
+
+      <div class="flex items-center gap-2">
+
+        <%= form.check_box :active %>
+
+        <%= form.label(
+              :active,
+              "Active",
+              class: "text-sm font-medium text-gray-700 dark:text-gray-300"
+            ) %>
+
+      </div>
+
+
+      <div class="flex items-center gap-3">
+
+        <%= form.submit(
+              "Create Template",
+              class: "rounded-xl bg-indigo-600 px-5 py-3
+                      font-semibold text-white
+                      hover:bg-indigo-700"
+            ) %>
+
+        <%= link_to(
+              "Cancel",
+              admin_ecosystems_load_sources_entity_templates_entity_templates_path,
+              data: {
+                turbo_frame: "entity_templates_results"
+              },
+              class: "rounded-xl border border-gray-300 px-5 py-3
+                      font-semibold text-gray-700
+                      hover:bg-gray-50"
+            ) %>
+
+      </div>
+
+    <% end %>
+
+  </div>
+
+<% end %>

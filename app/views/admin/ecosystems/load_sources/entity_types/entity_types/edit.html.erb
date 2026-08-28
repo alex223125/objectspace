@@ -1,0 +1,36 @@
+<div class="min-h-screen bg-slate-50 dark:bg-gray-950">
+
+  <div class="mx-auto max-w-3xl px-5 py-10">
+
+    <div class="mb-8">
+
+      <%= link_to(
+            "← Back to Entity Type",
+            admin_ecosystems_load_sources_entity_types_entity_type_path(@entity_type),
+            class: "text-sm font-medium text-gray-500 hover:text-indigo-600"
+          ) %>
+
+      <h1 class="mt-5 text-3xl font-bold text-gray-900 dark:text-white">
+        Edit Entity Type
+      </h1>
+
+      <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+        Update the configuration for
+        <span class="font-semibold">
+          <%= @entity_type.name %>
+        </span>.
+      </p>
+
+    </div>
+
+
+    <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm
+                dark:border-gray-800 dark:bg-gray-900">
+
+      <%= render "form" %>
+
+    </div>
+
+  </div>
+
+</div>

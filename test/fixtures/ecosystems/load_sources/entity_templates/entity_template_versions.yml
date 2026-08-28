@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  entity_template_id: 
+  version: 1
+  status: MyString
+  definition: 
+  published_at: 2026-08-28 11:17:00
+
+two:
+  entity_template_id: 
+  version: 1
+  status: MyString
+  definition: 
+  published_at: 2026-08-28 11:17:00

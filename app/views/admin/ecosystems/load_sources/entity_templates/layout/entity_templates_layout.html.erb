@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Objectspace</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+
+  <!--    assets for bootstrap 5-->
+  <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
+
+
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
+
+  <link rel="stylesheet" href="https://unpkg.com" crossorigin="anonymous" />
+
+
+
+  <!--    assets for tinymce-->
+  <%#= tinymce_assets %>
+  <!--    <script type="text/javascript" src="/assets/tinymce.js"></script>-->
+
+</head>
+
+<body class="bg-slate-50 dark:bg-gray-900">
+
+<div class="min-h-screen">
+
+  <!-- CUSTOM ENTITY TEMPLATES SIDEBAR -->
+  <aside
+    class="fixed inset-y-0 left-0 z-40 w-72
+             border-r border-slate-200
+             bg-white
+             dark:border-gray-800
+             dark:bg-gray-900">
+
+    <%= render "admin/ecosystems/load_sources/entity_templates/layout/sidebar" %>
+
+  </aside>
+
+
+  <!-- MAIN AREA -->
+  <div class="min-h-screen pl-72">
+
+    <!-- CUSTOM HEADER -->
+    <header>
+      <%= render "admin/ecosystems/load_sources/entity_templates/layout/header" %>
+    </header>
+
+
+    <!-- PAGE CONTENT -->
+    <main class="min-h-[calc(100vh-160px)]">
+
+      <div class="mx-auto max-w-7xl px-5 pt-8 sm:px-7 lg:px-10">
+
+        <%= content %>
+
+      </div>
+
+    </main>
+
+
+    <!-- CUSTOM FOOTER -->
+    <footer>
+      <%= render "admin/ecosystems/load_sources/entity_templates/layout/footer" %>
+    </footer>
+
+  </div>
+
+</div>
+
+</body>
+</html>

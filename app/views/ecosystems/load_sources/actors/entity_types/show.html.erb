@@ -1,0 +1,149 @@
+<div class="max-w-5xl mx-auto my-10 px-4 sm:px-6 lg:px-8">
+
+  <div class="mb-8">
+
+    <div class="text-sm text-gray-500 mb-2">
+      Ecosystems → Load Sources → Entity Types
+    </div>
+
+    <div class="flex items-center justify-between">
+
+      <div>
+
+        <h1 class="text-3xl font-bold text-gray-900">
+          <%= @entity_type.name %>
+        </h1>
+
+        <p class="mt-2 text-gray-500">
+          <%= @entity_type.slug %>
+        </p>
+
+      </div>
+
+      <div class="flex gap-2">
+
+        <%= link_to "Edit",
+                    edit_ecosystems_load_sources_entity_types_entity_type_path(@entity_type),
+                    class: "px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700" %>
+
+        <%= link_to "Back",
+                    ecosystems_load_sources_entity_types_entity_types_path,
+                    class: "px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50" %>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    <div class="bg-white rounded-xl border border-gray-200 p-6">
+
+      <h2 class="font-semibold text-gray-900 mb-4">
+        Definition
+      </h2>
+
+      <div class="space-y-4">
+
+        <div>
+          <div class="text-sm text-gray-500">
+            Name
+          </div>
+
+          <div class="font-medium text-gray-900">
+            <%= @entity_type.name %>
+          </div>
+        </div>
+
+        <div>
+          <div class="text-sm text-gray-500">
+            Slug
+          </div>
+
+          <div class="font-medium text-gray-900">
+            <%= @entity_type.slug %>
+          </div>
+        </div>
+
+        <div>
+          <div class="text-sm text-gray-500">
+            Status
+          </div>
+
+          <div class="font-medium text-gray-900">
+            <%= @entity_type.active? ? "Active" : "Inactive" %>
+          </div>
+        </div>
+
+        <div>
+          <div class="text-sm text-gray-500">
+            Parent
+          </div>
+
+          <div class="font-medium text-gray-900">
+            <% if @entity_type.parent.present? %>
+              <%= link_to @entity_type.parent.name,
+                          ecosystems_load_sources_entity_types_entity_type_path(@entity_type.parent),
+                          class: "text-blue-600 hover:underline" %>
+            <% else %>
+              Root Entity Type
+            <% end %>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="bg-white rounded-xl border border-gray-200 p-6">
+
+      <h2 class="font-semibold text-gray-900 mb-4">
+        Description
+      </h2>
+
+      <% if @entity_type.description.present? %>
+        <div class="text-gray-700 whitespace-pre-line">
+          <%= @entity_type.description %>
+        </div>
+      <% else %>
+        <div class="text-gray-400">
+          No description yet.
+        </div>
+      <% end %>
+
+    </div>
+
+  </div>
+
+  <div class="mt-6 bg-white rounded-xl border border-gray-200 p-6">
+
+    <h2 class="font-semibold text-gray-900 mb-4">
+      Child Entity Types
+    </h2>
+
+    <% if @entity_type.children.any? %>
+
+      <div class="space-y-2">
+
+        <% @entity_type.children.order(:name).each do |child| %>
+
+          <%= link_to child.name,
+                      ecosystems_load_sources_entity_types_entity_type_path(child),
+                      class: "block p-3 rounded-lg bg-gray-50 hover:bg-blue-50 hover:text-blue-700 transition" %>
+
+        <% end %>
+
+      </div>
+
+    <% else %>
+
+      <div class="text-gray-400">
+        No child entity types.
+      </div>
+
+    <% end %>
+
+  </div>
+
+</div>

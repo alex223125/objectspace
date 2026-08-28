@@ -1,0 +1,168 @@
+<%# app/views/admin/ecosystems/load_sources/entity_types/entity_types/_results.html.erb %>
+
+<% if entity_types.present? %>
+
+  <% entity_types.each do |entity_type| %>
+
+    <div
+      class="rounded-2xl border border-gray-200
+             bg-white p-6 shadow-sm
+             transition hover:-translate-y-0.5 hover:shadow-md
+             dark:border-gray-800 dark:bg-gray-800"
+    >
+
+      <!-- HEADER -->
+
+      <div class="flex items-start justify-between gap-4">
+
+        <div class="min-w-0">
+
+          <h2
+            class="truncate text-lg font-bold
+                   text-gray-900 dark:text-white"
+          >
+            <%= entity_type.name %>
+          </h2>
+
+          <div class="mt-1 font-mono text-xs text-indigo-500">
+            <%= entity_type.slug %>
+          </div>
+
+        </div>
+
+
+        <!-- STATUS -->
+
+        <% if entity_type.active? %>
+
+          <span
+            class="shrink-0 rounded-full bg-green-100
+                   px-3 py-1 text-xs font-semibold
+                   text-green-700
+                   dark:bg-green-900/30
+                   dark:text-green-400"
+          >
+            Active
+          </span>
+
+        <% else %>
+
+          <span
+            class="shrink-0 rounded-full bg-gray-100
+                   px-3 py-1 text-xs font-semibold
+                   text-gray-600
+                   dark:bg-gray-900
+                   dark:text-gray-400"
+          >
+            Inactive
+          </span>
+
+        <% end %>
+
+      </div>
+
+
+      <!-- DESCRIPTION -->
+
+      <% if entity_type.description.present? %>
+
+        <p
+          class="mt-4 line-clamp-3 text-sm
+                 text-gray-500 dark:text-gray-400"
+        >
+          <%= entity_type.description %>
+        </p>
+
+      <% else %>
+
+        <p class="mt-4 text-sm italic text-gray-400">
+          No description.
+        </p>
+
+      <% end %>
+
+
+      <!-- ACTIONS -->
+
+      <div
+        class="mt-6 flex items-center justify-between
+               border-t border-gray-100 pt-4
+               dark:border-gray-700"
+      >
+
+        <%= link_to(
+              "View",
+              admin_ecosystems_load_sources_entity_types_entity_type_path(
+                entity_type
+              ),
+              data: {
+                turbo_frame: "_top"
+              },
+              class: "text-sm font-semibold
+                      text-indigo-600
+                      hover:text-indigo-700
+                      dark:text-indigo-400"
+            ) %>
+
+
+        <%= link_to(
+              "Edit",
+              edit_admin_ecosystems_load_sources_entity_types_entity_type_path(
+                entity_type
+              ),
+              data: {
+                turbo_frame: "_top"
+              },
+              class: "text-sm font-semibold
+                      text-gray-600
+                      hover:text-indigo-600
+                      dark:text-gray-400"
+            ) %>
+
+      </div>
+
+    </div>
+
+  <% end %>
+
+<% else %>
+
+  <div class="md:col-span-2 xl:col-span-3">
+
+    <div
+      class="rounded-2xl border border-dashed
+             border-gray-300 bg-white p-12
+             text-center
+             dark:border-gray-700
+             dark:bg-gray-800"
+    >
+
+      <div
+        class="mx-auto mb-5 flex h-16 w-16
+               items-center justify-center
+               rounded-2xl bg-indigo-50
+               text-3xl
+               dark:bg-indigo-900/30"
+      >
+        🧩
+      </div>
+
+      <h3
+        class="text-lg font-bold
+               text-gray-900 dark:text-white"
+      >
+        No entity types found
+      </h3>
+
+      <p
+        class="mt-2 text-sm
+               text-gray-500 dark:text-gray-400"
+      >
+        Try changing your search or create a new entity type.
+      </p>
+
+    </div>
+
+  </div>
+
+<% end %>

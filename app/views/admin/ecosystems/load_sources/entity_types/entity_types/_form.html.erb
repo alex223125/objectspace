@@ -1,0 +1,167 @@
+<%= form_with(
+      model: @entity_type,
+      url: @entity_type.persisted? ?
+             admin_ecosystems_load_sources_entity_types_entity_type_path(@entity_type) :
+             admin_ecosystems_load_sources_entity_types_entity_types_path,
+      method: @entity_type.persisted? ? :patch : :post,
+      class: "space-y-6"
+    ) do |form| %>
+
+
+  <% if @entity_type.errors.any? %>
+
+    <div class="rounded-xl border border-red-200 bg-red-50 p-4
+                dark:border-red-900/50 dark:bg-red-900/20">
+
+      <div class="font-semibold text-red-700 dark:text-red-400">
+        Please fix the following errors:
+      </div>
+
+      <ul class="mt-2 list-disc pl-5 text-sm text-red-600 dark:text-red-400">
+
+        <% @entity_type.errors.full_messages.each do |message| %>
+
+          <li>
+            <%= message %>
+          </li>
+
+        <% end %>
+
+      </ul>
+
+    </div>
+
+  <% end %>
+
+
+  <!-- NAME -->
+
+  <div>
+
+    <%= form.label(
+          :name,
+          "Name",
+          class: "block text-sm font-semibold text-gray-700 dark:text-gray-300"
+        ) %>
+
+    <%= form.text_field(
+          :name,
+          placeholder: "Person, Organization, Product...",
+          class: "mt-2 block w-full rounded-xl border border-gray-300
+                  bg-white px-4 py-3 text-sm
+                  focus:border-indigo-500 focus:ring-indigo-500
+                  dark:border-gray-700 dark:bg-gray-950 dark:text-white"
+        ) %>
+
+  </div>
+
+
+  <!-- SLUG -->
+
+  <div>
+
+    <%= form.label(
+          :slug,
+          "Slug",
+          class: "block text-sm font-semibold text-gray-700 dark:text-gray-300"
+        ) %>
+
+    <%= form.text_field(
+          :slug,
+          placeholder: "person",
+          class: "mt-2 block w-full rounded-xl border border-gray-300
+                  bg-white px-4 py-3 font-mono text-sm
+                  focus:border-indigo-500 focus:ring-indigo-500
+                  dark:border-gray-700 dark:bg-gray-950 dark:text-white"
+        ) %>
+
+    <p class="mt-2 text-xs text-gray-400">
+      Use a stable machine-readable identifier.
+    </p>
+
+  </div>
+
+
+  <!-- DESCRIPTION -->
+
+  <div>
+
+    <%= form.label(
+          :description,
+          "Description",
+          class: "block text-sm font-semibold text-gray-700 dark:text-gray-300"
+        ) %>
+
+    <%= form.text_area(
+          :description,
+          rows: 5,
+          placeholder: "Describe what this entity type represents...",
+          class: "mt-2 block w-full rounded-xl border border-gray-300
+                  bg-white px-4 py-3 text-sm
+                  focus:border-indigo-500 focus:ring-indigo-500
+                  dark:border-gray-700 dark:bg-gray-950 dark:text-white"
+        ) %>
+
+  </div>
+
+
+  <!-- ACTIVE -->
+
+  <div class="rounded-xl border border-gray-200 bg-gray-50 p-4
+              dark:border-gray-800 dark:bg-gray-950">
+
+    <div class="flex items-center gap-3">
+
+      <%= form.check_box(
+            :active,
+            class: "h-5 w-5 rounded border-gray-300
+                    text-indigo-600 focus:ring-indigo-500"
+          ) %>
+
+      <div>
+
+        <%= form.label(
+              :active,
+              "Active",
+              class: "font-semibold text-gray-900 dark:text-white"
+            ) %>
+
+        <p class="text-xs text-gray-500 dark:text-gray-400">
+          Allow this entity type to be used by new templates.
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ACTIONS -->
+
+  <div class="flex items-center justify-end gap-3 border-t
+              border-gray-200 pt-6 dark:border-gray-800">
+
+    <%= link_to(
+          "Cancel",
+          @entity_type.persisted? ?
+            admin_ecosystems_load_sources_entity_types_entity_type_path(@entity_type) :
+            admin_ecosystems_load_sources_entity_types_entity_types_path,
+          class: "rounded-xl px-5 py-3 text-sm font-semibold
+                  text-gray-600 hover:bg-gray-100
+                  dark:text-gray-300 dark:hover:bg-gray-800"
+        ) %>
+
+
+    <%= form.submit(
+          @entity_type.persisted? ?
+            "Update Entity Type" :
+            "Create Entity Type",
+          class: "rounded-xl bg-indigo-600 px-5 py-3 text-sm
+                  font-semibold text-white shadow-sm
+                  hover:bg-indigo-700"
+        ) %>
+
+  </div>
+
+<% end %>

@@ -1,6 +1,8 @@
 Rails.application.routes.draw do
   namespace :ecosystems do
+
     namespace :load_sources do
+
       namespace :actors do
         resources :actors do
           collection do
@@ -8,8 +10,15 @@ Rails.application.routes.draw do
           end
         end
       end
+
+      namespace :entity_types do
+        resources :entity_types
+      end
+
     end
   end
+
+
 
   # devise_for :admin_users
 
@@ -283,12 +292,26 @@ Rails.application.routes.draw do
     sessions: 'admin_users/sessions'
   }
 
+
   namespace :admin do
-    # resources :articles, only: [:index]
-    resources :article_versions
     root to: "article_versions#index"
 
+    resources :article_versions
     resources :support_messages, only: [:index, :show, :update]
+
+    namespace :ecosystems do
+      namespace :load_sources do
+
+        namespace :entity_types do
+          resources :entity_types
+        end
+
+
+        namespace :entity_templates do
+          resources :entity_templates
+        end
+      end
+    end
   end
 
   resources :support_messages,
