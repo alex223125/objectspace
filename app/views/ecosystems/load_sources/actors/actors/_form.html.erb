@@ -1,0 +1,246 @@
+<%= form_with(
+      model: @actor,
+      url: @actor.persisted? ?
+        ecosystems_load_sources_actors_actor_path(@actor) :
+        ecosystems_load_sources_actors_actors_path,
+      method: @actor.persisted? ? :patch : :post,
+      local: true
+    ) do |form| %>
+
+  <% if @actor.errors.any? %>
+    <div class="mb-6 rounded-[24px] border-2 border-red-100 bg-red-50 p-5">
+      <div class="text-sm font-black text-red-700">
+        Please review the following:
+      </div>
+
+      <ul class="mt-3 space-y-1 text-xs text-red-500">
+        <% @actor.errors.full_messages.each do |message| %>
+          <li>• <%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+
+  <!-- Name -->
+
+  <div>
+    <%= form.label :name,
+      "Actor name",
+      class: "
+        block
+        text-[10px]
+        font-black
+        uppercase
+        tracking-widest
+        text-slate-500
+      " %>
+
+    <%= form.text_field :name,
+      class: "
+        mt-2
+        block w-full
+        rounded-2xl
+        border-2 border-slate-100
+        bg-white
+        px-4 py-3
+        text-sm
+        font-semibold
+        text-slate-700
+        shadow-sm
+        outline-none
+        transition
+        placeholder:text-slate-300
+        focus:border-sky-300
+        focus:ring-4
+        focus:ring-sky-50
+      ",
+      placeholder: "e.g. European Commission" %>
+  </div>
+
+
+  <!-- Slug -->
+
+  <div class="mt-6">
+
+    <%= form.label :slug,
+      "Slug",
+      class: "
+        block
+        text-[10px]
+        font-black
+        uppercase
+        tracking-widest
+        text-slate-500
+      " %>
+
+    <%= form.text_field :slug,
+      class: "
+        mt-2
+        block w-full
+        rounded-2xl
+        border-2 border-slate-100
+        bg-white
+        px-4 py-3
+        text-sm
+        font-semibold
+        text-slate-700
+        shadow-sm
+        outline-none
+        transition
+        placeholder:text-slate-300
+        focus:border-sky-300
+        focus:ring-4
+        focus:ring-sky-50
+      ",
+      placeholder: "european-commission" %>
+
+    <p class="mt-2 text-[10px] text-slate-400">
+      Used as the stable identifier for this actor.
+    </p>
+
+  </div>
+
+
+  <!-- Description -->
+
+  <div class="mt-6">
+
+    <%= form.label :description,
+      "Description",
+      class: "
+        block
+        text-[10px]
+        font-black
+        uppercase
+        tracking-widest
+        text-slate-500
+      " %>
+
+    <%= form.text_area :description,
+      rows: 6,
+      class: "
+        mt-2
+        block w-full
+        rounded-2xl
+        border-2 border-slate-100
+        bg-white
+        px-4 py-3
+        text-sm
+        leading-6
+        text-slate-700
+        shadow-sm
+        outline-none
+        transition
+        placeholder:text-slate-300
+        focus:border-sky-300
+        focus:ring-4
+        focus:ring-sky-50
+      ",
+      placeholder: "Describe this actor and its role in the ecosystem..." %>
+
+  </div>
+
+
+  <!-- Status -->
+
+  <div class="mt-6">
+
+    <%= form.label :status,
+      "Lifecycle status",
+      class: "
+        block
+        text-[10px]
+        font-black
+        uppercase
+        tracking-widest
+        text-slate-500
+      " %>
+
+    <%= form.select :status,
+      Ecosystems::LoadSources::Actors::Actor::STATUSES.map {
+        |status| [status.titleize, status]
+      },
+      {},
+      class: "
+        mt-2
+        block w-full
+        rounded-2xl
+        border-2 border-slate-100
+        bg-white
+        px-4 py-3
+        text-sm
+        font-semibold
+        text-slate-700
+        shadow-sm
+        outline-none
+        focus:border-sky-300
+        focus:ring-4
+        focus:ring-sky-50
+      " %>
+
+  </div>
+
+
+  <!-- Actions -->
+
+  <div
+    class="
+      mt-8
+      flex flex-col gap-3
+      sm:flex-row sm:items-center
+    "
+  >
+
+    <%= form.submit(
+      @actor.persisted? ? "Save Actor" : "Create Actor",
+      class: "
+        inline-flex
+        cursor-pointer
+        items-center
+        justify-center
+        rounded-2xl
+        border-2 border-sky-200
+        bg-gradient-to-r
+        from-sky-400
+        to-cyan-400
+        px-6 py-3
+        text-sm
+        font-black
+        text-white
+        shadow-md
+        shadow-sky-200/60
+        transition-all duration-300
+        hover:-translate-y-1
+        hover:from-sky-500
+        hover:to-cyan-500
+        hover:shadow-lg
+      "
+    ) %>
+
+    <%= link_to(
+      "Cancel",
+      @actor.persisted? ?
+        ecosystems_load_sources_actors_actor_path(@actor) :
+        ecosystems_load_sources_actors_actors_path,
+      class: "
+        inline-flex
+        items-center
+        justify-center
+        rounded-2xl
+        border-2 border-slate-100
+        bg-white
+        px-6 py-3
+        text-sm
+        font-black
+        text-slate-500
+        shadow-sm
+        transition
+        hover:border-slate-200
+        hover:bg-slate-50
+      "
+    ) %>
+
+  </div>
+
+<% end %>

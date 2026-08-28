@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_08_18_023658) do
+ActiveRecord::Schema[7.0].define(version: 2026_08_28_053745) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -340,6 +340,16 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_18_023658) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id"
+  end
+
+  create_table "ecosystems_load_sources_actors_actors", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.text "description"
+    t.string "status", default: "draft", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_ecosystems_load_sources_actors_actors_on_slug", unique: true
   end
 
   create_table "folder_hierarchies", id: false, force: :cascade do |t|

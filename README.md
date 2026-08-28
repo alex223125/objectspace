@@ -71,6 +71,11 @@ ActsAsTaggableOn::Tag.reindex
 Improvements::Improvement.reindex
 User.reindex
 
+
+Ecosystems::LoadSources::Actors::Actor.reindex
+
+
+
 # to redo slugs
 Articles::ArticleVersion.find_each(&:save)
 

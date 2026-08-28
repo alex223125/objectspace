@@ -362,4 +362,9 @@ import HumanVerificationController from "./admin_dashboard/support_messages/huma
 application.register("human_verification", HumanVerificationController)
 
 
+// app/javascript/controllers/ecosystems/load_sources/actors
+import ActorDiscoveryController from "./ecosystems/load_sources/actors/actor_discovery_controller"
+application.register("actor_discovery", ActorDiscoveryController)
+
+
 

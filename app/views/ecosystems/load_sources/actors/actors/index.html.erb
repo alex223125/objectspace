@@ -1,0 +1,548 @@
+<div
+  class="max-w-7xl mx-auto my-10 px-4 sm:px-6 lg:px-8"
+  data-controller="actor_discovery"
+  data-actor_discovery-search-url-value="<%= search_ecosystems_load_sources_actors_actors_path %>"
+>
+
+
+<!-- ========================================================= -->
+  <!-- PAGE HEADER -->
+  <!-- ========================================================= -->
+
+  <div
+    class="mb-8 rounded-[32px]
+           border-2 border-orange-100
+           bg-gradient-to-b
+           from-white
+           via-orange-50/30
+           to-slate-50/60
+           p-6 md:p-8
+           shadow-md shadow-orange-100/40"
+  >
+
+    <div
+      class="flex flex-col gap-6
+             lg:flex-row
+             lg:items-center
+             lg:justify-between"
+    >
+
+      <!-- Title -->
+
+      <div class="flex items-start gap-4">
+
+        <div
+          class="flex h-14 w-14 shrink-0
+                 items-center justify-center
+                 rounded-[22px]
+                 border-2 border-orange-200
+                 bg-orange-50
+                 text-2xl
+                 shadow-sm shadow-orange-200/50"
+        >
+          🎭
+        </div>
+
+        <div>
+
+          <div
+            class="mb-1 text-[10px]
+                   font-black uppercase
+                   tracking-[0.18em]
+                   text-orange-500"
+          >
+            Ecosystems / Load Sources / Actors
+          </div>
+
+          <h1
+            class="text-2xl md:text-3xl
+                   font-black
+                   tracking-tight
+                   text-slate-800"
+          >
+            Actors
+          </h1>
+
+          <p
+            class="mt-2 max-w-2xl
+                   text-sm leading-6
+                   text-slate-400"
+          >
+            Discover the people, organizations, communities,
+            systems and other entities participating in the ecosystem.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <!-- Header status -->
+
+      <div class="flex flex-wrap items-center gap-3">
+
+        <div
+          class="flex items-center gap-2
+                 rounded-full
+                 border border-emerald-200
+                 bg-emerald-50
+                 px-4 py-2
+                 text-xs font-black
+                 text-emerald-600"
+        >
+
+          <span
+            class="h-2 w-2
+                   rounded-full
+                   bg-emerald-400
+                   shadow-[0_0_8px_rgba(52,211,153,0.8)]"
+          ></span>
+
+          Ecosystem active
+
+        </div>
+
+
+        <%= link_to new_ecosystems_load_sources_actors_actor_path,
+                    class: "group flex items-center gap-2
+                            rounded-2xl
+                            border-2 border-orange-200
+                            bg-gradient-to-r
+                            from-orange-400
+                            to-amber-400
+                            px-5 py-3
+                            text-sm font-black
+                            text-white
+                            shadow-md shadow-orange-200/60
+                            transition-all duration-300
+                            hover:-translate-y-1
+                            hover:from-orange-500
+                            hover:to-amber-500
+                            hover:shadow-lg" do %>
+
+          <span>＋</span>
+
+          <span>New actor</span>
+
+        <% end %>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================================= -->
+  <!-- SEARCH PANEL -->
+  <!-- ========================================================= -->
+
+  <div
+    class="mb-8 rounded-[30px]
+           border-2 border-slate-100
+           bg-white
+           p-5 md:p-6
+           shadow-sm"
+  >
+
+    <div
+      class="flex flex-col gap-4
+             md:flex-row
+             md:items-center
+             md:justify-between"
+    >
+
+      <div>
+
+        <div
+          class="text-sm
+                 font-black
+                 text-slate-700"
+        >
+          Discover actors
+        </div>
+
+        <p
+          class="mt-1 text-xs
+                 text-slate-400"
+        >
+          Search the actor knowledge graph using Elasticsearch.
+        </p>
+
+      </div>
+
+
+      <!-- Search -->
+
+      <div class="relative w-full md:max-w-xl">
+
+        <!-- Search icon -->
+
+        <div
+          class="pointer-events-none
+                 absolute inset-y-0 left-0
+                 flex items-center pl-4
+                 text-slate-400"
+        >
+          🔎
+        </div>
+
+
+        <input
+          type="search"
+          autocomplete="off"
+          placeholder="Search actors..."
+          data-actor_discovery-target="searchInput"
+          data-action="input->actor_discovery#search"
+          class="w-full
+                 rounded-2xl
+                 border-2 border-slate-100
+                 bg-slate-50
+                 py-3.5 pl-11 pr-12
+                 text-sm font-semibold
+                 text-slate-700
+                 outline-none
+                 transition-all duration-300
+                 placeholder:text-slate-400
+                 focus:border-orange-300
+                 focus:bg-white
+                 focus:ring-4
+                 focus:ring-orange-100"
+        >
+
+
+        <!-- Loading spinner -->
+
+        <div
+          data-actor_discovery-target="spinner"
+          class="absolute inset-y-0 right-0
+                 hidden items-center pr-4"
+        >
+
+          <div
+            class="h-5 w-5
+                   animate-spin
+                   rounded-full
+                   border-2 border-orange-200
+                   border-t-orange-500"
+          ></div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- Search status -->
+
+    <div
+      data-actor_discovery-target="status"
+      class="mt-4 hidden"
+    >
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================================= -->
+  <!-- ENTITY DISCOVERY MESSAGE -->
+  <!-- ========================================================= -->
+
+  <div
+    data-actor_discovery-target="loadedMessage"
+    class="mb-6 hidden"
+  >
+  </div>
+
+
+
+  <!-- ========================================================= -->
+  <!-- INITIAL ACTOR COLLECTION -->
+  <!-- ========================================================= -->
+
+  <div
+    data-actor_discovery-target="results"
+    class="grid grid-cols-1
+           gap-5
+           md:grid-cols-2
+           xl:grid-cols-3"
+  >
+
+    <% if @actors.present? %>
+
+      <% @actors.each do |actor| %>
+
+        <%= render "actor_card", actor: actor %>
+
+      <% end %>
+
+    <% else %>
+
+      <div
+        class="md:col-span-2
+               xl:col-span-3
+               rounded-[28px]
+               border-2 border-dashed
+               border-orange-100
+               bg-orange-50/30
+               px-6 py-14
+               text-center"
+      >
+
+        <div
+          class="mx-auto mb-4
+                 flex h-16 w-16
+                 items-center justify-center
+                 rounded-[24px]
+                 bg-orange-100
+                 text-2xl"
+        >
+          🌱
+        </div>
+
+        <div
+          class="text-sm
+                 font-black
+                 text-slate-700"
+        >
+          No actors discovered yet
+        </div>
+
+        <p
+          class="mx-auto mt-2 max-w-md
+                 text-xs leading-6
+                 text-slate-400"
+        >
+          The actor ecosystem is still growing.
+          Create the first actor or search the knowledge base.
+        </p>
+
+      </div>
+
+    <% end %>
+
+  </div>
+
+
+
+  <!-- ========================================================= -->
+  <!-- LOADING STATE -->
+  <!-- ========================================================= -->
+
+  <div
+    data-actor_discovery-target="loading"
+    class="hidden"
+  >
+
+    <div
+      class="grid grid-cols-1
+             gap-5
+             md:grid-cols-2
+             xl:grid-cols-3"
+    >
+
+      <% 6.times do %>
+
+        <div
+          class="animate-pulse
+                 rounded-[28px]
+                 border-2 border-slate-100
+                 bg-white
+                 p-6
+                 shadow-sm"
+        >
+
+          <div class="flex items-start gap-4">
+
+            <div
+              class="h-12 w-12
+                     rounded-2xl
+                     bg-slate-100"
+            ></div>
+
+            <div class="flex-1">
+
+              <div
+                class="h-4 w-2/3
+                       rounded-full
+                       bg-slate-100"
+              ></div>
+
+              <div
+                class="mt-3 h-3 w-1/2
+                       rounded-full
+                       bg-slate-100"
+              ></div>
+
+            </div>
+
+          </div>
+
+          <div
+            class="mt-6 h-3 w-full
+                   rounded-full
+                   bg-slate-100"
+          ></div>
+
+          <div
+            class="mt-2 h-3 w-5/6
+                   rounded-full
+                   bg-slate-100"
+          ></div>
+
+        </div>
+
+      <% end %>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================================= -->
+  <!-- EMPTY SEARCH STATE -->
+  <!-- ========================================================= -->
+
+  <div
+    data-actor_discovery-target="empty"
+    class="hidden"
+  >
+
+    <div
+      class="rounded-[30px]
+             border-2 border-dashed
+             border-slate-200
+             bg-slate-50/70
+             px-6 py-14
+             text-center"
+    >
+
+      <div
+        class="mx-auto mb-4
+               flex h-16 w-16
+               items-center justify-center
+               rounded-[24px]
+               bg-slate-100
+               text-2xl"
+      >
+        🔭
+      </div>
+
+      <h2
+        class="text-sm
+               font-black
+               text-slate-700"
+      >
+        No actors found
+      </h2>
+
+      <p
+        class="mx-auto mt-2 max-w-md
+               text-xs leading-6
+               text-slate-400"
+      >
+        Try another search phrase.
+        The discovery engine searches actor names,
+        descriptions and metadata.
+      </p>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================================= -->
+  <!-- FOOTER PROGRESS -->
+  <!-- ========================================================= -->
+
+  <div
+    class="mt-10
+           rounded-[28px]
+           border-2 border-orange-100
+           bg-gradient-to-r
+           from-orange-50/70
+           via-white
+           to-emerald-50/50
+           p-5
+           shadow-sm"
+  >
+
+    <div
+      class="flex items-center
+             justify-between"
+    >
+
+      <div>
+
+        <div
+          class="text-[9px]
+                 font-black
+                 uppercase
+                 tracking-[0.18em]
+                 text-slate-400"
+        >
+          Actor discovery
+        </div>
+
+        <div
+          data-actor_discovery-target="resultCount"
+          class="mt-1 text-xs
+                 font-black
+                 text-orange-500"
+        >
+          <%= @actors.size %> entities discovered
+        </div>
+
+      </div>
+
+
+      <div class="flex items-center gap-2">
+
+        <span
+          class="h-2 w-2
+                 rounded-full
+                 bg-orange-400
+                 shadow-[0_0_8px_rgba(251,146,60,0.8)]"
+        ></span>
+
+        <span
+          class="text-[10px]
+                 font-bold
+                 text-slate-400"
+        >
+          Continuously evolving
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div
+      class="mt-4 h-2
+             overflow-hidden
+             rounded-full
+             bg-white
+             border border-orange-100"
+    >
+
+      <div
+        class="h-full w-[72%]
+               rounded-full
+               bg-gradient-to-r
+               from-orange-400
+               via-amber-400
+               to-emerald-400
+               shadow-sm"
+      ></div>
+
+    </div>
+
+  </div>
+
+</div>

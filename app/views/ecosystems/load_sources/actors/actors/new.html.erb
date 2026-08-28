@@ -1,0 +1,126 @@
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+  <!-- Breadcrumb -->
+
+  <div class="mb-6 flex flex-wrap items-center gap-2 text-xs font-bold">
+
+    <%= link_to "Encyclopedia",
+                root_path,
+                class: "text-slate-400 hover:text-sky-500" %>
+
+    <span class="text-slate-300">→</span>
+
+    <span class="text-orange-500">
+      Ecosystems
+    </span>
+
+    <span class="text-slate-300">→</span>
+
+    <span class="text-amber-500">
+      Load Sources
+    </span>
+
+    <span class="text-slate-300">→</span>
+
+    <%= link_to "Actors",
+                ecosystems_load_sources_actors_actors_path,
+                class: "text-sky-500 hover:text-sky-600" %>
+
+    <span class="text-slate-300">→</span>
+
+    <span class="text-slate-500">
+      New Actor
+    </span>
+
+  </div>
+
+
+  <!-- Main Card -->
+
+  <div
+    class="
+      overflow-hidden
+      rounded-[38px]
+      border-2 border-sky-100
+      bg-gradient-to-b
+      from-white
+      via-sky-50/20
+      to-slate-50/60
+      shadow-xl
+      shadow-sky-100/30
+    "
+  >
+
+    <!-- Header -->
+
+    <div
+      class="
+        border-b-2 border-sky-100
+        px-6 py-7
+        sm:px-8
+      "
+    >
+
+      <div class="flex items-center gap-4">
+
+        <div
+          class="
+            flex h-14 w-14
+            items-center justify-center
+            rounded-[22px]
+            border-2 border-sky-200
+            bg-sky-50
+            text-2xl
+            shadow-md shadow-sky-100
+          "
+        >
+          🧩
+        </div>
+
+        <div>
+
+          <div
+            class="
+              text-[10px]
+              font-black
+              uppercase
+              tracking-[0.18em]
+              text-sky-500
+            "
+          >
+            Actor Discovery
+          </div>
+
+          <h1
+            class="
+              mt-1
+              text-2xl
+              font-black
+              text-slate-800
+            "
+          >
+            Discover a new actor
+          </h1>
+
+          <p class="mt-1 text-xs text-slate-400">
+            Add a player to the load source layer.
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- Form -->
+
+    <div class="p-6 sm:p-8">
+
+      <%= render "form" %>
+
+    </div>
+
+  </div>
+
+</div>

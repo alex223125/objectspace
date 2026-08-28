@@ -1,0 +1,96 @@
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+  <div class="mb-6 flex flex-wrap items-center gap-2 text-xs font-bold">
+
+    <span class="text-slate-400">
+      Encyclopedia
+    </span>
+
+    <span class="text-slate-300">→</span>
+
+    <span class="text-orange-500">
+      Ecosystems
+    </span>
+
+    <span class="text-slate-300">→</span>
+
+    <span class="text-amber-500">
+      Load Sources
+    </span>
+
+    <span class="text-slate-300">→</span>
+
+    <%= link_to "Actors",
+                ecosystems_load_sources_actors_actors_path,
+                class: "text-sky-500" %>
+
+    <span class="text-slate-300">→</span>
+
+    <span class="text-slate-500">
+      Edit
+    </span>
+
+  </div>
+
+
+  <div
+    class="
+      overflow-hidden
+      rounded-[38px]
+      border-2 border-violet-100
+      bg-gradient-to-b
+      from-white
+      via-violet-50/10
+      to-slate-50/60
+      shadow-xl
+      shadow-violet-100/20
+    "
+  >
+
+    <div class="border-b-2 border-violet-100 p-8">
+
+      <div class="flex items-center gap-4">
+
+        <div
+          class="
+            flex h-14 w-14
+            items-center justify-center
+            rounded-[22px]
+            bg-violet-50
+            text-2xl
+          "
+        >
+          ✏️
+        </div>
+
+        <div>
+
+          <div
+            class="
+              text-[10px]
+              font-black
+              uppercase
+              tracking-widest
+              text-violet-500
+            "
+          >
+            Actor Entity
+          </div>
+
+          <h1 class="mt-1 text-2xl font-black text-slate-800">
+            Edit <%= @actor.name %>
+          </h1>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="p-8">
+      <%= render "form" %>
+    </div>
+
+  </div>
+
+</div>

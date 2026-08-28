@@ -1,0 +1,346 @@
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+  <!-- Breadcrumb -->
+
+  <div class="mb-6 flex flex-wrap items-center gap-2 text-xs font-bold">
+
+    <span class="text-slate-400">
+      Encyclopedia
+    </span>
+
+    <span class="text-slate-300">→</span>
+
+    <span class="text-orange-500">
+      Ecosystems
+    </span>
+
+    <span class="text-slate-300">→</span>
+
+    <span class="text-amber-500">
+      Load Sources
+    </span>
+
+    <span class="text-slate-300">→</span>
+
+    <%= link_to "Actors",
+                ecosystems_load_sources_actors_actors_path,
+                class: "text-sky-500 hover:text-sky-600" %>
+
+    <span class="text-slate-300">→</span>
+
+    <span class="text-slate-500">
+      <%= @actor.name %>
+    </span>
+
+  </div>
+
+
+  <!-- Actor Hero -->
+
+  <div
+    class="
+      overflow-hidden
+      rounded-[38px]
+      border-2 border-sky-100
+      bg-gradient-to-br
+      from-white
+      via-sky-50/20
+      to-violet-50/20
+      shadow-xl
+      shadow-sky-100/30
+    "
+  >
+
+    <div class="p-6 sm:p-8 lg:p-10">
+
+      <div
+        class="
+          flex flex-col gap-6
+          lg:flex-row
+          lg:items-start
+          lg:justify-between
+        "
+      >
+
+        <div class="flex items-start gap-5">
+
+          <div
+            class="
+              flex h-20 w-20
+              shrink-0
+              items-center justify-center
+              rounded-[28px]
+              border-[3px] border-sky-200
+              bg-sky-50
+              text-4xl
+              shadow-lg
+              shadow-sky-100
+            "
+          >
+            🧩
+          </div>
+
+          <div>
+
+            <div
+              class="
+                text-[10px]
+                font-black
+                uppercase
+                tracking-[0.2em]
+                text-sky-500
+              "
+            >
+              Actor Entity
+            </div>
+
+            <h1
+              class="
+                mt-2
+                text-3xl
+                font-black
+                tracking-tight
+                text-slate-800
+              "
+            >
+              <%= @actor.name %>
+            </h1>
+
+            <div class="mt-3 flex flex-wrap gap-2">
+
+              <span
+                class="
+                  rounded-full
+                  border border-sky-200
+                  bg-sky-50
+                  px-3 py-1
+                  text-[10px]
+                  font-black
+                  uppercase
+                  tracking-wider
+                  text-sky-600
+                "
+              >
+                Load Source
+              </span>
+
+              <span
+                class="
+                  rounded-full
+                  border border-emerald-200
+                  bg-emerald-50
+                  px-3 py-1
+                  text-[10px]
+                  font-black
+                  uppercase
+                  tracking-wider
+                  text-emerald-600
+                "
+              >
+                <%= @actor.status %>
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- Actions -->
+
+        <div class="flex gap-2">
+
+          <%= link_to "Edit",
+                      edit_ecosystems_load_sources_actors_actor_path(@actor),
+                      class: "
+              rounded-2xl
+              border-2 border-slate-100
+              bg-white
+              px-4 py-2.5
+              text-xs
+              font-black
+              text-slate-500
+              shadow-sm
+              hover:bg-slate-50
+            " %>
+
+          <%= link_to "Actors",
+                      ecosystems_load_sources_actors_actors_path,
+                      class: "
+              rounded-2xl
+              border-2 border-sky-100
+              bg-sky-50
+              px-4 py-2.5
+              text-xs
+              font-black
+              text-sky-600
+              shadow-sm
+              hover:bg-sky-100
+            " %>
+
+        </div>
+
+      </div>
+
+
+      <!-- Description -->
+
+      <div
+        class="
+          mt-8
+          rounded-[28px]
+          border-2 border-slate-100
+          bg-white/80
+          p-6
+          shadow-sm
+        "
+      >
+
+        <div
+          class="
+            text-[10px]
+            font-black
+            uppercase
+            tracking-widest
+            text-slate-400
+          "
+        >
+          Overview
+        </div>
+
+        <p
+          class="
+            mt-3
+            max-w-4xl
+            text-sm
+            leading-7
+            text-slate-600
+          "
+        >
+          <%= @actor.description.presence ||
+                "No description has been added yet." %>
+        </p>
+
+      </div>
+
+
+      <!-- Discovery Map -->
+
+      <div class="mt-6 grid gap-5 md:grid-cols-3">
+
+        <div
+          class="
+            rounded-[26px]
+            border-2 border-orange-100
+            bg-orange-50/50
+            p-5
+          "
+        >
+
+          <div class="text-2xl">
+            🌍
+          </div>
+
+          <div class="mt-3 text-sm font-black text-orange-700">
+            Ecosystem
+          </div>
+
+          <p class="mt-1 text-xs leading-5 text-slate-400">
+            Ecosystems this actor participates in.
+          </p>
+
+        </div>
+
+
+        <div
+          class="
+            rounded-[26px]
+            border-2 border-sky-100
+            bg-sky-50/50
+            p-5
+          "
+        >
+
+          <div class="text-2xl">
+            ⚡
+          </div>
+
+          <div class="mt-3 text-sm font-black text-sky-700">
+            Pressures
+          </div>
+
+          <p class="mt-1 text-xs leading-5 text-slate-400">
+            Pressure relationships will appear here.
+          </p>
+
+        </div>
+
+
+        <div
+          class="
+            rounded-[26px]
+            border-2 border-violet-100
+            bg-violet-50/50
+            p-5
+          "
+        >
+
+          <div class="text-2xl">
+            🔗
+          </div>
+
+          <div class="mt-3 text-sm font-black text-violet-700">
+            Relationships
+          </div>
+
+          <p class="mt-1 text-xs leading-5 text-slate-400">
+            Connected entities will appear here.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <!-- Future Encyclopedia Areas -->
+
+      <div
+        class="
+          mt-8
+          rounded-[30px]
+          border-2 border-dashed border-slate-200
+          bg-slate-50/50
+          p-6
+        "
+      >
+
+        <div class="flex items-center gap-3">
+
+          <span class="text-xl">
+            🗺️
+          </span>
+
+          <div>
+
+            <div class="text-sm font-black text-slate-700">
+              Actor knowledge map
+            </div>
+
+            <p class="mt-1 text-xs text-slate-400">
+              Relationships, evidence, activities, pressures,
+              infrastructure and other encyclopedia layers
+              will be connected here.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

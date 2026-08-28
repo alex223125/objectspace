@@ -1,4 +1,16 @@
 Rails.application.routes.draw do
+  namespace :ecosystems do
+    namespace :load_sources do
+      namespace :actors do
+        resources :actors do
+          collection do
+            get :search
+          end
+        end
+      end
+    end
+  end
+
   # devise_for :admin_users
 
   ##### API ROUTES

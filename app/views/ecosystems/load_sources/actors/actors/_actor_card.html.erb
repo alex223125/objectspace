@@ -1,0 +1,346 @@
+<%
+  status_classes =
+    case actor.status.to_s
+    when "published", "active"
+      "bg-emerald-50 text-emerald-700 border-emerald-200"
+    when "draft"
+      "bg-amber-50 text-amber-700 border-amber-200"
+    when "archived"
+      "bg-slate-100 text-slate-500 border-slate-200"
+    else
+      "bg-orange-50 text-orange-700 border-orange-200"
+    end
+%>
+
+<article
+  id="<%= dom_id(actor) %>"
+  class="
+    group relative
+    flex flex-col
+    overflow-hidden
+    rounded-[28px]
+    border-2 border-orange-100
+    bg-white
+    shadow-sm shadow-orange-100/40
+    transition-all duration-300
+    hover:-translate-y-1
+    hover:border-orange-200
+    hover:shadow-xl
+    hover:shadow-orange-100/60
+  "
+  data-actor-discovery-target="card"
+  data-actor-id="<%= actor.id %>"
+>
+
+  <!-- ========================================================= -->
+  <!-- TOP ACCENT -->
+  <!-- ========================================================= -->
+
+  <div
+    class="
+      h-1.5 w-full
+      bg-gradient-to-r
+      from-orange-400
+      via-amber-400
+      to-emerald-400
+    ">
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- CARD CONTENT -->
+  <!-- ========================================================= -->
+
+  <div class="flex flex-1 flex-col p-6">
+
+    <!-- Header -->
+
+    <div class="flex items-start justify-between gap-4">
+
+      <!-- Actor icon -->
+
+      <div
+        class="
+          flex h-12 w-12 shrink-0
+          items-center justify-center
+          rounded-2xl
+          border border-orange-200
+          bg-gradient-to-br
+          from-orange-50
+          to-amber-50
+          text-xl
+          shadow-sm
+          shadow-orange-100
+          transition-all duration-300
+          group-hover:scale-105
+        "
+      >
+        🎭
+      </div>
+
+
+      <!-- Status -->
+
+      <span
+        class="
+          inline-flex items-center
+          rounded-full
+          border
+          px-3 py-1
+          text-[10px]
+          font-black
+          uppercase
+          tracking-wider
+          <%= status_classes %>
+        "
+      >
+        <span
+          class="
+            mr-1.5
+            h-1.5 w-1.5
+            rounded-full
+            bg-current
+          "
+        ></span>
+
+        <%= actor.status.to_s.humanize %>
+      </span>
+
+    </div>
+
+
+    <!-- ======================================================= -->
+    <!-- ACTOR NAME -->
+    <!-- ======================================================= -->
+
+    <div class="mt-5">
+
+      <h3
+        class="
+          text-base
+          font-black
+          tracking-tight
+          text-slate-800
+          transition-colors duration-200
+          group-hover:text-orange-600
+        "
+      >
+        <%= actor.name %>
+      </h3>
+
+
+      <% if actor.slug.present? %>
+
+        <div
+          class="
+            mt-1
+            text-[10px]
+            font-bold
+            uppercase
+            tracking-widest
+            text-slate-400
+          "
+        >
+          <%= actor.slug %>
+        </div>
+
+      <% end %>
+
+    </div>
+
+
+    <!-- ======================================================= -->
+    <!-- DESCRIPTION -->
+    <!-- ======================================================= -->
+
+    <% if actor.description.present? %>
+
+      <p
+        class="
+          mt-4
+          line-clamp-3
+          text-xs
+          leading-6
+          text-slate-500
+        "
+      >
+        <%= actor.description %>
+      </p>
+
+    <% else %>
+
+      <p
+        class="
+          mt-4
+          text-xs
+          italic
+          leading-6
+          text-slate-300
+        "
+      >
+        No description has been added yet.
+      </p>
+
+    <% end %>
+
+
+    <!-- ======================================================= -->
+    <!-- ACTOR META -->
+    <!-- ======================================================= -->
+
+    <div
+      class="
+        mt-5
+        flex flex-wrap
+        items-center
+        gap-2
+      "
+    >
+
+      <!-- Entity type -->
+
+      <span
+        class="
+          rounded-xl
+          border border-sky-100
+          bg-sky-50
+          px-2.5 py-1
+          text-[9px]
+          font-black
+          uppercase
+          tracking-wider
+          text-sky-600
+        "
+      >
+        Actor
+      </span>
+
+
+      <!-- Layer -->
+
+      <span
+        class="
+          rounded-xl
+          border border-violet-100
+          bg-violet-50
+          px-2.5 py-1
+          text-[9px]
+          font-black
+          uppercase
+          tracking-wider
+          text-violet-600
+        "
+      >
+        Load Sources
+      </span>
+
+    </div>
+
+
+    <!-- ======================================================= -->
+    <!-- SPACER -->
+    <!-- ======================================================= -->
+
+    <div class="flex-1"></div>
+
+
+    <!-- ======================================================= -->
+    <!-- FOOTER -->
+    <!-- ======================================================= -->
+
+    <div
+      class="
+        mt-6
+        flex items-center
+        justify-between
+        border-t
+        border-slate-100
+        pt-4
+      "
+    >
+
+      <div
+        class="
+          flex items-center gap-2
+          text-[10px]
+          font-bold
+          text-slate-400
+        "
+      >
+
+        <span
+          class="
+            h-2 w-2
+            rounded-full
+            bg-emerald-400
+            shadow-[0_0_7px_rgba(52,211,153,0.6)]
+          "
+        ></span>
+
+        Encyclopedia entity
+
+      </div>
+
+
+      <!-- Show -->
+
+      <%= link_to(
+            ecosystems_load_sources_actors_actor_path(actor),
+            class: "
+          inline-flex items-center gap-2
+          rounded-xl
+          border border-orange-200
+          bg-orange-50
+          px-3 py-2
+          text-[10px]
+          font-black
+          text-orange-600
+          transition-all duration-200
+          hover:bg-orange-400
+          hover:text-white
+          hover:shadow-md
+          hover:shadow-orange-200
+        "
+          ) do %>
+
+        <span>Explore</span>
+
+        <span
+          class="
+            transition-transform
+            duration-200
+            group-hover:translate-x-0.5
+          "
+        >
+          →
+        </span>
+
+      <% end %>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- HOVER GLOW -->
+  <!-- ========================================================= -->
+
+  <div
+    class="
+      pointer-events-none
+      absolute
+      inset-x-6
+      bottom-0
+      h-px
+      bg-gradient-to-r
+      from-transparent
+      via-orange-300
+      to-transparent
+      opacity-0
+      transition-opacity duration-300
+      group-hover:opacity-100
+    "
+  ></div>
+
+</article>
