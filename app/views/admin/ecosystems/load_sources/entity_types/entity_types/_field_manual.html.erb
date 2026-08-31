@@ -1,0 +1,1970 @@
+<%# ============================================================================
+ENTITY TYPES — FIELD MANUAL
+
+Partial:
+app/views/admin/ecosystems/load_sources/entity_types/entity_types/_field_manual.html.erb
+
+Purpose:
+Beginner-friendly visual explanation of what Entity Types are, why they exist,
+how they relate to Entity Templates and Configurations, and when to create one.
+
+Usage:
+<%= render "admin/ecosystems/load_sources/entity_types/entity_types/field_manual" %>
+
+<!--============================================================================ %>-->
+
+<section class=" relative mb-10 overflow-hidden rounded-[32px] border-2 border-indigo-100 bg-gradient-to-b from-white via-indigo-50/30 to-slate-50 shadow-md shadow-indigo-100/40 "> <!-- ================================================================ --> <!-- AMBIENT WORLD / GAMIFICATION DECORATION --> <!-- ================================================================ --> <div class="pointer-events-none absolute inset-0 overflow-hidden">
+  <div
+    class="
+    absolute
+    -right-28
+    -top-28
+    h-80
+    w-80
+    rounded-full
+    bg-indigo-200/30
+    blur-3xl
+  "></div>
+
+  <div
+    class="
+    absolute
+    -bottom-32
+    -left-28
+    h-80
+    w-80
+    rounded-full
+    bg-violet-200/25
+    blur-3xl
+  "></div>
+
+  <div
+    class="
+    absolute
+    right-20
+    top-24
+    h-28
+    w-28
+    rounded-full
+    border-2
+    border-indigo-100/70
+  "></div>
+
+  <div
+    class="
+    absolute
+    right-32
+    top-36
+    h-8
+    w-8
+    rounded-full
+    bg-violet-200/60
+  "></div>
+
+  <div
+    class="
+    absolute
+    bottom-20
+    left-16
+    h-16
+    w-16
+    rounded-full
+    border
+    border-indigo-100/70
+  "></div>
+
+</div> <!-- ================================================================ --> <!-- CONTENT --> <!-- ================================================================ --> <div class="relative z-10 p-6 sm:p-8 lg:p-10">
+  <!-- ==============================================================
+       TOP STATUS
+  =============================================================== -->
+
+  <div class="flex flex-wrap items-center gap-3">
+
+    <div
+      class="
+      inline-flex
+      items-center
+      gap-2
+      rounded-full
+      border
+      border-indigo-200
+      bg-indigo-50
+      px-4
+      py-2
+      text-[11px]
+      font-black
+      uppercase
+      tracking-[0.18em]
+      text-indigo-600
+      shadow-sm
+    ">
+
+    <span
+      class="
+        h-2
+        w-2
+        animate-pulse
+        rounded-full
+        bg-indigo-500
+        shadow-[0_0_8px_rgba(99,102,241,0.55)]
+      "></span>
+
+      Field Manual
+
+    </div>
+
+    <div
+      class="
+      rounded-full
+      border
+      border-violet-200
+      bg-violet-50
+      px-4
+      py-2
+      text-[11px]
+      font-bold
+      uppercase
+      tracking-wider
+      text-violet-600
+      shadow-sm
+    ">
+      Quest Briefing 01
+    </div>
+
+    <div
+      class="
+      rounded-full
+      border
+      border-emerald-200
+      bg-emerald-50
+      px-4
+      py-2
+      text-[11px]
+      font-bold
+      uppercase
+      tracking-wider
+      text-emerald-600
+      shadow-sm
+    ">
+      Foundation Layer
+    </div>
+
+  </div>
+
+  <!-- ==============================================================
+       HERO
+  =============================================================== -->
+
+  <div
+    class="
+    mt-7
+    grid
+    grid-cols-1
+    gap-10
+    lg:grid-cols-12
+    lg:items-center
+  ">
+
+    <!-- ============================================================
+         HERO TEXT
+    ============================================================ -->
+
+    <div class="lg:col-span-7">
+
+      <div
+        class="
+        text-[12px]
+        font-black
+        uppercase
+        tracking-[0.22em]
+        text-indigo-500
+      ">
+        Architecture Protocol :: Layer 01
+      </div>
+
+      <h2
+        class="
+        mt-2
+        max-w-3xl
+        text-3xl
+        font-black
+        leading-tight
+        tracking-tight
+        text-gray-900
+        sm:text-4xl
+      ">
+        What is an Entity Type?
+      </h2>
+
+      <p
+        class="
+        mt-5
+        max-w-2xl
+        text-base
+        leading-7
+        text-gray-500
+        sm:text-[17px]
+      ">
+        An
+        <span class="font-black text-indigo-600">
+        Entity Type
+      </span>
+        is the system's answer to one simple question:
+        <strong class="font-black text-gray-700">
+          “What kind of thing is this?”
+        </strong>
+      </p>
+
+      <p
+        class="
+        mt-4
+        max-w-2xl
+        text-sm
+        leading-6
+        text-gray-500
+        sm:text-[15px]
+      ">
+        It gives your encyclopedia a controlled vocabulary for the things
+        you want to manage. Instead of creating hundreds of unrelated
+        records, you first define the kinds of things your system knows
+        about — characters, locations, books, products, organizations,
+        quests, creatures, or anything else your domain requires.
+      </p>
+
+      <!-- ==========================================================
+           BEGINNER RULE
+      =========================================================== -->
+
+      <div
+        class="
+        mt-7
+        rounded-2xl
+        border-2
+        border-amber-100
+        bg-gradient-to-r
+        from-amber-50
+        via-white
+        to-orange-50/60
+        p-5
+        shadow-sm
+        shadow-amber-100/50
+      ">
+
+        <div class="flex items-start gap-4">
+
+          <div
+            class="
+            flex
+            h-11
+            w-11
+            shrink-0
+            items-center
+            justify-center
+            rounded-2xl
+            border
+            border-amber-200
+            bg-amber-100
+            text-xl
+            shadow-sm
+          ">
+            💡
+          </div>
+
+          <div>
+
+            <div
+              class="
+              text-[12px]
+              font-black
+              uppercase
+              tracking-wider
+              text-amber-600
+            ">
+              Beginner Rule
+            </div>
+
+            <p
+              class="
+              mt-2
+              text-sm
+              leading-6
+              text-gray-500
+              sm:text-[15px]
+            ">
+              An Entity Type is
+              <strong class="font-black text-gray-700">
+                not the actual entity.
+              </strong>
+              It is the category or identity class that tells the system
+              what an entity is supposed to be.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ============================================================
+         VISUAL ENTITY TYPE CARD
+    ============================================================= -->
+
+    <div class="relative lg:col-span-5">
+
+      <div
+        class="
+        relative
+        mx-auto
+        max-w-sm
+        -rotate-1
+        rounded-[28px]
+        border-2
+        border-indigo-100
+        bg-white
+        p-6
+        shadow-lg
+        shadow-indigo-100/60
+        transition-all
+        duration-300
+        hover:translate-y-[-4px]
+        hover:rotate-0
+        hover:shadow-xl
+      ">
+
+        <!-- STATUS -->
+
+        <div
+          class="
+          absolute
+          right-5
+          top-5
+          rounded-full
+          border
+          border-emerald-200
+          bg-emerald-50
+          px-3
+          py-1.5
+          text-[10px]
+          font-black
+          uppercase
+          tracking-wider
+          text-emerald-600
+        ">
+          ✓ Active Type
+        </div>
+
+        <!-- TYPE ICON -->
+
+        <div
+          class="
+          flex
+          h-20
+          w-20
+          items-center
+          justify-center
+          rounded-[24px]
+          border-2
+          border-indigo-200
+          bg-gradient-to-br
+          from-indigo-500
+          to-violet-500
+          text-4xl
+          shadow-lg
+          shadow-indigo-200/70
+        ">
+          🧩
+        </div>
+
+        <div class="mt-6">
+
+          <div
+            class="
+            text-[11px]
+            font-black
+            uppercase
+            tracking-[0.2em]
+            text-indigo-500
+          ">
+            Entity Type
+          </div>
+
+          <div
+            class="
+            mt-1
+            text-xl
+            font-black
+            text-gray-900
+          ">
+            Character
+          </div>
+
+          <div
+            class="
+            mt-1
+            font-mono
+            text-xs
+            text-indigo-500
+          ">
+            character
+          </div>
+
+        </div>
+
+        <!-- DESCRIPTION -->
+
+        <div
+          class="
+          mt-5
+          rounded-xl
+          border
+          border-gray-200
+          bg-gray-50
+          p-4
+        ">
+
+          <div
+            class="
+            text-[10px]
+            font-black
+            uppercase
+            tracking-wider
+            text-gray-400
+          ">
+            Definition
+          </div>
+
+          <p
+            class="
+            mt-2
+            text-sm
+            leading-6
+            text-gray-500
+          ">
+            A person, NPC or fictional character represented in the
+            encyclopedia.
+          </p>
+
+        </div>
+
+        <!-- CAPABILITY -->
+
+        <div
+          class="
+          mt-4
+          flex
+          items-center
+          justify-between
+          rounded-xl
+          border
+          border-indigo-100
+          bg-indigo-50
+          px-4
+          py-3
+        ">
+
+        <span
+          class="
+            text-[10px]
+            font-black
+            uppercase
+            tracking-wider
+            text-indigo-500
+          ">
+          Template Ready
+        </span>
+
+          <span
+            class="
+            text-sm
+            font-black
+            text-indigo-700
+          ">
+          ✓ Yes
+        </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ==============================================================
+       CORE IDEA
+  =============================================================== -->
+
+  <div class="mt-12">
+
+    <div
+      class="
+      text-[12px]
+      font-black
+      uppercase
+      tracking-[0.2em]
+      text-gray-400
+    ">
+      The Core Idea
+    </div>
+
+    <div
+      class="
+      mt-5
+      grid
+      grid-cols-1
+      gap-4
+      md:grid-cols-3
+    ">
+
+      <!-- WHAT -->
+
+      <div
+        class="
+        rounded-2xl
+        border-2
+        border-indigo-100
+        bg-indigo-50/70
+        p-5
+        shadow-sm
+        shadow-indigo-100/40
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:shadow-md
+      ">
+
+        <div class="text-2xl">
+          🧬
+        </div>
+
+        <div
+          class="
+          mt-4
+          text-sm
+          font-black
+          text-indigo-700
+        ">
+          Entity Type
+        </div>
+
+        <p
+          class="
+          mt-2
+          text-sm
+          leading-6
+          text-gray-500
+        ">
+          Defines
+          <strong class="font-black text-gray-700">
+            what something is.
+          </strong>
+        </p>
+
+        <div
+          class="
+          mt-4
+          text-[11px]
+          font-black
+          text-indigo-500
+        ">
+          Character
+        </div>
+
+      </div>
+
+      <!-- TEMPLATE -->
+
+      <div
+        class="
+        rounded-2xl
+        border-2
+        border-violet-100
+        bg-violet-50/70
+        p-5
+        shadow-sm
+        shadow-violet-100/40
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:shadow-md
+      ">
+
+        <div class="text-2xl">
+          🧱
+        </div>
+
+        <div
+          class="
+          mt-4
+          text-sm
+          font-black
+          text-violet-700
+        ">
+          Entity Template
+        </div>
+
+        <p
+          class="
+          mt-2
+          text-sm
+          leading-6
+          text-gray-500
+        ">
+          Defines
+          <strong class="font-black text-gray-700">
+            what information it contains.
+          </strong>
+        </p>
+
+        <div
+          class="
+          mt-4
+          text-[11px]
+          font-black
+          text-violet-500
+        ">
+          Name + Biography + Image
+        </div>
+
+      </div>
+
+      <!-- ENTITY -->
+
+      <div
+        class="
+        rounded-2xl
+        border-2
+        border-emerald-100
+        bg-emerald-50/70
+        p-5
+        shadow-sm
+        shadow-emerald-100/40
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:shadow-md
+      ">
+
+        <div class="text-2xl">
+          👤
+        </div>
+
+        <div
+          class="
+          mt-4
+          text-sm
+          font-black
+          text-emerald-700
+        ">
+          Actual Entity
+        </div>
+
+        <p
+          class="
+          mt-2
+          text-sm
+          leading-6
+          text-gray-500
+        ">
+          Represents
+          <strong class="font-black text-gray-700">
+            one real record.
+          </strong>
+        </p>
+
+        <div
+          class="
+          mt-4
+          text-[11px]
+          font-black
+          text-emerald-500
+        ">
+          Commander Shepard
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ==============================================================
+       ARCHITECTURE MAP
+  =============================================================== -->
+
+  <div class="mt-12">
+
+    <div
+      class="
+      text-[12px]
+      font-black
+      uppercase
+      tracking-[0.2em]
+      text-gray-400
+    ">
+      System Map
+    </div>
+
+    <div
+      class="
+      mt-5
+      overflow-hidden
+      rounded-[24px]
+      border-2
+      border-gray-100
+      bg-white
+      shadow-sm
+    ">
+
+      <div
+        class="
+        grid
+        grid-cols-1
+        md:grid-cols-7
+      ">
+
+        <!-- TYPE -->
+
+        <div
+          class="
+          bg-indigo-50
+          p-6
+          text-center
+          md:col-span-2
+        ">
+
+          <div class="text-3xl">
+            🧬
+          </div>
+
+          <div
+            class="
+            mt-3
+            text-sm
+            font-black
+            text-indigo-700
+          ">
+            Entity Type
+          </div>
+
+          <p
+            class="
+            mt-2
+            text-xs
+            leading-5
+            text-gray-500
+          ">
+            What kind of thing?
+          </p>
+
+        </div>
+
+        <!-- ARROW -->
+
+        <div
+          class="
+          hidden
+          items-center
+          justify-center
+          bg-white
+          md:flex
+        ">
+        <span
+          class="
+            text-2xl
+            font-black
+            text-gray-300
+          ">
+          →
+        </span>
+        </div>
+
+        <!-- TEMPLATE -->
+
+        <div
+          class="
+          bg-violet-50
+          p-6
+          text-center
+          md:col-span-2
+        ">
+
+          <div class="text-3xl">
+            🧱
+          </div>
+
+          <div
+            class="
+            mt-3
+            text-sm
+            font-black
+            text-violet-700
+          ">
+            Entity Template
+          </div>
+
+          <p
+            class="
+            mt-2
+            text-xs
+            leading-5
+            text-gray-500
+          ">
+            What information?
+          </p>
+
+        </div>
+
+        <!-- ARROW -->
+
+        <div
+          class="
+          hidden
+          items-center
+          justify-center
+          bg-white
+          md:flex
+        ">
+        <span
+          class="
+            text-2xl
+            font-black
+            text-gray-300
+          ">
+          →
+        </span>
+        </div>
+
+        <!-- ENTITY -->
+
+        <div
+          class="
+          bg-emerald-50
+          p-6
+          text-center
+          md:col-span-2
+        ">
+
+          <div class="text-3xl">
+            👤
+          </div>
+
+          <div
+            class="
+            mt-3
+            text-sm
+            font-black
+            text-emerald-700
+          ">
+            Entity
+          </div>
+
+          <p
+            class="
+            mt-2
+            text-xs
+            leading-5
+            text-gray-500
+          ">
+            The actual record.
+          </p>
+
+        </div>
+
+      </div>
+
+      <!-- MOBILE FLOW -->
+
+      <div
+        class="
+        border-t
+        border-gray-100
+        p-4
+        text-center
+        text-xs
+        font-black
+        uppercase
+        tracking-wider
+        text-gray-400
+        md:hidden
+      ">
+        Type ↓ Template ↓ Entity
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ==============================================================
+       REAL WORLD EXAMPLE
+  =============================================================== -->
+
+  <div class="mt-12">
+
+    <div
+      class="
+      text-[12px]
+      font-black
+      uppercase
+      tracking-[0.2em]
+      text-gray-400
+    ">
+      Mission Example
+    </div>
+
+    <div
+      class="
+      mt-5
+      rounded-[24px]
+      border-2
+      border-indigo-100
+      bg-gradient-to-br
+      from-indigo-50
+      via-white
+      to-violet-50
+      p-6
+      shadow-sm
+      shadow-indigo-100/40
+      sm:p-7
+    ">
+
+      <div class="grid grid-cols-1 gap-6 lg:grid-cols-4 lg:items-center">
+
+        <!-- TYPE -->
+
+        <div>
+
+          <div
+            class="
+            text-[10px]
+            font-black
+            uppercase
+            tracking-wider
+            text-indigo-500
+          ">
+            Step 01 · Type
+          </div>
+
+          <div
+            class="
+            mt-2
+            text-xl
+            font-black
+            text-gray-900
+          ">
+            Character
+          </div>
+
+          <p
+            class="
+            mt-2
+            text-sm
+            leading-6
+            text-gray-500
+          ">
+            We decide that the system needs to know about characters.
+          </p>
+
+        </div>
+
+        <!-- TEMPLATE -->
+
+        <div>
+
+          <div
+            class="
+            text-[10px]
+            font-black
+            uppercase
+            tracking-wider
+            text-violet-500
+          ">
+            Step 02 · Template
+          </div>
+
+          <div
+            class="
+            mt-2
+            text-xl
+            font-black
+            text-gray-900
+          ">
+            Character Profile
+          </div>
+
+          <p
+            class="
+            mt-2
+            text-sm
+            leading-6
+            text-gray-500
+          ">
+            We decide which fields a character profile should contain.
+          </p>
+
+        </div>
+
+        <!-- CONFIGURATION -->
+
+        <div>
+
+          <div
+            class="
+            text-[10px]
+            font-black
+            uppercase
+            tracking-wider
+            text-orange-500
+          ">
+            Step 03 · Configuration
+          </div>
+
+          <div
+            class="
+            mt-2
+            text-xl
+            font-black
+            text-gray-900
+          ">
+            Encyclopedia
+          </div>
+
+          <p
+            class="
+            mt-2
+            text-sm
+            leading-6
+            text-gray-500
+          ">
+            We decide how this character structure behaves in a context.
+          </p>
+
+        </div>
+
+        <!-- RESULT -->
+
+        <div>
+
+          <div
+            class="
+            text-[10px]
+            font-black
+            uppercase
+            tracking-wider
+            text-emerald-500
+          ">
+            Step 04 · Result
+          </div>
+
+          <div
+            class="
+            mt-2
+            text-xl
+            font-black
+            text-gray-900
+          ">
+            Commander Shepard
+          </div>
+
+          <p
+            class="
+            mt-2
+            text-sm
+            leading-6
+            text-gray-500
+          ">
+            One actual entity can now be created using the architecture.
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ==============================================================
+       WHEN SHOULD YOU CREATE AN ENTITY TYPE?
+  =============================================================== -->
+
+  <div class="mt-12">
+
+    <div
+      class="
+      text-[12px]
+      font-black
+      uppercase
+      tracking-[0.2em]
+      text-gray-400
+    ">
+      When Should You Create One?
+    </div>
+
+    <div
+      class="
+      mt-5
+      grid
+      grid-cols-1
+      gap-5
+      md:grid-cols-3
+    ">
+
+      <!-- SCENARIO 1 -->
+
+      <div
+        class="
+        group
+        rounded-2xl
+        border-2
+        border-blue-100
+        bg-white
+        p-6
+        shadow-sm
+        shadow-blue-100/40
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:border-blue-200
+        hover:shadow-lg
+      ">
+
+        <div
+          class="
+          flex
+          h-12
+          w-12
+          items-center
+          justify-center
+          rounded-2xl
+          border
+          border-blue-100
+          bg-blue-50
+          text-xl
+        ">
+          📚
+        </div>
+
+        <div
+          class="
+          mt-5
+          text-base
+          font-black
+          text-gray-800
+        ">
+          Encyclopedia
+        </div>
+
+        <p
+          class="
+          mt-3
+          text-sm
+          leading-6
+          text-gray-500
+        ">
+          Create an Entity Type when your knowledge system needs to
+          distinguish between different kinds of information.
+        </p>
+
+        <div
+          class="
+          mt-4
+          text-[11px]
+          font-black
+          text-blue-500
+        ">
+          Character · Location · Organization
+        </div>
+
+      </div>
+
+      <!-- SCENARIO 2 -->
+
+      <div
+        class="
+        group
+        rounded-2xl
+        border-2
+        border-violet-100
+        bg-white
+        p-6
+        shadow-sm
+        shadow-violet-100/40
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:border-violet-200
+        hover:shadow-lg
+      ">
+
+        <div
+          class="
+          flex
+          h-12
+          w-12
+          items-center
+          justify-center
+          rounded-2xl
+          border
+          border-violet-100
+          bg-violet-50
+          text-xl
+        ">
+          🎮
+        </div>
+
+        <div
+          class="
+          mt-5
+          text-base
+          font-black
+          text-gray-800
+        ">
+          Game / World Database
+        </div>
+
+        <p
+          class="
+          mt-3
+          text-sm
+          leading-6
+          text-gray-500
+        ">
+          Give your world a vocabulary of recognizable things. A quest,
+          creature, weapon or faction can each become its own type.
+        </p>
+
+        <div
+          class="
+          mt-4
+          text-[11px]
+          font-black
+          text-violet-500
+        ">
+          Quest · Creature · Weapon
+        </div>
+
+      </div>
+
+      <!-- SCENARIO 3 -->
+
+      <div
+        class="
+        group
+        rounded-2xl
+        border-2
+        border-emerald-100
+        bg-white
+        p-6
+        shadow-sm
+        shadow-emerald-100/40
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:border-emerald-200
+        hover:shadow-lg
+      ">
+
+        <div
+          class="
+          flex
+          h-12
+          w-12
+          items-center
+          justify-center
+          rounded-2xl
+          border
+          border-emerald-100
+          bg-emerald-50
+          text-xl
+        ">
+          🏢
+        </div>
+
+        <div
+          class="
+          mt-5
+          text-base
+          font-black
+          text-gray-800
+        ">
+          Business System
+        </div>
+
+        <p
+          class="
+          mt-3
+          text-sm
+          leading-6
+          text-gray-500
+        ">
+          Model recurring categories of information such as products,
+          customers, projects, locations or departments.
+        </p>
+
+        <div
+          class="
+          mt-4
+          text-[11px]
+          font-black
+          text-emerald-500
+        ">
+          Product · Customer · Project
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ==============================================================
+       NAME / SLUG / DESCRIPTION EXPLAINER
+  =============================================================== -->
+
+  <div
+    class="
+    mt-12
+    rounded-[24px]
+    border-2
+    border-gray-100
+    bg-white
+    p-6
+    shadow-sm
+    sm:p-7
+  ">
+
+    <div class="flex items-start gap-4">
+
+      <div
+        class="
+        flex
+        h-12
+        w-12
+        shrink-0
+        items-center
+        justify-center
+        rounded-2xl
+        border
+        border-indigo-100
+        bg-indigo-50
+        text-xl
+      ">
+        🪪
+      </div>
+
+      <div class="min-w-0">
+
+        <div
+          class="
+          text-[12px]
+          font-black
+          uppercase
+          tracking-[0.15em]
+          text-indigo-500
+        ">
+          Your Entity Type Identity
+        </div>
+
+        <p
+          class="
+          mt-2
+          max-w-3xl
+          text-sm
+          leading-6
+          text-gray-500
+          sm:text-[15px]
+        ">
+          When creating a type, think of it as issuing an official identity
+          card for a new category of object in your system.
+        </p>
+
+      </div>
+
+    </div>
+
+    <div
+      class="
+      mt-6
+      grid
+      grid-cols-1
+      gap-3
+      sm:grid-cols-3
+    ">
+
+      <div
+        class="
+        rounded-xl
+        border
+        border-indigo-100
+        bg-indigo-50/60
+        p-4
+      ">
+
+        <div
+          class="
+          text-[10px]
+          font-black
+          uppercase
+          tracking-wider
+          text-indigo-500
+        ">
+          Name
+        </div>
+
+        <div
+          class="
+          mt-2
+          text-sm
+          font-black
+          text-gray-800
+        ">
+          Character
+        </div>
+
+        <p
+          class="
+          mt-1
+          text-xs
+          leading-5
+          text-gray-500
+        ">
+          Human-readable name.
+        </p>
+
+      </div>
+
+      <div
+        class="
+        rounded-xl
+        border
+        border-violet-100
+        bg-violet-50/60
+        p-4
+      ">
+
+        <div
+          class="
+          text-[10px]
+          font-black
+          uppercase
+          tracking-wider
+          text-violet-500
+        ">
+          Slug
+        </div>
+
+        <div
+          class="
+          mt-2
+          font-mono
+          text-sm
+          font-black
+          text-gray-800
+        ">
+          character
+        </div>
+
+        <p
+          class="
+          mt-1
+          text-xs
+          leading-5
+          text-gray-500
+        ">
+          Stable machine-readable identifier.
+        </p>
+
+      </div>
+
+      <div
+        class="
+        rounded-xl
+        border
+        border-emerald-100
+        bg-emerald-50/60
+        p-4
+      ">
+
+        <div
+          class="
+          text-[10px]
+          font-black
+          uppercase
+          tracking-wider
+          text-emerald-500
+        ">
+          Description
+        </div>
+
+        <div
+          class="
+          mt-2
+          text-sm
+          font-black
+          text-gray-800
+        ">
+          What this type means
+        </div>
+
+        <p
+          class="
+          mt-1
+          text-xs
+          leading-5
+          text-gray-500
+        ">
+          Explain the purpose to future administrators.
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ==============================================================
+       ACTIVE / INACTIVE EXPLAINER
+  =============================================================== -->
+
+  <div
+    class="
+    mt-7
+    grid
+    grid-cols-1
+    gap-5
+    md:grid-cols-2
+  ">
+
+    <!-- ACTIVE -->
+
+    <div
+      class="
+      rounded-2xl
+      border-2
+      border-emerald-100
+      bg-gradient-to-br
+      from-emerald-50
+      via-white
+      to-green-50
+      p-6
+      shadow-sm
+      shadow-emerald-100/40
+    ">
+
+      <div class="flex items-center gap-3">
+
+        <div
+          class="
+          flex
+          h-11
+          w-11
+          items-center
+          justify-center
+          rounded-2xl
+          border
+          border-emerald-200
+          bg-emerald-100
+          text-xl
+        ">
+          ✓
+        </div>
+
+        <div>
+
+          <div
+            class="
+            text-[11px]
+            font-black
+            uppercase
+            tracking-wider
+            text-emerald-600
+          ">
+            Active
+          </div>
+
+          <div
+            class="
+            mt-1
+            text-base
+            font-black
+            text-gray-800
+          ">
+            Type is available
+          </div>
+
+        </div>
+
+      </div>
+
+      <p
+        class="
+        mt-4
+        text-sm
+        leading-6
+        text-gray-500
+      ">
+        The type can participate in the entity architecture and can be
+        used by templates and configurations.
+      </p>
+
+    </div>
+
+    <!-- INACTIVE -->
+
+    <div
+      class="
+      rounded-2xl
+      border-2
+      border-gray-200
+      bg-gradient-to-br
+      from-gray-50
+      via-white
+      to-slate-50
+      p-6
+      shadow-sm
+    ">
+
+      <div class="flex items-center gap-3">
+
+        <div
+          class="
+          flex
+          h-11
+          w-11
+          items-center
+          justify-center
+          rounded-2xl
+          border
+          border-gray-200
+          bg-gray-100
+          text-xl
+        ">
+          ⏸
+        </div>
+
+        <div>
+
+          <div
+            class="
+            text-[11px]
+            font-black
+            uppercase
+            tracking-wider
+            text-gray-500
+          ">
+            Inactive
+          </div>
+
+          <div
+            class="
+            mt-1
+            text-base
+            font-black
+            text-gray-800
+          ">
+            Type is paused
+          </div>
+
+        </div>
+
+      </div>
+
+      <p
+        class="
+        mt-4
+        text-sm
+        leading-6
+        text-gray-500
+      ">
+        Use this when the category should remain defined but should no
+        longer be offered as an active part of the system.
+      </p>
+
+    </div>
+
+  </div>
+
+  <!-- ==============================================================
+       MISSION / WHAT TO DO ON THIS PAGE
+  =============================================================== -->
+
+  <div
+    class="
+    mt-12
+    rounded-[24px]
+    border-2
+    border-indigo-100
+    bg-gradient-to-r
+    from-indigo-50
+    via-white
+    to-violet-50
+    p-6
+    shadow-sm
+    shadow-indigo-100/50
+  ">
+
+    <div
+      class="
+      flex
+      flex-col
+      gap-5
+      sm:flex-row
+      sm:items-start
+    ">
+
+      <div
+        class="
+        flex
+        h-12
+        w-12
+        shrink-0
+        items-center
+        justify-center
+        rounded-2xl
+        border
+        border-indigo-200
+        bg-indigo-100
+        text-xl
+        shadow-sm
+      ">
+        🎯
+      </div>
+
+      <div>
+
+        <div
+          class="
+          text-[12px]
+          font-black
+          uppercase
+          tracking-[0.15em]
+          text-indigo-600
+        ">
+          Your Mission
+        </div>
+
+        <p
+          class="
+          mt-2
+          text-sm
+          leading-6
+          text-gray-500
+          sm:text-[15px]
+        ">
+          Before creating an Entity Type, ask:
+          <strong class="font-black text-gray-700">
+            “Is this a distinct kind of thing that my system needs to
+            understand?”
+          </strong>
+        </p>
+
+        <div
+          class="
+          mt-5
+          flex
+          flex-wrap
+          gap-2
+        ">
+
+        <span
+          class="
+            rounded-full
+            border
+            border-indigo-100
+            bg-indigo-50
+            px-3
+            py-1.5
+            text-[10px]
+            font-black
+            text-indigo-600
+          ">
+          1. Define the concept
+        </span>
+
+          <span
+            class="
+            rounded-full
+            border
+            border-violet-100
+            bg-violet-50
+            px-3
+            py-1.5
+            text-[10px]
+            font-black
+            text-violet-600
+          ">
+          2. Give it a stable slug
+        </span>
+
+          <span
+            class="
+            rounded-full
+            border
+            border-amber-100
+            bg-amber-50
+            px-3
+            py-1.5
+            text-[10px]
+            font-black
+            text-amber-600
+          ">
+          3. Explain its purpose
+        </span>
+
+          <span
+            class="
+            rounded-full
+            border
+            border-emerald-100
+            bg-emerald-50
+            px-3
+            py-1.5
+            text-[10px]
+            font-black
+            text-emerald-600
+          ">
+          4. Activate when ready
+        </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ==============================================================
+       FINAL WARNING / DESIGN PRINCIPLE
+  =============================================================== -->
+
+  <div
+    class="
+    mt-7
+    rounded-2xl
+    border-2
+    border-orange-100
+    bg-gradient-to-r
+    from-orange-50
+    via-white
+    to-amber-50
+    p-6
+    shadow-sm
+    shadow-orange-100/40
+  ">
+
+    <div class="flex items-start gap-4">
+
+      <div
+        class="
+        flex
+        h-11
+        w-11
+        shrink-0
+        items-center
+        justify-center
+        rounded-2xl
+        border
+        border-orange-200
+        bg-orange-100
+        text-xl
+      ">
+        ⚠️
+      </div>
+
+      <div>
+
+        <div
+          class="
+          text-[11px]
+          font-black
+          uppercase
+          tracking-[0.15em]
+          text-orange-600
+        ">
+          Field Rule
+        </div>
+
+        <p
+          class="
+          mt-2
+          text-sm
+          leading-6
+          text-gray-500
+          sm:text-[15px]
+        ">
+          Do not create an Entity Type merely because two records have
+          different names. Create one when they represent a
+          <strong class="font-black text-gray-700">
+            meaningful category of object
+          </strong>
+          that your system should recognize, organize and give structure to.
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ==============================================================
+       TERMINAL / FOOTER
+  =============================================================== -->
+
+  <div
+    class="
+    mt-8
+    flex
+    flex-col
+    gap-3
+    border-t-2
+    border-gray-100
+    pt-5
+    sm:flex-row
+    sm:items-center
+    sm:justify-between
+  ">
+
+    <div
+      class="
+      font-mono
+      text-[10px]
+      font-bold
+      uppercase
+      tracking-wider
+      text-gray-400
+    ">
+      ENTITY_PROTOCOL :: TYPE_REGISTRY :: ONLINE
+    </div>
+
+    <div
+      class="
+      flex
+      items-center
+      gap-2
+      text-[10px]
+      font-black
+      uppercase
+      tracking-wider
+      text-emerald-500
+    ">
+
+    <span
+      class="
+        h-2
+        w-2
+        rounded-full
+        bg-emerald-400
+        shadow-[0_0_8px_rgba(52,211,153,0.6)]
+      "></span>
+
+      Foundation module ready
+
+    </div>
+
+  </div>
+
+</div> </section>

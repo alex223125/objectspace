@@ -1,0 +1,2028 @@
+<%# ============================================================================
+ENTITY TEMPLATES — FIELD MANUAL
+
+Partial:
+app/views/admin/ecosystems/load_sources/entity_templates/_field_manual.html.erb
+
+Purpose:
+Beginner-friendly visual explanation of what Entity Templates are,
+why this page exists, and how templates fit into the Entity architecture.
+
+Usage:
+<%= render "admin/ecosystems/load_sources/entity_templates/field_manual" %>
+
+<!--============================================================================ %>-->
+
+<section class=" relative mb-10 overflow-hidden rounded-[32px] border-2 border-violet-100 bg-gradient-to-b from-white via-violet-50/30 to-slate-50 shadow-md shadow-violet-100/40 " > <!-- ================================================================ --> <!-- BACKGROUND / GAMIFICATION DECORATION --> <!-- ================================================================ --> <div class="pointer-events-none absolute inset-0 overflow-hidden">
+  <div
+    class="
+    absolute
+    -right-28
+    -top-28
+    h-80
+    w-80
+    rounded-full
+    bg-violet-200/30
+    blur-3xl
+  "
+  ></div>
+
+  <div
+    class="
+    absolute
+    -bottom-28
+    -left-28
+    h-80
+    w-80
+    rounded-full
+    bg-cyan-200/20
+    blur-3xl
+  "
+  ></div>
+
+  <div
+    class="
+    absolute
+    right-20
+    top-24
+    h-32
+    w-32
+    rounded-full
+    border-2
+    border-violet-100/60
+  "
+  ></div>
+
+  <div
+    class="
+    absolute
+    right-36
+    top-40
+    h-5
+    w-5
+    rounded-full
+    bg-orange-300/50
+  "
+  ></div>
+
+  <div
+    class="
+    absolute
+    bottom-20
+    left-20
+    h-4
+    w-4
+    rounded-full
+    bg-cyan-300/50
+  "
+  ></div>
+
+</div> <!-- ================================================================ --> <!-- CONTENT --> <!-- ================================================================ --> <div class="relative z-10 p-6 sm:p-8 lg:p-10">
+  <!-- ==============================================================
+       TOP LABEL
+  =============================================================== -->
+
+  <div class="flex flex-wrap items-center gap-3">
+
+    <div
+      class="
+      inline-flex
+      items-center
+      gap-2
+      rounded-full
+      border
+      border-violet-200
+      bg-violet-50
+      px-4
+      py-2
+      text-[11px]
+      font-black
+      uppercase
+      tracking-[0.18em]
+      text-violet-600
+      shadow-sm
+    "
+    >
+
+    <span
+      class="
+        h-2
+        w-2
+        animate-pulse
+        rounded-full
+        bg-violet-500
+        shadow-[0_0_8px_rgba(139,92,246,0.5)]
+      "
+    ></span>
+
+      Field Manual
+
+    </div>
+
+    <div
+      class="
+      rounded-full
+      border
+      border-cyan-200
+      bg-cyan-50
+      px-4
+      py-2
+      text-[11px]
+      font-bold
+      uppercase
+      tracking-wider
+      text-cyan-600
+      shadow-sm
+    "
+    >
+      Quest Briefing 02
+    </div>
+
+  </div>
+
+  <!-- ==============================================================
+       HERO
+  =============================================================== -->
+
+  <div
+    class="
+    mt-7
+    grid
+    grid-cols-1
+    gap-8
+    lg:grid-cols-12
+    lg:items-center
+  "
+  >
+
+    <!-- ============================================================
+         HERO TEXT
+    ============================================================= -->
+
+    <div class="lg:col-span-7">
+
+      <div
+        class="
+        text-[12px]
+        font-black
+        uppercase
+        tracking-[0.22em]
+        text-violet-500
+      "
+      >
+        Blueprint Archive
+      </div>
+
+      <h2
+        class="
+        mt-2
+        max-w-3xl
+        text-3xl
+        font-black
+        leading-tight
+        tracking-tight
+        text-gray-900
+        sm:text-4xl
+      "
+      >
+        What is an Entity Template?
+      </h2>
+
+      <p
+        class="
+        mt-5
+        max-w-2xl
+        text-base
+        leading-7
+        text-gray-500
+        sm:text-[17px]
+      "
+      >
+        An
+        <span class="font-black text-violet-600">Entity Template</span>
+        is the blueprint used to build a consistent entity.
+        It defines which pieces of information an entity can contain,
+        how those pieces are organized, and how the resulting record
+        can be presented to users.
+      </p>
+
+      <!-- BEGINNER RULE -->
+
+      <div
+        class="
+        mt-6
+        rounded-2xl
+        border-2
+        border-amber-100
+        bg-gradient-to-r
+        from-amber-50
+        via-white
+        to-orange-50/60
+        p-5
+        shadow-sm
+        shadow-amber-100/50
+      "
+      >
+
+        <div class="flex items-start gap-4">
+
+          <div
+            class="
+            flex
+            h-11
+            w-11
+            shrink-0
+            items-center
+            justify-center
+            rounded-2xl
+            border
+            border-amber-200
+            bg-amber-100
+            text-xl
+            shadow-sm
+          "
+          >
+            💡
+          </div>
+
+          <div>
+
+            <div
+              class="
+              text-[12px]
+              font-black
+              uppercase
+              tracking-wider
+              text-amber-600
+            "
+            >
+              Beginner Rule
+            </div>
+
+            <p
+              class="
+              mt-2
+              text-sm
+              leading-6
+              text-gray-500
+              sm:text-[15px]
+            "
+            >
+              A template is
+              <strong class="font-black text-gray-700">
+                not the entity itself
+              </strong>.
+              It is the blueprint that tells the system
+              <strong class="font-black text-violet-600">
+                what an entity should look like
+              </strong>.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ============================================================
+         GRAPHICAL BLUEPRINT CARD
+    ============================================================= -->
+
+    <div class="relative lg:col-span-5">
+
+      <div
+        class="
+        relative
+        mx-auto
+        max-w-sm
+        -rotate-1
+        rounded-[28px]
+        border-2
+        border-violet-100
+        bg-white
+        p-6
+        shadow-lg
+        shadow-violet-100/60
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:rotate-0
+        hover:shadow-xl
+      "
+      >
+
+        <!-- STATUS -->
+
+        <div
+          class="
+          absolute
+          right-5
+          top-5
+          rounded-full
+          border
+          border-emerald-200
+          bg-emerald-50
+          px-3
+          py-1.5
+          text-[10px]
+          font-black
+          uppercase
+          tracking-wider
+          text-emerald-600
+        "
+        >
+          ✓ Blueprint Ready
+        </div>
+
+        <!-- BLUEPRINT ICON -->
+
+        <div
+          class="
+          flex
+          h-20
+          w-20
+          items-center
+          justify-center
+          rounded-[24px]
+          border-2
+          border-violet-200
+          bg-gradient-to-br
+          from-violet-500
+          to-indigo-500
+          text-4xl
+          shadow-lg
+          shadow-violet-200/70
+        "
+        >
+          🧱
+        </div>
+
+        <div class="mt-6">
+
+          <div
+            class="
+            text-[11px]
+            font-black
+            uppercase
+            tracking-[0.2em]
+            text-violet-500
+          "
+          >
+            Entity Template
+          </div>
+
+          <div
+            class="
+            mt-1
+            text-xl
+            font-black
+            text-gray-900
+          "
+          >
+            Character Profile
+          </div>
+
+          <div
+            class="
+            mt-1
+            text-sm
+            text-gray-500
+          "
+          >
+            Blueprint for character records
+          </div>
+
+        </div>
+
+        <!-- FIELD MODULES -->
+
+        <div class="mt-6 space-y-2">
+
+          <div
+            class="
+            flex
+            items-center
+            justify-between
+            rounded-xl
+            border
+            border-gray-200
+            bg-gray-50
+            px-4
+            py-3
+          "
+          >
+
+            <div class="flex items-center gap-3">
+
+            <span
+              class="
+                flex
+                h-8
+                w-8
+                items-center
+                justify-center
+                rounded-lg
+                bg-indigo-100
+                text-sm
+              "
+            >
+              👤
+            </span>
+
+              <span class="text-sm font-black text-gray-700">
+              Name
+            </span>
+
+            </div>
+
+            <span
+              class="
+              text-[10px]
+              font-black
+              uppercase
+              text-indigo-500
+            "
+            >
+            Field
+          </span>
+
+          </div>
+
+          <div
+            class="
+            flex
+            items-center
+            justify-between
+            rounded-xl
+            border
+            border-gray-200
+            bg-gray-50
+            px-4
+            py-3
+          "
+          >
+
+            <div class="flex items-center gap-3">
+
+            <span
+              class="
+                flex
+                h-8
+                w-8
+                items-center
+                justify-center
+                rounded-lg
+                bg-violet-100
+                text-sm
+              "
+            >
+              📖
+            </span>
+
+              <span class="text-sm font-black text-gray-700">
+              Biography
+            </span>
+
+            </div>
+
+            <span
+              class="
+              text-[10px]
+              font-black
+              uppercase
+              text-violet-500
+            "
+            >
+            Field
+          </span>
+
+          </div>
+
+          <div
+            class="
+            flex
+            items-center
+            justify-between
+            rounded-xl
+            border
+            border-gray-200
+            bg-gray-50
+            px-4
+            py-3
+          "
+          >
+
+            <div class="flex items-center gap-3">
+
+            <span
+              class="
+                flex
+                h-8
+                w-8
+                items-center
+                justify-center
+                rounded-lg
+                bg-emerald-100
+                text-sm
+              "
+            >
+              🏷️
+            </span>
+
+              <span class="text-sm font-black text-gray-700">
+              Faction
+            </span>
+
+            </div>
+
+            <span
+              class="
+              text-[10px]
+              font-black
+              uppercase
+              text-emerald-500
+            "
+            >
+            Field
+          </span>
+
+          </div>
+
+        </div>
+
+        <!-- BLUEPRINT INTEGRITY -->
+
+        <div class="mt-6">
+
+          <div
+            class="
+            flex
+            items-center
+            justify-between
+            text-[10px]
+            font-black
+            uppercase
+            tracking-wider
+          "
+          >
+
+          <span class="text-gray-400">
+            Blueprint Integrity
+          </span>
+
+            <span class="text-violet-600">
+            100%
+          </span>
+
+          </div>
+
+          <div
+            class="
+            mt-2
+            h-3
+            overflow-hidden
+            rounded-full
+            border
+            border-gray-200
+            bg-gray-100
+          "
+          >
+
+            <div
+              class="
+              h-full
+              w-full
+              rounded-full
+              bg-gradient-to-r
+              from-violet-500
+              via-indigo-500
+              to-cyan-400
+              shadow-sm
+            "
+            ></div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ==============================================================
+       ARCHITECTURE MAP
+  =============================================================== -->
+
+  <div class="mt-12">
+
+    <div
+      class="
+      text-[12px]
+      font-black
+      uppercase
+      tracking-[0.2em]
+      text-gray-400
+    "
+    >
+      Entity Architecture
+    </div>
+
+    <p
+      class="
+      mt-2
+      max-w-3xl
+      text-sm
+      leading-6
+      text-gray-500
+    "
+    >
+      The template sits in the middle of the system.
+      It connects the definition of an entity with the actual records
+      that users eventually see.
+    </p>
+
+    <div
+      class="
+      mt-5
+      grid
+      grid-cols-1
+      gap-4
+      md:grid-cols-5
+    "
+    >
+
+      <!-- ENTITY TYPE -->
+
+      <div
+        class="
+        rounded-2xl
+        border-2
+        border-indigo-100
+        bg-indigo-50/70
+        p-5
+        shadow-sm
+        shadow-indigo-100/40
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:shadow-md
+      "
+      >
+
+        <div class="text-2xl">
+          🧬
+        </div>
+
+        <div
+          class="
+          mt-4
+          text-sm
+          font-black
+          text-indigo-700
+        "
+        >
+          Entity Type
+        </div>
+
+        <p
+          class="
+          mt-2
+          text-sm
+          leading-6
+          text-gray-500
+        "
+        >
+          Defines what kind of thing exists.
+        </p>
+
+        <div
+          class="
+          mt-4
+          text-[11px]
+          font-black
+          text-indigo-500
+        "
+        >
+          Character
+        </div>
+
+      </div>
+
+      <!-- ARROW -->
+
+      <div
+        class="
+        hidden
+        items-center
+        justify-center
+        md:flex
+      "
+      >
+      <span
+        class="
+          text-2xl
+          font-black
+          text-gray-300
+        "
+      >
+        →
+      </span>
+      </div>
+
+      <!-- TEMPLATE -->
+
+      <div
+        class="
+        rounded-2xl
+        border-2
+        border-violet-200
+        bg-gradient-to-br
+        from-violet-50
+        via-white
+        to-indigo-50
+        p-5
+        shadow-md
+        shadow-violet-100/60
+        ring-2
+        ring-violet-100/60
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:shadow-lg
+      "
+      >
+
+        <div class="text-2xl">
+          🧱
+        </div>
+
+        <div
+          class="
+          mt-4
+          text-sm
+          font-black
+          text-violet-700
+        "
+        >
+          Entity Template
+        </div>
+
+        <p
+          class="
+          mt-2
+          text-sm
+          leading-6
+          text-gray-500
+        "
+        >
+          Defines the blueprint and fields.
+        </p>
+
+        <div
+          class="
+          mt-4
+          inline-flex
+          rounded-full
+          border
+          border-violet-200
+          bg-violet-100
+          px-3
+          py-1.5
+          text-[10px]
+          font-black
+          uppercase
+          tracking-wider
+          text-violet-600
+        "
+        >
+          ★ You are here
+        </div>
+
+      </div>
+
+      <!-- ARROW -->
+
+      <div
+        class="
+        hidden
+        items-center
+        justify-center
+        md:flex
+      "
+      >
+      <span
+        class="
+          text-2xl
+          font-black
+          text-gray-300
+        "
+      >
+        →
+      </span>
+      </div>
+
+      <!-- CONFIGURATION -->
+
+      <div
+        class="
+        rounded-2xl
+        border-2
+        border-orange-100
+        bg-orange-50/70
+        p-5
+        shadow-sm
+        shadow-orange-100/40
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:shadow-md
+      "
+      >
+
+        <div class="text-2xl">
+          ⚙️
+        </div>
+
+        <div
+          class="
+          mt-4
+          text-sm
+          font-black
+          text-orange-700
+        "
+        >
+          Configuration
+        </div>
+
+        <p
+          class="
+          mt-2
+          text-sm
+          leading-6
+          text-gray-500
+        "
+        >
+          Decides where and how the blueprint is used.
+        </p>
+
+        <div
+          class="
+          mt-4
+          text-[11px]
+          font-black
+          text-orange-500
+        "
+        >
+          Context + behavior
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- MOBILE ARROW -->
+
+    <div
+      class="
+      mt-4
+      flex
+      items-center
+      justify-center
+      text-xl
+      font-black
+      text-gray-300
+      md:hidden
+    "
+    >
+      ↓
+    </div>
+
+    <!-- ENTITY RECORD -->
+
+    <div
+      class="
+      mt-4
+      rounded-2xl
+      border-2
+      border-emerald-100
+      bg-emerald-50/70
+      p-5
+      text-center
+      shadow-sm
+      shadow-emerald-100/40
+    "
+    >
+
+      <div class="text-2xl">
+        📦
+      </div>
+
+      <div
+        class="
+        mt-3
+        text-sm
+        font-black
+        text-emerald-700
+      "
+      >
+        Entity Record
+      </div>
+
+      <p
+        class="
+        mx-auto
+        mt-2
+        max-w-xl
+        text-sm
+        leading-6
+        text-gray-500
+      "
+      >
+        The actual character, location, product, article,
+        quest or other real record created from the blueprint.
+      </p>
+
+    </div>
+
+  </div>
+
+  <!-- ==============================================================
+       WHAT DO YOU BUILD HERE?
+  =============================================================== -->
+
+  <div class="mt-12">
+
+    <div
+      class="
+      text-[12px]
+      font-black
+      uppercase
+      tracking-[0.2em]
+      text-gray-400
+    "
+    >
+      What do you build here?
+    </div>
+
+    <div
+      class="
+      mt-5
+      grid
+      grid-cols-1
+      gap-5
+      md:grid-cols-3
+    "
+    >
+
+      <!-- SCENARIO 1 -->
+
+      <div
+        class="
+        group
+        rounded-2xl
+        border-2
+        border-indigo-100
+        bg-white
+        p-6
+        shadow-sm
+        shadow-indigo-100/40
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:border-indigo-200
+        hover:shadow-lg
+      "
+      >
+
+        <div
+          class="
+          flex
+          h-12
+          w-12
+          items-center
+          justify-center
+          rounded-2xl
+          border
+          border-indigo-100
+          bg-indigo-50
+          text-xl
+        "
+        >
+          👤
+        </div>
+
+        <div
+          class="
+          mt-5
+          text-base
+          font-black
+          text-gray-800
+        "
+        >
+          Character Blueprint
+        </div>
+
+        <p
+          class="
+          mt-3
+          text-sm
+          leading-6
+          text-gray-500
+        "
+        >
+          Create a template containing fields such as name,
+          portrait, biography, faction, occupation, skills
+          and relationships.
+        </p>
+
+        <div
+          class="
+          mt-4
+          flex
+          items-center
+          gap-2
+          text-[11px]
+          font-black
+          text-indigo-500
+        "
+        >
+
+          <span class="h-2 w-2 rounded-full bg-indigo-400"></span>
+
+          One structure, many characters
+
+        </div>
+
+      </div>
+
+      <!-- SCENARIO 2 -->
+
+      <div
+        class="
+        group
+        rounded-2xl
+        border-2
+        border-violet-100
+        bg-white
+        p-6
+        shadow-sm
+        shadow-violet-100/40
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:border-violet-200
+        hover:shadow-lg
+      "
+      >
+
+        <div
+          class="
+          flex
+          h-12
+          w-12
+          items-center
+          justify-center
+          rounded-2xl
+          border
+          border-violet-100
+          bg-violet-50
+          text-xl
+        "
+        >
+          📚
+        </div>
+
+        <div
+          class="
+          mt-5
+          text-base
+          font-black
+          text-gray-800
+        "
+        >
+          Knowledge Blueprint
+        </div>
+
+        <p
+          class="
+          mt-3
+          text-sm
+          leading-6
+          text-gray-500
+        "
+        >
+          Define a repeatable structure for articles,
+          encyclopedia entries, locations, organizations
+          or other knowledge records.
+        </p>
+
+        <div
+          class="
+          mt-4
+          flex
+          items-center
+          gap-2
+          text-[11px]
+          font-black
+          text-violet-500
+        "
+        >
+
+          <span class="h-2 w-2 rounded-full bg-violet-400"></span>
+
+          Keep knowledge consistent
+
+        </div>
+
+      </div>
+
+      <!-- SCENARIO 3 -->
+
+      <div
+        class="
+        group
+        rounded-2xl
+        border-2
+        border-cyan-100
+        bg-white
+        p-6
+        shadow-sm
+        shadow-cyan-100/40
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:border-cyan-200
+        hover:shadow-lg
+      "
+      >
+
+        <div
+          class="
+          flex
+          h-12
+          w-12
+          items-center
+          justify-center
+          rounded-2xl
+          border
+          border-cyan-100
+          bg-cyan-50
+          text-xl
+        "
+        >
+          🎮
+        </div>
+
+        <div
+          class="
+          mt-5
+          text-base
+          font-black
+          text-gray-800
+        "
+        >
+          Game-World Blueprint
+        </div>
+
+        <p
+          class="
+          mt-3
+          text-sm
+          leading-6
+          text-gray-500
+        "
+        >
+          Build reusable structures for quests, locations,
+          NPCs, factions, items, weapons or other objects
+          in a game-like world.
+        </p>
+
+        <div
+          class="
+          mt-4
+          flex
+          items-center
+          gap-2
+          text-[11px]
+          font-black
+          text-cyan-500
+        "
+        >
+
+          <span class="h-2 w-2 rounded-full bg-cyan-400"></span>
+
+          Build once, populate many times
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ==============================================================
+       BLUEPRINT EXAMPLE
+  =============================================================== -->
+
+  <div
+    class="
+    mt-7
+    rounded-[24px]
+    border-2
+    border-indigo-100
+    bg-gradient-to-r
+    from-indigo-50
+    via-white
+    to-violet-50
+    p-6
+    shadow-sm
+    shadow-indigo-100/50
+  "
+  >
+
+    <div
+      class="
+      flex
+      flex-col
+      gap-6
+      lg:flex-row
+      lg:items-center
+      lg:justify-between
+    "
+    >
+
+      <div>
+
+        <div
+          class="
+          text-[12px]
+          font-black
+          uppercase
+          tracking-[0.15em]
+          text-indigo-600
+        "
+        >
+          Field Example
+        </div>
+
+        <div
+          class="
+          mt-2
+          text-xl
+          font-black
+          text-gray-900
+        "
+        >
+          Imagine you are building a game encyclopedia.
+        </div>
+
+        <p
+          class="
+          mt-3
+          max-w-2xl
+          text-sm
+          leading-6
+          text-gray-500
+        "
+        >
+          Instead of designing every character page separately,
+          you create one
+          <strong class="font-black text-violet-600">
+            Character Template
+          </strong>.
+          Every character can then follow the same blueprint.
+        </p>
+
+      </div>
+
+      <!-- MINI BLUEPRINT -->
+
+      <div
+        class="
+        shrink-0
+        rounded-2xl
+        border-2
+        border-indigo-100
+        bg-white
+        p-5
+        shadow-sm
+      "
+      >
+
+        <div
+          class="
+          text-[10px]
+          font-black
+          uppercase
+          tracking-wider
+          text-indigo-400
+        "
+        >
+          Character Template
+        </div>
+
+        <div class="mt-3 grid grid-cols-2 gap-2">
+
+        <span
+          class="
+            rounded-lg
+            bg-gray-50
+            px-3
+            py-2
+            text-[10px]
+            font-black
+            text-gray-600
+          "
+        >
+          Name
+        </span>
+
+          <span
+            class="
+            rounded-lg
+            bg-gray-50
+            px-3
+            py-2
+            text-[10px]
+            font-black
+            text-gray-600
+          "
+          >
+          Portrait
+        </span>
+
+          <span
+            class="
+            rounded-lg
+            bg-gray-50
+            px-3
+            py-2
+            text-[10px]
+            font-black
+            text-gray-600
+          "
+          >
+          Biography
+        </span>
+
+          <span
+            class="
+            rounded-lg
+            bg-gray-50
+            px-3
+            py-2
+            text-[10px]
+            font-black
+            text-gray-600
+          "
+          >
+          Faction
+        </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ==============================================================
+       WHY TEMPLATES EXIST
+  =============================================================== -->
+
+  <div class="mt-12">
+
+    <div
+      class="
+      text-[12px]
+      font-black
+      uppercase
+      tracking-[0.2em]
+      text-gray-400
+    "
+    >
+      Why does this page exist?
+    </div>
+
+    <div
+      class="
+      mt-5
+      grid
+      grid-cols-1
+      gap-4
+      md:grid-cols-2
+    "
+    >
+
+      <!-- BENEFIT 1 -->
+
+      <div
+        class="
+        rounded-2xl
+        border
+        border-gray-200
+        bg-white
+        p-5
+        shadow-sm
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:shadow-md
+      "
+      >
+
+        <div class="flex items-start gap-4">
+
+          <div
+            class="
+            flex
+            h-11
+            w-11
+            shrink-0
+            items-center
+            justify-center
+            rounded-xl
+            bg-indigo-50
+            text-xl
+          "
+          >
+            ♻️
+          </div>
+
+          <div>
+
+            <div class="font-black text-gray-800">
+              Reuse
+            </div>
+
+            <p
+              class="
+              mt-1
+              text-sm
+              leading-6
+              text-gray-500
+            "
+            >
+              Build the structure once and use it for many
+              entity records instead of recreating the same
+              field definitions repeatedly.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- BENEFIT 2 -->
+
+      <div
+        class="
+        rounded-2xl
+        border
+        border-gray-200
+        bg-white
+        p-5
+        shadow-sm
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:shadow-md
+      "
+      >
+
+        <div class="flex items-start gap-4">
+
+          <div
+            class="
+            flex
+            h-11
+            w-11
+            shrink-0
+            items-center
+            justify-center
+            rounded-xl
+            bg-violet-50
+            text-xl
+          "
+          >
+            🧭
+          </div>
+
+          <div>
+
+            <div class="font-black text-gray-800">
+              Consistency
+            </div>
+
+            <p
+              class="
+              mt-1
+              text-sm
+              leading-6
+              text-gray-500
+            "
+            >
+              Every record created from the same blueprint
+              follows a predictable structure.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- BENEFIT 3 -->
+
+      <div
+        class="
+        rounded-2xl
+        border
+        border-gray-200
+        bg-white
+        p-5
+        shadow-sm
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:shadow-md
+      "
+      >
+
+        <div class="flex items-start gap-4">
+
+          <div
+            class="
+            flex
+            h-11
+            w-11
+            shrink-0
+            items-center
+            justify-center
+            rounded-xl
+            bg-emerald-50
+            text-xl
+          "
+          >
+            📈
+          </div>
+
+          <div>
+
+            <div class="font-black text-gray-800">
+              Scale
+            </div>
+
+            <p
+              class="
+              mt-1
+              text-sm
+              leading-6
+              text-gray-500
+            "
+            >
+              A well-designed template can support tens,
+              hundreds or thousands of entities without
+              changing the basic architecture.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- BENEFIT 4 -->
+
+      <div
+        class="
+        rounded-2xl
+        border
+        border-gray-200
+        bg-white
+        p-5
+        shadow-sm
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:shadow-md
+      "
+      >
+
+        <div class="flex items-start gap-4">
+
+          <div
+            class="
+            flex
+            h-11
+            w-11
+            shrink-0
+            items-center
+            justify-center
+            rounded-xl
+            bg-orange-50
+            text-xl
+          "
+          >
+            🛠️
+          </div>
+
+          <div>
+
+            <div class="font-black text-gray-800">
+              Maintainability
+            </div>
+
+            <p
+              class="
+              mt-1
+              text-sm
+              leading-6
+              text-gray-500
+            "
+            >
+              The structure is managed centrally, making
+              the entity system easier to understand,
+              extend and maintain.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ==============================================================
+       YOUR MISSION
+  =============================================================== -->
+
+  <div
+    class="
+    mt-8
+    rounded-[24px]
+    border-2
+    border-emerald-100
+    bg-gradient-to-r
+    from-emerald-50
+    via-white
+    to-green-50
+    p-6
+    shadow-sm
+    shadow-emerald-100/50
+  "
+  >
+
+    <div
+      class="
+      flex
+      flex-col
+      gap-5
+      sm:flex-row
+      sm:items-start
+    "
+    >
+
+      <div
+        class="
+        flex
+        h-12
+        w-12
+        shrink-0
+        items-center
+        justify-center
+        rounded-2xl
+        border
+        border-emerald-200
+        bg-emerald-100
+        text-xl
+        shadow-sm
+      "
+      >
+        🎯
+      </div>
+
+      <div class="flex-1">
+
+        <div
+          class="
+          text-[12px]
+          font-black
+          uppercase
+          tracking-[0.15em]
+          text-emerald-600
+        "
+        >
+          Your Mission
+        </div>
+
+        <p
+          class="
+          mt-2
+          text-sm
+          leading-6
+          text-gray-500
+          sm:text-[15px]
+        "
+        >
+          Your job on this page is to create and maintain the
+          <strong class="font-black text-gray-700">
+            blueprints
+          </strong>
+          that your entity system will use later.
+          Decide what information belongs to each kind of entity,
+          organize the structure clearly, and keep the blueprint
+          reusable.
+        </p>
+
+        <div
+          class="
+          mt-4
+          flex
+          flex-wrap
+          gap-2
+        "
+        >
+
+        <span
+          class="
+            rounded-full
+            border
+            border-violet-100
+            bg-violet-50
+            px-3
+            py-1.5
+            text-[10px]
+            font-black
+            text-violet-600
+          "
+        >
+          1. Define Blueprint
+        </span>
+
+          <span
+            class="
+            rounded-full
+            border
+            border-indigo-100
+            bg-indigo-50
+            px-3
+            py-1.5
+            text-[10px]
+            font-black
+            text-indigo-600
+          "
+          >
+          2. Add Structure
+        </span>
+
+          <span
+            class="
+            rounded-full
+            border
+            border-cyan-100
+            bg-cyan-50
+            px-3
+            py-1.5
+            text-[10px]
+            font-black
+            text-cyan-600
+          "
+          >
+          3. Organize Fields
+        </span>
+
+          <span
+            class="
+            rounded-full
+            border
+            border-emerald-100
+            bg-emerald-50
+            px-3
+            py-1.5
+            text-[10px]
+            font-black
+            text-emerald-600
+          "
+          >
+          4. Reuse
+        </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ==============================================================
+       IMPORTANT DISTINCTION
+  =============================================================== -->
+
+  <div
+    class="
+    mt-7
+    rounded-2xl
+    border-2
+    border-orange-100
+    bg-orange-50/60
+    p-5
+  "
+  >
+
+    <div class="flex items-start gap-4">
+
+      <div class="text-2xl">
+        🧠
+      </div>
+
+      <div>
+
+        <div
+          class="
+          text-[11px]
+          font-black
+          uppercase
+          tracking-[0.15em]
+          text-orange-600
+        "
+        >
+          Remember the difference
+        </div>
+
+        <div
+          class="
+          mt-3
+          grid
+          grid-cols-1
+          gap-3
+          text-sm
+          sm:grid-cols-3
+        "
+        >
+
+          <div
+            class="
+            rounded-xl
+            border
+            border-indigo-100
+            bg-white
+            p-4
+          "
+          >
+
+            <div
+              class="
+              text-[10px]
+              font-black
+              uppercase
+              tracking-wider
+              text-indigo-500
+            "
+            >
+              Entity Type
+            </div>
+
+            <div class="mt-1 font-black text-gray-800">
+              What is it?
+            </div>
+
+          </div>
+
+          <div
+            class="
+            rounded-xl
+            border
+            border-violet-100
+            bg-white
+            p-4
+          "
+          >
+
+            <div
+              class="
+              text-[10px]
+              font-black
+              uppercase
+              tracking-wider
+              text-violet-500
+            "
+            >
+              Template
+            </div>
+
+            <div class="mt-1 font-black text-gray-800">
+              What does it contain?
+            </div>
+
+          </div>
+
+          <div
+            class="
+            rounded-xl
+            border
+            border-orange-100
+            bg-white
+            p-4
+          "
+          >
+
+            <div
+              class="
+              text-[10px]
+              font-black
+              uppercase
+              tracking-wider
+              text-orange-500
+            "
+            >
+              Configuration
+            </div>
+
+            <div class="mt-1 font-black text-gray-800">
+              How is it used here?
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ==============================================================
+       TERMINAL FOOTER
+  =============================================================== -->
+
+  <div
+    class="
+    mt-8
+    flex
+    flex-col
+    gap-3
+    border-t-2
+    border-gray-100
+    pt-5
+    sm:flex-row
+    sm:items-center
+    sm:justify-between
+  "
+  >
+
+    <div
+      class="
+      font-mono
+      text-[10px]
+      font-bold
+      uppercase
+      tracking-wider
+      text-gray-400
+    "
+    >
+      ENTITY_PROTOCOL :: BLUEPRINT_ARCHIVE :: ONLINE
+    </div>
+
+    <div
+      class="
+      flex
+      items-center
+      gap-2
+      text-[10px]
+      font-black
+      uppercase
+      tracking-wider
+      text-emerald-500
+    "
+    >
+
+    <span
+      class="
+        h-2
+        w-2
+        rounded-full
+        bg-emerald-400
+        shadow-[0_0_8px_rgba(52,211,153,0.6)]
+      "
+    ></span>
+
+      Blueprint training module available
+
+    </div>
+
+  </div>
+
+</div> </section>
