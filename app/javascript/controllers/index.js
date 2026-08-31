@@ -374,6 +374,9 @@ application.register("admin_entity_templates", EntityTemplatesAdminController)
 import AdminEntityTypesController from "./admin/ecosystems/load_sources/entity_types/admin_entity_types_controller"
 application.register("admin_entity_types", AdminEntityTypesController)
 
+import EntityTemplateConfigurationController from "./admin/ecosystems/load_sources/entity_templates/entity_template_configuration_controller"
+application.register("entity_template_configuration", EntityTemplateConfigurationController)
+
 
 
 

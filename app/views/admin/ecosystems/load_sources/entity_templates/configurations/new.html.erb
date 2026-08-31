@@ -1,0 +1,1358 @@
+<%# ============================================================
+    ENTITY TEMPLATE CONFIGURATION — NEW
+    ============================================================ %>
+
+<body class="bg-slate-50 dark:bg-gray-900">
+
+<div class="min-h-screen">
+
+  <%# ============================================================
+      SIDEBAR
+      ============================================================ %>
+
+  <aside class="fixed inset-y-0 left-0 z-40 hidden w-72
+                border-r border-slate-200
+                bg-white
+                dark:border-gray-800
+                dark:bg-gray-900
+                lg:block">
+
+    <div class="flex h-full flex-col">
+
+      <%# HEADER %>
+
+      <div class="border-b border-slate-200 p-5 dark:border-gray-800">
+
+        <div class="flex items-center gap-3">
+
+          <div class="flex h-10 w-10 items-center justify-center
+                      rounded-xl bg-indigo-100
+                      text-indigo-600
+                      dark:bg-indigo-900/40
+                      dark:text-indigo-300">
+            🧩
+          </div>
+
+          <div>
+
+            <div class="text-sm font-bold text-gray-900 dark:text-white">
+              Entity Templates
+            </div>
+
+            <div class="text-xs text-gray-400">
+              Configuration Center
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <%# NAVIGATION %>
+
+      <nav class="flex-1 space-y-1 overflow-y-auto p-4">
+
+        <%= link_to admin_ecosystems_load_sources_entity_templates_entity_templates_path,
+                    class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium
+                            text-gray-700 transition hover:bg-indigo-50 hover:text-indigo-600
+                            dark:text-gray-300 dark:hover:bg-indigo-900/20 dark:hover:text-indigo-400" do %>
+
+          <span>📋</span>
+
+          <span>
+            Templates
+          </span>
+
+        <% end %>
+
+
+        <%= link_to admin_ecosystems_load_sources_entity_types_entity_types_path,
+                    class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium
+                            text-gray-700 transition hover:bg-indigo-50 hover:text-indigo-600
+                            dark:text-gray-300 dark:hover:bg-indigo-900/20 dark:hover:text-indigo-400" do %>
+
+          <span>🧩</span>
+
+          <span>
+            Entity Types
+          </span>
+
+        <% end %>
+
+
+        <div class="rounded-xl bg-indigo-50 text-indigo-700
+                    dark:bg-indigo-900/20 dark:text-indigo-300">
+
+          <div class="flex items-center gap-3 px-4 py-3 text-sm font-semibold">
+
+            <span>⚙️</span>
+
+            <span>
+              Configuration
+            </span>
+
+          </div>
+
+        </div>
+
+      </nav>
+
+
+      <%# PROGRESS %>
+
+      <div class="border-t border-slate-200 p-4 dark:border-gray-800">
+
+        <div class="mb-2 flex items-center justify-between">
+
+          <span class="text-[9px] font-black uppercase tracking-widest text-gray-400">
+            Configuration progress
+          </span>
+
+          <span class="text-[10px] font-black text-indigo-500">
+            0%
+          </span>
+
+        </div>
+
+        <div class="h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-gray-800">
+
+          <div class="h-full w-0 rounded-full
+                      bg-gradient-to-r from-emerald-400 via-sky-400 to-violet-500">
+          </div>
+
+        </div>
+
+        <p class="mt-2 text-[10px] leading-4 text-gray-400">
+          Configure the structure before activating this template.
+        </p>
+
+      </div>
+
+
+      <%# BACK %>
+
+      <div class="border-t border-slate-200 p-4 dark:border-gray-800">
+
+        <%= link_to admin_ecosystems_load_sources_entity_templates_entity_templates_path,
+                    class: "flex items-center gap-3 rounded-xl px-4 py-3
+                            text-sm font-medium text-gray-500
+                            transition hover:bg-slate-100 hover:text-gray-900
+                            dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white" do %>
+
+          <span>←</span>
+
+          <span>
+            Back to Templates
+          </span>
+
+        <% end %>
+
+      </div>
+
+    </div>
+
+  </aside>
+
+
+  <%# ============================================================
+      MAIN
+      ============================================================ %>
+
+  <div class="min-h-screen lg:pl-72">
+
+
+    <%# ==========================================================
+        HEADER
+        ========================================================== %>
+
+    <header class="sticky top-0 z-30 flex w-full
+                   border-b border-slate-200
+                   bg-white/90 backdrop-blur-xl
+                   dark:border-gray-800
+                   dark:bg-gray-900/90">
+
+      <div class="flex w-full flex-grow items-center justify-between
+                  px-4 py-3 md:px-6 2xl:px-10">
+
+        <%# LEFT %>
+
+        <div class="flex items-center gap-4">
+
+          <%= link_to admin_ecosystems_load_sources_entity_templates_entity_templates_path,
+                      class: "flex h-10 w-10 items-center justify-center
+                              rounded-xl border border-slate-200
+                              bg-white text-slate-500 shadow-sm
+                              transition hover:bg-slate-50
+                              dark:border-gray-700 dark:bg-gray-800
+                              dark:text-gray-300" do %>
+            ←
+          <% end %>
+
+
+          <div>
+
+            <div class="hidden text-[9px] font-black uppercase
+                        tracking-[0.2em] text-amber-500 sm:block">
+              Admin Command Center
+            </div>
+
+            <div class="text-sm font-black text-slate-700 dark:text-white">
+              Template Configuration
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <%# RIGHT %>
+
+        <div class="flex items-center gap-3">
+
+          <%# STATUS %>
+
+          <div class="hidden items-center gap-2 rounded-full
+                      border border-emerald-100 bg-emerald-50
+                      px-3 py-1.5 md:flex
+                      dark:border-emerald-900/40 dark:bg-emerald-900/20">
+
+            <span class="h-2 w-2 animate-pulse rounded-full
+                         bg-emerald-400
+                         shadow-[0_0_8px_rgba(52,211,153,0.6)]">
+            </span>
+
+            <span class="text-[9px] font-black uppercase
+                         tracking-wider text-emerald-600
+                         dark:text-emerald-400">
+              System Online
+            </span>
+
+          </div>
+
+
+          <%# XP %>
+
+          <div class="hidden items-center gap-2 rounded-xl
+                      border border-violet-100 bg-violet-50
+                      px-3 py-2 sm:flex
+                      dark:border-violet-900/40 dark:bg-violet-900/20">
+
+            <span class="text-sm">
+              ⚡
+            </span>
+
+            <div>
+
+              <div class="text-[9px] font-black uppercase
+                          tracking-wider text-violet-400">
+                XP
+              </div>
+
+              <div class="text-xs font-black text-violet-600
+                          dark:text-violet-400">
+                6,800
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <%# USER %>
+
+          <div class="flex items-center gap-3">
+
+            <div class="hidden text-right sm:block">
+
+              <div class="text-xs font-black text-slate-700 dark:text-white">
+                FirstName SecondName
+              </div>
+
+              <div class="mt-0.5 text-[9px] font-bold uppercase
+                          tracking-wider text-slate-400">
+                System Administrator
+              </div>
+
+            </div>
+
+
+            <div class="flex h-10 w-10 items-center justify-center
+                        overflow-hidden rounded-2xl border-2 border-white
+                        bg-gradient-to-br from-violet-400 to-sky-400
+                        text-white shadow-md shadow-violet-100
+                        dark:border-gray-800">
+
+              <span class="text-sm font-black">
+                F
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </header>
+
+
+    <%# ==========================================================
+        CONTENT
+        ========================================================== %>
+
+    <main class="min-h-[calc(100vh-160px)]">
+
+      <div class="mx-auto w-full max-w-7xl px-5 py-8 sm:px-7 lg:px-10">
+
+
+        <%# ========================================================
+            PAGE TITLE
+            ======================================================== %>
+
+        <div class="mb-8">
+
+          <div class="flex flex-col gap-5
+                      sm:flex-row sm:items-start sm:justify-between">
+
+            <div>
+
+              <div class="mb-3 flex items-center gap-3">
+
+                <div class="flex h-12 w-12 items-center justify-center
+                            rounded-2xl bg-indigo-100 text-indigo-600
+                            dark:bg-indigo-900/40 dark:text-indigo-300">
+
+                  ⚙️
+
+                </div>
+
+                <div>
+
+                  <div class="text-[10px] font-black uppercase
+                              tracking-[0.2em] text-indigo-500">
+                    Configuration
+                  </div>
+
+                  <h1 class="mt-1 text-2xl font-bold
+                             text-gray-900 dark:text-white">
+                    Configure Entity Template
+                  </h1>
+
+                </div>
+
+              </div>
+
+              <p class="max-w-2xl text-sm leading-6
+                        text-gray-500 dark:text-gray-400">
+
+                Define how this abstract entity should be structured,
+                displayed and populated when the template is used.
+
+              </p>
+
+
+              <%# BREADCRUMB %>
+
+              <div class="mt-4 flex flex-wrap items-center gap-2
+                          text-xs text-gray-400">
+
+                <span>Encyclopedia</span>
+                <span>›</span>
+                <span>Ecosystems</span>
+                <span>›</span>
+                <span>Load Sources</span>
+                <span>›</span>
+                <span>Entity Templates</span>
+                <span>›</span>
+
+                <span class="font-medium text-indigo-500">
+                  New Configuration
+                </span>
+
+              </div>
+
+            </div>
+
+
+            <%# HELP CARD %>
+
+            <div class="hidden max-w-xs rounded-2xl
+                        border border-indigo-100
+                        bg-indigo-50/70 p-4
+                        lg:block
+                        dark:border-indigo-900/40
+                        dark:bg-indigo-900/10">
+
+              <div class="flex items-start gap-3">
+
+                <div class="text-xl">
+                  💡
+                </div>
+
+                <div>
+
+                  <div class="text-xs font-black text-indigo-700
+                              dark:text-indigo-300">
+                    Configuration Tip
+                  </div>
+
+                  <p class="mt-1 text-[11px] leading-5
+                            text-indigo-600/80
+                            dark:text-indigo-300/70">
+
+                    Start with the identity fields, then add
+                    descriptive and relationship fields.
+
+                  </p>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <%# ========================================================
+            FORM
+            ======================================================== %>
+
+        <%= form_with model: @configuration,
+                      url: admin_ecosystems_load_sources_entity_templates_configurations_path,
+                      method: :post,
+                      local: true,
+                      class: "space-y-8" do |form| %>
+
+
+          <%# ERRORS %>
+
+          <% if @configuration.errors.any? %>
+
+            <div class="rounded-2xl border border-rose-200
+                        bg-rose-50 p-5
+                        dark:border-rose-900/40
+                        dark:bg-rose-900/10">
+
+              <div class="flex gap-3">
+
+                <div class="text-xl">
+                  ⚠️
+                </div>
+
+                <div>
+
+                  <h3 class="text-sm font-bold text-rose-700
+                             dark:text-rose-300">
+
+                    Please fix the following issues
+
+                  </h3>
+
+                  <ul class="mt-2 space-y-1 text-xs text-rose-600
+                             dark:text-rose-400">
+
+                    <% @configuration.errors.full_messages.each do |message| %>
+
+                      <li>
+                        • <%= message %>
+                      </li>
+
+                    <% end %>
+
+                  </ul>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          <% end %>
+
+
+          <%# ======================================================
+              SECTION 1 — BASIC IDENTITY
+              ====================================================== %>
+
+          <section class="overflow-hidden rounded-2xl
+                          border border-gray-200
+                          bg-white shadow-sm
+                          dark:border-gray-800
+                          dark:bg-gray-800">
+
+            <div class="border-b border-gray-100 px-6 py-5
+                        dark:border-gray-700">
+
+              <div class="flex items-center gap-3">
+
+                <div class="flex h-10 w-10 items-center justify-center
+                            rounded-xl bg-sky-100 text-sky-600
+                            dark:bg-sky-900/30 dark:text-sky-300">
+                  🪪
+                </div>
+
+                <div>
+
+                  <h2 class="text-sm font-bold text-gray-900
+                             dark:text-white">
+                    Template Identity
+                  </h2>
+
+                  <p class="mt-0.5 text-xs text-gray-400">
+                    Identify the configuration and its target entity.
+                  </p>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div class="grid grid-cols-1 gap-6 p-6 md:grid-cols-2">
+
+
+              <%# NAME %>
+
+              <div>
+
+                <%= form.label :name,
+                               "Configuration name",
+                               class: "mb-2 block text-sm font-medium
+                                       text-gray-700 dark:text-gray-300" %>
+
+                <%= form.text_field :name,
+                                    placeholder: "e.g. Privacy Company Profile",
+                                    class: "block w-full rounded-xl
+                                            border border-gray-300
+                                            bg-gray-50 px-4 py-3 text-sm
+                                            text-gray-900
+                                            outline-none
+                                            transition
+                                            focus:border-indigo-500
+                                            focus:ring-2
+                                            focus:ring-indigo-500/20
+                                            dark:border-gray-700
+                                            dark:bg-gray-900
+                                            dark:text-white" %>
+
+                <p class="mt-2 text-[11px] text-gray-400">
+                  Human-readable name for this configuration.
+                </p>
+
+              </div>
+
+
+              <%# SLUG %>
+
+              <div>
+
+                <%= form.label :slug,
+                               "Slug",
+                               class: "mb-2 block text-sm font-medium
+                                       text-gray-700 dark:text-gray-300" %>
+
+                <%= form.text_field :slug,
+                                    placeholder: "privacy-company-profile",
+                                    class: "block w-full rounded-xl
+                                            border border-gray-300
+                                            bg-gray-50 px-4 py-3 text-sm
+                                            text-gray-900
+                                            outline-none
+                                            transition
+                                            focus:border-indigo-500
+                                            focus:ring-2
+                                            focus:ring-indigo-500/20
+                                            dark:border-gray-700
+                                            dark:bg-gray-900
+                                            dark:text-white" %>
+
+                <p class="mt-2 text-[11px] text-gray-400">
+                  Stable identifier used by the system.
+                </p>
+
+              </div>
+
+
+              <%# DESCRIPTION %>
+
+              <div class="md:col-span-2">
+
+                <%= form.label :description,
+                               "Description",
+                               class: "mb-2 block text-sm font-medium
+                                       text-gray-700 dark:text-gray-300" %>
+
+                <%= form.text_area :description,
+                                   rows: 3,
+                                   placeholder: "Describe what this entity configuration represents...",
+                                   class: "block w-full rounded-xl
+                                           border border-gray-300
+                                           bg-gray-50 px-4 py-3 text-sm
+                                           text-gray-900
+                                           outline-none
+                                           transition
+                                           focus:border-indigo-500
+                                           focus:ring-2
+                                           focus:ring-indigo-500/20
+                                           dark:border-gray-700
+                                           dark:bg-gray-900
+                                           dark:text-white" %>
+
+              </div>
+
+            </div>
+
+          </section>
+
+
+          <%# ======================================================
+              SECTION 2 — TEMPLATE
+              ====================================================== %>
+
+          <section class="overflow-hidden rounded-2xl
+                          border border-gray-200
+                          bg-white shadow-sm
+                          dark:border-gray-800
+                          dark:bg-gray-800">
+
+            <div class="border-b border-gray-100 px-6 py-5
+                        dark:border-gray-700">
+
+              <div class="flex items-center gap-3">
+
+                <div class="flex h-10 w-10 items-center justify-center
+                            rounded-xl bg-violet-100 text-violet-600
+                            dark:bg-violet-900/30 dark:text-violet-300">
+                  🧩
+                </div>
+
+                <div>
+
+                  <h2 class="text-sm font-bold text-gray-900
+                             dark:text-white">
+                    Template Selection
+                  </h2>
+
+                  <p class="mt-0.5 text-xs text-gray-400">
+                    Select the entity type and template that define this structure.
+                  </p>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div class="grid grid-cols-1 gap-6 p-6 md:grid-cols-2">
+
+
+              <%# ENTITY TYPE %>
+
+              <div>
+
+                <%= form.label :entity_type_id,
+                               "Entity Type",
+                               class: "mb-2 block text-sm font-medium
+                                       text-gray-700 dark:text-gray-300" %>
+
+                <%= form.collection_select :entity_type_id,
+                                           (@entity_types || []),
+                                           :id,
+                                           :name,
+                                           { prompt: "Select entity type" },
+                                           {
+                                             class: "block w-full rounded-xl
+                                                     border border-gray-300
+                                                     bg-gray-50 px-4 py-3 text-sm
+                                                     text-gray-900
+                                                     focus:border-indigo-500
+                                                     focus:ring-indigo-500
+                                                     dark:border-gray-700
+                                                     dark:bg-gray-900
+                                                     dark:text-white"
+                                           } %>
+
+                <p class="mt-2 text-[11px] text-gray-400">
+                  The abstract entity category this configuration applies to.
+                </p>
+
+              </div>
+
+
+              <%# ENTITY TEMPLATE %>
+
+              <div>
+
+                <%= form.label :entity_template_id,
+                               "Entity Template",
+                               class: "mb-2 block text-sm font-medium
+                                       text-gray-700 dark:text-gray-300" %>
+
+                <%= form.collection_select :entity_template_id,
+                                           (@entity_templates || []),
+                                           :id,
+                                           :name,
+                                           { prompt: "Select template" },
+                                           {
+                                             class: "block w-full rounded-xl
+                                                     border border-gray-300
+                                                     bg-gray-50 px-4 py-3 text-sm
+                                                     text-gray-900
+                                                     focus:border-indigo-500
+                                                     focus:ring-indigo-500
+                                                     dark:border-gray-700
+                                                     dark:bg-gray-900
+                                                     dark:text-white"
+                                           } %>
+
+                <p class="mt-2 text-[11px] text-gray-400">
+                  The template used to construct the entity.
+                </p>
+
+              </div>
+
+
+              <%# ECOSYSTEM %>
+
+              <div>
+
+                <%= form.label :ecosystem_id,
+                               "Ecosystem",
+                               class: "mb-2 block text-sm font-medium
+                                       text-gray-700 dark:text-gray-300" %>
+
+                <%= form.collection_select :ecosystem_id,
+                                           (@ecosystems || []),
+                                           :id,
+                                           :name,
+                                           { prompt: "Select ecosystem" },
+                                           {
+                                             class: "block w-full rounded-xl
+                                                     border border-gray-300
+                                                     bg-gray-50 px-4 py-3 text-sm
+                                                     text-gray-900
+                                                     focus:border-indigo-500
+                                                     focus:ring-indigo-500
+                                                     dark:border-gray-700
+                                                     dark:bg-gray-900
+                                                     dark:text-white"
+                                           } %>
+
+                <p class="mt-2 text-[11px] text-gray-400">
+                  Scope this configuration to a specific ecosystem.
+                </p>
+
+              </div>
+
+
+              <%# SOURCE AREA %>
+
+              <div>
+
+                <%= form.label :source_area,
+                               "Entity context",
+                               class: "mb-2 block text-sm font-medium
+                                       text-gray-700 dark:text-gray-300" %>
+
+                <%= form.select :source_area,
+                                [
+                                  ["Ecosystem", "ecosystem"],
+                                  ["Activity", "activity"],
+                                  ["Load Source", "load_source"]
+                                ],
+                                { prompt: "Select context" },
+                                class: "block w-full rounded-xl
+                                        border border-gray-300
+                                        bg-gray-50 px-4 py-3 text-sm
+                                        text-gray-900
+                                        focus:border-indigo-500
+                                        focus:ring-indigo-500
+                                        dark:border-gray-700
+                                        dark:bg-gray-900
+                                        dark:text-white" %>
+
+                <p class="mt-2 text-[11px] text-gray-400">
+                  Determines where this abstract entity is used.
+                </p>
+
+              </div>
+
+            </div>
+
+          </section>
+
+
+          <%# ======================================================
+              SECTION 3 — DISPLAY
+              ====================================================== %>
+
+          <section class="overflow-hidden rounded-2xl
+                          border border-gray-200
+                          bg-white shadow-sm
+                          dark:border-gray-800
+                          dark:bg-gray-800">
+
+            <div class="border-b border-gray-100 px-6 py-5
+                        dark:border-gray-700">
+
+              <div class="flex items-center gap-3">
+
+                <div class="flex h-10 w-10 items-center justify-center
+                            rounded-xl bg-emerald-100 text-emerald-600
+                            dark:bg-emerald-900/30 dark:text-emerald-300">
+                  🎨
+                </div>
+
+                <div>
+
+                  <h2 class="text-sm font-bold text-gray-900
+                             dark:text-white">
+                    Presentation
+                  </h2>
+
+                  <p class="mt-0.5 text-xs text-gray-400">
+                    Control how entities created from this configuration appear.
+                  </p>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div class="grid grid-cols-1 gap-6 p-6 md:grid-cols-2">
+
+
+              <%# CARD STYLE %>
+
+              <div>
+
+                <%= form.label :display_style,
+                               "Display style",
+                               class: "mb-2 block text-sm font-medium
+                                       text-gray-700 dark:text-gray-300" %>
+
+                <%= form.select :display_style,
+                                [
+                                  ["Standard", "standard"],
+                                  ["Compact", "compact"],
+                                  ["Detailed", "detailed"],
+                                  ["Profile", "profile"],
+                                  ["Timeline", "timeline"],
+                                  ["Table", "table"]
+                                ],
+                                { prompt: "Select display style" },
+                                class: "block w-full rounded-xl
+                                        border border-gray-300
+                                        bg-gray-50 px-4 py-3 text-sm
+                                        text-gray-900
+                                        focus:border-indigo-500
+                                        focus:ring-indigo-500
+                                        dark:border-gray-700
+                                        dark:bg-gray-900
+                                        dark:text-white" %>
+
+              </div>
+
+
+              <%# ICON %>
+
+              <div>
+
+                <%= form.label :icon,
+                               "Entity icon",
+                               class: "mb-2 block text-sm font-medium
+                                       text-gray-700 dark:text-gray-300" %>
+
+                <%= form.text_field :icon,
+                                    placeholder: "🏢",
+                                    class: "block w-full rounded-xl
+                                            border border-gray-300
+                                            bg-gray-50 px-4 py-3 text-sm
+                                            text-gray-900
+                                            focus:border-indigo-500
+                                            focus:ring-indigo-500
+                                            dark:border-gray-700
+                                            dark:bg-gray-900
+                                            dark:text-white" %>
+
+              </div>
+
+
+              <%# COLOR %>
+
+              <div>
+
+                <%= form.label :accent_color,
+                               "Accent color",
+                               class: "mb-2 block text-sm font-medium
+                                       text-gray-700 dark:text-gray-300" %>
+
+                <%= form.select :accent_color,
+                                [
+                                  ["Indigo", "indigo"],
+                                  ["Sky", "sky"],
+                                  ["Emerald", "emerald"],
+                                  ["Violet", "violet"],
+                                  ["Amber", "amber"],
+                                  ["Rose", "rose"],
+                                  ["Slate", "slate"]
+                                ],
+                                { prompt: "Select accent color" },
+                                class: "block w-full rounded-xl
+                                        border border-gray-300
+                                        bg-gray-50 px-4 py-3 text-sm
+                                        text-gray-900
+                                        focus:border-indigo-500
+                                        focus:ring-indigo-500
+                                        dark:border-gray-700
+                                        dark:bg-gray-900
+                                        dark:text-white" %>
+
+              </div>
+
+
+              <%# PRIORITY %>
+
+              <div>
+
+                <%= form.label :display_priority,
+                               "Display priority",
+                               class: "mb-2 block text-sm font-medium
+                                       text-gray-700 dark:text-gray-300" %>
+
+                <%= form.number_field :display_priority,
+                                      min: 0,
+                                      placeholder: "100",
+                                      class: "block w-full rounded-xl
+                                              border border-gray-300
+                                              bg-gray-50 px-4 py-3 text-sm
+                                              text-gray-900
+                                              focus:border-indigo-500
+                                              focus:ring-indigo-500
+                                              dark:border-gray-700
+                                              dark:bg-gray-900
+                                              dark:text-white" %>
+
+                <p class="mt-2 text-[11px] text-gray-400">
+                  Lower values appear first.
+                </p>
+
+              </div>
+
+            </div>
+
+          </section>
+
+
+          <%# ======================================================
+              SECTION 4 — FIELD BEHAVIOR
+              ====================================================== %>
+
+          <section class="overflow-hidden rounded-2xl
+                          border border-gray-200
+                          bg-white shadow-sm
+                          dark:border-gray-800
+                          dark:bg-gray-800">
+
+            <div class="border-b border-gray-100 px-6 py-5
+                        dark:border-gray-700">
+
+              <div class="flex items-center gap-3">
+
+                <div class="flex h-10 w-10 items-center justify-center
+                            rounded-xl bg-amber-100 text-amber-600
+                            dark:bg-amber-900/30 dark:text-amber-300">
+                  🧱
+                </div>
+
+                <div>
+
+                  <h2 class="text-sm font-bold text-gray-900
+                             dark:text-white">
+                    Entity Behavior
+                  </h2>
+
+                  <p class="mt-0.5 text-xs text-gray-400">
+                    Define the default behavior of entities using this configuration.
+                  </p>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div class="grid grid-cols-1 gap-4 p-6 md:grid-cols-2">
+
+
+              <%# REQUIRED %>
+
+              <label class="flex cursor-pointer items-start gap-4
+                            rounded-2xl border border-gray-200
+                            bg-slate-50 p-4 transition
+                            hover:border-indigo-200 hover:bg-indigo-50/50
+                            dark:border-gray-700 dark:bg-gray-900
+                            dark:hover:border-indigo-800">
+
+                <%= form.check_box :required,
+                                   class: "mt-1 h-4 w-4 rounded
+                                           border-gray-300 text-indigo-600
+                                           focus:ring-indigo-500" %>
+
+                <span>
+
+                  <span class="block text-sm font-semibold
+                               text-gray-800 dark:text-white">
+                    Required configuration
+                  </span>
+
+                  <span class="mt-1 block text-[11px] leading-5
+                               text-gray-400">
+                    Entities using this configuration must satisfy it.
+                  </span>
+
+                </span>
+
+              </label>
+
+
+              <%# ACTIVE %>
+
+              <label class="flex cursor-pointer items-start gap-4
+                            rounded-2xl border border-gray-200
+                            bg-slate-50 p-4 transition
+                            hover:border-emerald-200 hover:bg-emerald-50/50
+                            dark:border-gray-700 dark:bg-gray-900
+                            dark:hover:border-emerald-800">
+
+                <%= form.check_box :active,
+                                   { class: "mt-1 h-4 w-4 rounded
+                                             border-gray-300 text-emerald-600
+                                             focus:ring-emerald-500" },
+                                   "1",
+                                   "0" %>
+
+                <span>
+
+                  <span class="block text-sm font-semibold
+                               text-gray-800 dark:text-white">
+                    Activate immediately
+                  </span>
+
+                  <span class="mt-1 block text-[11px] leading-5
+                               text-gray-400">
+                    Make this configuration available after creation.
+                  </span>
+
+                </span>
+
+              </label>
+
+
+              <%# SEARCHABLE %>
+
+              <label class="flex cursor-pointer items-start gap-4
+                            rounded-2xl border border-gray-200
+                            bg-slate-50 p-4 transition
+                            hover:border-sky-200 hover:bg-sky-50/50
+                            dark:border-gray-700 dark:bg-gray-900
+                            dark:hover:border-sky-800">
+
+                <%= form.check_box :searchable,
+                                   class: "mt-1 h-4 w-4 rounded
+                                           border-gray-300 text-sky-600
+                                           focus:ring-sky-500" %>
+
+                <span>
+
+                  <span class="block text-sm font-semibold
+                               text-gray-800 dark:text-white">
+                    Searchable
+                  </span>
+
+                  <span class="mt-1 block text-[11px] leading-5
+                               text-gray-400">
+                    Allow entities using this configuration to appear in search.
+                  </span>
+
+                </span>
+
+              </label>
+
+
+              <%# INDEXABLE %>
+
+              <label class="flex cursor-pointer items-start gap-4
+                            rounded-2xl border border-gray-200
+                            bg-slate-50 p-4 transition
+                            hover:border-violet-200 hover:bg-violet-50/50
+                            dark:border-gray-700 dark:bg-gray-900
+                            dark:hover:border-violet-800">
+
+                <%= form.check_box :indexable,
+                                   class: "mt-1 h-4 w-4 rounded
+                                           border-gray-300 text-violet-600
+                                           focus:ring-violet-500" %>
+
+                <span>
+
+                  <span class="block text-sm font-semibold
+                               text-gray-800 dark:text-white">
+                    Indexable
+                  </span>
+
+                  <span class="mt-1 block text-[11px] leading-5
+                               text-gray-400">
+                    Include entities in encyclopedia indexing.
+                  </span>
+
+                </span>
+
+              </label>
+
+            </div>
+
+          </section>
+
+
+          <%# ======================================================
+              SECTION 5 — ADVANCED
+              ====================================================== %>
+
+          <section class="overflow-hidden rounded-2xl
+                          border border-gray-200
+                          bg-white shadow-sm
+                          dark:border-gray-800
+                          dark:bg-gray-800">
+
+            <div class="border-b border-gray-100 px-6 py-5
+                        dark:border-gray-700">
+
+              <div class="flex items-center gap-3">
+
+                <div class="flex h-10 w-10 items-center justify-center
+                            rounded-xl bg-slate-100 text-slate-600
+                            dark:bg-slate-900 dark:text-slate-300">
+                  🛠️
+                </div>
+
+                <div>
+
+                  <h2 class="text-sm font-bold text-gray-900
+                             dark:text-white">
+                    Advanced Configuration
+                  </h2>
+
+                  <p class="mt-0.5 text-xs text-gray-400">
+                    Optional machine-readable settings for advanced entity behavior.
+                  </p>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div class="p-6">
+
+              <%= form.label :configuration,
+                             "Configuration JSON",
+                             class: "mb-2 block text-sm font-medium
+                                     text-gray-700 dark:text-gray-300" %>
+
+              <%= form.text_area :configuration,
+                                 rows: 10,
+                                 placeholder: '{&#10;  "title_field": "name",&#10;  "description_field": "description",&#10;  "fields": []&#10;}',
+                                 class: "block w-full rounded-xl
+                                         border border-gray-300
+                                         bg-slate-950 px-4 py-4
+                                         font-mono text-xs
+                                         leading-6 text-emerald-300
+                                         shadow-inner
+                                         focus:border-indigo-500
+                                         focus:ring-2
+                                         focus:ring-indigo-500/20
+                                         dark:border-gray-700" %>
+
+              <div class="mt-3 flex items-start gap-2">
+
+                <span class="text-sm">
+                  💡
+                </span>
+
+                <p class="text-[11px] leading-5 text-gray-400">
+
+                  Use this area for configuration that cannot be represented
+                  by the standard options above. Keep the structure valid JSON.
+
+                </p>
+
+              </div>
+
+            </div>
+
+          </section>
+
+
+          <%# ======================================================
+              ACTIONS
+              ====================================================== %>
+
+          <div class="sticky bottom-4 z-20">
+
+            <div class="flex flex-col gap-4 rounded-2xl
+                        border border-gray-200
+                        bg-white/95 p-4 shadow-xl
+                        backdrop-blur-xl
+                        sm:flex-row sm:items-center
+                        sm:justify-between
+                        dark:border-gray-700
+                        dark:bg-gray-900/95">
+
+
+              <div class="flex items-center gap-3">
+
+                <div class="flex h-10 w-10 items-center justify-center
+                            rounded-xl bg-amber-50 text-amber-500
+                            dark:bg-amber-900/20">
+                  🚀
+                </div>
+
+                <div>
+
+                  <div class="text-xs font-bold text-gray-700
+                              dark:text-white">
+                    Ready to create?
+                  </div>
+
+                  <div class="text-[10px] text-gray-400">
+                    You can edit this configuration later.
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <div class="flex flex-col gap-2 sm:flex-row">
+
+
+                <%= link_to admin_ecosystems_load_sources_entity_templates_entity_templates_path,
+                            class: "inline-flex items-center justify-center
+                                    rounded-xl border border-gray-200
+                                    bg-white px-5 py-3 text-sm font-semibold
+                                    text-gray-600 transition
+                                    hover:bg-gray-50
+                                    dark:border-gray-700
+                                    dark:bg-gray-800
+                                    dark:text-gray-300
+                                    dark:hover:bg-gray-700" do %>
+
+                  Cancel
+
+                <% end %>
+
+
+                <%= form.submit "Create Configuration",
+                                class: "inline-flex cursor-pointer
+                                        items-center justify-center gap-2
+                                        rounded-xl bg-gradient-to-r
+                                        from-indigo-600 to-violet-600
+                                        px-6 py-3 text-sm font-bold
+                                        text-white shadow-lg
+                                        shadow-indigo-200
+                                        transition
+                                        hover:-translate-y-0.5
+                                        hover:from-indigo-700
+                                        hover:to-violet-700
+                                        dark:shadow-indigo-900/30" %>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        <% end %>
+
+      </div>
+
+    </main>
+
+
+    <%# ==========================================================
+        FOOTER
+        ========================================================== %>
+
+    <footer class="border-t border-slate-200 bg-white
+                   dark:border-gray-800 dark:bg-gray-900">
+
+      <div class="mx-auto flex max-w-7xl flex-col gap-3
+                  px-5 py-6 sm:px-7
+                  md:flex-row md:items-center
+                  md:justify-between lg:px-10">
+
+        <div class="flex items-center gap-3">
+
+          <div class="flex h-9 w-9 items-center justify-center
+                      rounded-xl border border-emerald-200
+                      bg-emerald-50 dark:border-emerald-900/40
+                      dark:bg-emerald-900/20">
+
+            🏆
+
+          </div>
+
+          <div>
+
+            <div class="text-xs font-black text-slate-700
+                        dark:text-white">
+              Objectspace Admin
+            </div>
+
+            <div class="text-[10px] text-slate-400">
+              Entity configuration environment
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="flex items-center gap-2">
+
+          <span class="h-2 w-2 rounded-full bg-emerald-400
+                       shadow-[0_0_10px_rgba(52,211,153,0.5)]">
+          </span>
+
+          <span class="text-[9px] font-bold uppercase
+                       tracking-wider text-slate-400">
+            Configuration system operational
+          </span>
+
+        </div>
+
+
+        <div class="text-[10px] font-medium text-slate-400">
+          © <%= Time.current.year %> Objectspace
+        </div>
+
+      </div>
+
+    </footer>
+
+  </div>
+
+</div>

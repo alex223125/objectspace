@@ -48,6 +48,22 @@ module Admin
           end
 
           def show
+
+            content =
+              render_to_string(
+                template:
+                  "admin/ecosystems/load_sources/entity_types/entity_types/show",
+                layout: false
+              )
+
+            render(
+              template:
+                "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
+              layout: false,
+              locals: {
+                content: content
+              }
+            )
           end
 
           def new
@@ -55,6 +71,25 @@ module Admin
               ::Ecosystems::LoadSources::EntityTypes::EntityType.new(
                 active: true
               )
+
+            # render_with_entity_templates_layout
+
+
+            content =
+              render_to_string(
+                template:
+                  "admin/ecosystems/load_sources/entity_types/entity_types/new",
+                layout: false
+              )
+
+            render(
+              template:
+                "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
+              layout: false,
+              locals: {
+                content: content
+              }
+            )
           end
 
           def create

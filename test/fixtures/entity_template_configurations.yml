@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  entity_template: one
+  entity_type: one
+  context: one
+  context_type: Context
+  enabled: false
+  position: 1
+  settings: 
+
+two:
+  entity_template: two
+  entity_type: two
+  context: two
+  context_type: Context
+  enabled: false
+  position: 1
+  settings: 

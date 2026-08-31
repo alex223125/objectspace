@@ -309,6 +309,21 @@ Rails.application.routes.draw do
 
         namespace :entity_templates do
           resources :entity_templates
+
+          get :configuration,
+              to: "configurations#index",
+              as: :configuration
+
+          post :configuration,
+               to: "configurations#create"
+
+          patch "configuration/:id",
+                to: "configurations#update",
+                as: :update_configuration
+
+          delete "configuration/:id",
+                 to: "configurations#destroy",
+                 as: :delete_configuration
         end
       end
     end
