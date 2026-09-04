@@ -3,7 +3,7 @@ module Admin
     module LoadSources
       module EntityTemplates
 
-        class ConfigurationsController < ApplicationController
+        class ConfigurationsController < ::AdminController
           before_action :authenticate_admin_user!
 
           EntityType = ::Ecosystems::LoadSources::EntityTypes::EntityType

@@ -309,6 +309,14 @@ Rails.application.routes.draw do
 
         namespace :entity_templates do
           resources :entity_templates
+          resources :entity_template_versions do
+            member do
+              patch :publish, to: "entity_template_versions#publish"
+              patch :archive, to: "entity_template_versions#archive"
+              post :clone, to: "entity_template_versions#clone"
+              get :compare
+            end
+          end
 
           get :configuration,
               to: "configurations#index",

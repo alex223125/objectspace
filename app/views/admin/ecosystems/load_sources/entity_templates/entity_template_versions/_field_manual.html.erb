@@ -1,0 +1,1695 @@
+<%# ============================================================================
+ENTITY TEMPLATE VERSION — FIELD MANUAL
+
+Partial:
+app/views/admin/ecosystems/load_sources/entity_templates/entity_template_versions/_field_manual.html.erb
+
+Usage:
+<%= render "admin/ecosystems/load_sources/entity_templates/entity_template_versions/field_manual" %>
+
+<!--Purpose:-->
+<!--Beginner-friendly explanation of why Entity Template Versions exist,-->
+<!--how they relate to Entity Templates, and when an administrator should-->
+<!--create a new version.-->
+
+<!--Design language:-->
+<!--Soft Fallout / field-terminal / encyclopedia gamification.-->
+<!--============================================================================ %>-->
+
+<section class=" relative mb-10 overflow-hidden rounded-[32px] border-2 border-violet-100 bg-gradient-to-b from-white via-violet-50/30 to-slate-50 shadow-md shadow-violet-100/40 dark:border-violet-900/40 dark:from-gray-900 dark:via-violet-950/20 dark:to-gray-950 ">
+<%# ========================================================================
+BACKGROUND DECORATION
+======================================================================== %>
+
+  <div class="pointer-events-none absolute inset-0 overflow-hidden">
+    <div
+      class="
+    absolute
+    -right-28
+    -top-28
+    h-80
+    w-80
+    rounded-full
+    bg-violet-200/30
+    blur-3xl
+    dark:bg-violet-600/10
+  "></div>
+
+    <div
+      class="
+    absolute
+    -bottom-28
+    -left-28
+    h-80
+    w-80
+    rounded-full
+    bg-indigo-200/25
+    blur-3xl
+    dark:bg-indigo-600/10
+  "></div>
+
+    <div
+      class="
+    absolute
+    right-24
+    top-24
+    h-28
+    w-28
+    rounded-full
+    border-2
+    border-violet-100/70
+    dark:border-violet-800/30
+  "></div>
+
+    <div
+      class="
+    absolute
+    right-36
+    top-36
+    h-8
+    w-8
+    rounded-full
+    bg-indigo-200/40
+    dark:bg-indigo-500/20
+  "></div>
+
+    <div
+      class="
+    absolute
+    left-20
+    top-32
+    h-2
+    w-2
+    rounded-full
+    bg-violet-300
+  "></div>
+
+    <div
+      class="
+    absolute
+    left-32
+    top-24
+    h-1.5
+    w-1.5
+    rounded-full
+    bg-indigo-300
+  "></div>
+
+  </div>
+<%# ========================================================================
+CONTENT
+======================================================================== %>
+
+  <div class="relative z-10 p-6 sm:p-8 lg:p-10">
+<%# ======================================================================
+    TOP LABELS
+======================================================================= %>
+
+    <div class="flex flex-wrap items-center gap-3">
+
+      <div
+        class="
+      inline-flex
+      items-center
+      gap-2
+      rounded-full
+      border
+      border-violet-200
+      bg-violet-50
+      px-4
+      py-2
+      text-[11px]
+      font-black
+      uppercase
+      tracking-[0.18em]
+      text-violet-600
+      shadow-sm
+      dark:border-violet-800
+      dark:bg-violet-900/20
+      dark:text-violet-400
+    ">
+
+    <span
+      class="
+        h-2
+        w-2
+        animate-pulse
+        rounded-full
+        bg-violet-500
+        shadow-[0_0_8px_rgba(139,92,246,0.5)]
+      "></span>
+
+        Field Manual
+
+      </div>
+
+      <div
+        class="
+      rounded-full
+      border
+      border-indigo-200
+      bg-indigo-50
+      px-4
+      py-2
+      text-[11px]
+      font-bold
+      uppercase
+      tracking-wider
+      text-indigo-600
+      shadow-sm
+      dark:border-indigo-800
+      dark:bg-indigo-900/20
+      dark:text-indigo-400
+    ">
+        Archive Protocol 02
+      </div>
+
+    </div>
+
+<%# ======================================================================
+    HERO
+======================================================================= %>
+
+    <div
+      class="
+    mt-7
+    grid
+    grid-cols-1
+    gap-8
+    lg:grid-cols-12
+    lg:items-center
+  ">
+
+      <%# ====================================================================
+      HERO TEXT
+  ===================================================================== %>
+
+      <div class="lg:col-span-7">
+
+        <div
+          class="
+        text-[12px]
+        font-black
+        uppercase
+        tracking-[0.22em]
+        text-violet-500
+      ">
+          Template Evolution Protocol
+        </div>
+
+        <h2
+          class="
+        mt-2
+        max-w-3xl
+        text-3xl
+        font-black
+        leading-tight
+        tracking-tight
+        text-gray-900
+        dark:text-white
+        sm:text-4xl
+      ">
+          Why does a Template need Versions?
+        </h2>
+
+        <p
+          class="
+        mt-5
+        max-w-2xl
+        text-base
+        leading-7
+        text-gray-500
+        dark:text-gray-400
+        sm:text-[17px]
+      ">
+          Imagine an Entity Template as a blueprint for building
+          encyclopedia entities.
+          A
+          <span class="font-black text-violet-600">
+        Template Version
+      </span>
+          is a preserved edition of that blueprint.
+          When the blueprint changes, the old edition should remain
+          understandable instead of being silently rewritten.
+        </p>
+
+        <%# BEGINNER RULE %>
+
+        <div
+          class="
+        mt-6
+        rounded-2xl
+        border-2
+        border-amber-100
+        bg-gradient-to-r
+        from-amber-50
+        via-white
+        to-orange-50/60
+        p-5
+        shadow-sm
+        shadow-amber-100/50
+        dark:border-amber-900/50
+        dark:from-amber-950/30
+        dark:via-gray-900
+        dark:to-orange-950/20
+      ">
+
+          <div class="flex items-start gap-4">
+
+            <div
+              class="
+            flex
+            h-11
+            w-11
+            shrink-0
+            items-center
+            justify-center
+            rounded-2xl
+            border
+            border-amber-200
+            bg-amber-100
+            text-xl
+            shadow-sm
+            dark:border-amber-800
+            dark:bg-amber-900/30
+          ">
+              💡
+            </div>
+
+            <div>
+
+              <div
+                class="
+              text-[12px]
+              font-black
+              uppercase
+              tracking-wider
+              text-amber-600
+              dark:text-amber-400
+            ">
+                Beginner Rule
+              </div>
+
+              <p
+                class="
+              mt-2
+              text-sm
+              leading-6
+              text-gray-500
+              dark:text-gray-400
+              sm:text-[15px]
+            ">
+                If you change the structure of a template,
+                <strong class="font-black text-gray-700 dark:text-gray-200">
+                  create a new version
+                </strong>
+                instead of pretending the old structure never existed.
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <%# ====================================================================
+      GRAPHICAL VERSION CARD
+  ===================================================================== %>
+
+      <div class="relative lg:col-span-5">
+
+        <div
+          class="
+        relative
+        mx-auto
+        max-w-sm
+        rotate-1
+        rounded-[28px]
+        border-2
+        border-violet-100
+        bg-white
+        p-6
+        shadow-lg
+        shadow-violet-100/60
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:rotate-0
+        hover:shadow-xl
+        dark:border-violet-800
+        dark:bg-gray-800
+      ">
+
+          <%# STATUS %>
+
+          <div
+            class="
+          absolute
+          right-5
+          top-5
+          rounded-full
+          border
+          border-emerald-200
+          bg-emerald-50
+          px-3
+          py-1.5
+          text-[10px]
+          font-black
+          uppercase
+          tracking-wider
+          text-emerald-600
+          dark:border-emerald-800
+          dark:bg-emerald-900/20
+          dark:text-emerald-400
+        ">
+            ✓ Preserved
+          </div>
+
+          <%# VERSION ICON %>
+
+          <div
+            class="
+          flex
+          h-20
+          w-20
+          items-center
+          justify-center
+          rounded-[24px]
+          border-2
+          border-violet-200
+          bg-gradient-to-br
+          from-violet-500
+          to-indigo-500
+          text-4xl
+          shadow-lg
+          shadow-violet-200/70
+          dark:border-violet-700
+          dark:shadow-violet-900/30
+        ">
+            📜
+          </div>
+
+          <div class="mt-6">
+
+            <div
+              class="
+            text-[11px]
+            font-black
+            uppercase
+            tracking-[0.2em]
+            text-violet-500
+          ">
+              Template Archive
+            </div>
+
+            <div
+              class="
+            mt-1
+            text-xl
+            font-black
+            text-gray-900
+            dark:text-white
+          ">
+              Institution Template
+            </div>
+
+            <div
+              class="
+            mt-1
+            text-sm
+            text-gray-500
+            dark:text-gray-400
+          ">
+              Version 2
+            </div>
+
+          </div>
+
+          <%# VERSION ATTRIBUTES %>
+
+          <div class="mt-6 grid grid-cols-2 gap-3">
+
+            <div
+              class="
+            rounded-xl
+            border
+            border-violet-100
+            bg-violet-50
+            p-3
+            dark:border-violet-800
+            dark:bg-violet-900/20
+          ">
+
+              <div
+                class="
+              text-[10px]
+              font-black
+              uppercase
+              tracking-wider
+              text-gray-400
+            ">
+                Edition
+              </div>
+
+              <div
+                class="
+              mt-1
+              text-sm
+              font-black
+              text-violet-600
+              dark:text-violet-400
+            ">
+                v2
+              </div>
+
+            </div>
+
+            <div
+              class="
+            rounded-xl
+            border
+            border-emerald-100
+            bg-emerald-50
+            p-3
+            dark:border-emerald-800
+            dark:bg-emerald-900/20
+          ">
+
+              <div
+                class="
+              text-[10px]
+              font-black
+              uppercase
+              tracking-wider
+              text-gray-400
+            ">
+                State
+              </div>
+
+              <div
+                class="
+              mt-1
+              text-sm
+              font-black
+              text-emerald-600
+              dark:text-emerald-400
+            ">
+                Published
+              </div>
+
+            </div>
+
+          </div>
+
+          <%# STRUCTURE %>
+
+          <div class="mt-6">
+
+            <div
+              class="
+            flex
+            items-center
+            justify-between
+            text-[10px]
+            font-black
+            uppercase
+            tracking-wider
+          ">
+
+          <span class="text-gray-400">
+            Blueprint Integrity
+          </span>
+
+              <span class="text-violet-600 dark:text-violet-400">
+            100%
+          </span>
+
+            </div>
+
+            <div
+              class="
+            mt-2
+            h-3
+            overflow-hidden
+            rounded-full
+            border
+            border-gray-200
+            bg-gray-100
+            dark:border-gray-700
+            dark:bg-gray-900
+          ">
+
+              <div
+                class="
+              h-full
+              w-full
+              rounded-full
+              bg-gradient-to-r
+              from-violet-500
+              via-indigo-500
+              to-emerald-400
+              shadow-sm
+            "></div>
+
+            </div>
+
+          </div>
+
+          <div
+            class="
+          mt-5
+          rounded-xl
+          border
+          border-gray-100
+          bg-gray-50
+          px-4
+          py-3
+          font-mono
+          text-[10px]
+          font-bold
+          uppercase
+          tracking-wider
+          text-gray-400
+          dark:border-gray-700
+          dark:bg-gray-900
+        ">
+            SNAPSHOT :: LOCKED :: v2
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+<%# ======================================================================
+    ARCHITECTURE MAP
+======================================================================= %>
+
+    <div class="mt-12">
+
+      <div
+        class="
+      text-[12px]
+      font-black
+      uppercase
+      tracking-[0.2em]
+      text-gray-400
+    ">
+        System Map
+      </div>
+
+      <p
+        class="
+      mt-2
+      max-w-3xl
+      text-sm
+      leading-6
+      text-gray-500
+      dark:text-gray-400
+    ">
+        These four layers answer four different questions.
+        Keeping them separate allows the encyclopedia to evolve without
+        breaking existing entities.
+      </p>
+
+      <div
+        class="
+      mt-5
+      grid
+      grid-cols-1
+      gap-4
+      md:grid-cols-4
+    ">
+
+        <%# ENTITY TYPE %>
+
+        <div
+          class="
+        rounded-2xl
+        border-2
+        border-indigo-100
+        bg-indigo-50/70
+        p-5
+        shadow-sm
+        shadow-indigo-100/40
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:shadow-md
+        dark:border-indigo-800
+        dark:bg-indigo-900/20
+      ">
+
+          <div class="text-2xl">
+            🧬
+          </div>
+
+          <div
+            class="
+          mt-4
+          text-sm
+          font-black
+          text-indigo-700
+          dark:text-indigo-300
+        ">
+            Entity Type
+          </div>
+
+          <p
+            class="
+          mt-2
+          text-sm
+          leading-6
+          text-gray-500
+          dark:text-gray-400
+        ">
+            What kind of thing is this?
+          </p>
+
+          <div
+            class="
+          mt-4
+          text-[11px]
+          font-black
+          text-indigo-500
+        ">
+            Organisation
+          </div>
+
+        </div>
+
+        <%# TEMPLATE %>
+
+        <div
+          class="
+        rounded-2xl
+        border-2
+        border-violet-100
+        bg-violet-50/70
+        p-5
+        shadow-sm
+        shadow-violet-100/40
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:shadow-md
+        dark:border-violet-800
+        dark:bg-violet-900/20
+      ">
+
+          <div class="text-2xl">
+            🧱
+          </div>
+
+          <div
+            class="
+          mt-4
+          text-sm
+          font-black
+          text-violet-700
+          dark:text-violet-300
+        ">
+            Entity Template
+          </div>
+
+          <p
+            class="
+          mt-2
+          text-sm
+          leading-6
+          text-gray-500
+          dark:text-gray-400
+        ">
+            What structure should this type use?
+          </p>
+
+          <div
+            class="
+          mt-4
+          text-[11px]
+          font-black
+          text-violet-500
+        ">
+            Institution
+          </div>
+
+        </div>
+
+        <%# VERSION %>
+
+        <div
+          class="
+        rounded-2xl
+        border-2
+        border-orange-200
+        bg-gradient-to-br
+        from-orange-50
+        via-white
+        to-amber-50
+        p-5
+        shadow-md
+        shadow-orange-100/60
+        ring-2
+        ring-orange-100/60
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:shadow-lg
+        dark:border-orange-800
+        dark:from-orange-950/30
+        dark:via-gray-900
+        dark:to-amber-950/20
+      ">
+
+          <div class="text-2xl">
+            📜
+          </div>
+
+          <div
+            class="
+          mt-4
+          text-sm
+          font-black
+          text-orange-700
+          dark:text-orange-300
+        ">
+            Template Version
+          </div>
+
+          <p
+            class="
+          mt-2
+          text-sm
+          leading-6
+          text-gray-500
+          dark:text-gray-400
+        ">
+            Which edition of that structure?
+          </p>
+
+          <div
+            class="
+          mt-4
+          inline-flex
+          rounded-full
+          border
+          border-orange-200
+          bg-orange-100
+          px-3
+          py-1.5
+          text-[10px]
+          font-black
+          uppercase
+          tracking-wider
+          text-orange-600
+          dark:border-orange-800
+          dark:bg-orange-900/20
+          dark:text-orange-400
+        ">
+            ★ You are here
+          </div>
+
+        </div>
+
+        <%# ENTITY %>
+
+        <div
+          class="
+        rounded-2xl
+        border-2
+        border-emerald-100
+        bg-emerald-50/70
+        p-5
+        shadow-sm
+        shadow-emerald-100/40
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:shadow-md
+        dark:border-emerald-800
+        dark:bg-emerald-900/20
+      ">
+
+          <div class="text-2xl">
+            🗂️
+          </div>
+
+          <div
+            class="
+          mt-4
+          text-sm
+          font-black
+          text-emerald-700
+          dark:text-emerald-300
+        ">
+            Entity
+          </div>
+
+          <p
+            class="
+          mt-2
+          text-sm
+          leading-6
+          text-gray-500
+          dark:text-gray-400
+        ">
+            The actual encyclopedic object.
+          </p>
+
+          <div
+            class="
+          mt-4
+          text-[11px]
+          font-black
+          text-emerald-500
+        ">
+            Institution A
+          </div>
+
+        </div>
+
+      </div>
+
+      <%# CONNECTION LINE %>
+
+      <div
+        class="
+      mt-5
+      hidden
+      items-center
+      justify-center
+      md:flex
+    ">
+
+        <div class="h-px w-full bg-gradient-to-r from-indigo-200 via-violet-300 to-emerald-200"></div>
+
+      </div>
+
+    </div>
+
+<%# ======================================================================
+    VERSIONING SCENARIO
+======================================================================= %>
+
+    <div class="mt-12">
+
+      <div
+        class="
+      text-[12px]
+      font-black
+      uppercase
+      tracking-[0.2em]
+      text-gray-400
+    ">
+        Field Scenario
+      </div>
+
+      <h3
+        class="
+      mt-2
+      text-xl
+      font-black
+      text-gray-900
+      dark:text-white
+    ">
+        What happens when the template evolves?
+      </h3>
+
+      <div class="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-3">
+
+        <%# VERSION 1 %>
+
+        <div
+          class="
+        rounded-2xl
+        border
+        border-gray-200
+        bg-white
+        p-5
+        shadow-sm
+        dark:border-gray-700
+        dark:bg-gray-800
+      ">
+
+          <div class="flex items-center justify-between">
+
+            <div
+              class="
+            rounded-full
+            bg-gray-100
+            px-3
+            py-1.5
+            text-[10px]
+            font-black
+            uppercase
+            tracking-wider
+            text-gray-500
+            dark:bg-gray-900
+            dark:text-gray-400
+          ">
+              v1
+            </div>
+
+            <span class="text-lg">
+          📦
+        </span>
+
+          </div>
+
+          <div class="mt-4 text-sm font-black text-gray-800 dark:text-white">
+            Original Blueprint
+          </div>
+
+          <p
+            class="
+          mt-2
+          text-sm
+          leading-6
+          text-gray-500
+          dark:text-gray-400
+        ">
+            Institution has:
+            name, jurisdiction and institution type.
+          </p>
+
+          <div class="mt-4 space-y-2">
+
+            <div class="text-xs text-gray-400">
+              ✓ Name
+            </div>
+
+            <div class="text-xs text-gray-400">
+              ✓ Jurisdiction
+            </div>
+
+            <div class="text-xs text-gray-400">
+              ✓ Institution Type
+            </div>
+
+          </div>
+
+        </div>
+
+        <%# CHANGE %>
+
+        <div
+          class="
+        flex
+        flex-col
+        items-center
+        justify-center
+        rounded-2xl
+        border-2
+        border-dashed
+        border-orange-200
+        bg-orange-50/50
+        p-5
+        text-center
+        dark:border-orange-800
+        dark:bg-orange-900/10
+      ">
+
+          <div class="text-3xl">
+            ⚙️
+          </div>
+
+          <div
+            class="
+          mt-3
+          text-xs
+          font-black
+          uppercase
+          tracking-wider
+          text-orange-600
+          dark:text-orange-400
+        ">
+            Structure Changes
+          </div>
+
+          <p
+            class="
+          mt-2
+          text-sm
+          leading-6
+          text-gray-500
+          dark:text-gray-400
+        ">
+            You decide that
+            <strong class="font-black text-gray-700 dark:text-gray-200">
+              governance model
+            </strong>
+            is now required.
+          </p>
+
+          <div
+            class="
+          mt-4
+          text-2xl
+          text-orange-400
+        ">
+            ↓
+          </div>
+
+        </div>
+
+        <%# VERSION 2 %>
+
+        <div
+          class="
+        rounded-2xl
+        border-2
+        border-violet-200
+        bg-violet-50
+        p-5
+        shadow-sm
+        shadow-violet-100/50
+        dark:border-violet-800
+        dark:bg-violet-900/20
+      ">
+
+          <div class="flex items-center justify-between">
+
+            <div
+              class="
+            rounded-full
+            bg-violet-100
+            px-3
+            py-1.5
+            text-[10px]
+            font-black
+            uppercase
+            tracking-wider
+            text-violet-600
+            dark:bg-violet-900/40
+            dark:text-violet-400
+          ">
+              v2
+            </div>
+
+            <span class="text-lg">
+          🧬
+        </span>
+
+          </div>
+
+          <div class="mt-4 text-sm font-black text-violet-800 dark:text-violet-200">
+            Expanded Blueprint
+          </div>
+
+          <p
+            class="
+          mt-2
+          text-sm
+          leading-6
+          text-gray-500
+          dark:text-gray-400
+        ">
+            A new version preserves the original structure
+            and adds the new field.
+          </p>
+
+          <div class="mt-4 space-y-2">
+
+            <div class="text-xs text-gray-400">
+              ✓ Name
+            </div>
+
+            <div class="text-xs text-gray-400">
+              ✓ Jurisdiction
+            </div>
+
+            <div class="text-xs text-gray-400">
+              ✓ Institution Type
+            </div>
+
+            <div class="font-bold text-xs text-violet-500">
+              ★ Governance Model
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+<%# ======================================================================
+    WHY VERSIONING MATTERS
+======================================================================= %>
+
+    <div
+      class="
+    mt-10
+    grid
+    grid-cols-1
+    gap-5
+    md:grid-cols-3
+  ">
+
+      <%# HISTORY %>
+
+      <div
+        class="
+      rounded-2xl
+      border-2
+      border-indigo-100
+      bg-white
+      p-6
+      shadow-sm
+      shadow-indigo-100/40
+      transition-all
+      duration-300
+      hover:-translate-y-1
+      hover:shadow-lg
+      dark:border-indigo-900/60
+      dark:bg-gray-800
+    ">
+
+        <div
+          class="
+        flex
+        h-12
+        w-12
+        items-center
+        justify-center
+        rounded-2xl
+        border
+        border-indigo-100
+        bg-indigo-50
+        text-xl
+        dark:border-indigo-800
+        dark:bg-indigo-900/20
+      ">
+          🕰️
+        </div>
+
+        <div class="mt-5 text-base font-black text-gray-800 dark:text-white">
+          Preserve History
+        </div>
+
+        <p
+          class="
+        mt-3
+        text-sm
+        leading-6
+        text-gray-500
+        dark:text-gray-400
+      ">
+          You can understand what the encyclopedia structure looked like
+          yesterday, last year, or at the time an entity was created.
+        </p>
+
+        <div
+          class="
+        mt-4
+        text-[11px]
+        font-black
+        text-indigo-500
+      ">
+          Never erase structural history
+        </div>
+
+      </div>
+
+      <%# SAFE EVOLUTION %>
+
+      <div
+        class="
+      rounded-2xl
+      border-2
+      border-violet-100
+      bg-white
+      p-6
+      shadow-sm
+      shadow-violet-100/40
+      transition-all
+      duration-300
+      hover:-translate-y-1
+      hover:shadow-lg
+      dark:border-violet-900/60
+      dark:bg-gray-800
+    ">
+
+        <div
+          class="
+        flex
+        h-12
+        w-12
+        items-center
+        justify-center
+        rounded-2xl
+        border
+        border-violet-100
+        bg-violet-50
+        text-xl
+        dark:border-violet-800
+        dark:bg-violet-900/20
+      ">
+          🛡️
+        </div>
+
+        <div class="mt-5 text-base font-black text-gray-800 dark:text-white">
+          Evolve Safely
+        </div>
+
+        <p
+          class="
+        mt-3
+        text-sm
+        leading-6
+        text-gray-500
+        dark:text-gray-400
+      ">
+          New fields and structural changes can be introduced without
+          pretending that every existing entity was always built that way.
+        </p>
+
+        <div
+          class="
+        mt-4
+        text-[11px]
+        font-black
+        text-violet-500
+      ">
+          Change without breaking the past
+        </div>
+
+      </div>
+
+      <%# REPRODUCIBILITY %>
+
+      <div
+        class="
+      rounded-2xl
+      border-2
+      border-emerald-100
+      bg-white
+      p-6
+      shadow-sm
+      shadow-emerald-100/40
+      transition-all
+      duration-300
+      hover:-translate-y-1
+      hover:shadow-lg
+      dark:border-emerald-900/60
+      dark:bg-gray-800
+    ">
+
+        <div
+          class="
+        flex
+        h-12
+        w-12
+        items-center
+        justify-center
+        rounded-2xl
+        border
+        border-emerald-100
+        bg-emerald-50
+        text-xl
+        dark:border-emerald-800
+        dark:bg-emerald-900/20
+      ">
+          🔬
+        </div>
+
+        <div class="mt-5 text-base font-black text-gray-800 dark:text-white">
+          Reproduce the Structure
+        </div>
+
+        <p
+          class="
+        mt-3
+        text-sm
+        leading-6
+        text-gray-500
+        dark:text-gray-400
+      ">
+          A version gives the system a precise structural reference
+          for understanding how an entity was represented at a particular time.
+        </p>
+
+        <div
+          class="
+        mt-4
+        text-[11px]
+        font-black
+        text-emerald-500
+      ">
+          Same blueprint → same interpretation
+        </div>
+
+      </div>
+
+    </div>
+
+<%# ======================================================================
+    WHEN SHOULD I CREATE A VERSION?
+======================================================================= %>
+
+    <div
+      class="
+    mt-7
+    rounded-[24px]
+    border-2
+    border-emerald-100
+    bg-gradient-to-r
+    from-emerald-50
+    via-white
+    to-green-50
+    p-6
+    shadow-sm
+    shadow-emerald-100/50
+    dark:border-emerald-900/50
+    dark:from-emerald-950/20
+    dark:via-gray-900
+    dark:to-green-950/20
+  ">
+
+      <div
+        class="
+      flex
+      flex-col
+      gap-5
+      sm:flex-row
+      sm:items-start
+    ">
+
+        <div
+          class="
+        flex
+        h-12
+        w-12
+        shrink-0
+        items-center
+        justify-center
+        rounded-2xl
+        border
+        border-emerald-200
+        bg-emerald-100
+        text-xl
+        shadow-sm
+        dark:border-emerald-800
+        dark:bg-emerald-900/30
+      ">
+          🎯
+        </div>
+
+        <div>
+
+          <div
+            class="
+          text-[12px]
+          font-black
+          uppercase
+          tracking-[0.15em]
+          text-emerald-600
+          dark:text-emerald-400
+        ">
+            Administrator Mission
+          </div>
+
+          <h3
+            class="
+          mt-1
+          text-lg
+          font-black
+          text-gray-900
+          dark:text-white
+        ">
+            Create a new version when the blueprint changes.
+          </h3>
+
+          <p
+            class="
+          mt-2
+          text-sm
+          leading-6
+          text-gray-500
+          dark:text-gray-400
+        ">
+            A new version is appropriate when you add, remove, rename,
+            reorganize, or otherwise change important template fields
+            or structural rules.
+          </p>
+
+          <div
+            class="
+          mt-5
+          flex
+          flex-wrap
+          gap-2
+        ">
+
+        <span
+          class="
+            rounded-full
+            border
+            border-violet-100
+            bg-violet-50
+            px-3
+            py-1.5
+            text-[10px]
+            font-black
+            text-violet-600
+            dark:border-violet-800
+            dark:bg-violet-900/20
+            dark:text-violet-400
+          ">
+          1. Prepare structure
+        </span>
+
+            <span
+              class="
+            rounded-full
+            border
+            border-indigo-100
+            bg-indigo-50
+            px-3
+            py-1.5
+            text-[10px]
+            font-black
+            text-indigo-600
+            dark:border-indigo-800
+            dark:bg-indigo-900/20
+            dark:text-indigo-400
+          ">
+          2. Create version
+        </span>
+
+            <span
+              class="
+            rounded-full
+            border
+            border-orange-100
+            bg-orange-50
+            px-3
+            py-1.5
+            text-[10px]
+            font-black
+            text-orange-600
+            dark:border-orange-800
+            dark:bg-orange-900/20
+            dark:text-orange-400
+          ">
+          3. Review
+        </span>
+
+            <span
+              class="
+            rounded-full
+            border
+            border-emerald-100
+            bg-emerald-50
+            px-3
+            py-1.5
+            text-[10px]
+            font-black
+            text-emerald-600
+            dark:border-emerald-800
+            dark:bg-emerald-900/20
+            dark:text-emerald-400
+          ">
+          4. Publish
+        </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+<%# ======================================================================
+    DO NOT CONFUSE
+======================================================================= %>
+
+    <div
+      class="
+    mt-7
+    rounded-2xl
+    border
+    border-gray-200
+    bg-white
+    p-6
+    shadow-sm
+    dark:border-gray-700
+    dark:bg-gray-800
+  ">
+
+      <div
+        class="
+      text-[11px]
+      font-black
+      uppercase
+      tracking-[0.2em]
+      text-gray-400
+    ">
+        Field Identification
+      </div>
+
+      <div class="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
+
+        <div
+          class="
+        rounded-xl
+        border
+        border-gray-100
+        bg-gray-50
+        p-4
+        dark:border-gray-700
+        dark:bg-gray-900
+      ">
+
+          <div class="text-lg">
+            🧬
+          </div>
+
+          <div class="mt-2 text-sm font-black text-gray-800 dark:text-white">
+            Entity Type
+          </div>
+
+          <p class="mt-1 text-xs leading-5 text-gray-400">
+            Defines the kind of thing.
+          </p>
+
+        </div>
+
+        <div
+          class="
+        rounded-xl
+        border
+        border-gray-100
+        bg-gray-50
+        p-4
+        dark:border-gray-700
+        dark:bg-gray-900
+      ">
+
+          <div class="text-lg">
+            🧱
+          </div>
+
+          <div class="mt-2 text-sm font-black text-gray-800 dark:text-white">
+            Entity Template
+          </div>
+
+          <p class="mt-1 text-xs leading-5 text-gray-400">
+            Defines the reusable structure.
+          </p>
+
+        </div>
+
+        <div
+          class="
+        rounded-xl
+        border-2
+        border-violet-100
+        bg-violet-50
+        p-4
+        dark:border-violet-800
+        dark:bg-violet-900/20
+      ">
+
+          <div class="text-lg">
+            📜
+          </div>
+
+          <div class="mt-2 text-sm font-black text-violet-700 dark:text-violet-300">
+            Template Version
+          </div>
+
+          <p class="mt-1 text-xs leading-5 text-violet-500">
+            Defines which edition of the structure is being used.
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+<%# ======================================================================
+    TERMINAL FOOTER
+======================================================================= %>
+
+    <div
+      class="
+    mt-8
+    flex
+    flex-col
+    gap-3
+    border-t-2
+    border-gray-100
+    pt-5
+    sm:flex-row
+    sm:items-center
+    sm:justify-between
+    dark:border-gray-800
+  ">
+
+      <div
+        class="
+      font-mono
+      text-[10px]
+      font-bold
+      uppercase
+      tracking-wider
+      text-gray-400
+    ">
+        ENTITY_PROTOCOL :: VERSION_ARCHIVE :: ONLINE
+      </div>
+
+      <div
+        class="
+      flex
+      items-center
+      gap-2
+      text-[10px]
+      font-black
+      uppercase
+      tracking-wider
+      text-emerald-500
+    ">
+
+    <span
+      class="
+        h-2
+        w-2
+        rounded-full
+        bg-emerald-400
+        shadow-[0_0_8px_rgba(52,211,153,0.6)]
+      "></span>
+
+        Historical structure protected
+
+      </div>
+
+    </div>
+
+  </div> </section>

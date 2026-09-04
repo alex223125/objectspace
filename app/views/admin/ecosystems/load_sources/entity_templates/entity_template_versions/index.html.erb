@@ -1,0 +1,987 @@
+<%= render "admin/ecosystems/load_sources/entity_templates/entity_template_versions/field_manual" %>
+<%# ============================================================================
+ENTITY TEMPLATE VERSIONS — INDEX
+Path:
+app/views/admin/ecosystems/load_sources/entity_templates/entity_template_versions/index.html.erb
+
+Purpose:
+Administrative interface for managing Entity Template Versions.
+
+Expected controller variable:
+@entity_template_versions
+
+Expected model relationships:
+EntityTemplateVersion belongs_to :entity_template
+============================================================================ %>
+
+<div class="mx-auto w-full max-w-7xl px-5 py-8 sm:px-7 lg:px-10">
+<%# ========================================================================
+PAGE HEADER
+======================================================================== %>
+
+  <div class="mb-8">
+    <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+
+      <div>
+
+        <div class="flex items-center gap-3">
+
+          <div
+            class="
+          flex
+          h-12
+          w-12
+          items-center
+          justify-center
+          rounded-xl
+          bg-violet-100
+          text-2xl
+          shadow-sm
+          dark:bg-violet-900/40
+        ">
+            🧬
+          </div>
+
+          <div>
+
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+              Entity Template Versions
+            </h1>
+
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              Manage the evolution and published states of your entity templates.
+            </p>
+
+          </div>
+
+        </div>
+
+        <%# BREADCRUMB %>
+
+        <div class="mt-4 flex flex-wrap items-center gap-2 text-xs text-gray-400">
+
+      <span>
+        Encyclopedia
+      </span>
+
+          <span>
+        ›
+      </span>
+
+          <span>
+        Ecosystems
+      </span>
+
+          <span>
+        ›
+      </span>
+
+          <span>
+        Load Sources
+      </span>
+
+          <span>
+        ›
+      </span>
+
+          <span>
+        Entity Templates
+      </span>
+
+          <span>
+        ›
+      </span>
+
+          <span class="font-medium text-violet-500">
+        Versions
+      </span>
+
+        </div>
+
+      </div>
+
+      <%# CREATE VERSION BUTTON %>
+
+      <%= link_to(
+            new_admin_ecosystems_load_sources_entity_templates_entity_template_version_path,
+            class: "
+          inline-flex shrink-0 items-center justify-center gap-2
+          rounded-xl bg-violet-600 px-5 py-3
+          text-sm font-semibold text-white shadow-sm
+          transition hover:bg-violet-700
+          focus:outline-none focus:ring-2
+          focus:ring-violet-500 focus:ring-offset-2
+        "
+          ) do %>
+
+    <span class="text-lg leading-none">
+      +
+    </span>
+
+        Create Version
+
+      <% end %>
+
+    </div>
+
+  </div>
+<%# ========================================================================
+FIELD MANUAL / INTRODUCTION
+======================================================================== %>
+
+  <div class=" mb-8 overflow-hidden rounded-2xl border-2 border-violet-100 bg-gradient-to-br from-violet-50 via-white to-indigo-50 shadow-sm dark:border-violet-900/40 dark:from-violet-950/30 dark:via-gray-900 dark:to-indigo-950/30 ">
+    <div class="relative p-6 sm:p-8">
+
+      <%# Decorative background %>
+
+      <div
+        class="
+      pointer-events-none
+      absolute
+      -right-16
+      -top-16
+      h-48
+      w-48
+      rounded-full
+      bg-violet-200/30
+      blur-3xl
+      dark:bg-violet-500/10
+    "></div>
+
+      <div
+        class="
+      pointer-events-none
+      absolute
+      -bottom-20
+      -left-20
+      h-48
+      w-48
+      rounded-full
+      bg-indigo-200/30
+      blur-3xl
+      dark:bg-indigo-500/10
+    "></div>
+
+      <div class="relative">
+
+        <div class="flex items-start gap-4">
+
+          <div
+            class="
+          flex
+          h-12
+          w-12
+          shrink-0
+          items-center
+          justify-center
+          rounded-2xl
+          border
+          border-violet-200
+          bg-violet-100
+          text-xl
+          shadow-sm
+          dark:border-violet-800
+          dark:bg-violet-900/40
+        ">
+            📜
+          </div>
+
+          <div class="min-w-0">
+
+            <div
+              class="
+            text-[11px]
+            font-black
+            uppercase
+            tracking-[0.2em]
+            text-violet-500
+          ">
+              Version Control Protocol
+            </div>
+
+            <h2
+              class="
+            mt-1
+            text-xl
+            font-black
+            text-gray-900
+            dark:text-white
+          ">
+              Why do Entity Templates have versions?
+            </h2>
+
+            <p
+              class="
+            mt-3
+            max-w-4xl
+            text-sm
+            leading-6
+            text-gray-500
+            dark:text-gray-400
+          ">
+              An Entity Template describes the structure of an entity.
+              A version records how that structure looked at a particular
+              point in its evolution.
+              Instead of destroying the old structure when a template changes,
+              create a new version.
+            </p>
+
+          </div>
+
+        </div>
+
+        <%# VERSION FLOW %>
+
+        <div class="mt-7 grid grid-cols-1 gap-3 md:grid-cols-5">
+
+          <div
+            class="
+          rounded-xl
+          border
+          border-gray-200
+          bg-white
+          p-4
+          dark:border-gray-700
+          dark:bg-gray-800
+        ">
+
+            <div class="text-xl">
+              🧱
+            </div>
+
+            <div class="mt-2 text-xs font-black text-gray-800 dark:text-white">
+              Template
+            </div>
+
+            <div class="mt-1 text-xs text-gray-400">
+              Base structure
+            </div>
+
+          </div>
+
+          <div
+            class="
+          hidden
+          items-center
+          justify-center
+          text-xl
+          text-gray-300
+          md:flex
+        ">
+            →
+          </div>
+
+          <div
+            class="
+          rounded-xl
+          border-2
+          border-violet-200
+          bg-violet-50
+          p-4
+          shadow-sm
+          dark:border-violet-800
+          dark:bg-violet-900/20
+        ">
+
+            <div class="text-xl">
+              🧬
+            </div>
+
+            <div class="mt-2 text-xs font-black text-violet-700 dark:text-violet-300">
+              Version
+            </div>
+
+            <div class="mt-1 text-xs text-violet-500">
+              Snapshot of structure
+            </div>
+
+          </div>
+
+          <div
+            class="
+          hidden
+          items-center
+          justify-center
+          text-xl
+          text-gray-300
+          md:flex
+        ">
+            →
+          </div>
+
+          <div
+            class="
+          rounded-xl
+          border
+          border-emerald-200
+          bg-emerald-50
+          p-4
+          dark:border-emerald-800
+          dark:bg-emerald-900/20
+        ">
+
+            <div class="text-xl">
+              🚀
+            </div>
+
+            <div class="mt-2 text-xs font-black text-emerald-700 dark:text-emerald-300">
+              Published
+            </div>
+
+            <div class="mt-1 text-xs text-emerald-600">
+              Used by the system
+            </div>
+
+          </div>
+
+        </div>
+
+        <%# IMPORTANT RULE %>
+
+        <div
+          class="
+        mt-5
+        rounded-xl
+        border
+        border-amber-200
+        bg-amber-50
+        p-4
+        dark:border-amber-800
+        dark:bg-amber-900/20
+      ">
+
+          <div class="flex items-start gap-3">
+
+        <span class="text-lg">
+          💡
+        </span>
+
+            <p
+              class="
+            text-sm
+            leading-6
+            text-amber-700
+            dark:text-amber-300
+          ">
+              <strong class="font-black">
+                Golden rule:
+              </strong>
+
+              Do not rewrite history when the structure changes.
+              Create a new version so existing entities can continue
+              to understand the structure they were created with.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+<%# ========================================================================
+STATISTICS
+======================================================================== %>
+
+  <div class="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+<%# TOTAL %>
+
+    <div
+      class="
+    rounded-2xl
+    border
+    border-gray-200
+    bg-white
+    p-5
+    shadow-sm
+    dark:border-gray-800
+    dark:bg-gray-800
+  ">
+
+      <div class="text-xs font-semibold uppercase tracking-wider text-gray-400">
+        Total Versions
+      </div>
+
+      <div class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
+        <%= @entity_template_versions.count %>
+      </div>
+
+      <div class="mt-1 text-xs text-gray-400">
+        Template evolution records
+      </div>
+
+    </div>
+
+<%# PUBLISHED %>
+
+    <div
+      class="
+    rounded-2xl
+    border
+    border-emerald-100
+    bg-emerald-50
+    p-5
+    shadow-sm
+    dark:border-emerald-900
+    dark:bg-emerald-900/20
+  ">
+
+      <div class="text-xs font-semibold uppercase tracking-wider text-emerald-500">
+        Published
+      </div>
+
+      <div class="mt-2 text-3xl font-bold text-emerald-600">
+        <%= @entity_template_versions.count { |version| version.respond_to?(:published?) && version.published? } %>
+      </div>
+
+      <div class="mt-1 text-xs text-emerald-500/70">
+        Versions currently available
+      </div>
+
+    </div>
+
+<%# DRAFTS %>
+
+    <div
+      class="
+    rounded-2xl
+    border
+    border-amber-100
+    bg-amber-50
+    p-5
+    shadow-sm
+    dark:border-amber-900
+    dark:bg-amber-900/20
+  ">
+
+      <div class="text-xs font-semibold uppercase tracking-wider text-amber-500">
+        Drafts
+      </div>
+
+      <div class="mt-2 text-3xl font-bold text-amber-600">
+        <%= @entity_template_versions.count { |version| version.respond_to?(:draft?) && version.draft? } %>
+      </div>
+
+      <div class="mt-1 text-xs text-amber-500/70">
+        Versions still being prepared
+      </div>
+
+    </div>
+
+  </div>
+<%# ========================================================================
+VERSION LIST
+======================================================================== %>
+
+  <div>
+    <div class="mb-4 flex items-center justify-between">
+
+      <div>
+
+        <div
+          class="
+        text-[11px]
+        font-black
+        uppercase
+        tracking-[0.2em]
+        text-gray-400
+      ">
+          Template Archives
+        </div>
+
+        <h2 class="mt-1 text-lg font-black text-gray-900 dark:text-white">
+          Version Registry
+        </h2>
+
+      </div>
+
+      <div
+        class="
+      rounded-full
+      border
+      border-violet-100
+      bg-violet-50
+      px-3
+      py-1.5
+      text-[10px]
+      font-black
+      uppercase
+      tracking-wider
+      text-violet-600
+      dark:border-violet-800
+      dark:bg-violet-900/20
+      dark:text-violet-400
+    ">
+        <%= @entity_template_versions.count %> records
+      </div>
+
+    </div>
+
+    <% if @entity_template_versions.present? %>
+
+      <div class="space-y-4">
+
+        <% @entity_template_versions.each do |version| %>
+
+          <div
+            class="
+          group
+          overflow-hidden
+          rounded-2xl
+          border
+          border-gray-200
+          bg-white
+          shadow-sm
+          transition
+          duration-300
+          hover:-translate-y-0.5
+          hover:border-violet-200
+          hover:shadow-md
+          dark:border-gray-800
+          dark:bg-gray-800
+          dark:hover:border-violet-800
+        ">
+
+            <div class="p-5 sm:p-6">
+
+              <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+
+                <%# LEFT SIDE %>
+
+                <div class="min-w-0 flex-1">
+
+                  <div class="flex flex-wrap items-center gap-3">
+
+                    <%# VERSION BADGE %>
+
+                    <div
+                      class="
+                    inline-flex
+                    items-center
+                    gap-2
+                    rounded-full
+                    border
+                    border-violet-200
+                    bg-violet-50
+                    px-3
+                    py-1.5
+                    text-xs
+                    font-black
+                    text-violet-700
+                    dark:border-violet-800
+                    dark:bg-violet-900/20
+                    dark:text-violet-300
+                  ">
+
+                  <span>
+                    🧬
+                  </span>
+
+                      Version
+                      <%= version.try(:version_number) || version.try(:number) || version.id %>
+
+                    </div>
+
+                    <%# STATUS %>
+
+                    <% if version.respond_to?(:published?) && version.published? %>
+
+                  <span
+                    class="
+                      rounded-full
+                      bg-emerald-100
+                      px-3
+                      py-1.5
+                      text-xs
+                      font-semibold
+                      text-emerald-700
+                      dark:bg-emerald-900/30
+                      dark:text-emerald-400
+                    ">
+                    ✓ Published
+                  </span>
+
+                    <% elsif version.respond_to?(:draft?) && version.draft? %>
+
+                  <span
+                    class="
+                      rounded-full
+                      bg-amber-100
+                      px-3
+                      py-1.5
+                      text-xs
+                      font-semibold
+                      text-amber-700
+                      dark:bg-amber-900/30
+                      dark:text-amber-400
+                    ">
+                    ◐ Draft
+                  </span>
+
+                    <% elsif version.respond_to?(:status) && version.status.present? %>
+
+                  <span
+                    class="
+                      rounded-full
+                      bg-gray-100
+                      px-3
+                      py-1.5
+                      text-xs
+                      font-semibold
+                      text-gray-600
+                      dark:bg-gray-900
+                      dark:text-gray-400
+                    ">
+                    <%= version.status.to_s.humanize %>
+                  </span>
+
+                    <% end %>
+
+                  </div>
+
+                  <%# TEMPLATE NAME %>
+
+                  <h3
+                    class="
+                  mt-4
+                  truncate
+                  text-lg
+                  font-black
+                  text-gray-900
+                  dark:text-white
+                ">
+
+                    <% if version.respond_to?(:entity_template) && version.entity_template.present? %>
+
+                      <%= version.entity_template.name %>
+
+                    <% else %>
+
+                      Entity Template
+
+                    <% end %>
+
+                  </h3>
+
+                  <%# META %>
+
+                  <div
+                    class="
+                  mt-2
+                  flex
+                  flex-wrap
+                  items-center
+                  gap-x-4
+                  gap-y-2
+                  text-xs
+                  text-gray-400
+                ">
+
+                <span class="font-mono">
+                  ID: <%= version.id %>
+                </span>
+
+                    <% if version.respond_to?(:created_at) && version.created_at.present? %>
+
+                  <span>
+                    Created
+                    <%= time_ago_in_words(version.created_at) %>
+                    ago
+                  </span>
+
+                    <% end %>
+
+                    <% if version.respond_to?(:updated_at) && version.updated_at.present? %>
+
+                  <span>
+                    Updated
+                    <%= time_ago_in_words(version.updated_at) %>
+                    ago
+                  </span>
+
+                    <% end %>
+
+                  </div>
+
+                </div>
+
+                <%# RIGHT SIDE ACTIONS %>
+
+                <div
+                  class="
+                flex
+                shrink-0
+                flex-wrap
+                items-center
+                gap-2
+              ">
+
+                  <%= link_to(
+                        "View",
+                        admin_ecosystems_load_sources_entity_templates_entity_template_version_path(version),
+                        class: "
+                      inline-flex
+                      items-center
+                      justify-center
+                      rounded-xl
+                      border
+                      border-gray-200
+                      bg-white
+                      px-4
+                      py-2.5
+                      text-sm
+                      font-semibold
+                      text-gray-700
+                      transition
+                      hover:border-violet-200
+                      hover:text-violet-600
+                      dark:border-gray-700
+                      dark:bg-gray-800
+                      dark:text-gray-300
+                    "
+                      ) %>
+
+                  <%= link_to(
+                        "Edit",
+                        edit_admin_ecosystems_load_sources_entity_templates_entity_template_version_path(version),
+                        class: "
+                      inline-flex
+                      items-center
+                      justify-center
+                      rounded-xl
+                      bg-violet-600
+                      px-4
+                      py-2.5
+                      text-sm
+                      font-semibold
+                      text-white
+                      transition
+                      hover:bg-violet-700
+                    "
+                      ) %>
+
+                </div>
+
+              </div>
+
+              <%# VERSION TIMELINE %>
+
+              <div
+                class="
+              mt-5
+              border-t
+              border-gray-100
+              pt-5
+              dark:border-gray-700
+            ">
+
+                <div class="flex items-center gap-3">
+
+                  <div class="flex items-center gap-2">
+
+                    <div
+                      class="
+                    h-2.5
+                    w-2.5
+                    rounded-full
+                    bg-gray-300
+                    dark:bg-gray-600
+                  "></div>
+
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                  Structure
+                </span>
+
+                  </div>
+
+                  <div class="h-px flex-1 bg-gray-100 dark:bg-gray-700"></div>
+
+                  <div class="flex items-center gap-2">
+
+                    <div
+                      class="
+                    h-2.5
+                    w-2.5
+                    rounded-full
+                    bg-violet-400
+                    shadow-[0_0_8px_rgba(139,92,246,0.4)]
+                  "></div>
+
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-violet-500">
+                  Versioned
+                </span>
+
+                  </div>
+
+                  <div class="h-px flex-1 bg-gray-100 dark:bg-gray-700"></div>
+
+                  <div class="flex items-center gap-2">
+
+                    <div
+                      class="
+                    h-2.5
+                    w-2.5
+                    rounded-full
+                    bg-emerald-400
+                  "></div>
+
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-500">
+                  Runtime
+                </span>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        <% end %>
+
+      </div>
+
+    <% else %>
+
+      <%# ====================================================================
+      EMPTY STATE
+  ==================================================================== %>
+
+      <div
+        class="
+      rounded-2xl
+      border-2
+      border-dashed
+      border-gray-200
+      bg-white
+      p-12
+      text-center
+      dark:border-gray-700
+      dark:bg-gray-800
+    ">
+
+        <div
+          class="
+        mx-auto
+        mb-5
+        flex
+        h-20
+        w-20
+        items-center
+        justify-center
+        rounded-3xl
+        border
+        border-violet-100
+        bg-violet-50
+        text-4xl
+        dark:border-violet-800
+        dark:bg-violet-900/20
+      ">
+          🧬
+        </div>
+
+        <h3
+          class="
+        text-lg
+        font-black
+        text-gray-900
+        dark:text-white
+      ">
+          No template versions exist yet
+        </h3>
+
+        <p
+          class="
+        mx-auto
+        mt-2
+        max-w-lg
+        text-sm
+        leading-6
+        text-gray-500
+        dark:text-gray-400
+      ">
+          A template version is a preserved snapshot of an Entity Template.
+          Create the first version when you are ready to establish the
+          initial structure that your entities will use.
+        </p>
+
+        <%= link_to(
+              new_admin_ecosystems_load_sources_entity_templates_entity_template_version_path,
+              class: "
+            mt-6
+            inline-flex
+            items-center
+            gap-2
+            rounded-xl
+            bg-violet-600
+            px-5
+            py-3
+            text-sm
+            font-semibold
+            text-white
+            shadow-sm
+            transition
+            hover:bg-violet-700
+          "
+            ) do %>
+
+      <span class="text-lg">
+        +
+      </span>
+
+          Create First Version
+
+        <% end %>
+
+      </div>
+
+    <% end %>
+
+  </div>
+<%# ========================================================================
+FOOTER / SYSTEM STATUS
+======================================================================== %>
+
+  <div class=" mt-8 flex flex-col gap-3 border-t border-gray-100 pt-5 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800 ">
+    <div
+      class="
+    font-mono
+    text-[10px]
+    font-bold
+    uppercase
+    tracking-wider
+    text-gray-400
+  ">
+      ENTITY_PROTOCOL :: TEMPLATE_VERSION_LAYER :: ONLINE
+    </div>
+
+    <div
+      class="
+    flex
+    items-center
+    gap-2
+    text-[10px]
+    font-black
+    uppercase
+    tracking-wider
+    text-emerald-500
+  ">
+
+  <span
+    class="
+      h-2
+      w-2
+      rounded-full
+      bg-emerald-400
+      shadow-[0_0_8px_rgba(52,211,153,0.6)]
+    "></span>
+
+      Version registry operational
+
+    </div>
+
+  </div> </div>

@@ -36,11 +36,15 @@
 
   <nav class="flex-1 space-y-1 overflow-y-auto p-4">
 
+    <%# ================================================================
+        ENTITY TYPES
+    ================================================================= %>
+
     <%= link_to(
           admin_ecosystems_load_sources_entity_types_entity_types_path,
           class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium
-              text-gray-700 transition hover:bg-indigo-50 hover:text-indigo-600
-              dark:text-gray-300 dark:hover:bg-indigo-900/20"
+                  text-gray-700 transition hover:bg-indigo-50 hover:text-indigo-600
+                  dark:text-gray-300 dark:hover:bg-indigo-900/20"
         ) do %>
 
       <span>🧩</span>
@@ -50,12 +54,19 @@
       </span>
 
     <% end %>
-    
 
-    <%= link_to admin_ecosystems_load_sources_entity_templates_entity_templates_path,
-                class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium
-                        text-gray-700 transition hover:bg-indigo-50 hover:text-indigo-600
-                        dark:text-gray-300 dark:hover:bg-indigo-900/20 dark:hover:text-indigo-400" do %>
+
+    <%# ================================================================
+        ENTITY TEMPLATES
+    ================================================================= %>
+
+    <%= link_to(
+          admin_ecosystems_load_sources_entity_templates_entity_templates_path,
+          class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium
+                  text-gray-700 transition hover:bg-indigo-50 hover:text-indigo-600
+                  dark:text-gray-300 dark:hover:bg-indigo-900/20
+                  dark:hover:text-indigo-400"
+        ) do %>
 
       <span>📋</span>
 
@@ -65,19 +76,47 @@
 
     <% end %>
 
+
+    <%# ================================================================
+        ENTITY TEMPLATE VERSIONS
+    ================================================================= %>
+
+    <%= link_to(
+          admin_ecosystems_load_sources_entity_templates_entity_template_versions_path,
+          class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium
+                  text-gray-700 transition hover:bg-indigo-50 hover:text-indigo-600
+                  dark:text-gray-300 dark:hover:bg-indigo-900/20
+                  dark:hover:text-indigo-400"
+        ) do %>
+
+      <span>🧬</span>
+
+      <span>
+        Versions
+      </span>
+
+    <% end %>
+
+
+    <%# ================================================================
+        CONFIGURATION
+    ================================================================= %>
+
     <a
       class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium
-         text-gray-700 transition hover:bg-indigo-50 hover:text-indigo-600
-         dark:text-gray-300 dark:hover:bg-indigo-900/20 dark:hover:text-indigo-400"
+             text-gray-700 transition hover:bg-indigo-50 hover:text-indigo-600
+             dark:text-gray-300 dark:hover:bg-indigo-900/20
+             dark:hover:text-indigo-400"
       href="<%= admin_ecosystems_load_sources_entity_templates_configuration_path %>"
     >
+
       <span>⚙️</span>
 
       <span>
-    Configuration
-  </span>
-    </a>
+        Configuration
+      </span>
 
+    </a>
 
   </nav>
 
@@ -86,11 +125,14 @@
 
   <div class="border-t border-slate-200 p-4 dark:border-gray-800">
 
-    <%= link_to admin_root_path,
-                class: "flex items-center gap-3 rounded-xl px-4 py-3
-                        text-sm font-medium text-gray-500
-                        transition hover:bg-slate-100 hover:text-gray-900
-                        dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white" do %>
+    <%= link_to(
+          admin_root_path,
+          class: "flex items-center gap-3 rounded-xl px-4 py-3
+                  text-sm font-medium text-gray-500
+                  transition hover:bg-slate-100 hover:text-gray-900
+                  dark:text-gray-400 dark:hover:bg-gray-800
+                  dark:hover:text-white"
+        ) do %>
 
       <span>←</span>
 

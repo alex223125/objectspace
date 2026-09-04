@@ -1,0 +1,1307 @@
+<%# ============================================================================
+ENTITY TEMPLATE VERSION — COMPARE
+Path:
+app/views/admin/ecosystems/load_sources/entity_templates/entity_template_versions/compare.html.erb
+
+Purpose:
+Compare two versions of the same EntityTemplate.
+
+Shows:
+- version metadata
+- lifecycle status
+- definition changes
+- added fields
+- removed fields
+- changed fields
+- unchanged fields
+
+============================================================================ %>
+
+<div class="mx-auto w-full max-w-7xl px-5 py-8 sm:px-7 lg:px-10">
+
+  <%# ========================================================================
+  PAGE HEADER
+  ======================================================================== %>
+
+  <div class="mb-8">
+
+    <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+
+      <div>
+
+        <div class="flex flex-wrap items-center gap-3">
+
+          <div
+            class="
+              flex h-12 w-12 items-center justify-center
+              rounded-xl border border-violet-200
+              bg-violet-100 text-2xl
+              shadow-sm
+            "
+          >
+            ⚖️
+          </div>
+
+          <div>
+
+            <div
+              class="
+                text-[11px]
+                font-black
+                uppercase
+                tracking-[0.2em]
+                text-violet-500
+              "
+            >
+              Entity Template Version
+            </div>
+
+            <h1
+              class="
+                mt-1
+                text-3xl
+                font-black
+                tracking-tight
+                text-gray-900
+                dark:text-white
+              "
+            >
+              Compare Versions
+            </h1>
+
+          </div>
+
+        </div>
+
+
+        <%# BREADCRUMB %>
+
+        <div
+          class="
+            mt-4
+            flex flex-wrap items-center gap-2
+            text-xs text-gray-400
+          "
+        >
+
+          <span>Encyclopedia</span>
+          <span>›</span>
+
+          <span>Ecosystems</span>
+          <span>›</span>
+
+          <span>Load Sources</span>
+          <span>›</span>
+
+          <span>Entity Templates</span>
+          <span>›</span>
+
+          <span>Versions</span>
+          <span>›</span>
+
+          <span class="font-semibold text-violet-500">
+            Compare
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <%# HEADER ACTIONS %>
+
+      <div class="flex flex-wrap items-center gap-3">
+
+        <%= link_to(
+              "← Version",
+              admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
+                @entity_template_version
+              ),
+              class: "
+                inline-flex items-center justify-center
+                rounded-xl border border-gray-200
+                bg-white px-4 py-2.5
+                text-sm font-semibold text-gray-700
+                shadow-sm transition
+                hover:border-gray-300
+                hover:bg-gray-50
+                dark:border-gray-700
+                dark:bg-gray-800
+                dark:text-gray-200
+              "
+            ) %>
+
+        <%= link_to(
+              "All Versions",
+              admin_ecosystems_load_sources_entity_templates_entity_template_versions_path,
+              class: "
+                inline-flex items-center justify-center
+                rounded-xl border border-violet-200
+                bg-violet-50 px-4 py-2.5
+                text-sm font-semibold text-violet-700
+                shadow-sm transition
+                hover:bg-violet-100
+                dark:border-violet-800
+                dark:bg-violet-950/30
+                dark:text-violet-300
+              "
+            ) %>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <%# ========================================================================
+  TEMPLATE
+  ======================================================================== %>
+
+  <div
+    class="
+      mb-8
+      rounded-[24px]
+      border-2
+      border-indigo-100
+      bg-gradient-to-br
+      from-indigo-50
+      via-white
+      to-violet-50
+      p-6
+      shadow-sm
+      dark:border-indigo-900
+      dark:from-indigo-950/30
+      dark:via-gray-800
+      dark:to-violet-950/20
+    "
+  >
+
+    <div
+      class="
+        text-[10px]
+        font-black
+        uppercase
+        tracking-[0.18em]
+        text-indigo-500
+      "
+    >
+      Parent Template
+    </div>
+
+    <div
+      class="
+        mt-2
+        text-2xl
+        font-black
+        text-gray-900
+        dark:text-white
+      "
+    >
+      <%= @entity_template.name %>
+    </div>
+
+    <% if @entity_template.respond_to?(:slug) && @entity_template.slug.present? %>
+
+      <div class="mt-1 font-mono text-xs text-indigo-500">
+        <%= @entity_template.slug %>
+      </div>
+
+    <% end %>
+
+  </div>
+
+
+  <%# ========================================================================
+  VERSION SELECTORS
+  ======================================================================== %>
+
+  <div
+    class="
+      mb-8
+      rounded-[24px]
+      border-2
+      border-gray-100
+      bg-white
+      p-6
+      shadow-sm
+      dark:border-gray-700
+      dark:bg-gray-800
+    "
+  >
+
+    <div class="mb-5">
+
+      <div
+        class="
+          text-[10px]
+          font-black
+          uppercase
+          tracking-[0.18em]
+          text-violet-500
+        "
+      >
+        Comparison
+      </div>
+
+      <h2
+        class="
+          mt-1
+          text-lg
+          font-black
+          text-gray-900
+          dark:text-white
+        "
+      >
+        Select versions
+      </h2>
+
+    </div>
+
+
+    <%= form_with(
+          url: compare_admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
+            @entity_template_version
+          ),
+          method: :get,
+          local: true,
+          class: "grid grid-cols-1 gap-5 lg:grid-cols-2"
+        ) do %>
+
+
+      <%# LEFT VERSION %>
+
+      <div>
+
+        <label
+          for="left_id"
+          class="
+            mb-2 block text-sm font-bold
+            text-gray-700
+            dark:text-gray-300
+          "
+        >
+          Version A
+        </label>
+
+        <select
+          id="left_id"
+          name="left_id"
+          class="
+            block w-full rounded-xl
+            border border-gray-300
+            bg-gray-50
+            px-4 py-3
+            text-sm
+            text-gray-900
+            focus:border-violet-500
+            focus:outline-none
+            focus:ring-2
+            focus:ring-violet-500
+            dark:border-gray-700
+            dark:bg-gray-900
+            dark:text-white
+          "
+        >
+
+          <% @versions.each do |version| %>
+
+            <option
+              value="<%= version.id %>"
+              <%= "selected" if version.id == @left_version.id %>
+            >
+              Version
+              <%= version.version.presence || version.id %>
+              —
+              <%= version.status.to_s.humanize %>
+              —
+              <%= version.created_at.strftime("%Y-%m-%d") %>
+            </option>
+
+          <% end %>
+
+        </select>
+
+      </div>
+
+
+      <%# RIGHT VERSION %>
+
+      <div>
+
+        <label
+          for="right_id"
+          class="
+            mb-2 block text-sm font-bold
+            text-gray-700
+            dark:text-gray-300
+          "
+        >
+          Version B
+        </label>
+
+        <select
+          id="right_id"
+          name="right_id"
+          class="
+            block w-full rounded-xl
+            border border-gray-300
+            bg-gray-50
+            px-4 py-3
+            text-sm
+            text-gray-900
+            focus:border-violet-500
+            focus:outline-none
+            focus:ring-2
+            focus:ring-violet-500
+            dark:border-gray-700
+            dark:bg-gray-900
+            dark:text-white
+          "
+        >
+
+          <% @versions.each do |version| %>
+
+            <option
+              value="<%= version.id %>"
+              <%= "selected" if version.id == @right_version.id %>
+            >
+              Version
+              <%= version.version.presence || version.id %>
+              —
+              <%= version.status.to_s.humanize %>
+              —
+              <%= version.created_at.strftime("%Y-%m-%d") %>
+            </option>
+
+          <% end %>
+
+        </select>
+
+      </div>
+
+
+      <div class="lg:col-span-2">
+
+        <%= submit_tag(
+              "Compare Selected Versions",
+              class: "
+                inline-flex items-center justify-center gap-2
+                rounded-xl
+                bg-violet-600
+                px-5 py-3
+                text-sm font-bold
+                text-white
+                shadow-sm
+                transition
+                hover:bg-violet-700
+                focus:outline-none
+                focus:ring-2
+                focus:ring-violet-500
+                focus:ring-offset-2
+              "
+            ) %>
+
+      </div>
+
+    <% end %>
+
+  </div>
+
+
+  <%# ========================================================================
+  VERSION SUMMARY
+  ======================================================================== %>
+
+  <div class="mb-8 grid grid-cols-1 gap-5 lg:grid-cols-2">
+
+
+    <%# VERSION A %>
+
+    <div
+      class="
+        rounded-[24px]
+        border-2
+        border-sky-100
+        bg-sky-50/60
+        p-6
+        shadow-sm
+        dark:border-sky-900
+        dark:bg-sky-950/20
+      "
+    >
+
+      <div
+        class="
+          text-[10px]
+          font-black
+          uppercase
+          tracking-[0.18em]
+          text-sky-500
+        "
+      >
+        Version A
+      </div>
+
+      <div
+        class="
+          mt-2
+          text-2xl
+          font-black
+          text-gray-900
+          dark:text-white
+        "
+      >
+        Version
+        <%= @left_version.version.presence || @left_version.id %>
+      </div>
+
+      <div class="mt-4">
+
+        <% if @left_version.draft? %>
+
+          <span
+            class="
+              inline-flex items-center
+              rounded-full
+              border border-amber-200
+              bg-amber-50
+              px-3 py-1.5
+              text-xs font-black
+              uppercase tracking-wider
+              text-amber-700
+            "
+          >
+            Draft
+          </span>
+
+        <% elsif @left_version.published? %>
+
+          <span
+            class="
+              inline-flex items-center
+              rounded-full
+              border border-emerald-200
+              bg-emerald-50
+              px-3 py-1.5
+              text-xs font-black
+              uppercase tracking-wider
+              text-emerald-700
+            "
+          >
+            Published
+          </span>
+
+        <% elsif @left_version.archived? %>
+
+          <span
+            class="
+              inline-flex items-center
+              rounded-full
+              border border-slate-200
+              bg-slate-100
+              px-3 py-1.5
+              text-xs font-black
+              uppercase tracking-wider
+              text-slate-600
+            "
+          >
+            Archived
+          </span>
+
+        <% end %>
+
+      </div>
+
+      <div class="mt-4 text-xs text-gray-500 dark:text-gray-400">
+
+        Created:
+
+        <span class="font-semibold text-gray-700 dark:text-gray-200">
+          <%= @left_version.created_at.strftime("%Y-%m-%d %H:%M") %>
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <%# VERSION B %>
+
+    <div
+      class="
+        rounded-[24px]
+        border-2
+        border-violet-100
+        bg-violet-50/60
+        p-6
+        shadow-sm
+        dark:border-violet-900
+        dark:bg-violet-950/20
+      "
+    >
+
+      <div
+        class="
+          text-[10px]
+          font-black
+          uppercase
+          tracking-[0.18em]
+          text-violet-500
+        "
+      >
+        Version B
+      </div>
+
+      <div
+        class="
+          mt-2
+          text-2xl
+          font-black
+          text-gray-900
+          dark:text-white
+        "
+      >
+        Version
+        <%= @right_version.version.presence || @right_version.id %>
+      </div>
+
+      <div class="mt-4">
+
+        <% if @right_version.draft? %>
+
+          <span
+            class="
+              inline-flex items-center
+              rounded-full
+              border border-amber-200
+              bg-amber-50
+              px-3 py-1.5
+              text-xs font-black
+              uppercase tracking-wider
+              text-amber-700
+            "
+          >
+            Draft
+          </span>
+
+        <% elsif @right_version.published? %>
+
+          <span
+            class="
+              inline-flex items-center
+              rounded-full
+              border border-emerald-200
+              bg-emerald-50
+              px-3 py-1.5
+              text-xs font-black
+              uppercase tracking-wider
+              text-emerald-700
+            "
+          >
+            Published
+          </span>
+
+        <% elsif @right_version.archived? %>
+
+          <span
+            class="
+              inline-flex items-center
+              rounded-full
+              border border-slate-200
+              bg-slate-100
+              px-3 py-1.5
+              text-xs font-black
+              uppercase tracking-wider
+              text-slate-600
+            "
+          >
+            Archived
+          </span>
+
+        <% end %>
+
+      </div>
+
+      <div class="mt-4 text-xs text-gray-500 dark:text-gray-400">
+
+        Created:
+
+        <span class="font-semibold text-gray-700 dark:text-gray-200">
+          <%= @right_version.created_at.strftime("%Y-%m-%d %H:%M") %>
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <%# ========================================================================
+  CHANGE SUMMARY
+  ======================================================================== %>
+
+  <% added_count =
+       @definition_changes.count { |change| change[:type] == :added } %>
+
+  <% removed_count =
+       @definition_changes.count { |change| change[:type] == :removed } %>
+
+  <% changed_count =
+       @definition_changes.count { |change| change[:type] == :changed } %>
+
+  <% unchanged_count =
+       @definition_changes.count { |change| change[:type] == :unchanged } %>
+
+
+  <div class="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4">
+
+    <%# ADDED %>
+
+    <div
+      class="
+        rounded-2xl
+        border border-emerald-100
+        bg-emerald-50
+        p-5
+        dark:border-emerald-900
+        dark:bg-emerald-950/20
+      "
+    >
+
+      <div
+        class="
+          text-[10px]
+          font-black
+          uppercase
+          tracking-wider
+          text-emerald-500
+        "
+      >
+        Added
+      </div>
+
+      <div class="mt-2 text-3xl font-black text-emerald-600">
+        <%= added_count %>
+      </div>
+
+    </div>
+
+
+    <%# REMOVED %>
+
+    <div
+      class="
+        rounded-2xl
+        border border-red-100
+        bg-red-50
+        p-5
+        dark:border-red-900
+        dark:bg-red-950/20
+      "
+    >
+
+      <div
+        class="
+          text-[10px]
+          font-black
+          uppercase
+          tracking-wider
+          text-red-500
+        "
+      >
+        Removed
+      </div>
+
+      <div class="mt-2 text-3xl font-black text-red-600">
+        <%= removed_count %>
+      </div>
+
+    </div>
+
+
+    <%# CHANGED %>
+
+    <div
+      class="
+        rounded-2xl
+        border border-amber-100
+        bg-amber-50
+        p-5
+        dark:border-amber-900
+        dark:bg-amber-950/20
+      "
+    >
+
+      <div
+        class="
+          text-[10px]
+          font-black
+          uppercase
+          tracking-wider
+          text-amber-500
+        "
+      >
+        Changed
+      </div>
+
+      <div class="mt-2 text-3xl font-black text-amber-600">
+        <%= changed_count %>
+      </div>
+
+    </div>
+
+
+    <%# UNCHANGED %>
+
+    <div
+      class="
+        rounded-2xl
+        border border-gray-100
+        bg-gray-50
+        p-5
+        dark:border-gray-700
+        dark:bg-gray-900
+      "
+    >
+
+      <div
+        class="
+          text-[10px]
+          font-black
+          uppercase
+          tracking-wider
+          text-gray-400
+        "
+      >
+        Unchanged
+      </div>
+
+      <div class="mt-2 text-3xl font-black text-gray-600">
+        <%= unchanged_count %>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <%# ========================================================================
+  DIFFERENCES
+  ======================================================================== %>
+
+  <div
+    class="
+      overflow-hidden
+      rounded-[24px]
+      border-2
+      border-gray-100
+      bg-white
+      shadow-sm
+      dark:border-gray-700
+      dark:bg-gray-800
+    "
+  >
+
+    <div
+      class="
+        border-b border-gray-100
+        bg-gray-50/80
+        px-6 py-5
+        dark:border-gray-700
+        dark:bg-gray-900/50
+      "
+    >
+
+      <div
+        class="
+          text-[10px]
+          font-black
+          uppercase
+          tracking-[0.18em]
+          text-violet-500
+        "
+      >
+        Definition Diff
+      </div>
+
+      <h2
+        class="
+          mt-1
+          text-lg
+          font-black
+          text-gray-900
+          dark:text-white
+        "
+      >
+        Structural Changes
+      </h2>
+
+    </div>
+
+
+    <% if @definition_changes.empty? %>
+
+      <div class="p-10 text-center">
+
+        <div class="text-3xl">
+          📭
+        </div>
+
+        <h3
+          class="
+            mt-4
+            text-base
+            font-black
+            text-gray-700
+            dark:text-gray-200
+          "
+        >
+          No definition data
+        </h3>
+
+        <p class="mt-2 text-sm text-gray-400">
+          Both versions contain an empty definition.
+        </p>
+
+      </div>
+
+    <% else %>
+
+      <div class="divide-y divide-gray-100 dark:divide-gray-700">
+
+        <% @definition_changes.each do |change| %>
+
+          <% next if change[:type] == :unchanged %>
+
+          <div class="p-6">
+
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-start">
+
+              <%# CHANGE LABEL %>
+
+              <div class="shrink-0 lg:w-32">
+
+                <% if change[:type] == :added %>
+
+                  <span
+                    class="
+                      inline-flex rounded-full
+                      bg-emerald-100
+                      px-3 py-1.5
+                      text-xs font-black
+                      uppercase tracking-wider
+                      text-emerald-700
+                    "
+                  >
+                    + Added
+                  </span>
+
+                <% elsif change[:type] == :removed %>
+
+                  <span
+                    class="
+                      inline-flex rounded-full
+                      bg-red-100
+                      px-3 py-1.5
+                      text-xs font-black
+                      uppercase tracking-wider
+                      text-red-700
+                    "
+                  >
+                    − Removed
+                  </span>
+
+                <% elsif change[:type] == :changed %>
+
+                  <span
+                    class="
+                      inline-flex rounded-full
+                      bg-amber-100
+                      px-3 py-1.5
+                      text-xs font-black
+                      uppercase tracking-wider
+                      text-amber-700
+                    "
+                  >
+                    ~ Changed
+                  </span>
+
+                <% end %>
+
+              </div>
+
+
+              <%# KEY %>
+
+              <div class="lg:w-56">
+
+                <div
+                  class="
+                    font-mono
+                    text-sm
+                    font-bold
+                    text-gray-900
+                    dark:text-white
+                  "
+                >
+                  <%= change[:key] %>
+                </div>
+
+              </div>
+
+
+              <%# VALUES %>
+
+              <div class="grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
+
+                <%# OLD %>
+
+                <div>
+
+                  <div
+                    class="
+                      mb-2
+                      text-[10px]
+                      font-black
+                      uppercase
+                      tracking-wider
+                      text-red-400
+                    "
+                  >
+                    Version A
+                  </div>
+
+                  <% if change[:left].nil? %>
+
+                    <div
+                      class="
+                        rounded-xl
+                        border border-dashed
+                        border-gray-200
+                        bg-gray-50
+                        p-4
+                        font-mono
+                        text-xs
+                        text-gray-400
+                        dark:border-gray-700
+                        dark:bg-gray-900
+                      "
+                    >
+                      Not present
+                    </div>
+
+                  <% else %>
+
+                    <pre
+                      class="
+                        max-h-72
+                        overflow-auto
+                        rounded-xl
+                        border border-red-100
+                        bg-red-50
+                        p-4
+                        font-mono
+                        text-xs
+                        leading-5
+                        text-red-800
+                        dark:border-red-900
+                        dark:bg-red-950/20
+                        dark:text-red-300
+                      "
+                    ><%= JSON.pretty_generate(change[:left]) %></pre>
+
+                  <% end %>
+
+                </div>
+
+
+                <%# NEW %>
+
+                <div>
+
+                  <div
+                    class="
+                      mb-2
+                      text-[10px]
+                      font-black
+                      uppercase
+                      tracking-wider
+                      text-emerald-500
+                    "
+                  >
+                    Version B
+                  </div>
+
+                  <% if change[:right].nil? %>
+
+                    <div
+                      class="
+                        rounded-xl
+                        border border-dashed
+                        border-gray-200
+                        bg-gray-50
+                        p-4
+                        font-mono
+                        text-xs
+                        text-gray-400
+                        dark:border-gray-700
+                        dark:bg-gray-900
+                      "
+                    >
+                      Not present
+                    </div>
+
+                  <% else %>
+
+                    <pre
+                      class="
+                        max-h-72
+                        overflow-auto
+                        rounded-xl
+                        border border-emerald-100
+                        bg-emerald-50
+                        p-4
+                        font-mono
+                        text-xs
+                        leading-5
+                        text-emerald-800
+                        dark:border-emerald-900
+                        dark:bg-emerald-950/20
+                        dark:text-emerald-300
+                      "
+                    ><%= JSON.pretty_generate(change[:right]) %></pre>
+
+                  <% end %>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        <% end %>
+
+      </div>
+
+    <% end %>
+
+  </div>
+
+
+  <%# ========================================================================
+  RAW DEFINITIONS
+  ======================================================================== %>
+
+  <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+
+
+    <%# VERSION A RAW %>
+
+    <div
+      class="
+        overflow-hidden
+        rounded-[24px]
+        border-2
+        border-sky-100
+        bg-white
+        shadow-sm
+        dark:border-sky-900
+        dark:bg-gray-800
+      "
+    >
+
+      <div
+        class="
+          border-b border-sky-100
+          bg-sky-50/60
+          px-6 py-5
+          dark:border-sky-900
+          dark:bg-sky-950/20
+        "
+      >
+
+        <div
+          class="
+            text-[10px]
+            font-black
+            uppercase
+            tracking-[0.18em]
+            text-sky-500
+          "
+        >
+          Version A
+        </div>
+
+        <h2
+          class="
+            mt-1
+            text-lg
+            font-black
+            text-gray-900
+            dark:text-white
+          "
+        >
+          Full Definition
+        </h2>
+
+      </div>
+
+      <div class="p-5">
+
+        <pre
+          class="
+            max-h-[600px]
+            overflow-auto
+            rounded-2xl
+            bg-gray-950
+            p-5
+            font-mono
+            text-xs
+            leading-6
+            text-sky-300
+          "
+        ><%= JSON.pretty_generate(@left_definition) %></pre>
+
+      </div>
+
+    </div>
+
+
+    <%# VERSION B RAW %>
+
+    <div
+      class="
+        overflow-hidden
+        rounded-[24px]
+        border-2
+        border-violet-100
+        bg-white
+        shadow-sm
+        dark:border-violet-900
+        dark:bg-gray-800
+      "
+    >
+
+      <div
+        class="
+          border-b border-violet-100
+          bg-violet-50/60
+          px-6 py-5
+          dark:border-violet-900
+          dark:bg-violet-950/20
+        "
+      >
+
+        <div
+          class="
+            text-[10px]
+            font-black
+            uppercase
+            tracking-[0.18em]
+            text-violet-500
+          "
+        >
+          Version B
+        </div>
+
+        <h2
+          class="
+            mt-1
+            text-lg
+            font-black
+            text-gray-900
+            dark:text-white
+          "
+        >
+          Full Definition
+        </h2>
+
+      </div>
+
+      <div class="p-5">
+
+        <pre
+          class="
+            max-h-[600px]
+            overflow-auto
+            rounded-2xl
+            bg-gray-950
+            p-5
+            font-mono
+            text-xs
+            leading-6
+            text-violet-300
+          "
+        ><%= JSON.pretty_generate(@right_definition) %></pre>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <%# ========================================================================
+  FOOTER
+  ======================================================================== %>
+
+  <div
+    class="
+      mt-8
+      flex flex-col gap-3
+      border-t-2 border-gray-100
+      pt-5
+      sm:flex-row
+      sm:items-center
+      sm:justify-between
+      dark:border-gray-800
+    "
+  >
+
+    <div
+      class="
+        font-mono
+        text-[10px]
+        font-bold
+        uppercase
+        tracking-wider
+        text-gray-400
+      "
+    >
+      ENTITY_TEMPLATE_VERSION ::
+      COMPARE ::
+      <%= @left_version.id %>
+      ↔
+      <%= @right_version.id %>
+    </div>
+
+    <div
+      class="
+        flex items-center gap-2
+        text-[10px]
+        font-black
+        uppercase
+        tracking-wider
+        text-emerald-500
+      "
+    >
+
+      <span
+        class="
+          h-2 w-2 rounded-full
+          bg-emerald-400
+          shadow-[0_0_8px_rgba(52,211,153,0.6)]
+        "
+      ></span>
+
+      Version comparison online
+
+    </div>
+
+  </div>
+
+</div>
