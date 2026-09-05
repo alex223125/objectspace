@@ -42,6 +42,7 @@ npx @herb-tools/formatter app/views/admin/ecosystems/load_sources/entity_templat
 
 
 
+
 # 1
 
 bin/rails assets:precompile

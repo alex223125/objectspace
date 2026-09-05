@@ -1,5 +1,3 @@
-# app/services/admin/ecosystems/load_sources/entity_templates/entity_template_version_comparator.rb
-
 module Services
   module Admin
     module Ecosystems
@@ -39,14 +37,26 @@ module Services
                   added: added_fields.length,
                   removed: removed_fields.length,
                   modified: modified_fields.length,
-                  unchanged: unchanged_fields.length
+                  unchanged: unchanged_fields.length,
+                  total: all_fields.length
                 },
 
+                # --------------------------------------------------------
+                # IMPORTANT:
+                #
+                # This is the normalized collection consumed by the
+                # Stimulus controller and compare.html.erb.
+                # --------------------------------------------------------
+
+                fields: all_fields,
+
+                # Keep the individual collections available too.
                 added: added_fields,
                 removed: removed_fields,
                 modified: modified_fields,
                 unchanged: unchanged_fields,
 
+                # Keep raw definitions for debugging / other UI.
                 raw: {
                   version_a: definition_a,
                   version_b: definition_b
@@ -118,12 +128,14 @@ module Services
               @fields_a_by_name ||=
                 fields_a.each_with_object({}) do |field, result|
 
-                  name = field["name"].to_s.strip
+                  name =
+                    field["name"]
+                      .to_s
+                      .strip
 
                   next if name.blank?
 
                   result[name] = field
-
                 end
             end
 
@@ -132,12 +144,14 @@ module Services
               @fields_b_by_name ||=
                 fields_b.each_with_object({}) do |field, result|
 
-                  name = field["name"].to_s.strip
+                  name =
+                    field["name"]
+                      .to_s
+                      .strip
 
                   next if name.blank?
 
                   result[name] = field
-
                 end
             end
 
@@ -150,12 +164,20 @@ module Services
               @added_fields ||=
                 fields_b_by_name
                   .keys
-                  .difference(fields_a_by_name.keys)
+                  .difference(
+                    fields_a_by_name.keys
+                  )
                   .map do |name|
 
                   {
                     name: name,
-                    field: fields_b_by_name[name]
+                    change_type: "added",
+                    field: fields_b_by_name[name],
+
+                    version_a: nil,
+                    version_b: fields_b_by_name[name],
+
+                    changes: {}
                   }
 
                 end
@@ -170,12 +192,20 @@ module Services
               @removed_fields ||=
                 fields_a_by_name
                   .keys
-                  .difference(fields_b_by_name.keys)
+                  .difference(
+                    fields_b_by_name.keys
+                  )
                   .map do |name|
 
                   {
                     name: name,
-                    field: fields_a_by_name[name]
+                    change_type: "removed",
+                    field: fields_a_by_name[name],
+
+                    version_a: fields_a_by_name[name],
+                    version_b: nil,
+
+                    changes: {}
                   }
 
                 end
@@ -190,7 +220,9 @@ module Services
               @modified_fields ||=
                 fields_a_by_name
                   .keys
-                  .intersection(fields_b_by_name.keys)
+                  .intersection(
+                    fields_b_by_name.keys
+                  )
                   .filter_map do |name|
 
                   field_a =
@@ -209,9 +241,14 @@ module Services
 
                   {
                     name: name,
-                    changes: changes,
+                    change_type: "changed",
+
+                    field: field_b,
+
                     version_a: field_a,
-                    version_b: field_b
+                    version_b: field_b,
+
+                    changes: changes
                   }
 
                 end
@@ -226,7 +263,9 @@ module Services
               @unchanged_fields ||=
                 fields_a_by_name
                   .keys
-                  .intersection(fields_b_by_name.keys)
+                  .intersection(
+                    fields_b_by_name.keys
+                  )
                   .filter_map do |name|
 
                   field_a =
@@ -235,16 +274,44 @@ module Services
                   field_b =
                     fields_b_by_name[name]
 
-                  next unless compare_field(
-                    field_a,
-                    field_b
-                  ).empty?
+                  changes =
+                    compare_field(
+                      field_a,
+                      field_b
+                    )
+
+                  next unless changes.empty?
 
                   {
                     name: name,
-                    field: field_b
+                    change_type: "unchanged",
+
+                    field: field_b,
+
+                    version_a: field_a,
+                    version_b: field_b,
+
+                    changes: {}
                   }
 
+                end
+            end
+
+
+            # ============================================================
+            # ALL FIELDS
+            # ============================================================
+
+            def all_fields
+              @all_fields ||=
+                (
+                  added_fields +
+                    removed_fields +
+                    modified_fields +
+                    unchanged_fields
+                ).sort_by do |field|
+
+                  field[:name].to_s.downcase
                 end
             end
 

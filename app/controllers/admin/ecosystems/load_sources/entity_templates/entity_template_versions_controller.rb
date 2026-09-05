@@ -396,10 +396,8 @@ module Admin
                 )
                 .compare
 
-
             @field_changes =
               @comparison[:fields]
-
 
             @definition_changes =
               @comparison[:definition]

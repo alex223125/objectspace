@@ -4,32 +4,55 @@
   Path:
   app/views/admin/ecosystems/load_sources/entity_templates/entity_template_versions/compare.html.erb
 
-  Phase:
-  2.2 — Professional Comparison UI
-
   Purpose:
   Compare two versions of the same EntityTemplate.
 
   Expected controller variables:
 
-  @entity_template
-  @versions
-  @left_version
-  @right_version
-  @left_definition
-  @right_definition
-  @field_changes
-  @definition_changes
-  @comparison_summary
+    @entity_template
+    @versions
+    @entity_template_version
+    @left_version
+    @right_version
+    @left_definition
+    @right_definition
+    @field_changes
+    @definition_changes
+    @comparison_summary
+
+  Expected field comparison structure:
+
+    {
+      name: "email",
+      type: :changed,
+      left: {
+        "name" => "email",
+        "label" => "Email",
+        "type" => "text",
+        "required" => false
+      },
+      right: {
+        "name" => "email",
+        "label" => "Email",
+        "type" => "email",
+        "required" => false
+      },
+      changes: [
+        {
+          key: "type",
+          left: "text",
+          right: "email"
+        }
+      ]
+    }
   ============================================================================
 %>
 
 <%
-  # --------------------------------------------------------------------------
-  # Defensive normalization
-  # The controller may return nil for optional comparison values.
-  # Normalize them here so the view never calls methods such as .size on nil.
-  #   --------------------------------------------------------------------------
+  # ==========================================================================
+  # DEFENSIVE NORMALIZATION
+  # ==========================================================================
+
   versions =
     Array(@versions)
 
@@ -40,25 +63,38 @@
     Array(@definition_changes)
 
   comparison_summary =
-    @comparison_summary.is_a?(Hash) ? @comparison_summary : {}
+    @comparison_summary.is_a?(Hash) ?
+      @comparison_summary :
+      {}
 
   left_definition =
-    @left_definition || {}
+    @left_definition.is_a?(Hash) ?
+      @left_definition :
+      {}
 
   right_definition =
-    @right_definition || {}
+    @right_definition.is_a?(Hash) ?
+      @right_definition :
+      {}
+
+  # Support both symbol and string keys.
+  summary_value = lambda do |key|
+    comparison_summary[key] ||
+      comparison_summary[key.to_s] ||
+      0
+  end
 
   added_count =
-    comparison_summary[:added].to_i
+    summary_value.call(:added).to_i
 
   removed_count =
-    comparison_summary[:removed].to_i
+    summary_value.call(:removed).to_i
 
   changed_count =
-    comparison_summary[:changed].to_i
+    summary_value.call(:changed).to_i
 
   unchanged_count =
-    comparison_summary[:unchanged].to_i
+    summary_value.call(:unchanged).to_i
 
   total_changes =
     added_count +
@@ -68,13 +104,94 @@
   total_fields =
     total_changes +
       unchanged_count
+
+
+  # ==========================================================================
+  # HELPER LAMBDAS
+  # ==========================================================================
+
+  value_for = lambda do |object, key|
+    if object.is_a?(Hash)
+      object[key] ||
+        object[key.to_s]
+    end
+  end
+
+
+  field_name_for = lambda do |field|
+    (
+      value_for.call(field, :name) ||
+        value_for.call(field, :key)
+    ).to_s
+  end
+
+
+  field_type_for = lambda do |field|
+    value =
+      value_for.call(field, :type)
+
+    value.to_s.downcase
+  end
+
+
+  field_label_for = lambda do |field|
+    (
+      value_for.call(field, :label) ||
+        value_for.call(field, :name)
+    ).to_s
+  end
+
+
+  field_left_for = lambda do |field|
+    value_for.call(field, :left)
+  end
+
+
+  field_right_for = lambda do |field|
+    value_for.call(field, :right)
+  end
+
+
+  field_changes_for = lambda do |field|
+    value =
+      value_for.call(field, :changes)
+
+    value.is_a?(Array) ? value : []
+  end
+
+
+  change_key_for = lambda do |change|
+    (
+      value_for.call(change, :key) ||
+        value_for.call(change, :name)
+    ).to_s
+  end
+
+
+  change_left_for = lambda do |change|
+    value_for.call(change, :left)
+  end
+
+
+  change_right_for = lambda do |change|
+    value_for.call(change, :right)
+  end
+
+
+  pretty_json = lambda do |value|
+    begin
+      JSON.pretty_generate(value)
+    rescue StandardError
+      value.to_s
+    end
+  end
 %>
 
 <div class="mx-auto w-full max-w-7xl px-5 py-8 sm:px-7 lg:px-10">
   <%#
-    ==========================================================================
+    =========================================================================
     PAGE HEADER
-    ==========================================================================
+    =========================================================================
   %>
 
   <div class="mb-8">
@@ -83,9 +200,15 @@
         <div class="flex flex-wrap items-center gap-3">
           <div
             class="
-              flex h-12 w-12 shrink-0 items-center justify-center
+              flex
+              h-12
+              w-12
+              shrink-0
+              items-center
+              justify-center
               rounded-2xl
-              border border-violet-200
+              border
+              border-violet-200
               bg-violet-100
               text-2xl
               shadow-sm
@@ -142,29 +265,35 @@
       <%# HEADER ACTIONS %>
 
       <div class="flex flex-wrap items-center gap-3">
-        <% if defined?(@entity_template_version) && @entity_template_version.present? %>
+        <% if defined?(@entity_template_version) &&
+          @entity_template_version.present? %>
           <%= link_to(
                 "← Version",
                 admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
                   @entity_template_version
                 ),
                 class: "
-              inline-flex items-center justify-center
-              rounded-xl
-              border border-gray-200
-              bg-white
-              px-4 py-2.5
-              text-sm font-semibold
-              text-gray-700
-              shadow-sm
-              transition
-              hover:border-gray-300
-              hover:bg-gray-50
-              dark:border-gray-700
-              dark:bg-gray-800
-              dark:text-gray-200
-              dark:hover:bg-gray-750
-            "
+                  inline-flex
+                  items-center
+                  justify-center
+                  rounded-xl
+                  border
+                  border-gray-200
+                  bg-white
+                  px-4
+                  py-2.5
+                  text-sm
+                  font-semibold
+                  text-gray-700
+                  shadow-sm
+                  transition
+                  hover:border-gray-300
+                  hover:bg-gray-50
+                  dark:border-gray-700
+                  dark:bg-gray-800
+                  dark:text-gray-200
+                  dark:hover:bg-gray-750
+                "
               ) %>
         <% end %>
 
@@ -172,32 +301,38 @@
               "All Versions",
               admin_ecosystems_load_sources_entity_templates_entity_template_versions_path,
               class: "
-            inline-flex items-center justify-center
-            rounded-xl
-            border border-violet-200
-            bg-violet-50
-            px-4 py-2.5
-            text-sm font-semibold
-            text-violet-700
-            shadow-sm
-            transition
-            hover:bg-violet-100
-            dark:border-violet-800
-            dark:bg-violet-950/30
-            dark:text-violet-300
-          "
+                inline-flex
+                items-center
+                justify-center
+                rounded-xl
+                border
+                border-violet-200
+                bg-violet-50
+                px-4
+                py-2.5
+                text-sm
+                font-semibold
+                text-violet-700
+                shadow-sm
+                transition
+                hover:bg-violet-100
+                dark:border-violet-800
+                dark:bg-violet-950/30
+                dark:text-violet-300
+              "
             ) %>
       </div>
     </div>
   </div>
 
   <%#
-    ==========================================================================
+    =========================================================================
     PARENT TEMPLATE
-    ==========================================================================
+    =========================================================================
   %>
 
-  <% if defined?(@entity_template) && @entity_template.present? %>
+  <% if defined?(@entity_template) &&
+    @entity_template.present? %>
     <div
       class="
         mb-8
@@ -225,7 +360,8 @@
           <%= @entity_template.name %>
         </div>
 
-        <% if @entity_template.respond_to?(:slug) && @entity_template.slug.present? %>
+        <% if @entity_template.respond_to?(:slug) &&
+          @entity_template.slug.present? %>
           <div class="mt-1 font-mono text-xs text-indigo-500 dark:text-indigo-300">
             <%= @entity_template.slug %>
           </div>
@@ -235,15 +371,22 @@
   <% end %>
 
   <%#
-    ==========================================================================
+    =========================================================================
     VERSION SELECTOR
-    ==========================================================================
+    =========================================================================
   %>
 
   <div
     class="
-      mb-8 rounded-[24px] border-2 border-gray-100 bg-white p-6 shadow-sm
-      dark:border-gray-700 dark:bg-gray-800
+      mb-8
+      rounded-[24px]
+      border-2
+      border-gray-100
+      bg-white
+      p-6
+      shadow-sm
+      dark:border-gray-700
+      dark:bg-gray-800
     "
   >
     <div class="mb-6">
@@ -260,7 +403,8 @@
       </p>
     </div>
 
-    <% if defined?(@entity_template_version) && @entity_template_version.present? %>
+    <% if defined?(@entity_template_version) &&
+      @entity_template_version.present? %>
       <%= form_with(
             url: compare_admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
               @entity_template_version
@@ -306,7 +450,9 @@
             <% versions.each do |version| %>
               <option
                 value="<%= version.id %>"
-                <%= "selected" if defined?(@left_version) && @left_version.present? && version.id == @left_version.id %>
+                <%= "selected" if defined?(@left_version) &&
+                  @left_version.present? &&
+                  version.id == @left_version.id %>
               >
                 Version <%= version.version.presence || version.id %> —
                 <%= version.status.to_s.humanize %> —
@@ -353,7 +499,9 @@
             <% versions.each do |version| %>
               <option
                 value="<%= version.id %>"
-                <%= "selected" if defined?(@right_version) && @right_version.present? && version.id == @right_version.id %>
+                <%= "selected" if defined?(@right_version) &&
+                  @right_version.present? &&
+                  version.id == @right_version.id %>
               >
                 Version <%= version.version.presence || version.id %> —
                 <%= version.status.to_s.humanize %> —
@@ -367,25 +515,25 @@
           <%= submit_tag(
                 "Compare Selected Versions",
                 class: "
-              inline-flex
-              items-center
-              justify-center
-              gap-2
-              rounded-xl
-              bg-violet-600
-              px-5
-              py-3
-              text-sm
-              font-bold
-              text-white
-              shadow-sm
-              transition
-              hover:bg-violet-700
-              focus:outline-none
-              focus:ring-2
-              focus:ring-violet-500
-              focus:ring-offset-2
-            "
+                  inline-flex
+                  items-center
+                  justify-center
+                  gap-2
+                  rounded-xl
+                  bg-violet-600
+                  px-5
+                  py-3
+                  text-sm
+                  font-bold
+                  text-white
+                  shadow-sm
+                  transition
+                  hover:bg-violet-700
+                  focus:outline-none
+                  focus:ring-2
+                  focus:ring-violet-500
+                  focus:ring-offset-2
+                "
               ) %>
         </div>
       <% end %>
@@ -411,13 +559,15 @@
   </div>
 
   <%#
-    ==========================================================================
+    =========================================================================
     COMPARISON DIRECTION
-    ==========================================================================
+    =========================================================================
   %>
 
-  <% if defined?(@left_version) && @left_version.present? &&
-    defined?(@right_version) && @right_version.present? %>
+  <% if defined?(@left_version) &&
+    @left_version.present? &&
+    defined?(@right_version) &&
+    @right_version.present? %>
     <div
       class="
         mb-8
@@ -480,13 +630,15 @@
   <% end %>
 
   <%#
-    ==========================================================================
+    =========================================================================
     VERSION SUMMARY
-    ==========================================================================
+    =========================================================================
   %>
 
-  <% if defined?(@left_version) && @left_version.present? &&
-    defined?(@right_version) && @right_version.present? %>
+  <% if defined?(@left_version) &&
+    @left_version.present? &&
+    defined?(@right_version) &&
+    @right_version.present? %>
     <div class="mb-8 grid grid-cols-1 gap-5 lg:grid-cols-2">
       <%# VERSION A %>
 
@@ -537,7 +689,8 @@
         </div>
 
         <div class="mt-5">
-          <% if @left_version.respond_to?(:draft?) && @left_version.draft? %>
+          <% if @left_version.respond_to?(:draft?) &&
+            @left_version.draft? %>
             <span
               class="
                 inline-flex
@@ -557,7 +710,8 @@
             >
               Draft
             </span>
-          <% elsif @left_version.respond_to?(:published?) && @left_version.published? %>
+          <% elsif @left_version.respond_to?(:published?) &&
+            @left_version.published? %>
             <span
               class="
                 inline-flex
@@ -577,7 +731,8 @@
             >
               Published
             </span>
-          <% elsif @left_version.respond_to?(:archived?) && @left_version.archived? %>
+          <% elsif @left_version.respond_to?(:archived?) &&
+            @left_version.archived? %>
             <span
               class="
                 inline-flex
@@ -676,7 +831,8 @@
         </div>
 
         <div class="mt-5">
-          <% if @right_version.respond_to?(:draft?) && @right_version.draft? %>
+          <% if @right_version.respond_to?(:draft?) &&
+            @right_version.draft? %>
             <span
               class="
                 inline-flex
@@ -696,7 +852,8 @@
             >
               Draft
             </span>
-          <% elsif @right_version.respond_to?(:published?) && @right_version.published? %>
+          <% elsif @right_version.respond_to?(:published?) &&
+            @right_version.published? %>
             <span
               class="
                 inline-flex
@@ -716,7 +873,8 @@
             >
               Published
             </span>
-          <% elsif @right_version.respond_to?(:archived?) && @right_version.archived? %>
+          <% elsif @right_version.respond_to?(:archived?) &&
+            @right_version.archived? %>
             <span
               class="
                 inline-flex
@@ -768,9 +926,9 @@
   <% end %>
 
   <%#
-    ==========================================================================
+    =========================================================================
     CHANGE SUMMARY
-    ==========================================================================
+    =========================================================================
   %>
 
   <div class="mb-8">
@@ -908,16 +1066,23 @@
   </div>
 
   <%#
-    ==========================================================================
+    =========================================================================
     FIELD COMPARISON
-    ==========================================================================
+    =========================================================================
   %>
 
   <div
     data-controller="entity-template-version-compare"
+    data-entity-template-version-compare-fields-value="<%= @field_comparisons.to_json %>"
     class="
-      overflow-hidden rounded-[24px] border-2 border-gray-100 bg-white
-      shadow-sm dark:border-gray-700 dark:bg-gray-800
+      overflow-hidden
+      rounded-[24px]
+      border-2
+      border-gray-100
+      bg-white
+      shadow-sm
+      dark:border-gray-700
+      dark:bg-gray-800
     "
   >
     <%# FIELD COMPARISON HEADER %>
@@ -1036,6 +1201,7 @@
           data-filter="all"
           data-entity-template-version-compare-target="filter"
           data-action="click->entity-template-version-compare#filterChanged"
+          aria-pressed="true"
           class="
             rounded-lg
             bg-gray-900
@@ -1058,6 +1224,7 @@
           data-filter="added"
           data-entity-template-version-compare-target="filter"
           data-action="click->entity-template-version-compare#filterChanged"
+          aria-pressed="false"
           class="
             rounded-lg
             border
@@ -1083,6 +1250,7 @@
           data-filter="removed"
           data-entity-template-version-compare-target="filter"
           data-action="click->entity-template-version-compare#filterChanged"
+          aria-pressed="false"
           class="
             rounded-lg
             border
@@ -1108,6 +1276,7 @@
           data-filter="changed"
           data-entity-template-version-compare-target="filter"
           data-action="click->entity-template-version-compare#filterChanged"
+          aria-pressed="false"
           class="
             rounded-lg
             border
@@ -1133,6 +1302,7 @@
           data-filter="unchanged"
           data-entity-template-version-compare-target="filter"
           data-action="click->entity-template-version-compare#filterChanged"
+          aria-pressed="false"
           class="
             rounded-lg
             border
@@ -1204,7 +1374,11 @@
       </div>
     </div>
 
-    <%# FIELD LIST %>
+    <%#
+      =========================================================================
+      FIELD LIST
+      =========================================================================
+    %>
 
     <div class="divide-y divide-gray-100 dark:divide-gray-700">
       <% if field_changes.blank? %>
@@ -1235,38 +1409,50 @@
           </p>
         </div>
       <% else %>
-        <% field_changes.each_with_index do |field, index| %>
+        <% field_changes.each_with_index do |raw_field, index| %>
           <% field =
-              field.is_a?(Hash) ? field : {}
+              raw_field.is_a?(Hash) ?
+                raw_field :
+                {}
 
             field_id =
               "compare-field-#{index}"
 
             raw_field_type =
-              field[:type] || field["type"]
+              field_type_for.call(field)
 
             field_type =
-              raw_field_type.to_s.to_sym
+              raw_field_type.presence || "unchanged"
 
             field_name =
-              (field[:name] || field["name"]).to_s
+              field_name_for.call(field)
+
+            field_label =
+              field_label_for.call(field)
 
             left_field =
-              field[:left] || field["left"]
+              field_left_for.call(field)
 
             right_field =
-              field[:right] || field["right"]
+              field_right_for.call(field)
 
             property_changes =
-              field[:changes].is_a?(Array) ? field[:changes] :
-                field["changes"].is_a?(Array) ? field["changes"] :
-                  [] %>
+              field_changes_for.call(field)
+
+            field_search_text =
+              [
+                field_name,
+                field_label,
+                raw_field_type,
+                pretty_json.call(left_field),
+                pretty_json.call(right_field)
+              ].compact.join(" ").downcase %>
 
           <div
             id="<%= field_id %>"
             data-entity-template-version-compare-target="field"
             data-change-type="<%= field_type %>"
-            data-field-name="<%= field_name.downcase %>"
+            data-field-name="<%= field_search_text %>"
             class="transition"
           >
             <%# FIELD HEADER %>
@@ -1277,7 +1463,7 @@
 
                 <div class="shrink-0">
                   <% case field_type %>
-                  <% when :added %>
+                  <% when "added", "add" %>
                     <span
                       class="
                         inline-flex
@@ -1299,7 +1485,7 @@
                     >
                       + Added
                     </span>
-                  <% when :removed %>
+                  <% when "removed", "remove", "deleted" %>
                     <span
                       class="
                         inline-flex
@@ -1321,7 +1507,7 @@
                     >
                       − Removed
                     </span>
-                  <% when :changed %>
+                  <% when "changed", "modified" %>
                     <span
                       class="
                         inline-flex
@@ -1380,15 +1566,6 @@
                     <%= field_name.presence || "(unnamed field)" %>
                   </div>
 
-                  <% field_label =
-                      if right_field.is_a?(Hash) &&
-                        right_field["label"].present?
-                        right_field["label"]
-                      elsif left_field.is_a?(Hash) &&
-                        left_field["label"].present?
-                        left_field["label"]
-                      end %>
-
                   <% if field_label.present? %>
                     <div class="mt-1 truncate text-xs text-gray-400">
                       <%= field_label %>
@@ -1399,50 +1576,68 @@
                 <%# TYPE BADGES %>
 
                 <div class="flex flex-wrap items-center gap-2">
-                  <% if left_field.is_a?(Hash) &&
-                    left_field["type"].present? %>
-                    <span
-                      class="
-                        rounded-lg
-                        bg-sky-50
-                        px-2.5
-                        py-1
-                        font-mono
-                        text-[10px]
-                        font-bold
-                        text-sky-700
-                        dark:bg-sky-950/30
-                        dark:text-sky-300
-                      "
-                    >
-                      A: <%= left_field["type"] %>
-                    </span>
+                  <% if left_field.is_a?(Hash) %>
+                    <% left_type =
+                         value_for.call(
+                           left_field,
+                           :type
+                         ) %>
+
+                    <% if left_type.present? %>
+                      <span
+                        class="
+                          rounded-lg
+                          bg-sky-50
+                          px-2.5
+                          py-1
+                          font-mono
+                          text-[10px]
+                          font-bold
+                          text-sky-700
+                          dark:bg-sky-950/30
+                          dark:text-sky-300
+                        "
+                      >
+                        A: <%= left_type %>
+                      </span>
+                    <% end %>
                   <% end %>
 
-                  <% if right_field.is_a?(Hash) &&
-                    right_field["type"].present? %>
-                    <span
-                      class="
-                        rounded-lg
-                        bg-violet-50
-                        px-2.5
-                        py-1
-                        font-mono
-                        text-[10px]
-                        font-bold
-                        text-violet-700
-                        dark:bg-violet-950/30
-                        dark:text-violet-300
-                      "
-                    >
-                      B: <%= right_field["type"] %>
-                    </span>
+                  <% if right_field.is_a?(Hash) %>
+                    <% right_type =
+                         value_for.call(
+                           right_field,
+                           :type
+                         ) %>
+
+                    <% if right_type.present? %>
+                      <span
+                        class="
+                          rounded-lg
+                          bg-violet-50
+                          px-2.5
+                          py-1
+                          font-mono
+                          text-[10px]
+                          font-bold
+                          text-violet-700
+                          dark:bg-violet-950/30
+                          dark:text-violet-300
+                        "
+                      >
+                        B: <%= right_type %>
+                      </span>
+                    <% end %>
                   <% end %>
                 </div>
 
                 <%# PROPERTY CHANGE COUNT %>
 
-                <% if field_type == :changed && property_changes.any? %>
+                <% if [
+                  "changed",
+                  "modified"
+                ].include?(field_type) &&
+                  property_changes.any? %>
                   <div
                     class="
                       shrink-0
@@ -1462,7 +1657,7 @@
                   </div>
                 <% end %>
 
-                <%# EXPAND %>
+                <%# DETAILS BUTTON %>
 
                 <button
                   type="button"
@@ -1498,14 +1693,22 @@
 
               <%# PROPERTY CHANGE TAGS %>
 
-              <% if field_type == :changed && property_changes.any? %>
+              <% if [
+                "changed",
+                "modified"
+              ].include?(field_type) &&
+                property_changes.any? %>
                 <div class="mt-5 flex flex-wrap gap-2">
-                  <% property_changes.each do |property_change| %>
+                  <% property_changes.each do |raw_change| %>
                     <% property_change =
-                        property_change.is_a?(Hash) ? property_change : {}
+                        raw_change.is_a?(Hash) ?
+                          raw_change :
+                          {}
 
                       property_key =
-                        property_change[:key] || property_change["key"] %>
+                        change_key_for.call(
+                          property_change
+                        ) %>
 
                     <span
                       class="
@@ -1524,7 +1727,7 @@
                         dark:text-amber-300
                       "
                     >
-                      <%= property_key.to_s %>
+                      <%= property_key.presence || "changed" %>
                     </span>
                   <% end %>
                 </div>
@@ -1537,26 +1740,38 @@
                 data-compare-details
                 class="mt-6 hidden"
               >
-                <% if field_type == :changed && property_changes.any? %>
+                <% if [
+                  "changed",
+                  "modified"
+                ].include?(field_type) &&
+                  property_changes.any? %>
+                  <%#
+                    =========================================================
+                    CHANGED FIELD — PROPERTY LEVEL DIFF
+                    =========================================================
+                  %>
+
                   <div class="space-y-3">
-                    <% property_changes.each do |property_change| %>
+                    <% property_changes.each do |raw_change| %>
                       <% property_change =
-                          property_change.is_a?(Hash) ? property_change : {}
+                          raw_change.is_a?(Hash) ?
+                            raw_change :
+                            {}
 
                         property_key =
-                          property_change[:key] || property_change["key"]
+                          change_key_for.call(
+                            property_change
+                          )
 
                         property_left =
-                          property_change[:left]
-
-                        property_left =
-                          property_change["left"] if property_left.nil?
-
-                        property_right =
-                          property_change[:right]
+                          change_left_for.call(
+                            property_change
+                          )
 
                         property_right =
-                          property_change["right"] if property_right.nil? %>
+                          change_right_for.call(
+                            property_change
+                          ) %>
 
                       <div
                         class="
@@ -1571,7 +1786,7 @@
                       >
                         <div class="border-b border-amber-100 px-4 py-3 dark:border-amber-900">
                           <div class="font-mono text-xs font-black text-gray-900 dark:text-white">
-                            <%= property_key.to_s %>
+                            <%= property_key.presence || "Property change" %>
                           </div>
                         </div>
 
@@ -1603,6 +1818,7 @@
 
                             <pre
                               class="
+                                max-h-80
                                 overflow-auto
                                 rounded-lg
                                 bg-white
@@ -1615,7 +1831,7 @@
                                 dark:bg-gray-950
                                 dark:text-gray-300
                               "
-                            ><%= JSON.pretty_generate(property_left) %></pre>
+                            ><%= pretty_json.call(property_left) %></pre>
                           </div>
 
                           <%# VERSION B %>
@@ -1640,6 +1856,7 @@
 
                             <pre
                               class="
+                                max-h-80
                                 overflow-auto
                                 rounded-lg
                                 bg-white
@@ -1652,13 +1869,19 @@
                                 dark:bg-gray-950
                                 dark:text-gray-300
                               "
-                            ><%= JSON.pretty_generate(property_right) %></pre>
+                            ><%= pretty_json.call(property_right) %></pre>
                           </div>
                         </div>
                       </div>
                     <% end %>
                   </div>
                 <% else %>
+                  <%#
+                    =========================================================
+                    ADDED / REMOVED / UNCHANGED FIELD
+                    =========================================================
+                  %>
+
                   <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <%# VERSION A %>
 
@@ -1712,7 +1935,7 @@
                             leading-5
                             text-sky-300
                           "
-                        ><%= JSON.pretty_generate(left_field) %></pre>
+                        ><%= pretty_json.call(left_field) %></pre>
                       <% end %>
                     </div>
 
@@ -1768,7 +1991,7 @@
                             leading-5
                             text-violet-300
                           "
-                        ><%= JSON.pretty_generate(right_field) %></pre>
+                        ><%= pretty_json.call(right_field) %></pre>
                       <% end %>
                     </div>
                   </div>
@@ -1782,9 +2005,9 @@
   </div>
 
   <%#
-    ==========================================================================
+    =========================================================================
     RAW DEFINITIONS
-    ==========================================================================
+    =========================================================================
   %>
 
   <div class="mt-8">
@@ -1850,7 +2073,7 @@
               leading-6
               text-sky-300
             "
-          ><%= JSON.pretty_generate(left_definition) %></pre>
+          ><%= pretty_json.call(left_definition) %></pre>
         </div>
       </div>
 
@@ -1906,33 +2129,329 @@
               leading-6
               text-violet-300
             "
-          ><%= JSON.pretty_generate(right_definition) %></pre>
+          ><%= pretty_json.call(right_definition) %></pre>
         </div>
       </div>
     </div>
   </div>
 
   <%#
-    ==========================================================================
+    =========================================================================
+    DEFINITION-LEVEL CHANGES
+    =========================================================================
+  %>
+
+  <% if definition_changes.any? %>
+    <div class="mt-8">
+      <div class="mb-4">
+        <div class="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">
+          Definition Changes
+        </div>
+
+        <h2 class="mt-1 text-xl font-black text-gray-900 dark:text-white">
+          Top-level JSON changes
+        </h2>
+      </div>
+
+      <div
+        class="
+          overflow-hidden
+          rounded-[24px]
+          border-2
+          border-gray-100
+          bg-white
+          shadow-sm
+          dark:border-gray-700
+          dark:bg-gray-800
+        "
+      >
+        <div class="divide-y divide-gray-100 dark:divide-gray-700">
+          <% definition_changes.each do |raw_change| %>
+            <% change =
+                raw_change.is_a?(Hash) ?
+                  raw_change :
+                  {}
+
+              change_key =
+                value_for.call(
+                  change,
+                  :key
+                ).to_s
+
+              change_type =
+                value_for.call(
+                  change,
+                  :type
+                ).to_s
+
+              change_left =
+                value_for.call(
+                  change,
+                  :left
+                )
+
+              change_right =
+                value_for.call(
+                  change,
+                  :right
+                ) %>
+
+            <div class="p-5 sm:p-6">
+              <div
+                class="
+                  flex flex-col gap-4 lg:flex-row lg:items-center
+                  lg:justify-between
+                "
+              >
+                <div>
+                  <div class="font-mono text-sm font-black text-gray-900 dark:text-white">
+                    <%= change_key.presence || "(unknown key)" %>
+                  </div>
+
+                  <div class="mt-1 text-xs font-semibold text-gray-400">
+                    <%= change_type.presence || "changed" %>
+                  </div>
+                </div>
+
+                <div>
+                  <% case change_type %>
+                  <% when "added" %>
+                    <span
+                      class="
+                        rounded-full
+                        bg-emerald-50
+                        px-3
+                        py-1.5
+                        text-[10px]
+                        font-black
+                        uppercase
+                        text-emerald-700
+                      "
+                    >
+                      Added
+                    </span>
+                  <% when "removed" %>
+                    <span
+                      class="
+                        rounded-full bg-red-50 px-3 py-1.5 text-[10px]
+                        font-black uppercase text-red-700
+                      "
+                    >
+                      Removed
+                    </span>
+                  <% when "changed" %>
+                    <span
+                      class="
+                        rounded-full
+                        bg-amber-50
+                        px-3
+                        py-1.5
+                        text-[10px]
+                        font-black
+                        uppercase
+                        text-amber-700
+                      "
+                    >
+                      Changed
+                    </span>
+                  <% else %>
+                    <span
+                      class="
+                        rounded-full
+                        bg-gray-50
+                        px-3
+                        py-1.5
+                        text-[10px]
+                        font-black
+                        uppercase
+                        text-gray-500
+                      "
+                    >
+                      <%= change_type.presence || "Unknown" %>
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+
+              <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <div
+                    class="
+                      mb-2 text-[9px] font-black uppercase tracking-wider
+                      text-sky-500
+                    "
+                  >
+                    Version A
+                  </div>
+
+                  <pre
+                    class="
+                      max-h-72
+                      overflow-auto
+                      rounded-xl
+                      bg-gray-950
+                      p-4
+                      font-mono
+                      text-xs
+                      leading-5
+                      text-sky-300
+                    "
+                  ><%= pretty_json.call(change_left) %></pre>
+                </div>
+
+                <div>
+                  <div
+                    class="
+                      mb-2 text-[9px] font-black uppercase tracking-wider
+                      text-violet-500
+                    "
+                  >
+                    Version B
+                  </div>
+
+                  <pre
+                    class="
+                      max-h-72
+                      overflow-auto
+                      rounded-xl
+                      bg-gray-950
+                      p-4
+                      font-mono
+                      text-xs
+                      leading-5
+                      text-violet-300
+                    "
+                  ><%= pretty_json.call(change_right) %></pre>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <%#
+    =========================================================================
+    DEBUG INFORMATION
+    =========================================================================
+  %>
+
+  <details
+    class="
+      mt-8
+      overflow-hidden
+      rounded-[24px]
+      border
+      border-gray-200
+      bg-gray-50
+      dark:border-gray-700
+      dark:bg-gray-900
+    "
+  >
+    <summary
+      class="
+        cursor-pointer
+        px-6
+        py-4
+        text-xs
+        font-black
+        uppercase
+        tracking-wider
+        text-gray-500
+        hover:text-violet-500
+      "
+    >
+      Debug comparison payload
+    </summary>
+
+    <div class="border-t border-gray-200 p-5 dark:border-gray-700">
+      <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <div>
+          <div
+            class="
+              mb-2 text-[10px] font-black uppercase tracking-wider
+              text-gray-400
+            "
+          >
+            Field Changes Ruby Object
+          </div>
+
+          <pre
+            class="
+              max-h-96
+              overflow-auto
+              rounded-xl
+              bg-gray-950
+              p-4
+              font-mono
+              text-xs
+              leading-5
+              text-emerald-300
+            "
+          ><%= pretty_json.call(field_changes) %></pre>
+        </div>
+
+        <div>
+          <div
+            class="
+              mb-2 text-[10px] font-black uppercase tracking-wider
+              text-gray-400
+            "
+          >
+            Comparison Summary
+          </div>
+
+          <pre
+            class="
+              max-h-96
+              overflow-auto
+              rounded-xl
+              bg-gray-950
+              p-4
+              font-mono
+              text-xs
+              leading-5
+              text-violet-300
+            "
+          ><%= pretty_json.call(comparison_summary) %></pre>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <%#
+    =========================================================================
     FOOTER
-    ==========================================================================
+    =========================================================================
   %>
 
   <div
     class="
-      mt-8 flex flex-col gap-3 border-t-2 border-gray-100 pt-5 sm:flex-row
-      sm:items-center sm:justify-between dark:border-gray-800
+      mt-8
+      flex
+      flex-col
+      gap-3
+      border-t-2
+      border-gray-100
+      pt-5
+      sm:flex-row
+      sm:items-center
+      sm:justify-between
+      dark:border-gray-800
     "
   >
     <div class="font-mono text-[10px] font-bold uppercase tracking-wider text-gray-400">
       ENTITY_TEMPLATE_VERSION :: COMPARE ::
-      <% if defined?(@left_version) && @left_version.present? %>
+      <% if defined?(@left_version) &&
+        @left_version.present? %>
         <%= @left_version.id %>
       <% else %>
         —
       <% end %>
       ↔
-      <% if defined?(@right_version) && @right_version.present? %>
+      <% if defined?(@right_version) &&
+        @right_version.present? %>
         <%= @right_version.id %>
       <% else %>
         —

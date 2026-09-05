@@ -2,28 +2,62 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
     static targets = [
-        "field",
         "search",
         "filter",
-        "count",
-        "rawLeft",
-        "rawRight"
+        "field",
+        "count"
     ]
+
+    static values = {
+        fields: Array
+    }
 
     connect() {
         this.currentFilter = "all"
         this.currentSearch = ""
 
+        this.expanded = new Set()
+
         this.applyFilters()
+        this.updateVisibleCount()
+
+        console.log(
+            "entity_template_version_compare connected"
+        )
+
+        console.log("Fields:", this.fieldsValue)
+
+        console.log(
+            "comparison fields:",
+            this.hasFieldTarget
+                ? this.fieldTargets.length
+                : 0
+        )
+
+        console.log("========== COMPARE DEBUG ==========")
+
+        console.log("Controller:", this)
+        console.log("Element:", this.element)
+        console.log("Count target:", this.countTarget)
+        console.log("Fields:", this.fieldsValue)
+
+        console.log("===================================")
     }
 
-    // ============================================================
-    // SEARCH
-    // ============================================================
+    disconnect() {
+        this.expanded.clear()
+    }
 
-    searchChanged() {
+
+    // ========================================================================
+    // SEARCH
+    // ========================================================================
+
+    searchChanged(event) {
         this.currentSearch =
-            this.searchTarget.value
+            String(
+                event?.target?.value || ""
+            )
                 .trim()
                 .toLowerCase()
 
@@ -31,136 +65,200 @@ export default class extends Controller {
     }
 
 
-    // ============================================================
+    // ========================================================================
     // FILTER
-    // ============================================================
+    // ========================================================================
 
     filterChanged(event) {
-        this.currentFilter =
-            event.currentTarget.dataset.filter
+        const filter =
+            event?.currentTarget?.dataset?.filter || "all"
+
+        this.currentFilter = filter
 
         this.updateFilterButtons()
+
         this.applyFilters()
     }
 
 
-    // ============================================================
+    // ========================================================================
     // APPLY FILTERS
-    // ============================================================
+    // ========================================================================
 
     applyFilters() {
+        if (!this.hasFieldTarget) {
+            this.updateVisibleCount()
+            return
+        }
 
-        let visible = 0
+        let visibleCount = 0
 
-
-        this.fieldTargets.forEach((field) => {
-
-            const type =
-                field.dataset.changeType || "unchanged"
-
-            const name =
-                field.dataset.fieldName || ""
-
-
+        this.fieldTargets.forEach(field => {
             const matchesFilter =
-                this.currentFilter === "all" ||
-                type === this.currentFilter
-
+                this.matchesFilter(field)
 
             const matchesSearch =
-                this.currentSearch === "" ||
-                name.includes(this.currentSearch) ||
-                field.innerText
-                    .toLowerCase()
-                    .includes(this.currentSearch)
+                this.matchesSearch(field)
 
-
-            const show =
+            const visible =
                 matchesFilter &&
                 matchesSearch
 
-
-            field.classList.toggle(
-                "hidden",
-                !show
-            )
-
-
-            if (show) {
-                visible += 1
+            if (visible) {
+                field.classList.remove("hidden")
+                visibleCount += 1
+            } else {
+                field.classList.add("hidden")
             }
-
         })
 
-
-        this.updateCount(
-            visible
-        )
-
+        this.updateVisibleCount(visibleCount)
     }
 
 
-    // ============================================================
-    // COUNT
-    // ============================================================
+    // ========================================================================
+    // FILTER MATCH
+    // ========================================================================
 
-    updateCount(count) {
+    matchesFilter(field) {
+        if (this.currentFilter === "all") {
+            return true
+        }
 
+        const changeType =
+            String(
+                field.dataset.changeType || ""
+            )
+                .trim()
+                .toLowerCase()
+
+        return (
+            changeType ===
+            this.currentFilter
+        )
+    }
+
+
+    // ========================================================================
+    // SEARCH MATCH
+    // ========================================================================
+
+    matchesSearch(field) {
+        if (!this.currentSearch) {
+            return true
+        }
+
+        const fieldName =
+            String(
+                field.dataset.fieldName || ""
+            )
+                .toLowerCase()
+
+        const fieldText =
+            String(
+                field.textContent || ""
+            )
+                .toLowerCase()
+
+        return (
+            fieldName.includes(
+                this.currentSearch
+            ) ||
+            fieldText.includes(
+                this.currentSearch
+            )
+        )
+    }
+
+
+    // ========================================================================
+    // FILTER BUTTON UI
+    // ========================================================================
+
+    updateFilterButtons() {
+        if (!this.hasFilterTarget) {
+            return
+        }
+
+        this.filterTargets.forEach(button => {
+            const filter =
+                button.dataset.filter || "all"
+
+            const active =
+                filter === this.currentFilter
+
+            if (active) {
+                this.activateFilterButton(button)
+            } else {
+                this.deactivateFilterButton(button)
+            }
+        })
+    }
+
+
+    activateFilterButton(button) {
+        button.classList.add(
+            "ring-2",
+            "ring-violet-500",
+            "ring-offset-1"
+        )
+
+        button.setAttribute(
+            "aria-pressed",
+            "true"
+        )
+    }
+
+
+    deactivateFilterButton(button) {
+        button.classList.remove(
+            "ring-2",
+            "ring-violet-500",
+            "ring-offset-1"
+        )
+
+        button.setAttribute(
+            "aria-pressed",
+            "false"
+        )
+    }
+
+
+    // ========================================================================
+    // VISIBLE COUNT
+    // ========================================================================
+
+    updateVisibleCount(explicitCount = null) {
         if (!this.hasCountTarget) {
             return
         }
 
+        const count =
+            explicitCount !== null
+                ? explicitCount
+                : this.hasFieldTarget
+                    ? this.fieldTargets.filter(
+                        field =>
+                            !field.classList.contains(
+                                "hidden"
+                            )
+                    ).length
+                    : 0
 
         this.countTarget.textContent =
-            `${count} field${count === 1 ? "" : "s"}`
-
+            `${count} ${
+                count === 1
+                    ? "field"
+                    : "fields"
+            }`
     }
 
 
-    // ============================================================
-    // FILTER BUTTONS
-    // ============================================================
-
-    updateFilterButtons() {
-
-        this.filterTargets.forEach((button) => {
-
-            const active =
-                button.dataset.filter ===
-                this.currentFilter
-
-
-            button.classList.toggle(
-                "bg-gray-900",
-                active
-            )
-
-            button.classList.toggle(
-                "text-white",
-                active
-            )
-
-            button.classList.toggle(
-                "bg-white",
-                !active
-            )
-
-            button.classList.toggle(
-                "text-gray-700",
-                !active
-            )
-
-        })
-
-    }
-
-
-    // ============================================================
-    // EXPAND / COLLAPSE
-    // ============================================================
+    // ========================================================================
+    // TOGGLE FIELD DETAILS
+    // ========================================================================
 
     toggle(event) {
-
         const button =
             event.currentTarget
 
@@ -171,149 +269,247 @@ export default class extends Controller {
             return
         }
 
-
-        const element =
+        const details =
             document.getElementById(
                 targetId
             )
 
-        if (!element) {
+        if (!details) {
+            console.warn(
+                "Comparison details element not found:",
+                targetId
+            )
+
             return
         }
 
-
-        element.classList.toggle(
-            "hidden"
-        )
-
-
-        const expanded =
-            !element.classList.contains(
+        const isHidden =
+            details.classList.contains(
                 "hidden"
             )
 
+        if (isHidden) {
+            this.expandDetails(
+                button,
+                details
+            )
+        } else {
+            this.collapseDetails(
+                button,
+                details
+            )
+        }
+    }
+
+
+    // ========================================================================
+    // EXPAND
+    // ========================================================================
+
+    expandDetails(button, details) {
+        details.classList.remove(
+            "hidden"
+        )
 
         button.setAttribute(
             "aria-expanded",
-            expanded
+            "true"
         )
 
+        this.setChevron(
+            button,
+            true
+        )
 
-        const icon =
+        const targetId =
+            details.id
+
+        if (targetId) {
+            this.expanded.add(
+                targetId
+            )
+        }
+    }
+
+
+    // ========================================================================
+    // COLLAPSE
+    // ========================================================================
+
+    collapseDetails(button, details) {
+        details.classList.add(
+            "hidden"
+        )
+
+        button.setAttribute(
+            "aria-expanded",
+            "false"
+        )
+
+        this.setChevron(
+            button,
+            false
+        )
+
+        const targetId =
+            details.id
+
+        if (targetId) {
+            this.expanded.delete(
+                targetId
+            )
+        }
+    }
+
+
+    // ========================================================================
+    // CHEVRON
+    // ========================================================================
+
+    setChevron(button, expanded) {
+        const chevron =
             button.querySelector(
                 "[data-chevron]"
             )
 
-
-        if (icon) {
-
-            icon.classList.toggle(
-                "rotate-180",
-                expanded
-            )
-
-        }
-
-    }
-
-
-    // ============================================================
-    // EXPAND ALL
-    // ============================================================
-
-    expandAll() {
-
-        document
-            .querySelectorAll(
-                "[data-compare-details]"
-            )
-            .forEach((element) => {
-
-                element.classList.remove(
-                    "hidden"
-                )
-
-            })
-
-    }
-
-
-    // ============================================================
-    // COLLAPSE ALL
-    // ============================================================
-
-    collapseAll() {
-
-        document
-            .querySelectorAll(
-                "[data-compare-details]"
-            )
-            .forEach((element) => {
-
-                element.classList.add(
-                    "hidden"
-                )
-
-            })
-
-    }
-
-
-    // ============================================================
-    // COPY
-    // ============================================================
-
-    async copy(event) {
-
-        const button =
-            event.currentTarget
-
-        const targetId =
-            button.dataset.copyTarget
-
-        const element =
-            document.getElementById(
-                targetId
-            )
-
-
-        if (!element) {
+        if (!chevron) {
             return
         }
 
-
-        try {
-
-            await navigator.clipboard.writeText(
-                element.textContent
+        if (expanded) {
+            chevron.classList.add(
+                "rotate-180"
             )
-
-
-            const original =
-                button.innerHTML
-
-
-            button.innerHTML =
-                "✓ Copied"
-
-
-            setTimeout(() => {
-
-                button.innerHTML =
-                    original
-
-            }, 1200)
-
-
-        } catch (error) {
-
-            console.error(
-                "Unable to copy definition",
-                error
+        } else {
+            chevron.classList.remove(
+                "rotate-180"
             )
-
         }
-
     }
 
+
+    // ========================================================================
+    // EXPAND ALL
+    // ========================================================================
+
+    expandAll() {
+        if (!this.hasFieldTarget) {
+            return
+        }
+
+        this.fieldTargets.forEach(field => {
+            if (
+                field.classList.contains(
+                    "hidden"
+                )
+            ) {
+                return
+            }
+
+            const details =
+                field.querySelector(
+                    "[data-compare-details]"
+                )
+
+            if (!details) {
+                return
+            }
+
+            const button =
+                field.querySelector(
+                    'button[data-target]'
+                )
+
+            if (!button) {
+                return
+            }
+
+            this.expandDetails(
+                button,
+                details
+            )
+        })
+    }
+
+
+    // ========================================================================
+    // COLLAPSE ALL
+    // ========================================================================
+
+    collapseAll() {
+        if (!this.hasFieldTarget) {
+            return
+        }
+
+        this.fieldTargets.forEach(field => {
+            const details =
+                field.querySelector(
+                    "[data-compare-details]"
+                )
+
+            if (!details) {
+                return
+            }
+
+            const button =
+                field.querySelector(
+                    'button[data-target]'
+                )
+
+            if (!button) {
+                return
+            }
+
+            this.collapseDetails(
+                button,
+                details
+            )
+        })
+    }
+
+
+    // ========================================================================
+    // PUBLIC HELPERS
+    // ========================================================================
+
+    showAll() {
+        this.currentFilter = "all"
+        this.currentSearch = ""
+
+        if (this.hasSearchTarget) {
+            this.searchTarget.value = ""
+        }
+
+        this.updateFilterButtons()
+        this.applyFilters()
+    }
+
+
+    filterAdded() {
+        this.setFilter("added")
+    }
+
+
+    filterRemoved() {
+        this.setFilter("removed")
+    }
+
+
+    filterChangedFields() {
+        this.setFilter("changed")
+    }
+
+
+    filterUnchanged() {
+        this.setFilter("unchanged")
+    }
+
+
+    setFilter(filter) {
+        this.currentFilter =
+            filter || "all"
+
+        this.updateFilterButtons()
+        this.applyFilters()
+    }
 }
