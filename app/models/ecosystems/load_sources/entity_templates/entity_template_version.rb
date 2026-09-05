@@ -1,4 +1,4 @@
-# app/models/entity_template_version.rb
+# app/models/ecosystems/load_sources/entity_templates/entity_template_version.rb
 
 class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < ApplicationRecord
 
@@ -13,13 +13,17 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
   belongs_to :entity_template,
              class_name:
                "Ecosystems::LoadSources::EntityTemplates::EntityTemplate",
-             foreign_key: :entity_template_id
+             inverse_of:
+               :entity_template_versions
+
 
   has_many :entity_template_fields,
            class_name:
              "Ecosystems::LoadSources::EntityTemplates::EntityTemplateField",
            foreign_key: :entity_template_version_id,
+           inverse_of: :entity_template_version,
            dependent: :destroy
+
 
   # ============================================================
   # ENUMS
@@ -54,27 +58,8 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
   validates :definition,
             presence: true
 
+
   validate :definition_must_be_valid
-
-
-  # ============================================================
-  # SCOPES
-  # ============================================================
-
-  scope :latest_first,
-        -> { order(version: :desc) }
-
-  scope :oldest_first,
-        -> { order(version: :asc) }
-
-  scope :published_versions,
-        -> { where(status: "published") }
-
-  scope :draft_versions,
-        -> { where(status: "draft") }
-
-  scope :archived_versions,
-        -> { where(status: "archived") }
 
 
   # ============================================================
@@ -89,14 +74,54 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
 
 
   # ============================================================
+  # SCOPES
+  # ============================================================
+
+  scope :latest_first,
+        -> {
+          order(
+            version: :desc
+          )
+        }
+
+  scope :oldest_first,
+        -> {
+          order(
+            version: :asc
+          )
+        }
+
+  scope :published_versions,
+        -> {
+          where(
+            status: "published"
+          )
+        }
+
+  scope :draft_versions,
+        -> {
+          where(
+            status: "draft"
+          )
+        }
+
+  scope :archived_versions,
+        -> {
+          where(
+            status: "archived"
+          )
+        }
+
+
+  # ============================================================
   # VERSION HELPERS
   # ============================================================
 
   def latest?
     version ==
-      self.class
-          .where(entity_template_id: entity_template_id)
-          .maximum(:version)
+      entity_template
+        .entity_template_versions
+        .maximum(:version)
   end
 
 
@@ -115,15 +140,11 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
   end
 
 
-  # ============================================================
-  # VERSION NUMBERING
-  # ============================================================
-
   def next_version_number
-    self.class
-        .where(entity_template_id: entity_template_id)
-        .maximum(:version)
-        .to_i + 1
+    entity_template
+      .entity_template_versions
+      .maximum(:version)
+      .to_i + 1
   end
 
 
@@ -134,16 +155,18 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
   def publish!
     transaction do
 
-      self.class
-          .where(
-            entity_template_id: entity_template_id,
-            status: "published"
-          )
-          .where.not(id: id)
-          .update_all(
-            status: "archived",
-            updated_at: Time.current
-          )
+      entity_template
+        .entity_template_versions
+        .where(
+          status: "published"
+        )
+        .where.not(
+        id: id
+      )
+        .update_all(
+          status: "archived",
+          updated_at: Time.current
+        )
 
       update!(
         status: "published",
@@ -163,9 +186,11 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
           "Only a published version can be archived." unless published?
 
     transaction do
+
       update!(
         status: "archived"
       )
+
     end
   end
 
@@ -176,13 +201,14 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
 
   def create_next_version!(created_by_id: nil)
 
-    self.class.create!(
-      entity_template_id: entity_template_id,
-      version: next_version_number,
-      status: "draft",
-      definition: definition.deep_dup,
-      created_by_id: created_by_id
-    )
+    entity_template
+      .entity_template_versions
+      .create!(
+        version: next_version_number,
+        status: "draft",
+        definition: definition.deep_dup,
+        created_by_id: created_by_id
+      )
 
   end
 
@@ -192,12 +218,24 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
   # ============================================================
 
   def sections
-    definition.fetch("sections", [])
+    definition.fetch(
+      "sections",
+      []
+    )
   end
 
 
   def fields
-    definition.fetch("fields", [])
+
+    sections.flat_map do |section|
+
+      section.fetch(
+        "fields",
+        []
+      )
+
+    end
+
   end
 
 
@@ -225,68 +263,62 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
   end
 
 
-  private
-
-
   # ============================================================
-  # DEFINITION VALIDATION
+  # VALIDATION
   # ============================================================
 
   def definition_must_be_valid
 
     unless definition.is_a?(Hash)
+
       errors.add(
         :definition,
         "must be an object"
       )
 
       return
+
     end
 
-    unless definition["fields"].is_a?(Array)
+    # We allow either:
+    #
+    # {
+    #   "fields" => [...]
+    # }
+    #
+    # or:
+    #
+    # {
+    #   "sections" => [...]
+    # }
+    #
+    # because your application currently appears to use
+    # both concepts.
+
+    if definition.key?("fields") &&
+      !definition["fields"].is_a?(Array)
+
       errors.add(
         :definition,
-        "must contain fields"
+        "fields must be an array"
       )
 
-      return
     end
 
-    definition["fields"].each_with_index do |field, index|
+    if definition.key?("sections") &&
+      !definition["sections"].is_a?(Array)
 
-      unless field.is_a?(Hash)
-        errors.add(
-          :definition,
-          "field #{index + 1} must be an object"
-        )
-
-        next
-      end
-
-      if field["name"].blank?
-        errors.add(
-          :definition,
-          "field #{index + 1} must have a name"
-        )
-      end
-
-      if field["label"].blank?
-        errors.add(
-          :definition,
-          "field #{index + 1} must have a label"
-        )
-      end
-
-      if field["type"].blank?
-        errors.add(
-          :definition,
-          "field #{index + 1} must have a type"
-        )
-      end
+      errors.add(
+        :definition,
+        "sections must be an array"
+      )
 
     end
 
   end
+
+
+  private
 
 
   # ============================================================
@@ -295,15 +327,13 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
 
   def assign_version_number
 
-    return if entity_template_id.blank?
+    return if entity_template.blank?
 
     self.version =
-      self.class
-          .where(
-            entity_template_id: entity_template_id
-          )
-          .maximum(:version)
-          .to_i + 1
+      entity_template
+        .entity_template_versions
+        .maximum(:version)
+        .to_i + 1
 
   end
 
@@ -314,7 +344,14 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
 
   def normalize_definition
 
-    self.definition = {} if definition.nil?
+    self.definition =
+      if definition.nil?
+        {}
+      elsif definition.respond_to?(:deep_stringify_keys)
+        definition.deep_stringify_keys
+      else
+        definition
+      end
 
   end
 

@@ -417,6 +417,9 @@ application.register("entity_template_definition_builder", EntityTemplateDefinit
 import EntityTemplateLibraryController from "./admin/ecosystems/load_sources/entity_templates/definitions/entity_template_library_controller"
 application.register("entity_template_library", EntityTemplateLibraryController)
 
+import EntityTemplateVersionCompareController from "./admin/ecosystems/load_sources/entity_templates/entity_template_versions/entity_template_version_compare_controller"
+application.register("entity-template-version-compare", EntityTemplateVersionCompareController)
+
 
 
 

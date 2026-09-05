@@ -21,7 +21,10 @@ module Ecosystems
       ].freeze
 
         belongs_to :entity_template_version,
-                   class_name: "Ecosystems::LoadSources::EntityTemplateVersion"
+                   class_name:
+                     "Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion",
+                   foreign_key: :entity_template_version_id,
+                   inverse_of: :entity_template_fields
 
         validates :name, presence: true
         validates :slug, presence: true

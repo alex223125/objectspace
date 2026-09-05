@@ -306,9 +306,15 @@ module Admin
           # COMPARE
           # ============================================================
 
+          # ============================================================
+          # COMPARE
+          # ============================================================
+
           def compare
+
             @entity_template =
               @entity_template_version.entity_template
+
 
             @versions =
               @entity_template
@@ -318,25 +324,41 @@ module Admin
                   created_at: :desc
                 )
 
+
             @left_version =
               if params[:left_id].present?
-                @versions.find_by(id: params[:left_id])
+
+                @versions.find_by(
+                  id: params[:left_id]
+                )
+
               else
+
                 @entity_template_version
+
               end
+
 
             @right_version =
               if params[:right_id].present?
-                @versions.find_by(id: params[:right_id])
+
+                @versions.find_by(
+                  id: params[:right_id]
+                )
+
               else
+
                 @versions
                   .where.not(
-                  id: @left_version.id
+                  id: @left_version&.id
                 )
                   .first
+
               end
 
-            if @left_version.nil? || @right_version.nil?
+
+            if @left_version.nil? ||
+              @right_version.nil?
 
               redirect_to(
                 admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
@@ -347,7 +369,9 @@ module Admin
               )
 
               return
+
             end
+
 
             unless @left_version.entity_template_id ==
               @right_version.entity_template_id
@@ -361,23 +385,41 @@ module Admin
               )
 
               return
+
             end
+
+            @comparison =
+              Services::Admin::Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersionComparator
+                .new(
+                  @left_version,
+                  @right_version
+                )
+                .compare
+
+
+            @field_changes =
+              @comparison[:fields]
+
+
+            @definition_changes =
+              @comparison[:definition]
+
+
+            @comparison_summary =
+              @comparison[:summary]
+
 
             @left_definition =
               normalize_definition(
                 @left_version.definition
               )
 
+
             @right_definition =
               normalize_definition(
                 @right_version.definition
               )
 
-            @definition_changes =
-              build_definition_changes(
-                @left_definition,
-                @right_definition
-              )
 
             content =
               render_to_string(
@@ -385,6 +427,7 @@ module Admin
                   "admin/ecosystems/load_sources/entity_templates/entity_template_versions/compare",
                 layout: false
               )
+
 
             render(
               template:
@@ -394,6 +437,7 @@ module Admin
                 content: content
               }
             )
+
           end
 
 
