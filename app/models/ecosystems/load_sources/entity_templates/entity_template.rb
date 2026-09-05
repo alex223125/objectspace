@@ -15,6 +15,10 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplate < ApplicationReco
            foreign_key: :entity_template_id,
            dependent: :destroy
 
+  def entity_template_versions
+    self.versions
+  end
+
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true
   validates :entity_type, presence: true

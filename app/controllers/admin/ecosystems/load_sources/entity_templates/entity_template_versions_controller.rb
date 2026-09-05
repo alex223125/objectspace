@@ -378,6 +378,22 @@ module Admin
                 @left_definition,
                 @right_definition
               )
+
+            content =
+              render_to_string(
+                template:
+                  "admin/ecosystems/load_sources/entity_templates/entity_template_versions/compare",
+                layout: false
+              )
+
+            render(
+              template:
+                "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
+              layout: false,
+              locals: {
+                content: content
+              }
+            )
           end
 
 
