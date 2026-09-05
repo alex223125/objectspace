@@ -1,0 +1,97 @@
+module Admin
+  module Ecosystems
+    module LoadSources
+      module EntityTemplates
+        class EntityTemplateFieldsController <::AdminController
+  before_action :set_entity_template_version
+  before_action :set_entity_template_field, only: %i[
+    edit
+    update
+    destroy
+  ]
+
+  def index
+    @entity_template_fields =
+      @entity_template_version
+        .entity_template_fields
+        .ordered
+  end
+
+  def new
+    @entity_template_field =
+      @entity_template_version
+        .entity_template_fields
+        .new(
+          position: @entity_template_version.entity_template_fields.maximum(:position).to_i + 1
+        )
+  end
+
+  def create
+    @entity_template_field =
+      @entity_template_version
+        .entity_template_fields
+        .new(entity_template_field_params)
+
+    if @entity_template_field.save
+      redirect_to entity_template_version_path(@entity_template_version),
+                  notice: "Template field created."
+    else
+      render :new, status: :unprocessable_entity
+    end
+  end
+
+  def edit
+  end
+
+  def update
+    if @entity_template_field.update(entity_template_field_params)
+      redirect_to entity_template_version_path(@entity_template_version),
+                  notice: "Template field updated."
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
+  def destroy
+    @entity_template_field.destroy
+
+    redirect_to entity_template_version_path(@entity_template_version),
+                notice: "Template field removed."
+  end
+
+  private
+
+  def set_entity_template_version
+    @entity_template_version =
+      Ecosystems::LoadSources::EntityTemplateVersion.find(
+        params[:entity_template_version_id]
+      )
+  end
+
+  def set_entity_template_field
+    @entity_template_field =
+      @entity_template_version.entity_template_fields.find(
+        params[:id]
+      )
+  end
+
+  def entity_template_field_params
+    params.require(:entity_template_field).permit(
+      :name,
+      :slug,
+      :label,
+      :description,
+      :field_type,
+      :required,
+      :multiple,
+      :position,
+      :active,
+      settings: {}
+    )
+  end
+        end
+      end
+    end
+  end
+end
+

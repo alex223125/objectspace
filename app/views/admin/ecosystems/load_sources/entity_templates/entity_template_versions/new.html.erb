@@ -1,176 +1,94 @@
 <%# ============================================================================
 ENTITY TEMPLATE VERSION — NEW
+
 Path:
 app/views/admin/ecosystems/load_sources/entity_templates/entity_template_versions/new.html.erb
+
+Stimulus controller:
+entity_template_definition_builder
 ============================================================================ %>
 
-<div class="mx-auto w-full max-w-5xl px-5 py-8 sm:px-7 lg:px-10">
+<div class="mx-auto w-full max-w-6xl px-5 py-8 sm:px-7 lg:px-10" data-controller="entity_template_definition_builder" >
 <%# ================================================================ %>
 <%# HEADER %>
 <%# ================================================================ %>
 
-  <div class="mb-8">
-    <div class="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+  <div class="mb-8"> <div class="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+    <div>
 
-      <div>
+      <div class="flex items-center gap-3">
 
-        <div class="flex items-center gap-3">
-
-          <div
-            class="
-          flex h-12 w-12 items-center justify-center
-          rounded-2xl
-          border border-violet-200
-          bg-violet-100
-          text-2xl
-          shadow-sm
-        ">
-            🧬
-          </div>
-
-          <div>
-
-            <div
-              class="
-            text-[11px]
-            font-black
-            uppercase
-            tracking-[0.2em]
-            text-violet-500
-          ">
-              Entity Template System
-            </div>
-
-            <h1
-              class="
-            mt-1
-            text-3xl
-            font-black
-            tracking-tight
-            text-gray-900
-            dark:text-white
-          ">
-              Create Template Version
-            </h1>
-
-            <p
-              class="
-            mt-2
-            max-w-2xl
-            text-sm
-            leading-6
-            text-gray-500
-            dark:text-gray-400
-          ">
-              Create a new version of an Entity Template without changing
-              previously published versions.
-            </p>
-
-          </div>
-
+        <div class="flex h-12 w-12 items-center justify-center rounded-2xl border border-violet-200 bg-violet-100 text-2xl shadow-sm">
+          🧬
         </div>
 
-        <%# BREADCRUMB %>
+        <div>
 
-        <div
-          class="
-        mt-4
-        flex
-        flex-wrap
-        items-center
-        gap-2
-        text-xs
-        text-gray-400
-      ">
+          <div class="text-[11px] font-black uppercase tracking-[0.2em] text-violet-500">
+            Entity Template System
+          </div>
 
-          <span>Ecosystems</span>
-          <span>›</span>
-          <span>Load Sources</span>
-          <span>›</span>
-          <span>Entity Templates</span>
-          <span>›</span>
-          <span>Versions</span>
-          <span>›</span>
+          <h1 class="mt-1 text-3xl font-black tracking-tight text-gray-900 dark:text-white">
+            Create Template Version
+          </h1>
 
-          <span class="font-semibold text-violet-500">
-        New Version
-      </span>
+          <p class="mt-2 max-w-2xl text-sm leading-6 text-gray-500 dark:text-gray-400">
+            Create a new version of an Entity Template without changing
+            previously published versions.
+          </p>
 
         </div>
 
       </div>
 
-      <%# BACK %>
+      <div class="mt-4 flex flex-wrap items-center gap-2 text-xs text-gray-400">
+        <span>Ecosystems</span>
+        <span>›</span>
+        <span>Load Sources</span>
+        <span>›</span>
+        <span>Entity Templates</span>
+        <span>›</span>
+        <span>Versions</span>
+        <span>›</span>
 
-      <%= link_to(
-            admin_ecosystems_load_sources_entity_templates_entity_template_versions_path,
-            class: "
-          inline-flex shrink-0 items-center justify-center gap-2
-          rounded-xl
-          border border-gray-200
-          bg-white
-          px-5 py-3
-          text-sm font-semibold
-          text-gray-700
-          shadow-sm
-          transition
-          hover:border-violet-200
-          hover:bg-violet-50
-          hover:text-violet-700
-          dark:border-gray-700
-          dark:bg-gray-800
-          dark:text-gray-300
-        "
-          ) do %>
-
-        <span>←</span>
-        Back to Versions
-
-      <% end %>
+        <span class="font-semibold text-violet-500">
+        New Version
+      </span>
+      </div>
 
     </div>
+
+    <%= link_to(
+          admin_ecosystems_load_sources_entity_templates_entity_template_versions_path,
+          class: "inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+        ) do %>
+
+      <span>←</span>
+      Back to Versions
+
+    <% end %>
+
+  </div>
 
   </div>
 <%# ================================================================ %>
 <%# EXPLANATION %>
 <%# ================================================================ %>
 
-  <div class=" mb-8 rounded-[24px] border-2 border-violet-100 bg-gradient-to-r from-violet-50 via-white to-indigo-50 p-6 shadow-sm shadow-violet-100/50 ">
+  <div class="mb-8 rounded-[24px] border-2 border-violet-100 bg-gradient-to-r from-violet-50 via-white to-indigo-50 p-6 shadow-sm shadow-violet-100/50">
     <div class="flex items-start gap-4">
 
-      <div
-        class="
-      flex h-11 w-11 shrink-0
-      items-center justify-center
-      rounded-2xl
-      border border-violet-200
-      bg-violet-100
-      text-xl
-    ">
+      <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-violet-200 bg-violet-100 text-xl">
         💡
       </div>
 
       <div>
 
-        <div
-          class="
-        text-[11px]
-        font-black
-        uppercase
-        tracking-[0.18em]
-        text-violet-600
-      ">
+        <div class="text-[11px] font-black uppercase tracking-[0.18em] text-violet-600">
           Version Protocol
         </div>
 
-        <p
-          class="
-        mt-2
-        text-sm
-        leading-6
-        text-gray-600
-        dark:text-gray-300
-      ">
+        <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">
           A version is a preserved snapshot of a template's structure.
           When the structure changes significantly, create a new version
           instead of silently modifying the old one.
@@ -188,23 +106,21 @@ app/views/admin/ecosystems/load_sources/entity_templates/entity_template_version
   <%= form_with(
         model: @entity_template_version,
         url: admin_ecosystems_load_sources_entity_templates_entity_template_versions_path,
-        class: "space-y-8"
+        method: :post,
+        local: true,
+        class: "space-y-8",
+        data: {
+          action: "submit->entity_template_definition_builder#beforeSubmit"
+        }
       ) do |form| %>
 
+<%# ============================================================ %>
 <%# ERRORS %>
+<%# ============================================================ %>
 
     <% if @entity_template_version.errors.any? %>
 
-      <div
-        class="
-      rounded-2xl
-      border-2
-      border-red-100
-      bg-red-50
-      p-5
-      text-sm
-      text-red-700
-    ">
+      <div class="rounded-2xl border-2 border-red-100 bg-red-50 p-5 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-300">
 
         <div class="font-black">
           Please correct the following:
@@ -223,53 +139,22 @@ app/views/admin/ecosystems/load_sources/entity_templates/entity_template_version
     <% end %>
 
 <%# ============================================================ %>
-<%# TEMPLATE %>
+<%# STEP 01 — ENTITY TEMPLATE %>
 <%# ============================================================ %>
 
-    <div
-      class="
-    rounded-[24px]
-    border
-    border-gray-200
-    bg-white
-    p-6
-    shadow-sm
-    dark:border-gray-800
-    dark:bg-gray-800
-  ">
+    <div class="rounded-[24px] border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-800">
 
       <div class="mb-6">
 
-        <div
-          class="
-        text-[11px]
-        font-black
-        uppercase
-        tracking-[0.18em]
-        text-indigo-500
-      ">
+        <div class="text-[11px] font-black uppercase tracking-[0.18em] text-indigo-500">
           Step 01
         </div>
 
-        <h2
-          class="
-        mt-1
-        text-xl
-        font-black
-        text-gray-900
-        dark:text-white
-      ">
+        <h2 class="mt-1 text-xl font-black text-gray-900 dark:text-white">
           Choose the Entity Template
         </h2>
 
-        <p
-          class="
-        mt-2
-        text-sm
-        leading-6
-        text-gray-500
-        dark:text-gray-400
-      ">
+        <p class="mt-2 text-sm leading-6 text-gray-500 dark:text-gray-400">
           Every version belongs to one Entity Template.
         </p>
 
@@ -280,12 +165,7 @@ app/views/admin/ecosystems/load_sources/entity_templates/entity_template_version
         <%= form.label(
               :entity_template_id,
               "Entity Template",
-              class: "
-            mb-2 block
-            text-sm font-bold
-            text-gray-700
-            dark:text-gray-300
-          "
+              class: "mb-2 block text-sm font-bold text-gray-700 dark:text-gray-300"
             ) %>
 
         <%= form.collection_select(
@@ -295,285 +175,84 @@ app/views/admin/ecosystems/load_sources/entity_templates/entity_template_version
               :name,
               { prompt: "Select an entity template..." },
               {
-                class: "
-              block w-full
-              rounded-xl
-              border border-gray-300
-              bg-gray-50
-              px-4 py-3
-              text-sm
-              text-gray-900
-              focus:border-violet-500
-              focus:outline-none
-              focus:ring-2
-              focus:ring-violet-500
-              dark:border-gray-700
-              dark:bg-gray-900
-              dark:text-white
-            "
+                class: "block w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-900 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
               }
             ) %>
+
+        <p class="mt-2 text-xs text-gray-400">
+          Select the parent Entity Template for this version.
+        </p>
 
       </div>
 
     </div>
 
 <%# ============================================================ %>
-<%# VERSION INFORMATION %>
+<%# STEP 02 — VERSION INFORMATION %>
 <%# ============================================================ %>
 
-    <div
-      class="
-    rounded-[24px]
-    border
-    border-gray-200
-    bg-white
-    p-6
-    shadow-sm
-    dark:border-gray-800
-    dark:bg-gray-800
-  ">
+    <div class="rounded-[24px] border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-800">
 
       <div class="mb-6">
 
-        <div
-          class="
-        text-[11px]
-        font-black
-        uppercase
-        tracking-[0.18em]
-        text-violet-500
-      ">
+        <div class="text-[11px] font-black uppercase tracking-[0.18em] text-violet-500">
           Step 02
         </div>
 
-        <h2
-          class="
-        mt-1
-        text-xl
-        font-black
-        text-gray-900
-        dark:text-white
-      ">
+        <h2 class="mt-1 text-xl font-black text-gray-900 dark:text-white">
           Version Identity
         </h2>
 
-        <p
-          class="
-        mt-2
-        text-sm
-        leading-6
-        text-gray-500
-        dark:text-gray-400
-      ">
-          Give this version a clear identity so administrators can
-          understand what changed.
+        <p class="mt-2 text-sm leading-6 text-gray-500 dark:text-gray-400">
+          Define the revision number and lifecycle state of this version.
         </p>
 
       </div>
 
       <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 
-        <%# VERSION NUMBER %>
-
         <div>
 
           <%= form.label(
                 :version,
                 "Version",
-                class: "
-              mb-2 block
-              text-sm font-bold
-              text-gray-700
-              dark:text-gray-300
-            "
+                class: "mb-2 block text-sm font-bold text-gray-700 dark:text-gray-300"
               ) %>
 
-          <%= form.text_field(
+          <%= form.number_field(
                 :version,
-                placeholder: "1.0",
-                class: "
-              block w-full
-              rounded-xl
-              border border-gray-300
-              bg-gray-50
-              px-4 py-3
-              text-sm
-              font-mono
-              text-gray-900
-              focus:border-violet-500
-              focus:outline-none
-              focus:ring-2
-              focus:ring-violet-500
-              dark:border-gray-700
-              dark:bg-gray-900
-              dark:text-white
-            "
+                min: 1,
+                placeholder: "1",
+                class: "block w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-3 text-sm font-mono text-gray-900 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
               ) %>
 
           <p class="mt-2 text-xs text-gray-400">
-            Example: 1.0, 1.1, 2.0
+            Example: 1, 2, 3.
           </p>
 
         </div>
-
-
-        <%# NAME %>
 
         <div>
 
           <%= form.label(
-                :name,
-                "Version Name",
-                class: "
-              mb-2 block
-              text-sm font-bold
-              text-gray-700
-              dark:text-gray-300
-            "
+                :status,
+                "Status",
+                class: "mb-2 block text-sm font-bold text-gray-700 dark:text-gray-300"
               ) %>
 
-          <%= form.text_field(
-                :name,
-                placeholder: "Initial structure",
-                class: "
-              block w-full
-              rounded-xl
-              border border-gray-300
-              bg-gray-50
-              px-4 py-3
-              text-sm
-              text-gray-900
-              focus:border-violet-500
-              focus:outline-none
-              focus:ring-2
-              focus:ring-violet-500
-              dark:border-gray-700
-              dark:bg-gray-900
-              dark:text-white
-            "
+          <%= form.select(
+                :status,
+                [
+                  ["Draft", "draft"],
+                  ["Published", "published"],
+                  ["Archived", "archived"]
+                ],
+                {},
+                class: "block w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-900 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
               ) %>
 
-        </div>
-
-      </div>
-
-
-      <%# DESCRIPTION %>
-
-      <div class="mt-6">
-
-        <%= form.label(
-              :description,
-              "Description",
-              class: "
-            mb-2 block
-            text-sm font-bold
-            text-gray-700
-            dark:text-gray-300
-          "
-            ) %>
-
-        <%= form.text_area(
-              :description,
-              rows: 5,
-              placeholder: "Describe what this version represents and what changed...",
-              class: "
-            block w-full
-            rounded-xl
-            border border-gray-300
-            bg-gray-50
-            px-4 py-3
-            text-sm
-            leading-6
-            text-gray-900
-            focus:border-violet-500
-            focus:outline-none
-            focus:ring-2
-            focus:ring-violet-500
-            dark:border-gray-700
-            dark:bg-gray-900
-            dark:text-white
-          "
-            ) %>
-
-      </div>
-
-    </div>
-
-
-<%# ============================================================ %>
-<%# STATUS %>
-<%# ============================================================ %>
-
-    <div
-      class="
-    rounded-[24px]
-    border
-    border-gray-200
-    bg-white
-    p-6
-    shadow-sm
-    dark:border-gray-800
-    dark:bg-gray-800
-  ">
-
-      <div class="flex items-start gap-4">
-
-        <div
-          class="
-        flex h-11 w-11 shrink-0
-        items-center justify-center
-        rounded-2xl
-        border border-emerald-200
-        bg-emerald-50
-        text-xl
-      ">
-          ✓
-        </div>
-
-        <div class="flex-1">
-
-          <%= form.label(
-            :active,
-            class: "
-              cursor-pointer
-              text-sm font-black
-              text-gray-800
-              dark:text-white
-            "
-          ) do %>
-
-        <span class="flex items-center gap-3">
-
-          <%= form.check_box(
-                :active,
-                class: "
-                  h-5 w-5
-                  rounded
-                  border-gray-300
-                  text-emerald-600
-                  focus:ring-emerald-500
-                "
-              ) %>
-
-          Make this version active
-
-        </span>
-
-          <% end %>
-
-          <p
-            class="
-          mt-2
-          text-sm
-          leading-6
-          text-gray-500
-          dark:text-gray-400
-        ">
-            Active versions are available for use by the entity system.
-            Keep older versions inactive when they should remain preserved
-            but no longer be the current version.
+          <p class="mt-2 text-xs text-gray-400">
+            New versions normally begin as drafts.
           </p>
 
         </div>
@@ -582,70 +261,404 @@ app/views/admin/ecosystems/load_sources/entity_templates/entity_template_version
 
     </div>
 
+<%# ============================================================ %>
+<%# STEP 03 — DEFINITION BUILDER %>
+<%# ============================================================ %>
+
+    <div class="rounded-[24px] border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-800">
+
+      <div class="mb-6">
+
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+
+          <div>
+
+            <div class="text-[11px] font-black uppercase tracking-[0.18em] text-emerald-500">
+              Step 03
+            </div>
+
+            <h2 class="mt-1 text-xl font-black text-gray-900 dark:text-white">
+              Template Definition
+            </h2>
+
+            <p class="mt-2 text-sm leading-6 text-gray-500 dark:text-gray-400">
+              Build the structure visually instead of writing JSON manually.
+            </p>
+
+          </div>
+
+          <%# BUILDER STATS %>
+
+          <div class="flex items-center gap-3">
+
+            <div class="rounded-xl border border-violet-200 bg-violet-50 px-4 py-2 dark:border-violet-800 dark:bg-violet-900/20">
+
+              <div class="text-[10px] font-black uppercase tracking-wider text-violet-500">
+                Properties
+              </div>
+
+              <div
+                class="mt-0.5 text-lg font-black text-violet-700 dark:text-violet-300"
+                data-entity_template_definition_builder-target="propertyCount"
+              >
+                0 properties
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <%# ========================================================== %>
+      <%# BUILDER TOOLBAR %>
+      <%# ========================================================== %>
+
+      <div class="mb-6 rounded-2xl border border-violet-100 bg-violet-50/60 p-5 dark:border-violet-900/40 dark:bg-violet-900/10">
+
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+
+          <div>
+
+            <div class="text-sm font-black text-gray-900 dark:text-white">
+              Build your schema
+            </div>
+
+            <p class="mt-1 text-xs leading-5 text-gray-500 dark:text-gray-400">
+              Add properties and define their type, label, description,
+              and required state.
+            </p>
+
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+
+            <button
+              type="button"
+              data-action="click->entity_template_definition_builder#addProperty"
+              data-type="text"
+              class="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-xs font-black text-white shadow-sm transition hover:bg-violet-700"
+            >
+              ＋ Text
+            </button>
+
+            <button
+              type="button"
+              data-action="click->entity_template_definition_builder#addProperty"
+              data-type="number"
+              class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-bold text-gray-700 shadow-sm transition hover:border-violet-200 hover:bg-violet-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+            >
+              ＋ Number
+            </button>
+
+            <button
+              type="button"
+              data-action="click->entity_template_definition_builder#addProperty"
+              data-type="boolean"
+              class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-bold text-gray-700 shadow-sm transition hover:border-violet-200 hover:bg-violet-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+            >
+              ＋ Boolean
+            </button>
+
+            <button
+              type="button"
+              data-action="click->entity_template_definition_builder#addProperty"
+              data-type="date"
+              class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-bold text-gray-700 shadow-sm transition hover:border-violet-200 hover:bg-violet-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+            >
+              ＋ Date
+            </button>
+
+            <button
+              type="button"
+              data-action="click->entity_template_definition_builder#addProperty"
+              data-type="select"
+              class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-bold text-gray-700 shadow-sm transition hover:border-violet-200 hover:bg-violet-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+            >
+              ＋ Select
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <%# ========================================================== %>
+      <%# BUILDER STATUS %>
+      <%# ========================================================== %>
+
+      <div
+        class="mb-5 min-h-[28px] text-xs font-bold text-violet-600 transition-opacity duration-300"
+        data-entity_template_definition_builder-target="builderStatus"
+      >
+        Builder ready
+      </div>
+
+      <%# ========================================================== %>
+      <%# EMPTY STATE %>
+      <%# ========================================================== %>
+
+      <div
+        data-entity_template_definition_builder-target="emptyState"
+        class="rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 p-10 text-center dark:border-gray-700 dark:bg-gray-900"
+      >
+
+        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-100 text-3xl dark:bg-violet-900/30">
+          🧩
+        </div>
+
+        <h3 class="mt-4 text-lg font-black text-gray-900 dark:text-white">
+          Your template is empty
+        </h3>
+
+        <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-gray-500 dark:text-gray-400">
+          Start building your Entity Template by adding your first property.
+          You can choose a type and customize it afterwards.
+        </p>
+
+        <button
+          type="button"
+          data-action="click->entity_template_definition_builder#addProperty"
+          data-type="text"
+          class="mt-5 rounded-xl bg-violet-600 px-5 py-2.5 text-xs font-black text-white shadow-sm transition hover:bg-violet-700"
+        >
+          ＋ Add First Property
+        </button>
+
+      </div>
+
+      <%# ========================================================== %>
+      <%# DYNAMIC PROPERTIES %>
+      <%# IMPORTANT: controller expects "properties" %>
+      <%# ========================================================== %>
+
+      <div
+        data-entity_template_definition_builder-target="properties"
+        class="mt-5 space-y-4"
+      ></div>
+
+      <%# ========================================================== %>
+      <%# PROGRESS %>
+      <%# ========================================================== %>
+
+      <div class="mt-6 rounded-2xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900">
+
+        <div class="flex items-center gap-3">
+
+          <div
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-100 text-lg dark:bg-violet-900/30"
+            data-entity_template_definition_builder-target="progressIcon"
+          >
+            🧭
+          </div>
+
+          <div class="min-w-0 flex-1">
+
+            <div class="flex items-center justify-between gap-3">
+
+          <span
+            class="text-xs font-bold text-gray-600 dark:text-gray-300"
+            data-entity_template_definition_builder-target="progressMessage"
+          >
+            Start building your template
+          </span>
+
+              <span
+                class="text-xs font-black text-violet-600"
+                data-entity_template_definition_builder-target="progressText"
+              >
+            0%
+          </span>
+
+            </div>
+
+            <div class="mt-2 h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+
+              <div
+                class="h-full w-0 rounded-full bg-violet-600 transition-all duration-300"
+                data-entity_template_definition_builder-target="progressBar"
+              ></div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <%# ========================================================== %>
+      <%# BUILDER ACTIONS %>
+      <%# ========================================================== %>
+
+      <div class="mt-6 flex flex-col gap-3 border-t border-gray-200 pt-5 sm:flex-row sm:items-center sm:justify-between dark:border-gray-700">
+
+        <div class="flex flex-wrap gap-2">
+
+          <button
+            type="button"
+            data-action="click->entity_template_definition_builder#addProperty"
+            data-type="text"
+            class="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-xs font-black text-white shadow-sm transition hover:bg-violet-700"
+          >
+            ＋ Add Property
+          </button>
+
+          <button
+            type="button"
+            data-action="click->entity_template_definition_builder#clearBuilder"
+            class="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-white px-4 py-2.5 text-xs font-bold text-red-600 transition hover:bg-red-50 dark:border-red-900/50 dark:bg-gray-800 dark:text-red-400"
+          >
+            🧹 Clear
+          </button>
+
+        </div>
+
+        <div
+          class="text-xs font-semibold text-gray-400"
+          data-entity_template_definition_builder-target="builderStatus"
+        >
+          Builder ready
+        </div>
+
+      </div>
+
+      <%# ========================================================== %>
+      <%# GENERATED JSON %>
+      <%# ========================================================== %>
+
+      <details class="mt-6 rounded-2xl border border-gray-200 dark:border-gray-700">
+
+        <summary class="cursor-pointer px-5 py-4 text-sm font-bold text-gray-700 dark:text-gray-300">
+          Advanced: View generated JSON
+        </summary>
+
+        <div class="border-t border-gray-200 p-5 dark:border-gray-700">
+
+          <%= form.text_area(
+                :definition,
+                rows: 18,
+                spellcheck: false,
+                data: {
+                  "entity_template_definition_builder-target": "definitionInput"
+                },
+                class: "block w-full rounded-xl border border-gray-700 bg-gray-950 px-4 py-4 font-mono text-sm leading-6 text-green-400 shadow-inner focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              ) %>
+
+          <div
+            class="mt-3 text-xs font-bold text-emerald-500"
+            data-entity_template_definition_builder-target="jsonStatus"
+          >
+            Valid JSON
+          </div>
+
+          <div class="mt-4">
+
+            <div class="mb-2 text-[10px] font-black uppercase tracking-wider text-gray-400">
+              Generated Preview
+            </div>
+
+            <pre
+              class="max-h-96 overflow-auto rounded-xl bg-gray-950 p-4 font-mono text-xs leading-6 text-green-400"
+              data-entity_template_definition_builder-target="jsonPreview"
+            ></pre>
+
+          </div>
+
+          <div class="mt-3 flex flex-wrap gap-2">
+
+            <button
+              type="button"
+              data-action="click->entity_template_definition_builder#importJson"
+              class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-xs font-bold text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+            >
+              📥 Import JSON
+            </button>
+
+          </div>
+
+          <p class="mt-2 text-xs text-gray-400">
+            The builder automatically keeps this JSON synchronized.
+            Advanced users can inspect or import JSON directly.
+          </p>
+
+        </div>
+
+      </details>
+
+    </div>
+
+<%# ============================================================ %>
+<%# VERSION PREVIEW %>
+<%# ============================================================ %>
+
+    <div class="rounded-[24px] border border-indigo-100 bg-indigo-50/60 p-6 dark:border-indigo-900/40 dark:bg-indigo-900/10">
+
+      <div class="flex items-start gap-4">
+
+        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-indigo-200 bg-indigo-100 text-xl dark:border-indigo-800 dark:bg-indigo-900/40">
+          🚀
+        </div>
+
+        <div>
+
+          <div class="text-[11px] font-black uppercase tracking-[0.18em] text-indigo-500">
+            Version Lifecycle
+          </div>
+
+          <h3 class="mt-1 text-lg font-black text-gray-900 dark:text-white">
+            Create safely
+          </h3>
+
+          <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">
+            Creating a new version does not modify previous versions.
+            The new definition is stored as its own snapshot.
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
 
 <%# ============================================================ %>
 <%# ACTIONS %>
 <%# ============================================================ %>
 
-    <div
-      class="
-    flex
-    flex-col-reverse
-    gap-3
-    border-t
-    border-gray-200
-    pt-6
-    sm:flex-row
-    sm:items-center
-    sm:justify-between
-    dark:border-gray-800
-  ">
+    <div class="flex flex-col-reverse gap-3 border-t border-gray-200 pt-6 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800">
 
       <%= link_to(
             "Cancel",
             admin_ecosystems_load_sources_entity_templates_entity_template_versions_path,
-            class: "
-          inline-flex
-          items-center
-          justify-center
-          rounded-xl
-          border border-gray-200
-          bg-white
-          px-5 py-3
-          text-sm font-semibold
-          text-gray-600
-          shadow-sm
-          hover:bg-gray-50
-          dark:border-gray-700
-          dark:bg-gray-800
-          dark:text-gray-300
-        "
+            class: "inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-600 shadow-sm transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
           ) %>
 
+      <div class="flex items-center gap-3">
 
-      <%= form.submit(
-            "Create Template Version",
-            class: "
-          inline-flex
-          items-center
-          justify-center
-          rounded-xl
-          bg-violet-600
-          px-6 py-3
-          text-sm font-black
-          text-white
-          shadow-sm
-          transition
-          hover:bg-violet-700
-          focus:outline-none
-          focus:ring-2
-          focus:ring-violet-500
-          focus:ring-offset-2
-        "
-          ) %>
+        <div
+          class="text-xs font-semibold text-gray-400"
+          data-entity_template_definition_builder-target="submitStatus"
+        ></div>
+
+        <%= form.submit(
+              "Create Template Version",
+              data: {
+                "entity_template_definition_builder-target": "submitButton"
+              },
+              class: "inline-flex items-center justify-center rounded-xl bg-violet-600 px-6 py-3 text-sm font-black text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+            ) %>
+
+      </div>
 
     </div>
 
   <% end %>
 
-</div>
+<%# ================================================================ %>
+<%# TOAST %>
+<%# ================================================================ %>
+
+  <div data-entity_template_definition_builder-target="toast" class="fixed bottom-6 right-6 z-50 hidden rounded-2xl bg-gray-900 px-5 py-3 text-sm font-bold text-white shadow-xl" ></div> </div>

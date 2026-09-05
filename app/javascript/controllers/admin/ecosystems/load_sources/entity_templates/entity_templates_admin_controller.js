@@ -2,9 +2,9 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
     static targets = [
+        "results",
         "spinner",
         "message",
-        "results",
         "toast"
     ]
 
@@ -15,6 +15,10 @@ export default class extends Controller {
     connect() {
         this.searchTimer = null
         this.abortController = null
+
+        // Intercept normal links/forms inside this controller.
+        this.element.addEventListener("click", this.handleClick.bind(this))
+        this.element.addEventListener("submit", this.handleSubmit.bind(this))
     }
 
     disconnect() {
@@ -25,7 +29,108 @@ export default class extends Controller {
         }
     }
 
-    search(event) {
+    async handleClick(event) {
+        const link = event.target.closest("a[data-async]")
+
+        if (!link) {
+            return
+        }
+
+        event.preventDefault()
+
+        await this.loadPage(link.href)
+    }
+
+    async handleSubmit(event) {
+        const form = event.target.closest("form[data-async]")
+
+        if (!form) {
+            return
+        }
+
+        event.preventDefault()
+
+        await this.submitForm(form)
+    }
+
+    async loadPage(url) {
+        this.showLoading()
+        this.showMessage("Loading template workspace…")
+
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    "Accept": "text/html",
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            })
+
+            if (!response.ok) {
+                throw new Error(`Request failed: ${response.status}`)
+            }
+
+            const html = await response.text()
+
+            this.resultsTarget.innerHTML = html
+
+            this.showMessage("Workspace loaded.")
+            this.showSuccess("✨ Workspace loaded!")
+
+            this.playSuccessAnimation()
+
+            window.history.pushState({}, "", url)
+        } catch (error) {
+            console.error(error)
+
+            this.showMessage("Unable to load workspace.")
+            this.showToast("❌ Something went wrong.")
+        } finally {
+            this.hideLoading()
+        }
+    }
+
+    async submitForm(form) {
+        this.showLoading()
+        this.showMessage("Creating entity template…")
+
+        const formData = new FormData(form)
+
+        try {
+            const response = await fetch(form.action, {
+                method: form.method.toUpperCase() || "POST",
+                body: formData,
+                headers: {
+                    "Accept": "text/html",
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            })
+
+            if (!response.ok) {
+                throw new Error(`Create failed: ${response.status}`)
+            }
+
+            const html = await response.text()
+
+            this.resultsTarget.innerHTML = html
+
+            this.showMessage("Entity template created!")
+            this.showSuccess("🏆 Template created!")
+
+            this.playSuccessAnimation()
+
+            // If the server redirects, fetch() follows it automatically.
+            window.history.pushState({}, "", response.url)
+        } catch (error) {
+            console.error(error)
+
+            this.showMessage("Unable to create template.")
+            this.showToast("❌ Template creation failed.")
+        } finally {
+            this.hideLoading()
+        }
+    }
+
+    async search(event) {
         const query = event.target.value
 
         this.clearSearchTimer()
@@ -33,26 +138,6 @@ export default class extends Controller {
         this.searchTimer = setTimeout(() => {
             this.performSearch(query)
         }, 350)
-    }
-
-    submitSearch() {
-        this.showLoading()
-
-        setTimeout(() => {
-            this.showMessage("Loading templates…")
-        }, 50)
-    }
-
-    filterChanged() {
-        const form = this.element.querySelector("form")
-
-        if (!form) {
-            return
-        }
-
-        this.showLoading()
-
-        form.requestSubmit()
     }
 
     async performSearch(query) {
@@ -75,22 +160,15 @@ export default class extends Controller {
 
         const url = `${this.searchUrlValue}?${params.toString()}`
 
-        if (this.abortController) {
-            this.abortController.abort()
-        }
-
-        this.abortController = new AbortController()
-
         this.showLoading()
-        this.showMessage("Searching the template knowledge base…")
+        this.showMessage("Searching templates…")
 
         try {
             const response = await fetch(url, {
                 headers: {
-                    Accept: "text/html",
+                    "Accept": "text/html",
                     "X-Requested-With": "XMLHttpRequest"
-                },
-                signal: this.abortController.signal
+                }
             })
 
             if (!response.ok) {
@@ -99,73 +177,41 @@ export default class extends Controller {
 
             const html = await response.text()
 
-            this.replaceResults(html)
+            const parser = new DOMParser()
+            const doc = parser.parseFromString(html, "text/html")
 
-            this.showMessage(
-                query.length > 0
-                    ? `New template results loaded for "${query}".`
-                    : "Template catalogue loaded."
-            )
+            const results =
+                doc.querySelector('[data-async-results]')
 
-            this.showToast("✨ New template results loaded")
-
-        } catch (error) {
-            if (error.name === "AbortError") {
-                return
+            if (results) {
+                this.resultsTarget.innerHTML = results.innerHTML
+            } else {
+                this.resultsTarget.innerHTML = html
             }
 
+            this.showMessage("Search completed.")
+            this.showSuccess("✨ Results updated!")
+
+            window.history.replaceState({}, "", url)
+        } catch (error) {
             console.error(error)
 
-            this.showMessage("Unable to load templates.")
-
-            this.showToast(
-                "Something went wrong while loading templates."
-            )
-
+            this.showToast("❌ Search failed.")
         } finally {
             this.hideLoading()
         }
     }
 
-    replaceResults(html) {
-        const parser = new DOMParser()
-
-        const document = parser.parseFromString(
-            html,
-            "text/html"
-        )
-
-        const newResults =
-            document.querySelector(
-                '[data-admin-entity-templates-target="results"]'
-            )
-
-        if (!newResults || !this.hasResultsTarget) {
-            window.location.href = this.buildCurrentUrl()
-
-            return
-        }
-
-        this.resultsTarget.innerHTML = newResults.innerHTML
-    }
-
-    buildCurrentUrl() {
+    filterChanged() {
         const form = this.element.querySelector("form")
 
         if (!form) {
-            return this.searchUrlValue
+            return
         }
 
-        const formData = new FormData(form)
-        const params = new URLSearchParams()
-
-        formData.forEach((value, key) => {
-            if (value !== "") {
-                params.append(key, value)
-            }
-        })
-
-        return `${this.searchUrlValue}?${params.toString()}`
+        this.performSearch(
+            form.querySelector('[name="q"]')?.value || ""
+        )
     }
 
     showLoading() {
@@ -186,6 +232,10 @@ export default class extends Controller {
         }
     }
 
+    showSuccess(message) {
+        this.showToast(message)
+    }
+
     showToast(message) {
         if (!this.hasToastTarget) {
             return
@@ -198,7 +248,31 @@ export default class extends Controller {
 
         this.toastTimer = setTimeout(() => {
             this.toastTarget.classList.add("hidden")
-        }, 2200)
+        }, 2500)
+    }
+
+    playSuccessAnimation() {
+        this.resultsTarget.classList.remove(
+            "ring-2",
+            "ring-green-400",
+            "scale-[1.01]"
+        )
+
+        void this.resultsTarget.offsetWidth
+
+        this.resultsTarget.classList.add(
+            "ring-2",
+            "ring-green-400",
+            "scale-[1.01]"
+        )
+
+        setTimeout(() => {
+            this.resultsTarget.classList.remove(
+                "ring-2",
+                "ring-green-400",
+                "scale-[1.01]"
+            )
+        }, 700)
     }
 
     clearSearchTimer() {

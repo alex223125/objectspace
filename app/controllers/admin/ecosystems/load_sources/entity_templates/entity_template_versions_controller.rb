@@ -105,8 +105,7 @@ module Admin
 
           def create
             @entity_template_version =
-              ::Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion
-                .new(
+              ::Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion.new(
                 entity_template_version_params
               )
 
@@ -118,12 +117,9 @@ module Admin
                 notice: "Entity template version was successfully created."
               )
             else
-              @entity_templates =
-                EntityTemplate
-                  .order(:name)
+              @entity_templates = EntityTemplate.order(:name)
 
-              render :new,
-                     status: :unprocessable_entity
+              render :new, status: :unprocessable_entity
             end
           end
 
@@ -345,11 +341,44 @@ module Admin
           # STRONG PARAMETERS
           # ============================================================
 
+          # def entity_template_version_params
+          #   params.require(:entity_template_version).permit(
+          #     :entity_template_id,
+          #     definition: {}
+          #   )
+          # end
+
+          # def entity_template_version_params
+          #   params.require(:entity_template_version).permit(
+          #     :entity_template_id,
+          #     :version,
+          #     :status,
+          #     definition: {}
+          #   )
+          # end
+
+
           def entity_template_version_params
-            params.require(:entity_template_version).permit(
-              :entity_template_id,
-              definition: {}
-            )
+            permitted =
+              params.require(:entity_template_version).permit(
+                :entity_template_id,
+                :version,
+                :status,
+                :definition
+              )
+
+            if permitted[:definition].present?
+              begin
+                permitted[:definition] =
+                  JSON.parse(permitted[:definition])
+              rescue JSON::ParserError
+                permitted[:definition] = {}
+              end
+            else
+              permitted[:definition] = {}
+            end
+
+            permitted
           end
 
           # ============================================================

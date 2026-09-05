@@ -5,7 +5,7 @@ app/views/admin/ecosystems/load_sources/entity_templates/entity_template_version
 
 Purpose:
 Display a single EntityTemplateVersion, its lifecycle state, parent template,
-definition payload and available lifecycle actions.
+definition payload, template fields and available lifecycle actions.
 
 Lifecycle:
 
@@ -16,346 +16,305 @@ PUBLISHED
 ARCHIVED
 
 Additional features:
-- Clone Version
-- Compare Versions
+
+Clone Version
+Compare Versions
+Manage Template Fields
 ============================================================================ %>
-
 <div class="mx-auto w-full max-w-7xl px-5 py-8 sm:px-7 lg:px-10">
+<%# ========================================================================
+PAGE HEADER
+======================================================================== %>
 
-  <%# ========================================================================
-  PAGE HEADER
-  ======================================================================== %>
+  <div class="mb-8"> <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+    <div>
 
-  <div class="mb-8">
-    <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-
-      <div>
-
-        <div class="flex flex-wrap items-center gap-3">
-
-          <div
-            class="
-              flex h-12 w-12 items-center justify-center
-              rounded-xl border border-violet-200
-              bg-violet-100 text-2xl
-              shadow-sm
-            "
-          >
-            🧬
-          </div>
-
-          <div>
-
-            <div
-              class="
-                text-[11px]
-                font-black
-                uppercase
-                tracking-[0.2em]
-                text-violet-500
-              "
-            >
-              Entity Template Version
-            </div>
-
-            <h1
-              class="
-                mt-1
-                text-3xl
-                font-black
-                tracking-tight
-                text-gray-900
-                dark:text-white
-              "
-            >
-              Version
-              <%= @entity_template_version.version.presence || @entity_template_version.id %>
-            </h1>
-
-          </div>
-
-        </div>
-
-        <%# BREADCRUMB %>
+      <div class="flex flex-wrap items-center gap-3">
 
         <div
           class="
-            mt-4
-            flex flex-wrap items-center gap-2
-            text-xs text-gray-400
-          "
-        >
+          flex h-12 w-12 items-center justify-center
+          rounded-xl border border-violet-200
+          bg-violet-100 text-2xl
+          shadow-sm
+        ">
+          🧬
+        </div>
 
-          <span>Encyclopedia</span>
-          <span>›</span>
+        <div>
 
-          <span>Ecosystems</span>
-          <span>›</span>
+          <div
+            class="
+            text-[11px]
+            font-black
+            uppercase
+            tracking-[0.2em]
+            text-violet-500
+          ">
+            Entity Template Version
+          </div>
 
-          <span>Load Sources</span>
-          <span>›</span>
-
-          <span>Entity Templates</span>
-          <span>›</span>
-
-          <span>Versions</span>
-          <span>›</span>
-
-          <span class="font-semibold text-violet-500">
+          <h1
+            class="
+            mt-1
+            text-3xl
+            font-black
+            tracking-tight
+            text-gray-900
+            dark:text-white
+          ">
             Version
             <%= @entity_template_version.version.presence || @entity_template_version.id %>
-          </span>
+          </h1>
 
         </div>
 
       </div>
 
+      <%# BREADCRUMB %>
 
-      <%# ======================================================================
-      HEADER ACTIONS
-      ======================================================================= %>
+      <div
+        class="
+        mt-4
+        flex flex-wrap items-center gap-2
+        text-xs text-gray-400
+      ">
 
-      <div class="flex flex-wrap items-center gap-3">
+        <span>Encyclopedia</span>
+        <span>›</span>
 
-        <%# ALL VERSIONS %>
+        <span>Ecosystems</span>
+        <span>›</span>
 
-        <%= link_to(
-              "← All Versions",
-              admin_ecosystems_load_sources_entity_templates_entity_template_versions_path,
-              class: "
-                inline-flex items-center justify-center
-                rounded-xl border border-gray-200
-                bg-white px-4 py-2.5
-                text-sm font-semibold text-gray-700
-                shadow-sm transition
-                hover:border-gray-300
-                hover:bg-gray-50
-                dark:border-gray-700
-                dark:bg-gray-800
-                dark:text-gray-200
-              "
-            ) %>
+        <span>Load Sources</span>
+        <span>›</span>
 
+        <span>Entity Templates</span>
+        <span>›</span>
 
-        <%# COMPARE VERSIONS %>
+        <span>Versions</span>
+        <span>›</span>
 
-        <%= link_to(
-              "⚖ Compare Versions",
-              compare_admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
-                @entity_template_version
-              ),
-              class: "
-                inline-flex items-center justify-center gap-2
-                rounded-xl border border-violet-200
-                bg-violet-50 px-4 py-2.5
-                text-sm font-bold text-violet-700
-                shadow-sm transition
-                hover:border-violet-300
-                hover:bg-violet-100
-                dark:border-violet-800
-                dark:bg-violet-950/40
-                dark:text-violet-300
-              "
-            ) %>
-
-
-        <%# CLONE VERSION %>
-
-        <%= button_to(
-              "⧉ Clone Version",
-              clone_admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
-                @entity_template_version
-              ),
-              method: :post,
-              class: "
-                inline-flex items-center justify-center gap-2
-                rounded-xl border border-indigo-200
-                bg-indigo-50 px-4 py-2.5
-                text-sm font-bold text-indigo-700
-                shadow-sm transition
-                hover:border-indigo-300
-                hover:bg-indigo-100
-                dark:border-indigo-800
-                dark:bg-indigo-950/40
-                dark:text-indigo-300
-              ",
-              data: {
-                turbo_confirm: "Clone this version into a new draft version?"
-              }
-            ) %>
-
-
-        <%# DRAFT ACTIONS %>
-
-        <% if @entity_template_version.draft? %>
-
-          <%= link_to(
-                "Edit Draft",
-                edit_admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
-                  @entity_template_version
-                ),
-                class: "
-                  inline-flex items-center justify-center gap-2
-                  rounded-xl bg-violet-600 px-5 py-2.5
-                  text-sm font-bold text-white
-                  shadow-sm transition
-                  hover:bg-violet-700
-                  focus:outline-none
-                  focus:ring-2
-                  focus:ring-violet-500
-                  focus:ring-offset-2
-                "
-              ) %>
-
-
-          <%= button_to(
-                "Publish",
-                publish_admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
-                  @entity_template_version
-                ),
-                method: :patch,
-                class: "
-                  inline-flex items-center justify-center gap-2
-                  rounded-xl bg-emerald-600 px-5 py-2.5
-                  text-sm font-bold text-white
-                  shadow-sm transition
-                  hover:bg-emerald-700
-                  focus:outline-none
-                  focus:ring-2
-                  focus:ring-emerald-500
-                  focus:ring-offset-2
-                ",
-                data: {
-                  turbo_confirm: "Publish this entity template version?"
-                }
-              ) %>
-
-
-          <%# PUBLISHED ACTIONS %>
-
-        <% elsif @entity_template_version.published? %>
-
-          <%= button_to(
-                "Archive",
-                archive_admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
-                  @entity_template_version
-                ),
-                method: :patch,
-                class: "
-                  inline-flex items-center justify-center gap-2
-                  rounded-xl bg-amber-600 px-5 py-2.5
-                  text-sm font-bold text-white
-                  shadow-sm transition
-                  hover:bg-amber-700
-                  focus:outline-none
-                  focus:ring-2
-                  focus:ring-amber-500
-                  focus:ring-offset-2
-                ",
-                data: {
-                  turbo_confirm: "Archive this published version? It will remain in version history but will no longer be active."
-                }
-              ) %>
-
-        <% end %>
+        <span class="font-semibold text-violet-500">
+        Version
+          <%= @entity_template_version.version.presence || @entity_template_version.id %>
+      </span>
 
       </div>
 
     </div>
+
+    <%# ======================================================================
+  HEADER ACTIONS
+  ======================================================================= %>
+
+    <div class="flex flex-wrap items-center gap-3">
+
+      <%# ALL VERSIONS %>
+
+      <%= link_to(
+            "← All Versions",
+            admin_ecosystems_load_sources_entity_templates_entity_template_versions_path,
+            class: "
+            inline-flex items-center justify-center
+            rounded-xl border border-gray-200
+            bg-white px-4 py-2.5
+            text-sm font-semibold text-gray-700
+            shadow-sm transition
+            hover:border-gray-300
+            hover:bg-gray-50
+            dark:border-gray-700
+            dark:bg-gray-800
+            dark:text-gray-200
+          "
+          ) %>
+
+      <%# COMPARE VERSIONS %>
+
+      <%= link_to(
+            "⚖ Compare Versions",
+            compare_admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
+              @entity_template_version
+            ),
+            class: "
+            inline-flex items-center justify-center gap-2
+            rounded-xl border border-violet-200
+            bg-violet-50 px-4 py-2.5
+            text-sm font-bold text-violet-700
+            shadow-sm transition
+            hover:border-violet-300
+            hover:bg-violet-100
+            dark:border-violet-800
+            dark:bg-violet-950/40
+            dark:text-violet-300
+          "
+          ) %>
+
+      <%# CLONE VERSION %>
+
+      <%= button_to(
+            "⧉ Clone Version",
+            clone_admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
+              @entity_template_version
+            ),
+            method: :post,
+            class: "
+            inline-flex items-center justify-center gap-2
+            rounded-xl border border-indigo-200
+            bg-indigo-50 px-4 py-2.5
+            text-sm font-bold text-indigo-700
+            shadow-sm transition
+            hover:border-indigo-300
+            hover:bg-indigo-100
+            dark:border-indigo-800
+            dark:bg-indigo-950/40
+            dark:text-indigo-300
+          ",
+            data: {
+              turbo_confirm: "Clone this version into a new draft version?"
+            }
+          ) %>
+
+      <%# DRAFT ACTIONS %>
+
+      <% if @entity_template_version.draft? %>
+
+        <%= link_to(
+              "Edit Draft",
+              edit_admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
+                @entity_template_version
+              ),
+              class: "
+              inline-flex items-center justify-center gap-2
+              rounded-xl bg-violet-600 px-5 py-2.5
+              text-sm font-bold text-white
+              shadow-sm transition
+              hover:bg-violet-700
+              focus:outline-none
+              focus:ring-2
+              focus:ring-violet-500
+              focus:ring-offset-2
+            "
+            ) %>
+
+        <%= button_to(
+              "Publish",
+              publish_admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
+                @entity_template_version
+              ),
+              method: :patch,
+              class: "
+              inline-flex items-center justify-center gap-2
+              rounded-xl bg-emerald-600 px-5 py-2.5
+              text-sm font-bold text-white
+              shadow-sm transition
+              hover:bg-emerald-700
+              focus:outline-none
+              focus:ring-2
+              focus:ring-emerald-500
+              focus:ring-offset-2
+            ",
+              data: {
+                turbo_confirm: "Publish this entity template version?"
+              }
+            ) %>
+
+      <% elsif @entity_template_version.published? %>
+
+        <%= button_to(
+              "Archive",
+              archive_admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
+                @entity_template_version
+              ),
+              method: :patch,
+              class: "
+              inline-flex items-center justify-center gap-2
+              rounded-xl bg-amber-600 px-5 py-2.5
+              text-sm font-bold text-white
+              shadow-sm transition
+              hover:bg-amber-700
+              focus:outline-none
+              focus:ring-2
+              focus:ring-amber-500
+              focus:ring-offset-2
+            ",
+              data: {
+                turbo_confirm: "Archive this published version? It will remain in version history but will no longer be active."
+              }
+            ) %>
+
+      <% end %>
+
+    </div>
+
   </div>
 
+  </div>
+<%# ========================================================================
+STATUS / MISSION PANEL
+======================================================================== %>
 
-  <%# ========================================================================
-  STATUS / MISSION PANEL
-  ======================================================================== %>
-
-  <div
-    class="
-      mb-8
-      overflow-hidden
-      rounded-[28px]
-      border-2
-      bg-gradient-to-br
-      from-white
-      via-violet-50/40
-      to-slate-50
-      shadow-md
-      shadow-violet-100/40
-      dark:border-gray-700
-      dark:from-gray-800
-      dark:via-gray-800
-      dark:to-gray-900
-    "
-  >
-
+  <div class=" mb-8 overflow-hidden rounded-[28px] border-2 bg-gradient-to-br from-white via-violet-50/40 to-slate-50 shadow-md shadow-violet-100/40 dark:border-gray-700 dark:from-gray-800 dark:via-gray-800 dark:to-gray-900 ">
     <div class="relative p-6 sm:p-8">
 
       <div
         class="
-          pointer-events-none absolute -right-20 -top-20
-          h-64 w-64 rounded-full
-          bg-violet-200/30 blur-3xl
-        "
-      ></div>
+      pointer-events-none absolute -right-20 -top-20
+      h-64 w-64 rounded-full
+      bg-violet-200/30 blur-3xl
+    "></div>
 
       <div
         class="
-          pointer-events-none absolute -bottom-20 -left-20
-          h-64 w-64 rounded-full
-          bg-indigo-200/20 blur-3xl
-        "
-      ></div>
+      pointer-events-none absolute -bottom-20 -left-20
+      h-64 w-64 rounded-full
+      bg-indigo-200/20 blur-3xl
+    "></div>
 
       <div
         class="
-          relative z-10
-          grid grid-cols-1 gap-8
-          lg:grid-cols-12
-          lg:items-center
-        "
-      >
-
-        <%# LEFT %>
+      relative z-10
+      grid grid-cols-1 gap-8
+      lg:grid-cols-12
+      lg:items-center
+    ">
 
         <div class="lg:col-span-8">
 
           <div
             class="
-              text-[11px]
-              font-black
-              uppercase
-              tracking-[0.2em]
-              text-violet-500
-            "
-          >
+          text-[11px]
+          font-black
+          uppercase
+          tracking-[0.2em]
+          text-violet-500
+        ">
             Template Protocol
           </div>
 
           <h2
             class="
-              mt-2
-              text-2xl
-              font-black
-              tracking-tight
-              text-gray-900
-              dark:text-white
-              sm:text-3xl
-            "
-          >
+          mt-2
+          text-2xl
+          font-black
+          tracking-tight
+          text-gray-900
+          dark:text-white
+          sm:text-3xl
+        ">
             This version defines a reusable entity structure.
           </h2>
 
           <p
             class="
-              mt-4
-              max-w-3xl
-              text-sm
-              leading-6
-              text-gray-500
-              dark:text-gray-400
-              sm:text-[15px]
-            "
-          >
+          mt-4
+          max-w-3xl
+          text-sm
+          leading-6
+          text-gray-500
+          dark:text-gray-400
+          sm:text-[15px]
+        ">
             An Entity Template Version is a snapshot of how an entity should
             be structured at a particular point in time. Draft versions can
             be changed, published versions represent an active structure,
@@ -364,32 +323,27 @@ Additional features:
 
         </div>
 
-
-        <%# STATUS %>
-
         <div class="lg:col-span-4">
 
           <div
             class="
-              rounded-2xl
-              border-2
-              bg-white
-              p-5
-              shadow-sm
-              dark:border-gray-700
-              dark:bg-gray-900
-            "
-          >
+          rounded-2xl
+          border-2
+          bg-white
+          p-5
+          shadow-sm
+          dark:border-gray-700
+          dark:bg-gray-900
+        ">
 
             <div
               class="
-                text-[10px]
-                font-black
-                uppercase
-                tracking-[0.18em]
-                text-gray-400
-              "
-            >
+            text-[10px]
+            font-black
+            uppercase
+            tracking-[0.18em]
+            text-gray-400
+          ">
               Current Status
             </div>
 
@@ -399,16 +353,15 @@ Additional features:
 
                 <div
                   class="
-                    inline-flex items-center gap-2
-                    rounded-full
-                    border border-amber-200
-                    bg-amber-50
-                    px-4 py-2
-                    text-xs font-black
-                    uppercase tracking-wider
-                    text-amber-700
-                  "
-                >
+                inline-flex items-center gap-2
+                rounded-full
+                border border-amber-200
+                bg-amber-50
+                px-4 py-2
+                text-xs font-black
+                uppercase tracking-wider
+                text-amber-700
+              ">
                   <span class="h-2 w-2 rounded-full bg-amber-400"></span>
                   Draft
                 </div>
@@ -417,23 +370,21 @@ Additional features:
 
                 <div
                   class="
-                    inline-flex items-center gap-2
-                    rounded-full
-                    border border-emerald-200
-                    bg-emerald-50
-                    px-4 py-2
-                    text-xs font-black
-                    uppercase tracking-wider
-                    text-emerald-700
-                  "
-                >
-                  <span
-                    class="
-                      h-2 w-2 rounded-full
-                      bg-emerald-400
-                      shadow-[0_0_8px_rgba(52,211,153,0.7)]
-                    "
-                  ></span>
+                inline-flex items-center gap-2
+                rounded-full
+                border border-emerald-200
+                bg-emerald-50
+                px-4 py-2
+                text-xs font-black
+                uppercase tracking-wider
+                text-emerald-700
+              ">
+              <span
+                class="
+                  h-2 w-2 rounded-full
+                  bg-emerald-400
+                  shadow-[0_0_8px_rgba(52,211,153,0.7)]
+                "></span>
 
                   Published
                 </div>
@@ -442,16 +393,15 @@ Additional features:
 
                 <div
                   class="
-                    inline-flex items-center gap-2
-                    rounded-full
-                    border border-slate-200
-                    bg-slate-100
-                    px-4 py-2
-                    text-xs font-black
-                    uppercase tracking-wider
-                    text-slate-600
-                  "
-                >
+                inline-flex items-center gap-2
+                rounded-full
+                border border-slate-200
+                bg-slate-100
+                px-4 py-2
+                text-xs font-black
+                uppercase tracking-wider
+                text-slate-600
+              ">
                   <span class="h-2 w-2 rounded-full bg-slate-400"></span>
                   Archived
                 </div>
@@ -460,16 +410,15 @@ Additional features:
 
                 <div
                   class="
-                    inline-flex items-center gap-2
-                    rounded-full
-                    border border-gray-200
-                    bg-gray-100
-                    px-4 py-2
-                    text-xs font-black
-                    uppercase tracking-wider
-                    text-gray-600
-                  "
-                >
+                inline-flex items-center gap-2
+                rounded-full
+                border border-gray-200
+                bg-gray-100
+                px-4 py-2
+                text-xs font-black
+                uppercase tracking-wider
+                text-gray-600
+              ">
                   Unknown
                 </div>
 
@@ -486,31 +435,24 @@ Additional features:
     </div>
 
   </div>
-
-
-  <%# ========================================================================
-  VERSION INFORMATION
-  ======================================================================== %>
+<%# ========================================================================
+VERSION INFORMATION
+======================================================================== %>
 
   <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-
-
-    <%# ======================================================================
-    PARENT TEMPLATE
-    ======================================================================= %>
+<%# PARENT TEMPLATE %>
 
     <div
       class="
-        rounded-2xl
-        border border-indigo-100
-        bg-indigo-50/60
-        p-6
-        shadow-sm
-        shadow-indigo-100/30
-        dark:border-indigo-900
-        dark:bg-indigo-950/30
-      "
-    >
+    rounded-2xl
+    border border-indigo-100
+    bg-indigo-50/60
+    p-6
+    shadow-sm
+    shadow-indigo-100/30
+    dark:border-indigo-900
+    dark:bg-indigo-950/30
+  ">
 
       <div class="text-2xl">
         🧱
@@ -518,26 +460,24 @@ Additional features:
 
       <div
         class="
-          mt-4
-          text-[10px]
-          font-black
-          uppercase
-          tracking-[0.18em]
-          text-indigo-500
-        "
-      >
+      mt-4
+      text-[10px]
+      font-black
+      uppercase
+      tracking-[0.18em]
+      text-indigo-500
+    ">
         Parent Template
       </div>
 
       <div
         class="
-          mt-2
-          text-lg
-          font-black
-          text-gray-900
-          dark:text-white
-        "
-      >
+      mt-2
+      text-lg
+      font-black
+      text-gray-900
+      dark:text-white
+    ">
         <%= @entity_template_version.entity_template&.name || "Unknown Template" %>
       </div>
 
@@ -545,12 +485,11 @@ Additional features:
 
         <div
           class="
-            mt-1
-            font-mono
-            text-xs
-            text-indigo-500
-          "
-        >
+        mt-1
+        font-mono
+        text-xs
+        text-indigo-500
+      ">
           <%= @entity_template_version.entity_template.slug if @entity_template_version.entity_template.respond_to?(:slug) %>
         </div>
 
@@ -560,37 +499,33 @@ Additional features:
                 @entity_template_version.entity_template
               ),
               class: "
-                mt-5
-                inline-flex
-                text-xs
-                font-black
-                text-indigo-600
-                hover:text-indigo-700
-                dark:text-indigo-400
-              "
+            mt-5
+            inline-flex
+            text-xs
+            font-black
+            text-indigo-600
+            hover:text-indigo-700
+            dark:text-indigo-400
+          "
             ) %>
 
       <% end %>
 
     </div>
 
-
-    <%# ======================================================================
-    VERSION
-    ======================================================================= %>
+<%# VERSION %>
 
     <div
       class="
-        rounded-2xl
-        border border-violet-100
-        bg-violet-50/60
-        p-6
-        shadow-sm
-        shadow-violet-100/30
-        dark:border-violet-900
-        dark:bg-violet-950/30
-      "
-    >
+    rounded-2xl
+    border border-violet-100
+    bg-violet-50/60
+    p-6
+    shadow-sm
+    shadow-violet-100/30
+    dark:border-violet-900
+    dark:bg-violet-950/30
+  ">
 
       <div class="text-2xl">
         🧬
@@ -598,26 +533,24 @@ Additional features:
 
       <div
         class="
-          mt-4
-          text-[10px]
-          font-black
-          uppercase
-          tracking-[0.18em]
-          text-violet-500
-        "
-      >
+      mt-4
+      text-[10px]
+      font-black
+      uppercase
+      tracking-[0.18em]
+      text-violet-500
+    ">
         Version Identifier
       </div>
 
       <div
         class="
-          mt-2
-          text-2xl
-          font-black
-          text-gray-900
-          dark:text-white
-        "
-      >
+      mt-2
+      text-2xl
+      font-black
+      text-gray-900
+      dark:text-white
+    ">
         <%= @entity_template_version.version.presence || "Version ##{@entity_template_version.id}" %>
       </div>
 
@@ -628,23 +561,19 @@ Additional features:
 
     </div>
 
-
-    <%# ======================================================================
-    TIMELINE
-    ======================================================================= %>
+<%# TIMELINE %>
 
     <div
       class="
-        rounded-2xl
-        border border-emerald-100
-        bg-emerald-50/60
-        p-6
-        shadow-sm
-        shadow-emerald-100/30
-        dark:border-emerald-900
-        dark:bg-emerald-950/30
-      "
-    >
+    rounded-2xl
+    border border-emerald-100
+    bg-emerald-50/60
+    p-6
+    shadow-sm
+    shadow-emerald-100/30
+    dark:border-emerald-900
+    dark:bg-emerald-950/30
+  ">
 
       <div class="text-2xl">
         ⏱️
@@ -652,14 +581,13 @@ Additional features:
 
       <div
         class="
-          mt-4
-          text-[10px]
-          font-black
-          uppercase
-          tracking-[0.18em]
-          text-emerald-500
-        "
-      >
+      mt-4
+      text-[10px]
+      font-black
+      uppercase
+      tracking-[0.18em]
+      text-emerald-500
+    ">
         Timeline
       </div>
 
@@ -668,15 +596,15 @@ Additional features:
         <div>
           Created:
           <span class="font-semibold text-gray-700 dark:text-gray-200">
-            <%= @entity_template_version.created_at&.strftime("%Y-%m-%d %H:%M") %>
-          </span>
+        <%= @entity_template_version.created_at&.strftime("%Y-%m-%d %H:%M") %>
+      </span>
         </div>
 
         <div>
           Updated:
           <span class="font-semibold text-gray-700 dark:text-gray-200">
-            <%= @entity_template_version.updated_at&.strftime("%Y-%m-%d %H:%M") %>
-          </span>
+        <%= @entity_template_version.updated_at&.strftime("%Y-%m-%d %H:%M") %>
+      </span>
         </div>
 
         <% if @entity_template_version.respond_to?(:published_at) &&
@@ -685,8 +613,8 @@ Additional features:
           <div>
             Published:
             <span class="font-semibold text-emerald-600">
-              <%= @entity_template_version.published_at.strftime("%Y-%m-%d %H:%M") %>
-            </span>
+          <%= @entity_template_version.published_at.strftime("%Y-%m-%d %H:%M") %>
+        </span>
           </div>
 
         <% end %>
@@ -696,64 +624,577 @@ Additional features:
     </div>
 
   </div>
-
-
-  <%# ========================================================================
-  DEFINITION
-  ======================================================================== %>
+<%# ========================================================================
+TEMPLATE FIELDS
+======================================================================== %>
 
   <div class="mt-8">
-
     <div
       class="
-        overflow-hidden
-        rounded-[24px]
-        border-2
-        border-gray-100
-        bg-white
-        shadow-sm
-        dark:border-gray-700
-        dark:bg-gray-800
-      "
-    >
+    overflow-hidden
+    rounded-[24px]
+    border-2
+    border-sky-100
+    bg-gradient-to-br
+    from-sky-50
+    via-white
+    to-indigo-50
+    shadow-sm
+    shadow-sky-100/40
+    dark:border-sky-900
+    dark:from-sky-950/20
+    dark:via-gray-800
+    dark:to-gray-900
+  ">
+
+      <%# HEADER %>
 
       <div
         class="
-          flex flex-col gap-4
-          border-b border-gray-100
-          bg-gray-50/80
-          px-6 py-5
-          sm:flex-row
-          sm:items-center
-          sm:justify-between
-          dark:border-gray-700
-          dark:bg-gray-900/50
-        "
-      >
+      flex flex-col gap-4
+      border-b
+      border-sky-100
+      px-6 py-5
+      sm:flex-row
+      sm:items-center
+      sm:justify-between
+      dark:border-gray-700
+    ">
 
         <div>
 
           <div
             class="
-              text-[10px]
-              font-black
-              uppercase
-              tracking-[0.18em]
-              text-violet-500
+          text-[10px]
+          font-black
+          uppercase
+          tracking-[0.18em]
+          text-sky-500
+        ">
+            Entity Structure
+          </div>
+
+          <h2
+            class="
+          mt-1
+          text-lg
+          font-black
+          text-gray-900
+          dark:text-white
+        ">
+            Template Fields
+          </h2>
+
+          <p
+            class="
+          mt-2
+          max-w-2xl
+          text-sm
+          leading-6
+          text-gray-500
+          dark:text-gray-400
+        ">
+            Define the dynamic attributes that entities created from this
+            template version can contain.
+          </p>
+
+        </div>
+
+        <%# ADD FIELD %>
+
+        <% if @entity_template_version.draft? %>
+
+          <%= link_to(
+                "＋ Add Field",
+                new_admin_ecosystems_load_sources_entity_templates_entity_template_version_entity_template_field_path(
+                  @entity_template_version
+                ),
+                class: "
+              inline-flex shrink-0
+              items-center justify-center gap-2
+              rounded-xl
+              bg-sky-600
+              px-5 py-3
+              text-sm font-black
+              text-white
+              shadow-sm
+              shadow-sky-200
+              transition
+              hover:-translate-y-0.5
+              hover:bg-sky-700
+              hover:shadow-md
+              focus:outline-none
+              focus:ring-2
+              focus:ring-sky-500
+              focus:ring-offset-2
             "
-          >
+              ) %>
+
+        <% end %>
+
+      </div>
+
+      <%# FIELD LIST %>
+
+      <div class="p-6 sm:p-8">
+
+        <% fields = @entity_template_version.entity_template_fields.ordered %>
+
+        <% if fields.any? %>
+
+          <div class="space-y-4">
+
+            <% fields.each_with_index do |field, index| %>
+
+              <div
+                class="
+              group
+              rounded-2xl
+              border-2
+              border-gray-100
+              bg-white
+              p-5
+              shadow-sm
+              transition
+              hover:-translate-y-0.5
+              hover:border-sky-200
+              hover:shadow-md
+              dark:border-gray-700
+              dark:bg-gray-900
+              dark:hover:border-sky-800
+            ">
+
+                <div
+                  class="
+                flex flex-col gap-5
+                lg:flex-row
+                lg:items-center
+                lg:justify-between
+              ">
+
+                  <%# FIELD INFORMATION %>
+
+                  <div class="flex min-w-0 items-start gap-4">
+
+                    <div
+                      class="
+                    flex h-11 w-11
+                    shrink-0
+                    items-center justify-center
+                    rounded-2xl
+                    border border-sky-200
+                    bg-sky-50
+                    text-lg
+                    font-black
+                    text-sky-600
+                    shadow-sm
+                    dark:border-sky-800
+                    dark:bg-sky-950/40
+                    dark:text-sky-300
+                  ">
+                      <%= index + 1 %>
+                    </div>
+
+                    <div class="min-w-0">
+
+                      <div class="flex flex-wrap items-center gap-2">
+
+                        <h3
+                          class="
+                        text-base
+                        font-black
+                        text-gray-900
+                        dark:text-white
+                      ">
+                          <%= field.label %>
+                        </h3>
+
+                        <% if field.required? %>
+
+                      <span
+                        class="
+                          rounded-full
+                          border border-red-200
+                          bg-red-50
+                          px-2.5 py-1
+                          text-[9px]
+                          font-black
+                          uppercase
+                          tracking-wider
+                          text-red-600
+                        ">
+                        Required
+                      </span>
+
+                        <% end %>
+
+                        <% unless field.active? %>
+
+                      <span
+                        class="
+                          rounded-full
+                          border border-slate-200
+                          bg-slate-100
+                          px-2.5 py-1
+                          text-[9px]
+                          font-black
+                          uppercase
+                          tracking-wider
+                          text-slate-500
+                        ">
+                        Inactive
+                      </span>
+
+                        <% end %>
+
+                      </div>
+
+                      <div
+                        class="
+                      mt-2
+                      flex flex-wrap
+                      items-center gap-2
+                      text-xs
+                    ">
+
+                    <span
+                      class="
+                        rounded-lg
+                        bg-sky-100
+                        px-2.5 py-1
+                        font-bold
+                        text-sky-700
+                        dark:bg-sky-900/40
+                        dark:text-sky-300
+                      ">
+                      <%= field.field_type %>
+                    </span>
+
+                        <span class="font-mono text-gray-400">
+                      <%= field.slug %>
+                    </span>
+
+                        <% if field.multiple? %>
+
+                      <span
+                        class="
+                          rounded-lg
+                          bg-violet-100
+                          px-2.5 py-1
+                          font-bold
+                          text-violet-700
+                          dark:bg-violet-900/40
+                          dark:text-violet-300
+                        ">
+                        Multiple
+                      </span>
+
+                        <% end %>
+
+                      </div>
+
+                      <% if field.description.present? %>
+
+                        <p
+                          class="
+                        mt-3
+                        max-w-3xl
+                        text-sm
+                        leading-6
+                        text-gray-500
+                        dark:text-gray-400
+                      ">
+                          <%= field.description %>
+                        </p>
+
+                      <% end %>
+
+                    </div>
+
+                  </div>
+
+                  <%# ACTIONS %>
+
+                  <div
+                    class="
+                  flex shrink-0
+                  items-center gap-2
+                ">
+
+                    <%= link_to(
+                          "Edit",
+                          edit_admin_ecosystems_load_sources_entity_templates_entity_template_version_entity_template_field_path(
+                            @entity_template_version,
+                            field
+                          ),
+                          class: "
+                        inline-flex
+                        items-center justify-center
+                        rounded-xl
+                        border border-gray-200
+                        bg-white
+                        px-4 py-2.5
+                        text-xs
+                        font-black
+                        text-gray-700
+                        shadow-sm
+                        transition
+                        hover:border-sky-300
+                        hover:bg-sky-50
+                        hover:text-sky-700
+                        dark:border-gray-700
+                        dark:bg-gray-800
+                        dark:text-gray-200
+                        dark:hover:border-sky-700
+                        dark:hover:bg-sky-950/30
+                      "
+                        ) %>
+
+                    <% if @entity_template_version.draft? %>
+
+                      <%= button_to(
+                            "Delete",
+                            admin_ecosystems_load_sources_entity_templates_entity_template_version_entity_template_field_path(
+                              @entity_template_version,
+                              field
+                            ),
+                            method: :delete,
+                            class: "
+                          inline-flex
+                          items-center justify-center
+                          rounded-xl
+                          border border-red-200
+                          bg-red-50
+                          px-4 py-2.5
+                          text-xs
+                          font-black
+                          text-red-600
+                          shadow-sm
+                          transition
+                          hover:border-red-300
+                          hover:bg-red-100
+                          dark:border-red-900
+                          dark:bg-red-950/30
+                          dark:text-red-400
+                        ",
+                            data: {
+                              turbo_confirm: "Remove this template field?"
+                            }
+                          ) %>
+
+                    <% end %>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            <% end %>
+
+          </div>
+
+          <%# FIELD SUMMARY %>
+
+          <div
+            class="
+          mt-6
+          flex flex-col gap-3
+          rounded-2xl
+          border border-sky-100
+          bg-sky-50/60
+          px-5 py-4
+          sm:flex-row
+          sm:items-center
+          sm:justify-between
+          dark:border-sky-900
+          dark:bg-sky-950/20
+        ">
+
+            <div
+              class="
+            text-xs
+            font-bold
+            text-sky-700
+            dark:text-sky-300
+          ">
+              🧩
+              <%= fields.size %>
+              <%= "field".pluralize(fields.size) %>
+              configured for this version
+            </div>
+
+            <div
+              class="
+            font-mono
+            text-[10px]
+            font-bold
+            uppercase
+            tracking-wider
+            text-sky-500
+          ">
+              VERSION ::
+              <%= @entity_template_version.version.presence || @entity_template_version.id %>
+            </div>
+
+          </div>
+
+        <% else %>
+
+          <%# EMPTY STATE %>
+
+          <div
+            class="
+          rounded-2xl
+          border-2
+          border-dashed
+          border-sky-200
+          bg-white/70
+          p-10
+          text-center
+          dark:border-sky-800
+          dark:bg-gray-900/60
+        ">
+
+            <div class="text-4xl">
+              🧩
+            </div>
+
+            <h3
+              class="
+            mt-4
+            text-base
+            font-black
+            text-gray-800
+            dark:text-gray-200
+          ">
+              No template fields yet
+            </h3>
+
+            <p
+              class="
+            mx-auto
+            mt-2
+            max-w-lg
+            text-sm
+            leading-6
+            text-gray-400
+          ">
+              This version does not have any dynamic entity attributes
+              configured yet. Add fields such as jurisdiction, governance
+              model, scale, funding model or other attributes required by
+              this template.
+            </p>
+
+            <% if @entity_template_version.draft? %>
+
+              <%= link_to(
+                    "＋ Create First Field",
+                    new_admin_ecosystems_load_sources_entity_templates_entity_template_version_entity_template_field_path(
+                      @entity_template_version
+                    ),
+                    class: "
+                  mt-6
+                  inline-flex
+                  items-center justify-center
+                  rounded-xl
+                  bg-sky-600
+                  px-5 py-3
+                  text-sm
+                  font-black
+                  text-white
+                  shadow-sm
+                  shadow-sky-200
+                  transition
+                  hover:bg-sky-700
+                  dark:shadow-none
+                "
+                  ) %>
+
+            <% else %>
+
+              <div
+                class="
+              mt-6
+              inline-flex
+              items-center gap-2
+              rounded-xl
+              border border-gray-200
+              bg-gray-50
+              px-4 py-3
+              text-xs
+              font-bold
+              text-gray-500
+              dark:border-gray-700
+              dark:bg-gray-800
+              dark:text-gray-400
+            ">
+                🔒
+                Only draft versions can be modified.
+              </div>
+
+            <% end %>
+
+          </div>
+
+        <% end %>
+
+      </div>
+
+    </div>
+
+  </div>
+<%# ========================================================================
+DEFINITION
+======================================================================== %>
+
+  <div class="mt-8">
+    <div
+      class="
+    overflow-hidden
+    rounded-[24px]
+    border-2
+    border-gray-100
+    bg-white
+    shadow-sm
+    dark:border-gray-700
+    dark:bg-gray-800
+  ">
+
+      <div
+        class="
+      flex flex-col gap-4
+      border-b border-gray-100
+      bg-gray-50/80
+      px-6 py-5
+      sm:flex-row
+      sm:items-center
+      sm:justify-between
+      dark:border-gray-700
+      dark:bg-gray-900/50
+    ">
+
+        <div>
+
+          <div
+            class="
+          text-[10px]
+          font-black
+          uppercase
+          tracking-[0.18em]
+          text-violet-500
+        ">
             Structure Payload
           </div>
 
           <h2
             class="
-              mt-1
-              text-lg
-              font-black
-              text-gray-900
-              dark:text-white
-            "
-          >
+          mt-1
+          text-lg
+          font-black
+          text-gray-900
+          dark:text-white
+        ">
             Version Definition
           </h2>
 
@@ -761,21 +1202,20 @@ Additional features:
 
         <div
           class="
-            inline-flex items-center gap-2
-            rounded-full
-            border border-gray-200
-            bg-white
-            px-3 py-1.5
-            font-mono
-            text-[10px]
-            font-bold
-            uppercase
-            tracking-wider
-            text-gray-400
-            dark:border-gray-700
-            dark:bg-gray-800
-          "
-        >
+        inline-flex items-center gap-2
+        rounded-full
+        border border-gray-200
+        bg-white
+        px-3 py-1.5
+        font-mono
+        text-[10px]
+        font-bold
+        uppercase
+        tracking-wider
+        text-gray-400
+        dark:border-gray-700
+        dark:bg-gray-800
+      ">
           JSON Definition
         </div>
 
@@ -785,37 +1225,35 @@ Additional features:
 
         <% if @entity_template_version.definition.present? %>
 
-          <pre
-            class="
-              overflow-x-auto
-              rounded-2xl
-              border
-              border-gray-800
-              bg-gray-950
-              p-5
-              font-mono
-              text-xs
-              leading-6
-              text-emerald-300
-              shadow-inner
-            "
-          ><%= JSON.pretty_generate(@entity_template_version.definition) %></pre>
+      <pre
+        class="
+          overflow-x-auto
+          rounded-2xl
+          border
+          border-gray-800
+          bg-gray-950
+          p-5
+          font-mono
+          text-xs
+          leading-6
+          text-emerald-300
+          shadow-inner
+        "><%= JSON.pretty_generate(@entity_template_version.definition) %></pre>
 
         <% else %>
 
           <div
             class="
-              rounded-2xl
-              border-2
-              border-dashed
-              border-gray-200
-              bg-gray-50
-              p-10
-              text-center
-              dark:border-gray-700
-              dark:bg-gray-900
-            "
-          >
+          rounded-2xl
+          border-2
+          border-dashed
+          border-gray-200
+          bg-gray-50
+          p-10
+          text-center
+          dark:border-gray-700
+          dark:bg-gray-900
+        ">
 
             <div class="text-3xl">
               📭
@@ -823,26 +1261,24 @@ Additional features:
 
             <h3
               class="
-                mt-4
-                text-base
-                font-black
-                text-gray-700
-                dark:text-gray-200
-              "
-            >
+            mt-4
+            text-base
+            font-black
+            text-gray-700
+            dark:text-gray-200
+          ">
               No definition configured
             </h3>
 
             <p
               class="
-                mx-auto
-                mt-2
-                max-w-md
-                text-sm
-                leading-6
-                text-gray-400
-              "
-            >
+            mx-auto
+            mt-2
+            max-w-md
+            text-sm
+            leading-6
+            text-gray-400
+          ">
               This version exists, but its structural definition is currently
               empty.
             </p>
@@ -856,82 +1292,73 @@ Additional features:
     </div>
 
   </div>
-
-
-  <%# ========================================================================
-  COMPARE VERSIONS
-  ======================================================================== %>
+<%# ========================================================================
+COMPARE VERSIONS
+======================================================================== %>
 
   <div class="mt-8">
-
     <div
       class="
-        overflow-hidden
-        rounded-[24px]
-        border-2
-        border-violet-100
-        bg-gradient-to-br
-        from-violet-50
-        via-white
-        to-indigo-50
-        shadow-sm
-        shadow-violet-100/40
-        dark:border-violet-900
-        dark:from-violet-950/20
-        dark:via-gray-800
-        dark:to-gray-900
-      "
-    >
+    overflow-hidden
+    rounded-[24px]
+    border-2
+    border-violet-100
+    bg-gradient-to-br
+    from-violet-50
+    via-white
+    to-indigo-50
+    shadow-sm
+    shadow-violet-100/40
+    dark:border-violet-900
+    dark:from-violet-950/20
+    dark:via-gray-800
+    dark:to-gray-900
+  ">
 
       <div
         class="
-          border-b
-          border-violet-100
-          px-6 py-5
-          dark:border-gray-700
-        "
-      >
+      border-b
+      border-violet-100
+      px-6 py-5
+      dark:border-gray-700
+    ">
 
         <div
           class="
-            text-[10px]
-            font-black
-            uppercase
-            tracking-[0.18em]
-            text-violet-500
-          "
-        >
+        text-[10px]
+        font-black
+        uppercase
+        tracking-[0.18em]
+        text-violet-500
+      ">
           Version Analysis
         </div>
 
         <h2
           class="
-            mt-1
-            text-lg
-            font-black
-            text-gray-900
-            dark:text-white
-          "
-        >
+        mt-1
+        text-lg
+        font-black
+        text-gray-900
+        dark:text-white
+      ">
           Compare this version
         </h2>
 
         <p
           class="
-            mt-2
-            max-w-3xl
-            text-sm
-            leading-6
-            text-gray-500
-            dark:text-gray-400
-          "
-        >
+        mt-2
+        max-w-3xl
+        text-sm
+        leading-6
+        text-gray-500
+        dark:text-gray-400
+      ">
           Compare this snapshot with another version of the same entity
           template to identify structural changes over time.
         </p>
 
       </div>
-
 
       <div class="p-6 sm:p-8">
 
@@ -950,10 +1377,10 @@ Additional features:
                   :version_id,
                   "Compare with version",
                   class: "
-                    mb-2 block text-sm font-semibold
-                    text-gray-700
-                    dark:text-gray-300
-                  "
+                mb-2 block text-sm font-semibold
+                text-gray-700
+                dark:text-gray-300
+              "
                 ) %>
 
             <%= form.select(
@@ -973,59 +1400,55 @@ Additional features:
                   },
                   {
                     class: "
-                      block w-full rounded-xl
-                      border border-gray-300
-                      bg-white px-4 py-3
-                      text-sm text-gray-900
-                      shadow-sm
-                      focus:border-violet-500
-                      focus:outline-none
-                      focus:ring-2 focus:ring-violet-500
-                      dark:border-gray-700
-                      dark:bg-gray-900
-                      dark:text-white
-                    "
+                  block w-full rounded-xl
+                  border border-gray-300
+                  bg-white px-4 py-3
+                  text-sm text-gray-900
+                  shadow-sm
+                  focus:border-violet-500
+                  focus:outline-none
+                  focus:ring-2 focus:ring-violet-500
+                  dark:border-gray-700
+                  dark:bg-gray-900
+                  dark:text-white
+                "
                   }
                 ) %>
 
           </div>
 
-
           <div>
 
             <div
               class="
-                rounded-xl
-                border border-gray-200
-                bg-white
-                px-4 py-3
-                dark:border-gray-700
-                dark:bg-gray-900
-              "
-            >
+            rounded-xl
+            border border-gray-200
+            bg-white
+            px-4 py-3
+            dark:border-gray-700
+            dark:bg-gray-900
+          ">
 
               <div
                 class="
-                  text-[10px]
-                  font-black
-                  uppercase
-                  tracking-wider
-                  text-gray-400
-                "
-              >
+              text-[10px]
+              font-black
+              uppercase
+              tracking-wider
+              text-gray-400
+            ">
                 Current version
               </div>
 
               <div
                 class="
-                  mt-1
-                  font-mono
-                  text-sm
-                  font-bold
-                  text-violet-600
-                  dark:text-violet-400
-                "
-              >
+              mt-1
+              font-mono
+              text-sm
+              font-bold
+              text-violet-600
+              dark:text-violet-400
+            ">
                 <%= @entity_template_version.version.presence || "##{@entity_template_version.id}" %>
               </div>
 
@@ -1033,27 +1456,26 @@ Additional features:
 
           </div>
 
-
           <div>
 
             <%= form.submit(
                   "Compare Versions →",
                   class: "
-                    inline-flex w-full
-                    items-center justify-center
-                    rounded-xl
-                    bg-violet-600
-                    px-5 py-3
-                    text-sm font-bold
-                    text-white
-                    shadow-sm
-                    transition
-                    hover:bg-violet-700
-                    focus:outline-none
-                    focus:ring-2
-                    focus:ring-violet-500
-                    focus:ring-offset-2
-                  "
+                inline-flex w-full
+                items-center justify-center
+                rounded-xl
+                bg-violet-600
+                px-5 py-3
+                text-sm font-bold
+                text-white
+                shadow-sm
+                transition
+                hover:bg-violet-700
+                focus:outline-none
+                focus:ring-2
+                focus:ring-violet-500
+                focus:ring-offset-2
+              "
                 ) %>
 
           </div>
@@ -1065,78 +1487,70 @@ Additional features:
     </div>
 
   </div>
-
-
-  <%# ========================================================================
-  LIFECYCLE MAP
-  ======================================================================== %>
+<%# ========================================================================
+LIFECYCLE MAP
+======================================================================== %>
 
   <div class="mt-8">
-
     <div
       class="
-        rounded-[24px]
-        border-2
-        border-orange-100
-        bg-gradient-to-br
-        from-orange-50
-        via-white
-        to-amber-50
-        p-6
-        shadow-sm
-        shadow-orange-100/40
-        dark:border-orange-900
-        dark:from-orange-950/20
-        dark:via-gray-800
-        dark:to-gray-900
-      "
-    >
+    rounded-[24px]
+    border-2
+    border-orange-100
+    bg-gradient-to-br
+    from-orange-50
+    via-white
+    to-amber-50
+    p-6
+    shadow-sm
+    shadow-orange-100/40
+    dark:border-orange-900
+    dark:from-orange-950/20
+    dark:via-gray-800
+    dark:to-gray-900
+  ">
 
       <div
         class="
-          text-[10px]
-          font-black
-          uppercase
-          tracking-[0.18em]
-          text-orange-500
-        "
-      >
+      text-[10px]
+      font-black
+      uppercase
+      tracking-[0.18em]
+      text-orange-500
+    ">
         Version Lifecycle
       </div>
 
       <div
         class="
-          mt-5
-          grid
-          grid-cols-1
-          gap-4
-          md:grid-cols-3
-        "
-      >
+      mt-5
+      grid
+      grid-cols-1
+      gap-4
+      md:grid-cols-3
+    ">
 
         <%# DRAFT %>
 
         <div
           class="
-            rounded-2xl
-            border-2
-            p-5
-            <%= @entity_template_version.draft? ? 'border-amber-300 bg-amber-50 shadow-md shadow-amber-100' : 'border-gray-100 bg-white' %>
-            dark:border-gray-700
-            dark:bg-gray-900
-          "
-        >
+        rounded-2xl
+        border-2
+        p-5
+        <%= @entity_template_version.draft? ? 'border-amber-300 bg-amber-50 shadow-md shadow-amber-100' : 'border-gray-100 bg-white' %>
+        dark:border-gray-700
+        dark:bg-gray-900
+      ">
 
           <div class="flex items-center gap-3">
 
             <div
               class="
-                flex h-10 w-10 items-center justify-center
-                rounded-xl
-                bg-amber-100
-                text-lg
-              "
-            >
+            flex h-10 w-10 items-center justify-center
+            rounded-xl
+            bg-amber-100
+            text-lg
+          ">
               ✏️
             </div>
 
@@ -1156,30 +1570,27 @@ Additional features:
 
         </div>
 
-
         <%# PUBLISHED %>
 
         <div
           class="
-            rounded-2xl
-            border-2
-            p-5
-            <%= @entity_template_version.published? ? 'border-emerald-300 bg-emerald-50 shadow-md shadow-emerald-100' : 'border-gray-100 bg-white' %>
-            dark:border-gray-700
-            dark:bg-gray-900
-          "
-        >
+        rounded-2xl
+        border-2
+        p-5
+        <%= @entity_template_version.published? ? 'border-emerald-300 bg-emerald-50 shadow-md shadow-emerald-100' : 'border-gray-100 bg-white' %>
+        dark:border-gray-700
+        dark:bg-gray-900
+      ">
 
           <div class="flex items-center gap-3">
 
             <div
               class="
-                flex h-10 w-10 items-center justify-center
-                rounded-xl
-                bg-emerald-100
-                text-lg
-              "
-            >
+            flex h-10 w-10 items-center justify-center
+            rounded-xl
+            bg-emerald-100
+            text-lg
+          ">
               ✓
             </div>
 
@@ -1199,30 +1610,27 @@ Additional features:
 
         </div>
 
-
         <%# ARCHIVED %>
 
         <div
           class="
-            rounded-2xl
-            border-2
-            p-5
-            <%= @entity_template_version.archived? ? 'border-slate-300 bg-slate-100 shadow-md shadow-slate-100' : 'border-gray-100 bg-white' %>
-            dark:border-gray-700
-            dark:bg-gray-900
-          "
-        >
+        rounded-2xl
+        border-2
+        p-5
+        <%= @entity_template_version.archived? ? 'border-slate-300 bg-slate-100 shadow-md shadow-slate-100' : 'border-gray-100 bg-white' %>
+        dark:border-gray-700
+        dark:bg-gray-900
+      ">
 
           <div class="flex items-center gap-3">
 
             <div
               class="
-                flex h-10 w-10 items-center justify-center
-                rounded-xl
-                bg-slate-100
-                text-lg
-              "
-            >
+            flex h-10 w-10 items-center justify-center
+            rounded-xl
+            bg-slate-100
+            text-lg
+          ">
               ◼
             </div>
 
@@ -1244,20 +1652,18 @@ Additional features:
 
       </div>
 
-
       <div
         class="
-          mt-5
-          border-t
-          border-orange-100
-          pt-5
-          text-xs
-          leading-6
-          text-gray-500
-          dark:border-gray-700
-          dark:text-gray-400
-        "
-      >
+      mt-5
+      border-t
+      border-orange-100
+      pt-5
+      text-xs
+      leading-6
+      text-gray-500
+      dark:border-gray-700
+      dark:text-gray-400
+    ">
         Published versions define the active structure used by the system.
         Archived versions are retained as historical snapshots and should not
         be silently deleted.
@@ -1266,11 +1672,9 @@ Additional features:
     </div>
 
   </div>
-
-
-  <%# ========================================================================
-  DANGER ZONE
-  ======================================================================== %>
+<%# ========================================================================
+DANGER ZONE
+======================================================================== %>
 
   <% if @entity_template_version.draft? ||
     @entity_template_version.archived? %>
@@ -1279,68 +1683,62 @@ Additional features:
 
       <div
         class="
-          rounded-[24px]
-          border-2
-          border-red-100
-          bg-red-50/50
-          p-6
-          dark:border-red-900
-          dark:bg-red-950/20
-        "
-      >
+      rounded-[24px]
+      border-2
+      border-red-100
+      bg-red-50/50
+      p-6
+      dark:border-red-900
+      dark:bg-red-950/20
+    ">
 
         <div
           class="
-            flex flex-col gap-5
-            sm:flex-row
-            sm:items-start
-            sm:justify-between
-          "
-        >
+        flex flex-col gap-5
+        sm:flex-row
+        sm:items-start
+        sm:justify-between
+      ">
 
           <div>
 
             <div
               class="
-                text-[10px]
-                font-black
-                uppercase
-                tracking-[0.18em]
-                text-red-500
-              "
-            >
+            text-[10px]
+            font-black
+            uppercase
+            tracking-[0.18em]
+            text-red-500
+          ">
               Administrative Action
             </div>
 
             <h2
               class="
-                mt-1
-                text-base
-                font-black
-                text-gray-800
-                dark:text-white
-              "
-            >
+            mt-1
+            text-base
+            font-black
+            text-gray-800
+            dark:text-white
+          ">
               Delete this version
             </h2>
 
             <p
               class="
-                mt-2
-                max-w-2xl
-                text-sm
-                leading-6
-                text-gray-500
-                dark:text-gray-400
-              "
-            >
+            mt-2
+            max-w-2xl
+            text-sm
+            leading-6
+            text-gray-500
+            dark:text-gray-400
+          ">
               Deletion permanently removes this version from the database.
               For published or historically important versions, archiving is
               preferred over deletion.
             </p>
 
           </div>
-
 
           <%= button_to(
                 "Delete Version",
@@ -1349,21 +1747,21 @@ Additional features:
                 ),
                 method: :delete,
                 class: "
-                  inline-flex shrink-0
-                  items-center justify-center
-                  rounded-xl
-                  border border-red-200
-                  bg-white
-                  px-4 py-2.5
-                  text-sm font-bold
-                  text-red-600
-                  shadow-sm
-                  transition
-                  hover:bg-red-50
-                  dark:border-red-800
-                  dark:bg-gray-900
-                  dark:text-red-400
-                ",
+              inline-flex shrink-0
+              items-center justify-center
+              rounded-xl
+              border border-red-200
+              bg-white
+              px-4 py-2.5
+              text-sm font-bold
+              text-red-600
+              shadow-sm
+              transition
+              hover:bg-red-50
+              dark:border-red-800
+              dark:bg-gray-900
+              dark:text-red-400
+            ",
                 data: {
                   turbo_confirm: "Delete this entity template version permanently?"
                 }
@@ -1377,35 +1775,20 @@ Additional features:
 
   <% end %>
 
+<%# ========================================================================
+FOOTER
+======================================================================== %>
 
-  <%# ========================================================================
-  FOOTER
-  ======================================================================== %>
-
-  <div
-    class="
-      mt-8
-      flex flex-col gap-3
-      border-t-2
-      border-gray-100
-      pt-5
-      sm:flex-row
-      sm:items-center
-      sm:justify-between
-      dark:border-gray-800
-    "
-  >
-
+  <div class=" mt-8 flex flex-col gap-3 border-t-2 border-gray-100 pt-5 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800 ">
     <div
       class="
-        font-mono
-        text-[10px]
-        font-bold
-        uppercase
-        tracking-wider
-        text-gray-400
-      "
-    >
+    font-mono
+    text-[10px]
+    font-bold
+    uppercase
+    tracking-wider
+    text-gray-400
+  ">
       ENTITY_TEMPLATE_VERSION ::
       <%= @entity_template_version.id %> ::
       <%= @entity_template_version.status.to_s.upcase %>
@@ -1413,27 +1796,24 @@ Additional features:
 
     <div
       class="
-        flex items-center gap-2
-        text-[10px]
-        font-black
-        uppercase
-        tracking-wider
-        text-emerald-500
-      "
-    >
+    flex items-center gap-2
+    text-[10px]
+    font-black
+    uppercase
+    tracking-wider
+    text-emerald-500
+  ">
 
-      <span
-        class="
-          h-2 w-2 rounded-full
-          bg-emerald-400
-          shadow-[0_0_8px_rgba(52,211,153,0.6)]
-        "
-      ></span>
+  <span
+    class="
+      h-2 w-2 rounded-full
+      bg-emerald-400
+      shadow-[0_0_8px_rgba(52,211,153,0.6)]
+    "></span>
 
       Version record online
 
     </div>
 
   </div>
-
 </div>

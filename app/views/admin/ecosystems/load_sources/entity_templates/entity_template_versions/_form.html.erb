@@ -1,0 +1,223 @@
+<%= form_with(
+model: @entity_template_version,
+url: @entity_template_version.persisted? ?
+admin_ecosystems_load_sources_entity_templates_entity_template_version_path(@entity_template_version) :
+admin_ecosystems_load_sources_entity_templates_entity_template_versions_path,
+method: @entity_template_version.persisted? ? :patch : :post,
+class: "space-y-8"
+) do |form| %>
+
+<% if @entity_template_version.errors.any? %>
+<div class="rounded-2xl border border-red-200 bg-red-50 p-5 dark:border-red-900/50 dark:bg-red-900/20">
+
+    <div class="flex items-start gap-3">
+
+        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-300">
+            !
+        </div>
+
+        <div>
+            <h3 class="font-semibold text-red-800 dark:text-red-200">
+                Unable to save template version
+            </h3>
+
+            <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-red-700 dark:text-red-300">
+                <% @entity_template_version.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+                <% end %>
+            </ul>
+        </div>
+
+    </div>
+
+</div>
+<% end %>
+
+
+<%# ============================================================ %>
+<%# ENTITY TEMPLATE                                             %>
+<%# ============================================================ %>
+
+<div>
+
+    <%= form.label(
+    :entity_template_id,
+    "Entity Template",
+    class: "block text-sm font-semibold text-gray-700 dark:text-gray-300"
+    ) %>
+
+    <%= form.collection_select(
+    :entity_template_id,
+    @entity_templates,
+    :id,
+    :name,
+    { prompt: "Select entity template" },
+    {
+    class: "mt-2 block w-full rounded-xl border border-gray-300
+    bg-white px-4 py-3 text-sm
+    focus:border-indigo-500 focus:ring-indigo-500
+    dark:border-gray-700 dark:bg-gray-900
+    dark:text-white"
+    }
+    ) %>
+
+    <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+        Select the entity template this version belongs to.
+    </p>
+
+</div>
+
+
+<%# ============================================================ %>
+<%# VERSION                                                      %>
+<%# ============================================================ %>
+
+<div>
+
+    <%= form.label(
+    :version,
+    "Version",
+    class: "block text-sm font-semibold text-gray-700 dark:text-gray-300"
+    ) %>
+
+    <%= form.number_field(
+    :version,
+    min: 1,
+    placeholder: "1",
+    class: "mt-2 block w-full rounded-xl border border-gray-300
+    bg-white px-4 py-3 text-sm
+    focus:border-indigo-500 focus:ring-indigo-500
+    dark:border-gray-700 dark:bg-gray-900
+    dark:text-white"
+    ) %>
+
+    <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+        The version number for this entity template definition.
+    </p>
+
+</div>
+
+
+<%# ============================================================ %>
+<%# STATUS                                                       %>
+<%# ============================================================ %>
+
+<div>
+
+    <%= form.label(
+    :status,
+    "Status",
+    class: "block text-sm font-semibold text-gray-700 dark:text-gray-300"
+    ) %>
+
+    <%= form.select(
+    :status,
+    [
+    ["Draft", "draft"],
+    ["Published", "published"],
+    ["Archived", "archived"]
+    ],
+    {},
+    class: "mt-2 block w-full rounded-xl border border-gray-300
+    bg-white px-4 py-3 text-sm
+    focus:border-indigo-500 focus:ring-indigo-500
+    dark:border-gray-700 dark:bg-gray-900
+    dark:text-white"
+    ) %>
+
+    <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+        Draft versions can be edited before publishing.
+    </p>
+
+</div>
+
+
+<%# ============================================================ %>
+<%# DEFINITION                                                   %>
+<%# ============================================================ %>
+
+<div>
+
+    <div class="mb-2 flex items-center justify-between">
+
+        <%= form.label(
+        :definition,
+        "Definition",
+        class: "block text-sm font-semibold text-gray-700 dark:text-gray-300"
+        ) %>
+
+        <span class="rounded-lg bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-300">
+        JSON
+      </span>
+
+    </div>
+
+
+    <%= form.text_area(
+    :definition,
+    value: (
+    if @entity_template_version.definition.present?
+    JSON.pretty_generate(@entity_template_version.definition)
+    else
+    JSON.pretty_generate({})
+    end
+    ),
+    rows: 18,
+    spellcheck: false,
+    placeholder: <<~JSON
+    {
+    "title": "",
+    "description": "",
+    "fields": []
+    }
+    JSON
+    ,
+    class: "block w-full rounded-xl border border-gray-300
+    bg-gray-950 px-4 py-4 font-mono text-sm
+    leading-6 text-green-400
+    shadow-inner
+    focus:border-indigo-500 focus:ring-indigo-500
+    dark:border-gray-700"
+    ) %>
+
+    <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+        Enter the structure for this template version as valid JSON.
+    </p>
+
+</div>
+
+
+<%# ============================================================ %>
+<%# ACTIONS                                                       %>
+<%# ============================================================ %>
+
+<div class="flex flex-col gap-3 border-t border-gray-200 pt-6 sm:flex-row sm:items-center dark:border-gray-700">
+
+    <%= form.submit(
+    @entity_template_version.persisted? ?
+    "Update Template Version" :
+    "Create Template Version",
+    class: "inline-flex items-center justify-center rounded-xl
+    bg-indigo-600 px-6 py-3
+    text-sm font-semibold text-white
+    shadow-sm transition
+    hover:-translate-y-0.5 hover:bg-indigo-700
+    focus:outline-none focus:ring-2
+    focus:ring-indigo-500 focus:ring-offset-2"
+    ) %>
+
+
+    <%= link_to(
+    "Cancel",
+    admin_ecosystems_load_sources_entity_templates_entity_template_versions_path,
+    class: "inline-flex items-center justify-center rounded-xl
+    border border-gray-300 bg-white px-6 py-3
+    text-sm font-semibold text-gray-700
+    transition hover:bg-gray-50
+    dark:border-gray-700 dark:bg-gray-800
+    dark:text-gray-300 dark:hover:bg-gray-700"
+    ) %>
+
+</div>
+
+<% end %>

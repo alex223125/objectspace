@@ -36,6 +36,7 @@
 
   <nav class="flex-1 space-y-1 overflow-y-auto p-4">
 
+
     <%# ================================================================
         ENTITY TYPES
     ================================================================= %>
@@ -94,6 +95,33 @@
       <span>
         Versions
       </span>
+
+    <% end %>
+
+
+    <%# ================================================================
+        ENTITY TEMPLATE FIELDS
+    ================================================================= %>
+
+    <% if defined?(@entity_template_version) && @entity_template_version&.persisted? %>
+
+      <%= link_to(
+            admin_ecosystems_load_sources_entity_templates_entity_template_version_entity_template_fields_path(
+              @entity_template_version
+            ),
+            class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium
+                    text-gray-700 transition hover:bg-indigo-50 hover:text-indigo-600
+                    dark:text-gray-300 dark:hover:bg-indigo-900/20
+                    dark:hover:text-indigo-400"
+          ) do %>
+
+        <span>🧱</span>
+
+        <span>
+          Fields
+        </span>
+
+      <% end %>
 
     <% end %>
 

@@ -1,0 +1,29 @@
+<div class="max-w-4xl mx-auto my-10 p-8
+            bg-gradient-to-b from-white via-orange-50/20 to-slate-50/50
+            border-2 border-orange-100
+            rounded-[38px]
+            shadow-md shadow-orange-100/40">
+
+  <div class="mb-8 pb-6 border-b-2 border-orange-100">
+
+    <div class="text-[10px]
+                font-black
+                uppercase
+                tracking-[0.2em]
+                text-sky-500">
+      Template Field Manual
+    </div>
+
+    <h1 class="mt-1 text-2xl font-black text-slate-800">
+      Edit <%= @entity_template_field.label %>
+    </h1>
+
+    <p class="mt-1 text-xs text-slate-400">
+      Modify the definition of this template field.
+    </p>
+
+  </div>
+
+  <%= render "form" %>
+
+</div>

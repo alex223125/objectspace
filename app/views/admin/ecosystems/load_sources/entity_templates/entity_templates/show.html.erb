@@ -1,0 +1,370 @@
+<%# FILE: app/views/admin/ecosystems/load_sources/entity_templates/entity_templates/show.html.erb %>
+
+<div class="mx-auto w-full max-w-5xl px-5 py-8 sm:px-7 lg:px-10">
+
+  <!-- HEADER -->
+
+  <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
+    <div>
+
+      <div class="mb-3 flex items-center gap-2 text-sm text-gray-400">
+        <%= link_to(
+              "Entity Templates",
+              admin_ecosystems_load_sources_entity_templates_entity_templates_path,
+              class: "hover:text-indigo-600 dark:hover:text-indigo-400"
+            ) %>
+
+        <span>›</span>
+
+        <span class="text-gray-600 dark:text-gray-300">
+          <%= @entity_template.name %>
+        </span>
+      </div>
+
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+        <%= @entity_template.name %>
+      </h1>
+
+      <% if @entity_template.description.present? %>
+        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          <%= @entity_template.description %>
+        </p>
+      <% end %>
+
+    </div>
+
+
+    <!-- ACTIONS -->
+
+    <div class="flex items-center gap-3">
+
+      <%= link_to(
+            "Back",
+            admin_ecosystems_load_sources_entity_templates_entity_templates_path,
+            class: "rounded-xl border border-gray-300 px-4 py-2.5
+                    text-sm font-semibold text-gray-700
+                    hover:bg-gray-50
+                    dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
+          ) %>
+
+      <%= link_to(
+            "Edit",
+            edit_admin_ecosystems_load_sources_entity_templates_entity_template_path(@entity_template),
+            class: "rounded-xl bg-indigo-600 px-4 py-2.5
+                    text-sm font-semibold text-white
+                    hover:bg-indigo-700"
+          ) %>
+
+    </div>
+
+  </div>
+
+
+  <!-- STATUS / BASIC INFORMATION -->
+
+  <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+
+    <!-- STATUS -->
+
+    <div
+      class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm
+             dark:border-gray-800 dark:bg-gray-800"
+    >
+
+      <div class="text-xs font-semibold uppercase tracking-wider text-gray-400">
+        Status
+      </div>
+
+      <div class="mt-2">
+
+        <% if @entity_template.active? %>
+
+          <span
+            class="inline-flex items-center rounded-full
+                   bg-green-100 px-3 py-1 text-sm font-semibold text-green-700
+                   dark:bg-green-900/30 dark:text-green-400"
+          >
+            Active
+          </span>
+
+        <% else %>
+
+          <span
+            class="inline-flex items-center rounded-full
+                   bg-gray-100 px-3 py-1 text-sm font-semibold text-gray-600
+                   dark:bg-gray-700 dark:text-gray-300"
+          >
+            Inactive
+          </span>
+
+        <% end %>
+
+      </div>
+
+    </div>
+
+
+    <!-- ENTITY TYPE -->
+
+    <div
+      class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm
+             dark:border-gray-800 dark:bg-gray-800"
+    >
+
+      <div class="text-xs font-semibold uppercase tracking-wider text-gray-400">
+        Entity Type
+      </div>
+
+      <div class="mt-2 text-lg font-semibold text-gray-900 dark:text-white">
+
+        <% if @entity_template.entity_type.present? %>
+          <%= @entity_template.entity_type.name %>
+        <% else %>
+          —
+        <% end %>
+
+      </div>
+
+    </div>
+
+
+    <!-- VERSIONS -->
+
+    <div
+      class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm
+             dark:border-gray-800 dark:bg-gray-800"
+    >
+
+      <div class="text-xs font-semibold uppercase tracking-wider text-gray-400">
+        Versions
+      </div>
+
+      <div class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
+        <%= @entity_template.versions_count %>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- TEMPLATE DETAILS -->
+
+  <div
+    class="mb-6 rounded-2xl border border-gray-200 bg-white shadow-sm
+           dark:border-gray-800 dark:bg-gray-800"
+  >
+
+    <div
+      class="border-b border-gray-200 px-6 py-5
+             dark:border-gray-700"
+    >
+
+      <h2 class="text-lg font-bold text-gray-900 dark:text-white">
+        Template Details
+      </h2>
+
+    </div>
+
+
+    <div class="grid grid-cols-1 gap-6 p-6 sm:grid-cols-2">
+
+      <div>
+
+        <div class="text-xs font-semibold uppercase tracking-wider text-gray-400">
+          Name
+        </div>
+
+        <div class="mt-1 text-sm font-medium text-gray-900 dark:text-white">
+          <%= @entity_template.name %>
+        </div>
+
+      </div>
+
+
+      <div>
+
+        <div class="text-xs font-semibold uppercase tracking-wider text-gray-400">
+          Slug
+        </div>
+
+        <div class="mt-1 font-mono text-sm text-gray-700 dark:text-gray-300">
+          <%= @entity_template.slug %>
+        </div>
+
+      </div>
+
+
+      <div class="sm:col-span-2">
+
+        <div class="text-xs font-semibold uppercase tracking-wider text-gray-400">
+          Description
+        </div>
+
+        <div class="mt-1 text-sm text-gray-700 dark:text-gray-300">
+
+          <% if @entity_template.description.present? %>
+            <%= simple_format(@entity_template.description) %>
+          <% else %>
+            <span class="text-gray-400">
+              No description provided.
+            </span>
+          <% end %>
+
+        </div>
+
+      </div>
+
+
+      <div>
+
+        <div class="text-xs font-semibold uppercase tracking-wider text-gray-400">
+          Created
+        </div>
+
+        <div class="mt-1 text-sm text-gray-700 dark:text-gray-300">
+          <%= l(@entity_template.created_at, format: :long) %>
+        </div>
+
+      </div>
+
+
+      <div>
+
+        <div class="text-xs font-semibold uppercase tracking-wider text-gray-400">
+          Last Updated
+        </div>
+
+        <div class="mt-1 text-sm text-gray-700 dark:text-gray-300">
+          <%= l(@entity_template.updated_at, format: :long) %>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- VERSIONS -->
+
+  <div
+    class="rounded-2xl border border-gray-200 bg-white shadow-sm
+           dark:border-gray-800 dark:bg-gray-800"
+  >
+
+    <div
+      class="flex items-center justify-between
+             border-b border-gray-200 px-6 py-5
+             dark:border-gray-700"
+    >
+
+      <div>
+
+        <h2 class="text-lg font-bold text-gray-900 dark:text-white">
+          Template Versions
+        </h2>
+
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Version history for this entity template.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="p-6">
+
+      <% if @entity_template.versions.present? %>
+
+        <div class="space-y-4">
+
+          <% @entity_template.versions.order(version: :desc).each do |version| %>
+
+            <div
+              class="rounded-xl border border-gray-200 p-5
+                     dark:border-gray-700"
+            >
+
+              <div class="flex items-center justify-between">
+
+                <div>
+
+                  <div class="text-sm font-semibold text-gray-900 dark:text-white">
+                    Version <%= version.version %>
+                  </div>
+
+                  <% if version.created_at.present? %>
+                    <div class="mt-1 text-xs text-gray-400">
+                      <%= l(version.created_at, format: :long) %>
+                    </div>
+                  <% end %>
+
+                </div>
+
+                <span
+                  class="rounded-full bg-indigo-50 px-3 py-1
+                         text-xs font-semibold text-indigo-600
+                         dark:bg-indigo-900/30 dark:text-indigo-400"
+                >
+                  v<%= version.version %>
+                </span>
+
+              </div>
+
+            </div>
+
+          <% end %>
+
+        </div>
+
+      <% else %>
+
+        <div class="py-10 text-center">
+
+          <div class="text-3xl">
+            🧩
+          </div>
+
+          <h3 class="mt-3 text-sm font-semibold text-gray-900 dark:text-white">
+            No versions yet
+          </h3>
+
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            This template has not been versioned yet.
+          </p>
+
+        </div>
+
+      <% end %>
+
+    </div>
+
+  </div>
+
+
+  <!-- FOOTER ACTIONS -->
+
+  <div class="mt-6 flex items-center justify-between">
+
+    <%= link_to(
+          "← Back to Entity Templates",
+          admin_ecosystems_load_sources_entity_templates_entity_templates_path,
+          class: "text-sm font-medium text-gray-500
+                  hover:text-indigo-600
+                  dark:text-gray-400 dark:hover:text-indigo-400"
+        ) %>
+
+    <%= link_to(
+          "Edit Template",
+          edit_admin_ecosystems_load_sources_entity_templates_entity_template_path(@entity_template),
+          class: "rounded-xl bg-indigo-600 px-5 py-3
+                  text-sm font-semibold text-white
+                  hover:bg-indigo-700"
+        ) %>
+
+  </div>
+
+</div>

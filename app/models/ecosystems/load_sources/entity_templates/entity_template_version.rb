@@ -13,6 +13,11 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
              class_name: "Ecosystems::LoadSources::EntityTemplates::EntityTemplate"
 
 
+  has_many :entity_template_fields,
+           class_name: "Ecosystems::LoadSources::EntityTemplateField",
+           dependent: :destroy
+
+
   # ============================================================
   # ENUMS
   # ============================================================
@@ -45,6 +50,20 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
 
   validates :definition,
             presence: true
+
+
+  validate :definition_must_be_valid
+
+  def definition_must_be_valid
+    unless definition.is_a?(Hash)
+      errors.add(:definition, "must be an object")
+      return
+    end
+
+    unless definition["fields"].is_a?(Array)
+      errors.add(:definition, "must contain fields")
+    end
+  end
 
 
   # ============================================================

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_08_31_065203) do
+ActiveRecord::Schema[7.0].define(version: 2026_09_04_110617) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -367,6 +367,24 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_31_065203) do
     t.index ["context_type", "context_id"], name: "idx_et_config_context"
     t.index ["entity_template_id"], name: "idx_et_config_template"
     t.index ["entity_type_id"], name: "idx_et_config_type"
+  end
+
+  create_table "ecosystems_load_sources_entity_template_fields", force: :cascade do |t|
+    t.bigint "entity_template_version_id", null: false
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.string "label", null: false
+    t.text "description"
+    t.string "field_type", null: false
+    t.boolean "required", default: false, null: false
+    t.boolean "multiple", default: false, null: false
+    t.integer "position", default: 0, null: false
+    t.boolean "active", default: true, null: false
+    t.jsonb "settings", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["entity_template_version_id", "slug"], name: "idx_entity_template_fields_version_slug", unique: true
+    t.index ["entity_template_version_id"], name: "idx_entity_template_fields_version"
   end
 
   create_table "ecosystems_load_sources_entity_template_versions", force: :cascade do |t|
@@ -990,6 +1008,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_31_065203) do
   add_foreign_key "articles_simple_class_attributes", "simple_class_attributes"
   add_foreign_key "ecosystems_load_sources_entity_template_configurations", "ecosystems_load_sources_entity_templates", column: "entity_template_id", name: "fk_et_config_template"
   add_foreign_key "ecosystems_load_sources_entity_template_configurations", "ecosystems_load_sources_entity_types", column: "entity_type_id", name: "fk_et_config_type"
+  add_foreign_key "ecosystems_load_sources_entity_template_fields", "ecosystems_load_sources_entity_template_versions", column: "entity_template_version_id"
   add_foreign_key "ecosystems_load_sources_entity_template_versions", "ecosystems_load_sources_entity_templates", column: "entity_template_id"
   add_foreign_key "ecosystems_load_sources_entity_templates", "ecosystems_load_sources_entity_types", column: "entity_type_id"
   add_foreign_key "ecosystems_load_sources_entity_types", "ecosystems_load_sources_entity_types", column: "parent_id"

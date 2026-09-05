@@ -4,6 +4,36 @@
 
 import { application } from "./application"
 
+// // ============================================================
+// // GLOBAL STIMULUS IDENTIFIER ALIAS
+// // ============================================================
+// //
+// // Allows:
+// //
+// //   entity_template_builder
+// //   entity-template-builder
+// //
+// // to refer to the same Stimulus controller.
+// //
+// // Therefore ChatGPT-generated HTML can use either convention.
+// // ============================================================
+//
+// const originalRegister = application.register.bind(application)
+//
+// application.register = (identifier, controller) => {
+//     const kebabIdentifier = identifier.replace(/_/g, "-")
+//     const underscoreIdentifier = identifier.replace(/-/g, "_")
+//
+//     originalRegister(kebabIdentifier, controller)
+//
+//     if (underscoreIdentifier !== kebabIdentifier) {
+//         originalRegister(underscoreIdentifier, controller)
+//     }
+// }
+
+
+
+
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
 
@@ -377,8 +407,80 @@ application.register("admin_entity_types", AdminEntityTypesController)
 import EntityTemplateConfigurationController from "./admin/ecosystems/load_sources/entity_templates/entity_template_configuration_controller"
 application.register("entity_template_configuration", EntityTemplateConfigurationController)
 
+// Admin - Ecosystems - Load Sources - Definitions
+// import EntityTemplateBuilderController from "./admin/ecosystems/load_sources/entity_templates/definitions/entity_template_builder_controller"
+// application.register("entity_template_builder", EntityTemplateBuilderController)
+
+import EntityTemplateDefinitionBuilderController from "./admin/ecosystems/load_sources/entity_templates/definitions/entity_template_definition_builder_controller"
+application.register("entity_template_definition_builder", EntityTemplateDefinitionBuilderController)
+
+import EntityTemplateLibraryController from "./admin/ecosystems/load_sources/entity_templates/definitions/entity_template_library_controller"
+application.register("entity_template_library", EntityTemplateLibraryController)
 
 
 
 
 
+
+
+
+
+
+//
+// // ============================================================
+// // STIMULUS UNDERSCORE / KEBAB-CASE COMPATIBILITY ALIASES
+// // ============================================================
+// //
+// // Existing registrations in this file use identifiers such as:
+// //
+// //   entity_template_builder
+// //
+// // This additionally registers:
+// //
+// //   entity-template-builder
+// //
+// // Both identifiers point to the same controller.
+// //
+// // IMPORTANT:
+// // This works by reading the controllers already registered
+// // with Stimulus and creating aliases after registration.
+// // ============================================================
+//
+// setTimeout(() => {
+//     application.controllers.forEach((controller) => {
+//         const identifier = controller.identifier
+//
+//         if (!identifier) {
+//             return
+//         }
+//
+//         const kebabIdentifier = identifier.replace(/_/g, "-")
+//         const underscoreIdentifier = identifier.replace(/-/g, "_")
+//
+//         if (
+//             kebabIdentifier !== identifier &&
+//             !application.controllers.some(
+//                 (existingController) =>
+//                     existingController.identifier === kebabIdentifier
+//             )
+//         ) {
+//             application.register(
+//                 kebabIdentifier,
+//                 controller.constructor
+//             )
+//         }
+//
+//         if (
+//             underscoreIdentifier !== identifier &&
+//             !application.controllers.some(
+//                 (existingController) =>
+//                     existingController.identifier === underscoreIdentifier
+//             )
+//         ) {
+//             application.register(
+//                 underscoreIdentifier,
+//                 controller.constructor
+//             )
+//         }
+//     })
+// }, 0)

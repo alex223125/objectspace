@@ -24,6 +24,14 @@ lsof -i :3000
 kill -QUIT PID_HERE
 kill -9 PID_HERE
 
+## links
+## entity types
+http://localhost:3000/admin/ecosystems/load_sources/entity_types/entity_types
+
+##
+tree -I 'tmp|log|storage|node_modules|.git| css.gz'
+
+
 # 1
 
 bin/rails assets:precompile

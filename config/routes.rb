@@ -316,6 +316,7 @@ Rails.application.routes.draw do
               post :clone, to: "entity_template_versions#clone"
               get :compare
             end
+            resources :entity_template_fields
           end
 
           get :configuration,

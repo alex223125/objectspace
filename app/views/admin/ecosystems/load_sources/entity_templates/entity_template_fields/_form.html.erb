@@ -1,0 +1,185 @@
+<%= form_with model: [
+  @entity_template_version.entity_template,
+  @entity_template_version,
+  @entity_template_field
+],
+              class: "space-y-6" do |form| %>
+
+  <% if @entity_template_field.errors.any? %>
+
+    <div class="rounded-2xl
+                border-2 border-red-100
+                bg-red-50
+                p-5">
+
+      <div class="text-sm font-black text-red-700">
+        Field could not be saved
+      </div>
+
+      <ul class="mt-2 text-xs text-red-500 space-y-1">
+        <% @entity_template_field.errors.full_messages.each do |message| %>
+          <li>• <%= message %></li>
+        <% end %>
+      </ul>
+
+    </div>
+
+  <% end %>
+
+  <div>
+    <%= form.label :name,
+                   "Internal Name",
+                   class: "text-xs font-black uppercase tracking-wider text-slate-500" %>
+
+    <%= form.text_field :name,
+                        class: "mt-2 w-full rounded-2xl
+                border-2 border-slate-100
+                px-4 py-3
+                text-sm
+                focus:border-orange-300
+                focus:ring-orange-100" %>
+  </div>
+
+  <div>
+    <%= form.label :label,
+                   "Display Label",
+                   class: "text-xs font-black uppercase tracking-wider text-slate-500" %>
+
+    <%= form.text_field :label,
+                        class: "mt-2 w-full rounded-2xl
+                border-2 border-slate-100
+                px-4 py-3
+                text-sm
+                focus:border-orange-300" %>
+  </div>
+
+  <div>
+    <%= form.label :slug,
+                   "Slug",
+                   class: "text-xs font-black uppercase tracking-wider text-slate-500" %>
+
+    <%= form.text_field :slug,
+                        class: "mt-2 w-full rounded-2xl
+                border-2 border-slate-100
+                px-4 py-3
+                text-sm
+                focus:border-orange-300" %>
+  </div>
+
+  <div>
+    <%= form.label :description,
+                   "Description",
+                   class: "text-xs font-black uppercase tracking-wider text-slate-500" %>
+
+    <%= form.text_area :description,
+                       rows: 4,
+                       class: "mt-2 w-full rounded-2xl
+                border-2 border-slate-100
+                px-4 py-3
+                text-sm
+                focus:border-orange-300" %>
+  </div>
+
+  <div>
+    <%= form.label :field_type,
+                   "Field Type",
+                   class: "text-xs font-black uppercase tracking-wider text-slate-500" %>
+
+    <%= form.select :field_type,
+                    Ecosystems::LoadSources::EntityTemplateField::FIELD_TYPES.map {
+                      |type| [type.titleize, type]
+                    },
+                    { include_blank: "Select field type" },
+                    class: "mt-2 w-full rounded-2xl
+                border-2 border-slate-100
+                px-4 py-3
+                text-sm
+                focus:border-orange-300" %>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+    <label class="flex items-center gap-3
+                  rounded-2xl
+                  border-2 border-slate-100
+                  bg-slate-50/50
+                  p-4">
+
+      <%= form.check_box :required %>
+
+      <span class="text-xs font-black text-slate-600">
+        Required
+      </span>
+
+    </label>
+
+    <label class="flex items-center gap-3
+                  rounded-2xl
+                  border-2 border-slate-100
+                  bg-slate-50/50
+                  p-4">
+
+      <%= form.check_box :multiple %>
+
+      <span class="text-xs font-black text-slate-600">
+        Multiple Values
+      </span>
+
+    </label>
+
+
+    <label class="flex items-center gap-3
+                  rounded-2xl
+                  border-2 border-slate-100
+                  bg-slate-50/50
+                  p-4">
+
+      <%= form.check_box :active %>
+
+      <span class="text-xs font-black text-slate-600">
+        Active
+      </span>
+
+    </label>
+
+  </div>
+
+
+  <div>
+    <%= form.label :position,
+                   "Position",
+                   class: "text-xs font-black uppercase tracking-wider text-slate-500" %>
+
+    <%= form.number_field :position,
+                          min: 0,
+                          class: "mt-2 w-full rounded-2xl
+                border-2 border-slate-100
+                px-4 py-3
+                text-sm" %>
+  </div>
+
+
+  <div class="flex justify-end gap-3 pt-4">
+
+    <%= link_to "Cancel",
+                entity_template_version_path(@entity_template_version),
+                class: "rounded-2xl
+                border-2 border-slate-100
+                bg-white
+                px-5 py-3
+                text-sm font-black
+                text-slate-500" %>
+
+    <%= form.submit,
+          class: "rounded-2xl
+                bg-gradient-to-r
+                from-orange-400
+                to-amber-400
+                px-6 py-3
+                text-sm font-black
+                text-white
+                shadow-md shadow-orange-200/60" %>
+
+  </div>
+
+<% end %>
