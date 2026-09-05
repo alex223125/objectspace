@@ -50,7 +50,8 @@ import 'tinymce/plugins/searchreplace';
 // import 'tinymce/plugins/spellchecker';
 // import 'tinymce/plugins/tabfocus';
 import 'tinymce/plugins/table';
-import 'tinymce/plugins/template';
+import '../../../tinymce_plugins/template';
+
 // import 'tinymce/plugins/textcolor';
 // import 'tinymce/plugins/textpattern';
 // import 'tinymce/plugins/toc';

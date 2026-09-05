@@ -32,7 +32,8 @@
     "sortablejs": "^1.15.0",
     "stimulus-clipboard": "^4.0.1",
     "stimulus-use": "^0.52.0",
-    "tinymce": "^6.8.3"
+    "tinymce": "^8.9.0",
+    "tinymce-premium": "^8.9.0"
   },
   "overrides": {
     "puppeteer": "^25.2.1",
@@ -47,7 +48,10 @@
     "build:css": "sass ./app/assets/stylesheets/application.bootstrap.scss:./app/assets/builds/application.css --no-source-map --load-path=node_modules --quiet-deps"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "autoprefixer": "^10.4.13",
+    "eslint": "^10.10.0",
+    "globals": "^17.12.0",
     "postcss": "^8.4.21",
     "tailwindcss": "^3.2.4"
   }

@@ -2,7 +2,8 @@
 
 class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < ApplicationRecord
 
-  self.table_name = "ecosystems_load_sources_entity_template_versions"
+  self.table_name =
+    "ecosystems_load_sources_entity_template_versions"
 
 
   # ============================================================
@@ -10,13 +11,15 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
   # ============================================================
 
   belongs_to :entity_template,
-             class_name: "Ecosystems::LoadSources::EntityTemplates::EntityTemplate"
-
+             class_name:
+               "Ecosystems::LoadSources::EntityTemplates::EntityTemplate",
+             foreign_key: :entity_template_id
 
   has_many :entity_template_fields,
-           class_name: "Ecosystems::LoadSources::EntityTemplateField",
+           class_name:
+             "Ecosystems::LoadSources::EntityTemplates::EntityTemplateField",
+           foreign_key: :entity_template_version_id,
            dependent: :destroy
-
 
   # ============================================================
   # ENUMS
@@ -51,19 +54,7 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
   validates :definition,
             presence: true
 
-
   validate :definition_must_be_valid
-
-  def definition_must_be_valid
-    unless definition.is_a?(Hash)
-      errors.add(:definition, "must be an object")
-      return
-    end
-
-    unless definition["fields"].is_a?(Array)
-      errors.add(:definition, "must contain fields")
-    end
-  end
 
 
   # ============================================================
@@ -102,7 +93,10 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
   # ============================================================
 
   def latest?
-    version == entity_template.entity_template_versions.maximum(:version)
+    version ==
+      self.class
+          .where(entity_template_id: entity_template_id)
+          .maximum(:version)
   end
 
 
@@ -126,10 +120,10 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
   # ============================================================
 
   def next_version_number
-    entity_template
-      .entity_template_versions
-      .maximum(:version)
-      .to_i + 1
+    self.class
+        .where(entity_template_id: entity_template_id)
+        .maximum(:version)
+        .to_i + 1
   end
 
 
@@ -139,19 +133,23 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
 
   def publish!
     transaction do
-      entity_template
-        .entity_template_versions
-        .where(status: "published")
-        .where.not(id: id)
-        .update_all(
-          status: "archived",
-          updated_at: Time.current
-        )
+
+      self.class
+          .where(
+            entity_template_id: entity_template_id,
+            status: "published"
+          )
+          .where.not(id: id)
+          .update_all(
+            status: "archived",
+            updated_at: Time.current
+          )
 
       update!(
         status: "published",
         published_at: Time.current
       )
+
     end
   end
 
@@ -177,12 +175,15 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
   # ============================================================
 
   def create_next_version!(created_by_id: nil)
-    entity_template.entity_template_versions.create!(
+
+    self.class.create!(
+      entity_template_id: entity_template_id,
       version: next_version_number,
       status: "draft",
       definition: definition.deep_dup,
       created_by_id: created_by_id
     )
+
   end
 
 
@@ -196,9 +197,7 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
 
 
   def fields
-    sections.flat_map do |section|
-      section.fetch("fields", [])
-    end
+    definition.fetch("fields", [])
   end
 
 
@@ -230,17 +229,82 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
 
 
   # ============================================================
+  # DEFINITION VALIDATION
+  # ============================================================
+
+  def definition_must_be_valid
+
+    unless definition.is_a?(Hash)
+      errors.add(
+        :definition,
+        "must be an object"
+      )
+
+      return
+    end
+
+    unless definition["fields"].is_a?(Array)
+      errors.add(
+        :definition,
+        "must contain fields"
+      )
+
+      return
+    end
+
+    definition["fields"].each_with_index do |field, index|
+
+      unless field.is_a?(Hash)
+        errors.add(
+          :definition,
+          "field #{index + 1} must be an object"
+        )
+
+        next
+      end
+
+      if field["name"].blank?
+        errors.add(
+          :definition,
+          "field #{index + 1} must have a name"
+        )
+      end
+
+      if field["label"].blank?
+        errors.add(
+          :definition,
+          "field #{index + 1} must have a label"
+        )
+      end
+
+      if field["type"].blank?
+        errors.add(
+          :definition,
+          "field #{index + 1} must have a type"
+        )
+      end
+
+    end
+
+  end
+
+
+  # ============================================================
   # AUTOMATIC VERSION NUMBER
   # ============================================================
 
   def assign_version_number
-    return if entity_template.blank?
+
+    return if entity_template_id.blank?
 
     self.version =
-      entity_template
-        .entity_template_versions
-        .maximum(:version)
-        .to_i + 1
+      self.class
+          .where(
+            entity_template_id: entity_template_id
+          )
+          .maximum(:version)
+          .to_i + 1
+
   end
 
 
@@ -249,6 +313,9 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
   # ============================================================
 
   def normalize_definition
+
     self.definition = {} if definition.nil?
+
   end
+
 end

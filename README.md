@@ -31,6 +31,13 @@ http://localhost:3000/admin/ecosystems/load_sources/entity_types/entity_types
 ##
 tree -I 'tmp|log|storage|node_modules|.git| css.gz'
 
+## js lint
+npx eslint app/javascript/controllers/admin/ecosystems/load_sources/entity_templates/definitions/entity_template_definition_builder_controller.js --fix
+npx prettier app/javascript/controllers/admin/ecosystems/load_sources/entity_templates/definitions/entity_template_definition_builder_controller.js --write
+eslint file.js --fix-broken-syntax
+
+
+
 
 # 1
 

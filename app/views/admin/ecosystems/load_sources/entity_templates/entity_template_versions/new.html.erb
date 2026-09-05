@@ -3,15 +3,12 @@ ENTITY TEMPLATE VERSION — NEW
 
 Path:
 app/views/admin/ecosystems/load_sources/entity_templates/entity_template_versions/new.html.erb
-
-Stimulus controller:
-entity_template_definition_builder
 ============================================================================ %>
 
 <div class="mx-auto w-full max-w-6xl px-5 py-8 sm:px-7 lg:px-10" data-controller="entity_template_definition_builder" >
-<%# ================================================================ %>
-<%# HEADER %>
-<%# ================================================================ %>
+<%# ========================================================================
+HEADER
+======================================================================== %>
 
   <div class="mb-8"> <div class="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
     <div>
@@ -62,18 +59,16 @@ entity_template_definition_builder
           admin_ecosystems_load_sources_entity_templates_entity_template_versions_path,
           class: "inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
         ) do %>
-
       <span>←</span>
       Back to Versions
-
     <% end %>
 
   </div>
 
   </div>
-<%# ================================================================ %>
-<%# EXPLANATION %>
-<%# ================================================================ %>
+<%# ========================================================================
+EXPLANATION
+======================================================================== %>
 
   <div class="mb-8 rounded-[24px] border-2 border-violet-100 bg-gradient-to-r from-violet-50 via-white to-indigo-50 p-6 shadow-sm shadow-violet-100/50">
     <div class="flex items-start gap-4">
@@ -99,12 +94,20 @@ entity_template_definition_builder
     </div>
 
   </div>
-<%# ================================================================ %>
-<%# FORM %>
-<%# ================================================================ %>
+<%# ========================================================================
+FORM
+
+IMPORTANT:
+The definition textarea is a real Rails form field:
+
+entity_template_version[definition]
+
+Stimulus keeps that field synchronized with the visual builder.
+======================================================================== %>
 
   <%= form_with(
         model: @entity_template_version,
+        scope: :entity_template_version,
         url: admin_ecosystems_load_sources_entity_templates_entity_template_versions_path,
         method: :post,
         local: true,
@@ -114,9 +117,9 @@ entity_template_definition_builder
         }
       ) do |form| %>
 
-<%# ============================================================ %>
-<%# ERRORS %>
-<%# ============================================================ %>
+<%# ======================================================================
+ERRORS
+====================================================================== %>
 
     <% if @entity_template_version.errors.any? %>
 
@@ -138,9 +141,9 @@ entity_template_definition_builder
 
     <% end %>
 
-<%# ============================================================ %>
-<%# STEP 01 — ENTITY TEMPLATE %>
-<%# ============================================================ %>
+<%# ======================================================================
+STEP 01 — ENTITY TEMPLATE
+====================================================================== %>
 
     <div class="rounded-[24px] border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-800">
 
@@ -187,9 +190,9 @@ entity_template_definition_builder
 
     </div>
 
-<%# ============================================================ %>
-<%# STEP 02 — VERSION INFORMATION %>
-<%# ============================================================ %>
+<%# ======================================================================
+STEP 02 — VERSION INFORMATION
+====================================================================== %>
 
     <div class="rounded-[24px] border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-800">
 
@@ -261,9 +264,9 @@ entity_template_definition_builder
 
     </div>
 
-<%# ============================================================ %>
-<%# STEP 03 — DEFINITION BUILDER %>
-<%# ============================================================ %>
+<%# ======================================================================
+STEP 03 — DEFINITION BUILDER
+====================================================================== %>
 
     <div class="rounded-[24px] border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-800">
 
@@ -287,14 +290,12 @@ entity_template_definition_builder
 
           </div>
 
-          <%# BUILDER STATS %>
-
           <div class="flex items-center gap-3">
 
             <div class="rounded-xl border border-violet-200 bg-violet-50 px-4 py-2 dark:border-violet-800 dark:bg-violet-900/20">
 
               <div class="text-[10px] font-black uppercase tracking-wider text-violet-500">
-                Properties
+                Fields
               </div>
 
               <div
@@ -312,9 +313,9 @@ entity_template_definition_builder
 
       </div>
 
-      <%# ========================================================== %>
-      <%# BUILDER TOOLBAR %>
-      <%# ========================================================== %>
+      <%# ====================================================================
+  BUILDER TOOLBAR
+  ==================================================================== %>
 
       <div class="mb-6 rounded-2xl border border-violet-100 bg-violet-50/60 p-5 dark:border-violet-900/40 dark:bg-violet-900/10">
 
@@ -386,20 +387,20 @@ entity_template_definition_builder
 
       </div>
 
-      <%# ========================================================== %>
-      <%# BUILDER STATUS %>
-      <%# ========================================================== %>
+      <%# ====================================================================
+  BUILDER STATUS
+  ==================================================================== %>
 
       <div
-        class="mb-5 min-h-[28px] text-xs font-bold text-violet-600 transition-opacity duration-300"
+        class="mb-5 min-h-[28px] text-xs font-bold text-violet-600"
         data-entity_template_definition_builder-target="builderStatus"
       >
         Builder ready
       </div>
 
-      <%# ========================================================== %>
-      <%# EMPTY STATE %>
-      <%# ========================================================== %>
+      <%# ====================================================================
+  EMPTY STATE
+  ==================================================================== %>
 
       <div
         data-entity_template_definition_builder-target="emptyState"
@@ -416,7 +417,6 @@ entity_template_definition_builder
 
         <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-gray-500 dark:text-gray-400">
           Start building your Entity Template by adding your first property.
-          You can choose a type and customize it afterwards.
         </p>
 
         <button
@@ -430,69 +430,18 @@ entity_template_definition_builder
 
       </div>
 
-      <%# ========================================================== %>
-      <%# DYNAMIC PROPERTIES %>
-      <%# IMPORTANT: controller expects "properties" %>
-      <%# ========================================================== %>
+      <%# ====================================================================
+  DYNAMIC PROPERTIES
+  ==================================================================== %>
 
       <div
         data-entity_template_definition_builder-target="properties"
         class="mt-5 space-y-4"
       ></div>
 
-      <%# ========================================================== %>
-      <%# PROGRESS %>
-      <%# ========================================================== %>
-
-      <div class="mt-6 rounded-2xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900">
-
-        <div class="flex items-center gap-3">
-
-          <div
-            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-100 text-lg dark:bg-violet-900/30"
-            data-entity_template_definition_builder-target="progressIcon"
-          >
-            🧭
-          </div>
-
-          <div class="min-w-0 flex-1">
-
-            <div class="flex items-center justify-between gap-3">
-
-          <span
-            class="text-xs font-bold text-gray-600 dark:text-gray-300"
-            data-entity_template_definition_builder-target="progressMessage"
-          >
-            Start building your template
-          </span>
-
-              <span
-                class="text-xs font-black text-violet-600"
-                data-entity_template_definition_builder-target="progressText"
-              >
-            0%
-          </span>
-
-            </div>
-
-            <div class="mt-2 h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
-
-              <div
-                class="h-full w-0 rounded-full bg-violet-600 transition-all duration-300"
-                data-entity_template_definition_builder-target="progressBar"
-              ></div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <%# ========================================================== %>
-      <%# BUILDER ACTIONS %>
-      <%# ========================================================== %>
+      <%# ====================================================================
+  BUILDER ACTIONS
+  ==================================================================== %>
 
       <div class="mt-6 flex flex-col gap-3 border-t border-gray-200 pt-5 sm:flex-row sm:items-center sm:justify-between dark:border-gray-700">
 
@@ -517,18 +466,20 @@ entity_template_definition_builder
 
         </div>
 
-        <div
-          class="text-xs font-semibold text-gray-400"
-          data-entity_template_definition_builder-target="builderStatus"
-        >
-          Builder ready
-        </div>
-
       </div>
 
-      <%# ========================================================== %>
-      <%# GENERATED JSON %>
-      <%# ========================================================== %>
+      <%# ====================================================================
+  DEFINITION JSON
+
+  IMPORTANT:
+  This is the actual Rails form field.
+
+  Stimulus writes the generated JSON into it.
+
+  Rails receives:
+
+  entity_template_version[definition]
+  ==================================================================== %>
 
       <details class="mt-6 rounded-2xl border border-gray-200 dark:border-gray-700">
 
@@ -538,51 +489,34 @@ entity_template_definition_builder
 
         <div class="border-t border-gray-200 p-5 dark:border-gray-700">
 
-          <%= form.text_area(
-                :definition,
-                rows: 18,
-                spellcheck: false,
-                data: {
-                  "entity_template_definition_builder-target": "definitionInput"
-                },
-                class: "block w-full rounded-xl border border-gray-700 bg-gray-950 px-4 py-4 font-mono text-sm leading-6 text-green-400 shadow-inner focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              ) %>
+        <textarea
+          name="entity_template_version[definition]"
+          rows="18"
+          spellcheck="false"
+          data-entity_template_definition_builder-target="definitionInput"
+          data-action="input->entity_template_definition_builder#definitionInputChanged"
+          class="block w-full rounded-xl border border-gray-700 bg-gray-950 px-4 py-4 font-mono text-sm leading-6 text-green-400 shadow-inner focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+        ><%= @entity_template_version.definition %></textarea>
+
+
 
           <div
-            class="mt-3 text-xs font-bold text-emerald-500"
+            class="mt-3 min-h-[20px] text-xs font-bold text-emerald-500"
             data-entity_template_definition_builder-target="jsonStatus"
           >
-            Valid JSON
+            JSON will be generated automatically.
           </div>
 
-          <div class="mt-4">
-
-            <div class="mb-2 text-[10px] font-black uppercase tracking-wider text-gray-400">
-              Generated Preview
-            </div>
-
-            <pre
-              class="max-h-96 overflow-auto rounded-xl bg-gray-950 p-4 font-mono text-xs leading-6 text-green-400"
-              data-entity_template_definition_builder-target="jsonPreview"
-            ></pre>
-
-          </div>
-
-          <div class="mt-3 flex flex-wrap gap-2">
-
-            <button
-              type="button"
-              data-action="click->entity_template_definition_builder#importJson"
-              class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-xs font-bold text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
-            >
-              📥 Import JSON
-            </button>
-
-          </div>
+          <button
+            type="button"
+            data-action="click->entity_template_definition_builder#importJson"
+            class="mt-4 rounded-xl border border-gray-200 bg-white px-4 py-2 text-xs font-bold text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+          >
+            📥 Import JSON
+          </button>
 
           <p class="mt-2 text-xs text-gray-400">
-            The builder automatically keeps this JSON synchronized.
-            Advanced users can inspect or import JSON directly.
+            The visual builder and JSON field stay synchronized.
           </p>
 
         </div>
@@ -591,42 +525,9 @@ entity_template_definition_builder
 
     </div>
 
-<%# ============================================================ %>
-<%# VERSION PREVIEW %>
-<%# ============================================================ %>
-
-    <div class="rounded-[24px] border border-indigo-100 bg-indigo-50/60 p-6 dark:border-indigo-900/40 dark:bg-indigo-900/10">
-
-      <div class="flex items-start gap-4">
-
-        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-indigo-200 bg-indigo-100 text-xl dark:border-indigo-800 dark:bg-indigo-900/40">
-          🚀
-        </div>
-
-        <div>
-
-          <div class="text-[11px] font-black uppercase tracking-[0.18em] text-indigo-500">
-            Version Lifecycle
-          </div>
-
-          <h3 class="mt-1 text-lg font-black text-gray-900 dark:text-white">
-            Create safely
-          </h3>
-
-          <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">
-            Creating a new version does not modify previous versions.
-            The new definition is stored as its own snapshot.
-          </p>
-
-        </div>
-
-      </div>
-
-    </div>
-
-<%# ============================================================ %>
-<%# ACTIONS %>
-<%# ============================================================ %>
+<%# ======================================================================
+ACTIONS
+====================================================================== %>
 
     <div class="flex flex-col-reverse gap-3 border-t border-gray-200 pt-6 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800">
 
@@ -639,16 +540,16 @@ entity_template_definition_builder
       <div class="flex items-center gap-3">
 
         <div
-          class="text-xs font-semibold text-gray-400"
+          class="hidden text-xs font-bold text-violet-600"
           data-entity_template_definition_builder-target="submitStatus"
         ></div>
 
         <%= form.submit(
               "Create Template Version",
+              class: "inline-flex items-center justify-center rounded-xl bg-violet-600 px-6 py-3 text-sm font-black text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2",
               data: {
-                "entity_template_definition_builder-target": "submitButton"
-              },
-              class: "inline-flex items-center justify-center rounded-xl bg-violet-600 px-6 py-3 text-sm font-black text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+                entity_template_definition_builder_target: "submitButton"
+              }
             ) %>
 
       </div>
@@ -657,8 +558,4 @@ entity_template_definition_builder
 
   <% end %>
 
-<%# ================================================================ %>
-<%# TOAST %>
-<%# ================================================================ %>
-
-  <div data-entity_template_definition_builder-target="toast" class="fixed bottom-6 right-6 z-50 hidden rounded-2xl bg-gray-900 px-5 py-3 text-sm font-bold text-white shadow-xl" ></div> </div>
+</div>
