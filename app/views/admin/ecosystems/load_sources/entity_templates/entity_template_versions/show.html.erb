@@ -112,21 +112,24 @@ PAGE HEADER
 
       <%# ALL VERSIONS %>
 
+
       <%= link_to(
             "← All Versions",
-            admin_ecosystems_load_sources_entity_templates_entity_template_versions_path,
+            admin_ecosystems_load_sources_entity_templates_entity_template_versions_path(
+              entity_template_id: @entity_template.id
+            ),
             class: "
-            inline-flex items-center justify-center
-            rounded-xl border border-gray-200
-            bg-white px-4 py-2.5
-            text-sm font-semibold text-gray-700
-            shadow-sm transition
-            hover:border-gray-300
-            hover:bg-gray-50
-            dark:border-gray-700
-            dark:bg-gray-800
-            dark:text-gray-200
-          "
+          inline-flex items-center justify-center
+          rounded-xl border border-gray-200
+          bg-white px-4 py-2.5
+          text-sm font-semibold text-gray-700
+          shadow-sm transition
+          hover:border-gray-300
+          hover:bg-gray-50
+          dark:border-gray-700
+          dark:bg-gray-800
+          dark:text-gray-200
+        "
           ) %>
 
       <%# COMPARE VERSIONS %>

@@ -10,6 +10,7 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplate < ApplicationReco
   belongs_to :entity_type,
              class_name: "Ecosystems::LoadSources::EntityTypes::EntityType"
 
+  #####################################################################################################################
   has_many :entity_template_versions,
            class_name:
              "Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion",
@@ -17,9 +18,12 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplate < ApplicationReco
            inverse_of: :entity_template,
            dependent: :destroy
 
-  def versions
-    self.entity_template_versions
-  end
+  has_many :versions,
+           class_name:
+             "Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion",
+           foreign_key: :entity_template_id,
+           inverse_of: :entity_template
+  #####################################################################################################################
 
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true

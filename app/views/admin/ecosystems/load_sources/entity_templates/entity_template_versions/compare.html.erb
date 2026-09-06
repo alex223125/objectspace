@@ -7,44 +7,34 @@
   Purpose:
   Compare two versions of the same EntityTemplate.
 
-  Expected controller variables:
-
-    @entity_template
-    @versions
-    @entity_template_version
-    @left_version
-    @right_version
-    @left_definition
-    @right_definition
-    @field_changes
-    @definition_changes
-    @comparison_summary
-
-  Expected field comparison structure:
+  The comparator returns fields in this structure:
 
     {
       name: "email",
-      type: :changed,
-      left: {
-        "name" => "email",
-        "label" => "Email",
-        "type" => "text",
-        "required" => false
-      },
-      right: {
-        "name" => "email",
-        "label" => "Email",
-        "type" => "email",
-        "required" => false
-      },
-      changes: [
-        {
-          key: "type",
-          left: "text",
-          right: "email"
+      change_type: "changed",
+
+      version_a: {...},
+      version_b: {...},
+
+      version_a_present: true,
+      version_b_present: true,
+
+      changes: {
+        "type" => {
+          from: "text",
+          to: "email"
+        },
+        "required" => {
+          from: false,
+          to: true
         }
-      ]
+      },
+
+      version_a_text: {...},
+      version_b_text: {...}
     }
+
+  This view intentionally renders explicit human-readable differences.
   ============================================================================
 %>
 
@@ -77,12 +67,17 @@
       @right_definition :
       {}
 
-  # Support both symbol and string keys.
+
+  # ==========================================================================
+  # SUMMARY HELPERS
+  # ==========================================================================
+
   summary_value = lambda do |key|
     comparison_summary[key] ||
       comparison_summary[key.to_s] ||
       0
   end
+
 
   added_count =
     summary_value.call(:added).to_i
@@ -96,10 +91,12 @@
   unchanged_count =
     summary_value.call(:unchanged).to_i
 
+
   total_changes =
     added_count +
       removed_count +
       changed_count
+
 
   total_fields =
     total_changes +
@@ -107,7 +104,7 @@
 
 
   # ==========================================================================
-  # HELPER LAMBDAS
+  # GENERIC HELPERS
   # ==========================================================================
 
   value_for = lambda do |object, key|
@@ -127,10 +124,10 @@
 
 
   field_type_for = lambda do |field|
-    value =
-      value_for.call(field, :type)
-
-    value.to_s.downcase
+    (
+      value_for.call(field, :change_type) ||
+        value_for.call(field, :type)
+    ).to_s.downcase
   end
 
 
@@ -143,12 +140,12 @@
 
 
   field_left_for = lambda do |field|
-    value_for.call(field, :left)
+    value_for.call(field, :version_a)
   end
 
 
   field_right_for = lambda do |field|
-    value_for.call(field, :right)
+    value_for.call(field, :version_b)
   end
 
 
@@ -156,25 +153,56 @@
     value =
       value_for.call(field, :changes)
 
-    value.is_a?(Array) ? value : []
-  end
+    case value
+    when Hash
+      value.map do |key, change|
+        change_hash =
+          change.is_a?(Hash) ?
+            change :
+            {}
 
+        {
+          key: key.to_s,
+          from:
+            change_hash[:from] ||
+              change_hash["from"],
+          to:
+            change_hash[:to] ||
+              change_hash["to"]
+        }
+      end
+    when Array
+      value.map do |change|
+        change_hash =
+          change.is_a?(Hash) ?
+            change :
+            {}
 
-  change_key_for = lambda do |change|
-    (
-      value_for.call(change, :key) ||
-        value_for.call(change, :name)
-    ).to_s
-  end
+        {
+          key:
+            (
+              change_hash[:key] ||
+                change_hash["key"] ||
+                change_hash[:name] ||
+                change_hash["name"]
+            ).to_s,
 
+          from:
+            change_hash[:from] ||
+              change_hash["from"] ||
+              change_hash[:left] ||
+              change_hash["left"],
 
-  change_left_for = lambda do |change|
-    value_for.call(change, :left)
-  end
-
-
-  change_right_for = lambda do |change|
-    value_for.call(change, :right)
+          to:
+            change_hash[:to] ||
+              change_hash["to"] ||
+              change_hash[:right] ||
+              change_hash["right"]
+        }
+      end
+    else
+      []
+    end
   end
 
 
@@ -185,13 +213,40 @@
       value.to_s
     end
   end
+
+
+  display_value = lambda do |value|
+    case value
+    when nil
+      "—"
+    when true
+      "true"
+    when false
+      "false"
+    when String
+      value.present? ? value : "(empty)"
+    when Array, Hash
+      pretty_json.call(value)
+    else
+      value.to_s
+    end
+  end
+
+
+  human_property_name = lambda do |key|
+    key.to_s
+       .humanize
+       .split
+       .map(&:capitalize)
+       .join(" ")
+  end
 %>
 
 <div class="mx-auto w-full max-w-7xl px-5 py-8 sm:px-7 lg:px-10">
   <%#
-    =========================================================================
+    ========================================================================
     PAGE HEADER
-    =========================================================================
+    ========================================================================
   %>
 
   <div class="mb-8">
@@ -200,20 +255,10 @@
         <div class="flex flex-wrap items-center gap-3">
           <div
             class="
-              flex
-              h-12
-              w-12
-              shrink-0
-              items-center
-              justify-center
-              rounded-2xl
-              border
-              border-violet-200
-              bg-violet-100
-              text-2xl
-              shadow-sm
-              dark:border-violet-800
-              dark:bg-violet-950/40
+              flex h-12 w-12 shrink-0 items-center justify-center
+              rounded-2xl border border-violet-200 bg-violet-100
+              text-2xl shadow-sm
+              dark:border-violet-800 dark:bg-violet-950/40
             "
           >
             ⚖️
@@ -240,29 +285,21 @@
           </div>
         </div>
 
-        <%# BREADCRUMB %>
-
         <div class="mt-4 flex flex-wrap items-center gap-2 text-xs text-gray-400">
           <span>Encyclopedia</span>
           <span>›</span>
-
           <span>Ecosystems</span>
           <span>›</span>
-
           <span>Load Sources</span>
           <span>›</span>
-
           <span>Entity Templates</span>
           <span>›</span>
-
           <span>Versions</span>
           <span>›</span>
 
           <span class="font-semibold text-violet-500"> Compare </span>
         </div>
       </div>
-
-      <%# HEADER ACTIONS %>
 
       <div class="flex flex-wrap items-center gap-3">
         <% if defined?(@entity_template_version) &&
@@ -273,26 +310,12 @@
                   @entity_template_version
                 ),
                 class: "
-                  inline-flex
-                  items-center
-                  justify-center
-                  rounded-xl
-                  border
-                  border-gray-200
-                  bg-white
-                  px-4
-                  py-2.5
-                  text-sm
-                  font-semibold
-                  text-gray-700
-                  shadow-sm
-                  transition
-                  hover:border-gray-300
-                  hover:bg-gray-50
-                  dark:border-gray-700
-                  dark:bg-gray-800
-                  dark:text-gray-200
-                  dark:hover:bg-gray-750
+                  inline-flex items-center justify-center rounded-xl
+                  border border-gray-200 bg-white px-4 py-2.5
+                  text-sm font-semibold text-gray-700 shadow-sm transition
+                  hover:border-gray-300 hover:bg-gray-50
+                  dark:border-gray-700 dark:bg-gray-800
+                  dark:text-gray-200 dark:hover:bg-gray-750
                 "
               ) %>
         <% end %>
@@ -301,23 +324,11 @@
               "All Versions",
               admin_ecosystems_load_sources_entity_templates_entity_template_versions_path,
               class: "
-                inline-flex
-                items-center
-                justify-center
-                rounded-xl
-                border
-                border-violet-200
-                bg-violet-50
-                px-4
-                py-2.5
-                text-sm
-                font-semibold
-                text-violet-700
-                shadow-sm
-                transition
+                inline-flex items-center justify-center rounded-xl
+                border border-violet-200 bg-violet-50 px-4 py-2.5
+                text-sm font-semibold text-violet-700 shadow-sm transition
                 hover:bg-violet-100
-                dark:border-violet-800
-                dark:bg-violet-950/30
+                dark:border-violet-800 dark:bg-violet-950/30
                 dark:text-violet-300
               "
             ) %>
@@ -326,29 +337,20 @@
   </div>
 
   <%#
-    =========================================================================
+    ========================================================================
     PARENT TEMPLATE
-    =========================================================================
+    ========================================================================
   %>
 
   <% if defined?(@entity_template) &&
     @entity_template.present? %>
     <div
       class="
-        mb-8
-        overflow-hidden
-        rounded-[24px]
-        border-2
-        border-indigo-100
-        bg-gradient-to-br
-        from-indigo-50
-        via-white
-        to-violet-50
+        mb-8 overflow-hidden rounded-[24px] border-2
+        border-indigo-100 bg-gradient-to-br from-indigo-50 via-white to-violet-50
         shadow-sm
-        dark:border-indigo-900
-        dark:from-indigo-950/30
-        dark:via-gray-800
-        dark:to-violet-950/20
+        dark:border-indigo-900 dark:from-indigo-950/30
+        dark:via-gray-800 dark:to-violet-950/20
       "
     >
       <div class="px-6 py-6 sm:px-7">
@@ -371,22 +373,15 @@
   <% end %>
 
   <%#
-    =========================================================================
+    ========================================================================
     VERSION SELECTOR
-    =========================================================================
+    ========================================================================
   %>
 
   <div
     class="
-      mb-8
-      rounded-[24px]
-      border-2
-      border-gray-100
-      bg-white
-      p-6
-      shadow-sm
-      dark:border-gray-700
-      dark:bg-gray-800
+      mb-8 rounded-[24px] border-2 border-gray-100 bg-white p-6 shadow-sm
+      dark:border-gray-700 dark:bg-gray-800
     "
   >
     <div class="mb-6">
@@ -413,8 +408,6 @@
             local: true,
             class: "grid grid-cols-1 gap-5 lg:grid-cols-2"
           ) do %>
-        <%# VERSION A %>
-
         <div>
           <label
             for="left_id"
@@ -427,24 +420,11 @@
             id="left_id"
             name="left_id"
             class="
-              block
-              w-full
-              rounded-xl
-              border
-              border-gray-300
-              bg-gray-50
-              px-4
-              py-3
-              text-sm
-              text-gray-900
-              outline-none
-              transition
-              focus:border-sky-500
-              focus:ring-2
-              focus:ring-sky-500
-              dark:border-gray-700
-              dark:bg-gray-900
-              dark:text-white
+              block w-full rounded-xl border border-gray-300
+              bg-gray-50 px-4 py-3 text-sm text-gray-900
+              outline-none transition focus:border-sky-500
+              focus:ring-2 focus:ring-sky-500
+              dark:border-gray-700 dark:bg-gray-900 dark:text-white
             "
           >
             <% versions.each do |version| %>
@@ -462,8 +442,6 @@
           </select>
         </div>
 
-        <%# VERSION B %>
-
         <div>
           <label
             for="right_id"
@@ -476,24 +454,11 @@
             id="right_id"
             name="right_id"
             class="
-              block
-              w-full
-              rounded-xl
-              border
-              border-gray-300
-              bg-gray-50
-              px-4
-              py-3
-              text-sm
-              text-gray-900
-              outline-none
-              transition
-              focus:border-violet-500
-              focus:ring-2
-              focus:ring-violet-500
-              dark:border-gray-700
-              dark:bg-gray-900
-              dark:text-white
+              block w-full rounded-xl border border-gray-300
+              bg-gray-50 px-4 py-3 text-sm text-gray-900
+              outline-none transition focus:border-violet-500
+              focus:ring-2 focus:ring-violet-500
+              dark:border-gray-700 dark:bg-gray-900 dark:text-white
             "
           >
             <% versions.each do |version| %>
@@ -515,23 +480,10 @@
           <%= submit_tag(
                 "Compare Selected Versions",
                 class: "
-                  inline-flex
-                  items-center
-                  justify-center
-                  gap-2
-                  rounded-xl
-                  bg-violet-600
-                  px-5
-                  py-3
-                  text-sm
-                  font-bold
-                  text-white
-                  shadow-sm
-                  transition
-                  hover:bg-violet-700
-                  focus:outline-none
-                  focus:ring-2
-                  focus:ring-violet-500
+                  inline-flex items-center justify-center gap-2 rounded-xl
+                  bg-violet-600 px-5 py-3 text-sm font-bold text-white
+                  shadow-sm transition hover:bg-violet-700
+                  focus:outline-none focus:ring-2 focus:ring-violet-500
                   focus:ring-offset-2
                 "
               ) %>
@@ -540,17 +492,9 @@
     <% else %>
       <div
         class="
-          rounded-xl
-          border
-          border-amber-200
-          bg-amber-50
-          p-4
-          text-sm
-          font-semibold
-          text-amber-700
-          dark:border-amber-900
-          dark:bg-amber-950/20
-          dark:text-amber-300
+          rounded-xl border border-amber-200 bg-amber-50 p-4
+          text-sm font-semibold text-amber-700
+          dark:border-amber-900 dark:bg-amber-950/20 dark:text-amber-300
         "
       >
         No current entity template version is available for comparison.
@@ -559,9 +503,9 @@
   </div>
 
   <%#
-    =========================================================================
+    ========================================================================
     COMPARISON DIRECTION
-    =========================================================================
+    ========================================================================
   %>
 
   <% if defined?(@left_version) &&
@@ -570,15 +514,8 @@
     @right_version.present? %>
     <div
       class="
-        mb-8
-        rounded-[24px]
-        border-2
-        border-gray-100
-        bg-white
-        p-5
-        shadow-sm
-        dark:border-gray-700
-        dark:bg-gray-800
+        mb-8 rounded-[24px] border-2 border-gray-100 bg-white
+        p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800
       "
     >
       <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -606,13 +543,8 @@
 
             <span
               class="
-                rounded-lg
-                bg-violet-50
-                px-3
-                py-2
-                text-violet-700
-                dark:bg-violet-950/30
-                dark:text-violet-300
+                rounded-lg bg-violet-50 px-3 py-2 text-violet-700
+                dark:bg-violet-950/30 dark:text-violet-300
               "
             >
               Version
@@ -630,9 +562,9 @@
   <% end %>
 
   <%#
-    =========================================================================
+    ========================================================================
     VERSION SUMMARY
-    =========================================================================
+    ========================================================================
   %>
 
   <% if defined?(@left_version) &&
@@ -644,14 +576,8 @@
 
       <div
         class="
-          rounded-[24px]
-          border-2
-          border-sky-100
-          bg-sky-50/60
-          p-6
-          shadow-sm
-          dark:border-sky-900
-          dark:bg-sky-950/20
+          rounded-[24px] border-2 border-sky-100 bg-sky-50/60 p-6 shadow-sm
+          dark:border-sky-900 dark:bg-sky-950/20
         "
       >
         <div class="flex items-start justify-between gap-4">
@@ -672,16 +598,8 @@
 
           <div
             class="
-              rounded-xl
-              bg-sky-100
-              px-3
-              py-2
-              font-mono
-              text-[10px]
-              font-bold
-              text-sky-700
-              dark:bg-sky-950/40
-              dark:text-sky-300
+              rounded-xl bg-sky-100 px-3 py-2 font-mono text-[10px]
+              font-bold text-sky-700 dark:bg-sky-950/40 dark:text-sky-300
             "
           >
             A
@@ -689,90 +607,16 @@
         </div>
 
         <div class="mt-5">
-          <% if @left_version.respond_to?(:draft?) &&
-            @left_version.draft? %>
-            <span
-              class="
-                inline-flex
-                items-center
-                rounded-full
-                border
-                border-amber-200
-                bg-amber-50
-                px-3
-                py-1.5
-                text-xs
-                font-black
-                uppercase
-                tracking-wider
-                text-amber-700
-              "
-            >
-              Draft
-            </span>
-          <% elsif @left_version.respond_to?(:published?) &&
-            @left_version.published? %>
-            <span
-              class="
-                inline-flex
-                items-center
-                rounded-full
-                border
-                border-emerald-200
-                bg-emerald-50
-                px-3
-                py-1.5
-                text-xs
-                font-black
-                uppercase
-                tracking-wider
-                text-emerald-700
-              "
-            >
-              Published
-            </span>
-          <% elsif @left_version.respond_to?(:archived?) &&
-            @left_version.archived? %>
-            <span
-              class="
-                inline-flex
-                items-center
-                rounded-full
-                border
-                border-slate-200
-                bg-slate-100
-                px-3
-                py-1.5
-                text-xs
-                font-black
-                uppercase
-                tracking-wider
-                text-slate-600
-              "
-            >
-              Archived
-            </span>
-          <% else %>
-            <span
-              class="
-                inline-flex
-                items-center
-                rounded-full
-                border
-                border-gray-200
-                bg-gray-50
-                px-3
-                py-1.5
-                text-xs
-                font-black
-                uppercase
-                tracking-wider
-                text-gray-600
-              "
-            >
-              <%= @left_version.status.to_s.humanize.presence || "Unknown" %>
-            </span>
-          <% end %>
+          <span
+            class="
+              inline-flex items-center rounded-full border
+              border-sky-200 bg-white px-3 py-1.5 text-xs
+              font-black uppercase tracking-wider text-sky-700
+              dark:border-sky-800 dark:bg-sky-950/30 dark:text-sky-300
+            "
+          >
+            <%= @left_version.status.to_s.humanize.presence || "Unknown" %>
+          </span>
         </div>
 
         <div class="mt-4 text-xs text-gray-500 dark:text-gray-400">
@@ -785,14 +629,8 @@
 
       <div
         class="
-          rounded-[24px]
-          border-2
-          border-violet-100
-          bg-violet-50/60
-          p-6
-          shadow-sm
-          dark:border-violet-900
-          dark:bg-violet-950/20
+          rounded-[24px] border-2 border-violet-100 bg-violet-50/60 p-6 shadow-sm
+          dark:border-violet-900 dark:bg-violet-950/20
         "
       >
         <div class="flex items-start justify-between gap-4">
@@ -814,16 +652,9 @@
 
           <div
             class="
-              rounded-xl
-              bg-violet-100
-              px-3
-              py-2
-              font-mono
-              text-[10px]
-              font-bold
-              text-violet-700
-              dark:bg-violet-950/40
-              dark:text-violet-300
+              rounded-xl bg-violet-100 px-3 py-2 font-mono text-[10px]
+              font-bold text-violet-700
+              dark:bg-violet-950/40 dark:text-violet-300
             "
           >
             B
@@ -831,90 +662,17 @@
         </div>
 
         <div class="mt-5">
-          <% if @right_version.respond_to?(:draft?) &&
-            @right_version.draft? %>
-            <span
-              class="
-                inline-flex
-                items-center
-                rounded-full
-                border
-                border-amber-200
-                bg-amber-50
-                px-3
-                py-1.5
-                text-xs
-                font-black
-                uppercase
-                tracking-wider
-                text-amber-700
-              "
-            >
-              Draft
-            </span>
-          <% elsif @right_version.respond_to?(:published?) &&
-            @right_version.published? %>
-            <span
-              class="
-                inline-flex
-                items-center
-                rounded-full
-                border
-                border-emerald-200
-                bg-emerald-50
-                px-3
-                py-1.5
-                text-xs
-                font-black
-                uppercase
-                tracking-wider
-                text-emerald-700
-              "
-            >
-              Published
-            </span>
-          <% elsif @right_version.respond_to?(:archived?) &&
-            @right_version.archived? %>
-            <span
-              class="
-                inline-flex
-                items-center
-                rounded-full
-                border
-                border-slate-200
-                bg-slate-100
-                px-3
-                py-1.5
-                text-xs
-                font-black
-                uppercase
-                tracking-wider
-                text-slate-600
-              "
-            >
-              Archived
-            </span>
-          <% else %>
-            <span
-              class="
-                inline-flex
-                items-center
-                rounded-full
-                border
-                border-gray-200
-                bg-gray-50
-                px-3
-                py-1.5
-                text-xs
-                font-black
-                uppercase
-                tracking-wider
-                text-gray-600
-              "
-            >
-              <%= @right_version.status.to_s.humanize.presence || "Unknown" %>
-            </span>
-          <% end %>
+          <span
+            class="
+              inline-flex items-center rounded-full border
+              border-violet-200 bg-white px-3 py-1.5 text-xs
+              font-black uppercase tracking-wider text-violet-700
+              dark:border-violet-800 dark:bg-violet-950/30
+              dark:text-violet-300
+            "
+          >
+            <%= @right_version.status.to_s.humanize.presence || "Unknown" %>
+          </span>
         </div>
 
         <div class="mt-4 text-xs text-gray-500 dark:text-gray-400">
@@ -926,9 +684,9 @@
   <% end %>
 
   <%#
-    =========================================================================
+    ========================================================================
     CHANGE SUMMARY
-    =========================================================================
+    ========================================================================
   %>
 
   <div class="mb-8">
@@ -943,25 +701,14 @@
     </div>
 
     <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
-      <%# ADDED %>
-
       <div
         class="
-          rounded-2xl
-          border
-          border-emerald-100
-          bg-emerald-50
-          p-5
-          dark:border-emerald-900
-          dark:bg-emerald-950/20
+          rounded-2xl border border-emerald-100 bg-emerald-50 p-5
+          dark:border-emerald-900 dark:bg-emerald-950/20
         "
       >
-        <div class="flex items-center justify-between gap-3">
-          <div class="text-[10px] font-black uppercase tracking-wider text-emerald-500">
-            Added
-          </div>
-
-          <span class="text-sm text-emerald-500"> + </span>
+        <div class="text-[10px] font-black uppercase tracking-wider text-emerald-500">
+          Added
         </div>
 
         <div class="mt-2 text-3xl font-black text-emerald-600">
@@ -973,25 +720,14 @@
         </div>
       </div>
 
-      <%# REMOVED %>
-
       <div
         class="
-          rounded-2xl
-          border
-          border-red-100
-          bg-red-50
-          p-5
-          dark:border-red-900
-          dark:bg-red-950/20
+          rounded-2xl border border-red-100 bg-red-50 p-5
+          dark:border-red-900 dark:bg-red-950/20
         "
       >
-        <div class="flex items-center justify-between gap-3">
-          <div class="text-[10px] font-black uppercase tracking-wider text-red-500">
-            Removed
-          </div>
-
-          <span class="text-sm text-red-500"> − </span>
+        <div class="text-[10px] font-black uppercase tracking-wider text-red-500">
+          Removed
         </div>
 
         <div class="mt-2 text-3xl font-black text-red-600">
@@ -1003,25 +739,14 @@
         </div>
       </div>
 
-      <%# CHANGED %>
-
       <div
         class="
-          rounded-2xl
-          border
-          border-amber-100
-          bg-amber-50
-          p-5
-          dark:border-amber-900
-          dark:bg-amber-950/20
+          rounded-2xl border border-amber-100 bg-amber-50 p-5
+          dark:border-amber-900 dark:bg-amber-950/20
         "
       >
-        <div class="flex items-center justify-between gap-3">
-          <div class="text-[10px] font-black uppercase tracking-wider text-amber-500">
-            Changed
-          </div>
-
-          <span class="text-sm text-amber-500"> ~ </span>
+        <div class="text-[10px] font-black uppercase tracking-wider text-amber-500">
+          Changed
         </div>
 
         <div class="mt-2 text-3xl font-black text-amber-600">
@@ -1033,25 +758,14 @@
         </div>
       </div>
 
-      <%# UNCHANGED %>
-
       <div
         class="
-          rounded-2xl
-          border
-          border-gray-100
-          bg-gray-50
-          p-5
-          dark:border-gray-700
-          dark:bg-gray-900
+          rounded-2xl border border-gray-100 bg-gray-50 p-5
+          dark:border-gray-700 dark:bg-gray-900
         "
       >
-        <div class="flex items-center justify-between gap-3">
-          <div class="text-[10px] font-black uppercase tracking-wider text-gray-400">
-            Unchanged
-          </div>
-
-          <span class="text-sm text-gray-400"> = </span>
+        <div class="text-[10px] font-black uppercase tracking-wider text-gray-400">
+          Unchanged
         </div>
 
         <div class="mt-2 text-3xl font-black text-gray-600 dark:text-gray-300">
@@ -1066,36 +780,26 @@
   </div>
 
   <%#
-    =========================================================================
+    ========================================================================
     FIELD COMPARISON
-    =========================================================================
+    ========================================================================
   %>
 
   <div
     data-controller="entity-template-version-compare"
-    data-entity-template-version-compare-fields-value="<%= @field_comparisons.to_json %>"
+    data-entity-template-version-compare-fields-value="<%= ERB::Util.html_escape((@field_comparisons_json || field_changes).to_json) %>"
     class="
-      overflow-hidden
-      rounded-[24px]
-      border-2
-      border-gray-100
-      bg-white
-      shadow-sm
-      dark:border-gray-700
-      dark:bg-gray-800
+      overflow-hidden rounded-[24px] border-2 border-gray-100
+      bg-white shadow-sm
+      dark:border-gray-700 dark:bg-gray-800
     "
   >
-    <%# FIELD COMPARISON HEADER %>
+    <%# HEADER %>
 
     <div
       class="
-        border-b
-        border-gray-100
-        bg-gray-50/80
-        px-6
-        py-6
-        dark:border-gray-700
-        dark:bg-gray-900/50
+        border-b border-gray-100 bg-gray-50/80 px-6 py-6
+        dark:border-gray-700 dark:bg-gray-900/50
       "
     >
       <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
@@ -1114,25 +818,15 @@
           </h2>
 
           <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Review every field and inspect exactly what changed.
+            Review exactly what was added, removed, or modified.
           </p>
         </div>
 
         <div
           class="
-            rounded-xl
-            border
-            border-gray-200
-            bg-white
-            px-4
-            py-2.5
-            text-sm
-            font-semibold
-            text-gray-500
-            shadow-sm
-            dark:border-gray-700
-            dark:bg-gray-900
-            dark:text-gray-300
+            rounded-xl border border-gray-200 bg-white px-4 py-2.5
+            text-sm font-semibold text-gray-500 shadow-sm
+            dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300
           "
           data-entity-template-version-compare-target="count"
         >
@@ -1147,45 +841,23 @@
         <div class="relative">
           <input
             type="search"
-            placeholder="Search fields, labels, types..."
+            placeholder="Search fields, labels, types, descriptions..."
             autocomplete="off"
             data-entity-template-version-compare-target="search"
             data-action="input->entity-template-version-compare#searchChanged"
             class="
-              block
-              w-full
-              rounded-xl
-              border
-              border-gray-200
-              bg-white
-              px-4
-              py-3
-              pl-11
-              text-sm
-              text-gray-900
-              shadow-sm
-              outline-none
-              transition
-              placeholder:text-gray-400
-              focus:border-violet-500
-              focus:ring-2
-              focus:ring-violet-500
-              dark:border-gray-700
-              dark:bg-gray-950
-              dark:text-white
+              block w-full rounded-xl border border-gray-200 bg-white
+              px-4 py-3 pl-11 text-sm text-gray-900 shadow-sm outline-none
+              transition placeholder:text-gray-400
+              focus:border-violet-500 focus:ring-2 focus:ring-violet-500
+              dark:border-gray-700 dark:bg-gray-950 dark:text-white
             "
           >
 
           <div
             class="
-              pointer-events-none
-              absolute
-              inset-y-0
-              left-0
-              flex
-              items-center
-              pl-4
-              text-gray-400
+              pointer-events-none absolute inset-y-0 left-0 flex
+              items-center pl-4 text-gray-400
             "
           >
             🔎
@@ -1203,17 +875,9 @@
           data-action="click->entity-template-version-compare#filterChanged"
           aria-pressed="true"
           class="
-            rounded-lg
-            bg-gray-900
-            px-3
-            py-2
-            text-xs
-            font-bold
-            text-white
-            transition
-            hover:bg-gray-800
-            dark:bg-white
-            dark:text-gray-900
+            rounded-lg bg-gray-900 px-3 py-2 text-xs font-bold text-white
+            transition hover:bg-gray-800
+            dark:bg-white dark:text-gray-900
           "
         >
           All <%= field_changes.size %>
@@ -1226,19 +890,10 @@
           data-action="click->entity-template-version-compare#filterChanged"
           aria-pressed="false"
           class="
-            rounded-lg
-            border
-            border-emerald-200
-            bg-emerald-50
-            px-3
-            py-2
-            text-xs
-            font-bold
-            text-emerald-700
-            transition
+            rounded-lg border border-emerald-200 bg-emerald-50
+            px-3 py-2 text-xs font-bold text-emerald-700 transition
             hover:bg-emerald-100
-            dark:border-emerald-800
-            dark:bg-emerald-950/30
+            dark:border-emerald-800 dark:bg-emerald-950/30
             dark:text-emerald-300
           "
         >
@@ -1252,20 +907,9 @@
           data-action="click->entity-template-version-compare#filterChanged"
           aria-pressed="false"
           class="
-            rounded-lg
-            border
-            border-red-200
-            bg-red-50
-            px-3
-            py-2
-            text-xs
-            font-bold
-            text-red-700
-            transition
-            hover:bg-red-100
-            dark:border-red-800
-            dark:bg-red-950/30
-            dark:text-red-300
+            rounded-lg border border-red-200 bg-red-50 px-3 py-2
+            text-xs font-bold text-red-700 transition hover:bg-red-100
+            dark:border-red-800 dark:bg-red-950/30 dark:text-red-300
           "
         >
           − Removed <%= removed_count %>
@@ -1278,20 +922,9 @@
           data-action="click->entity-template-version-compare#filterChanged"
           aria-pressed="false"
           class="
-            rounded-lg
-            border
-            border-amber-200
-            bg-amber-50
-            px-3
-            py-2
-            text-xs
-            font-bold
-            text-amber-700
-            transition
-            hover:bg-amber-100
-            dark:border-amber-800
-            dark:bg-amber-950/30
-            dark:text-amber-300
+            rounded-lg border border-amber-200 bg-amber-50 px-3 py-2
+            text-xs font-bold text-amber-700 transition hover:bg-amber-100
+            dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-300
           "
         >
           ~ Changed <%= changed_count %>
@@ -1304,21 +937,10 @@
           data-action="click->entity-template-version-compare#filterChanged"
           aria-pressed="false"
           class="
-            rounded-lg
-            border
-            border-gray-200
-            bg-white
-            px-3
-            py-2
-            text-xs
-            font-bold
-            text-gray-700
-            shadow-sm
-            transition
+            rounded-lg border border-gray-200 bg-white px-3 py-2
+            text-xs font-bold text-gray-700 shadow-sm transition
             hover:bg-gray-50
-            dark:border-gray-700
-            dark:bg-gray-900
-            dark:text-gray-200
+            dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200
           "
         >
           = Unchanged <%= unchanged_count %>
@@ -1329,20 +951,9 @@
             type="button"
             data-action="click->entity-template-version-compare#expandAll"
             class="
-              rounded-lg
-              border
-              border-gray-200
-              bg-white
-              px-3
-              py-2
-              text-xs
-              font-bold
-              text-gray-700
-              transition
-              hover:bg-gray-50
-              dark:border-gray-700
-              dark:bg-gray-900
-              dark:text-gray-200
+              rounded-lg border border-gray-200 bg-white px-3 py-2
+              text-xs font-bold text-gray-700 transition hover:bg-gray-50
+              dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200
             "
           >
             Expand all
@@ -1352,20 +963,9 @@
             type="button"
             data-action="click->entity-template-version-compare#collapseAll"
             class="
-              rounded-lg
-              border
-              border-gray-200
-              bg-white
-              px-3
-              py-2
-              text-xs
-              font-bold
-              text-gray-700
-              transition
-              hover:bg-gray-50
-              dark:border-gray-700
-              dark:bg-gray-900
-              dark:text-gray-200
+              rounded-lg border border-gray-200 bg-white px-3 py-2
+              text-xs font-bold text-gray-700 transition hover:bg-gray-50
+              dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200
             "
           >
             Collapse all
@@ -1375,9 +975,9 @@
     </div>
 
     <%#
-      =========================================================================
+      ======================================================================
       FIELD LIST
-      =========================================================================
+      ======================================================================
     %>
 
     <div class="divide-y divide-gray-100 dark:divide-gray-700">
@@ -1385,15 +985,8 @@
         <div class="p-10 text-center">
           <div
             class="
-              mx-auto
-              flex
-              h-14
-              w-14
-              items-center
-              justify-center
-              rounded-2xl
-              bg-emerald-50
-              text-2xl
+              mx-auto flex h-14 w-14 items-center justify-center
+              rounded-2xl bg-emerald-50 text-2xl
               dark:bg-emerald-950/30
             "
           >
@@ -1415,47 +1008,60 @@
                 raw_field :
                 {}
 
+
             field_id =
               "compare-field-#{index}"
 
-            raw_field_type =
+
+            field_type =
               field_type_for.call(field)
 
             field_type =
-              raw_field_type.presence || "unchanged"
+              "unchanged" if field_type.blank?
+
 
             field_name =
               field_name_for.call(field)
 
+
             field_label =
               field_label_for.call(field)
+
 
             left_field =
               field_left_for.call(field)
 
+
             right_field =
               field_right_for.call(field)
 
+
             property_changes =
               field_changes_for.call(field)
+
 
             field_search_text =
               [
                 field_name,
                 field_label,
-                raw_field_type,
+                field_type,
                 pretty_json.call(left_field),
-                pretty_json.call(right_field)
-              ].compact.join(" ").downcase %>
+                pretty_json.call(right_field),
+                property_changes.map { |change| change[:key] }
+              ].flatten.compact.join(" ").downcase %>
 
           <div
             id="<%= field_id %>"
             data-entity-template-version-compare-target="field"
             data-change-type="<%= field_type %>"
-            data-field-name="<%= field_search_text %>"
+            data-field-name="<%= ERB::Util.html_escape(field_search_text) %>"
             class="transition"
           >
-            <%# FIELD HEADER %>
+            <%#
+              =================================================================
+              FIELD HEADER
+              =================================================================
+            %>
 
             <div class="p-5 sm:p-6">
               <div class="flex flex-col gap-4 lg:flex-row lg:items-center">
@@ -1466,20 +1072,10 @@
                   <% when "added", "add" %>
                     <span
                       class="
-                        inline-flex
-                        rounded-full
-                        border
-                        border-emerald-200
-                        bg-emerald-50
-                        px-3
-                        py-1.5
-                        text-[10px]
-                        font-black
-                        uppercase
-                        tracking-wider
-                        text-emerald-700
-                        dark:border-emerald-800
-                        dark:bg-emerald-950/30
+                        inline-flex rounded-full border border-emerald-200
+                        bg-emerald-50 px-3 py-1.5 text-[10px]
+                        font-black uppercase tracking-wider text-emerald-700
+                        dark:border-emerald-800 dark:bg-emerald-950/30
                         dark:text-emerald-300
                       "
                     >
@@ -1488,20 +1084,10 @@
                   <% when "removed", "remove", "deleted" %>
                     <span
                       class="
-                        inline-flex
-                        rounded-full
-                        border
-                        border-red-200
-                        bg-red-50
-                        px-3
-                        py-1.5
-                        text-[10px]
-                        font-black
-                        uppercase
-                        tracking-wider
-                        text-red-700
-                        dark:border-red-800
-                        dark:bg-red-950/30
+                        inline-flex rounded-full border border-red-200
+                        bg-red-50 px-3 py-1.5 text-[10px]
+                        font-black uppercase tracking-wider text-red-700
+                        dark:border-red-800 dark:bg-red-950/30
                         dark:text-red-300
                       "
                     >
@@ -1510,20 +1096,10 @@
                   <% when "changed", "modified" %>
                     <span
                       class="
-                        inline-flex
-                        rounded-full
-                        border
-                        border-amber-200
-                        bg-amber-50
-                        px-3
-                        py-1.5
-                        text-[10px]
-                        font-black
-                        uppercase
-                        tracking-wider
-                        text-amber-700
-                        dark:border-amber-800
-                        dark:bg-amber-950/30
+                        inline-flex rounded-full border border-amber-200
+                        bg-amber-50 px-3 py-1.5 text-[10px]
+                        font-black uppercase tracking-wider text-amber-700
+                        dark:border-amber-800 dark:bg-amber-950/30
                         dark:text-amber-300
                       "
                     >
@@ -1532,20 +1108,10 @@
                   <% else %>
                     <span
                       class="
-                        inline-flex
-                        rounded-full
-                        border
-                        border-gray-200
-                        bg-gray-50
-                        px-3
-                        py-1.5
-                        text-[10px]
-                        font-black
-                        uppercase
-                        tracking-wider
-                        text-gray-500
-                        dark:border-gray-700
-                        dark:bg-gray-900
+                        inline-flex rounded-full border border-gray-200
+                        bg-gray-50 px-3 py-1.5 text-[10px]
+                        font-black uppercase tracking-wider text-gray-500
+                        dark:border-gray-700 dark:bg-gray-900
                         dark:text-gray-400
                       "
                     >
@@ -1578,24 +1144,14 @@
                 <div class="flex flex-wrap items-center gap-2">
                   <% if left_field.is_a?(Hash) %>
                     <% left_type =
-                         value_for.call(
-                           left_field,
-                           :type
-                         ) %>
+                         value_for.call(left_field, :type) %>
 
                     <% if left_type.present? %>
                       <span
                         class="
-                          rounded-lg
-                          bg-sky-50
-                          px-2.5
-                          py-1
-                          font-mono
-                          text-[10px]
-                          font-bold
-                          text-sky-700
-                          dark:bg-sky-950/30
-                          dark:text-sky-300
+                          rounded-lg bg-sky-50 px-2.5 py-1 font-mono
+                          text-[10px] font-bold text-sky-700
+                          dark:bg-sky-950/30 dark:text-sky-300
                         "
                       >
                         A: <%= left_type %>
@@ -1605,24 +1161,14 @@
 
                   <% if right_field.is_a?(Hash) %>
                     <% right_type =
-                         value_for.call(
-                           right_field,
-                           :type
-                         ) %>
+                         value_for.call(right_field, :type) %>
 
                     <% if right_type.present? %>
                       <span
                         class="
-                          rounded-lg
-                          bg-violet-50
-                          px-2.5
-                          py-1
-                          font-mono
-                          text-[10px]
-                          font-bold
-                          text-violet-700
-                          dark:bg-violet-950/30
-                          dark:text-violet-300
+                          rounded-lg bg-violet-50 px-2.5 py-1 font-mono
+                          text-[10px] font-bold text-violet-700
+                          dark:bg-violet-950/30 dark:text-violet-300
                         "
                       >
                         B: <%= right_type %>
@@ -1631,29 +1177,18 @@
                   <% end %>
                 </div>
 
-                <%# PROPERTY CHANGE COUNT %>
+                <%# CHANGE COUNT %>
 
-                <% if [
-                  "changed",
-                  "modified"
-                ].include?(field_type) &&
-                  property_changes.any? %>
+                <% if property_changes.any? %>
                   <div
                     class="
-                      shrink-0
-                      rounded-lg
-                      bg-amber-50
-                      px-2.5
-                      py-1
-                      text-[10px]
-                      font-bold
-                      text-amber-700
-                      dark:bg-amber-950/30
-                      dark:text-amber-300
+                      shrink-0 rounded-lg bg-amber-50 px-2.5 py-1
+                      text-[10px] font-bold text-amber-700
+                      dark:bg-amber-950/30 dark:text-amber-300
                     "
                   >
                     <%= property_changes.size %>
-                    <%= property_changes.size == 1 ? "change" : "changes" %>
+                    <%= property_changes.size == 1 ? "property changed" : "properties changed" %>
                   </div>
                 <% end %>
 
@@ -1665,24 +1200,11 @@
                   data-action="click->entity-template-version-compare#toggle"
                   aria-expanded="false"
                   class="
-                    inline-flex
-                    shrink-0
-                    items-center
-                    justify-center
-                    rounded-lg
-                    border
-                    border-gray-200
-                    bg-white
-                    px-3
-                    py-2
-                    text-xs
-                    font-bold
-                    text-gray-600
-                    shadow-sm
-                    transition
-                    hover:bg-gray-50
-                    dark:border-gray-700
-                    dark:bg-gray-900
+                    inline-flex shrink-0 items-center justify-center
+                    rounded-lg border border-gray-200 bg-white
+                    px-3 py-2 text-xs font-bold text-gray-600 shadow-sm
+                    transition hover:bg-gray-50
+                    dark:border-gray-700 dark:bg-gray-900
                     dark:text-gray-300
                   "
                 >
@@ -1691,308 +1213,646 @@
                 </button>
               </div>
 
-              <%# PROPERTY CHANGE TAGS %>
+              <%#
+                =================================================================
+                QUICK CHANGE SUMMARY
+                =================================================================
+              %>
 
-              <% if [
-                "changed",
-                "modified"
-              ].include?(field_type) &&
-                property_changes.any? %>
-                <div class="mt-5 flex flex-wrap gap-2">
-                  <% property_changes.each do |raw_change| %>
-                    <% property_change =
-                        raw_change.is_a?(Hash) ?
-                          raw_change :
-                          {}
-
-                      property_key =
-                        change_key_for.call(
-                          property_change
-                        ) %>
-
-                    <span
+              <% if property_changes.any? %>
+                <div class="mt-5 space-y-2">
+                  <% property_changes.each do |change| %>
+                    <div
                       class="
-                        rounded-lg
-                        border
-                        border-amber-200
-                        bg-amber-50
-                        px-2.5
-                        py-1
-                        font-mono
-                        text-[10px]
-                        font-bold
-                        text-amber-700
-                        dark:border-amber-800
-                        dark:bg-amber-950/30
-                        dark:text-amber-300
+                        flex flex-col gap-2 rounded-xl border
+                        border-amber-100 bg-amber-50/50 p-3
+                        sm:flex-row sm:items-center
+                        dark:border-amber-900 dark:bg-amber-950/10
                       "
                     >
-                      <%= property_key.presence || "changed" %>
-                    </span>
+                      <div
+                        class="
+                          shrink-0 font-mono text-xs font-black
+                          text-amber-700 dark:text-amber-300
+                        "
+                      >
+                        <%= human_property_name.call(change[:key]) %>
+                      </div>
+
+                      <div class="hidden text-gray-400 sm:block">
+                        :
+                      </div>
+
+                      <div
+                        class="
+                          min-w-0 flex-1 truncate font-mono text-xs
+                          text-red-600 dark:text-red-300
+                        "
+                      >
+                        <span class="mr-1 font-sans text-[10px] uppercase text-gray-400">
+                          A
+                        </span>
+
+                        <%= display_value.call(change[:from]) %>
+                      </div>
+
+                      <div class="hidden text-gray-400 sm:block">
+                        →
+                      </div>
+
+                      <div
+                        class="
+                          min-w-0 flex-1 truncate font-mono text-xs
+                          text-emerald-600 dark:text-emerald-300
+                        "
+                      >
+                        <span class="mr-1 font-sans text-[10px] uppercase text-gray-400">
+                          B
+                        </span>
+
+                        <%= display_value.call(change[:to]) %>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              <% elsif ["added", "removed"].include?(field_type) %>
+                <div
+                  class="
+                    mt-5 rounded-xl border p-4 text-xs font-semibold
+                    <%= field_type == "added" ?
+                    "border-emerald-100 bg-emerald-50/60 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/10 dark:text-emerald-300" :
+                    "border-red-100 bg-red-50/60 text-red-700 dark:border-red-900 dark:bg-red-950/10 dark:text-red-300" %>
+                  "
+                >
+                  <% if field_type == "added" %>
+                    This field did not exist in Version A and was introduced in
+                    Version B.
+                  <% else %>
+                    This field existed in Version A but was removed from Version
+                    B.
                   <% end %>
                 </div>
               <% end %>
 
-              <%# DETAILS %>
+              <%#
+                =================================================================
+                DETAILS
+                =================================================================
+              %>
 
               <div
                 id="<%= "#{field_id}-details" %>"
                 data-compare-details
                 class="mt-6 hidden"
               >
-                <% if [
-                  "changed",
-                  "modified"
-                ].include?(field_type) &&
-                  property_changes.any? %>
-                  <%#
-                    =========================================================
-                    CHANGED FIELD — PROPERTY LEVEL DIFF
-                    =========================================================
-                  %>
+                <%#
+                  ===============================================================
+                  CHANGED FIELD
+                  ===============================================================
+                %>
 
-                  <div class="space-y-3">
-                    <% property_changes.each do |raw_change| %>
-                      <% property_change =
-                          raw_change.is_a?(Hash) ?
-                            raw_change :
-                            {}
-
-                        property_key =
-                          change_key_for.call(
-                            property_change
-                          )
-
-                        property_left =
-                          change_left_for.call(
-                            property_change
-                          )
-
-                        property_right =
-                          change_right_for.call(
-                            property_change
-                          ) %>
-
-                      <div
-                        class="
-                          overflow-hidden
-                          rounded-xl
-                          border
-                          border-amber-100
-                          bg-amber-50/40
-                          dark:border-amber-900
-                          dark:bg-amber-950/10
-                        "
-                      >
-                        <div class="border-b border-amber-100 px-4 py-3 dark:border-amber-900">
-                          <div class="font-mono text-xs font-black text-gray-900 dark:text-white">
-                            <%= property_key.presence || "Property change" %>
-                          </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2">
-                          <%# VERSION A %>
-
+                <% if ["changed", "modified"].include?(field_type) %>
+                  <div class="space-y-5">
+                    <% if property_changes.any? %>
+                      <div>
+                        <div class="mb-3">
                           <div
                             class="
-                              border-b border-amber-100 p-4 md:border-b-0
-                              md:border-r dark:border-amber-900
+                              text-[10px] font-black uppercase
+                              tracking-[0.18em] text-amber-500
                             "
                           >
-                            <div
-                              class="
-                                mb-2
-                                flex
-                                items-center
-                                gap-2
-                                text-[9px]
-                                font-black
-                                uppercase
-                                tracking-wider
-                                text-sky-500
-                              "
-                            >
-                              <span class="h-1.5 w-1.5 rounded-full bg-sky-400"></span>
-                              Version A
-                            </div>
-
-                            <pre
-                              class="
-                                max-h-80
-                                overflow-auto
-                                rounded-lg
-                                bg-white
-                                p-3
-                                font-mono
-                                text-xs
-                                leading-5
-                                text-gray-700
-                                shadow-sm
-                                dark:bg-gray-950
-                                dark:text-gray-300
-                              "
-                            ><%= pretty_json.call(property_left) %></pre>
+                            What changed
                           </div>
 
-                          <%# VERSION B %>
+                          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            The following properties have different values
+                            between the two versions.
+                          </p>
+                        </div>
 
-                          <div class="p-4">
+                        <div class="space-y-4">
+                          <% property_changes.each do |change| %>
                             <div
                               class="
-                                mb-2
-                                flex
-                                items-center
-                                gap-2
-                                text-[9px]
-                                font-black
-                                uppercase
-                                tracking-wider
-                                text-violet-500
+                                overflow-hidden rounded-2xl border
+                                border-gray-200 bg-white shadow-sm
+                                dark:border-gray-700 dark:bg-gray-900
                               "
                             >
-                              <span class="h-1.5 w-1.5 rounded-full bg-violet-400"></span>
-                              Version B
-                            </div>
+                              <%# PROPERTY HEADER %>
 
-                            <pre
-                              class="
-                                max-h-80
-                                overflow-auto
-                                rounded-lg
-                                bg-white
-                                p-3
-                                font-mono
-                                text-xs
-                                leading-5
-                                text-gray-700
-                                shadow-sm
-                                dark:bg-gray-950
-                                dark:text-gray-300
-                              "
-                            ><%= pretty_json.call(property_right) %></pre>
+                              <div
+                                class="
+                                  flex flex-col gap-2 border-b
+                                  border-gray-200 bg-gray-50 px-4 py-3
+                                  sm:flex-row sm:items-center
+                                  sm:justify-between
+                                  dark:border-gray-700 dark:bg-gray-950
+                                "
+                              >
+                                <div class="font-mono text-sm font-black text-gray-900 dark:text-white">
+                                  <%= human_property_name.call(change[:key]) %>
+                                </div>
+
+                                <div
+                                  class="
+                                    rounded-lg bg-amber-100 px-2.5 py-1
+                                    font-mono text-[10px] font-bold
+                                    text-amber-700
+                                    dark:bg-amber-950/40 dark:text-amber-300
+                                  "
+                                >
+                                  <%= change[:key] %>
+                                </div>
+                              </div>
+
+                              <%# BEFORE / AFTER %>
+
+                              <div class="grid grid-cols-1 md:grid-cols-2">
+                                <%# BEFORE %>
+
+                                <div
+                                  class="
+                                    border-b border-gray-200 p-5
+                                    md:border-b-0 md:border-r
+                                    dark:border-gray-700
+                                  "
+                                >
+                                  <div
+                                    class="
+                                      mb-3 flex items-center gap-2
+                                      text-[10px] font-black uppercase
+                                      tracking-wider text-red-500
+                                    "
+                                  >
+                                    <span class="h-2 w-2 rounded-full bg-red-400"></span>
+                                    Version A — Before
+                                  </div>
+
+                                  <div
+                                    class="
+                                      rounded-xl border border-red-100
+                                      bg-red-50/60 p-4
+                                      dark:border-red-900
+                                      dark:bg-red-950/20
+                                    "
+                                  >
+                                    <% if change[:from].is_a?(Hash) ||
+                                      change[:from].is_a?(Array) %>
+                                      <pre
+                                        class="
+                                          max-h-80 overflow-auto
+                                          whitespace-pre-wrap break-words
+                                          font-mono text-xs leading-5
+                                          text-red-700
+                                          dark:text-red-300
+                                        "
+                                      ><%= display_value.call(change[:from]) %></pre>
+                                    <% else %>
+                                      <div
+                                        class="
+                                          break-words font-mono text-sm
+                                          font-semibold text-red-700
+                                          dark:text-red-300
+                                        "
+                                      >
+                                        <%= display_value.call(change[:from]) %>
+                                      </div>
+                                    <% end %>
+                                  </div>
+                                </div>
+
+                                <%# AFTER %>
+
+                                <div class="p-5">
+                                  <div
+                                    class="
+                                      mb-3 flex items-center gap-2
+                                      text-[10px] font-black uppercase
+                                      tracking-wider text-emerald-500
+                                    "
+                                  >
+                                    <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+                                    Version B — After
+                                  </div>
+
+                                  <div
+                                    class="
+                                      rounded-xl border border-emerald-100
+                                      bg-emerald-50/60 p-4
+                                      dark:border-emerald-900
+                                      dark:bg-emerald-950/20
+                                    "
+                                  >
+                                    <% if change[:to].is_a?(Hash) ||
+                                      change[:to].is_a?(Array) %>
+                                      <pre
+                                        class="
+                                          max-h-80 overflow-auto
+                                          whitespace-pre-wrap break-words
+                                          font-mono text-xs leading-5
+                                          text-emerald-700
+                                          dark:text-emerald-300
+                                        "
+                                      ><%= display_value.call(change[:to]) %></pre>
+                                    <% else %>
+                                      <div
+                                        class="
+                                          break-words font-mono text-sm
+                                          font-semibold text-emerald-700
+                                          dark:text-emerald-300
+                                        "
+                                      >
+                                        <%= display_value.call(change[:to]) %>
+                                      </div>
+                                    <% end %>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <%# EXPLANATION %>
+
+                              <div
+                                class="
+                                  border-t border-gray-200 bg-blue-50/40
+                                  px-5 py-4
+                                  dark:border-gray-700
+                                  dark:bg-blue-950/10
+                                "
+                              >
+                                <div
+                                  class="
+                                    text-[10px] font-black uppercase
+                                    tracking-wider text-blue-500
+                                  "
+                                >
+                                  Change explanation
+                                </div>
+
+                                <p class="mt-1 text-xs leading-5 text-gray-600 dark:text-gray-300">
+                                  The
+                                  <span class="font-bold"><%= human_property_name.call(change[:key]) %></span>
+                                  property changed from
+                                  <span class="font-mono font-bold text-red-600 dark:text-red-300"><%= display_value.call(change[:from]) %></span>
+                                  to
+                                  <span class="font-mono font-bold text-emerald-600 dark:text-emerald-300"><%= display_value.call(change[:to]) %></span>.
+                                </p>
+                              </div>
+                            </div>
+                          <% end %>
+                        </div>
+                      </div>
+                    <% else %>
+                      <div
+                        class="
+                          rounded-xl border border-gray-200 bg-gray-50
+                          p-5 text-sm text-gray-500
+                          dark:border-gray-700 dark:bg-gray-900
+                          dark:text-gray-400
+                        "
+                      >
+                        The field is marked as changed, but no property-level
+                        differences were returned by the comparator.
+                      </div>
+                    <% end %>
+
+                    <%# COMPLETE FIELD A/B %>
+
+                    <div>
+                      <div class="mb-3">
+                        <div
+                          class="
+                            text-[10px] font-black uppercase
+                            tracking-[0.18em] text-violet-500
+                          "
+                        >
+                          Complete field definitions
+                        </div>
+
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                          Full field payload before and after the change.
+                        </p>
+                      </div>
+
+                      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <div>
+                          <div
+                            class="
+                              mb-2 text-[9px] font-black uppercase
+                              tracking-wider text-sky-500
+                            "
+                          >
+                            Version A
                           </div>
+
+                          <pre
+                            class="
+                              max-h-96 overflow-auto rounded-xl bg-gray-950
+                              p-4 font-mono text-xs leading-5 text-sky-300
+                            "
+                          ><%= pretty_json.call(left_field) %></pre>
+                        </div>
+
+                        <div>
+                          <div
+                            class="
+                              mb-2 text-[9px] font-black uppercase
+                              tracking-wider text-violet-500
+                            "
+                          >
+                            Version B
+                          </div>
+
+                          <pre
+                            class="
+                              max-h-96 overflow-auto rounded-xl bg-gray-950
+                              p-4 font-mono text-xs leading-5 text-violet-300
+                            "
+                          ><%= pretty_json.call(right_field) %></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <%#
+                    ===============================================================
+                    ADDED FIELD
+                    ===============================================================
+                  %>
+                <% elsif ["added", "add"].include?(field_type) %>
+                  <div class="space-y-5">
+                    <div
+                      class="
+                        rounded-2xl border border-emerald-200
+                        bg-emerald-50/60 p-5
+                        dark:border-emerald-900
+                        dark:bg-emerald-950/20
+                      "
+                    >
+                      <div
+                        class="
+                          text-[10px] font-black uppercase tracking-[0.18em]
+                          text-emerald-500
+                        "
+                      >
+                        What happened?
+                      </div>
+
+                      <h3
+                        class="
+                          mt-2 text-lg font-black text-emerald-800
+                          dark:text-emerald-200
+                        "
+                      >
+                        Field added
+                      </h3>
+
+                      <p
+                        class="
+                          mt-2 text-sm leading-6 text-emerald-700
+                          dark:text-emerald-300
+                        "
+                      >
+                        The field <strong><%= field_name %></strong> did not
+                        exist in Version A and was introduced in Version B.
+                      </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                      <div>
+                        <div
+                          class="
+                            mb-2 text-[9px] font-black uppercase
+                            tracking-wider text-sky-500
+                          "
+                        >
+                          Version A
+                        </div>
+
+                        <div
+                          class="
+                            rounded-xl border border-dashed border-red-200
+                            bg-red-50/50 p-5 text-sm font-semibold
+                            text-red-500
+                            dark:border-red-900
+                            dark:bg-red-950/20
+                            dark:text-red-300
+                          "
+                        >
+                          Field not present.
+                        </div>
+                      </div>
+
+                      <div>
+                        <div
+                          class="
+                            mb-2 text-[9px] font-black uppercase
+                            tracking-wider text-emerald-500
+                          "
+                        >
+                          Version B — New field
+                        </div>
+
+                        <pre
+                          class="
+                            max-h-96 overflow-auto rounded-xl
+                            bg-gray-950 p-4 font-mono text-xs
+                            leading-5 text-emerald-300
+                          "
+                        ><%= pretty_json.call(right_field) %></pre>
+                      </div>
+                    </div>
+
+                    <% if right_field.is_a?(Hash) %>
+                      <div
+                        class="
+                          rounded-2xl border border-gray-200 bg-white
+                          p-5 dark:border-gray-700 dark:bg-gray-900
+                        "
+                      >
+                        <div
+                          class="
+                            text-[10px] font-black uppercase
+                            tracking-[0.18em] text-gray-400
+                          "
+                        >
+                          New field configuration
+                        </div>
+
+                        <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                          <% [
+                               ["Type", value_for.call(right_field, :type)],
+                               ["Label", value_for.call(right_field, :label)],
+                               ["Required", value_for.call(right_field, :required)],
+                               ["Description", value_for.call(right_field, :description)]
+                             ].each do |property_name, property_value| %>
+                            <div class="rounded-xl bg-gray-50 p-4 dark:bg-gray-950">
+                              <div class="text-[9px] font-black uppercase tracking-wider text-gray-400">
+                                <%= property_name %>
+                              </div>
+
+                              <div
+                                class="
+                                  mt-2 break-words text-sm font-semibold
+                                  text-gray-800 dark:text-gray-200
+                                "
+                              >
+                                <%= display_value.call(property_value) %>
+                              </div>
+                            </div>
+                          <% end %>
                         </div>
                       </div>
                     <% end %>
                   </div>
-                <% else %>
+
                   <%#
-                    =========================================================
-                    ADDED / REMOVED / UNCHANGED FIELD
-                    =========================================================
+                    ===============================================================
+                    REMOVED FIELD
+                    ===============================================================
                   %>
-
-                  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <%# VERSION A %>
-
-                    <div>
+                <% elsif ["removed", "remove", "deleted"].include?(field_type) %>
+                  <div class="space-y-5">
+                    <div
+                      class="
+                        rounded-2xl border border-red-200
+                        bg-red-50/60 p-5
+                        dark:border-red-900
+                        dark:bg-red-950/20
+                      "
+                    >
                       <div
                         class="
-                          mb-2
-                          flex
-                          items-center
-                          gap-2
-                          text-[10px]
-                          font-black
-                          uppercase
-                          tracking-wider
-                          text-sky-500
+                          text-[10px] font-black uppercase tracking-[0.18em]
+                          text-red-500
                         "
                       >
-                        <span class="h-2 w-2 rounded-full bg-sky-400"></span>
-                        Version A
+                        What happened?
                       </div>
 
-                      <% if left_field.nil? %>
-                        <div
-                          class="
-                            rounded-xl
-                            border
-                            border-dashed
-                            border-red-200
-                            bg-red-50/50
-                            p-4
-                            text-xs
-                            font-semibold
-                            text-red-500
-                            dark:border-red-900
-                            dark:bg-red-950/20
-                            dark:text-red-300
-                          "
-                        >
-                          Field not present in Version A
-                        </div>
-                      <% else %>
-                        <pre
-                          class="
-                            max-h-96
-                            overflow-auto
-                            rounded-xl
-                            bg-gray-950
-                            p-4
-                            font-mono
-                            text-xs
-                            leading-5
-                            text-sky-300
-                          "
-                        ><%= pretty_json.call(left_field) %></pre>
-                      <% end %>
+                      <h3 class="mt-2 text-lg font-black text-red-800 dark:text-red-200">
+                        Field removed
+                      </h3>
+
+                      <p class="mt-2 text-sm leading-6 text-red-700 dark:text-red-300">
+                        The field <strong><%= field_name %></strong> existed in
+                        Version A but is no longer present in Version B.
+                      </p>
                     </div>
 
-                    <%# VERSION B %>
-
-                    <div>
-                      <div
-                        class="
-                          mb-2
-                          flex
-                          items-center
-                          gap-2
-                          text-[10px]
-                          font-black
-                          uppercase
-                          tracking-wider
-                          text-violet-500
-                        "
-                      >
-                        <span class="h-2 w-2 rounded-full bg-violet-400"></span>
-                        Version B
-                      </div>
-
-                      <% if right_field.nil? %>
+                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                      <div>
                         <div
                           class="
-                            rounded-xl
-                            border
-                            border-dashed
-                            border-red-200
-                            bg-red-50/50
-                            p-4
-                            text-xs
-                            font-semibold
-                            text-red-500
+                            mb-2 text-[9px] font-black uppercase
+                            tracking-wider text-red-500
+                          "
+                        >
+                          Version A — Removed field
+                        </div>
+
+                        <pre
+                          class="
+                            max-h-96 overflow-auto rounded-xl
+                            bg-gray-950 p-4 font-mono text-xs
+                            leading-5 text-red-300
+                          "
+                        ><%= pretty_json.call(left_field) %></pre>
+                      </div>
+
+                      <div>
+                        <div
+                          class="
+                            mb-2 text-[9px] font-black uppercase
+                            tracking-wider text-violet-500
+                          "
+                        >
+                          Version B
+                        </div>
+
+                        <div
+                          class="
+                            rounded-xl border border-dashed
+                            border-red-200 bg-red-50/50 p-5
+                            text-sm font-semibold text-red-500
                             dark:border-red-900
                             dark:bg-red-950/20
                             dark:text-red-300
                           "
                         >
-                          Field not present in Version B
+                          Field not present.
                         </div>
-                      <% else %>
+                      </div>
+                    </div>
+                  </div>
+
+                  <%#
+                    ===============================================================
+                    UNCHANGED FIELD
+                    ===============================================================
+                  %>
+                <% else %>
+                  <div class="space-y-5">
+                    <div
+                      class="
+                        rounded-2xl border border-gray-200
+                        bg-gray-50 p-5
+                        dark:border-gray-700 dark:bg-gray-900
+                      "
+                    >
+                      <div
+                        class="
+                          text-[10px] font-black uppercase tracking-[0.18em]
+                          text-gray-400
+                        "
+                      >
+                        No changes
+                      </div>
+
+                      <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">
+                        This field is identical in both versions.
+                      </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                      <div>
+                        <div
+                          class="
+                            mb-2 text-[9px] font-black uppercase
+                            tracking-wider text-sky-500
+                          "
+                        >
+                          Version A
+                        </div>
+
                         <pre
                           class="
-                            max-h-96
-                            overflow-auto
-                            rounded-xl
-                            bg-gray-950
-                            p-4
-                            font-mono
-                            text-xs
-                            leading-5
-                            text-violet-300
+                            max-h-96 overflow-auto rounded-xl
+                            bg-gray-950 p-4 font-mono text-xs
+                            leading-5 text-sky-300
+                          "
+                        ><%= pretty_json.call(left_field) %></pre>
+                      </div>
+
+                      <div>
+                        <div
+                          class="
+                            mb-2 text-[9px] font-black uppercase
+                            tracking-wider text-violet-500
+                          "
+                        >
+                          Version B
+                        </div>
+
+                        <pre
+                          class="
+                            max-h-96 overflow-auto rounded-xl
+                            bg-gray-950 p-4 font-mono text-xs
+                            leading-5 text-violet-300
                           "
                         ><%= pretty_json.call(right_field) %></pre>
-                      <% end %>
+                      </div>
                     </div>
                   </div>
                 <% end %>
@@ -2005,9 +1865,9 @@
   </div>
 
   <%#
-    =========================================================================
+    ========================================================================
     RAW DEFINITIONS
-    =========================================================================
+    ========================================================================
   %>
 
   <div class="mt-8">
@@ -2026,29 +1886,19 @@
     </div>
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-      <%# VERSION A RAW %>
+      <%# VERSION A %>
 
       <div
         class="
-          overflow-hidden
-          rounded-[24px]
-          border-2
-          border-sky-100
-          bg-white
-          shadow-sm
-          dark:border-sky-900
-          dark:bg-gray-800
+          overflow-hidden rounded-[24px] border-2 border-sky-100
+          bg-white shadow-sm
+          dark:border-sky-900 dark:bg-gray-800
         "
       >
         <div
           class="
-            border-b
-            border-sky-100
-            bg-sky-50/60
-            px-6
-            py-5
-            dark:border-sky-900
-            dark:bg-sky-950/20
+            border-b border-sky-100 bg-sky-50/60 px-6 py-5
+            dark:border-sky-900 dark:bg-sky-950/20
           "
         >
           <div class="text-[10px] font-black uppercase tracking-[0.18em] text-sky-500">
@@ -2063,43 +1913,26 @@
         <div class="p-5">
           <pre
             class="
-              max-h-[600px]
-              overflow-auto
-              rounded-2xl
-              bg-gray-950
-              p-5
-              font-mono
-              text-xs
-              leading-6
-              text-sky-300
+              max-h-[600px] overflow-auto rounded-2xl bg-gray-950
+              p-5 font-mono text-xs leading-6 text-sky-300
             "
           ><%= pretty_json.call(left_definition) %></pre>
         </div>
       </div>
 
-      <%# VERSION B RAW %>
+      <%# VERSION B %>
 
       <div
         class="
-          overflow-hidden
-          rounded-[24px]
-          border-2
-          border-violet-100
-          bg-white
-          shadow-sm
-          dark:border-violet-900
-          dark:bg-gray-800
+          overflow-hidden rounded-[24px] border-2 border-violet-100
+          bg-white shadow-sm
+          dark:border-violet-900 dark:bg-gray-800
         "
       >
         <div
           class="
-            border-b
-            border-violet-100
-            bg-violet-50/60
-            px-6
-            py-5
-            dark:border-violet-900
-            dark:bg-violet-950/20
+            border-b border-violet-100 bg-violet-50/60 px-6 py-5
+            dark:border-violet-900 dark:bg-violet-950/20
           "
         >
           <div
@@ -2119,15 +1952,8 @@
         <div class="p-5">
           <pre
             class="
-              max-h-[600px]
-              overflow-auto
-              rounded-2xl
-              bg-gray-950
-              p-5
-              font-mono
-              text-xs
-              leading-6
-              text-violet-300
+              max-h-[600px] overflow-auto rounded-2xl bg-gray-950
+              p-5 font-mono text-xs leading-6 text-violet-300
             "
           ><%= pretty_json.call(right_definition) %></pre>
         </div>
@@ -2136,9 +1962,9 @@
   </div>
 
   <%#
-    =========================================================================
-    DEFINITION-LEVEL CHANGES
-    =========================================================================
+    ========================================================================
+    DEFINITION LEVEL CHANGES
+    ========================================================================
   %>
 
   <% if definition_changes.any? %>
@@ -2155,14 +1981,9 @@
 
       <div
         class="
-          overflow-hidden
-          rounded-[24px]
-          border-2
-          border-gray-100
-          bg-white
-          shadow-sm
-          dark:border-gray-700
-          dark:bg-gray-800
+          overflow-hidden rounded-[24px] border-2 border-gray-100
+          bg-white shadow-sm
+          dark:border-gray-700 dark:bg-gray-800
         "
       >
         <div class="divide-y divide-gray-100 dark:divide-gray-700">
@@ -2172,29 +1993,21 @@
                   raw_change :
                   {}
 
+
               change_key =
-                value_for.call(
-                  change,
-                  :key
-                ).to_s
+                value_for.call(change, :key).to_s
+
 
               change_type =
-                value_for.call(
-                  change,
-                  :type
-                ).to_s
+                value_for.call(change, :type).to_s
+
 
               change_left =
-                value_for.call(
-                  change,
-                  :left
-                )
+                value_for.call(change, :left)
+
 
               change_right =
-                value_for.call(
-                  change,
-                  :right
-                ) %>
+                value_for.call(change, :right) %>
 
             <div class="p-5 sm:p-6">
               <div
@@ -2213,64 +2026,14 @@
                   </div>
                 </div>
 
-                <div>
-                  <% case change_type %>
-                  <% when "added" %>
-                    <span
-                      class="
-                        rounded-full
-                        bg-emerald-50
-                        px-3
-                        py-1.5
-                        text-[10px]
-                        font-black
-                        uppercase
-                        text-emerald-700
-                      "
-                    >
-                      Added
-                    </span>
-                  <% when "removed" %>
-                    <span
-                      class="
-                        rounded-full bg-red-50 px-3 py-1.5 text-[10px]
-                        font-black uppercase text-red-700
-                      "
-                    >
-                      Removed
-                    </span>
-                  <% when "changed" %>
-                    <span
-                      class="
-                        rounded-full
-                        bg-amber-50
-                        px-3
-                        py-1.5
-                        text-[10px]
-                        font-black
-                        uppercase
-                        text-amber-700
-                      "
-                    >
-                      Changed
-                    </span>
-                  <% else %>
-                    <span
-                      class="
-                        rounded-full
-                        bg-gray-50
-                        px-3
-                        py-1.5
-                        text-[10px]
-                        font-black
-                        uppercase
-                        text-gray-500
-                      "
-                    >
-                      <%= change_type.presence || "Unknown" %>
-                    </span>
-                  <% end %>
-                </div>
+                <span
+                  class="
+                    inline-flex rounded-full bg-amber-50 px-3 py-1.5
+                    text-[10px] font-black uppercase text-amber-700
+                  "
+                >
+                  <%= change_type.presence || "Changed" %>
+                </span>
               </div>
 
               <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -2286,15 +2049,8 @@
 
                   <pre
                     class="
-                      max-h-72
-                      overflow-auto
-                      rounded-xl
-                      bg-gray-950
-                      p-4
-                      font-mono
-                      text-xs
-                      leading-5
-                      text-sky-300
+                      max-h-72 overflow-auto rounded-xl bg-gray-950
+                      p-4 font-mono text-xs leading-5 text-sky-300
                     "
                   ><%= pretty_json.call(change_left) %></pre>
                 </div>
@@ -2311,15 +2067,8 @@
 
                   <pre
                     class="
-                      max-h-72
-                      overflow-auto
-                      rounded-xl
-                      bg-gray-950
-                      p-4
-                      font-mono
-                      text-xs
-                      leading-5
-                      text-violet-300
+                      max-h-72 overflow-auto rounded-xl bg-gray-950
+                      p-4 font-mono text-xs leading-5 text-violet-300
                     "
                   ><%= pretty_json.call(change_right) %></pre>
                 </div>
@@ -2332,34 +2081,21 @@
   <% end %>
 
   <%#
-    =========================================================================
-    DEBUG INFORMATION
-    =========================================================================
+    ========================================================================
+    DEBUG
+    ========================================================================
   %>
 
   <details
     class="
-      mt-8
-      overflow-hidden
-      rounded-[24px]
-      border
-      border-gray-200
-      bg-gray-50
-      dark:border-gray-700
-      dark:bg-gray-900
+      mt-8 overflow-hidden rounded-[24px] border border-gray-200
+      bg-gray-50 dark:border-gray-700 dark:bg-gray-900
     "
   >
     <summary
       class="
-        cursor-pointer
-        px-6
-        py-4
-        text-xs
-        font-black
-        uppercase
-        tracking-wider
-        text-gray-500
-        hover:text-violet-500
+        cursor-pointer px-6 py-4 text-xs font-black uppercase
+        tracking-wider text-gray-500 hover:text-violet-500
       "
     >
       Debug comparison payload
@@ -2374,20 +2110,13 @@
               text-gray-400
             "
           >
-            Field Changes Ruby Object
+            Field Comparisons
           </div>
 
           <pre
             class="
-              max-h-96
-              overflow-auto
-              rounded-xl
-              bg-gray-950
-              p-4
-              font-mono
-              text-xs
-              leading-5
-              text-emerald-300
+              max-h-96 overflow-auto rounded-xl bg-gray-950
+              p-4 font-mono text-xs leading-5 text-emerald-300
             "
           ><%= pretty_json.call(field_changes) %></pre>
         </div>
@@ -2404,15 +2133,8 @@
 
           <pre
             class="
-              max-h-96
-              overflow-auto
-              rounded-xl
-              bg-gray-950
-              p-4
-              font-mono
-              text-xs
-              leading-5
-              text-violet-300
+              max-h-96 overflow-auto rounded-xl bg-gray-950
+              p-4 font-mono text-xs leading-5 text-violet-300
             "
           ><%= pretty_json.call(comparison_summary) %></pre>
         </div>
@@ -2421,23 +2143,15 @@
   </details>
 
   <%#
-    =========================================================================
+    ========================================================================
     FOOTER
-    =========================================================================
+    ========================================================================
   %>
 
   <div
     class="
-      mt-8
-      flex
-      flex-col
-      gap-3
-      border-t-2
-      border-gray-100
-      pt-5
-      sm:flex-row
-      sm:items-center
-      sm:justify-between
+      mt-8 flex flex-col gap-3 border-t-2 border-gray-100 pt-5
+      sm:flex-row sm:items-center sm:justify-between
       dark:border-gray-800
     "
   >
@@ -2460,14 +2174,8 @@
 
     <div
       class="
-        flex
-        items-center
-        gap-2
-        text-[10px]
-        font-black
-        uppercase
-        tracking-wider
-        text-emerald-500
+        flex items-center gap-2 text-[10px] font-black uppercase
+        tracking-wider text-emerald-500
       "
     >
       <span

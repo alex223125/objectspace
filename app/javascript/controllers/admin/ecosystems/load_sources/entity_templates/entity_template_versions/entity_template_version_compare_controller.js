@@ -2,9 +2,9 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
     static targets = [
+        "field",
         "search",
         "filter",
-        "field",
         "count"
     ]
 
@@ -16,48 +16,33 @@ export default class extends Controller {
         this.currentFilter = "all"
         this.currentSearch = ""
 
-        this.expanded = new Set()
-
-        this.applyFilters()
-        this.updateVisibleCount()
-
-        console.log(
-            "entity_template_version_compare connected"
-        )
-
-        console.log("Fields:", this.fieldsValue)
-
-        console.log(
-            "comparison fields:",
-            this.hasFieldTarget
-                ? this.fieldTargets.length
-                : 0
-        )
-
-        console.log("========== COMPARE DEBUG ==========")
-
-        console.log("Controller:", this)
-        console.log("Element:", this.element)
-        console.log("Count target:", this.countTarget)
-        console.log("Fields:", this.fieldsValue)
-
-        console.log("===================================")
-    }
-
-    disconnect() {
-        this.expanded.clear()
+        this.initializeFields()
+        this.updateCount()
     }
 
 
-    // ========================================================================
+    // ============================================================
+    // INITIALIZATION
+    // ============================================================
+
+    initializeFields() {
+        this.fieldTargets.forEach((field) => {
+            this.setFieldVisible(field, true)
+            this.closeDetails(field)
+        })
+
+        this.updateFilterButtons()
+    }
+
+
+    // ============================================================
     // SEARCH
-    // ========================================================================
+    // ============================================================
 
     searchChanged(event) {
         this.currentSearch =
-            String(
-                event?.target?.value || ""
-            )
+            event.target.value
+                .toString()
                 .trim()
                 .toLowerCase()
 
@@ -65,127 +50,249 @@ export default class extends Controller {
     }
 
 
-    // ========================================================================
+    // ============================================================
     // FILTER
-    // ========================================================================
+    // ============================================================
 
     filterChanged(event) {
         const filter =
-            event?.currentTarget?.dataset?.filter || "all"
+            event.currentTarget.dataset.filter || "all"
 
         this.currentFilter = filter
 
         this.updateFilterButtons()
-
         this.applyFilters()
     }
 
 
-    // ========================================================================
-    // APPLY FILTERS
-    // ========================================================================
+    // ============================================================
+    // APPLY SEARCH + FILTER
+    // ============================================================
 
     applyFilters() {
-        if (!this.hasFieldTarget) {
-            this.updateVisibleCount()
-            return
-        }
-
         let visibleCount = 0
 
-        this.fieldTargets.forEach(field => {
+        this.fieldTargets.forEach((field) => {
             const matchesFilter =
-                this.matchesFilter(field)
+                this.matchesCurrentFilter(field)
 
             const matchesSearch =
-                this.matchesSearch(field)
+                this.matchesCurrentSearch(field)
 
             const visible =
-                matchesFilter &&
-                matchesSearch
+                matchesFilter && matchesSearch
+
+            this.setFieldVisible(field, visible)
 
             if (visible) {
-                field.classList.remove("hidden")
                 visibleCount += 1
-            } else {
-                field.classList.add("hidden")
             }
         })
 
-        this.updateVisibleCount(visibleCount)
+        this.updateCount(visibleCount)
     }
 
 
-    // ========================================================================
+    // ============================================================
     // FILTER MATCH
-    // ========================================================================
+    // ============================================================
 
-    matchesFilter(field) {
+    matchesCurrentFilter(field) {
         if (this.currentFilter === "all") {
             return true
         }
 
         const changeType =
-            String(
-                field.dataset.changeType || ""
-            )
-                .trim()
-                .toLowerCase()
+            this.normalizedChangeType(field)
 
-        return (
-            changeType ===
-            this.currentFilter
-        )
+        return changeType === this.currentFilter
     }
 
 
-    // ========================================================================
+    // ============================================================
     // SEARCH MATCH
-    // ========================================================================
+    // ============================================================
 
-    matchesSearch(field) {
+    matchesCurrentSearch(field) {
         if (!this.currentSearch) {
             return true
         }
 
-        const fieldName =
-            String(
-                field.dataset.fieldName || ""
-            )
-                .toLowerCase()
+        const searchText =
+            this.searchTextFor(field)
 
-        const fieldText =
-            String(
-                field.textContent || ""
-            )
-                .toLowerCase()
-
-        return (
-            fieldName.includes(
-                this.currentSearch
-            ) ||
-            fieldText.includes(
-                this.currentSearch
-            )
+        return searchText.includes(
+            this.currentSearch
         )
     }
 
 
-    // ========================================================================
-    // FILTER BUTTON UI
-    // ========================================================================
+    // ============================================================
+    // BUILD SEARCH TEXT
+    // ============================================================
 
-    updateFilterButtons() {
-        if (!this.hasFilterTarget) {
+    searchTextFor(field) {
+        const parts = []
+
+        // ----------------------------------------------------------
+        // HTML DATA
+        // ----------------------------------------------------------
+
+        const fieldName =
+            field.dataset.fieldName
+
+        if (fieldName) {
+            parts.push(fieldName)
+        }
+
+
+        // ----------------------------------------------------------
+        // FIELD DATA FROM STIMULUS VALUE
+        // ----------------------------------------------------------
+
+        const index =
+            this.fieldTargets.indexOf(field)
+
+        if (
+            index >= 0 &&
+            this.hasFieldsValue &&
+            Array.isArray(this.fieldsValue)
+        ) {
+            const fieldData =
+                this.fieldsValue[index]
+
+            if (fieldData) {
+                parts.push(
+                    this.stringifyForSearch(fieldData)
+                )
+            }
+        }
+
+
+        // ----------------------------------------------------------
+        // VISIBLE TEXT
+        // ----------------------------------------------------------
+
+        parts.push(
+            field.textContent || ""
+        )
+
+        return parts
+            .join(" ")
+            .toLowerCase()
+    }
+
+
+    // ============================================================
+    // STRINGIFY OBJECT FOR SEARCH
+    // ============================================================
+
+    stringifyForSearch(value) {
+        try {
+            return JSON.stringify(value)
+        } catch (error) {
+            return String(value)
+        }
+    }
+
+
+    // ============================================================
+    // NORMALIZE CHANGE TYPE
+    // ============================================================
+
+    normalizedChangeType(field) {
+        const value =
+            (
+                field.dataset.changeType ||
+                ""
+            )
+                .toString()
+                .trim()
+                .toLowerCase()
+
+        switch (value) {
+            case "add":
+            case "added":
+                return "added"
+
+            case "remove":
+            case "removed":
+            case "deleted":
+                return "removed"
+
+            case "modify":
+            case "modified":
+            case "change":
+            case "changed":
+                return "changed"
+
+            case "unchanged":
+            default:
+                return "unchanged"
+        }
+    }
+
+
+    // ============================================================
+    // VISIBILITY
+    // ============================================================
+
+    setFieldVisible(field, visible) {
+        if (visible) {
+            field.classList.remove("hidden")
+        } else {
+            field.classList.add("hidden")
+        }
+    }
+
+
+    // ============================================================
+    // UPDATE COUNT
+    // ============================================================
+
+    updateCount(count = null) {
+        if (!this.hasCountTarget) {
             return
         }
 
-        this.filterTargets.forEach(button => {
+        const value =
+            count === null
+                ? this.visibleFieldCount()
+                : count
+
+        this.countTarget.textContent =
+            `${value} ${value === 1 ? "field" : "fields"}`
+    }
+
+
+    // ============================================================
+    // VISIBLE FIELD COUNT
+    // ============================================================
+
+    visibleFieldCount() {
+        return this.fieldTargets.filter(
+            (field) =>
+                !field.classList.contains("hidden")
+        ).length
+    }
+
+
+    // ============================================================
+    // UPDATE FILTER BUTTONS
+    // ============================================================
+
+    updateFilterButtons() {
+        this.filterTargets.forEach((button) => {
             const filter =
                 button.dataset.filter || "all"
 
             const active =
                 filter === this.currentFilter
+
+            button.setAttribute(
+                "aria-pressed",
+                active.toString()
+            )
 
             if (active) {
                 this.activateFilterButton(button)
@@ -196,6 +303,10 @@ export default class extends Controller {
     }
 
 
+    // ============================================================
+    // ACTIVE FILTER BUTTON
+    // ============================================================
+
     activateFilterButton(button) {
         button.classList.add(
             "ring-2",
@@ -203,12 +314,15 @@ export default class extends Controller {
             "ring-offset-1"
         )
 
-        button.setAttribute(
-            "aria-pressed",
-            "true"
+        button.classList.remove(
+            "opacity-60"
         )
     }
 
+
+    // ============================================================
+    // INACTIVE FILTER BUTTON
+    // ============================================================
 
     deactivateFilterButton(button) {
         button.classList.remove(
@@ -216,49 +330,16 @@ export default class extends Controller {
             "ring-violet-500",
             "ring-offset-1"
         )
-
-        button.setAttribute(
-            "aria-pressed",
-            "false"
-        )
     }
 
 
-    // ========================================================================
-    // VISIBLE COUNT
-    // ========================================================================
-
-    updateVisibleCount(explicitCount = null) {
-        if (!this.hasCountTarget) {
-            return
-        }
-
-        const count =
-            explicitCount !== null
-                ? explicitCount
-                : this.hasFieldTarget
-                    ? this.fieldTargets.filter(
-                        field =>
-                            !field.classList.contains(
-                                "hidden"
-                            )
-                    ).length
-                    : 0
-
-        this.countTarget.textContent =
-            `${count} ${
-                count === 1
-                    ? "field"
-                    : "fields"
-            }`
-    }
-
-
-    // ========================================================================
-    // TOGGLE FIELD DETAILS
-    // ========================================================================
+    // ============================================================
+    // TOGGLE DETAILS
+    // ============================================================
 
     toggle(event) {
+        event.preventDefault()
+
         const button =
             event.currentTarget
 
@@ -270,46 +351,35 @@ export default class extends Controller {
         }
 
         const details =
-            document.getElementById(
-                targetId
-            )
+            document.getElementById(targetId)
 
         if (!details) {
-            console.warn(
-                "Comparison details element not found:",
-                targetId
-            )
-
             return
         }
 
-        const isHidden =
-            details.classList.contains(
-                "hidden"
-            )
+        const isOpen =
+            !details.classList.contains("hidden")
 
-        if (isHidden) {
-            this.expandDetails(
-                button,
-                details
+        if (isOpen) {
+            this.closeDetailsElement(
+                details,
+                button
             )
         } else {
-            this.collapseDetails(
-                button,
-                details
+            this.openDetailsElement(
+                details,
+                button
             )
         }
     }
 
 
-    // ========================================================================
-    // EXPAND
-    // ========================================================================
+    // ============================================================
+    // OPEN DETAILS
+    // ============================================================
 
-    expandDetails(button, details) {
-        details.classList.remove(
-            "hidden"
-        )
+    openDetailsElement(details, button) {
+        details.classList.remove("hidden")
 
         button.setAttribute(
             "aria-expanded",
@@ -320,26 +390,15 @@ export default class extends Controller {
             button,
             true
         )
-
-        const targetId =
-            details.id
-
-        if (targetId) {
-            this.expanded.add(
-                targetId
-            )
-        }
     }
 
 
-    // ========================================================================
-    // COLLAPSE
-    // ========================================================================
+    // ============================================================
+    // CLOSE DETAILS
+    // ============================================================
 
-    collapseDetails(button, details) {
-        details.classList.add(
-            "hidden"
-        )
+    closeDetailsElement(details, button) {
+        details.classList.add("hidden")
 
         button.setAttribute(
             "aria-expanded",
@@ -350,23 +409,84 @@ export default class extends Controller {
             button,
             false
         )
+    }
 
-        const targetId =
-            details.id
 
-        if (targetId) {
-            this.expanded.delete(
-                targetId
+    // ============================================================
+    // CLOSE DETAILS FOR FIELD
+    // ============================================================
+
+    closeDetails(field) {
+        const details =
+            field.querySelector(
+                "[data-compare-details]"
+            )
+
+        if (!details) {
+            return
+        }
+
+        details.classList.add("hidden")
+
+        const button =
+            field.querySelector(
+                'button[data-target]'
+            )
+
+        if (button) {
+            button.setAttribute(
+                "aria-expanded",
+                "false"
+            )
+
+            this.setChevron(
+                button,
+                false
             )
         }
     }
 
 
-    // ========================================================================
-    // CHEVRON
-    // ========================================================================
+    // ============================================================
+    // OPEN DETAILS FOR FIELD
+    // ============================================================
 
-    setChevron(button, expanded) {
+    openDetails(field) {
+        const details =
+            field.querySelector(
+                "[data-compare-details]"
+            )
+
+        if (!details) {
+            return
+        }
+
+        details.classList.remove("hidden")
+
+        const button =
+            field.querySelector(
+                'button[data-target]'
+            )
+
+        if (button) {
+            button.setAttribute(
+                "aria-expanded",
+                "true"
+            )
+
+            this.setChevron(
+                button,
+                true
+            )
+        }
+    }
+
+
+    // ============================================================
+    // CHEVRON
+    // ============================================================
+
+    setChevron(button, open) {
         const chevron =
             button.querySelector(
                 "[data-chevron]"
@@ -376,7 +496,7 @@ export default class extends Controller {
             return
         }
 
-        if (expanded) {
+        if (open) {
             chevron.classList.add(
                 "rotate-180"
             )
@@ -388,128 +508,57 @@ export default class extends Controller {
     }
 
 
-    // ========================================================================
+    // ============================================================
     // EXPAND ALL
-    // ========================================================================
+    // ============================================================
 
-    expandAll() {
-        if (!this.hasFieldTarget) {
-            return
+    expandAll(event) {
+        if (event) {
+            event.preventDefault()
         }
 
-        this.fieldTargets.forEach(field => {
+        this.fieldTargets.forEach((field) => {
             if (
-                field.classList.contains(
-                    "hidden"
-                )
+                !field.classList.contains("hidden")
             ) {
-                return
+                this.openDetails(field)
             }
-
-            const details =
-                field.querySelector(
-                    "[data-compare-details]"
-                )
-
-            if (!details) {
-                return
-            }
-
-            const button =
-                field.querySelector(
-                    'button[data-target]'
-                )
-
-            if (!button) {
-                return
-            }
-
-            this.expandDetails(
-                button,
-                details
-            )
         })
     }
 
 
-    // ========================================================================
+    // ============================================================
     // COLLAPSE ALL
-    // ========================================================================
+    // ============================================================
 
-    collapseAll() {
-        if (!this.hasFieldTarget) {
-            return
+    collapseAll(event) {
+        if (event) {
+            event.preventDefault()
         }
 
-        this.fieldTargets.forEach(field => {
-            const details =
-                field.querySelector(
-                    "[data-compare-details]"
-                )
-
-            if (!details) {
-                return
-            }
-
-            const button =
-                field.querySelector(
-                    'button[data-target]'
-                )
-
-            if (!button) {
-                return
-            }
-
-            this.collapseDetails(
-                button,
-                details
-            )
+        this.fieldTargets.forEach((field) => {
+            this.closeDetails(field)
         })
     }
 
 
-    // ========================================================================
-    // PUBLIC HELPERS
-    // ========================================================================
+    // ============================================================
+    // ESCAPE KEY SUPPORT
+    // ============================================================
 
-    showAll() {
+    keydown(event) {
+        if (event.key === "Escape") {
+            this.collapseAll()
+        }
+    }
+
+
+    // ============================================================
+    // DISCONNECT
+    // ============================================================
+
+    disconnect() {
         this.currentFilter = "all"
         this.currentSearch = ""
-
-        if (this.hasSearchTarget) {
-            this.searchTarget.value = ""
-        }
-
-        this.updateFilterButtons()
-        this.applyFilters()
-    }
-
-
-    filterAdded() {
-        this.setFilter("added")
-    }
-
-
-    filterRemoved() {
-        this.setFilter("removed")
-    }
-
-
-    filterChangedFields() {
-        this.setFilter("changed")
-    }
-
-
-    filterUnchanged() {
-        this.setFilter("unchanged")
-    }
-
-
-    setFilter(filter) {
-        this.currentFilter =
-            filter || "all"
-
-        this.updateFilterButtons()
-        this.applyFilters()
     }
 }

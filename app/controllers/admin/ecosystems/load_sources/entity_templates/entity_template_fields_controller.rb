@@ -2,7 +2,7 @@ module Admin
   module Ecosystems
     module LoadSources
       module EntityTemplates
-        class EntityTemplateFieldsController <::AdminController
+        class EntityTemplateFieldsController < ::AdminController
   before_action :set_entity_template_version
   before_action :set_entity_template_field, only: %i[
     edit
