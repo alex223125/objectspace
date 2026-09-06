@@ -1,166 +1,554 @@
 <%= render "admin/ecosystems/load_sources/entity_templates/entity_template_versions/field_manual" %>
+
 <%# ============================================================================
 ENTITY TEMPLATE VERSIONS — INDEX
+
 Path:
 app/views/admin/ecosystems/load_sources/entity_templates/entity_template_versions/index.html.erb
 
 Purpose:
-Administrative interface for managing Entity Template Versions.
+High-performance administrative registry for Entity Template Versions.
 
-Expected controller variable:
+Partials used:
+
+_search_form.html.erb
+_pagination.html.erb
+
+Expected controller variables:
+
 @entity_template_versions
+@total_versions
+@published_versions
+@draft_versions
+@archived_versions
 
-Expected model relationships:
-EntityTemplateVersion belongs_to :entity_template
+Optional controller variables:
+
+@search
+@status
+@sort
+@direction
+@page
+@per_page
+@total_pages
+
+Supported query parameters:
+
+q
+status
+sort
+direction
+per_page
+page
+
 ============================================================================ %>
 
-<div class="mx-auto w-full max-w-7xl px-5 py-8 sm:px-7 lg:px-10">
-<%# ========================================================================
-PAGE HEADER
-======================================================================== %>
+<%
+
+  # ==========================================================================
+  # SAFE DEFAULTS
+  # ==========================================================================
+
+  versions =
+    @entity_template_versions ||
+      ::Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion
+        .includes(:entity_template)
+        .order(version: :desc)
+
+  total_versions =
+    if defined?(@total_versions) && !@total_versions.nil?
+      @total_versions
+    else
+      versions.respond_to?(:total_count) ?
+        versions.total_count :
+        versions.count
+    end
+
+  published_versions =
+    if defined?(@published_versions) && !@published_versions.nil?
+      @published_versions
+    else
+      versions.respond_to?(:where) ?
+        versions.where(status: "published").count :
+        0
+    end
+
+  draft_versions =
+    if defined?(@draft_versions) && !@draft_versions.nil?
+      @draft_versions
+    else
+      versions.respond_to?(:where) ?
+        versions.where(status: "draft").count :
+        0
+    end
+
+  archived_versions =
+    if defined?(@archived_versions) && !@archived_versions.nil?
+      @archived_versions
+    else
+      versions.respond_to?(:where) ?
+        versions.where(status: "archived").count :
+        0
+    end
+
+
+  # ==========================================================================
+  # CURRENT FILTER / SORT STATE
+  # ==========================================================================
+
+  search =
+    if defined?(@search) && @search.present?
+      @search.to_s
+    else
+      params[:q].to_s
+    end
+
+  current_status =
+    if defined?(@status) && @status.present?
+      @status.to_s
+    else
+      params[:status].to_s
+    end
+
+  current_sort =
+    if defined?(@sort) && @sort.present?
+      @sort.to_s
+    else
+      params[:sort].presence || "version"
+    end
+
+  current_direction =
+    if defined?(@direction) && @direction.present?
+      @direction.to_s
+    else
+      params[:direction].presence || "desc"
+    end
+
+
+  # ==========================================================================
+  # PAGINATION STATE
+  # ==========================================================================
+
+  current_page =
+    if defined?(@page) && @page.present?
+      @page.to_i
+    else
+      params[:page].to_i
+    end
+
+  current_page = 1 if current_page < 1
+
+  per_page =
+    if defined?(@per_page) && @per_page.present?
+      @per_page.to_i
+    else
+      params[:per_page].to_i
+    end
+
+  per_page = 25 if per_page <= 0
+
+  total_pages =
+    if defined?(@total_pages) && @total_pages.present?
+      @total_pages.to_i
+    elsif total_versions.to_i > 0
+      (total_versions.to_f / per_page).ceil
+    else
+      1
+    end
+
+  total_pages = 1 if total_pages < 1
+
+  current_page =
+    [current_page, total_pages].min
+
+
+  # ==========================================================================
+  # URL HELPERS
+  # ==========================================================================
+
+  base_query =
+    request.query_parameters.except("page")
+
+
+  sort_direction =
+    current_direction == "asc" ? "desc" : "asc"
+
+  sort_indicator =
+    current_direction == "asc" ? "↑" : "↓"
+
+
+  sort_url =
+    lambda do |column|
+
+      query =
+        base_query.merge(
+          "sort" => column,
+          "direction" =>
+            column == current_sort ?
+              sort_direction :
+              "desc",
+          "page" => 1
+        )
+
+      request.path +
+        "?" +
+        query.to_query
+
+    end
+
+
+  status_url =
+    lambda do |status|
+
+      query =
+        base_query.merge(
+          "status" => status,
+          "page" => 1
+        )
+
+      query.delete("status") if status.blank?
+
+      request.path +
+        "?" +
+        query.to_query
+
+    end
+
+
+  clear_filters_url =
+    request.path +
+      "?" +
+      {
+        "page" => 1,
+        "per_page" => per_page
+      }.to_query
+
+
+  # ==========================================================================
+  # RESULT RANGE
+  # ==========================================================================
+
+  first_item =
+    if total_versions.to_i.zero?
+      0
+    else
+      ((current_page - 1) * per_page) + 1
+    end
+
+  last_item =
+    [
+      current_page * per_page,
+      total_versions.to_i
+    ].min
+
+
+  # ==========================================================================
+  # STATUS BADGE HELPER
+  # ==========================================================================
+
+  status_badge =
+    lambda do |version|
+
+      if version.respond_to?(:published?) && version.published?
+
+        {
+          label: "Published",
+          classes:
+            "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+          icon: "✓"
+        }
+
+      elsif version.respond_to?(:draft?) && version.draft?
+
+        {
+          label: "Draft",
+          classes:
+            "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+          icon: "◐"
+        }
+
+      elsif version.respond_to?(:archived?) && version.archived?
+
+        {
+          label: "Archived",
+          classes:
+            "bg-gray-100 text-gray-600 dark:bg-gray-900 dark:text-gray-400",
+          icon: "◌"
+        }
+
+      else
+
+        {
+          label:
+            version.respond_to?(:status) &&
+              version.status.present? ?
+              version.status.to_s.humanize :
+              "Unknown",
+
+          classes:
+            "bg-gray-100 text-gray-600 dark:bg-gray-900 dark:text-gray-400",
+
+          icon: "?"
+        }
+
+      end
+
+    end
+
+%>
+
+
+<div
+  class="
+    mx-auto
+    w-full
+    max-w-[1600px]
+    px-4
+    py-6
+    sm:px-6
+    lg:px-8
+  "
+>
+
+
+  <%# =========================================================================
+  HEADER
+  ========================================================================= %>
 
   <div class="mb-8">
-    <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
 
-      <div>
+    <div
+      class="
+        flex
+        flex-col
+        gap-5
+        xl:flex-row
+        xl:items-center
+        xl:justify-between
+      "
+    >
 
-        <div class="flex items-center gap-3">
+      <div class="min-w-0">
+
+        <div class="flex items-center gap-4">
 
           <div
             class="
-          flex
-          h-12
-          w-12
-          items-center
-          justify-center
-          rounded-xl
-          bg-violet-100
-          text-2xl
-          shadow-sm
-          dark:bg-violet-900/40
-        ">
+              flex
+              h-14
+              w-14
+              shrink-0
+              items-center
+              justify-center
+              rounded-2xl
+              bg-violet-100
+              text-2xl
+              shadow-sm
+              dark:bg-violet-900/40
+            "
+          >
             🧬
           </div>
 
-          <div>
 
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+          <div class="min-w-0">
+
+            <h1
+              class="
+                text-2xl
+                font-black
+                tracking-tight
+                text-gray-900
+                sm:text-3xl
+                dark:text-white
+              "
+            >
               Entity Template Versions
             </h1>
 
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              Manage the evolution and published states of your entity templates.
+            <p
+              class="
+                mt-1
+                max-w-3xl
+                text-sm
+                text-gray-500
+                dark:text-gray-400
+              "
+            >
+              Search, inspect, filter and manage the version history of your
+              entity templates.
             </p>
 
           </div>
 
         </div>
 
+
         <%# BREADCRUMB %>
 
-        <div class="mt-4 flex flex-wrap items-center gap-2 text-xs text-gray-400">
+        <div
+          class="
+            mt-4
+            flex
+            flex-wrap
+            items-center
+            gap-2
+            text-xs
+            text-gray-400
+          "
+        >
 
-      <span>
-        Encyclopedia
-      </span>
+          <span>Encyclopedia</span>
+          <span>›</span>
 
-          <span>
-        ›
-      </span>
+          <span>Ecosystems</span>
+          <span>›</span>
 
-          <span>
-        Ecosystems
-      </span>
+          <span>Load Sources</span>
+          <span>›</span>
 
-          <span>
-        ›
-      </span>
+          <span>Entity Templates</span>
+          <span>›</span>
 
-          <span>
-        Load Sources
-      </span>
-
-          <span>
-        ›
-      </span>
-
-          <span>
-        Entity Templates
-      </span>
-
-          <span>
-        ›
-      </span>
-
-          <span class="font-medium text-violet-500">
-        Versions
-      </span>
+          <span class="font-semibold text-violet-500">
+            Versions
+          </span>
 
         </div>
 
       </div>
 
-      <%# CREATE VERSION BUTTON %>
 
-      <%= link_to(
-            new_admin_ecosystems_load_sources_entity_templates_entity_template_version_path,
-            class: "
-          inline-flex shrink-0 items-center justify-center gap-2
-          rounded-xl bg-violet-600 px-5 py-3
-          text-sm font-semibold text-white shadow-sm
-          transition hover:bg-violet-700
-          focus:outline-none focus:ring-2
-          focus:ring-violet-500 focus:ring-offset-2
-        "
-          ) do %>
+      <%# HEADER ACTIONS %>
 
-    <span class="text-lg leading-none">
-      +
-    </span>
+      <div class="flex shrink-0 flex-wrap items-center gap-2">
 
-        Create Version
+        <%= link_to(
+              admin_ecosystems_load_sources_entity_templates_entity_template_versions_path,
+              class: "
+                inline-flex
+                items-center
+                justify-center
+                gap-2
+                rounded-xl
+                border
+                border-gray-200
+                bg-white
+                px-4
+                py-3
+                text-sm
+                font-semibold
+                text-gray-700
+                shadow-sm
+                transition
+                hover:border-violet-200
+                hover:text-violet-600
+                dark:border-gray-700
+                dark:bg-gray-800
+                dark:text-gray-300
+              "
+            ) do %>
 
-      <% end %>
+          <span>↻</span>
+          Refresh
+
+        <% end %>
+
+
+        <%= link_to(
+              new_admin_ecosystems_load_sources_entity_templates_entity_template_version_path,
+              class: "
+                inline-flex
+                items-center
+                justify-center
+                gap-2
+                rounded-xl
+                bg-violet-600
+                px-5
+                py-3
+                text-sm
+                font-semibold
+                text-white
+                shadow-sm
+                transition
+                hover:bg-violet-700
+                focus:outline-none
+                focus:ring-2
+                focus:ring-violet-500
+                focus:ring-offset-2
+              "
+            ) do %>
+
+          <span class="text-lg leading-none">
+            +
+          </span>
+
+          Create Version
+
+        <% end %>
+
+      </div>
 
     </div>
 
   </div>
-<%# ========================================================================
-FIELD MANUAL / INTRODUCTION
-======================================================================== %>
 
-  <div class=" mb-8 overflow-hidden rounded-2xl border-2 border-violet-100 bg-gradient-to-br from-violet-50 via-white to-indigo-50 shadow-sm dark:border-violet-900/40 dark:from-violet-950/30 dark:via-gray-900 dark:to-indigo-950/30 ">
+
+  <%# =========================================================================
+  INTRODUCTION
+  ========================================================================= %>
+
+  <div
+    class="
+      mb-8
+      overflow-hidden
+      rounded-2xl
+      border-2
+      border-violet-100
+      bg-gradient-to-br
+      from-violet-50
+      via-white
+      to-indigo-50
+      shadow-sm
+      dark:border-violet-900/40
+      dark:from-violet-950/30
+      dark:via-gray-900
+      dark:to-indigo-950/30
+    "
+  >
+
     <div class="relative p-6 sm:p-8">
 
-      <%# Decorative background %>
+      <div
+        class="
+          pointer-events-none
+          absolute
+          -right-16
+          -top-16
+          h-48
+          w-48
+          rounded-full
+          bg-violet-200/30
+          blur-3xl
+          dark:bg-violet-500/10
+        "
+      ></div>
 
       <div
         class="
-      pointer-events-none
-      absolute
-      -right-16
-      -top-16
-      h-48
-      w-48
-      rounded-full
-      bg-violet-200/30
-      blur-3xl
-      dark:bg-violet-500/10
-    "></div>
+          pointer-events-none
+          absolute
+          -bottom-20
+          -left-20
+          h-48
+          w-48
+          rounded-full
+          bg-indigo-200/30
+          blur-3xl
+          dark:bg-indigo-500/10
+        "
+      ></div>
 
-      <div
-        class="
-      pointer-events-none
-      absolute
-      -bottom-20
-      -left-20
-      h-48
-      w-48
-      rounded-full
-      bg-indigo-200/30
-      blur-3xl
-      dark:bg-indigo-500/10
-    "></div>
 
       <div class="relative">
 
@@ -168,208 +556,223 @@ FIELD MANUAL / INTRODUCTION
 
           <div
             class="
-          flex
-          h-12
-          w-12
-          shrink-0
-          items-center
-          justify-center
-          rounded-2xl
-          border
-          border-violet-200
-          bg-violet-100
-          text-xl
-          shadow-sm
-          dark:border-violet-800
-          dark:bg-violet-900/40
-        ">
+              flex
+              h-12
+              w-12
+              shrink-0
+              items-center
+              justify-center
+              rounded-2xl
+              border
+              border-violet-200
+              bg-violet-100
+              text-xl
+              shadow-sm
+              dark:border-violet-800
+              dark:bg-violet-900/40
+            "
+          >
             📜
           </div>
+
 
           <div class="min-w-0">
 
             <div
               class="
-            text-[11px]
-            font-black
-            uppercase
-            tracking-[0.2em]
-            text-violet-500
-          ">
+                text-[11px]
+                font-black
+                uppercase
+                tracking-[0.2em]
+                text-violet-500
+              "
+            >
               Version Control Protocol
             </div>
 
             <h2
               class="
-            mt-1
-            text-xl
-            font-black
-            text-gray-900
-            dark:text-white
-          ">
-              Why do Entity Templates have versions?
+                mt-1
+                text-xl
+                font-black
+                text-gray-900
+                dark:text-white
+              "
+            >
+              Immutable template evolution
             </h2>
 
             <p
               class="
-            mt-3
-            max-w-4xl
-            text-sm
-            leading-6
-            text-gray-500
-            dark:text-gray-400
-          ">
-              An Entity Template describes the structure of an entity.
-              A version records how that structure looked at a particular
-              point in its evolution.
-              Instead of destroying the old structure when a template changes,
-              create a new version.
+                mt-3
+                max-w-4xl
+                text-sm
+                leading-6
+                text-gray-500
+                dark:text-gray-400
+              "
+            >
+              Every version represents a preserved structural snapshot.
+              Published versions can be used by runtime systems while older
+              versions remain available for historical compatibility,
+              inspection and comparison.
             </p>
 
           </div>
 
         </div>
 
-        <%# VERSION FLOW %>
 
-        <div class="mt-7 grid grid-cols-1 gap-3 md:grid-cols-5">
+        <%# CONCEPT CARDS %>
+
+        <div class="mt-7 grid grid-cols-1 gap-3 md:grid-cols-3">
 
           <div
             class="
-          rounded-xl
-          border
-          border-gray-200
-          bg-white
-          p-4
-          dark:border-gray-700
-          dark:bg-gray-800
-        ">
+              rounded-xl
+              border
+              border-gray-200
+              bg-white
+              p-4
+              dark:border-gray-700
+              dark:bg-gray-800
+            "
+          >
 
             <div class="text-xl">
               🧱
             </div>
 
-            <div class="mt-2 text-xs font-black text-gray-800 dark:text-white">
+            <div
+              class="
+                mt-2
+                text-xs
+                font-black
+                text-gray-800
+                dark:text-white
+              "
+            >
               Template
             </div>
 
             <div class="mt-1 text-xs text-gray-400">
-              Base structure
+              Base entity structure
             </div>
 
           </div>
 
-          <div
-            class="
-          hidden
-          items-center
-          justify-center
-          text-xl
-          text-gray-300
-          md:flex
-        ">
-            →
-          </div>
 
           <div
             class="
-          rounded-xl
-          border-2
-          border-violet-200
-          bg-violet-50
-          p-4
-          shadow-sm
-          dark:border-violet-800
-          dark:bg-violet-900/20
-        ">
+              rounded-xl
+              border-2
+              border-violet-200
+              bg-violet-50
+              p-4
+              shadow-sm
+              dark:border-violet-800
+              dark:bg-violet-900/20
+            "
+          >
 
             <div class="text-xl">
               🧬
             </div>
 
-            <div class="mt-2 text-xs font-black text-violet-700 dark:text-violet-300">
+            <div
+              class="
+                mt-2
+                text-xs
+                font-black
+                text-violet-700
+                dark:text-violet-300
+              "
+            >
               Version
             </div>
 
             <div class="mt-1 text-xs text-violet-500">
-              Snapshot of structure
+              Immutable structural snapshot
             </div>
 
           </div>
 
-          <div
-            class="
-          hidden
-          items-center
-          justify-center
-          text-xl
-          text-gray-300
-          md:flex
-        ">
-            →
-          </div>
 
           <div
             class="
-          rounded-xl
-          border
-          border-emerald-200
-          bg-emerald-50
-          p-4
-          dark:border-emerald-800
-          dark:bg-emerald-900/20
-        ">
+              rounded-xl
+              border
+              border-emerald-200
+              bg-emerald-50
+              p-4
+              dark:border-emerald-800
+              dark:bg-emerald-900/20
+            "
+          >
 
             <div class="text-xl">
               🚀
             </div>
 
-            <div class="mt-2 text-xs font-black text-emerald-700 dark:text-emerald-300">
+            <div
+              class="
+                mt-2
+                text-xs
+                font-black
+                text-emerald-700
+                dark:text-emerald-300
+              "
+            >
               Published
             </div>
 
             <div class="mt-1 text-xs text-emerald-600">
-              Used by the system
+              Runtime-ready structure
             </div>
 
           </div>
 
         </div>
 
-        <%# IMPORTANT RULE %>
+
+        <%# GOLDEN RULE %>
 
         <div
           class="
-        mt-5
-        rounded-xl
-        border
-        border-amber-200
-        bg-amber-50
-        p-4
-        dark:border-amber-800
-        dark:bg-amber-900/20
-      ">
+            mt-5
+            rounded-xl
+            border
+            border-amber-200
+            bg-amber-50
+            p-4
+            dark:border-amber-800
+            dark:bg-amber-900/20
+          "
+        >
 
           <div class="flex items-start gap-3">
 
-        <span class="text-lg">
-          💡
-        </span>
+            <span class="text-lg">
+              💡
+            </span>
 
             <p
               class="
-            text-sm
-            leading-6
-            text-amber-700
-            dark:text-amber-300
-          ">
+                text-sm
+                leading-6
+                text-amber-700
+                dark:text-amber-300
+              "
+            >
+
               <strong class="font-black">
                 Golden rule:
               </strong>
 
-              Do not rewrite history when the structure changes.
-              Create a new version so existing entities can continue
-              to understand the structure they were created with.
+              Do not rewrite structural history. Create a new version when
+              the template changes so existing entities can continue to
+              resolve against the structure they were created with.
+
             </p>
 
           </div>
@@ -381,607 +784,1734 @@ FIELD MANUAL / INTRODUCTION
     </div>
 
   </div>
-<%# ========================================================================
-STATISTICS
-======================================================================== %>
 
-  <div class="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
-<%# TOTAL %>
 
-    <div
-      class="
-    rounded-2xl
-    border
-    border-gray-200
-    bg-white
-    p-5
-    shadow-sm
-    dark:border-gray-800
-    dark:bg-gray-800
-  ">
+  <%# =========================================================================
+  FILTER NOTICE
+  ========================================================================= %>
 
-      <div class="text-xs font-semibold uppercase tracking-wider text-gray-400">
-        Total Versions
+  <div
+    id="entity-template-version-filter-notice"
+    class="
+      mb-4
+      hidden
+      rounded-xl
+      border
+      border-violet-200
+      bg-violet-50
+      px-4
+      py-3
+      text-sm
+      text-violet-700
+      shadow-sm
+      dark:border-violet-800
+      dark:bg-violet-900/20
+      dark:text-violet-300
+    "
+    role="status"
+    aria-live="polite"
+  >
+
+    <div class="flex items-center gap-3">
+
+      <div
+        class="
+          flex
+          h-8
+          w-8
+          shrink-0
+          items-center
+          justify-center
+          rounded-lg
+          bg-violet-100
+          text-violet-600
+          dark:bg-violet-900/40
+          dark:text-violet-300
+        "
+      >
+        ✓
       </div>
 
-      <div class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
-        <%= @entity_template_versions.count %>
-      </div>
 
-      <div class="mt-1 text-xs text-gray-400">
-        Template evolution records
-      </div>
+      <div>
 
-    </div>
+        <div class="font-semibold">
+          Search applied
+        </div>
 
-<%# PUBLISHED %>
+        <div class="text-xs opacity-80">
+          Showing the records matching your current filters.
+        </div>
 
-    <div
-      class="
-    rounded-2xl
-    border
-    border-emerald-100
-    bg-emerald-50
-    p-5
-    shadow-sm
-    dark:border-emerald-900
-    dark:bg-emerald-900/20
-  ">
-
-      <div class="text-xs font-semibold uppercase tracking-wider text-emerald-500">
-        Published
-      </div>
-
-      <div class="mt-2 text-3xl font-bold text-emerald-600">
-        <%= @entity_template_versions.count { |version| version.respond_to?(:published?) && version.published? } %>
-      </div>
-
-      <div class="mt-1 text-xs text-emerald-500/70">
-        Versions currently available
-      </div>
-
-    </div>
-
-<%# DRAFTS %>
-
-    <div
-      class="
-    rounded-2xl
-    border
-    border-amber-100
-    bg-amber-50
-    p-5
-    shadow-sm
-    dark:border-amber-900
-    dark:bg-amber-900/20
-  ">
-
-      <div class="text-xs font-semibold uppercase tracking-wider text-amber-500">
-        Drafts
-      </div>
-
-      <div class="mt-2 text-3xl font-bold text-amber-600">
-        <%= @entity_template_versions.count { |version| version.respond_to?(:draft?) && version.draft? } %>
-      </div>
-
-      <div class="mt-1 text-xs text-amber-500/70">
-        Versions still being prepared
       </div>
 
     </div>
 
   </div>
-<%# ========================================================================
-VERSION LIST
-======================================================================== %>
 
-  <div>
-    <div class="mb-4 flex items-center justify-between">
 
-      <div>
+  <%# =========================================================================
+  STATISTICS
+  ========================================================================= %>
 
-        <div
-          class="
-        text-[11px]
-        font-black
-        uppercase
-        tracking-[0.2em]
-        text-gray-400
-      ">
-          Template Archives
-        </div>
+  <div
+    id="entity-template-version-results"
+    tabindex="-1"
+    data-filter-results
+    class="
+      mb-8
+      grid
+      grid-cols-1
+      gap-4
+      scroll-mt-24
+      outline-none
+      sm:grid-cols-2
+      xl:grid-cols-4
+    "
+  >
 
-        <h2 class="mt-1 text-lg font-black text-gray-900 dark:text-white">
-          Version Registry
-        </h2>
 
-      </div>
+    <%# TOTAL %>
 
-      <div
-        class="
-      rounded-full
-      border
-      border-violet-100
-      bg-violet-50
-      px-3
-      py-1.5
-      text-[10px]
-      font-black
-      uppercase
-      tracking-wider
-      text-violet-600
-      dark:border-violet-800
-      dark:bg-violet-900/20
-      dark:text-violet-400
-    ">
-        <%= @entity_template_versions.count %> records
-      </div>
+    <%= link_to(
+          status_url.call(""),
+          class: "
+            group
+            rounded-2xl
+            border
+            border-gray-200
+            bg-white
+            p-5
+            shadow-sm
+            transition
+            hover:-translate-y-0.5
+            hover:border-violet-200
+            hover:shadow-md
+            dark:border-gray-800
+            dark:bg-gray-800
+          "
+        ) do %>
 
-    </div>
+      <div class="flex items-start justify-between">
 
-    <% if @entity_template_versions.present? %>
-
-      <div class="space-y-4">
-
-        <% @entity_template_versions.each do |version| %>
+        <div>
 
           <div
             class="
-          group
-          overflow-hidden
-          rounded-2xl
-          border
-          border-gray-200
-          bg-white
-          shadow-sm
-          transition
-          duration-300
-          hover:-translate-y-0.5
-          hover:border-violet-200
-          hover:shadow-md
-          dark:border-gray-800
-          dark:bg-gray-800
-          dark:hover:border-violet-800
-        ">
-
-            <div class="p-5 sm:p-6">
-
-              <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-
-                <%# LEFT SIDE %>
-
-                <div class="min-w-0 flex-1">
-
-                  <div class="flex flex-wrap items-center gap-3">
-
-                    <%# VERSION BADGE %>
-
-                    <div
-                      class="
-                    inline-flex
-                    items-center
-                    gap-2
-                    rounded-full
-                    border
-                    border-violet-200
-                    bg-violet-50
-                    px-3
-                    py-1.5
-                    text-xs
-                    font-black
-                    text-violet-700
-                    dark:border-violet-800
-                    dark:bg-violet-900/20
-                    dark:text-violet-300
-                  ">
-
-                  <span>
-                    🧬
-                  </span>
-
-                      Version
-                      <%= version.try(:version_number) || version.try(:number) || version.id %>
-
-                    </div>
-
-                    <%# STATUS %>
-
-                    <% if version.respond_to?(:published?) && version.published? %>
-
-                  <span
-                    class="
-                      rounded-full
-                      bg-emerald-100
-                      px-3
-                      py-1.5
-                      text-xs
-                      font-semibold
-                      text-emerald-700
-                      dark:bg-emerald-900/30
-                      dark:text-emerald-400
-                    ">
-                    ✓ Published
-                  </span>
-
-                    <% elsif version.respond_to?(:draft?) && version.draft? %>
-
-                  <span
-                    class="
-                      rounded-full
-                      bg-amber-100
-                      px-3
-                      py-1.5
-                      text-xs
-                      font-semibold
-                      text-amber-700
-                      dark:bg-amber-900/30
-                      dark:text-amber-400
-                    ">
-                    ◐ Draft
-                  </span>
-
-                    <% elsif version.respond_to?(:status) && version.status.present? %>
-
-                  <span
-                    class="
-                      rounded-full
-                      bg-gray-100
-                      px-3
-                      py-1.5
-                      text-xs
-                      font-semibold
-                      text-gray-600
-                      dark:bg-gray-900
-                      dark:text-gray-400
-                    ">
-                    <%= version.status.to_s.humanize %>
-                  </span>
-
-                    <% end %>
-
-                  </div>
-
-                  <%# TEMPLATE NAME %>
-
-                  <h3
-                    class="
-                  mt-4
-                  truncate
-                  text-lg
-                  font-black
-                  text-gray-900
-                  dark:text-white
-                ">
-
-                    <% if version.respond_to?(:entity_template) && version.entity_template.present? %>
-
-                      <%= version.entity_template.name %>
-
-                    <% else %>
-
-                      Entity Template
-
-                    <% end %>
-
-                  </h3>
-
-                  <%# META %>
-
-                  <div
-                    class="
-                  mt-2
-                  flex
-                  flex-wrap
-                  items-center
-                  gap-x-4
-                  gap-y-2
-                  text-xs
-                  text-gray-400
-                ">
-
-                <span class="font-mono">
-                  ID: <%= version.id %>
-                </span>
-
-                    <% if version.respond_to?(:created_at) && version.created_at.present? %>
-
-                  <span>
-                    Created
-                    <%= time_ago_in_words(version.created_at) %>
-                    ago
-                  </span>
-
-                    <% end %>
-
-                    <% if version.respond_to?(:updated_at) && version.updated_at.present? %>
-
-                  <span>
-                    Updated
-                    <%= time_ago_in_words(version.updated_at) %>
-                    ago
-                  </span>
-
-                    <% end %>
-
-                  </div>
-
-                </div>
-
-                <%# RIGHT SIDE ACTIONS %>
-
-                <div
-                  class="
-                flex
-                shrink-0
-                flex-wrap
-                items-center
-                gap-2
-              ">
-
-                  <%= link_to(
-                        "View",
-                        admin_ecosystems_load_sources_entity_templates_entity_template_version_path(version),
-                        class: "
-                      inline-flex
-                      items-center
-                      justify-center
-                      rounded-xl
-                      border
-                      border-gray-200
-                      bg-white
-                      px-4
-                      py-2.5
-                      text-sm
-                      font-semibold
-                      text-gray-700
-                      transition
-                      hover:border-violet-200
-                      hover:text-violet-600
-                      dark:border-gray-700
-                      dark:bg-gray-800
-                      dark:text-gray-300
-                    "
-                      ) %>
-
-                  <%= link_to(
-                        "Edit",
-                        edit_admin_ecosystems_load_sources_entity_templates_entity_template_version_path(version),
-                        class: "
-                      inline-flex
-                      items-center
-                      justify-center
-                      rounded-xl
-                      bg-violet-600
-                      px-4
-                      py-2.5
-                      text-sm
-                      font-semibold
-                      text-white
-                      transition
-                      hover:bg-violet-700
-                    "
-                      ) %>
-
-                </div>
-
-              </div>
-
-              <%# VERSION TIMELINE %>
-
-              <div
-                class="
-              mt-5
-              border-t
-              border-gray-100
-              pt-5
-              dark:border-gray-700
-            ">
-
-                <div class="flex items-center gap-3">
-
-                  <div class="flex items-center gap-2">
-
-                    <div
-                      class="
-                    h-2.5
-                    w-2.5
-                    rounded-full
-                    bg-gray-300
-                    dark:bg-gray-600
-                  "></div>
-
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400">
-                  Structure
-                </span>
-
-                  </div>
-
-                  <div class="h-px flex-1 bg-gray-100 dark:bg-gray-700"></div>
-
-                  <div class="flex items-center gap-2">
-
-                    <div
-                      class="
-                    h-2.5
-                    w-2.5
-                    rounded-full
-                    bg-violet-400
-                    shadow-[0_0_8px_rgba(139,92,246,0.4)]
-                  "></div>
-
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-violet-500">
-                  Versioned
-                </span>
-
-                  </div>
-
-                  <div class="h-px flex-1 bg-gray-100 dark:bg-gray-700"></div>
-
-                  <div class="flex items-center gap-2">
-
-                    <div
-                      class="
-                    h-2.5
-                    w-2.5
-                    rounded-full
-                    bg-emerald-400
-                  "></div>
-
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-500">
-                  Runtime
-                </span>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
-
+              text-xs
+              font-semibold
+              uppercase
+              tracking-wider
+              text-gray-400
+            "
+          >
+            Total Versions
           </div>
 
-        <% end %>
+          <div
+            class="
+              mt-2
+              text-3xl
+              font-black
+              text-gray-900
+              dark:text-white
+            "
+          >
+            <%= number_with_delimiter(total_versions) %>
+          </div>
 
-      </div>
+          <div class="mt-1 text-xs text-gray-400">
+            All template version records
+          </div>
 
-    <% else %>
+        </div>
 
-      <%# ====================================================================
-      EMPTY STATE
-  ==================================================================== %>
-
-      <div
-        class="
-      rounded-2xl
-      border-2
-      border-dashed
-      border-gray-200
-      bg-white
-      p-12
-      text-center
-      dark:border-gray-700
-      dark:bg-gray-800
-    ">
 
         <div
           class="
-        mx-auto
-        mb-5
-        flex
-        h-20
-        w-20
-        items-center
-        justify-center
-        rounded-3xl
-        border
-        border-violet-100
-        bg-violet-50
-        text-4xl
-        dark:border-violet-800
-        dark:bg-violet-900/20
-      ">
+            flex
+            h-10
+            w-10
+            items-center
+            justify-center
+            rounded-xl
+            bg-violet-100
+            text-lg
+            dark:bg-violet-900/30
+          "
+        >
           🧬
         </div>
 
-        <h3
-          class="
-        text-lg
-        font-black
-        text-gray-900
-        dark:text-white
-      ">
-          No template versions exist yet
-        </h3>
+      </div>
 
-        <p
-          class="
-        mx-auto
-        mt-2
-        max-w-lg
-        text-sm
-        leading-6
-        text-gray-500
-        dark:text-gray-400
-      ">
-          A template version is a preserved snapshot of an Entity Template.
-          Create the first version when you are ready to establish the
-          initial structure that your entities will use.
-        </p>
+    <% end %>
 
-        <%= link_to(
-              new_admin_ecosystems_load_sources_entity_templates_entity_template_version_path,
-              class: "
-            mt-6
-            inline-flex
-            items-center
-            gap-2
-            rounded-xl
-            bg-violet-600
-            px-5
-            py-3
-            text-sm
-            font-semibold
-            text-white
+
+    <%# PUBLISHED %>
+
+    <%= link_to(
+          status_url.call("published"),
+          class: "
+            group
+            rounded-2xl
+            border
+            border-emerald-100
+            bg-emerald-50
+            p-5
             shadow-sm
             transition
-            hover:bg-violet-700
+            hover:-translate-y-0.5
+            hover:shadow-md
+            dark:border-emerald-900
+            dark:bg-emerald-900/20
           "
-            ) do %>
+        ) do %>
 
-      <span class="text-lg">
-        +
-      </span>
+      <div class="flex items-start justify-between">
 
-          Create First Version
+        <div>
 
-        <% end %>
+          <div
+            class="
+              text-xs
+              font-semibold
+              uppercase
+              tracking-wider
+              text-emerald-500
+            "
+          >
+            Published
+          </div>
+
+          <div class="mt-2 text-3xl font-black text-emerald-600">
+            <%= number_with_delimiter(published_versions) %>
+          </div>
+
+          <div class="mt-1 text-xs text-emerald-500/70">
+            Runtime-ready versions
+          </div>
+
+        </div>
+
+
+        <div
+          class="
+            flex
+            h-10
+            w-10
+            items-center
+            justify-center
+            rounded-xl
+            bg-emerald-100
+            text-lg
+            dark:bg-emerald-900/40
+          "
+        >
+          ✓
+        </div>
+
+      </div>
+
+    <% end %>
+
+
+    <%# DRAFT %>
+
+    <%= link_to(
+          status_url.call("draft"),
+          class: "
+            group
+            rounded-2xl
+            border
+            border-amber-100
+            bg-amber-50
+            p-5
+            shadow-sm
+            transition
+            hover:-translate-y-0.5
+            hover:shadow-md
+            dark:border-amber-900
+            dark:bg-amber-900/20
+          "
+        ) do %>
+
+      <div class="flex items-start justify-between">
+
+        <div>
+
+          <div
+            class="
+              text-xs
+              font-semibold
+              uppercase
+              tracking-wider
+              text-amber-500
+            "
+          >
+            Drafts
+          </div>
+
+          <div class="mt-2 text-3xl font-black text-amber-600">
+            <%= number_with_delimiter(draft_versions) %>
+          </div>
+
+          <div class="mt-1 text-xs text-amber-500/70">
+            Versions in preparation
+          </div>
+
+        </div>
+
+
+        <div
+          class="
+            flex
+            h-10
+            w-10
+            items-center
+            justify-center
+            rounded-xl
+            bg-amber-100
+            text-lg
+            dark:bg-amber-900/40
+          "
+        >
+          ◐
+        </div>
+
+      </div>
+
+    <% end %>
+
+
+    <%# ARCHIVED %>
+
+    <%= link_to(
+          status_url.call("archived"),
+          class: "
+            group
+            rounded-2xl
+            border
+            border-gray-200
+            bg-gray-50
+            p-5
+            shadow-sm
+            transition
+            hover:-translate-y-0.5
+            hover:shadow-md
+            dark:border-gray-700
+            dark:bg-gray-900/50
+          "
+        ) do %>
+
+      <div class="flex items-start justify-between">
+
+        <div>
+
+          <div
+            class="
+              text-xs
+              font-semibold
+              uppercase
+              tracking-wider
+              text-gray-400
+            "
+          >
+            Archived
+          </div>
+
+          <div
+            class="
+              mt-2
+              text-3xl
+              font-black
+              text-gray-600
+              dark:text-gray-300
+            "
+          >
+            <%= number_with_delimiter(archived_versions) %>
+          </div>
+
+          <div class="mt-1 text-xs text-gray-400">
+            Historical versions
+          </div>
+
+        </div>
+
+
+        <div
+          class="
+            flex
+            h-10
+            w-10
+            items-center
+            justify-center
+            rounded-xl
+            bg-gray-200
+            text-lg
+            dark:bg-gray-800
+          "
+        >
+          ◌
+        </div>
 
       </div>
 
     <% end %>
 
   </div>
-<%# ========================================================================
-FOOTER / SYSTEM STATUS
-======================================================================== %>
 
-  <div class=" mt-8 flex flex-col gap-3 border-t border-gray-100 pt-5 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800 ">
+
+  <%# =========================================================================
+  SEARCH + FILTER TOOLBAR
+
+  Delegated to:
+
+  _search_form.html.erb
+  ========================================================================= %>
+
+  <%= render(
+        "admin/ecosystems/load_sources/entity_templates/entity_template_versions/search_form",
+
+        search: search,
+
+        current_status: current_status,
+
+        current_sort: current_sort,
+
+        current_direction: current_direction,
+
+        per_page: per_page,
+
+        clear_filters_url: clear_filters_url,
+
+        form_url:
+          admin_ecosystems_load_sources_entity_templates_entity_template_versions_path
+      ) %>
+
+
+  <%# =========================================================================
+  REGISTRY HEADER
+  ========================================================================= %>
+
+  <div class="mb-4">
+
     <div
       class="
-    font-mono
-    text-[10px]
-    font-bold
-    uppercase
-    tracking-wider
-    text-gray-400
-  ">
+        flex
+        flex-col
+        gap-3
+        sm:flex-row
+        sm:items-end
+        sm:justify-between
+      "
+    >
+
+      <div>
+
+        <div
+          class="
+            text-[11px]
+            font-black
+            uppercase
+            tracking-[0.2em]
+            text-gray-400
+          "
+        >
+          Template Archives
+        </div>
+
+        <h2
+          class="
+            mt-1
+            text-xl
+            font-black
+            text-gray-900
+            dark:text-white
+          "
+        >
+          Version Registry
+        </h2>
+
+      </div>
+
+
+      <div class="flex flex-wrap items-center gap-2">
+
+        <div
+          class="
+            rounded-full
+            border
+            border-gray-200
+            bg-white
+            px-3
+            py-1.5
+            text-xs
+            font-semibold
+            text-gray-500
+            shadow-sm
+            dark:border-gray-700
+            dark:bg-gray-800
+            dark:text-gray-400
+          "
+        >
+
+          <% if total_versions.to_i > 0 %>
+
+            Showing
+
+            <span class="font-black text-gray-800 dark:text-white">
+              <%= number_with_delimiter(first_item) %>
+            </span>
+
+            –
+
+            <span class="font-black text-gray-800 dark:text-white">
+              <%= number_with_delimiter(last_item) %>
+            </span>
+
+            of
+
+            <span class="font-black text-gray-800 dark:text-white">
+              <%= number_with_delimiter(total_versions) %>
+            </span>
+
+          <% else %>
+
+            0 records
+
+          <% end %>
+
+        </div>
+
+
+        <div
+          class="
+            rounded-full
+            border
+            border-violet-100
+            bg-violet-50
+            px-3
+            py-1.5
+            text-[10px]
+            font-black
+            uppercase
+            tracking-wider
+            text-violet-600
+            dark:border-violet-800
+            dark:bg-violet-900/20
+            dark:text-violet-400
+          "
+        >
+          <%= per_page %> / page
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <%# =========================================================================
+  VERSION TABLE
+  ========================================================================= %>
+
+  <% if versions.present? %>
+
+    <div
+      class="
+        overflow-hidden
+        rounded-2xl
+        border
+        border-gray-200
+        bg-white
+        shadow-sm
+        dark:border-gray-800
+        dark:bg-gray-800
+      "
+    >
+
+      <div class="overflow-x-auto">
+
+        <table class="w-full min-w-[1050px] text-left">
+
+          <%# -----------------------------------------------------------------
+          TABLE HEADER
+          ------------------------------------------------------------------ %>
+
+          <thead
+            class="
+              border-b
+              border-gray-200
+              bg-gray-50
+              dark:border-gray-700
+              dark:bg-gray-900/60
+            "
+          >
+
+          <tr>
+
+
+            <%# VERSION %>
+
+            <th class="px-5 py-4">
+
+              <%= link_to(
+                    sort_url.call("version"),
+                    class: "
+                        group
+                        inline-flex
+                        items-center
+                        gap-2
+                        text-[10px]
+                        font-black
+                        uppercase
+                        tracking-wider
+                        text-gray-500
+                        hover:text-violet-600
+                      "
+                  ) do %>
+
+                Version
+
+                <% if current_sort == "version" %>
+
+                    <span class="text-violet-500">
+                      <%= sort_indicator %>
+                    </span>
+
+                <% end %>
+
+              <% end %>
+
+            </th>
+
+
+            <%# TEMPLATE %>
+
+            <th class="px-5 py-4">
+
+              <%= link_to(
+                    sort_url.call("entity_template"),
+                    class: "
+                        group
+                        inline-flex
+                        items-center
+                        gap-2
+                        text-[10px]
+                        font-black
+                        uppercase
+                        tracking-wider
+                        text-gray-500
+                        hover:text-violet-600
+                      "
+                  ) do %>
+
+                Entity Template
+
+                <% if current_sort == "entity_template" %>
+
+                    <span class="text-violet-500">
+                      <%= sort_indicator %>
+                    </span>
+
+                <% end %>
+
+              <% end %>
+
+            </th>
+
+
+            <%# STATUS %>
+
+            <th class="px-5 py-4">
+
+              <%= link_to(
+                    sort_url.call("status"),
+                    class: "
+                        group
+                        inline-flex
+                        items-center
+                        gap-2
+                        text-[10px]
+                        font-black
+                        uppercase
+                        tracking-wider
+                        text-gray-500
+                        hover:text-violet-600
+                      "
+                  ) do %>
+
+                Status
+
+                <% if current_sort == "status" %>
+
+                    <span class="text-violet-500">
+                      <%= sort_indicator %>
+                    </span>
+
+                <% end %>
+
+              <% end %>
+
+            </th>
+
+
+            <%# STRUCTURE %>
+
+            <th class="px-5 py-4">
+
+                <span
+                  class="
+                    text-[10px]
+                    font-black
+                    uppercase
+                    tracking-wider
+                    text-gray-500
+                  "
+                >
+                  Structure
+                </span>
+
+            </th>
+
+
+            <%# CREATED %>
+
+            <th class="px-5 py-4">
+
+              <%= link_to(
+                    sort_url.call("created_at"),
+                    class: "
+                        group
+                        inline-flex
+                        items-center
+                        gap-2
+                        text-[10px]
+                        font-black
+                        uppercase
+                        tracking-wider
+                        text-gray-500
+                        hover:text-violet-600
+                      "
+                  ) do %>
+
+                Created
+
+                <% if current_sort == "created_at" %>
+
+                    <span class="text-violet-500">
+                      <%= sort_indicator %>
+                    </span>
+
+                <% end %>
+
+              <% end %>
+
+            </th>
+
+
+            <%# ACTIONS %>
+
+            <th class="px-5 py-4 text-right">
+
+                <span
+                  class="
+                    text-[10px]
+                    font-black
+                    uppercase
+                    tracking-wider
+                    text-gray-500
+                  "
+                >
+                  Actions
+                </span>
+
+            </th>
+
+          </tr>
+
+          </thead>
+
+
+          <%# -----------------------------------------------------------------
+          TABLE BODY
+          ------------------------------------------------------------------ %>
+
+          <tbody
+            class="
+              divide-y
+              divide-gray-100
+              dark:divide-gray-700
+            "
+          >
+
+          <% versions.each do |version| %>
+
+            <%
+
+              badge =
+                status_badge.call(version)
+
+
+              template =
+                if version.respond_to?(:entity_template)
+                  version.entity_template
+                end
+
+
+              version_number =
+                if version.respond_to?(:version)
+                  version.version
+                elsif version.respond_to?(:version_number)
+                  version.version_number
+                else
+                  version.id
+                end
+
+
+              field_count =
+                if version.respond_to?(:field_count)
+                  version.field_count
+                elsif version.respond_to?(:entity_template_fields)
+                  version.entity_template_fields.size
+                else
+                  nil
+                end
+
+
+              section_count =
+                if version.respond_to?(:section_count)
+                  version.section_count
+                else
+                  nil
+                end
+
+            %>
+
+
+            <tr
+              class="
+                  group
+                  transition
+                  hover:bg-violet-50/40
+                  dark:hover:bg-violet-950/10
+                "
+            >
+
+
+              <%# ==========================================================
+                VERSION
+                =========================================================== %>
+
+              <td class="whitespace-nowrap px-5 py-5">
+
+                <div class="flex items-center gap-3">
+
+                  <div
+                    class="
+                        flex
+                        h-10
+                        w-10
+                        shrink-0
+                        items-center
+                        justify-center
+                        rounded-xl
+                        bg-violet-100
+                        text-sm
+                        font-black
+                        text-violet-700
+                        dark:bg-violet-900/30
+                        dark:text-violet-300
+                      "
+                  >
+                    <%= version_number %>
+                  </div>
+
+
+                  <div>
+
+                    <div
+                      class="
+                          text-sm
+                          font-black
+                          text-gray-900
+                          dark:text-white
+                        "
+                    >
+                      v<%= version_number %>
+                    </div>
+
+                    <div
+                      class="
+                          mt-0.5
+                          font-mono
+                          text-[10px]
+                          text-gray-400
+                        "
+                    >
+                      ID #<%= version.id %>
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </td>
+
+
+              <%# ==========================================================
+                TEMPLATE
+                =========================================================== %>
+
+              <td class="max-w-sm px-5 py-5">
+
+                <% if template.present? %>
+
+                  <div
+                    class="
+                        truncate
+                        text-sm
+                        font-bold
+                        text-gray-900
+                        dark:text-white
+                      "
+                    title="<%= template.name %>"
+                  >
+                    <%= template.name %>
+                  </div>
+
+
+                  <% if template.respond_to?(:id) %>
+
+                    <div
+                      class="
+                          mt-1
+                          font-mono
+                          text-[10px]
+                          text-gray-400
+                        "
+                    >
+                      Template #<%= template.id %>
+                    </div>
+
+                  <% end %>
+
+                <% else %>
+
+                  <div
+                    class="
+                        text-sm
+                        font-semibold
+                        text-gray-400
+                      "
+                  >
+                    Unknown Template
+                  </div>
+
+                <% end %>
+
+              </td>
+
+
+              <%# ==========================================================
+                STATUS
+                =========================================================== %>
+
+              <td class="whitespace-nowrap px-5 py-5">
+
+                  <span
+                    class="
+                      inline-flex
+                      items-center
+                      gap-1.5
+                      rounded-full
+                      px-3
+                      py-1.5
+                      text-xs
+                      font-bold
+                      <%= badge[:classes] %>
+                    "
+                  >
+
+                    <span>
+                      <%= badge[:icon] %>
+                    </span>
+
+                    <%= badge[:label] %>
+
+                  </span>
+
+
+                <% if version.respond_to?(:published_at) &&
+                  version.published_at.present? %>
+
+                  <div
+                    class="
+                        mt-1.5
+                        text-[10px]
+                        text-gray-400
+                      "
+                  >
+                    Published
+                    <%= time_ago_in_words(version.published_at) %>
+                    ago
+                  </div>
+
+                <% end %>
+
+              </td>
+
+
+              <%# ==========================================================
+                STRUCTURE
+                =========================================================== %>
+
+              <td class="whitespace-nowrap px-5 py-5">
+
+                <div class="flex items-center gap-4">
+
+                  <% if section_count.present? %>
+
+                    <div>
+
+                      <div
+                        class="
+                            text-sm
+                            font-black
+                            text-gray-800
+                            dark:text-gray-200
+                          "
+                      >
+                        <%= number_with_delimiter(section_count) %>
+                      </div>
+
+                      <div
+                        class="
+                            text-[10px]
+                            uppercase
+                            tracking-wider
+                            text-gray-400
+                          "
+                      >
+                        sections
+                      </div>
+
+                    </div>
+
+                  <% end %>
+
+
+                  <% if field_count.present? %>
+
+                    <div>
+
+                      <div
+                        class="
+                            text-sm
+                            font-black
+                            text-gray-800
+                            dark:text-gray-200
+                          "
+                      >
+                        <%= number_with_delimiter(field_count) %>
+                      </div>
+
+                      <div
+                        class="
+                            text-[10px]
+                            uppercase
+                            tracking-wider
+                            text-gray-400
+                          "
+                      >
+                        fields
+                      </div>
+
+                    </div>
+
+                  <% end %>
+
+
+                  <% if section_count.blank? &&
+                    field_count.blank? %>
+
+                      <span class="text-xs text-gray-400">
+                        —
+                      </span>
+
+                  <% end %>
+
+                </div>
+
+              </td>
+
+
+              <%# ==========================================================
+                CREATED
+                =========================================================== %>
+
+              <td class="whitespace-nowrap px-5 py-5">
+
+                <% if version.respond_to?(:created_at) &&
+                  version.created_at.present? %>
+
+                  <div
+                    class="
+                        text-sm
+                        font-semibold
+                        text-gray-700
+                        dark:text-gray-300
+                      "
+                  >
+                    <%= version.created_at.strftime("%b %-d, %Y") %>
+                  </div>
+
+                  <div
+                    class="
+                        mt-0.5
+                        text-[10px]
+                        text-gray-400
+                      "
+                  >
+                    <%= time_ago_in_words(version.created_at) %>
+                    ago
+                  </div>
+
+                <% else %>
+
+                    <span class="text-xs text-gray-400">
+                      —
+                    </span>
+
+                <% end %>
+
+              </td>
+
+
+              <%# ==========================================================
+                ACTIONS
+                =========================================================== %>
+
+              <td class="whitespace-nowrap px-5 py-5 text-right">
+
+                <div
+                  class="
+                      flex
+                      items-center
+                      justify-end
+                      gap-2
+                    "
+                >
+
+                  <%= link_to(
+                        admin_ecosystems_load_sources_entity_templates_entity_template_version_path(version),
+                        title: "View version",
+                        class: "
+                            inline-flex
+                            h-9
+                            items-center
+                            justify-center
+                            rounded-lg
+                            border
+                            border-gray-200
+                            bg-white
+                            px-3
+                            text-xs
+                            font-semibold
+                            text-gray-700
+                            transition
+                            hover:border-violet-200
+                            hover:text-violet-600
+                            dark:border-gray-700
+                            dark:bg-gray-800
+                            dark:text-gray-300
+                          "
+                      ) do %>
+
+                    View
+
+                  <% end %>
+
+
+                  <%= link_to(
+                        edit_admin_ecosystems_load_sources_entity_templates_entity_template_version_path(version),
+                        title: "Edit version",
+                        class: "
+                            inline-flex
+                            h-9
+                            items-center
+                            justify-center
+                            rounded-lg
+                            bg-violet-600
+                            px-3
+                            text-xs
+                            font-semibold
+                            text-white
+                            transition
+                            hover:bg-violet-700
+                          "
+                      ) do %>
+
+                    Edit
+
+                  <% end %>
+
+                </div>
+
+              </td>
+
+            </tr>
+
+          <% end %>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+
+      <%# =====================================================================
+      PAGINATION
+
+      Delegated to:
+
+      _pagination.html.erb
+      ====================================================================== %>
+
+      <%= render(
+            "admin/ecosystems/load_sources/entity_templates/entity_template_versions/pagination",
+
+            versions: versions,
+
+            total_versions: total_versions,
+
+            current_page: current_page,
+
+            per_page: per_page,
+
+            total_pages: total_pages
+          ) %>
+
+    </div>
+
+
+  <% else %>
+
+
+    <%# =======================================================================
+    EMPTY STATE
+    ======================================================================== %>
+
+    <div
+      class="
+        rounded-2xl
+        border-2
+        border-dashed
+        border-gray-200
+        bg-white
+        px-6
+        py-16
+        text-center
+        shadow-sm
+        dark:border-gray-700
+        dark:bg-gray-800
+      "
+    >
+
+      <div
+        class="
+          mx-auto
+          mb-5
+          flex
+          h-20
+          w-20
+          items-center
+          justify-center
+          rounded-3xl
+          border
+          border-violet-100
+          bg-violet-50
+          text-4xl
+          dark:border-violet-800
+          dark:bg-violet-900/20
+        "
+      >
+        🧬
+      </div>
+
+
+      <% if search.present? || current_status.present? %>
+
+        <h3
+          class="
+            text-lg
+            font-black
+            text-gray-900
+            dark:text-white
+          "
+        >
+          No matching versions
+        </h3>
+
+
+        <p
+          class="
+            mx-auto
+            mt-2
+            max-w-lg
+            text-sm
+            leading-6
+            text-gray-500
+            dark:text-gray-400
+          "
+        >
+          No entity template versions match the current search and filter
+          criteria. Try changing the search or clearing the filters.
+        </p>
+
+
+        <%= link_to(
+              "Clear filters",
+              clear_filters_url,
+              class: "
+                mt-6
+                inline-flex
+                items-center
+                justify-center
+                rounded-xl
+                bg-violet-600
+                px-5
+                py-3
+                text-sm
+                font-semibold
+                text-white
+                transition
+                hover:bg-violet-700
+              "
+            ) %>
+
+
+      <% else %>
+
+
+        <h3
+          class="
+            text-lg
+            font-black
+            text-gray-900
+            dark:text-white
+          "
+        >
+          No template versions exist yet
+        </h3>
+
+
+        <p
+          class="
+            mx-auto
+            mt-2
+            max-w-lg
+            text-sm
+            leading-6
+            text-gray-500
+            dark:text-gray-400
+          "
+        >
+          A template version is a preserved snapshot of an Entity Template.
+          Create the first version when you are ready to establish the
+          initial structure that your entities will use.
+        </p>
+
+
+        <%= link_to(
+              new_admin_ecosystems_load_sources_entity_templates_entity_template_version_path,
+              class: "
+                mt-6
+                inline-flex
+                items-center
+                gap-2
+                rounded-xl
+                bg-violet-600
+                px-5
+                py-3
+                text-sm
+                font-semibold
+                text-white
+                shadow-sm
+                transition
+                hover:bg-violet-700
+              "
+            ) do %>
+
+          <span class="text-lg">
+            +
+          </span>
+
+          Create First Version
+
+        <% end %>
+
+      <% end %>
+
+    </div>
+
+  <% end %>
+
+
+  <%# =========================================================================
+  LOADING / ASYNC STATUS PANEL
+  ========================================================================= %>
+
+  <div
+    class="
+      mt-6
+      hidden
+      rounded-xl
+      border
+      border-violet-200
+      bg-violet-50
+      px-4
+      py-3
+      dark:border-violet-800
+      dark:bg-violet-900/20
+    "
+    data-version-registry-loading
+    aria-live="polite"
+  >
+
+    <div class="flex items-center gap-3">
+
+      <div
+        class="
+          h-4
+          w-4
+          animate-spin
+          rounded-full
+          border-2
+          border-violet-200
+          border-t-violet-600
+        "
+      ></div>
+
+
+      <div>
+
+        <div
+          class="
+            text-xs
+            font-bold
+            text-violet-700
+            dark:text-violet-300
+          "
+          data-version-registry-loading-message
+        >
+          Loading more records…
+        </div>
+
+        <div
+          class="
+            mt-0.5
+            text-[10px]
+            text-violet-500
+            dark:text-violet-400
+          "
+        >
+          Please keep this page open while the registry updates.
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <%# =========================================================================
+  FOOTER
+  ========================================================================= %>
+
+  <div
+    class="
+      mt-8
+      flex
+      flex-col
+      gap-3
+      border-t
+      border-gray-100
+      pt-5
+      sm:flex-row
+      sm:items-center
+      sm:justify-between
+      dark:border-gray-800
+    "
+  >
+
+    <div
+      class="
+        font-mono
+        text-[10px]
+        font-bold
+        uppercase
+        tracking-wider
+        text-gray-400
+      "
+    >
       ENTITY_PROTOCOL :: TEMPLATE_VERSION_LAYER :: ONLINE
     </div>
 
+
     <div
       class="
-    flex
-    items-center
-    gap-2
-    text-[10px]
-    font-black
-    uppercase
-    tracking-wider
-    text-emerald-500
-  ">
+        flex
+        items-center
+        gap-2
+        text-[10px]
+        font-black
+        uppercase
+        tracking-wider
+        text-emerald-500
+      "
+    >
 
-  <span
-    class="
-      h-2
-      w-2
-      rounded-full
-      bg-emerald-400
-      shadow-[0_0_8px_rgba(52,211,153,0.6)]
-    "></span>
+      <span
+        class="
+          h-2
+          w-2
+          rounded-full
+          bg-emerald-400
+          shadow-[0_0_8px_rgba(52,211,153,0.6)]
+        "
+      ></span>
 
       Version registry operational
 
     </div>
 
-  </div> </div>
+  </div>
+
+</div>
+
+
+<%# ============================================================================
+RESULT HIGHLIGHT STYLES
+============================================================================ %>
+
+<style>
+
+    @keyframes entity-template-version-results-highlight {
+
+        0% {
+            box-shadow:
+                    0 0 0 0 rgba(139, 92, 246, 0);
+        }
+
+        25% {
+            box-shadow:
+                    0 0 0 6px rgba(139, 92, 246, 0.18);
+        }
+
+        100% {
+            box-shadow:
+                    0 0 0 0 rgba(139, 92, 246, 0);
+        }
+
+    }
+
+
+    .entity-template-version-results-highlight {
+
+        animation:
+                entity-template-version-results-highlight
+                1.2s
+                ease-out;
+
+    }
+
+
+    @media (prefers-reduced-motion: reduce) {
+
+        .entity-template-version-results-highlight {
+
+            animation: none;
+
+        }
+
+    }
+
+</style>
+
+
+<%# ============================================================================
+FILTER / SEARCH RESULT BEHAVIOR
+============================================================================ %>
+
+<script>
+
+    (() => {
+
+        const results =
+            document.getElementById(
+                "entity-template-version-results"
+            );
+
+
+        const notice =
+            document.getElementById(
+                "entity-template-version-filter-notice"
+            );
+
+
+        if (!results) {
+            return;
+        }
+
+
+        const url =
+            new URL(
+                window.location.href
+            );
+
+
+        const params =
+            url.searchParams;
+
+
+        /*
+         * Determine whether the current page represents
+         * an applied search/filter.
+         *
+         * We intentionally include all supported registry
+         * parameters rather than checking only `q`.
+         */
+        const hasFilters =
+            Boolean(
+                params.get("q") ||
+                params.get("status") ||
+                params.get("sort") ||
+                params.get("direction") ||
+                params.get("per_page")
+            );
+
+
+        /*
+         * Rails submit_tag("Apply") generates:
+         *
+         * commit=Apply
+         */
+        const searchWasApplied =
+            params.get("commit") === "Apply" &&
+            hasFilters;
+
+
+        if (!searchWasApplied) {
+            return;
+        }
+
+
+        /*
+         * Display confirmation.
+         */
+        if (notice) {
+
+            notice.classList.remove(
+                "hidden"
+            );
+
+
+            window.setTimeout(
+                () => {
+
+                    notice.classList.add(
+                        "hidden"
+                    );
+
+                },
+                4500
+            );
+
+        }
+
+
+        /*
+         * Wait until the browser has rendered the
+         * server response.
+         */
+        window.requestAnimationFrame(
+            () => {
+
+
+                /*
+                 * Scroll to results.
+                 */
+                results.scrollIntoView({
+
+                    behavior:
+                        window.matchMedia(
+                            "(prefers-reduced-motion: reduce)"
+                        ).matches
+                            ? "auto"
+                            : "smooth",
+
+                    block: "start"
+
+                });
+
+
+                /*
+                 * Give keyboard/screen-reader focus.
+                 */
+                try {
+
+                    results.focus({
+                        preventScroll: true
+                    });
+
+                } catch (error) {
+
+                    results.focus();
+
+                }
+
+
+                /*
+                 * Highlight result area.
+                 */
+                results.classList.remove(
+                    "entity-template-version-results-highlight"
+                );
+
+
+                /*
+                 * Force animation restart.
+                 */
+                void results.offsetWidth;
+
+
+                results.classList.add(
+                    "entity-template-version-results-highlight"
+                );
+
+
+                /*
+                 * Remove highlight after animation.
+                 */
+                window.setTimeout(
+                    () => {
+
+                        results.classList.remove(
+                            "entity-template-version-results-highlight"
+                        );
+
+                    },
+                    1400
+                );
+
+            }
+        );
+
+    })();
+
+</script>

@@ -1,9 +1,44 @@
+# app/controllers/admin/ecosystems/load_sources/entity_templates/entity_template_versions_controller.rb
+
 module Admin
   module Ecosystems
     module LoadSources
       module EntityTemplates
 
         class EntityTemplateVersionsController < ::AdminController
+
+          # ============================================================
+          # CONSTANTS
+          # ============================================================
+
+          VERSION_MODEL =
+            ::Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion
+
+          STATUS_VALUES = %w[
+            draft
+            published
+            archived
+          ].freeze
+
+          SORT_COLUMNS = %w[
+            version
+            status
+            created_at
+            updated_at
+            published_at
+            entity_template_id
+          ].freeze
+
+          DEFAULT_SORT = "version".freeze
+          DEFAULT_DIRECTION = "desc".freeze
+
+          DEFAULT_PER_PAGE = 50
+          MAX_PER_PAGE = 200
+
+
+          # ============================================================
+          # CALLBACKS
+          # ============================================================
 
           before_action :set_entity_template_version,
                         only: [
@@ -21,42 +56,70 @@ module Admin
                           :update,
                           :destroy,
                           :new,
-                          :create
+                          :create,
+                          :compare
                         ]
 
 
           # ============================================================
           # INDEX
           # ============================================================
-
-          # def index
-          #   @versions =
-          #     @entity_template
-          #       .entity_template_versions
-          #       .order(version: :desc)
-          # end
-
+          #
+          # Searchkick-powered version registry.
+          #
+          # Supported parameters:
+          #
+          # q
+          # status
+          # entity_template_id
+          # version
+          # sort
+          # direction
+          # page
+          # per_page
+          #
+          # Example:
+          #
+          # ?q=scientific
+          #
+          # ?q=scientific&status=published
+          #
+          # ?sort=version&direction=desc
+          #
+          # ?page=2&per_page=100
+          #
+          # ============================================================
 
           def index
+
+            # IMPORTANT:
+            #
+            # Pagination MUST be prepared before:
+            #
+            # 1. build_search_scope
+            # 2. prepare_index_statistics
+            #
+            # Both methods use @page and @per_page.
+
+            prepare_index_filters
+
+            prepare_index_pagination
+
+            search_scope =
+              build_search_scope
+
             @entity_template_versions =
-              ::Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion
-                .includes(:entity_template)
-                .order(version: :desc)
+              execute_search(
+                search_scope
+              )
 
-            content = render_to_string(
-              template: "admin/ecosystems/load_sources/entity_templates/entity_template_versions/index",
-              layout: false
-            )
+            prepare_index_statistics
 
-            render(
-              template: "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
-              layout: false,
-              locals: {
-                content: content
-              }
-            )
+            prepare_index_metadata
+
+            render_index
+
           end
-
 
 
           # ============================================================
@@ -64,26 +127,33 @@ module Admin
           # ============================================================
 
           def show
+
             @version =
               @entity_template_version
 
             @entity_template_versions =
               @entity_template
                 .entity_template_versions
-                .order(version: :desc)
+                .order(
+                  version: :desc
+                )
 
-            content = render_to_string(
-              template: "admin/ecosystems/load_sources/entity_templates/entity_template_versions/show",
-              layout: false
-            )
+            content =
+              render_to_string(
+                template:
+                  "admin/ecosystems/load_sources/entity_templates/entity_template_versions/show",
+                layout: false
+              )
 
             render(
-              template: "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
+              template:
+                "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
               layout: false,
               locals: {
                 content: content
               }
             )
+
           end
 
 
@@ -92,6 +162,7 @@ module Admin
           # ============================================================
 
           def new
+
             @version =
               @entity_template
                 .entity_template_versions
@@ -99,6 +170,7 @@ module Admin
 
             @version.version =
               next_version_number
+
           end
 
 
@@ -107,8 +179,10 @@ module Admin
           # ============================================================
 
           def edit
+
             @version =
               @entity_template_version
+
           end
 
 
@@ -117,6 +191,7 @@ module Admin
           # ============================================================
 
           def create
+
             @version =
               @entity_template
                 .entity_template_versions
@@ -127,17 +202,26 @@ module Admin
             @version.version ||=
               next_version_number
 
+
             if @version.save
+
               redirect_to(
                 admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
                   @version
                 ),
-                notice: "Entity template version was successfully created."
+                notice:
+                  "Entity template version was successfully created."
               )
+
             else
-              render :new,
-                     status: :unprocessable_entity
+
+              render(
+                :new,
+                status: :unprocessable_entity
+              )
+
             end
+
           end
 
 
@@ -146,22 +230,32 @@ module Admin
           # ============================================================
 
           def update
+
             @version =
               @entity_template_version
+
 
             if @version.update(
               entity_template_version_params
             )
+
               redirect_to(
                 admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
                   @version
                 ),
-                notice: "Entity template version was successfully updated."
+                notice:
+                  "Entity template version was successfully updated."
               )
+
             else
-              render :edit,
-                     status: :unprocessable_entity
+
+              render(
+                :edit,
+                status: :unprocessable_entity
+              )
+
             end
+
           end
 
 
@@ -170,15 +264,19 @@ module Admin
           # ============================================================
 
           def destroy
+
             @version =
               @entity_template_version
 
             @version.destroy
 
+
             redirect_to(
               admin_ecosystems_load_sources_entity_templates_entity_template_versions_path,
-              notice: "Entity template version was successfully deleted."
+              notice:
+                "Entity template version was successfully deleted."
             )
+
           end
 
 
@@ -187,10 +285,13 @@ module Admin
           # ============================================================
 
           def compare
+
             @versions =
               @entity_template
                 .entity_template_versions
-                .order(version: :desc)
+                .order(
+                  version: :desc
+                )
 
 
             # ----------------------------------------------------------
@@ -237,6 +338,7 @@ module Admin
 
               @right_version =
                 @entity_template_version
+
             end
 
 
@@ -294,7 +396,7 @@ module Admin
 
 
               # --------------------------------------------------------
-              # DEFINITION-LEVEL CHANGES
+              # DEFINITION CHANGES
               # --------------------------------------------------------
 
               @definition_changes =
@@ -346,7 +448,9 @@ module Admin
                 @field_comparisons.map do |field|
 
                   field_hash =
-                    field.is_a?(Hash) ? field : {}
+                    field.is_a?(Hash) ?
+                      field :
+                      {}
 
 
                   changes =
@@ -356,95 +460,9 @@ module Admin
 
 
                   normalized_changes =
-                    if changes.is_a?(Hash)
-
-                      changes.map do |attribute, change|
-
-                        change_hash =
-                          change.is_a?(Hash) ?
-                            change :
-                            {}
-
-
-                        {
-                          key: attribute.to_s,
-
-                          from:
-                            change_hash[:from] ||
-                              change_hash["from"],
-
-                          to:
-                            change_hash[:to] ||
-                              change_hash["to"],
-
-                          from_text:
-                            format_comparison_value(
-                              change_hash[:from] ||
-                                change_hash["from"]
-                            ),
-
-                          to_text:
-                            format_comparison_value(
-                              change_hash[:to] ||
-                                change_hash["to"]
-                            )
-                        }
-
-                      end
-
-                    elsif changes.is_a?(Array)
-
-                      changes.map do |change|
-
-                        change_hash =
-                          change.is_a?(Hash) ?
-                            change :
-                            {}
-
-
-                        {
-                          key:
-                            (
-                              change_hash[:key] ||
-                                change_hash["key"] ||
-                                change_hash[:name] ||
-                                change_hash["name"]
-                            ).to_s,
-
-                          from:
-                            change_hash[:from] ||
-                              change_hash["from"] ||
-                              change_hash[:left] ||
-                              change_hash["left"],
-
-                          to:
-                            change_hash[:to] ||
-                              change_hash["to"] ||
-                              change_hash[:right] ||
-                              change_hash["right"],
-
-                          from_text:
-                            format_comparison_value(
-                              change_hash[:from] ||
-                                change_hash["from"] ||
-                                change_hash[:left] ||
-                                change_hash["left"]
-                            ),
-
-                          to_text:
-                            format_comparison_value(
-                              change_hash[:to] ||
-                                change_hash["to"] ||
-                                change_hash[:right] ||
-                                change_hash["right"]
-                            )
-                        }
-
-                      end
-
-                    else
-                      []
-                    end
+                    normalize_comparison_changes(
+                      changes
+                    )
 
 
                   {
@@ -462,14 +480,18 @@ module Admin
                       ).to_s,
 
                     version_a_present:
-                      field_hash.key?(:version_a_present) ?
-                        field_hash[:version_a_present] :
-                        field_hash["version_a_present"],
+                      if field_hash.key?(:version_a_present)
+                        field_hash[:version_a_present]
+                      else
+                        field_hash["version_a_present"]
+                      end,
 
                     version_b_present:
-                      field_hash.key?(:version_b_present) ?
-                        field_hash[:version_b_present] :
-                        field_hash["version_b_present"],
+                      if field_hash.key?(:version_b_present)
+                        field_hash[:version_b_present]
+                      else
+                        field_hash["version_b_present"]
+                      end,
 
                     version_a:
                       field_hash[:version_a] ||
@@ -499,20 +521,15 @@ module Admin
               # NO COMPARISON AVAILABLE
               # --------------------------------------------------------
 
-              @left_definition =
-                {}
+              @left_definition = {}
 
-              @right_definition =
-                {}
+              @right_definition = {}
 
-              @field_comparisons =
-                []
+              @field_comparisons = []
 
-              @field_changes =
-                []
+              @field_changes = []
 
-              @definition_changes =
-                []
+              @definition_changes = []
 
               @comparison_summary =
                 {
@@ -522,22 +539,28 @@ module Admin
                   unchanged: 0
                 }
 
-              @field_comparisons_json =
-                []
+              @field_comparisons_json = []
+
             end
 
-            content = render_to_string(
-              template: "admin/ecosystems/load_sources/entity_templates/entity_template_versions/compare",
-              layout: false
-            )
+
+            content =
+              render_to_string(
+                template:
+                  "admin/ecosystems/load_sources/entity_templates/entity_template_versions/compare",
+                layout: false
+              )
+
 
             render(
-              template: "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
+              template:
+                "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
               layout: false,
               locals: {
                 content: content
               }
             )
+
           end
 
 
@@ -545,77 +568,657 @@ module Admin
 
 
           # ============================================================
-          # ENTITY TEMPLATE VERSION
+          # INDEX — FILTERS
+          # ============================================================
+
+          def prepare_index_filters
+
+            @filters =
+              {
+                q:
+                  params[:q].to_s.strip,
+
+                status:
+                  normalize_status_filter(
+                    params[:status]
+                  ),
+
+                entity_template_id:
+                  normalize_integer_parameter(
+                    params[:entity_template_id]
+                  ),
+
+                version:
+                  normalize_integer_parameter(
+                    params[:version]
+                  )
+              }
+
+          end
+
+
+          # ============================================================
+          # INDEX — SEARCH SCOPE
+          # ============================================================
+
+          def build_search_scope
+
+            query =
+              @filters[:q].presence || "*"
+
+
+            where =
+              {}
+
+
+            # ----------------------------------------------------------
+            # STATUS
+            # ----------------------------------------------------------
+
+            if @filters[:status].present?
+
+              where[:status] =
+                @filters[:status]
+
+            end
+
+
+            # ----------------------------------------------------------
+            # ENTITY TEMPLATE
+            # ----------------------------------------------------------
+
+            if @filters[:entity_template_id].present?
+
+              where[:entity_template_id] =
+                @filters[:entity_template_id]
+
+            end
+
+
+            # ----------------------------------------------------------
+            # VERSION
+            # ----------------------------------------------------------
+
+            if @filters[:version].present?
+
+              where[:version] =
+                @filters[:version]
+
+            end
+
+
+            VERSION_MODEL.search(
+              query,
+
+              where: where,
+
+              order:
+                search_order,
+
+              page:
+                @page,
+
+              per_page:
+                @per_page,
+
+              load: true
+            )
+
+          end
+
+
+          # ============================================================
+          # INDEX — EXECUTE SEARCH
+          # ============================================================
+
+          def execute_search(search_scope)
+
+            search_scope
+
+          rescue Searchkick::Error => e
+
+            Rails.logger.error(
+              "[EntityTemplateVersion Searchkick] #{e.class}: #{e.message}"
+            )
+
+
+            fallback_index_query
+
+          rescue StandardError => e
+
+            Rails.logger.error(
+              "[EntityTemplateVersion Search] #{e.class}: #{e.message}"
+            )
+
+
+            fallback_index_query
+
+          end
+
+
+          # ============================================================
+          # INDEX — FALLBACK
           # ============================================================
           #
-          # The version is identified by params[:id].
+          # This protects the admin interface if Elasticsearch/OpenSearch
+          # is temporarily unavailable.
           #
-          # Example:
-          #
-          # /entity_template_versions/2
-          #
-          # gives:
-          #
-          # params[:id] == "2"
+          # It is deliberately SQL-based and only used as a fallback.
           #
           # ============================================================
 
+          def fallback_index_query
+
+            scope =
+              VERSION_MODEL
+                .includes(:entity_template)
+
+
+            # ----------------------------------------------------------
+            # STATUS
+            # ----------------------------------------------------------
+
+            if @filters[:status].present?
+
+              scope =
+                scope.where(
+                  status: @filters[:status]
+                )
+
+            end
+
+
+            # ----------------------------------------------------------
+            # ENTITY TEMPLATE
+            # ----------------------------------------------------------
+
+            if @filters[:entity_template_id].present?
+
+              scope =
+                scope.where(
+                  entity_template_id:
+                    @filters[:entity_template_id]
+                )
+
+            end
+
+
+            # ----------------------------------------------------------
+            # VERSION
+            # ----------------------------------------------------------
+
+            if @filters[:version].present?
+
+              scope =
+                scope.where(
+                  version:
+                    @filters[:version]
+                )
+
+            end
+
+
+            # ----------------------------------------------------------
+            # TEXT SEARCH
+            # ----------------------------------------------------------
+
+            if @filters[:q].present?
+
+              query =
+                "%#{ActiveRecord::Base.sanitize_sql_like(
+                  @filters[:q]
+                )}%"
+
+
+              scope =
+                scope.where(
+                  <<~SQL.squish,
+                    CAST(
+                      ecosystems_load_sources_entity_template_versions.version
+                      AS TEXT
+                    ) ILIKE :query
+
+                    OR
+                    ecosystems_load_sources_entity_template_versions.status
+                    ILIKE :query
+
+                    OR
+                    CAST(
+                      ecosystems_load_sources_entity_template_versions.definition
+                      AS TEXT
+                    ) ILIKE :query
+                  SQL
+                  query: query
+                )
+
+            end
+
+
+            # ----------------------------------------------------------
+            # SORT
+            # ----------------------------------------------------------
+
+            scope =
+              scope.order(
+                "#{safe_sort_column} #{safe_sort_direction}"
+              )
+
+
+            # ----------------------------------------------------------
+            # PAGINATION
+            # ----------------------------------------------------------
+
+            scope =
+              scope
+                .page(@page)
+                .per(@per_page)
+
+
+            scope
+
+          end
+
+
+          # ============================================================
+          # INDEX — SORT
+          # ============================================================
+
+          def search_order
+
+            {
+              safe_sort_column =>
+                safe_sort_direction
+            }
+
+          end
+
+
+          def safe_sort_column
+
+            requested =
+              params[:sort].to_s
+
+
+            return DEFAULT_SORT unless
+              SORT_COLUMNS.include?(requested)
+
+
+            requested
+
+          end
+
+
+          def safe_sort_direction
+
+            requested =
+              params[:direction].to_s.downcase
+
+
+            return DEFAULT_DIRECTION unless
+              %w[
+                asc
+                desc
+              ].include?(requested)
+
+
+            requested
+
+          end
+
+
+          # ============================================================
+          # INDEX — PAGINATION
+          # ============================================================
+
+          def prepare_index_pagination
+
+            @page =
+              normalize_positive_integer(
+                params[:page],
+                1
+              )
+
+
+            @per_page =
+              normalize_per_page(
+                params[:per_page]
+              )
+
+          end
+
+
+          # ============================================================
+          # INDEX — STATISTICS
+          # ============================================================
+
+          def prepare_index_statistics
+
+            # ----------------------------------------------------------
+            # SEARCH RESULT COUNT
+            # ----------------------------------------------------------
+            #
+            # Searchkick:
+            #   total_count
+            #
+            # Kaminari/Pagy-style fallback:
+            #   total_entries
+            #
+            # Plain collection:
+            #   size
+            #
+            # ----------------------------------------------------------
+
+            @filtered_count =
+              if @entity_template_versions.respond_to?(:total_count)
+
+                @entity_template_versions.total_count
+
+              elsif @entity_template_versions.respond_to?(:total_entries)
+
+                @entity_template_versions.total_entries
+
+              elsif @entity_template_versions.respond_to?(:count)
+
+                @entity_template_versions.count
+
+              else
+
+                @entity_template_versions.size
+
+              end
+
+
+            @filtered_count =
+              @filtered_count.to_i
+
+
+            # ----------------------------------------------------------
+            # GLOBAL COUNTS
+            # ----------------------------------------------------------
+            #
+            # These intentionally represent the entire registry rather
+            # than only the current filtered result.
+            #
+            # ----------------------------------------------------------
+
+            @total_versions_count =
+              VERSION_MODEL.count
+
+
+            @published_versions_count =
+              VERSION_MODEL.where(
+                status: "published"
+              ).count
+
+
+            @draft_versions_count =
+              VERSION_MODEL.where(
+                status: "draft"
+              ).count
+
+
+            @archived_versions_count =
+              VERSION_MODEL.where(
+                status: "archived"
+              ).count
+
+
+            # ----------------------------------------------------------
+            # SEARCH RESULT COUNT
+            # ----------------------------------------------------------
+
+            @search_result_count =
+              @filtered_count
+
+
+            # ----------------------------------------------------------
+            # SHOWING RANGE
+            # ----------------------------------------------------------
+            #
+            # @page and @per_page are guaranteed to be initialized
+            # because prepare_index_pagination now runs BEFORE this
+            # method.
+            #
+            # ----------------------------------------------------------
+
+            @showing_from =
+              if @filtered_count.zero?
+
+                0
+
+              else
+
+                ((@page - 1) * @per_page) + 1
+
+              end
+
+
+            @showing_to =
+              if @filtered_count.zero?
+
+                0
+
+              else
+
+                [
+                  @page * @per_page,
+                  @filtered_count
+                ].min
+
+              end
+
+
+            # ----------------------------------------------------------
+            # TOTAL PAGES
+            # ----------------------------------------------------------
+
+            @total_pages =
+              if @filtered_count.zero?
+
+                1
+
+              else
+
+                (
+                  @filtered_count.to_f /
+                    @per_page
+                ).ceil
+
+              end
+
+
+            @total_pages =
+              1 if @total_pages < 1
+
+
+            # ----------------------------------------------------------
+            # CURRENT PAGE SAFETY
+            # ----------------------------------------------------------
+            #
+            # If a user requests a page beyond the final page, we keep
+            # the requested page here rather than silently changing the
+            # Searchkick query after it has already executed.
+            #
+            # The view can safely detect an empty page.
+            #
+            # ----------------------------------------------------------
+
+            @has_results =
+              @filtered_count.positive?
+
+
+            @is_empty_page =
+              @has_results &&
+                @entity_template_versions.respond_to?(:empty?) &&
+                @entity_template_versions.empty?
+
+          end
+
+
+          # ============================================================
+          # INDEX — METADATA
+          # ============================================================
+
+          def prepare_index_metadata
+
+            @search_query =
+              @filters[:q]
+
+
+            @search_status =
+              @filters[:status]
+
+
+            @search_sort =
+              safe_sort_column
+
+
+            @search_direction =
+              safe_sort_direction
+
+
+            @available_statuses =
+              STATUS_VALUES
+
+
+            @available_sort_columns =
+              SORT_COLUMNS
+
+
+            @available_per_page_values =
+              [
+                25,
+                50,
+                100,
+                200
+              ]
+
+
+            @search_applied =
+              @search_query.present? ||
+                @search_status.present? ||
+                @filters[:entity_template_id].present? ||
+                @filters[:version].present?
+
+
+            @search_message =
+              build_search_message
+
+          end
+
+
+          # ============================================================
+          # INDEX — SEARCH MESSAGE
+          # ============================================================
+
+          def build_search_message
+
+            return nil unless @search_applied
+
+
+            if @search_result_count.to_i.zero?
+
+              if @search_query.present?
+
+                "No entity template versions matched “#{@search_query}”."
+
+              else
+
+                "No entity template versions matched the selected filters."
+
+              end
+
+            elsif @search_query.present?
+
+              "Found #{@search_result_count} entity template #{'version'.pluralize(@search_result_count)} matching “#{@search_query}”."
+
+            else
+
+              "Showing #{@search_result_count} entity template #{'version'.pluralize(@search_result_count)} matching the selected filters."
+
+            end
+
+          end
+
+
+          # ============================================================
+          # INDEX — RENDER
+          # ============================================================
+
+          def render_index
+
+            content =
+              render_to_string(
+                template:
+                  "admin/ecosystems/load_sources/entity_templates/entity_template_versions/index",
+                layout: false
+              )
+
+
+            render(
+              template:
+                "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
+              layout: false,
+              locals: {
+                content: content
+              }
+            )
+
+          end
+
+
+          # ============================================================
+          # ENTITY TEMPLATE VERSION
+          # ============================================================
+
           def set_entity_template_version
+
             @entity_template_version =
-              ::Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion.find(
+              VERSION_MODEL.find(
                 params[:id]
               )
+
           end
 
 
           # ============================================================
           # ENTITY TEMPLATE
           # ============================================================
-          #
-          # EntityTemplateVersion belongs_to EntityTemplate, so derive
-          # the template from the version instead of expecting
-          # params[:entity_template_id].
-          #
-          # ============================================================
 
           def set_entity_template
+
             @entity_template =
               if @entity_template_version.present?
+
                 @entity_template_version.entity_template
+
               else
+
                 find_entity_template_for_collection_action
+
               end
 
+
             return if @entity_template.present?
-            #
-            # raise ActiveRecord::RecordNotFound,
-            #       "Could not determine the EntityTemplate for this request."
+
           end
 
 
           # ============================================================
           # COLLECTION ENTITY TEMPLATE
           # ============================================================
-          #
-          # For collection actions such as index/new/create there is no
-          # entity_template_version ID.
-          #
-          # Your current routes also do not nest versions under an
-          # entity_template ID, so params[:entity_template_id] cannot be
-          # used reliably here.
-          #
-          # If index/new/create are accessed through an entity template
-          # route elsewhere in the application, this method can resolve
-          # that parameter.
-          #
-          # ============================================================
 
           def find_entity_template_for_collection_action
-            return nil if params[:entity_template_id].blank?
+
+            return nil if
+              params[:entity_template_id].blank?
+
 
             ::Ecosystems::LoadSources::EntityTemplates::EntityTemplate.find_by(
-              id: params[:entity_template_id]
+              id:
+                params[:entity_template_id]
             )
+
           end
 
 
@@ -624,11 +1227,16 @@ module Admin
           # ============================================================
 
           def find_comparison_version(id)
+
             return nil if id.blank?
+
 
             @entity_template
               .entity_template_versions
-              .find_by(id: id)
+              .find_by(
+                id: id
+              )
+
           end
 
 
@@ -637,13 +1245,16 @@ module Admin
           # ============================================================
 
           def previous_version_for(version)
+
             return nil unless version.present?
 
-            @versions =
-              @versions ||
-                @entity_template
-                  .entity_template_versions
-                  .order(version: :desc)
+
+            @versions ||=
+              @entity_template
+                .entity_template_versions
+                .order(
+                  version: :desc
+                )
 
 
             versions =
@@ -652,14 +1263,20 @@ module Admin
 
             current_index =
               versions.index do |candidate|
-                candidate.id == version.id
+
+                candidate.id ==
+                  version.id
+
               end
 
 
             return nil unless current_index
 
 
-            versions[current_index + 1]
+            versions[
+              current_index + 1
+            ]
+
           end
 
 
@@ -667,11 +1284,16 @@ module Admin
           # DEFINITION CHANGES
           # ============================================================
 
-          def build_definition_changes(left_definition, right_definition)
+          def build_definition_changes(
+            left_definition,
+            right_definition
+          )
+
             left =
               left_definition.is_a?(Hash) ?
                 left_definition :
                 {}
+
 
             right =
               right_definition.is_a?(Hash) ?
@@ -683,7 +1305,10 @@ module Admin
               (
                 left.keys +
                   right.keys
-              ).map(&:to_s).uniq.sort
+              )
+                .map(&:to_s)
+                .uniq
+                .sort
 
 
             keys.each_with_object([]) do |key, changes|
@@ -696,6 +1321,7 @@ module Admin
                   left,
                   key
                 )
+
 
               right_value =
                 fetch_hash_value(
@@ -737,7 +1363,9 @@ module Admin
                 }
 
               end
+
             end
+
           end
 
 
@@ -746,10 +1374,130 @@ module Admin
           # ============================================================
 
           def fetch_hash_value(hash, key)
+
             return nil unless hash.is_a?(Hash)
 
-            hash[key] ||
+
+            if hash.key?(key)
+
+              hash[key]
+
+            elsif hash.key?(key.to_sym)
+
               hash[key.to_sym]
+
+            end
+
+          end
+
+
+          # ============================================================
+          # COMPARISON CHANGES
+          # ============================================================
+
+          def normalize_comparison_changes(changes)
+
+            if changes.is_a?(Hash)
+
+              changes.map do |attribute, change|
+
+                change_hash =
+                  change.is_a?(Hash) ?
+                    change :
+                    {}
+
+
+                from_value =
+                  change_hash[:from] ||
+                    change_hash["from"]
+
+
+                to_value =
+                  change_hash[:to] ||
+                    change_hash["to"]
+
+
+                {
+                  key:
+                    attribute.to_s,
+
+                  from:
+                    from_value,
+
+                  to:
+                    to_value,
+
+                  from_text:
+                    format_comparison_value(
+                      from_value
+                    ),
+
+                  to_text:
+                    format_comparison_value(
+                      to_value
+                    )
+                }
+
+              end
+
+            elsif changes.is_a?(Array)
+
+              changes.map do |change|
+
+                change_hash =
+                  change.is_a?(Hash) ?
+                    change :
+                    {}
+
+
+                from_value =
+                  change_hash[:from] ||
+                    change_hash["from"] ||
+                    change_hash[:left] ||
+                    change_hash["left"]
+
+
+                to_value =
+                  change_hash[:to] ||
+                    change_hash["to"] ||
+                    change_hash[:right] ||
+                    change_hash["right"]
+
+
+                {
+                  key:
+                    (
+                      change_hash[:key] ||
+                        change_hash["key"] ||
+                        change_hash[:name] ||
+                        change_hash["name"]
+                    ).to_s,
+
+                  from:
+                    from_value,
+
+                  to:
+                    to_value,
+
+                  from_text:
+                    format_comparison_value(
+                      from_value
+                    ),
+
+                  to_text:
+                    format_comparison_value(
+                      to_value
+                    )
+                }
+
+              end
+
+            else
+
+              []
+
+            end
+
           end
 
 
@@ -758,30 +1506,148 @@ module Admin
           # ============================================================
 
           def format_comparison_value(value)
+
             case value
 
             when nil
+
               "—"
 
             when true
+
               "true"
 
             when false
+
               "false"
 
             when String
-              value.presence || "empty"
+
+              value.presence ||
+                "empty"
 
             when Array, Hash
-              JSON.pretty_generate(value)
+
+              JSON.pretty_generate(
+                value
+              )
 
             else
+
               value.to_s
 
             end
 
           rescue StandardError
+
             value.to_s
+
+          end
+
+
+          # ============================================================
+          # STATUS NORMALIZATION
+          # ============================================================
+
+          def normalize_status_filter(value)
+
+            value =
+              value.to_s.strip.downcase
+
+
+            return nil if value.blank?
+
+
+            return value if
+              STATUS_VALUES.include?(value)
+
+
+            nil
+
+          end
+
+
+          # ============================================================
+          # INTEGER PARAMETER
+          # ============================================================
+
+          def normalize_integer_parameter(value)
+
+            return nil if value.blank?
+
+
+            integer =
+              Integer(
+                value,
+                exception: false
+              )
+
+
+            return nil unless integer
+
+
+            return nil if integer.negative?
+
+
+            integer
+
+          end
+
+
+          # ============================================================
+          # POSITIVE INTEGER
+          # ============================================================
+
+          def normalize_positive_integer(
+            value,
+            default
+          )
+
+            integer =
+              Integer(
+                value,
+                exception: false
+              )
+
+
+            return default unless integer
+
+
+            return default if integer < 1
+
+
+            integer
+
+          end
+
+
+          # ============================================================
+          # PER PAGE
+          # ============================================================
+
+          def normalize_per_page(value)
+
+            requested =
+              Integer(
+                value,
+                exception: false
+              )
+
+
+            requested ||=
+              DEFAULT_PER_PAGE
+
+
+            requested =
+              DEFAULT_PER_PAGE if
+              requested < 1
+
+
+            [
+              requested,
+              MAX_PER_PAGE
+            ].min
+
           end
 
 
@@ -790,13 +1656,17 @@ module Admin
           # ============================================================
 
           def entity_template_version_params
+
             params
-              .require(:entity_template_version)
+              .require(
+                :entity_template_version
+              )
               .permit(
                 :version,
                 :status,
                 :definition
               )
+
           end
 
 
@@ -805,10 +1675,13 @@ module Admin
           # ============================================================
 
           def next_version_number
+
             latest =
               @entity_template
                 .entity_template_versions
-                .order(version: :desc)
+                .order(
+                  version: :desc
+                )
                 .first
 
 
@@ -817,6 +1690,7 @@ module Admin
 
 
             latest_version + 1
+
           end
 
         end

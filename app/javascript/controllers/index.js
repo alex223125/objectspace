@@ -420,6 +420,8 @@ application.register("entity_template_library", EntityTemplateLibraryController)
 import EntityTemplateVersionCompareController from "./admin/ecosystems/load_sources/entity_templates/entity_template_versions/entity_template_version_compare_controller"
 application.register("entity-template-version-compare", EntityTemplateVersionCompareController)
 
+import VersionListController from "./admin/ecosystems/load_sources/entity_templates/entity_template_versions/version_list_controller"
+application.register("version-list", VersionListController)
 
 
 

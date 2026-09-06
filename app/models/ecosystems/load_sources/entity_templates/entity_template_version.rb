@@ -7,6 +7,40 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
 
 
   # ============================================================
+  # SEARCHKICK
+  # ============================================================
+  #
+  # Searchable fields:
+  #
+  # - version
+  # - status
+  # - entity_template_id
+  # - entity_template_name
+  # - display_name
+  # - definition
+  #
+  # The definition is flattened into searchable text so that
+  # searches can find field names, labels, descriptions, etc.
+  #
+  # ============================================================
+
+  searchkick(
+    word_start: [
+      :display_name,
+      :entity_template_name,
+      :status,
+      :search_text
+    ],
+    searchable: [
+      :display_name,
+      :entity_template_name,
+      :status,
+      :search_text
+    ]
+  )
+
+
+  # ============================================================
   # ASSOCIATIONS
   # ============================================================
 
@@ -114,37 +148,127 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
 
 
   # ============================================================
+  # SEARCHKICK DATA
+  # ============================================================
+  #
+  # Searchkick calls this method when indexing the record.
+  #
+  # Keep this method deterministic and inexpensive.
+  #
+  # ============================================================
+
+  def search_data
+
+    {
+      id: id,
+
+      version: version,
+
+      status: status,
+
+      entity_template_id:
+        entity_template_id,
+
+      entity_template_name:
+        entity_template_name_for_search,
+
+      display_name:
+        display_name,
+
+      search_text:
+        search_text,
+
+      created_at:
+        created_at,
+
+      updated_at:
+        updated_at,
+
+      published_at:
+        published_at
+    }
+
+  end
+
+
+  # ============================================================
+  # SEARCH DISPLAY HELPERS
+  # ============================================================
+
+  def entity_template_name_for_search
+
+    entity_template&.name.to_s
+
+  end
+
+
+  def search_text
+
+    parts = []
+
+    parts << display_name
+    parts << entity_template_name_for_search
+    parts << status
+    parts << "version #{version}"
+
+    definition_search_text =
+      definition_to_search_text(
+        definition
+      )
+
+    parts << definition_search_text
+
+    parts
+      .compact
+      .map(&:to_s)
+      .reject(&:blank?)
+      .join(" ")
+
+  end
+
+
+  # ============================================================
   # VERSION HELPERS
   # ============================================================
 
   def latest?
+
     version ==
       entity_template
         .entity_template_versions
         .maximum(:version)
+
   end
 
 
   def published?
+
     status == "published"
+
   end
 
 
   def draft?
+
     status == "draft"
+
   end
 
 
   def archived?
+
     status == "archived"
+
   end
 
 
   def next_version_number
+
     entity_template
       .entity_template_versions
       .maximum(:version)
       .to_i + 1
+
   end
 
 
@@ -153,6 +277,7 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
   # ============================================================
 
   def publish!
+
     transaction do
 
       entity_template
@@ -174,6 +299,7 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
       )
 
     end
+
   end
 
 
@@ -182,6 +308,7 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
   # ============================================================
 
   def archive!
+
     raise ActiveRecord::RecordInvalid,
           "Only a published version can be archived." unless published?
 
@@ -192,6 +319,7 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
       )
 
     end
+
   end
 
 
@@ -218,10 +346,12 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
   # ============================================================
 
   def sections
+
     definition.fetch(
       "sections",
       []
     )
+
   end
 
 
@@ -240,12 +370,16 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
 
 
   def field_count
+
     fields.size
+
   end
 
 
   def section_count
+
     sections.size
+
   end
 
 
@@ -254,12 +388,16 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
   # ============================================================
 
   def display_name
-    "#{entity_template.name} v#{version}"
+
+    "#{entity_template_name_for_search} v#{version}"
+
   end
 
 
   def status_label
+
     status.to_s.humanize
+
   end
 
 
@@ -280,20 +418,10 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
 
     end
 
-    # We allow either:
-    #
-    # {
-    #   "fields" => [...]
-    # }
-    #
-    # or:
-    #
-    # {
-    #   "sections" => [...]
-    # }
-    #
-    # because your application currently appears to use
-    # both concepts.
+
+    # ----------------------------------------------------------
+    # FIELDS
+    # ----------------------------------------------------------
 
     if definition.key?("fields") &&
       !definition["fields"].is_a?(Array)
@@ -304,6 +432,11 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
       )
 
     end
+
+
+    # ----------------------------------------------------------
+    # SECTIONS
+    # ----------------------------------------------------------
 
     if definition.key?("sections") &&
       !definition["sections"].is_a?(Array)
@@ -346,12 +479,99 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
 
     self.definition =
       if definition.nil?
+
         {}
+
       elsif definition.respond_to?(:deep_stringify_keys)
+
         definition.deep_stringify_keys
+
       else
+
         definition
+
       end
+
+  end
+
+
+  # ============================================================
+  # DEFINITION → SEARCH TEXT
+  # ============================================================
+  #
+  # Converts nested JSONB into a searchable string.
+  #
+  # Example:
+  #
+  # {
+  #   "sections" => [
+  #     {
+  #       "name" => "Identity",
+  #       "fields" => [
+  #         {
+  #           "name" => "Scientific Name",
+  #           "label" => "Scientific Name"
+  #         }
+  #       ]
+  #     }
+  #   ]
+  # }
+  #
+  # becomes searchable text containing:
+  #
+  # Identity
+  # Scientific Name
+  # label
+  #
+  # This allows Searchkick to find records by content
+  # inside the JSON definition.
+  #
+  # ============================================================
+
+  def definition_to_search_text(value)
+
+    case value
+
+    when Hash
+
+      value
+        .flat_map do |key, child|
+
+        [
+          key.to_s,
+          definition_to_search_text(child)
+        ]
+
+      end
+        .join(" ")
+
+    when Array
+
+      value
+        .map do |child|
+
+        definition_to_search_text(child)
+
+      end
+        .join(" ")
+
+    when String
+
+      value
+
+    when Numeric, TrueClass, FalseClass
+
+      value.to_s
+
+    when NilClass
+
+      ""
+
+    else
+
+      value.to_s
+
+    end
 
   end
 

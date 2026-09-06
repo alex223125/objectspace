@@ -39,7 +39,12 @@ npx @herb-tools/linter app/views/admin/ecosystems/load_sources/entity_templates/
 npx @herb-tools/formatter app/views/admin/ecosystems/load_sources/entity_templates/entity_template_versions/compare.html.erb
 
 
+npx @herb-tools/linter app/views/admin/ecosystems/load_sources/entity_templates/entity_template_versions/_pagination.html.erb --fix
+npx @herb-tools/formatter app/views/admin/ecosystems/load_sources/entity_templates/entity_template_versions/_pagination.html.erb
 
+
+npx @herb-tools/linter app/views/admin/ecosystems/load_sources/entity_templates/entity_template_versions/index.html.erb --fix
+npx @herb-tools/formatter app/views/admin/ecosystems/load_sources/entity_templates/entity_template_versions/index.html.erb
 
 
 
@@ -94,6 +99,9 @@ User.reindex
 Ecosystems::LoadSources::Actors::Actor.reindex
 Ecosystems::LoadSources::EntityTemplates::EntityTemplate.reindex
 Ecosystems::LoadSources::EntityTypes::EntityType.reindex
+
+bin/rails runner "Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion.reindex"
+
 
 
 # to redo slugs

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_09_04_110617) do
+ActiveRecord::Schema[7.0].define(version: 2026_09_06_141030) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -395,8 +395,12 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_04_110617) do
     t.datetime "published_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "idx_entity_template_versions_created_at"
     t.index ["entity_template_id", "version"], name: "idx_entity_template_versions_template_version", unique: true
     t.index ["entity_template_id"], name: "idx_entity_template_versions_template"
+    t.index ["status", "version"], name: "idx_entity_template_versions_status_version"
+    t.index ["status"], name: "idx_entity_template_versions_status"
+    t.index ["updated_at"], name: "idx_entity_template_versions_updated_at"
   end
 
   create_table "ecosystems_load_sources_entity_templates", force: :cascade do |t|

@@ -1,0 +1,1240 @@
+<%# ============================================================================
+ENTITY TEMPLATE VERSIONS — SEARCH FORM PARTIAL
+
+Path:
+app/views/admin/ecosystems/load_sources/entity_templates/entity_template_versions/_search_form.html.erb
+
+Purpose:
+Reusable search, filtering, sorting and pagination toolbar for the
+Entity Template Versions registry.
+
+Expected variables:
+
+Optional:
+@search
+@status
+@sort
+@direction
+@per_page
+
+The partial is intentionally defensive so it can be rendered from the index
+without requiring every controller variable to be present.
+============================================================================ %>
+
+<%
+  # --------------------------------------------------------------------------
+  # SAFE DEFAULTS
+  # --------------------------------------------------------------------------
+
+  current_search =
+    if defined?(@search) && @search.present?
+      @search.to_s
+    else
+      params[:q].to_s
+    end
+
+  current_status =
+    if defined?(@status) && @status.present?
+      @status.to_s
+    else
+      params[:status].to_s
+    end
+
+  current_sort =
+    if defined?(@sort) && @sort.present?
+      @sort.to_s
+    else
+      params[:sort].presence || "version"
+    end
+
+  current_direction =
+    if defined?(@direction) && @direction.present?
+      @direction.to_s
+    else
+      params[:direction].presence || "desc"
+    end
+
+  current_per_page =
+    if defined?(@per_page) && @per_page.present?
+      @per_page.to_i
+    else
+      params[:per_page].to_i
+    end
+
+  current_per_page = 25 if current_per_page <= 0
+
+  current_page =
+    if params[:page].present?
+      params[:page].to_i
+    else
+      1
+    end
+
+  current_page = 1 if current_page < 1
+
+  # --------------------------------------------------------------------------
+  # AVAILABLE OPTIONS
+  # --------------------------------------------------------------------------
+
+  status_options = [
+    ["All statuses", ""],
+    ["Published", "published"],
+    ["Draft", "draft"],
+    ["Archived", "archived"]
+  ]
+
+  sort_options = [
+    ["Version", "version"],
+    ["Entity Template", "entity_template"],
+    ["Status", "status"],
+    ["Created", "created_at"],
+    ["Updated", "updated_at"]
+  ]
+
+  per_page_options = [
+    ["25 / page", 25],
+    ["50 / page", 50],
+    ["100 / page", 100],
+    ["250 / page", 250]
+  ]
+
+  # --------------------------------------------------------------------------
+  # FILTER STATE
+  # --------------------------------------------------------------------------
+
+  filters_active =
+    current_search.present? ||
+      current_status.present? ||
+      current_sort != "version" ||
+      current_direction != "desc" ||
+      current_per_page != 25
+
+  has_search =
+    current_search.present?
+
+  has_status =
+    current_status.present?
+
+  # --------------------------------------------------------------------------
+  # CLEAR FILTER URL
+  # --------------------------------------------------------------------------
+
+  clear_filters_url =
+    request.path +
+      "?" +
+      {
+        "page" => 1,
+        "per_page" => 25
+      }.to_query
+
+  # --------------------------------------------------------------------------
+  # CURRENT SORT LABEL
+  # --------------------------------------------------------------------------
+
+  current_sort_label =
+    sort_options
+      .find { |option| option[1].to_s == current_sort.to_s }
+      &.first ||
+      "Version"
+
+  current_direction_label =
+    current_direction == "asc" ? "Ascending" : "Descending"
+
+  # --------------------------------------------------------------------------
+  # QUERY SUMMARY
+  # --------------------------------------------------------------------------
+
+  active_filter_count = 0
+
+  active_filter_count += 1 if current_search.present?
+  active_filter_count += 1 if current_status.present?
+  active_filter_count += 1 if current_sort != "version"
+  active_filter_count += 1 if current_direction != "desc"
+  active_filter_count += 1 if current_per_page != 25
+%>
+
+<div
+  id="entity-template-version-search-form"
+  class="
+    overflow-hidden
+    rounded-2xl
+    border
+    border-gray-200
+    bg-white
+    shadow-sm
+    dark:border-gray-800
+    dark:bg-gray-800
+  "
+>
+  <%# =========================================================================
+  HEADER
+  ========================================================================= %>
+
+  <div
+    class="
+      border-b
+      border-gray-100
+      bg-gradient-to-r
+      from-violet-50
+      via-white
+      to-indigo-50
+      px-5
+      py-4
+      dark:border-gray-700
+      dark:from-violet-950/20
+      dark:via-gray-800
+      dark:to-indigo-950/20
+    "
+  >
+    <div
+      class="
+        flex
+        flex-col
+        gap-3
+        sm:flex-row
+        sm:items-center
+        sm:justify-between
+      "
+    >
+
+      <div class="flex items-start gap-3">
+
+        <div
+          class="
+            flex
+            h-10
+            w-10
+            shrink-0
+            items-center
+            justify-center
+            rounded-xl
+            bg-violet-100
+            text-lg
+            dark:bg-violet-900/40
+          "
+        >
+          🔎
+        </div>
+
+        <div>
+
+          <div
+            class="
+              text-[10px]
+              font-black
+              uppercase
+              tracking-[0.2em]
+              text-violet-500
+            "
+          >
+            Registry Query
+          </div>
+
+          <h3
+            class="
+              mt-0.5
+              text-sm
+              font-black
+              text-gray-900
+              dark:text-white
+            "
+          >
+            Search &amp; Filter Versions
+          </h3>
+
+          <p
+            class="
+              mt-1
+              text-xs
+              text-gray-500
+              dark:text-gray-400
+            "
+          >
+            Find versions by template, version number, ID or lifecycle state.
+          </p>
+
+        </div>
+
+      </div>
+
+      <% if filters_active %>
+
+        <div
+          class="
+            inline-flex
+            w-fit
+            items-center
+            gap-2
+            rounded-full
+            border
+            border-violet-200
+            bg-violet-50
+            px-3
+            py-1.5
+            text-[10px]
+            font-black
+            uppercase
+            tracking-wider
+            text-violet-600
+            dark:border-violet-800
+            dark:bg-violet-900/20
+            dark:text-violet-400
+          "
+        >
+          <span
+            class="
+              flex
+              h-5
+              min-w-5
+              items-center
+              justify-center
+              rounded-full
+              bg-violet-600
+              px-1
+              text-[9px]
+              font-black
+              text-white
+            "
+          >
+            <%= active_filter_count %>
+          </span>
+
+          Active
+          <%= active_filter_count == 1 ? "filter" : "filters" %>
+        </div>
+
+      <% else %>
+
+        <div
+          class="
+            inline-flex
+            w-fit
+            items-center
+            gap-2
+            rounded-full
+            border
+            border-gray-200
+            bg-white
+            px-3
+            py-1.5
+            text-[10px]
+            font-bold
+            uppercase
+            tracking-wider
+            text-gray-400
+            dark:border-gray-700
+            dark:bg-gray-800
+            dark:text-gray-500
+          "
+        >
+          All versions
+        </div>
+
+      <% end %>
+
+    </div>
+  </div>
+
+  <%# =========================================================================
+  FORM
+  ========================================================================= %>
+
+  <%= form_with(
+        url: admin_ecosystems_load_sources_entity_templates_entity_template_versions_path,
+        method: :get,
+        local: true,
+        class: "p-5",
+        data: {
+          entity_template_version_search_form: true
+        }
+      ) do %>
+
+    <%# -----------------------------------------------------------------------
+    PRIMARY SEARCH ROW
+    ------------------------------------------------------------------------ %>
+
+    <div class="flex flex-col gap-3 xl:flex-row">
+
+      <%# SEARCH INPUT %>
+
+      <div class="relative min-w-0 flex-1">
+
+        <label
+          for="entity-template-version-search"
+          class="
+            mb-1.5
+            block
+            text-[10px]
+            font-black
+            uppercase
+            tracking-wider
+            text-gray-400
+          "
+        >
+          Search
+        </label>
+
+        <div
+          class="
+            pointer-events-none
+            absolute
+            bottom-0
+            left-0
+            flex
+            h-[46px]
+            items-center
+            pl-4
+            text-gray-400
+          "
+        >
+          🔎
+        </div>
+
+        <%= search_field_tag(
+              :q,
+              current_search,
+              id: "entity-template-version-search",
+              placeholder:
+                "Search template name, version, ID, status...",
+              autocomplete: "off",
+              spellcheck: false,
+              class: "
+                w-full
+                rounded-xl
+                border
+                border-gray-200
+                bg-gray-50
+                py-3
+                pl-11
+                pr-12
+                text-sm
+                text-gray-900
+                outline-none
+                transition
+                placeholder:text-gray-400
+                hover:border-gray-300
+                focus:border-violet-400
+                focus:bg-white
+                focus:ring-2
+                focus:ring-violet-100
+                dark:border-gray-700
+                dark:bg-gray-900
+                dark:text-white
+                dark:placeholder:text-gray-500
+                dark:hover:border-gray-600
+                dark:focus:border-violet-600
+                dark:focus:bg-gray-900
+                dark:focus:ring-violet-900/30
+              "
+            ) %>
+
+        <% if current_search.present? %>
+
+          <button
+            type="button"
+            class="
+              absolute
+              bottom-0
+              right-0
+              flex
+              h-[46px]
+              w-11
+              items-center
+              justify-center
+              text-gray-400
+              transition
+              hover:text-gray-600
+              dark:hover:text-gray-200
+            "
+            aria-label="Clear search"
+            data-clear-version-search
+          >
+            ×
+          </button>
+
+        <% end %>
+
+      </div>
+
+      <%# STATUS %>
+
+      <div class="w-full xl:w-52">
+
+        <label
+          for="entity-template-version-status"
+          class="
+            mb-1.5
+            block
+            text-[10px]
+            font-black
+            uppercase
+            tracking-wider
+            text-gray-400
+          "
+        >
+          Status
+        </label>
+
+        <%= select_tag(
+              :status,
+              options_for_select(
+                status_options,
+                current_status
+              ),
+              id: "entity-template-version-status",
+              class: "
+                w-full
+                rounded-xl
+                border
+                border-gray-200
+                bg-gray-50
+                px-4
+                py-3
+                text-sm
+                font-medium
+                text-gray-700
+                outline-none
+                transition
+                hover:border-gray-300
+                focus:border-violet-400
+                focus:bg-white
+                focus:ring-2
+                focus:ring-violet-100
+                dark:border-gray-700
+                dark:bg-gray-900
+                dark:text-gray-300
+                dark:hover:border-gray-600
+                dark:focus:border-violet-600
+                dark:focus:bg-gray-900
+                dark:focus:ring-violet-900/30
+              "
+            ) %>
+
+      </div>
+
+      <%# PER PAGE %>
+
+      <div class="w-full xl:w-40">
+
+        <label
+          for="entity-template-version-per-page"
+          class="
+            mb-1.5
+            block
+            text-[10px]
+            font-black
+            uppercase
+            tracking-wider
+            text-gray-400
+          "
+        >
+          Records
+        </label>
+
+        <%= select_tag(
+              :per_page,
+              options_for_select(
+                per_page_options,
+                current_per_page
+              ),
+              id: "entity-template-version-per-page",
+              class: "
+                w-full
+                rounded-xl
+                border
+                border-gray-200
+                bg-gray-50
+                px-4
+                py-3
+                text-sm
+                font-medium
+                text-gray-700
+                outline-none
+                transition
+                hover:border-gray-300
+                focus:border-violet-400
+                focus:bg-white
+                focus:ring-2
+                focus:ring-violet-100
+                dark:border-gray-700
+                dark:bg-gray-900
+                dark:text-gray-300
+                dark:hover:border-gray-600
+                dark:focus:border-violet-600
+                dark:focus:bg-gray-900
+                dark:focus:ring-violet-900/30
+              "
+            ) %>
+
+      </div>
+
+      <%# APPLY BUTTON %>
+
+      <div class="w-full xl:w-auto">
+
+        <label
+          class="
+            mb-1.5
+            block
+            text-[10px]
+            font-black
+            uppercase
+            tracking-wider
+            text-transparent
+            select-none
+          "
+          aria-hidden="true"
+        >
+          Apply
+        </label>
+
+        <%= submit_tag(
+              "Apply",
+              name: "commit",
+              value: "Apply",
+              class: "
+                inline-flex
+                min-h-[46px]
+                w-full
+                items-center
+                justify-center
+                gap-2
+                rounded-xl
+                bg-violet-600
+                px-6
+                py-3
+                text-sm
+                font-semibold
+                text-white
+                shadow-sm
+                transition
+                hover:bg-violet-700
+                focus:outline-none
+                focus:ring-2
+                focus:ring-violet-500
+                focus:ring-offset-2
+                xl:w-auto
+              "
+            ) do %>
+        <% end %>
+
+      </div>
+
+    </div>
+
+    <%# -----------------------------------------------------------------------
+    ADVANCED SORTING
+    ------------------------------------------------------------------------ %>
+
+    <div
+      class="
+        mt-5
+        border-t
+        border-gray-100
+        pt-5
+        dark:border-gray-700
+      "
+    >
+
+      <div
+        class="
+          mb-3
+          flex
+          items-center
+          justify-between
+        "
+      >
+
+        <div>
+
+          <div
+            class="
+              text-[10px]
+              font-black
+              uppercase
+              tracking-[0.18em]
+              text-gray-400
+            "
+          >
+            Sorting
+          </div>
+
+          <div
+            class="
+              mt-0.5
+              text-xs
+              text-gray-400
+            "
+          >
+            Control the order of the version registry.
+          </div>
+
+        </div>
+
+        <div
+          class="
+            hidden
+            rounded-lg
+            bg-gray-50
+            px-2.5
+            py-1.5
+            text-[10px]
+            font-semibold
+            text-gray-400
+            sm:block
+            dark:bg-gray-900
+          "
+        >
+          <%= current_sort_label %>
+          ·
+          <%= current_direction_label %>
+        </div>
+
+      </div>
+
+      <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+
+        <%# SORT FIELD %>
+
+        <div>
+
+          <label
+            for="entity-template-version-sort"
+            class="
+              mb-1.5
+              block
+              text-xs
+              font-semibold
+              text-gray-600
+              dark:text-gray-300
+            "
+          >
+            Sort by
+          </label>
+
+          <%= select_tag(
+                :sort,
+                options_for_select(
+                  sort_options,
+                  current_sort
+                ),
+                id: "entity-template-version-sort",
+                class: "
+                  w-full
+                  rounded-xl
+                  border
+                  border-gray-200
+                  bg-gray-50
+                  px-4
+                  py-3
+                  text-sm
+                  font-medium
+                  text-gray-700
+                  outline-none
+                  transition
+                  hover:border-gray-300
+                  focus:border-violet-400
+                  focus:bg-white
+                  focus:ring-2
+                  focus:ring-violet-100
+                  dark:border-gray-700
+                  dark:bg-gray-900
+                  dark:text-gray-300
+                  dark:hover:border-gray-600
+                  dark:focus:border-violet-600
+                  dark:focus:bg-gray-900
+                  dark:focus:ring-violet-900/30
+                "
+              ) %>
+
+        </div>
+
+        <%# SORT DIRECTION %>
+
+        <div>
+
+          <label
+            for="entity-template-version-direction"
+            class="
+              mb-1.5
+              block
+              text-xs
+              font-semibold
+              text-gray-600
+              dark:text-gray-300
+            "
+          >
+            Direction
+          </label>
+
+          <%= select_tag(
+                :direction,
+                options_for_select(
+                  [
+                    ["Descending", "desc"],
+                    ["Ascending", "asc"]
+                  ],
+                  current_direction
+                ),
+                id: "entity-template-version-direction",
+                class: "
+                  w-full
+                  rounded-xl
+                  border
+                  border-gray-200
+                  bg-gray-50
+                  px-4
+                  py-3
+                  text-sm
+                  font-medium
+                  text-gray-700
+                  outline-none
+                  transition
+                  hover:border-gray-300
+                  focus:border-violet-400
+                  focus:bg-white
+                  focus:ring-2
+                  focus:ring-violet-100
+                  dark:border-gray-700
+                  dark:bg-gray-900
+                  dark:text-gray-300
+                  dark:hover:border-gray-600
+                  dark:focus:border-violet-600
+                  dark:focus:bg-gray-900
+                  dark:focus:ring-violet-900/30
+                "
+              ) %>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <%# -----------------------------------------------------------------------
+    ACTIVE FILTERS
+    ------------------------------------------------------------------------ %>
+
+    <% if filters_active %>
+
+      <div
+        class="
+          mt-5
+          rounded-xl
+          border
+          border-violet-100
+          bg-violet-50/70
+          p-4
+          dark:border-violet-900
+          dark:bg-violet-900/10
+        "
+      >
+
+        <div
+          class="
+            flex
+            flex-col
+            gap-3
+            sm:flex-row
+            sm:items-start
+            sm:justify-between
+          "
+        >
+
+          <div>
+
+            <div
+              class="
+                text-[10px]
+                font-black
+                uppercase
+                tracking-wider
+                text-violet-500
+              "
+            >
+              Active filters
+            </div>
+
+            <div
+              class="
+                mt-2
+                flex
+                flex-wrap
+                items-center
+                gap-2
+              "
+            >
+
+              <% if has_search %>
+
+                <span
+                  class="
+                    inline-flex
+                    max-w-full
+                    items-center
+                    gap-1.5
+                    rounded-full
+                    border
+                    border-violet-200
+                    bg-white
+                    px-3
+                    py-1.5
+                    text-xs
+                    font-semibold
+                    text-violet-600
+                    dark:border-violet-800
+                    dark:bg-gray-800
+                    dark:text-violet-400
+                  "
+                >
+                  <span class="text-violet-400">
+                    Search:
+                  </span>
+
+                  <span class="max-w-[260px] truncate font-black">
+                    <%= current_search %>
+                  </span>
+                </span>
+
+              <% end %>
+
+              <% if has_status %>
+
+                <span
+                  class="
+                    inline-flex
+                    items-center
+                    gap-1.5
+                    rounded-full
+                    border
+                    border-gray-200
+                    bg-white
+                    px-3
+                    py-1.5
+                    text-xs
+                    font-semibold
+                    text-gray-600
+                    dark:border-gray-700
+                    dark:bg-gray-800
+                    dark:text-gray-300
+                  "
+                >
+                  <span class="text-gray-400">
+                    Status:
+                  </span>
+
+                  <span class="font-black">
+                    <%= current_status.humanize %>
+                  </span>
+                </span>
+
+              <% end %>
+
+              <% if current_sort != "version" %>
+
+                <span
+                  class="
+                    inline-flex
+                    items-center
+                    gap-1.5
+                    rounded-full
+                    border
+                    border-indigo-200
+                    bg-white
+                    px-3
+                    py-1.5
+                    text-xs
+                    font-semibold
+                    text-indigo-600
+                    dark:border-indigo-800
+                    dark:bg-gray-800
+                    dark:text-indigo-400
+                  "
+                >
+                  <span class="text-indigo-400">
+                    Sort:
+                  </span>
+
+                  <span class="font-black">
+                    <%= current_sort_label %>
+                  </span>
+                </span>
+
+              <% end %>
+
+              <% if current_direction != "desc" %>
+
+                <span
+                  class="
+                    inline-flex
+                    items-center
+                    gap-1.5
+                    rounded-full
+                    border
+                    border-indigo-200
+                    bg-white
+                    px-3
+                    py-1.5
+                    text-xs
+                    font-semibold
+                    text-indigo-600
+                    dark:border-indigo-800
+                    dark:bg-gray-800
+                    dark:text-indigo-400
+                  "
+                >
+                  <span class="text-indigo-400">
+                    Direction:
+                  </span>
+
+                  <span class="font-black">
+                    Ascending
+                  </span>
+                </span>
+
+              <% end %>
+
+              <% if current_per_page != 25 %>
+
+                <span
+                  class="
+                    inline-flex
+                    items-center
+                    gap-1.5
+                    rounded-full
+                    border
+                    border-gray-200
+                    bg-white
+                    px-3
+                    py-1.5
+                    text-xs
+                    font-semibold
+                    text-gray-600
+                    dark:border-gray-700
+                    dark:bg-gray-800
+                    dark:text-gray-300
+                  "
+                >
+                  <span class="text-gray-400">
+                    Page size:
+                  </span>
+
+                  <span class="font-black">
+                    <%= current_per_page %>
+                  </span>
+                </span>
+
+              <% end %>
+
+            </div>
+
+          </div>
+
+          <%= link_to(
+                clear_filters_url,
+                class: "
+                  inline-flex
+                  shrink-0
+                  items-center
+                  justify-center
+                  gap-2
+                  rounded-lg
+                  border
+                  border-violet-200
+                  bg-white
+                  px-3
+                  py-2
+                  text-xs
+                  font-semibold
+                  text-violet-600
+                  shadow-sm
+                  transition
+                  hover:border-violet-300
+                  hover:bg-violet-50
+                  dark:border-violet-800
+                  dark:bg-gray-800
+                  dark:text-violet-400
+                  dark:hover:bg-violet-900/20
+                "
+              ) do %>
+            <span>↺</span>
+            Clear all
+          <% end %>
+
+        </div>
+
+      </div>
+
+    <% end %>
+
+    <%# -----------------------------------------------------------------------
+    HIDDEN / PAGINATION STATE
+    ------------------------------------------------------------------------ %>
+
+    <%= hidden_field_tag :page, 1 %>
+
+  <% end %>
+
+  <%# =========================================================================
+  SEARCH HELP
+  ========================================================================= %>
+
+  <div
+    class="
+      border-t
+      border-gray-100
+      bg-gray-50/60
+      px-5
+      py-3
+      dark:border-gray-700
+      dark:bg-gray-900/30
+    "
+  >
+
+    <div
+      class="
+        flex
+        flex-col
+        gap-2
+        sm:flex-row
+        sm:items-center
+        sm:justify-between
+      "
+    >
+
+      <div
+        class="
+          flex
+          items-center
+          gap-2
+          text-[10px]
+          text-gray-400
+        "
+      >
+        <span
+          class="
+            flex
+            h-5
+            w-5
+            items-center
+            justify-center
+            rounded-md
+            bg-gray-200
+            font-black
+            text-gray-500
+            dark:bg-gray-800
+            dark:text-gray-400
+          "
+        >
+          ?
+        </span>
+
+        <span>
+          Search supports template names, version numbers, record IDs and
+          status values.
+        </span>
+      </div>
+
+      <div
+        class="
+          flex
+          items-center
+          gap-2
+          text-[10px]
+          font-semibold
+          text-gray-400
+        "
+      >
+        <span>
+          Current:
+        </span>
+
+        <span class="font-black text-gray-600 dark:text-gray-300">
+          <%= current_sort_label %>
+        </span>
+
+        <span>·</span>
+
+        <span class="font-black text-gray-600 dark:text-gray-300">
+          <%= current_direction == "asc" ? "↑" : "↓" %>
+        </span>
+
+        <span>·</span>
+
+        <span class="font-black text-gray-600 dark:text-gray-300">
+          <%= current_per_page %>
+        </span>
+
+        <span>
+          / page
+        </span>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+    (() => {
+        const form =
+            document.getElementById(
+                "entity-template-version-search-form"
+            );
+
+        if (!form) {
+            return;
+        }
+
+        const searchInput =
+            form.querySelector(
+                "#entity-template-version-search"
+            );
+
+        const clearSearchButton =
+            form.querySelector(
+                "[data-clear-version-search]"
+            );
+
+        /*
+         * Clear the search field without immediately submitting.
+         *
+         * The user can then add another search term or press Apply.
+         */
+        if (clearSearchButton && searchInput) {
+            clearSearchButton.addEventListener(
+                "click",
+                () => {
+                    searchInput.value = "";
+                    searchInput.focus();
+                }
+            );
+        }
+
+        /*
+         * Pressing Escape inside the search field clears it.
+         */
+        if (searchInput) {
+            searchInput.addEventListener(
+                "keydown",
+                (event) => {
+                    if (
+                        event.key === "Escape" &&
+                        searchInput.value
+                    ) {
+                        searchInput.value = "";
+                        event.preventDefault();
+                    }
+                }
+            );
+        }
+
+        /*
+         * Changing the status or page size does not automatically submit.
+         *
+         * This keeps the form predictable and lets the user combine multiple
+         * filters before applying them.
+         */
+    })();
+</script>
