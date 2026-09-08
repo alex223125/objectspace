@@ -147,6 +147,18 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
         }
 
 
+  def latest_version
+    entity_template_versions.order(version: :desc).first
+  end
+
+  def published_version
+    entity_template_versions.published.order(version: :desc).first
+  end
+
+  def versions_count
+    entity_template_versions.count
+  end
+
   # ============================================================
   # SEARCHKICK DATA
   # ============================================================
@@ -277,17 +289,11 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
   # ============================================================
 
   def publish!
-
     transaction do
-
       entity_template
         .entity_template_versions
-        .where(
-          status: "published"
-        )
-        .where.not(
-        id: id
-      )
+        .where(status: "published")
+        .where.not(id: id)
         .update_all(
           status: "archived",
           updated_at: Time.current
@@ -297,10 +303,16 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
         status: "published",
         published_at: Time.current
       )
-
     end
+  rescue ActiveRecord::RecordNotUnique
+    errors.add(
+      :status,
+      "could not be published because another version was published concurrently"
+    )
 
+    raise ActiveRecord::RecordInvalid.new(self)
   end
+
 
 
   # ============================================================
@@ -327,17 +339,14 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
   # CLONE
   # ============================================================
 
-  def create_next_version!(created_by_id: nil)
-
+  def create_next_version!
     entity_template
       .entity_template_versions
       .create!(
         version: next_version_number,
         status: "draft",
-        definition: definition.deep_dup,
-        created_by_id: created_by_id
+        definition: definition.deep_dup
       )
-
   end
 
 

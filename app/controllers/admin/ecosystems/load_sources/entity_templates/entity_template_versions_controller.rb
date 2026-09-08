@@ -46,7 +46,8 @@ module Admin
                           :edit,
                           :update,
                           :destroy,
-                          :compare
+                          :compare,
+                          :clone
                         ]
 
           before_action :set_entity_template,
@@ -57,7 +58,8 @@ module Admin
                           :destroy,
                           :new,
                           :create,
-                          :compare
+                          :compare,
+                          :clone
                         ]
 
 
@@ -559,6 +561,46 @@ module Admin
               locals: {
                 content: content
               }
+            )
+
+          end
+
+          # ============================================================
+          # CLONE
+          # ============================================================
+
+          def clone
+
+            source_version =
+              @entity_template_version
+
+
+            cloned_version =
+              source_version.create_next_version!
+
+
+            redirect_to(
+              admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
+                cloned_version
+              ),
+              notice:
+                "Entity template version #{source_version.version} was successfully cloned as draft version #{cloned_version.version}."
+            )
+
+
+          rescue ActiveRecord::RecordInvalid => e
+
+            Rails.logger.error(
+              "[EntityTemplateVersion Clone] #{e.class}: #{e.message}"
+            )
+
+
+            redirect_to(
+              admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
+                source_version
+              ),
+              alert:
+                "Unable to clone entity template version: #{e.record.errors.full_messages.to_sentence}"
             )
 
           end
