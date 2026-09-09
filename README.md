@@ -43,6 +43,9 @@ npx @herb-tools/linter app/views/admin/ecosystems/load_sources/entity_templates/
 npx @herb-tools/formatter app/views/admin/ecosystems/load_sources/entity_templates/entity_template_versions/_pagination.html.erb
 
 
+npx @herb-tools/linter app/views/admin/ecosystems/load_sources/entity_templates/entity_template_fields/_form.html.erb --fix
+npx @herb-tools/formatter app/views/admin/ecosystems/load_sources/entity_templates/entity_template_fields/_form.html.erb
+
 npx @herb-tools/linter app/views/admin/ecosystems/load_sources/entity_templates/entity_template_versions/index.html.erb --fix
 npx @herb-tools/formatter app/views/admin/ecosystems/load_sources/entity_templates/entity_template_versions/index.html.erb
 
@@ -69,6 +72,8 @@ SECRET_KEY_BASE_DUMMY=1 bundle exec rails zeitwerk:check
 
 ## Erb not close tag correction
 bundle exec erb_lint --format compact --autocorrect app/views/algorithm/shared/partials/algorithm_version/_algorithm_version_fields.html.erb
+bundle exec erb_lint --format compact --autocorrect app/views/admin/ecosystems/load_sources/entity_templates/entity_template_versions/index.html.erb
+bundle exec erb_lint --format compact --autocorrect app/views/admin/ecosystems/load_sources/entity_templates/entity_template_fields/_form.html.erb
 
 
 # elsticsearch 

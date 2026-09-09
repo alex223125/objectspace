@@ -181,10 +181,29 @@ module Admin
           # ============================================================
 
           def edit
+            @entity_templates =
+              ::Ecosystems::LoadSources::EntityTemplates::EntityTemplate.order(:name)
 
             @version =
               @entity_template_version
 
+
+            content =
+              render_to_string(
+                template:
+                  "admin/ecosystems/load_sources/entity_templates/entity_template_versions/edit",
+                layout: false
+              )
+
+
+            render(
+              template:
+                "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
+              layout: false,
+              locals: {
+                content: content
+              }
+            )
           end
 
 
@@ -231,35 +250,68 @@ module Admin
           # UPDATE
           # ============================================================
 
+
           def update
+            permitted_params = entity_template_version_params
 
-            @version =
-              @entity_template_version
+            if permitted_params[:definition].present?
+              begin
+                permitted_params[:definition] = JSON.parse(permitted_params[:definition])
+              rescue JSON::ParserError => e
+                @entity_template_version.errors.add(
+                  :definition,
+                  "contains invalid JSON: #{e.message}"
+                )
 
+                load_entity_templates
 
-            if @version.update(
-              entity_template_version_params
-            )
+                content =
+                  render_to_string(
+                    template:
+                      "admin/ecosystems/load_sources/entity_templates/entity_template_versions/edit",
+                    layout: false
+                  )
 
-              redirect_to(
-                admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
-                  @version
-                ),
-                notice:
-                  "Entity template version was successfully updated."
-              )
-
-            else
-
-              render(
-                :edit,
-                status: :unprocessable_entity
-              )
-
+                return render(
+                  template:
+                    "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
+                  layout: false,
+                  locals: {
+                    content: content
+                  },
+                  status: :unprocessable_entity
+                )
+              end
             end
 
-          end
+            if @entity_template_version.update(permitted_params)
+              redirect_to(
+                admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
+                  @entity_template_version
+                ),
+                notice: "Template version updated."
+              )
+            else
+              load_entity_templates
 
+              content =
+                render_to_string(
+                  template:
+                    "admin/ecosystems/load_sources/entity_templates/entity_template_versions/edit",
+                  layout: false
+                )
+
+              render(
+                template:
+                  "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
+                layout: false,
+                locals: {
+                  content: content
+                },
+                status: :unprocessable_entity
+              )
+            end
+          end
 
           # ============================================================
           # DESTROY
@@ -1701,7 +1753,7 @@ module Admin
 
             params
               .require(
-                :entity_template_version
+                :ecosystems_load_sources_entity_templates_entity_template_version
               )
               .permit(
                 :version,

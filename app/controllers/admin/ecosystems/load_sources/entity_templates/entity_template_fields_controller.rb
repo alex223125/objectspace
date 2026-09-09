@@ -24,6 +24,23 @@ module Admin
         .new(
           position: @entity_template_version.entity_template_fields.maximum(:position).to_i + 1
         )
+
+    content =
+      render_to_string(
+        template:
+          "admin/ecosystems/load_sources/entity_templates/entity_template_fields/new",
+        layout: false
+      )
+
+
+    render(
+      template:
+        "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
+      layout: false,
+      locals: {
+        content: content
+      }
+    )
   end
 
   def create
@@ -33,7 +50,9 @@ module Admin
         .new(entity_template_field_params)
 
     if @entity_template_field.save
-      redirect_to entity_template_version_path(@entity_template_version),
+      redirect_to admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
+                    @entity_template_version
+                  ),
                   notice: "Template field created."
     else
       render :new, status: :unprocessable_entity
@@ -41,11 +60,29 @@ module Admin
   end
 
   def edit
+    content =
+      render_to_string(
+        template:
+          "admin/ecosystems/load_sources/entity_templates/entity_template_fields/edit",
+        layout: false
+      )
+
+
+    render(
+      template:
+        "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
+      layout: false,
+      locals: {
+        content: content
+      }
+    )
   end
 
   def update
     if @entity_template_field.update(entity_template_field_params)
-      redirect_to entity_template_version_path(@entity_template_version),
+      redirect_to admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
+                    @entity_template_version
+                  ),
                   notice: "Template field updated."
     else
       render :edit, status: :unprocessable_entity
@@ -55,7 +92,9 @@ module Admin
   def destroy
     @entity_template_field.destroy
 
-    redirect_to entity_template_version_path(@entity_template_version),
+    redirect_to admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
+                  @entity_template_version
+                ),
                 notice: "Template field removed."
   end
 
@@ -63,7 +102,7 @@ module Admin
 
   def set_entity_template_version
     @entity_template_version =
-      Ecosystems::LoadSources::EntityTemplateVersion.find(
+      ::Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion.find(
         params[:entity_template_version_id]
       )
   end
@@ -76,18 +115,22 @@ module Admin
   end
 
   def entity_template_field_params
-    params.require(:entity_template_field).permit(
-      :name,
-      :slug,
-      :label,
-      :description,
-      :field_type,
-      :required,
-      :multiple,
-      :position,
-      :active,
-      settings: {}
-    )
+    params
+      .require(
+        :ecosystems_load_sources_entity_templates_entity_template_field
+      )
+      .permit(
+        :name,
+        :slug,
+        :label,
+        :description,
+        :field_type,
+        :required,
+        :multiple,
+        :position,
+        :active,
+        settings: {}
+      )
   end
         end
       end

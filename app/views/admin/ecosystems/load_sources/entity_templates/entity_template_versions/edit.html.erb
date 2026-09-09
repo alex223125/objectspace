@@ -12,113 +12,106 @@ This page edits the version's definition JSON.
 Published versions should ideally be protected at the model/controller level.
 ============================================================================ %>
 
-<div class=" mx-auto w-full max-w-6xl px-5 py-8 sm:px-7 lg:px-10 ">
+<div class="mx-auto w-full max-w-6xl px-5 py-8 sm:px-7 lg:px-10">
 <%# ================================================================ %>
 <%# HEADER %>
 <%# ================================================================ %>
 
-  <div class="mb-8">
-    <div class="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+  <div class="mb-8"> <div class="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+    <div>
 
-      <div>
+      <div class="flex items-center gap-3">
 
-        <div class="flex items-center gap-3">
-
-          <div
-            class="
-          flex
-          h-12
-          w-12
-          shrink-0
-          items-center
-          justify-center
-          rounded-xl
-          bg-orange-100
-          text-2xl
-          shadow-sm
-        ">
-            ✏️
-          </div>
-
-          <div>
-
-            <div
-              class="
-            text-xs
-            font-black
-            uppercase
-            tracking-[0.18em]
-            text-orange-500
-          ">
-              Entity Template Version
-            </div>
-
-            <h1
-              class="
-            mt-1
-            text-3xl
-            font-black
-            tracking-tight
-            text-gray-900
-            dark:text-white
-          ">
-              Edit Draft
-            </h1>
-
-            <p
-              class="
-            mt-1
-            text-sm
-            text-gray-500
-            dark:text-gray-400
-          ">
-              Modify the structure definition of this template version.
-            </p>
-
-          </div>
-
+        <div class="
+        flex
+        h-12
+        w-12
+        shrink-0
+        items-center
+        justify-center
+        rounded-xl
+        bg-orange-100
+        text-2xl
+        shadow-sm
+      ">
+          ✏️
         </div>
 
-        <%# BREADCRUMB %>
+        <div>
 
-        <div
-          class="
-        mt-4
-        flex
-        flex-wrap
-        items-center
-        gap-2
-        text-xs
-        text-gray-400
-      ">
+          <div class="
+          text-xs
+          font-black
+          uppercase
+          tracking-[0.18em]
+          text-orange-500
+        ">
+            Entity Template Version
+          </div>
 
-          <span>Ecosystems</span>
-          <span>›</span>
+          <h1 class="
+          mt-1
+          text-3xl
+          font-black
+          tracking-tight
+          text-gray-900
+          dark:text-white
+        ">
+            Edit Draft
+          </h1>
 
-          <span>Load Sources</span>
-          <span>›</span>
-
-          <span>Entity Templates</span>
-          <span>›</span>
-
-          <span>Versions</span>
-          <span>›</span>
-
-          <span class="font-medium text-orange-500">
-        Edit
-      </span>
+          <p class="
+          mt-1
+          text-sm
+          text-gray-500
+          dark:text-gray-400
+        ">
+            Modify the structure definition of this template version.
+          </p>
 
         </div>
 
       </div>
 
-      <%# BACK %>
+      <%# BREADCRUMB %>
 
-      <%= link_to(
-            admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
-              @entity_template_version
-            ),
-            class: "
+      <div class="
+      mt-4
+      flex
+      flex-wrap
+      items-center
+      gap-2
+      text-xs
+      text-gray-400
+    ">
+
+        <span>Ecosystems</span>
+        <span>›</span>
+
+        <span>Load Sources</span>
+        <span>›</span>
+
+        <span>Entity Templates</span>
+        <span>›</span>
+
+        <span>Versions</span>
+        <span>›</span>
+
+        <span class="font-medium text-orange-500">
+        Edit
+      </span>
+
+      </div>
+
+    </div>
+
+    <%# BACK %>
+
+    <%= link_to(
+          admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
+            @entity_template_version
+          ),
+          class: "
           inline-flex
           shrink-0
           items-center
@@ -141,14 +134,14 @@ Published versions should ideally be protected at the model/controller level.
           dark:bg-gray-800
           dark:text-gray-200
         "
-          ) do %>
+        ) do %>
 
-        <span>←</span>
-        Cancel
+      <span>←</span>
+      Cancel
 
-      <% end %>
+    <% end %>
 
-    </div>
+  </div>
 
   </div>
 <%# ================================================================ %>
@@ -158,43 +151,40 @@ Published versions should ideally be protected at the model/controller level.
   <div class=" mb-8 rounded-2xl border-2 border-orange-100 bg-gradient-to-r from-orange-50 via-white to-amber-50 p-5 shadow-sm shadow-orange-100/40 ">
     <div class="flex items-start gap-4">
 
-      <div
-        class="
-      flex
-      h-11
-      w-11
-      shrink-0
-      items-center
-      justify-center
-      rounded-xl
-      border
-      border-orange-200
-      bg-orange-100
-      text-xl
-    ">
+      <div class="
+    flex
+    h-11
+    w-11
+    shrink-0
+    items-center
+    justify-center
+    rounded-xl
+    border
+    border-orange-200
+    bg-orange-100
+    text-xl
+  ">
         🛠️
       </div>
 
       <div class="min-w-0">
 
-        <div
-          class="
-        text-[11px]
-        font-black
-        uppercase
-        tracking-[0.16em]
-        text-orange-600
-      ">
+        <div class="
+      text-[11px]
+      font-black
+      uppercase
+      tracking-[0.16em]
+      text-orange-600
+    ">
           Draft Workspace
         </div>
 
-        <p
-          class="
-        mt-1
-        text-sm
-        leading-6
-        text-gray-600
-      ">
+        <p class="
+      mt-1
+      text-sm
+      leading-6
+      text-gray-600
+    ">
           You are editing the definition of
           <strong class="font-black text-gray-800">
             Version #<%= @entity_template_version.id %>
@@ -215,32 +205,29 @@ Published versions should ideally be protected at the model/controller level.
 <%# ================================================================ %>
 
   <%= form_with(
-        model: [
-          :admin,
-          :ecosystems,
-          :load_sources,
-          :entity_templates,
+        model: @entity_template_version,
+        url: admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
           @entity_template_version
-        ],
+        ),
+        method: :patch,
         local: true
       ) do |form| %>
 
 <%# ==============================================================
-     ERRORS
+    ERRORS
 =============================================================== %>
 
     <% if @entity_template_version.errors.any? %>
 
-      <div
-        class="
-      mb-8
-      rounded-2xl
-      border-2
-      border-red-100
-      bg-red-50
-      p-5
-      text-red-700
-    ">
+      <div class="
+    mb-8
+    rounded-2xl
+    border-2
+    border-red-100
+    bg-red-50
+    p-5
+    text-red-700
+  ">
 
         <div class="font-black">
           Unable to save this version.
@@ -265,33 +252,31 @@ Published versions should ideally be protected at the model/controller level.
     <div class="grid grid-cols-1 gap-8 lg:grid-cols-12">
 
       <%# ============================================================
-       LEFT COLUMN
+      LEFT COLUMN
   ============================================================= %>
 
       <div class="lg:col-span-4">
 
         <%# TEMPLATE %>
 
-        <div
-          class="
-        rounded-2xl
-        border
-        border-gray-200
-        bg-white
-        p-6
-        shadow-sm
-        dark:border-gray-800
-        dark:bg-gray-800
-      ">
+        <div class="
+      rounded-2xl
+      border
+      border-gray-200
+      bg-white
+      p-6
+      shadow-sm
+      dark:border-gray-800
+      dark:bg-gray-800
+    ">
 
-          <div
-            class="
-          text-[11px]
-          font-black
-          uppercase
-          tracking-[0.16em]
-          text-gray-400
-        ">
+          <div class="
+        text-[11px]
+        font-black
+        uppercase
+        tracking-[0.16em]
+        text-gray-400
+      ">
             Template
           </div>
 
@@ -311,73 +296,71 @@ Published versions should ideally be protected at the model/controller level.
 
             <%= form.collection_select(
                   :entity_template_id,
-                  @entity_templates,
+                  @entity_templates || [],
                   :id,
                   :name,
-                  {},
+                  {
+                    selected: @entity_template_version.entity_template_id
+                  },
                   class: "
-                mt-2
-                block
-                w-full
-                rounded-xl
-                border
-                border-gray-300
-                bg-gray-50
-                px-4
-                py-3
-                text-sm
-                text-gray-900
-                focus:border-orange-500
-                focus:outline-none
-                focus:ring-2
-                focus:ring-orange-500
-                dark:border-gray-700
-                dark:bg-gray-900
-                dark:text-white
-              "
+        mt-2
+        block
+        w-full
+        rounded-xl
+        border
+        border-gray-300
+        bg-gray-50
+        px-4
+        py-3
+        text-sm
+        text-gray-900
+        focus:border-orange-500
+        focus:outline-none
+        focus:ring-2
+        focus:ring-orange-500
+        dark:border-gray-700
+        dark:bg-gray-900
+        dark:text-white
+      "
                 ) %>
 
           </div>
 
-          <div
-            class="
-          mt-5
-          rounded-xl
-          border
-          border-indigo-100
-          bg-indigo-50
-          p-4
-        ">
+          <div class="
+        mt-5
+        rounded-xl
+        border
+        border-indigo-100
+        bg-indigo-50
+        p-4
+      ">
 
-            <div
-              class="
-            text-[10px]
-            font-black
-            uppercase
-            tracking-wider
-            text-indigo-500
-          ">
+            <div class="
+          text-[10px]
+          font-black
+          uppercase
+          tracking-wider
+          text-indigo-500
+        ">
               Version Identity
             </div>
 
-            <div
-              class="
-            mt-2
-            font-mono
-            text-sm
-            font-bold
-            text-indigo-700
-          ">
+            <div class="
+          mt-2
+          font-mono
+          text-sm
+          font-bold
+          text-indigo-700
+        ">
               #<%= @entity_template_version.id %>
             </div>
 
-            <p
-              class="
-            mt-2
-            text-xs
-            leading-5
-            text-gray-500
-          ">
+            <p class="
+          mt-2
+          text-xs
+          leading-5
+          text-gray-500
+        ">
               This identifier remains attached to this version even when
               the definition changes.
             </p>
@@ -388,56 +371,52 @@ Published versions should ideally be protected at the model/controller level.
 
         <%# EDITING RULES %>
 
-        <div
-          class="
-        mt-5
-        rounded-2xl
-        border-2
-        border-amber-100
-        bg-gradient-to-br
-        from-amber-50
-        via-white
-        to-orange-50
-        p-6
-      ">
+        <div class="
+      mt-5
+      rounded-2xl
+      border-2
+      border-amber-100
+      bg-gradient-to-br
+      from-amber-50
+      via-white
+      to-orange-50
+      p-6
+    ">
 
           <div class="flex items-start gap-3">
 
-            <div
-              class="
-            flex
-            h-10
-            w-10
-            shrink-0
-            items-center
-            justify-center
-            rounded-xl
-            bg-amber-100
-            text-lg
-          ">
+            <div class="
+          flex
+          h-10
+          w-10
+          shrink-0
+          items-center
+          justify-center
+          rounded-xl
+          bg-amber-100
+          text-lg
+        ">
               ⚠️
             </div>
 
             <div>
 
-              <div
-                class="
-              text-[11px]
-              font-black
-              uppercase
-              tracking-wider
-              text-amber-600
-            ">
+              <div class="
+            text-[11px]
+            font-black
+            uppercase
+            tracking-wider
+            text-amber-600
+          ">
                 Field Rule
               </div>
 
-              <p
-                class="
-              mt-2
-              text-sm
-              leading-6
-              text-gray-600
-            ">
+              <p class="
+            mt-2
+            text-sm
+            leading-6
+            text-gray-600
+          ">
                 Keep the definition valid JSON. Every field should describe
                 a meaningful part of the entity structure.
               </p>
@@ -451,88 +430,82 @@ Published versions should ideally be protected at the model/controller level.
       </div>
 
       <%# ============================================================
-       RIGHT COLUMN — DEFINITION
+      RIGHT COLUMN — DEFINITION
   ============================================================= %>
 
       <div class="lg:col-span-8">
 
-        <div
-          class="
-        overflow-hidden
-        rounded-2xl
-        border
-        border-gray-200
-        bg-white
-        shadow-sm
-        dark:border-gray-800
-        dark:bg-gray-800
-      ">
+        <div class="
+      overflow-hidden
+      rounded-2xl
+      border
+      border-gray-200
+      bg-white
+      shadow-sm
+      dark:border-gray-800
+      dark:bg-gray-800
+    ">
 
           <%# HEADER %>
 
-          <div
-            class="
-          border-b
-          border-gray-100
-          bg-gray-50
-          px-6
-          py-5
-          dark:border-gray-700
-          dark:bg-gray-900/50
-        ">
+          <div class="
+        border-b
+        border-gray-100
+        bg-gray-50
+        px-6
+        py-5
+        dark:border-gray-700
+        dark:bg-gray-900/50
+      ">
 
             <div class="flex items-start justify-between gap-4">
 
               <div>
 
-                <div
-                  class="
-                text-[11px]
-                font-black
-                uppercase
-                tracking-[0.16em]
-                text-violet-500
-              ">
+                <div class="
+              text-[11px]
+              font-black
+              uppercase
+              tracking-[0.16em]
+              text-violet-500
+            ">
                   Structure Definition
                 </div>
 
-                <h2
-                  class="
-                mt-1
-                text-lg
-                font-black
-                text-gray-900
-                dark:text-white
-              ">
+                <h2 class="
+              mt-1
+              text-lg
+              font-black
+              text-gray-900
+              dark:text-white
+            ">
                   Template Definition
                 </h2>
 
-                <p
-                  class="
-                mt-1
-                text-sm
-                text-gray-500
-                dark:text-gray-400
-              ">
+                <p class="
+              mt-1
+              text-sm
+              text-gray-500
+              dark:text-gray-400
+            ">
                   Define the fields and structure used by this version.
                 </p>
 
               </div>
 
-              <div
-                class="
-              rounded-full
-              border
-              border-violet-200
-              bg-violet-50
-              px-3
-              py-1.5
-              text-[10px]
-              font-black
-              uppercase
-              tracking-wider
-              text-violet-600
-            ">
+              <div class="
+            rounded-full
+            border
+            border-violet-200
+            bg-violet-50
+            px-3
+            py-1.5
+            text-[10px]
+            font-black
+            uppercase
+            tracking-wider
+            text-violet-600
+          ">
                 JSON
               </div>
 
@@ -586,15 +559,14 @@ Published versions should ideally be protected at the model/controller level.
               "
                 ) %>
 
-            <div
-              class="
-            mt-4
-            rounded-xl
-            border
-            border-cyan-100
-            bg-cyan-50
-            p-4
-          ">
+            <div class="
+          mt-4
+          rounded-xl
+          border
+          border-cyan-100
+          bg-cyan-50
+          p-4
+        ">
 
               <div class="flex items-start gap-3">
 
@@ -604,29 +576,27 @@ Published versions should ideally be protected at the model/controller level.
 
                 <div>
 
-                  <div
-                    class="
-                  text-[11px]
-                  font-black
-                  uppercase
-                  tracking-wider
-                  text-cyan-600
-                ">
+                  <div class="
+                text-[11px]
+                font-black
+                uppercase
+                tracking-wider
+                text-cyan-600
+              ">
                     Example Structure
                   </div>
 
-                  <pre
-                    class="
-                  mt-3
-                  overflow-x-auto
-                  rounded-lg
-                  bg-white
-                  p-4
-                  font-mono
-                  text-xs
-                  leading-5
-                  text-gray-600
-                ">{
+                  <pre class="
+                mt-3
+                overflow-x-auto
+                rounded-lg
+                bg-white
+                p-4
+                font-mono
+                text-xs
+                leading-5
+                text-gray-600
+              ">{
 
 "fields": [
 {
@@ -652,22 +622,21 @@ Published versions should ideally be protected at the model/controller level.
 
           <%# ACTIONS %>
 
-          <div
-            class="
-          flex
-          flex-col
-          gap-3
-          border-t
-          border-gray-100
-          bg-gray-50
-          px-6
-          py-5
-          sm:flex-row
-          sm:items-center
-          sm:justify-between
-          dark:border-gray-700
-          dark:bg-gray-900/50
-        ">
+          <div class="
+        flex
+        flex-col
+        gap-3
+        border-t
+        border-gray-100
+        bg-gray-50
+        px-6
+        py-5
+        sm:flex-row
+        sm:items-center
+        sm:justify-between
+        dark:border-gray-700
+        dark:bg-gray-900/50
+      ">
 
             <%= link_to(
                   "Cancel",
@@ -735,42 +704,38 @@ Published versions should ideally be protected at the model/controller level.
 <%# ================================================================ %>
 
   <div class=" mt-8 flex flex-col gap-3 border-t-2 border-gray-100 pt-5 sm:flex-row sm:items-center sm:justify-between ">
-    <div
-      class="
-    font-mono
-    text-[10px]
-    font-bold
-    uppercase
-    tracking-wider
-    text-gray-400
-  ">
+    <div class="
+  font-mono
+  text-[10px]
+  font-bold
+  uppercase
+  tracking-wider
+  text-gray-400
+">
       ENTITY_TEMPLATE :: VERSION_EDITOR :: ONLINE
     </div>
 
-    <div
-      class="
-    flex
-    items-center
-    gap-2
-    text-[10px]
-    font-black
-    uppercase
-    tracking-wider
-    text-orange-500
-  ">
+    <div class="
+  flex
+  items-center
+  gap-2
+  text-[10px]
+  font-black
+  uppercase
+  tracking-wider
+  text-orange-500
+">
 
-  <span
-    class="
-      h-2
-      w-2
-      rounded-full
-      bg-orange-400
-      shadow-[0_0_8px_rgba(251,146,60,0.6)]
-    "></span>
+  <span class="
+    h-2
+    w-2
+    rounded-full
+    bg-orange-400
+    shadow-[0_0_8px_rgba(251,146,60,0.6)]
+  "></span>
 
       Draft modification mode
 
     </div>
 
-  </div>
-</div>
+  </div> </div>

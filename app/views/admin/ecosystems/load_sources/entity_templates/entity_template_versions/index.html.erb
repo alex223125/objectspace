@@ -44,7 +44,6 @@ page
 ============================================================================ %>
 
 <%
-
   # ==========================================================================
   # SAFE DEFAULTS
   # ==========================================================================
@@ -91,7 +90,6 @@ page
         0
     end
 
-
   # ==========================================================================
   # CURRENT FILTER / SORT STATE
   # ==========================================================================
@@ -123,7 +121,6 @@ page
     else
       params[:direction].presence || "desc"
     end
-
 
   # ==========================================================================
   # PAGINATION STATE
@@ -161,7 +158,6 @@ page
   current_page =
     [current_page, total_pages].min
 
-
   # ==========================================================================
   # URL HELPERS
   # ==========================================================================
@@ -169,13 +165,11 @@ page
   base_query =
     request.query_parameters.except("page")
 
-
   sort_direction =
     current_direction == "asc" ? "desc" : "asc"
 
   sort_indicator =
     current_direction == "asc" ? "↑" : "↓"
-
 
   sort_url =
     lambda do |column|
@@ -196,7 +190,6 @@ page
 
     end
 
-
   status_url =
     lambda do |status|
 
@@ -213,7 +206,6 @@ page
         query.to_query
 
     end
-
 
   clear_filters_url =
     request.path +
@@ -294,7 +286,6 @@ page
       end
 
     end
-
 %>
 
 
@@ -307,8 +298,7 @@ page
     py-6
     sm:px-6
     lg:px-8
-  "
->
+  ">
 
 
   <%# =========================================================================
@@ -325,8 +315,7 @@ page
         xl:flex-row
         xl:items-center
         xl:justify-between
-      "
-    >
+      ">
 
       <div class="min-w-0">
 
@@ -345,8 +334,7 @@ page
               text-2xl
               shadow-sm
               dark:bg-violet-900/40
-            "
-          >
+            ">
             🧬
           </div>
 
@@ -361,8 +349,7 @@ page
                 text-gray-900
                 sm:text-3xl
                 dark:text-white
-              "
-            >
+              ">
               Entity Template Versions
             </h1>
 
@@ -373,8 +360,7 @@ page
                 text-sm
                 text-gray-500
                 dark:text-gray-400
-              "
-            >
+              ">
               Search, inspect, filter and manage the version history of your
               entity templates.
             </p>
@@ -395,8 +381,7 @@ page
             gap-2
             text-xs
             text-gray-400
-          "
-        >
+          ">
 
           <span>Encyclopedia</span>
           <span>›</span>
@@ -514,8 +499,7 @@ page
       dark:from-violet-950/30
       dark:via-gray-900
       dark:to-indigo-950/30
-    "
-  >
+    ">
 
     <div class="relative p-6 sm:p-8">
 
@@ -531,8 +515,7 @@ page
           bg-violet-200/30
           blur-3xl
           dark:bg-violet-500/10
-        "
-      ></div>
+        "></div>
 
       <div
         class="
@@ -546,8 +529,7 @@ page
           bg-indigo-200/30
           blur-3xl
           dark:bg-indigo-500/10
-        "
-      ></div>
+        "></div>
 
 
       <div class="relative">
@@ -570,8 +552,7 @@ page
               shadow-sm
               dark:border-violet-800
               dark:bg-violet-900/40
-            "
-          >
+            ">
             📜
           </div>
 
@@ -585,8 +566,7 @@ page
                 uppercase
                 tracking-[0.2em]
                 text-violet-500
-              "
-            >
+              ">
               Version Control Protocol
             </div>
 
@@ -597,8 +577,7 @@ page
                 font-black
                 text-gray-900
                 dark:text-white
-              "
-            >
+              ">
               Immutable template evolution
             </h2>
 
@@ -610,8 +589,7 @@ page
                 leading-6
                 text-gray-500
                 dark:text-gray-400
-              "
-            >
+              ">
               Every version represents a preserved structural snapshot.
               Published versions can be used by runtime systems while older
               versions remain available for historical compatibility,
@@ -636,8 +614,7 @@ page
               p-4
               dark:border-gray-700
               dark:bg-gray-800
-            "
-          >
+            ">
 
             <div class="text-xl">
               🧱
@@ -650,8 +627,7 @@ page
                 font-black
                 text-gray-800
                 dark:text-white
-              "
-            >
+              ">
               Template
             </div>
 
@@ -672,8 +648,7 @@ page
               shadow-sm
               dark:border-violet-800
               dark:bg-violet-900/20
-            "
-          >
+            ">
 
             <div class="text-xl">
               🧬
@@ -686,8 +661,7 @@ page
                 font-black
                 text-violet-700
                 dark:text-violet-300
-              "
-            >
+              ">
               Version
             </div>
 
@@ -707,8 +681,7 @@ page
               p-4
               dark:border-emerald-800
               dark:bg-emerald-900/20
-            "
-          >
+            ">
 
             <div class="text-xl">
               🚀
@@ -721,8 +694,7 @@ page
                 font-black
                 text-emerald-700
                 dark:text-emerald-300
-              "
-            >
+              ">
               Published
             </div>
 
@@ -747,8 +719,7 @@ page
             p-4
             dark:border-amber-800
             dark:bg-amber-900/20
-          "
-        >
+          ">
 
           <div class="flex items-start gap-3">
 
@@ -762,8 +733,7 @@ page
                 leading-6
                 text-amber-700
                 dark:text-amber-300
-              "
-            >
+              ">
 
               <strong class="font-black">
                 Golden rule:
@@ -809,8 +779,7 @@ page
       dark:text-violet-300
     "
     role="status"
-    aria-live="polite"
-  >
+    aria-live="polite">
 
     <div class="flex items-center gap-3">
 
@@ -827,8 +796,7 @@ page
           text-violet-600
           dark:bg-violet-900/40
           dark:text-violet-300
-        "
-      >
+        ">
         ✓
       </div>
 
@@ -867,8 +835,7 @@ page
       outline-none
       sm:grid-cols-2
       xl:grid-cols-4
-    "
-  >
+    ">
 
 
     <%# TOTAL %>
@@ -903,8 +870,7 @@ page
               uppercase
               tracking-wider
               text-gray-400
-            "
-          >
+            ">
             Total Versions
           </div>
 
@@ -915,8 +881,7 @@ page
               font-black
               text-gray-900
               dark:text-white
-            "
-          >
+            ">
             <%= number_with_delimiter(total_versions) %>
           </div>
 
@@ -938,8 +903,7 @@ page
             bg-violet-100
             text-lg
             dark:bg-violet-900/30
-          "
-        >
+          ">
           🧬
         </div>
 
@@ -979,8 +943,7 @@ page
               uppercase
               tracking-wider
               text-emerald-500
-            "
-          >
+            ">
             Published
           </div>
 
@@ -1006,8 +969,7 @@ page
             bg-emerald-100
             text-lg
             dark:bg-emerald-900/40
-          "
-        >
+          ">
           ✓
         </div>
 
@@ -1047,8 +1009,7 @@ page
               uppercase
               tracking-wider
               text-amber-500
-            "
-          >
+            ">
             Drafts
           </div>
 
@@ -1074,8 +1035,7 @@ page
             bg-amber-100
             text-lg
             dark:bg-amber-900/40
-          "
-        >
+          ">
           ◐
         </div>
 
@@ -1115,8 +1075,7 @@ page
               uppercase
               tracking-wider
               text-gray-400
-            "
-          >
+            ">
             Archived
           </div>
 
@@ -1127,8 +1086,7 @@ page
               font-black
               text-gray-600
               dark:text-gray-300
-            "
-          >
+            ">
             <%= number_with_delimiter(archived_versions) %>
           </div>
 
@@ -1150,8 +1108,7 @@ page
             bg-gray-200
             text-lg
             dark:bg-gray-800
-          "
-        >
+          ">
           ◌
         </div>
 
@@ -1204,8 +1161,7 @@ page
         sm:flex-row
         sm:items-end
         sm:justify-between
-      "
-    >
+      ">
 
       <div>
 
@@ -1216,8 +1172,7 @@ page
             uppercase
             tracking-[0.2em]
             text-gray-400
-          "
-        >
+          ">
           Template Archives
         </div>
 
@@ -1228,8 +1183,7 @@ page
             font-black
             text-gray-900
             dark:text-white
-          "
-        >
+          ">
           Version Registry
         </h2>
 
@@ -1253,8 +1207,7 @@ page
             dark:border-gray-700
             dark:bg-gray-800
             dark:text-gray-400
-          "
-        >
+          ">
 
           <% if total_versions.to_i > 0 %>
 
@@ -1301,8 +1254,7 @@ page
             dark:border-violet-800
             dark:bg-violet-900/20
             dark:text-violet-400
-          "
-        >
+          ">
           <%= per_page %> / page
         </div>
 
@@ -1329,8 +1281,7 @@ page
         shadow-sm
         dark:border-gray-800
         dark:bg-gray-800
-      "
-    >
+      ">
 
       <div class="overflow-x-auto">
 
@@ -1347,8 +1298,7 @@ page
               bg-gray-50
               dark:border-gray-700
               dark:bg-gray-900/60
-            "
-          >
+            ">
 
           <tr>
 
@@ -1469,8 +1419,7 @@ page
                     uppercase
                     tracking-wider
                     text-gray-500
-                  "
-                >
+                  ">
                   Structure
                 </span>
 
@@ -1523,8 +1472,7 @@ page
                     uppercase
                     tracking-wider
                     text-gray-500
-                  "
-                >
+                  ">
                   Actions
                 </span>
 
@@ -1544,13 +1492,11 @@ page
               divide-y
               divide-gray-100
               dark:divide-gray-700
-            "
-          >
+            ">
 
           <% versions.each do |version| %>
 
             <%
-
               badge =
                 status_badge.call(version)
 
@@ -1587,7 +1533,6 @@ page
                 else
                   nil
                 end
-
             %>
 
 
@@ -1597,8 +1542,7 @@ page
                   transition
                   hover:bg-violet-50/40
                   dark:hover:bg-violet-950/10
-                "
-            >
+                ">
 
 
               <%# ==========================================================
@@ -1624,8 +1568,7 @@ page
                         text-violet-700
                         dark:bg-violet-900/30
                         dark:text-violet-300
-                      "
-                  >
+                      ">
                     <%= version_number %>
                   </div>
 
@@ -1638,8 +1581,7 @@ page
                           font-black
                           text-gray-900
                           dark:text-white
-                        "
-                    >
+                        ">
                       v<%= version_number %>
                     </div>
 
@@ -1649,8 +1591,7 @@ page
                           font-mono
                           text-[10px]
                           text-gray-400
-                        "
-                    >
+                        ">
                       ID #<%= version.id %>
                     </div>
 
@@ -1677,8 +1618,7 @@ page
                         text-gray-900
                         dark:text-white
                       "
-                    title="<%= template.name %>"
-                  >
+                    title="<%= template.name %>">
                     <%= template.name %>
                   </div>
 
@@ -1691,8 +1631,7 @@ page
                           font-mono
                           text-[10px]
                           text-gray-400
-                        "
-                    >
+                        ">
                       Template #<%= template.id %>
                     </div>
 
@@ -1705,8 +1644,7 @@ page
                         text-sm
                         font-semibold
                         text-gray-400
-                      "
-                  >
+                      ">
                     Unknown Template
                   </div>
 
@@ -1732,8 +1670,7 @@ page
                       text-xs
                       font-bold
                       <%= badge[:classes] %>
-                    "
-                  >
+                    ">
 
                     <span>
                       <%= badge[:icon] %>
@@ -1752,8 +1689,7 @@ page
                         mt-1.5
                         text-[10px]
                         text-gray-400
-                      "
-                  >
+                      ">
                     Published
                     <%= time_ago_in_words(version.published_at) %>
                     ago
@@ -1782,8 +1718,7 @@ page
                             font-black
                             text-gray-800
                             dark:text-gray-200
-                          "
-                      >
+                          ">
                         <%= number_with_delimiter(section_count) %>
                       </div>
 
@@ -1793,8 +1728,7 @@ page
                             uppercase
                             tracking-wider
                             text-gray-400
-                          "
-                      >
+                          ">
                         sections
                       </div>
 
@@ -1813,8 +1747,7 @@ page
                             font-black
                             text-gray-800
                             dark:text-gray-200
-                          "
-                      >
+                          ">
                         <%= number_with_delimiter(field_count) %>
                       </div>
 
@@ -1824,8 +1757,7 @@ page
                             uppercase
                             tracking-wider
                             text-gray-400
-                          "
-                      >
+                          ">
                         fields
                       </div>
 
@@ -1863,8 +1795,7 @@ page
                         font-semibold
                         text-gray-700
                         dark:text-gray-300
-                      "
-                  >
+                      ">
                     <%= version.created_at.strftime("%b %-d, %Y") %>
                   </div>
 
@@ -1873,8 +1804,7 @@ page
                         mt-0.5
                         text-[10px]
                         text-gray-400
-                      "
-                  >
+                      ">
                     <%= time_ago_in_words(version.created_at) %>
                     ago
                   </div>
@@ -1902,8 +1832,7 @@ page
                       items-center
                       justify-end
                       gap-2
-                    "
-                >
+                    ">
 
                   <%= link_to(
                         admin_ecosystems_load_sources_entity_templates_entity_template_version_path(version),
@@ -2018,8 +1947,7 @@ page
         shadow-sm
         dark:border-gray-700
         dark:bg-gray-800
-      "
-    >
+      ">
 
       <div
         class="
@@ -2037,8 +1965,7 @@ page
           text-4xl
           dark:border-violet-800
           dark:bg-violet-900/20
-        "
-      >
+        ">
         🧬
       </div>
 
@@ -2051,8 +1978,7 @@ page
             font-black
             text-gray-900
             dark:text-white
-          "
-        >
+          ">
           No matching versions
         </h3>
 
@@ -2066,8 +1992,7 @@ page
             leading-6
             text-gray-500
             dark:text-gray-400
-          "
-        >
+          ">
           No entity template versions match the current search and filter
           criteria. Try changing the search or clearing the filters.
         </p>
@@ -2103,8 +2028,7 @@ page
             font-black
             text-gray-900
             dark:text-white
-          "
-        >
+          ">
           No template versions exist yet
         </h3>
 
@@ -2118,8 +2042,7 @@ page
             leading-6
             text-gray-500
             dark:text-gray-400
-          "
-        >
+          ">
           A template version is a preserved snapshot of an Entity Template.
           Create the first version when you are ready to establish the
           initial structure that your entities will use.
@@ -2179,8 +2102,7 @@ page
       dark:bg-violet-900/20
     "
     data-version-registry-loading
-    aria-live="polite"
-  >
+    aria-live="polite">
 
     <div class="flex items-center gap-3">
 
@@ -2193,8 +2115,7 @@ page
           border-2
           border-violet-200
           border-t-violet-600
-        "
-      ></div>
+        "></div>
 
 
       <div>
@@ -2206,8 +2127,7 @@ page
             text-violet-700
             dark:text-violet-300
           "
-          data-version-registry-loading-message
-        >
+          data-version-registry-loading-message>
           Loading more records…
         </div>
 
@@ -2217,8 +2137,7 @@ page
             text-[10px]
             text-violet-500
             dark:text-violet-400
-          "
-        >
+          ">
           Please keep this page open while the registry updates.
         </div>
 
@@ -2246,8 +2165,7 @@ page
       sm:items-center
       sm:justify-between
       dark:border-gray-800
-    "
-  >
+    ">
 
     <div
       class="
@@ -2257,8 +2175,7 @@ page
         uppercase
         tracking-wider
         text-gray-400
-      "
-    >
+      ">
       ENTITY_PROTOCOL :: TEMPLATE_VERSION_LAYER :: ONLINE
     </div>
 
@@ -2273,8 +2190,7 @@ page
         uppercase
         tracking-wider
         text-emerald-500
-      "
-    >
+      ">
 
       <span
         class="
@@ -2283,8 +2199,7 @@ page
           rounded-full
           bg-emerald-400
           shadow-[0_0_8px_rgba(52,211,153,0.6)]
-        "
-      ></span>
+        "></span>
 
       Version registry operational
 
