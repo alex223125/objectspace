@@ -15,6 +15,22 @@ module Admin
       @entity_template_version
         .entity_template_fields
         .ordered
+
+    content =
+      render_to_string(
+        template:
+          "admin/ecosystems/load_sources/entity_templates/entity_template_fields/index",
+        layout: false
+      )
+
+    render(
+      template:
+        "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
+      layout: false,
+      locals: {
+        content: content
+      }
+    )
   end
 
   def new
@@ -85,7 +101,22 @@ module Admin
                   ),
                   notice: "Template field updated."
     else
-      render :edit, status: :unprocessable_entity
+      content =
+        render_to_string(
+          template:
+            "admin/ecosystems/load_sources/entity_templates/entity_template_fields/edit",
+          layout: false
+        )
+
+      render(
+        template:
+          "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
+        layout: false,
+        status: :unprocessable_entity,
+        locals: {
+          content: content
+        }
+      )
     end
   end
 

@@ -75,6 +75,8 @@ bundle exec erb_lint --format compact --autocorrect app/views/algorithm/shared/p
 bundle exec erb_lint --format compact --autocorrect app/views/admin/ecosystems/load_sources/entity_templates/entity_template_versions/index.html.erb
 bundle exec erb_lint --format compact --autocorrect app/views/admin/ecosystems/load_sources/entity_templates/entity_template_fields/_form.html.erb
 
+bundle exec erb_lint --format compact --autocorrect app/views/admin/ecosystems/load_sources/entity_templates/entity_template_fields/index.html.erb
+
 
 # elsticsearch 
 In case of this error:
