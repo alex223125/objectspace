@@ -103,26 +103,167 @@
         ENTITY TEMPLATE FIELDS
     ================================================================= %>
 
+<%# ================================================================
+ENTITY TEMPLATE FIELDS
+================================================================= %>
+
     <% if defined?(@entity_template_version) && @entity_template_version&.persisted? %>
 
-      <%= link_to(
-            admin_ecosystems_load_sources_entity_templates_entity_template_version_entity_template_fields_path(
-              @entity_template_version
-            ),
-            class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium
-                    text-gray-700 transition hover:bg-indigo-50 hover:text-indigo-600
-                    dark:text-gray-300 dark:hover:bg-indigo-900/20
-                    dark:hover:text-indigo-400"
-          ) do %>
+      <div class="mt-3 rounded-2xl border border-indigo-100 bg-indigo-50/50 p-2 dark:border-indigo-900/50 dark:bg-indigo-950/20">
+<%# VERSION CONTEXT %>
 
-        <span>🧱</span>
+        <div class="mb-2 px-3 pt-2">
 
-        <span>
-          Fields
-        </span>
+          <div class="flex items-center gap-2">
 
-      <% end %>
+    <span
+      class="flex h-6 w-6 items-center justify-center rounded-lg
+             bg-indigo-100 text-xs
+             dark:bg-indigo-900/50">
+      🧬
+    </span>
 
+            <div class="min-w-0 flex-1">
+
+              <div
+                class="truncate text-[10px] font-black uppercase
+               tracking-[0.15em] text-indigo-500
+               dark:text-indigo-400">
+                Current Version
+              </div>
+
+              <div
+                class="mt-0.5 truncate text-xs font-black
+               text-gray-700 dark:text-gray-200">
+                <%= @entity_template_version.entity_template.name %>
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="mt-2 flex flex-wrap items-center gap-2">
+
+    <span
+      class="rounded-full border border-indigo-200
+             bg-white px-2 py-1
+             text-[9px] font-black uppercase
+             tracking-wider text-indigo-600
+             dark:border-indigo-800
+             dark:bg-gray-900
+             dark:text-indigo-400">
+      v<%= @entity_template_version.version %>
+    </span>
+
+            <span
+              class="rounded-full border border-slate-200
+             bg-white px-2 py-1
+             font-mono text-[9px] font-bold
+             text-slate-400
+             dark:border-gray-700
+             dark:bg-gray-900
+             dark:text-gray-500">
+      ID #<%= @entity_template_version.id %>
+    </span>
+
+            <% if @entity_template_version.respond_to?(:status) && @entity_template_version.status.present? %>
+      <span
+        class="rounded-full border border-emerald-200
+               bg-emerald-50 px-2 py-1
+               text-[9px] font-black uppercase
+               tracking-wider text-emerald-600
+               dark:border-emerald-800
+               dark:bg-emerald-950/30
+               dark:text-emerald-400">
+        <%= @entity_template_version.status.to_s.titleize %>
+      </span>
+            <% end %>
+
+          </div>
+
+        </div>
+
+
+<%# FIELDS NAVIGATION %>
+
+        <%= link_to(
+              admin_ecosystems_load_sources_entity_templates_entity_template_version_entity_template_fields_path(
+                @entity_template_version
+              ),
+              class: "group relative flex items-center gap-3
+              rounded-xl px-3 py-3
+              text-sm font-medium
+              transition-all duration-200
+              hover:bg-white hover:shadow-sm
+              dark:hover:bg-gray-900"
+            ) do %>
+
+          <%# ACTIVE INDICATOR %>
+
+          <span
+            class="absolute left-0 top-1/2 h-7 w-1
+           -translate-y-1/2 rounded-r-full
+           bg-gradient-to-b from-indigo-400 to-violet-500
+           opacity-70
+           transition group-hover:h-9 group-hover:opacity-100">
+  </span>
+
+
+          <%# ICON %>
+
+          <span
+            class="flex h-9 w-9 shrink-0 items-center justify-center
+           rounded-xl border border-orange-100
+           bg-gradient-to-br from-orange-50 to-amber-50
+           text-lg shadow-sm
+           transition group-hover:scale-105
+           dark:border-orange-900/40
+           dark:from-orange-950/40
+           dark:to-amber-950/30">
+    🧱
+  </span>
+
+
+          <%# LABEL %>
+
+          <span class="min-w-0 flex-1">
+
+    <span
+      class="block text-xs font-black
+             text-gray-700
+             group-hover:text-indigo-600
+             dark:text-gray-200
+             dark:group-hover:text-indigo-400">
+      Fields
+    </span>
+
+    <span
+      class="mt-0.5 block truncate
+             text-[10px] font-medium
+             text-gray-400
+             dark:text-gray-500">
+      Fields for v<%= @entity_template_version.version %>
+    </span>
+
+  </span>
+
+
+          <%# FIELD COUNT %>
+
+          <span
+            class="rounded-full border border-orange-200
+           bg-orange-50 px-2 py-1
+           text-[9px] font-black
+           text-orange-600
+           dark:border-orange-800
+           dark:bg-orange-950/30
+           dark:text-orange-400">
+    <%= @entity_template_version.entity_template_fields.count %>
+  </span>
+
+        <% end %>
+
+      </div>
     <% end %>
 
 
