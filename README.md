@@ -109,6 +109,9 @@ Ecosystems::LoadSources::EntityTypes::EntityType.reindex
 
 bin/rails runner "Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion.reindex"
 
+bundle exec rails runner "Ecosystems::LoadSources::Entity::Entity.reindex"
+
+
 
 
 # to redo slugs

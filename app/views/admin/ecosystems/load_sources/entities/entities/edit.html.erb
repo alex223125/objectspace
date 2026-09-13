@@ -1,0 +1,1344 @@
+<%# ============================================================================
+ENTITY — EDIT
+
+Path:
+app/views/admin/ecosystems/load_sources/entities/entities/edit.html.erb
+
+Purpose:
+Administrative editor for an Entity.
+
+Expected controller variable:
+@entity
+
+Route:
+GET /admin/ecosystems/load_sources/entities/:id/edit
+
+Supported actions:
+PATCH /admin/ecosystems/load_sources/entities/:id
+
+============================================================================ %>
+
+<%
+  # ==========================================================================
+  # SAFE DEFAULTS
+  # ==========================================================================
+
+  entity =
+    @entity
+
+  entities_path =
+    admin_ecosystems_load_sources_entities_path
+
+  entity_path =
+    admin_ecosystems_load_sources_entity_path(entity)
+
+
+  # ==========================================================================
+  # SAFE ENTITY VALUES
+  # ==========================================================================
+
+  entity_id =
+    entity.respond_to?(:id) ? entity.id : nil
+
+  entity_name =
+    if entity.respond_to?(:name) && entity.name.present?
+      entity.name
+    elsif entity.respond_to?(:title) && entity.title.present?
+      entity.title
+    else
+      "Entity ##{entity_id}"
+    end
+
+
+  entity_status =
+    if entity.respond_to?(:status) && entity.status.present?
+      entity.status.to_s
+    else
+      "draft"
+    end
+
+
+  template =
+    if entity.respond_to?(:entity_template)
+      entity.entity_template
+    end
+
+
+  template_version =
+    if entity.respond_to?(:entity_template_version)
+      entity.entity_template_version
+    elsif entity.respond_to?(:template_version)
+      entity.template_version
+    end
+
+
+  template_name =
+    if template.present? && template.respond_to?(:name)
+      template.name
+    else
+      nil
+    end
+
+
+  version_number =
+    if template_version.present? &&
+      template_version.respond_to?(:version)
+      template_version.version
+    else
+      nil
+    end
+
+
+  # ==========================================================================
+  # STATUS STYLE
+  # ==========================================================================
+
+  status_classes =
+    case entity_status.to_s
+
+    when "published"
+
+      "bg-emerald-100 text-emerald-700
+       dark:bg-emerald-900/30 dark:text-emerald-400"
+
+    when "draft"
+
+      "bg-amber-100 text-amber-700
+       dark:bg-amber-900/30 dark:text-amber-400"
+
+    when "archived"
+
+      "bg-gray-100 text-gray-600
+       dark:bg-gray-900 dark:text-gray-400"
+
+    when "deprecated"
+
+      "bg-rose-100 text-rose-700
+       dark:bg-rose-900/30 dark:text-rose-400"
+
+    else
+
+      "bg-gray-100 text-gray-600
+       dark:bg-gray-900 dark:text-gray-400"
+
+    end
+
+
+  # ==========================================================================
+  # STATUS ICON
+  # ==========================================================================
+
+  status_icon =
+    case entity_status.to_s
+    when "published"
+      "✓"
+    when "draft"
+      "◐"
+    when "archived"
+      "◌"
+    when "deprecated"
+      "!"
+    else
+      "?"
+    end
+%>
+
+
+<div
+  class="
+    mx-auto
+    w-full
+    max-w-[1600px]
+    px-4
+    py-6
+    sm:px-6
+    lg:px-8
+  ">
+
+
+  <%# =========================================================================
+  HEADER
+  ========================================================================= %>
+
+  <div class="mb-8">
+
+    <div
+      class="
+        flex
+        flex-col
+        gap-5
+        xl:flex-row
+        xl:items-center
+        xl:justify-between
+      ">
+
+      <div class="min-w-0">
+
+        <div class="flex items-center gap-4">
+
+          <div
+            class="
+              flex
+              h-14
+              w-14
+              shrink-0
+              items-center
+              justify-center
+              rounded-2xl
+              bg-indigo-100
+              text-2xl
+              shadow-sm
+              dark:bg-indigo-900/40
+            ">
+            🧩
+          </div>
+
+
+          <div class="min-w-0">
+
+            <h1
+              class="
+                text-2xl
+                font-black
+                tracking-tight
+                text-gray-900
+                sm:text-3xl
+                dark:text-white
+              ">
+              Edit Entity
+            </h1>
+
+            <p
+              class="
+                mt-1
+                max-w-3xl
+                text-sm
+                text-gray-500
+                dark:text-gray-400
+              ">
+              Update the entity while preserving its template and version
+              context.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <%# BREADCRUMB %>
+
+        <div
+          class="
+            mt-4
+            flex
+            flex-wrap
+            items-center
+            gap-2
+            text-xs
+            text-gray-400
+          ">
+
+          <span>Encyclopedia</span>
+          <span>›</span>
+
+          <span>Ecosystems</span>
+          <span>›</span>
+
+          <span>Load Sources</span>
+          <span>›</span>
+
+          <span>Entities</span>
+          <span>›</span>
+
+          <span class="font-semibold text-indigo-500">
+            Edit
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <%# HEADER ACTIONS %>
+
+      <div class="flex shrink-0 flex-wrap items-center gap-2">
+
+        <%= link_to(
+              entities_path,
+              class: "
+                inline-flex
+                items-center
+                justify-center
+                gap-2
+                rounded-xl
+                border
+                border-gray-200
+                bg-white
+                px-4
+                py-3
+                text-sm
+                font-semibold
+                text-gray-700
+                shadow-sm
+                transition
+                hover:border-indigo-200
+                hover:text-indigo-600
+                dark:border-gray-700
+                dark:bg-gray-800
+                dark:text-gray-300
+              "
+            ) do %>
+
+          <span>←</span>
+          Back to Entities
+
+        <% end %>
+
+
+        <%= link_to(
+              entity_path,
+              class: "
+                inline-flex
+                items-center
+                justify-center
+                gap-2
+                rounded-xl
+                bg-indigo-600
+                px-5
+                py-3
+                text-sm
+                font-semibold
+                text-white
+                shadow-sm
+                transition
+                hover:bg-indigo-700
+                focus:outline-none
+                focus:ring-2
+                focus:ring-indigo-500
+                focus:ring-offset-2
+              "
+            ) do %>
+
+          <span>👁</span>
+          View Entity
+
+        <% end %>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <%# =========================================================================
+  ENTITY CONTEXT CARD
+  ========================================================================= %>
+
+  <div
+    class="
+      mb-8
+      overflow-hidden
+      rounded-2xl
+      border-2
+      border-indigo-100
+      bg-gradient-to-br
+      from-indigo-50
+      via-white
+      to-violet-50
+      shadow-sm
+      dark:border-indigo-900/40
+      dark:from-indigo-950/30
+      dark:via-gray-900
+      dark:to-violet-950/30
+    ">
+
+    <div class="relative p-6 sm:p-8">
+
+      <div
+        class="
+          pointer-events-none
+          absolute
+          -right-16
+          -top-16
+          h-48
+          w-48
+          rounded-full
+          bg-indigo-200/30
+          blur-3xl
+          dark:bg-indigo-500/10
+        "></div>
+
+
+      <div class="relative">
+
+        <div
+          class="
+            flex
+            flex-col
+            gap-5
+            lg:flex-row
+            lg:items-center
+            lg:justify-between
+          ">
+
+
+          <div class="flex min-w-0 items-start gap-4">
+
+            <div
+              class="
+                flex
+                h-12
+                w-12
+                shrink-0
+                items-center
+                justify-center
+                rounded-2xl
+                border
+                border-indigo-200
+                bg-indigo-100
+                text-xl
+                shadow-sm
+                dark:border-indigo-800
+                dark:bg-indigo-900/40
+              ">
+              🧩
+            </div>
+
+
+            <div class="min-w-0">
+
+              <div
+                class="
+                  text-[11px]
+                  font-black
+                  uppercase
+                  tracking-[0.2em]
+                  text-indigo-500
+                ">
+                Entity Record
+              </div>
+
+              <div
+                class="
+                  mt-1
+                  truncate
+                  text-xl
+                  font-black
+                  text-gray-900
+                  dark:text-white
+                "
+                title="<%= entity_name %>">
+
+                <%= entity_name %>
+
+              </div>
+
+
+              <% if entity_id.present? %>
+
+                <div
+                  class="
+                    mt-1
+                    font-mono
+                    text-[10px]
+                    text-gray-400
+                  ">
+                  Entity #<%= entity_id %>
+                </div>
+
+              <% end %>
+
+            </div>
+
+          </div>
+
+
+          <div class="flex flex-wrap items-center gap-2">
+
+            <span
+              class="
+                inline-flex
+                items-center
+                gap-1.5
+                rounded-full
+                px-3
+                py-1.5
+                text-xs
+                font-bold
+                <%= status_classes %>
+              ">
+
+              <span>
+                <%= status_icon %>
+              </span>
+
+              <%= entity_status.to_s.humanize %>
+
+            </span>
+
+
+            <% if template_name.present? %>
+
+              <span
+                class="
+                  rounded-full
+                  border
+                  border-indigo-200
+                  bg-white
+                  px-3
+                  py-1.5
+                  text-xs
+                  font-bold
+                  text-indigo-600
+                  dark:border-indigo-800
+                  dark:bg-gray-900
+                  dark:text-indigo-400
+                ">
+
+                <%= template_name %>
+
+              </span>
+
+            <% end %>
+
+
+            <% if version_number.present? %>
+
+              <span
+                class="
+                  rounded-full
+                  border
+                  border-violet-200
+                  bg-violet-50
+                  px-3
+                  py-1.5
+                  text-xs
+                  font-black
+                  text-violet-600
+                  dark:border-violet-800
+                  dark:bg-violet-900/20
+                  dark:text-violet-400
+                ">
+
+                v<%= version_number %>
+
+              </span>
+
+            <% end %>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <%# =========================================================================
+  MAIN FORM
+  ========================================================================= %>
+
+  <%= form_with(
+        model: entity,
+        url: entity_path,
+        method: :patch,
+        local: true,
+        class: "space-y-8"
+      ) do |form| %>
+
+
+    <%# =======================================================================
+    VALIDATION ERRORS
+    ======================================================================== %>
+
+    <% if entity.respond_to?(:errors) && entity.errors.any? %>
+
+      <div
+        class="
+          rounded-2xl
+          border-2
+          border-rose-200
+          bg-rose-50
+          p-5
+          shadow-sm
+          dark:border-rose-900
+          dark:bg-rose-950/20
+        "
+        role="alert">
+
+        <div class="flex items-start gap-3">
+
+          <div
+            class="
+              flex
+              h-10
+              w-10
+              shrink-0
+              items-center
+              justify-center
+              rounded-xl
+              bg-rose-100
+              text-rose-600
+              dark:bg-rose-900/40
+              dark:text-rose-400
+            ">
+            !
+          </div>
+
+
+          <div class="min-w-0">
+
+            <div
+              class="
+                text-sm
+                font-black
+                text-rose-800
+                dark:text-rose-300
+              ">
+              Unable to save entity
+            </div>
+
+
+            <ul
+              class="
+                mt-2
+                space-y-1
+                text-xs
+                text-rose-600
+                dark:text-rose-400
+              ">
+
+              <% entity.errors.full_messages.each do |message| %>
+
+                <li>
+                  • <%= message %>
+                </li>
+
+              <% end %>
+
+            </ul>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    <% end %>
+
+
+    <%# =======================================================================
+    IDENTITY
+    ======================================================================== %>
+
+    <div
+      class="
+        overflow-hidden
+        rounded-2xl
+        border
+        border-gray-200
+        bg-white
+        shadow-sm
+        dark:border-gray-800
+        dark:bg-gray-800
+      ">
+
+      <div
+        class="
+          border-b
+          border-gray-100
+          bg-gray-50
+          px-6
+          py-5
+          dark:border-gray-700
+          dark:bg-gray-900/50
+        ">
+
+        <div class="flex items-center gap-3">
+
+          <div
+            class="
+              flex
+              h-10
+              w-10
+              items-center
+              justify-center
+              rounded-xl
+              bg-indigo-100
+              text-lg
+              dark:bg-indigo-900/40
+            ">
+            🪪
+          </div>
+
+          <div>
+
+            <h2
+              class="
+                text-sm
+                font-black
+                text-gray-900
+                dark:text-white
+              ">
+              Entity Identity
+            </h2>
+
+            <p
+              class="
+                mt-0.5
+                text-xs
+                text-gray-400
+              ">
+              Core identifying information for this entity.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="grid grid-cols-1 gap-6 p-6 lg:grid-cols-2">
+
+
+        <%# NAME %>
+
+        <% if entity.respond_to?(:name) %>
+
+          <div>
+
+            <%= form.label(
+                  :name,
+                  "Name",
+                  class: "
+                    mb-2
+                    block
+                    text-xs
+                    font-black
+                    uppercase
+                    tracking-wider
+                    text-gray-500
+                    dark:text-gray-400
+                  "
+                ) %>
+
+            <%= form.text_field(
+                  :name,
+                  class: "
+                    block
+                    w-full
+                    rounded-xl
+                    border
+                    border-gray-200
+                    bg-white
+                    px-4
+                    py-3
+                    text-sm
+                    font-medium
+                    text-gray-900
+                    shadow-sm
+                    outline-none
+                    transition
+                    placeholder:text-gray-400
+                    focus:border-indigo-400
+                    focus:ring-2
+                    focus:ring-indigo-100
+                    dark:border-gray-700
+                    dark:bg-gray-900
+                    dark:text-white
+                    dark:focus:border-indigo-500
+                    dark:focus:ring-indigo-900/40
+                  ",
+                  placeholder: "Enter entity name"
+                ) %>
+
+          </div>
+
+        <% end %>
+
+
+        <%# TITLE %>
+
+        <% if entity.respond_to?(:title) %>
+
+          <div>
+
+            <%= form.label(
+                  :title,
+                  "Title",
+                  class: "
+                    mb-2
+                    block
+                    text-xs
+                    font-black
+                    uppercase
+                    tracking-wider
+                    text-gray-500
+                    dark:text-gray-400
+                  "
+                ) %>
+
+            <%= form.text_field(
+                  :title,
+                  class: "
+                    block
+                    w-full
+                    rounded-xl
+                    border
+                    border-gray-200
+                    bg-white
+                    px-4
+                    py-3
+                    text-sm
+                    font-medium
+                    text-gray-900
+                    shadow-sm
+                    outline-none
+                    transition
+                    placeholder:text-gray-400
+                    focus:border-indigo-400
+                    focus:ring-2
+                    focus:ring-indigo-100
+                    dark:border-gray-700
+                    dark:bg-gray-900
+                    dark:text-white
+                    dark:focus:border-indigo-500
+                    dark:focus:ring-indigo-900/40
+                  ",
+                  placeholder: "Enter entity title"
+                ) %>
+
+          </div>
+
+        <% end %>
+
+
+        <%# SLUG %>
+
+        <% if entity.respond_to?(:slug) %>
+
+          <div>
+
+            <%= form.label(
+                  :slug,
+                  "Slug",
+                  class: "
+                    mb-2
+                    block
+                    text-xs
+                    font-black
+                    uppercase
+                    tracking-wider
+                    text-gray-500
+                    dark:text-gray-400
+                  "
+                ) %>
+
+            <%= form.text_field(
+                  :slug,
+                  class: "
+                    block
+                    w-full
+                    rounded-xl
+                    border
+                    border-gray-200
+                    bg-gray-50
+                    px-4
+                    py-3
+                    font-mono
+                    text-sm
+                    text-gray-700
+                    shadow-sm
+                    outline-none
+                    transition
+                    focus:border-indigo-400
+                    focus:ring-2
+                    focus:ring-indigo-100
+                    dark:border-gray-700
+                    dark:bg-gray-900
+                    dark:text-gray-300
+                  ",
+                  placeholder: "entity-slug"
+                ) %>
+
+          </div>
+
+        <% end %>
+
+
+        <%# STATUS %>
+
+        <% if entity.respond_to?(:status) %>
+
+          <div>
+
+            <%= form.label(
+                  :status,
+                  "Status",
+                  class: "
+                    mb-2
+                    block
+                    text-xs
+                    font-black
+                    uppercase
+                    tracking-wider
+                    text-gray-500
+                    dark:text-gray-400
+                  "
+                ) %>
+
+            <%= form.select(
+                  :status,
+                  options_for_select(
+                    [
+                      ["Draft", "draft"],
+                      ["Published", "published"],
+                      ["Archived", "archived"],
+                      ["Deprecated", "deprecated"]
+                    ],
+                    entity.status.to_s
+                  ),
+                  {},
+                  class: "
+                    block
+                    w-full
+                    rounded-xl
+                    border
+                    border-gray-200
+                    bg-white
+                    px-4
+                    py-3
+                    text-sm
+                    font-semibold
+                    text-gray-900
+                    shadow-sm
+                    outline-none
+                    transition
+                    focus:border-indigo-400
+                    focus:ring-2
+                    focus:ring-indigo-100
+                    dark:border-gray-700
+                    dark:bg-gray-900
+                    dark:text-white
+                  "
+                ) %>
+
+          </div>
+
+        <% end %>
+
+      </div>
+
+    </div>
+
+
+    <%# =======================================================================
+    DESCRIPTION
+    ======================================================================== %>
+
+    <% if entity.respond_to?(:description) %>
+
+      <div
+        class="
+          overflow-hidden
+          rounded-2xl
+          border
+          border-gray-200
+          bg-white
+          shadow-sm
+          dark:border-gray-800
+          dark:bg-gray-800
+        ">
+
+        <div
+          class="
+            border-b
+            border-gray-100
+            bg-gray-50
+            px-6
+            py-5
+            dark:border-gray-700
+            dark:bg-gray-900/50
+          ">
+
+          <div class="flex items-center gap-3">
+
+            <div
+              class="
+                flex
+                h-10
+                w-10
+                items-center
+                justify-center
+                rounded-xl
+                bg-violet-100
+                text-lg
+                dark:bg-violet-900/40
+              ">
+              📝
+            </div>
+
+            <div>
+
+              <h2
+                class="
+                  text-sm
+                  font-black
+                  text-gray-900
+                  dark:text-white
+                ">
+                Description
+              </h2>
+
+              <p
+                class="
+                  mt-0.5
+                  text-xs
+                  text-gray-400
+                ">
+                Describe the purpose and meaning of this entity.
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="p-6">
+
+          <%= form.text_area(
+                :description,
+                rows: 6,
+                class: "
+                  block
+                  w-full
+                  rounded-xl
+                  border
+                  border-gray-200
+                  bg-white
+                  px-4
+                  py-3
+                  text-sm
+                  leading-6
+                  text-gray-900
+                  shadow-sm
+                  outline-none
+                  transition
+                  placeholder:text-gray-400
+                  focus:border-indigo-400
+                  focus:ring-2
+                  focus:ring-indigo-100
+                  dark:border-gray-700
+                  dark:bg-gray-900
+                  dark:text-white
+                  dark:focus:border-indigo-500
+                  dark:focus:ring-indigo-900/40
+                ",
+                placeholder: "Describe this entity..."
+              ) %>
+
+        </div>
+
+      </div>
+
+    <% end %>
+
+
+    <%# =======================================================================
+    TEMPLATE CONTEXT
+    ======================================================================== %>
+
+    <div
+      class="
+        overflow-hidden
+        rounded-2xl
+        border
+        border-violet-200
+        bg-violet-50/50
+        shadow-sm
+        dark:border-violet-900/50
+        dark:bg-violet-950/20
+      ">
+
+      <div class="p-6">
+
+        <div class="flex items-start gap-4">
+
+          <div
+            class="
+              flex
+              h-11
+              w-11
+              shrink-0
+              items-center
+              justify-center
+              rounded-xl
+              bg-violet-100
+              text-lg
+              dark:bg-violet-900/40
+            ">
+            🧬
+          </div>
+
+
+          <div class="min-w-0 flex-1">
+
+            <div
+              class="
+                text-[10px]
+                font-black
+                uppercase
+                tracking-[0.2em]
+                text-violet-500
+              ">
+              Template Context
+            </div>
+
+            <div
+              class="
+                mt-1
+                text-sm
+                font-black
+                text-gray-900
+                dark:text-white
+              ">
+              <%= template_name.presence || "No template assigned" %>
+            </div>
+
+
+            <% if version_number.present? %>
+
+              <div
+                class="
+                  mt-1
+                  text-xs
+                  text-gray-500
+                  dark:text-gray-400
+                ">
+                Entity structure version:
+                <span
+                  class="
+                    font-black
+                    text-violet-600
+                    dark:text-violet-400
+                  ">
+                  v<%= version_number %>
+                </span>
+              </div>
+
+            <% end %>
+
+
+            <div
+              class="
+                mt-4
+                rounded-xl
+                border
+                border-amber-200
+                bg-amber-50
+                px-4
+                py-3
+                dark:border-amber-800
+                dark:bg-amber-900/20
+              ">
+
+              <div class="flex items-start gap-3">
+
+                <span class="text-lg">
+                  💡
+                </span>
+
+                <p
+                  class="
+                    text-xs
+                    leading-5
+                    text-amber-700
+                    dark:text-amber-300
+                  ">
+
+                  The entity should remain compatible with its assigned
+                  template version. Structural changes should be made through
+                  template versioning rather than by rewriting historical
+                  structure.
+
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <%# =======================================================================
+    FORM ACTIONS
+    ======================================================================== %>
+
+    <div
+      class="
+        flex
+        flex-col
+        gap-3
+        border-t
+        border-gray-100
+        pt-6
+        sm:flex-row
+        sm:items-center
+        sm:justify-between
+        dark:border-gray-800
+      ">
+
+
+      <div
+        class="
+          font-mono
+          text-[10px]
+          font-bold
+          uppercase
+          tracking-wider
+          text-gray-400
+        ">
+
+        ENTITY_PROTOCOL :: EDIT_LAYER
+
+      </div>
+
+
+      <div class="flex flex-wrap items-center gap-3">
+
+        <%= link_to(
+              entity_path,
+              class: "
+                inline-flex
+                items-center
+                justify-center
+                rounded-xl
+                border
+                border-gray-200
+                bg-white
+                px-5
+                py-3
+                text-sm
+                font-semibold
+                text-gray-700
+                shadow-sm
+                transition
+                hover:border-gray-300
+                hover:bg-gray-50
+                dark:border-gray-700
+                dark:bg-gray-800
+                dark:text-gray-300
+                dark:hover:bg-gray-700
+              "
+            ) do %>
+
+          Cancel
+
+        <% end %>
+
+
+        <%= form.submit(
+              "Save Entity",
+              class: "
+                inline-flex
+                cursor-pointer
+                items-center
+                justify-center
+                gap-2
+                rounded-xl
+                bg-indigo-600
+                px-6
+                py-3
+                text-sm
+                font-semibold
+                text-white
+                shadow-sm
+                transition
+                hover:bg-indigo-700
+                focus:outline-none
+                focus:ring-2
+                focus:ring-indigo-500
+                focus:ring-offset-2
+              "
+            ) %>
+
+      </div>
+
+    </div>
+
+  <% end %>
+
+
+  <%# =========================================================================
+  FOOTER
+  ========================================================================= %>
+
+  <div
+    class="
+      mt-8
+      flex
+      flex-col
+      gap-3
+      border-t
+      border-gray-100
+      pt-5
+      sm:flex-row
+      sm:items-center
+      sm:justify-between
+      dark:border-gray-800
+    ">
+
+    <div
+      class="
+        font-mono
+        text-[10px]
+        font-bold
+        uppercase
+        tracking-wider
+        text-gray-400
+      ">
+      ENTITY_PROTOCOL :: ENTITY_EDIT_LAYER :: ONLINE
+    </div>
+
+
+    <div
+      class="
+        flex
+        items-center
+        gap-2
+        text-[10px]
+        font-black
+        uppercase
+        tracking-wider
+        text-emerald-500
+      ">
+
+      <span
+        class="
+          h-2
+          w-2
+          rounded-full
+          bg-emerald-400
+          shadow-[0_0_8px_rgba(52,211,153,0.6)]
+        "></span>
+
+      Entity editor operational
+
+    </div>
+
+  </div>
+
+</div>

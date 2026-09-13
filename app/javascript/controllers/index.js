@@ -423,11 +423,15 @@ application.register("entity-template-version-compare", EntityTemplateVersionCom
 import VersionListController from "./admin/ecosystems/load_sources/entity_templates/entity_template_versions/version_list_controller"
 application.register("version-list", VersionListController)
 
+import EntityCommandCenterController from "./admin/ecosystems/load_sources/entites/entity_command_center_controller"
+application.register("entity-command-center", EntityCommandCenterController)
 
 
+import EntityTemplateVersionController from "./admin/ecosystems/load_sources/entites/entity_template_version_controller"
+application.register("entity-template-version", EntityTemplateVersionController)
 
-
-
+import EntityTemplateVersionCreatorController from "./admin/ecosystems/load_sources/entity_templates/entity_template_versions/entity_template_version_creator_controller"
+application.register("entity_template_version_creator", EntityTemplateVersionCreatorController)
 
 
 

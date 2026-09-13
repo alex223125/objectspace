@@ -14,6 +14,9 @@ module Admin
           VERSION_MODEL =
             ::Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion
 
+          ENTITY_TEMPLATE_MODEL =
+            ::Ecosystems::LoadSources::EntityTemplates::EntityTemplate
+
           STATUS_VALUES = %w[
             draft
             published
@@ -66,42 +69,8 @@ module Admin
           # ============================================================
           # INDEX
           # ============================================================
-          #
-          # Searchkick-powered version registry.
-          #
-          # Supported parameters:
-          #
-          # q
-          # status
-          # entity_template_id
-          # version
-          # sort
-          # direction
-          # page
-          # per_page
-          #
-          # Example:
-          #
-          # ?q=scientific
-          #
-          # ?q=scientific&status=published
-          #
-          # ?sort=version&direction=desc
-          #
-          # ?page=2&per_page=100
-          #
-          # ============================================================
 
           def index
-
-            # IMPORTANT:
-            #
-            # Pagination MUST be prepared before:
-            #
-            # 1. build_search_scope
-            # 2. prepare_index_statistics
-            #
-            # Both methods use @page and @per_page.
 
             prepare_index_filters
 
@@ -120,6 +89,104 @@ module Admin
             prepare_index_metadata
 
             render_index
+
+          end
+
+          # ============================================================
+          # ENTITY TEMPLATE SEARCH
+          # ============================================================
+
+          def search
+
+            query =
+              params[:q].to_s.strip
+
+            if query.blank?
+
+              return render(
+                json: {
+                  results: []
+                }
+              )
+
+            end
+
+
+            templates =
+              ::Ecosystems::LoadSources::EntityTemplates::EntityTemplate.search(
+                query,
+                fields: [
+                  :name,
+                  :title,
+                  :slug,
+                  :id
+                ],
+                match: :word_start,
+                misspellings: {
+                  below: 5
+                },
+                limit: 20,
+                load: true
+              )
+
+
+            results =
+              templates.map do |template|
+
+                {
+                  id: template.id,
+                  name:
+                    template.respond_to?(:name) ?
+                      template.name :
+                      nil,
+                  title:
+                    template.respond_to?(:title) ?
+                      template.title :
+                      nil,
+                  slug:
+                    template.respond_to?(:slug) ?
+                      template.slug :
+                      nil
+                }
+
+              end
+
+
+            render(
+              json: {
+                results: results
+              }
+            )
+
+          rescue Searchkick::Error => e
+
+            Rails.logger.error(
+              "[EntityTemplate Search] #{e.class}: #{e.message}"
+            )
+
+
+            render(
+              json: {
+                results: [],
+                error: "Search service unavailable."
+              },
+              status: :service_unavailable
+            )
+
+          rescue StandardError => e
+
+            Rails.logger.error(
+              "[EntityTemplate Search] #{e.class}: #{e.message}"
+            )
+
+
+            render(
+              json: {
+                results: [],
+                error: "Unable to search entity templates."
+              },
+              status: :internal_server_error
+            )
 
           end
 
@@ -165,13 +232,110 @@ module Admin
 
           def new
 
+            # ----------------------------------------------------------
+            # IMPORTANT
+            #
+            # @entity_template is populated by set_entity_template.
+            #
+            # For a NEW version there is no @entity_template_version,
+            # therefore set_entity_template reads:
+            #
+            # params[:entity_template_id]
+            #
+            # Example:
+            #
+            # /entity_template_versions/new?entity_template_id=12
+            #
+            # ----------------------------------------------------------
+
+            unless @entity_template.present?
+
+              redirect_to(
+                admin_ecosystems_load_sources_entity_templates_entity_templates_path,
+                alert:
+                  "Please select an Entity Template before creating a version."
+              ) and return
+
+            end
+
+
+            # ----------------------------------------------------------
+            # AVAILABLE TEMPLATES
+            #
+            # Useful for the form if it displays a template selector.
+            # ----------------------------------------------------------
+
+            @entity_templates =
+              ENTITY_TEMPLATE_MODEL
+                .order(:name)
+
+
+            # ----------------------------------------------------------
+            # BUILD NEW VERSION
+            # ----------------------------------------------------------
+
             @version =
               @entity_template
                 .entity_template_versions
                 .build
 
+
+            # ----------------------------------------------------------
+            # AUTOMATIC VERSION NUMBER
+            # ----------------------------------------------------------
+
             @version.version =
               next_version_number
+
+
+            # ----------------------------------------------------------
+            # DEFAULT STATUS
+            # ----------------------------------------------------------
+
+            if @version.respond_to?(:status) &&
+              @version.status.blank?
+
+              @version.status =
+                "draft"
+
+            end
+
+
+            # ----------------------------------------------------------
+            # DEFAULT DEFINITION
+            #
+            # Keep the form safe when definition is a JSON/JSONB field.
+            # ----------------------------------------------------------
+
+            if @version.respond_to?(:definition) &&
+              @version.definition.blank?
+
+              @version.definition =
+                {}
+
+            end
+
+
+            # ----------------------------------------------------------
+            # RENDER THROUGH ADMIN ENTITY TEMPLATE LAYOUT
+            # ----------------------------------------------------------
+
+            content =
+              render_to_string(
+                template:
+                  "admin/ecosystems/load_sources/entity_templates/entity_template_versions/new",
+                layout: false
+              )
+
+
+            render(
+              template:
+                "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
+              layout: false,
+              locals: {
+                content: content
+              }
+            )
 
           end
 
@@ -181,8 +345,10 @@ module Admin
           # ============================================================
 
           def edit
+
             @entity_templates =
-              ::Ecosystems::LoadSources::EntityTemplates::EntityTemplate.order(:name)
+              ENTITY_TEMPLATE_MODEL
+                .order(:name)
 
             @version =
               @entity_template_version
@@ -204,6 +370,7 @@ module Admin
                 content: content
               }
             )
+
           end
 
 
@@ -213,6 +380,25 @@ module Admin
 
           def create
 
+            # ----------------------------------------------------------
+            # SAFETY
+            # ----------------------------------------------------------
+
+            unless @entity_template.present?
+
+              redirect_to(
+                admin_ecosystems_load_sources_entity_templates_entity_templates_path,
+                alert:
+                  "Please select an Entity Template before creating a version."
+              ) and return
+
+            end
+
+
+            # ----------------------------------------------------------
+            # BUILD VERSION
+            # ----------------------------------------------------------
+
             @version =
               @entity_template
                 .entity_template_versions
@@ -220,11 +406,68 @@ module Admin
                   entity_template_version_params
                 )
 
+
+            # ----------------------------------------------------------
+            # VERSION NUMBER
+            # ----------------------------------------------------------
+
             @version.version ||=
               next_version_number
 
 
-            if @version.save
+            # ----------------------------------------------------------
+            # DEFAULT STATUS
+            # ----------------------------------------------------------
+
+            if @version.respond_to?(:status) &&
+              @version.status.blank?
+
+              @version.status =
+                "draft"
+
+            end
+
+
+            # ----------------------------------------------------------
+            # DEFINITION JSON
+            # ----------------------------------------------------------
+
+            if @version.respond_to?(:definition)
+
+              definition =
+                @version.definition
+
+
+              if definition.is_a?(String) &&
+                definition.present?
+
+                begin
+
+                  @version.definition =
+                    JSON.parse(
+                      definition
+                    )
+
+                rescue JSON::ParserError => e
+
+                  @version.errors.add(
+                    :definition,
+                    "contains invalid JSON: #{e.message}"
+                  )
+
+                end
+
+              end
+
+            end
+
+
+            # ----------------------------------------------------------
+            # SAVE
+            # ----------------------------------------------------------
+
+            if @version.errors.empty? &&
+              @version.save
 
               redirect_to(
                 admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
@@ -234,14 +477,47 @@ module Admin
                   "Entity template version was successfully created."
               )
 
-            else
-
-              render(
-                :new,
-                status: :unprocessable_entity
-              )
+              return
 
             end
+
+
+            # ----------------------------------------------------------
+            # CREATE FAILED
+            #
+            # IMPORTANT:
+            #
+            # Do NOT use:
+            #
+            # render :new
+            #
+            # because your admin interface uses the custom
+            # entity_templates_layout.
+            # ----------------------------------------------------------
+
+            @entity_templates =
+              ENTITY_TEMPLATE_MODEL
+                .order(:name)
+
+
+            content =
+              render_to_string(
+                template:
+                  "admin/ecosystems/load_sources/entity_templates/entity_template_versions/new",
+                layout: false
+              )
+
+
+            render(
+              template:
+                "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
+              layout: false,
+              locals: {
+                content: content
+              },
+              status:
+                :unprocessable_entity
+            )
 
           end
 
@@ -250,20 +526,31 @@ module Admin
           # UPDATE
           # ============================================================
 
-
           def update
-            permitted_params = entity_template_version_params
+
+            permitted_params =
+              entity_template_version_params
+
 
             if permitted_params[:definition].present?
+
               begin
-                permitted_params[:definition] = JSON.parse(permitted_params[:definition])
+
+                permitted_params[:definition] =
+                  JSON.parse(
+                    permitted_params[:definition]
+                  )
+
               rescue JSON::ParserError => e
+
                 @entity_template_version.errors.add(
                   :definition,
                   "contains invalid JSON: #{e.message}"
                 )
 
+
                 load_entity_templates
+
 
                 content =
                   render_to_string(
@@ -272,6 +559,7 @@ module Admin
                     layout: false
                   )
 
+
                 return render(
                   template:
                     "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
@@ -279,20 +567,31 @@ module Admin
                   locals: {
                     content: content
                   },
-                  status: :unprocessable_entity
+                  status:
+                    :unprocessable_entity
                 )
+
               end
+
             end
 
-            if @entity_template_version.update(permitted_params)
+
+            if @entity_template_version.update(
+              permitted_params
+            )
+
               redirect_to(
                 admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
                   @entity_template_version
                 ),
-                notice: "Template version updated."
+                notice:
+                  "Template version updated."
               )
+
             else
+
               load_entity_templates
+
 
               content =
                 render_to_string(
@@ -301,6 +600,7 @@ module Admin
                   layout: false
                 )
 
+
               render(
                 template:
                   "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
@@ -308,10 +608,14 @@ module Admin
                 locals: {
                   content: content
                 },
-                status: :unprocessable_entity
+                status:
+                  :unprocessable_entity
               )
+
             end
+
           end
+
 
           # ============================================================
           # DESTROY
@@ -321,6 +625,7 @@ module Admin
 
             @version =
               @entity_template_version
+
 
             @version.destroy
 
@@ -348,24 +653,17 @@ module Admin
                 )
 
 
-            # ----------------------------------------------------------
-            # SELECT VERSIONS
-            # ----------------------------------------------------------
-
             @left_version =
               find_comparison_version(
                 params[:left_id]
               )
+
 
             @right_version =
               find_comparison_version(
                 params[:right_id]
               )
 
-
-            # ----------------------------------------------------------
-            # DEFAULT VERSION SELECTION
-            # ----------------------------------------------------------
 
             if @left_version.nil? &&
               @right_version.nil?
@@ -396,10 +694,6 @@ module Admin
             end
 
 
-            # ----------------------------------------------------------
-            # COMPARISON
-            # ----------------------------------------------------------
-
             if @left_version.present? &&
               @right_version.present?
 
@@ -409,13 +703,10 @@ module Admin
                   @right_version
                 )
 
+
               comparison =
                 comparator.compare
 
-
-              # --------------------------------------------------------
-              # RAW DEFINITIONS
-              # --------------------------------------------------------
 
               raw_comparison =
                 comparison[:raw] ||
@@ -435,10 +726,6 @@ module Admin
                   {}
 
 
-              # --------------------------------------------------------
-              # FIELD COMPARISONS
-              # --------------------------------------------------------
-
               @field_comparisons =
                 comparison[:fields] ||
                   comparison["fields"] ||
@@ -449,20 +736,12 @@ module Admin
                 @field_comparisons
 
 
-              # --------------------------------------------------------
-              # DEFINITION CHANGES
-              # --------------------------------------------------------
-
               @definition_changes =
                 build_definition_changes(
                   @left_definition,
                   @right_definition
                 )
 
-
-              # --------------------------------------------------------
-              # SUMMARY
-              # --------------------------------------------------------
 
               raw_summary =
                 comparison[:summary] ||
@@ -493,10 +772,6 @@ module Admin
                       0
                 }
 
-
-              # --------------------------------------------------------
-              # STIMULUS PAYLOAD
-              # --------------------------------------------------------
 
               @field_comparisons_json =
                 @field_comparisons.map do |field|
@@ -571,10 +846,6 @@ module Admin
 
             else
 
-              # --------------------------------------------------------
-              # NO COMPARISON AVAILABLE
-              # --------------------------------------------------------
-
               @left_definition = {}
 
               @right_definition = {}
@@ -616,6 +887,7 @@ module Admin
             )
 
           end
+
 
           # ============================================================
           # CLONE
@@ -701,13 +973,8 @@ module Admin
               @filters[:q].presence || "*"
 
 
-            where =
-              {}
+            where = {}
 
-
-            # ----------------------------------------------------------
-            # STATUS
-            # ----------------------------------------------------------
 
             if @filters[:status].present?
 
@@ -717,10 +984,6 @@ module Admin
             end
 
 
-            # ----------------------------------------------------------
-            # ENTITY TEMPLATE
-            # ----------------------------------------------------------
-
             if @filters[:entity_template_id].present?
 
               where[:entity_template_id] =
@@ -728,10 +991,6 @@ module Admin
 
             end
 
-
-            # ----------------------------------------------------------
-            # VERSION
-            # ----------------------------------------------------------
 
             if @filters[:version].present?
 
@@ -743,18 +1002,10 @@ module Admin
 
             VERSION_MODEL.search(
               query,
-
               where: where,
-
-              order:
-                search_order,
-
-              page:
-                @page,
-
-              per_page:
-                @per_page,
-
+              order: search_order,
+              page: @page,
+              per_page: @per_page,
               load: true
             )
 
@@ -793,13 +1044,6 @@ module Admin
           # ============================================================
           # INDEX — FALLBACK
           # ============================================================
-          #
-          # This protects the admin interface if Elasticsearch/OpenSearch
-          # is temporarily unavailable.
-          #
-          # It is deliberately SQL-based and only used as a fallback.
-          #
-          # ============================================================
 
           def fallback_index_query
 
@@ -807,10 +1051,6 @@ module Admin
               VERSION_MODEL
                 .includes(:entity_template)
 
-
-            # ----------------------------------------------------------
-            # STATUS
-            # ----------------------------------------------------------
 
             if @filters[:status].present?
 
@@ -821,10 +1061,6 @@ module Admin
 
             end
 
-
-            # ----------------------------------------------------------
-            # ENTITY TEMPLATE
-            # ----------------------------------------------------------
 
             if @filters[:entity_template_id].present?
 
@@ -837,10 +1073,6 @@ module Admin
             end
 
 
-            # ----------------------------------------------------------
-            # VERSION
-            # ----------------------------------------------------------
-
             if @filters[:version].present?
 
               scope =
@@ -851,10 +1083,6 @@ module Admin
 
             end
 
-
-            # ----------------------------------------------------------
-            # TEXT SEARCH
-            # ----------------------------------------------------------
 
             if @filters[:q].present?
 
@@ -888,19 +1116,11 @@ module Admin
             end
 
 
-            # ----------------------------------------------------------
-            # SORT
-            # ----------------------------------------------------------
-
             scope =
               scope.order(
                 "#{safe_sort_column} #{safe_sort_direction}"
               )
 
-
-            # ----------------------------------------------------------
-            # PAGINATION
-            # ----------------------------------------------------------
 
             scope =
               scope
@@ -987,21 +1207,6 @@ module Admin
 
           def prepare_index_statistics
 
-            # ----------------------------------------------------------
-            # SEARCH RESULT COUNT
-            # ----------------------------------------------------------
-            #
-            # Searchkick:
-            #   total_count
-            #
-            # Kaminari/Pagy-style fallback:
-            #   total_entries
-            #
-            # Plain collection:
-            #   size
-            #
-            # ----------------------------------------------------------
-
             @filtered_count =
               if @entity_template_versions.respond_to?(:total_count)
 
@@ -1026,15 +1231,6 @@ module Admin
               @filtered_count.to_i
 
 
-            # ----------------------------------------------------------
-            # GLOBAL COUNTS
-            # ----------------------------------------------------------
-            #
-            # These intentionally represent the entire registry rather
-            # than only the current filtered result.
-            #
-            # ----------------------------------------------------------
-
             @total_versions_count =
               VERSION_MODEL.count
 
@@ -1057,23 +1253,9 @@ module Admin
               ).count
 
 
-            # ----------------------------------------------------------
-            # SEARCH RESULT COUNT
-            # ----------------------------------------------------------
-
             @search_result_count =
               @filtered_count
 
-
-            # ----------------------------------------------------------
-            # SHOWING RANGE
-            # ----------------------------------------------------------
-            #
-            # @page and @per_page are guaranteed to be initialized
-            # because prepare_index_pagination now runs BEFORE this
-            # method.
-            #
-            # ----------------------------------------------------------
 
             @showing_from =
               if @filtered_count.zero?
@@ -1102,10 +1284,6 @@ module Admin
               end
 
 
-            # ----------------------------------------------------------
-            # TOTAL PAGES
-            # ----------------------------------------------------------
-
             @total_pages =
               if @filtered_count.zero?
 
@@ -1124,18 +1302,6 @@ module Admin
             @total_pages =
               1 if @total_pages < 1
 
-
-            # ----------------------------------------------------------
-            # CURRENT PAGE SAFETY
-            # ----------------------------------------------------------
-            #
-            # If a user requests a page beyond the final page, we keep
-            # the requested page here rather than silently changing the
-            # Searchkick query after it has already executed.
-            #
-            # The view can safely detect an empty page.
-            #
-            # ----------------------------------------------------------
 
             @has_results =
               @filtered_count.positive?
@@ -1292,9 +1458,6 @@ module Admin
 
               end
 
-
-            return if @entity_template.present?
-
           end
 
 
@@ -1308,7 +1471,7 @@ module Admin
               params[:entity_template_id].blank?
 
 
-            ::Ecosystems::LoadSources::EntityTemplates::EntityTemplate.find_by(
+            ENTITY_TEMPLATE_MODEL.find_by(
               id:
                 params[:entity_template_id]
             )
@@ -1604,15 +1767,12 @@ module Admin
             case value
 
             when nil
-
               "—"
 
             when true
-
               "true"
 
             when false
-
               "false"
 
             when String
@@ -1784,6 +1944,19 @@ module Admin
 
 
             latest_version + 1
+
+          end
+
+
+          # ============================================================
+          # LOAD ENTITY TEMPLATES
+          # ============================================================
+
+          def load_entity_templates
+
+            @entity_templates =
+              ENTITY_TEMPLATE_MODEL
+                .order(:name)
 
           end
 

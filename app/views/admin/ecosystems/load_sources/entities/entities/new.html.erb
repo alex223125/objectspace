@@ -1,0 +1,1111 @@
+<%
+  template_versions_data = @entity_templates.each_with_object({}) do |template, result|
+    result[template.id.to_s] = {
+      name: template.name,
+      versions: template.versions.order(version: :asc).map do |version|
+        {
+          id: version.id,
+          version: version.version,
+          status: version.status
+        }
+      end
+    }
+  end
+%>
+
+<div class="min-h-screen bg-gradient-to-b from-white via-orange-50/20 to-slate-50/70 px-4 py-8 sm:px-6 lg:px-8">
+
+  <div class="mx-auto max-w-6xl">
+
+    <!-- ========================================================= -->
+    <!-- ECOSYSTEM HEADER -->
+    <!-- ========================================================= -->
+
+    <div class="mb-8 rounded-[38px] border-2 border-orange-100 bg-gradient-to-b from-white via-orange-50/20 to-slate-50/50 p-6 shadow-md shadow-orange-100/40 sm:p-8">
+
+      <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+
+        <div class="flex items-center gap-4">
+
+          <div class="flex h-12 w-12 items-center justify-center rounded-2xl border border-orange-200/60 bg-orange-100/80 text-xl text-orange-600 shadow-sm shadow-orange-100">
+            🌍
+          </div>
+
+          <div>
+
+            <div class="text-[9px] font-black uppercase tracking-[0.3em] text-orange-500">
+              ECOSYSTEM / LOAD SOURCES / ENTITIES
+            </div>
+
+            <h1 class="mt-1 text-2xl font-black tracking-tight text-slate-800 sm:text-3xl">
+              Create an <span class="text-orange-500">Entity</span>
+            </h1>
+
+            <p class="mt-1 max-w-2xl text-xs font-medium leading-5 text-slate-400">
+              Introduce a new entity into the ecosystem and begin building its
+              identity, relationships and knowledge profile.
+            </p>
+
+          </div>
+
+        </div>
+
+        <div class="flex w-fit items-center gap-2 rounded-full border border-orange-200/60 bg-orange-50 px-4 py-2 text-[11px] font-bold text-orange-600 shadow-sm">
+          <span class="h-2 w-2 animate-pulse rounded-full bg-orange-400"></span>
+          Ecosystem continuously evolving
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- ECOSYSTEM PATH -->
+    <!-- ========================================================= -->
+
+    <div class="mb-8 rounded-[38px] border-2 border-orange-100 bg-white p-6 shadow-md shadow-orange-100/30 sm:p-8">
+
+      <div class="mb-7 flex items-center justify-between">
+
+        <div>
+
+          <div class="text-[9px] font-black uppercase tracking-[0.25em] text-slate-400">
+            ENTITY DEPLOYMENT PATH
+          </div>
+
+          <div class="mt-1 text-sm font-black text-slate-700">
+            Build the entity through the ecosystem
+          </div>
+
+        </div>
+
+        <div class="text-right">
+
+          <div class="text-lg font-black text-orange-500">
+            01
+          </div>
+
+          <div class="text-[8px] font-black uppercase tracking-widest text-slate-400">
+            OF 04
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="relative px-2 md:px-8">
+
+        <div class="absolute left-[8%] right-[8%] top-[27px] z-0 hidden h-2 rounded-full bg-orange-100 md:block"></div>
+
+        <div class="absolute left-[8%] top-[27px] z-0 hidden h-2 w-[18%] rounded-full bg-gradient-to-r from-orange-400 to-amber-400 shadow-sm shadow-orange-200 md:block"></div>
+
+        <div class="absolute left-[8%] top-[27px] z-0 hidden h-2 w-[10%] animate-pulse rounded-full bg-white/70 blur-[1px] md:block"></div>
+
+
+        <div class="grid grid-cols-1 gap-7 md:grid-cols-4 md:gap-4">
+
+          <!-- 01 -->
+
+          <div class="group relative z-10 flex flex-col items-center">
+
+            <div class="flex h-14 w-14 items-center justify-center rounded-[22px] border-[3px] border-orange-400 bg-orange-50 text-sm font-black text-orange-700 shadow-md shadow-orange-200/60 ring-[5px] ring-orange-100/60 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-orange-200">
+              01
+            </div>
+
+            <div class="mt-3 text-center">
+
+              <div class="text-[13px] font-black tracking-wide text-orange-700">
+                Identity
+              </div>
+
+              <div class="mt-2 inline-flex rounded-full border border-orange-200/50 bg-orange-100 px-3 py-1 text-[9px] font-black uppercase tracking-wider text-orange-700">
+                Current mission
+              </div>
+
+              <p class="mx-auto mt-2 max-w-[180px] text-[10px] leading-4 text-slate-400">
+                Give the entity a recognizable name, address and purpose.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <!-- 02 -->
+
+          <div class="group relative z-10 flex flex-col items-center">
+
+            <div class="flex h-14 w-14 items-center justify-center rounded-[22px] border-[3px] border-sky-200 bg-sky-50 text-sm font-black text-sky-500 shadow-md shadow-sky-100 ring-[5px] ring-sky-50 transition-all duration-300 group-hover:scale-110">
+              02
+            </div>
+
+            <div class="mt-3 text-center">
+
+              <div class="text-[13px] font-black tracking-wide text-sky-600">
+                Profile
+              </div>
+
+              <div class="mt-2 inline-flex rounded-full border border-sky-200/50 bg-sky-50 px-3 py-1 text-[9px] font-black uppercase tracking-wider text-sky-600">
+                Intelligence
+              </div>
+
+              <p class="mx-auto mt-2 max-w-[180px] text-[10px] leading-4 text-slate-400">
+                Expand the entity with structured knowledge and attributes.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <!-- 03 -->
+
+          <div class="group relative z-10 flex flex-col items-center">
+
+            <div class="flex h-14 w-14 items-center justify-center rounded-[22px] border-[3px] border-violet-200 bg-violet-50 text-sm font-black text-violet-500 shadow-md shadow-violet-100 ring-[5px] ring-violet-50 transition-all duration-300 group-hover:scale-110">
+              03
+            </div>
+
+            <div class="mt-3 text-center">
+
+              <div class="text-[13px] font-black tracking-wide text-violet-600">
+                Relationships
+              </div>
+
+              <div class="mt-2 inline-flex rounded-full border border-violet-200/50 bg-violet-50 px-3 py-1 text-[9px] font-black uppercase tracking-wider text-violet-600">
+                Connect
+              </div>
+
+              <p class="mx-auto mt-2 max-w-[180px] text-[10px] leading-4 text-slate-400">
+                Connect the entity to other nodes across the ecosystem.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <!-- 04 -->
+
+          <div class="group relative z-10 flex flex-col items-center">
+
+            <div class="flex h-14 w-14 items-center justify-center rounded-[22px] border-[3px] border-emerald-200 bg-emerald-50 text-sm font-black text-emerald-500 shadow-md shadow-emerald-100 ring-[5px] ring-emerald-50 transition-all duration-300 group-hover:scale-110">
+              04
+            </div>
+
+            <div class="mt-3 text-center">
+
+              <div class="text-[13px] font-black tracking-wide text-emerald-600">
+                Ecosystem
+              </div>
+
+              <div class="mt-2 inline-flex rounded-full border border-emerald-200/50 bg-emerald-50 px-3 py-1 text-[9px] font-black uppercase tracking-wider text-emerald-600">
+                Impact
+              </div>
+
+              <p class="mx-auto mt-2 max-w-[180px] text-[10px] leading-4 text-slate-400">
+                Observe how the entity contributes to the wider system.
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- FORM -->
+    <!-- ========================================================= -->
+
+    <%= form_with model: @entity,
+                  scope: :entity,
+                  url: admin_ecosystems_load_sources_entities_path,
+                  class: "grid gap-6 lg:grid-cols-[1fr_350px]",
+                  data: {
+                    controller: "entity-template-version",
+                    entity_template_version_templates_value:
+                      template_versions_data.to_json
+                  } do |form| %>
+
+
+      <% if @entity.errors.any? %>
+
+        <div class="mb-6 rounded-3xl border border-red-200 bg-red-50 p-5 shadow-sm shadow-red-100 lg:col-span-2">
+
+          <div class="flex items-start gap-3">
+
+            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-100 text-red-600">
+              ⚠
+            </div>
+
+            <div>
+
+              <div class="text-[10px] font-black uppercase tracking-[0.2em] text-red-500">
+                ENTITY DEPLOYMENT FAILED
+              </div>
+
+              <div class="mt-2 space-y-1">
+
+                <% @entity.errors.full_messages.each do |message| %>
+
+                  <p class="text-xs font-semibold text-red-700">
+                    <%= message %>
+                  </p>
+
+                <% end %>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      <% end %>
+
+
+      <!-- ======================================================= -->
+      <!-- MAIN FORM -->
+      <!-- ======================================================= -->
+
+      <div class="rounded-[38px] border-2 border-orange-100 bg-white shadow-md shadow-orange-100/30">
+
+        <div class="border-b-2 border-orange-100 bg-gradient-to-r from-orange-50/80 via-white to-transparent px-6 py-6 sm:px-8">
+
+          <div class="flex items-center gap-4">
+
+            <div class="flex h-12 w-12 items-center justify-center rounded-2xl border border-orange-200 bg-orange-100 text-xl text-orange-600 shadow-sm">
+              ✦
+            </div>
+
+            <div>
+
+              <div class="text-[9px] font-black uppercase tracking-[0.25em] text-orange-500">
+                PHASE 01
+              </div>
+
+              <h2 class="mt-1 text-lg font-black text-slate-700">
+                Define identity
+              </h2>
+
+              <p class="mt-1 text-xs text-slate-400">
+                Every entity begins with a clear and recognizable identity.
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="p-6 sm:p-8">
+
+          <!-- =================================================== -->
+          <!-- ENTITY CLASSIFICATION -->
+          <!-- =================================================== -->
+
+          <div class="mb-7 grid gap-5 md:grid-cols-2">
+
+
+            <!-- ENTITY TYPE -->
+
+            <div>
+
+              <div class="mb-2 flex items-center justify-between">
+
+                <%= form.label :entity_type_id,
+                               "Entity Type",
+                               class: "text-[10px] font-black uppercase tracking-[0.2em] text-slate-500" %>
+
+                <span class="text-[9px] font-bold uppercase tracking-wider text-orange-500">
+                  +20 XP
+                </span>
+
+              </div>
+
+
+              <div class="group relative">
+
+                <div class="pointer-events-none absolute left-4 top-1/2 z-10 flex -translate-y-1/2 items-center text-lg text-slate-500 transition group-focus-within:text-orange-400">
+                  ◈
+                </div>
+
+                <%= form.collection_select(
+                      :entity_type_id,
+                      @entity_types,
+                      :id,
+                      :name,
+                      { prompt: "Select entity type..." },
+                      {
+                        class: "w-full appearance-none rounded-2xl border-2 border-slate-200 bg-white py-4 pl-12 pr-12 text-sm font-bold text-slate-700 shadow-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100"
+                      }
+                    ) %>
+
+                <div class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                  ▾
+                </div>
+
+              </div>
+
+
+              <p class="mt-2 text-[10px] text-slate-400">
+                Determines what kind of entity this is.
+              </p>
+
+            </div>
+
+
+            <!-- ENTITY TEMPLATE -->
+
+            <div>
+
+              <div class="mb-2 flex items-center justify-between">
+
+                <%= form.label :entity_template_id,
+                               "Entity Template",
+                               class: "text-[10px] font-black uppercase tracking-[0.2em] text-slate-500" %>
+
+                <span class="text-[9px] font-bold uppercase tracking-wider text-violet-500">
+                  +25 XP
+                </span>
+
+              </div>
+
+
+              <div class="group relative">
+
+                <div class="pointer-events-none absolute left-4 top-1/2 z-10 flex -translate-y-1/2 items-center text-lg text-violet-500 transition">
+                  ✦
+                </div>
+
+                <%= form.collection_select(
+                      :entity_template_id,
+                      @entity_templates,
+                      :id,
+                      :name,
+                      { prompt: "Select entity template..." },
+                      {
+                        class: "w-full appearance-none rounded-2xl border-2 border-slate-200 bg-white py-4 pl-12 pr-12 text-sm font-bold text-slate-700 shadow-sm outline-none transition focus:border-violet-400 focus:ring-4 focus:ring-violet-100",
+                        data: {
+                          entity_template_version_target: "template",
+                          action: "change->entity-template-version#templateChanged"
+                        }
+                      }
+                    ) %>
+
+                <div class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                  ▾
+                </div>
+
+              </div>
+
+
+              <p class="mt-2 text-[10px] text-slate-400">
+                Determines the structure and intelligence fields of this entity.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <!-- =================================================== -->
+          <!-- TEMPLATE VERSION -->
+          <!-- =================================================== -->
+
+          <div class="mb-7">
+
+            <div class="mb-2 flex items-center justify-between">
+
+              <%= form.label :entity_template_version_id,
+                             "Template Version",
+                             class: "text-[10px] font-black uppercase tracking-[0.2em] text-slate-500" %>
+
+              <span
+                class="text-[9px] font-black uppercase tracking-wider text-violet-500"
+                data-entity-template-version-target="versionBadge">
+                WAITING
+              </span>
+
+            </div>
+
+
+            <div class="group relative">
+
+              <div class="pointer-events-none absolute left-4 top-1/2 z-10 flex -translate-y-1/2 items-center text-lg text-violet-500">
+                ◌
+              </div>
+
+
+              <%= form.select(
+                    :entity_template_version_id,
+                    [],
+                    {},
+                    {
+                      class: "w-full appearance-none rounded-2xl border-2 border-slate-200 bg-slate-100 py-4 pl-12 pr-12 text-sm font-bold text-slate-400 shadow-sm outline-none transition focus:border-violet-400 focus:ring-4 focus:ring-violet-100 cursor-not-allowed",
+                      disabled: true,
+                      data: {
+                        entity_template_version_target: "version",
+                        action: "change->entity-template-version#versionChanged"
+                      }
+                    }
+                  ) %>
+
+
+              <div class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                ▾
+              </div>
+
+            </div>
+
+
+            <div class="mt-2 flex items-center justify-between">
+
+              <p
+                class="text-[10px] text-slate-400"
+                data-entity-template-version-target="versionHelp">
+                Select an entity template first.
+              </p>
+
+              <span class="text-[9px] font-bold uppercase tracking-wider text-slate-300">
+                STRUCTURE
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <!-- =================================================== -->
+          <!-- NAME -->
+          <!-- =================================================== -->
+
+          <div class="mb-7">
+
+            <div class="mb-2 flex items-center justify-between">
+
+              <%= form.label :name,
+                             class: "text-[10px] font-black uppercase tracking-[0.2em] text-slate-500" %>
+
+              <span class="text-[9px] font-black uppercase tracking-wider text-orange-500">
+                +25 XP
+              </span>
+
+            </div>
+
+
+            <div class="group relative">
+
+              <div class="pointer-events-none absolute left-4 top-1/2 flex -translate-y-1/2 items-center text-lg text-slate-300 transition group-focus-within:text-orange-400">
+                ◈
+              </div>
+
+              <%= form.text_field :name,
+                                  class: "w-full rounded-2xl border-2 border-slate-100 bg-slate-50/70 py-4 pl-12 pr-4 text-sm font-bold text-slate-700 placeholder-slate-300 outline-none transition focus:border-orange-300 focus:bg-white focus:ring-4 focus:ring-orange-100",
+                                  placeholder: "Name your entity..." %>
+
+            </div>
+
+
+            <div class="mt-2 flex items-center justify-between">
+
+              <span class="text-[10px] text-slate-400">
+                Choose a clear and recognizable name.
+              </span>
+
+              <span class="text-[9px] font-bold uppercase tracking-wider text-slate-300">
+                REQUIRED
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <!-- =================================================== -->
+          <!-- SLUG -->
+          <!-- =================================================== -->
+
+          <div class="mb-7">
+
+            <div class="mb-2 flex items-center justify-between">
+
+              <%= form.label :slug,
+                             class: "text-[10px] font-black uppercase tracking-[0.2em] text-slate-500" %>
+
+              <span class="text-[9px] font-black uppercase tracking-wider text-sky-500">
+                +15 XP
+              </span>
+
+            </div>
+
+
+            <div class="flex overflow-hidden rounded-2xl border-2 border-slate-100 bg-slate-50/70 transition focus-within:border-sky-300 focus-within:bg-white focus-within:ring-4 focus-within:ring-sky-100">
+
+              <div class="flex items-center border-r-2 border-slate-100 bg-slate-100/70 px-4 font-mono text-xs text-slate-400">
+                /
+              </div>
+
+              <%= form.text_field :slug,
+                                  class: "w-full bg-transparent px-4 py-4 font-mono text-sm font-semibold text-sky-600 placeholder-slate-300 outline-none",
+                                  placeholder: "entity-slug" %>
+
+            </div>
+
+
+            <p class="mt-2 text-[10px] text-slate-400">
+              This becomes the entity's unique address inside the ecosystem.
+            </p>
+
+          </div>
+
+
+          <!-- =================================================== -->
+          <!-- SUMMARY -->
+          <!-- =================================================== -->
+
+          <div>
+
+            <div class="mb-2 flex items-center justify-between">
+
+              <%= form.label :summary,
+                             class: "text-[10px] font-black uppercase tracking-[0.2em] text-slate-500" %>
+
+              <span class="text-[9px] font-black uppercase tracking-wider text-violet-500">
+                +60 XP
+              </span>
+
+            </div>
+
+
+            <%= form.text_area :summary,
+                               rows: 7,
+                               class: "w-full resize-none rounded-2xl border-2 border-slate-100 bg-slate-50/70 px-4 py-4 text-sm leading-6 text-slate-700 placeholder-slate-300 outline-none transition focus:border-violet-300 focus:bg-white focus:ring-4 focus:ring-violet-100",
+                               placeholder: "Describe this entity's role, purpose, capabilities, or significance..." %>
+
+
+            <div class="mt-2 flex items-center justify-between">
+
+              <span class="text-[10px] text-slate-400">
+                Explain why this entity matters to the ecosystem.
+              </span>
+
+              <span class="text-[9px] font-bold uppercase tracking-wider text-slate-300">
+                LORE
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <!-- =================================================== -->
+          <!-- XP REWARD -->
+          <!-- =================================================== -->
+
+          <div class="mt-8 rounded-[28px] border-2 border-orange-100 bg-gradient-to-r from-orange-50/80 via-white to-amber-50/50 p-5 shadow-sm">
+
+            <div class="flex items-center justify-between">
+
+              <div class="flex items-center gap-3">
+
+                <div class="flex h-11 w-11 items-center justify-center rounded-2xl border border-orange-200 bg-orange-100 text-lg text-orange-500">
+                  ✨
+                </div>
+
+                <div>
+
+                  <div class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500">
+                    MISSION REWARD
+                  </div>
+
+                  <div class="mt-1 text-sm font-black text-slate-700">
+                    Entity Creation
+                  </div>
+
+                  <div class="mt-1 text-[10px] text-slate-400">
+                    Complete all identity requirements to deploy.
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <div class="text-right">
+
+                <div class="text-2xl font-black text-orange-500">
+                  +100
+                </div>
+
+                <div class="text-[9px] font-black uppercase tracking-wider text-orange-400">
+                  XP
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- =================================================== -->
+          <!-- ACTIONS -->
+          <!-- =================================================== -->
+
+          <div class="mt-8 flex flex-col-reverse gap-3 border-t-2 border-slate-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
+
+            <%= link_to admin_ecosystems_load_sources_entities_path,
+                        class: "rounded-2xl border-2 border-slate-100 bg-white px-6 py-3.5 text-center text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 transition hover:border-slate-200 hover:bg-slate-50 hover:text-slate-600" do %>
+              ← Back to entities
+            <% end %>
+
+
+            <%= form.submit "DEPLOY ENTITY  →",
+                            class: "cursor-pointer rounded-2xl border-2 border-orange-300 bg-gradient-to-r from-orange-400 to-amber-400 px-8 py-4 text-[10px] font-black uppercase tracking-[0.18em] text-white shadow-md shadow-orange-200/70 transition-all duration-300 hover:-translate-y-1 hover:from-orange-500 hover:to-amber-500 hover:shadow-lg hover:shadow-orange-200/80" %>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ======================================================= -->
+      <!-- RIGHT SIDEBAR -->
+      <!-- ======================================================= -->
+
+      <div class="space-y-6">
+
+
+        <!-- ENTITY PREVIEW -->
+
+        <div class="relative overflow-hidden rounded-[38px] border-2 border-orange-100 bg-gradient-to-b from-white via-orange-50/30 to-slate-50 p-6 shadow-md shadow-orange-100/30">
+
+          <div class="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-orange-200/30 blur-3xl"></div>
+
+          <div class="absolute -bottom-16 -left-10 h-32 w-32 rounded-full bg-amber-200/20 blur-3xl"></div>
+
+
+          <div class="relative">
+
+            <div class="mb-6 flex items-center justify-between">
+
+              <div class="text-[9px] font-black uppercase tracking-[0.25em] text-orange-500">
+                ENTITY PREVIEW
+              </div>
+
+              <div class="flex items-center gap-2">
+
+                <span class="h-2 w-2 animate-pulse rounded-full bg-emerald-400"></span>
+
+                <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-500">
+                  READY
+                </span>
+
+              </div>
+
+            </div>
+
+
+            <div class="mx-auto mb-6 flex h-28 w-28 items-center justify-center rounded-[32px] border-2 border-orange-200 bg-orange-50 text-5xl text-orange-500 shadow-lg shadow-orange-100">
+              ✦
+            </div>
+
+
+            <div class="text-center">
+
+              <div class="text-xl font-black text-slate-700">
+                YOUR ENTITY
+              </div>
+
+              <div class="mt-1 font-mono text-[10px] text-slate-300">
+                /awaiting-identity
+              </div>
+
+            </div>
+
+
+            <div class="mt-6 grid grid-cols-3 gap-2">
+
+              <div class="rounded-2xl border border-orange-100 bg-white p-3 text-center shadow-sm">
+
+                <div class="text-sm font-black text-slate-700">
+                  01
+                </div>
+
+                <div class="mt-1 text-[8px] font-bold uppercase tracking-wider text-slate-400">
+                  LEVEL
+                </div>
+
+              </div>
+
+
+              <div class="rounded-2xl border border-sky-100 bg-white p-3 text-center shadow-sm">
+
+                <div class="text-sm font-black text-sky-500">
+                  00
+                </div>
+
+                <div class="mt-1 text-[8px] font-bold uppercase tracking-wider text-slate-400">
+                  LINKS
+                </div>
+
+              </div>
+
+
+              <div class="rounded-2xl border border-emerald-100 bg-white p-3 text-center shadow-sm">
+
+                <div class="text-sm font-black text-emerald-500">
+                  00%
+                </div>
+
+                <div class="mt-1 text-[8px] font-bold uppercase tracking-wider text-slate-400">
+                  HEALTH
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div class="mt-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+
+              <div class="flex items-center justify-between">
+
+                <span class="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400">
+                  INTELLIGENCE PROFILE
+                </span>
+
+                <span class="rounded-full bg-slate-50 px-2 py-1 text-[8px] font-bold text-slate-300">
+                  EMPTY
+                </span>
+
+              </div>
+
+              <p class="mt-3 text-xs leading-5 text-slate-400">
+                Your entity intelligence profile will grow as you add
+                attributes, evidence and relationships.
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- XP BREAKDOWN -->
+
+        <div class="rounded-[32px] border-2 border-orange-100 bg-white p-6 shadow-sm shadow-orange-100/20">
+
+          <div class="mb-5 flex items-center justify-between">
+
+            <div class="text-[9px] font-black uppercase tracking-[0.25em] text-slate-400">
+              XP BREAKDOWN
+            </div>
+
+            <span class="rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-[8px] font-black text-orange-500">
+              +100 MAX
+            </span>
+
+          </div>
+
+
+          <div class="space-y-4">
+
+            <div class="flex items-center justify-between">
+
+              <div class="flex items-center gap-3">
+
+                <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-orange-50 text-xs text-orange-500">
+                  ◈
+                </span>
+
+                <span class="text-xs font-medium text-slate-500">
+                  Identity
+                </span>
+
+              </div>
+
+              <span class="text-[10px] font-black text-orange-500">
+                +25
+              </span>
+
+            </div>
+
+
+            <div class="flex items-center justify-between">
+
+              <div class="flex items-center gap-3">
+
+                <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-sky-50 text-xs text-sky-500">
+                  /
+                </span>
+
+                <span class="text-xs font-medium text-slate-500">
+                  Slug
+                </span>
+
+              </div>
+
+              <span class="text-[10px] font-black text-sky-500">
+                +15
+              </span>
+
+            </div>
+
+
+            <div class="flex items-center justify-between">
+
+              <div class="flex items-center gap-3">
+
+                <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-violet-50 text-xs text-violet-500">
+                  ✎
+                </span>
+
+                <span class="text-xs font-medium text-slate-500">
+                  Description
+                </span>
+
+              </div>
+
+              <span class="text-[10px] font-black text-violet-500">
+                +60
+              </span>
+
+            </div>
+
+
+            <div class="border-t border-slate-100 pt-4">
+
+              <div class="mb-2 flex items-center justify-between">
+
+                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">
+                  Mission progress
+                </span>
+
+                <span class="text-[10px] font-black text-orange-500">
+                  0 / 100 XP
+                </span>
+
+              </div>
+
+
+              <div class="h-2.5 overflow-hidden rounded-full border border-orange-100 bg-orange-50">
+
+                <div class="h-full w-0 rounded-full bg-gradient-to-r from-orange-400 via-amber-400 to-emerald-400"></div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- ECOSYSTEM INTEL -->
+
+        <div class="rounded-[32px] border-2 border-slate-100 bg-gradient-to-b from-white to-slate-50 p-6 shadow-sm">
+
+          <div class="mb-5 flex items-center gap-3">
+
+            <div class="flex h-10 w-10 items-center justify-center rounded-2xl border border-sky-100 bg-sky-50 text-sm text-sky-500">
+              ◉
+            </div>
+
+            <div>
+
+              <div class="text-[9px] font-black uppercase tracking-[0.2em] text-sky-500">
+                ECOSYSTEM INTEL
+              </div>
+
+              <div class="mt-1 text-xs font-black text-slate-600">
+                What happens next?
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div class="space-y-4">
+
+            <div class="flex gap-3">
+
+              <span class="font-mono text-[9px] font-bold text-orange-400">
+                01
+              </span>
+
+              <div>
+
+                <div class="text-[10px] font-bold text-slate-600">
+                  Entity enters the ecosystem
+                </div>
+
+                <div class="mt-1 text-[9px] leading-4 text-slate-400">
+                  The new node becomes part of your knowledge foundation.
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div class="flex gap-3">
+
+              <span class="font-mono text-[9px] font-bold text-sky-400">
+                02
+              </span>
+
+              <div>
+
+                <div class="text-[10px] font-bold text-slate-600">
+                  Intelligence can be expanded
+                </div>
+
+                <div class="mt-1 text-[9px] leading-4 text-slate-400">
+                  Add structured attributes, observations and evidence.
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div class="flex gap-3">
+
+              <span class="font-mono text-[9px] font-bold text-violet-400">
+                03
+              </span>
+
+              <div>
+
+                <div class="text-[10px] font-bold text-slate-600">
+                  Relationships unlock context
+                </div>
+
+                <div class="mt-1 text-[9px] leading-4 text-slate-400">
+                  Connect the entity to people, organisations, concepts and systems.
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div class="flex gap-3">
+
+              <span class="font-mono text-[9px] font-bold text-emerald-400">
+                04
+              </span>
+
+              <div>
+
+                <div class="text-[10px] font-bold text-slate-600">
+                  Ecosystem impact grows
+                </div>
+
+                <div class="mt-1 text-[9px] leading-4 text-slate-400">
+                  Better knowledge creates a stronger and more useful ecosystem.
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    <% end %>
+
+
+    <!-- ========================================================= -->
+    <!-- ECOSYSTEM LOOP -->
+    <!-- ========================================================= -->
+
+    <div class="mt-8 rounded-[32px] border-2 border-orange-100 bg-gradient-to-r from-orange-50/70 via-white to-emerald-50/50 p-6 shadow-sm">
+
+      <div class="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+
+        <div class="flex items-start gap-4">
+
+          <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-orange-100 text-lg shadow-sm">
+            🔄
+          </div>
+
+          <div>
+
+            <div class="text-sm font-black text-slate-700">
+              Ecosystem improvement loop
+            </div>
+
+            <p class="mt-1 max-w-3xl text-xs leading-6 text-slate-400">
+              Every entity becomes part of a larger knowledge network.
+              As entities gain relationships, evidence, observations and
+              feedback, the ecosystem becomes more complete and useful.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <%= link_to admin_ecosystems_load_sources_entities_path,
+                    class: "group flex shrink-0 items-center justify-center gap-2 rounded-2xl border-2 border-orange-200 bg-gradient-to-r from-orange-400 to-amber-400 px-5 py-3 text-sm font-black text-white shadow-md shadow-orange-200/60 transition-all duration-300 hover:-translate-y-1 hover:from-orange-500 hover:to-amber-500 hover:shadow-lg hover:shadow-orange-200/80" do %>
+
+          <span>
+            Explore entities
+          </span>
+
+          <span class="transition-transform duration-300 group-hover:translate-x-1">
+            →
+          </span>
+
+        <% end %>
+
+      </div>
+
+
+      <div class="mt-6">
+
+        <div class="mb-2 flex items-center justify-between">
+
+          <span class="text-[9px] font-black uppercase tracking-widest text-slate-400">
+            Ecosystem Evolution
+          </span>
+
+          <span class="text-[10px] font-black text-orange-500">
+            Ready for new knowledge
+          </span>
+
+        </div>
+
+
+        <div class="h-2.5 overflow-hidden rounded-full border border-orange-100 bg-white">
+
+          <div class="h-full w-[18%] rounded-full bg-gradient-to-r from-orange-400 via-amber-400 to-emerald-400 shadow-sm"></div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+  </div>
+
+</div>

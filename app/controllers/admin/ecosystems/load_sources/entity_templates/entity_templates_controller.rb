@@ -122,7 +122,19 @@ module Admin
     else
       @entity_types = ::Ecosystems::LoadSources::EntityTypes::EntityType.where(active: true).order(:name)
 
-      render :new, status: :unprocessable_entity
+      content = render_to_string(
+        template: "admin/ecosystems/load_sources/entity_templates/entity_templates/new",
+        layout: false
+      )
+
+      render(
+        template: "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
+        layout: false,
+        locals: {
+          content: content
+        },
+        status: :unprocessable_entity
+      )
     end
   end
 

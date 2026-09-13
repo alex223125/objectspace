@@ -58,6 +58,11 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
            inverse_of: :entity_template_version,
            dependent: :destroy
 
+  has_many :entities,
+           class_name: "Ecosystems::LoadSources::Entity::Entity",
+           foreign_key: :entity_template_version_id,
+           inverse_of: :entity_template_version
+
 
   # ============================================================
   # ENUMS

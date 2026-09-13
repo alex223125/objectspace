@@ -316,6 +316,9 @@ Rails.application.routes.draw do
               post :clone, to: "entity_template_versions#clone"
               get :compare
             end
+            collection do
+              get :search
+            end
             resources :entity_template_fields
           end
 
@@ -333,6 +336,18 @@ Rails.application.routes.draw do
           delete "configuration/:id",
                  to: "configurations#destroy",
                  as: :delete_configuration
+        end
+
+
+        resources :entities, controller: "entities/entities" do
+          member do
+            post :clone
+            patch :archive
+            patch :restore
+            patch :publish
+            patch :deprecate
+            get :compare
+          end
         end
       end
     end

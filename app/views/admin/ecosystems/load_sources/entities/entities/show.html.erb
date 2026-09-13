@@ -1,0 +1,2452 @@
+<%# ============================================================================
+ENTITY — SHOW
+
+Path:
+app/views/admin/ecosystems/load_sources/entities/entities/show.html.erb
+
+Purpose:
+Administrative detail view for an Entity.
+
+Important structural resolution:
+
+Entity belongs to EntityTemplateVersion
+EntityTemplateVersion has_many EntityTemplateFields
+EntityTemplateField belongs_to EntityTemplateVersion
+Entity values are resolved from the persisted entity payload/attributes
+Template fields are used as the structural definition
+This view is intentionally defensive so it can work while the underlying
+Entity storage evolves.
+============================================================================ %>
+
+<%
+  # ==========================================================================
+  # SAFE DEFAULTS
+  # ==========================================================================
+  entity = @entity
+
+  template =
+    if entity.respond_to?(:entity_template)
+      entity.entity_template
+    elsif entity.respond_to?(:entity_template_version) &&
+      entity.entity_template_version.present? &&
+      entity.entity_template_version.respond_to?(:entity_template)
+      entity.entity_template_version.entity_template
+    end
+
+  template_version =
+    if entity.respond_to?(:entity_template_version)
+      entity.entity_template_version
+    elsif entity.respond_to?(:template_version)
+      entity.template_version
+    end
+
+  entity_id =
+    if entity.respond_to?(:id)
+      entity.id
+    else
+      "—"
+    end
+
+  entity_name =
+    if entity.respond_to?(:name) && entity.name.present?
+      entity.name.to_s
+    elsif entity.respond_to?(:title) && entity.title.present?
+      entity.title.to_s
+    elsif entity.respond_to?(:label) && entity.label.present?
+      entity.label.to_s
+    else
+      "Entity ##{entity_id}"
+    end
+
+  entity_status =
+    if entity.respond_to?(:status) && entity.status.present?
+      entity.status.to_s
+    else
+      "unknown"
+    end
+
+  entity_identifier =
+    if entity.respond_to?(:identifier) && entity.identifier.present?
+      entity.identifier.to_s
+    elsif entity.respond_to?(:slug) && entity.slug.present?
+      entity.slug.to_s
+    elsif entity.respond_to?(:external_id) && entity.external_id.present?
+      entity.external_id.to_s
+    else
+      nil
+    end
+
+  entity_description =
+    if entity.respond_to?(:description) && entity.description.present?
+      entity.description.to_s
+    elsif entity.respond_to?(:summary) && entity.summary.present?
+      entity.summary.to_s
+    else
+      nil
+    end
+
+  version_number =
+    if template_version.respond_to?(:version)
+      template_version.version
+    elsif entity.respond_to?(:version)
+      entity.version
+    elsif entity.respond_to?(:version_number)
+      entity.version_number
+    end
+
+  created_at =
+    if entity.respond_to?(:created_at)
+      entity.created_at
+    end
+
+  updated_at =
+    if entity.respond_to?(:updated_at)
+      entity.updated_at
+    end
+
+  published_at =
+    if entity.respond_to?(:published_at)
+      entity.published_at
+    end
+
+  # ==========================================================================
+  # STATUS PRESENTATION
+  # ==========================================================================
+  status_badge =
+    case entity_status.downcase
+
+    when "published"
+
+      {
+        label: "Published",
+        classes:
+          "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+        icon: "✓"
+      }
+
+    when "draft"
+
+      {
+        label: "Draft",
+        classes:
+          "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+        icon: "◐"
+      }
+
+    when "archived"
+
+      {
+        label: "Archived",
+        classes:
+          "bg-gray-100 text-gray-600 dark:bg-gray-900 dark:text-gray-400",
+        icon: "◌"
+      }
+
+    when "active"
+
+      {
+        label: "Active",
+        classes:
+          "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+        icon: "●"
+      }
+
+    else
+
+      {
+        label: entity_status.humanize,
+        classes:
+          "bg-gray-100 text-gray-600 dark:bg-gray-900 dark:text-gray-400",
+        icon: "?"
+      }
+
+    end
+
+#   ==========================================================================
+#   ENTITY PAYLOAD
+#   Do NOT use entity.attributes directly as the displayed entity data.
+#     ActiveRecord's attributes contains database columns and would therefore
+# expose id/status/timestamps/etc.
+# We first look for dedicated payload columns such as data and
+# attributes_data.
+# ==========================================================================
+entity_payload = {}
+
+if entity.respond_to?(:data)
+
+candidate = entity.data
+
+if candidate.respond_to?(:to_h)
+  candidate = candidate.to_h
+end
+
+entity_payload = candidate if candidate.is_a?(Hash)
+
+end
+
+if entity_payload.blank? && entity.respond_to?(:attributes_data)
+
+candidate = entity.attributes_data
+
+if candidate.respond_to?(:to_h)
+  candidate = candidate.to_h
+end
+
+entity_payload = candidate if candidate.is_a?(Hash)
+
+end
+
+# ==========================================================================
+# FALLBACK PAYLOAD RESOLUTION
+# Some Entity implementations may expose the dynamic values through
+# methods such as entity_attributes or fields.
+# ==========================================================================
+if entity_payload.blank? && entity.respond_to?(:entity_attributes)
+
+candidate = entity.entity_attributes
+
+if candidate.respond_to?(:to_h)
+  candidate = candidate.to_h
+end
+
+entity_payload = candidate if candidate.is_a?(Hash)
+
+end
+
+if entity_payload.blank? && entity.respond_to?(:fields)
+
+candidate = entity.fields
+
+if candidate.respond_to?(:to_h)
+  candidate = candidate.to_h
+end
+
+entity_payload = candidate if candidate.is_a?(Hash)
+
+end
+
+entity_payload =
+{} unless entity_payload.is_a?(Hash)
+
+# Normalize keys so lookup works regardless of string/symbol JSON keys.
+normalized_entity_payload = {}
+
+entity_payload.each do |key, value|
+normalized_entity_payload[key.to_s] = value
+end
+
+# ==========================================================================
+# TEMPLATE FIELDS
+# THIS IS THE IMPORTANT FIX.
+# EntityTemplateVersion has_many :entity_template_fields.
+# Therefore the fields displayed under "Entity Data" should be resolved
+# from the entity's template version.
+#   ==========================================================================
+                                              template_fields = []
+
+  if template_version.present? &&
+    template_version.respond_to?(:entity_template_fields)
+
+    candidate_fields =
+      template_version.entity_template_fields
+
+    template_fields =
+      candidate_fields.to_a
+
+  end
+
+  # ==========================================================================
+  # FIELD HELPERS
+  # ==========================================================================
+  field_name_for =
+    lambda do |field|
+
+      if field.respond_to?(:name) && field.name.present?
+        field.name.to_s
+      elsif field.respond_to?(:key) && field.key.present?
+        field.key.to_s
+      elsif field.respond_to?(:identifier) && field.identifier.present?
+        field.identifier.to_s
+      elsif field.respond_to?(:slug) && field.slug.present?
+        field.slug.to_s
+      else
+        "field_#{field.respond_to?(:id) ? field.id : "unknown"}"
+      end
+
+    end
+
+  field_label_for =
+    lambda do |field|
+
+      if field.respond_to?(:label) && field.label.present?
+        field.label.to_s
+      elsif field.respond_to?(:display_name) && field.display_name.present?
+        field.display_name.to_s
+      elsif field.respond_to?(:title) && field.title.present?
+        field.title.to_s
+      elsif field.respond_to?(:name) && field.name.present?
+        field.name.to_s.humanize
+      elsif field.respond_to?(:key) && field.key.present?
+        field.key.to_s.humanize
+      elsif field.respond_to?(:identifier) && field.identifier.present?
+        field.identifier.to_s.humanize
+      else
+        field_name_for.call(field).humanize
+      end
+
+    end
+
+  field_type_for =
+    lambda do |field|
+
+      if field.respond_to?(:field_type) && field.field_type.present?
+        field.field_type.to_s
+      elsif field.respond_to?(:data_type) && field.data_type.present?
+        field.data_type.to_s
+      elsif field.respond_to?(:type) && field.type.present?
+        field.type.to_s
+      elsif field.respond_to?(:kind) && field.kind.present?
+        field.kind.to_s
+      else
+        "value"
+      end
+
+    end
+
+  # ==========================================================================
+  # VALUE RESOLUTION
+  # Try several common key forms:
+  #                          field.name
+  # field.key
+  # field.identifier
+  # field.slug
+  # This lets the template definition and persisted JSON remain compatible
+  # even if they use different naming conventions.
+  #   ==========================================================================
+                                      value_for_field =
+                                        lambda do |field|
+
+    possible_keys = []
+
+    %i[name key identifier slug].each do |attribute_name|
+
+      if field.respond_to?(attribute_name)
+
+        candidate =
+          field.public_send(attribute_name)
+
+        if candidate.present?
+          possible_keys << candidate.to_s
+        end
+
+      end
+
+    end
+
+    possible_keys =
+      possible_keys.uniq
+
+    found = false
+    value = nil
+
+    possible_keys.each do |key|
+
+      if normalized_entity_payload.key?(key)
+
+        value = normalized_entity_payload[key]
+        found = true
+        break
+
+      end
+
+    end
+
+    unless found
+
+      # Also support nested string/symbol keys in case the original payload
+
+      # was not normalized deeply.
+
+      possible_keys.each do |key|
+
+        symbol_key =
+          begin
+            key.to_sym
+          rescue
+            nil
+          end
+
+        if symbol_key && entity_payload.key?(symbol_key)
+
+          value = entity_payload[symbol_key]
+          found = true
+          break
+
+        end
+
+      end
+
+    end
+
+    [found, value]
+
+  end
+
+  # ==========================================================================
+  #   RESOLVED ENTITY DATA
+  # Each item contains:
+  #             field
+  # key
+  # label
+  # type
+  # value
+  # present
+  # This allows the view to show the structural definition even when a field
+  # currently has no persisted value.
+  #   ==========================================================================
+                               resolved_fields = []
+
+  template_fields.each do |field|
+
+    key =
+      field_name_for.call(field)
+
+    label =
+      field_label_for.call(field)
+
+    type =
+      field_type_for.call(field)
+
+    present_value, value =
+      value_for_field.call(field)
+
+    resolved_fields << {
+      field: field,
+      key: key,
+      label: label,
+      type: type,
+      value: value,
+      present: present_value
+    }
+
+  end
+
+  # ==========================================================================
+  # EXTRA PAYLOAD VALUES
+  # If the entity contains persisted values that are NOT currently represented
+  # by the template version, show them under "Additional persisted values".
+  # ==========================================================================
+                                             defined_field_keys =
+                                               resolved_fields.map { |item| item[:key].to_s }
+
+  extra_payload =
+    normalized_entity_payload.reject do |key, _value|
+
+      key.to_s.in?(defined_field_keys) ||
+        key.to_s.in?(%w[
+      id
+      created_at
+      updated_at
+      deleted_at
+    ])
+
+    end
+
+  # ==========================================================================
+  # DISPLAY COUNTS
+  # ==========================================================================
+  field_count =
+    if template_fields.present?
+
+      template_fields.size
+
+    elsif entity.respond_to?(:field_count) &&
+      entity.field_count.present?
+
+      entity.field_count
+
+    elsif entity_payload.present?
+
+      entity_payload.size
+
+    else
+
+      0
+    end
+
+  section_count =
+    if entity.respond_to?(:section_count)
+
+      entity.section_count
+
+    elsif entity.respond_to?(:sections) &&
+      entity.sections.respond_to?(:size)
+
+      entity.sections.size
+
+    end
+
+  # ==========================================================================
+  # URLS
+  # ==========================================================================
+  entities_path =
+    admin_ecosystems_load_sources_entities_path
+
+  entity_path =
+    admin_ecosystems_load_sources_entity_path(@entity)
+
+  edit_entity_path =
+    edit_admin_ecosystems_load_sources_entity_path(@entity)
+
+  clone_entity_path =
+    clone_admin_ecosystems_load_sources_entity_path(@entity)
+
+  archive_entity_path =
+    archive_admin_ecosystems_load_sources_entity_path(@entity)
+
+  restore_entity_path =
+    restore_admin_ecosystems_load_sources_entity_path(@entity)
+
+  publish_entity_path =
+    publish_admin_ecosystems_load_sources_entity_path(@entity)
+
+  deprecate_entity_path =
+    deprecate_admin_ecosystems_load_sources_entity_path(@entity)
+
+  compare_entity_path =
+    compare_admin_ecosystems_load_sources_entity_path(@entity)
+
+  template_path =
+    if template.present?
+
+      begin
+
+        admin_ecosystems_load_sources_entity_templates_entity_template_path(template)
+
+      rescue
+
+        nil
+
+      end
+
+    end
+
+  version_path =
+    if template_version.present?
+
+      begin
+
+        admin_ecosystems_load_sources_entity_templates_entity_template_version_path(template_version)
+
+      rescue
+
+        nil
+
+      end
+
+    end
+%>
+
+<div class=" mx-auto w-full max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8 ">
+<%# =========================================================================
+HEADER
+========================================================================= %>
+
+  <div class="mb-8">
+    <div
+      class="
+    flex
+    flex-col
+    gap-5
+    xl:flex-row
+    xl:items-center
+    xl:justify-between
+  ">
+
+      <div class="min-w-0">
+
+        <div class="flex items-center gap-4">
+
+          <div
+            class="
+          flex
+          h-14
+          w-14
+          shrink-0
+          items-center
+          justify-center
+          rounded-2xl
+          bg-violet-100
+          text-2xl
+          shadow-sm
+          dark:bg-violet-900/40
+        ">
+            ◈
+          </div>
+
+          <div class="min-w-0">
+
+            <div
+              class="
+            mb-1
+            text-[11px]
+            font-black
+            uppercase
+            tracking-[0.2em]
+            text-violet-500
+          ">
+              Entity Registry
+            </div>
+
+            <h1
+              class="
+            truncate
+            text-2xl
+            font-black
+            tracking-tight
+            text-gray-900
+            sm:text-3xl
+            dark:text-white
+          "
+              title="<%= entity_name %>">
+
+              <%= entity_name %>
+
+            </h1>
+
+            <p
+              class="
+            mt-1
+            max-w-3xl
+            text-sm
+            text-gray-500
+            dark:text-gray-400
+          ">
+
+              Inspect the entity record, structural definition, version
+              lineage and persisted attributes.
+
+            </p>
+
+          </div>
+
+        </div>
+
+        <%# BREADCRUMB %>
+
+        <div
+          class="
+        mt-4
+        flex
+        flex-wrap
+        items-center
+        gap-2
+        text-xs
+        text-gray-400
+      ">
+
+          <span>Encyclopedia</span>
+          <span>›</span>
+
+          <span>Ecosystems</span>
+          <span>›</span>
+
+          <span>Load Sources</span>
+          <span>›</span>
+
+          <span>Entities</span>
+          <span>›</span>
+
+          <span class="font-semibold text-violet-500">
+        <%= entity_name %>
+      </span>
+
+        </div>
+
+      </div>
+
+      <%# HEADER ACTIONS %>
+
+      <div class="flex shrink-0 flex-wrap items-center gap-2">
+
+        <%= link_to(
+              entities_path,
+              class: "
+            inline-flex
+            items-center
+            justify-center
+            gap-2
+            rounded-xl
+            border
+            border-gray-200
+            bg-white
+            px-4
+            py-3
+            text-sm
+            font-semibold
+            text-gray-700
+            shadow-sm
+            transition
+            hover:border-violet-200
+            hover:text-violet-600
+            dark:border-gray-700
+            dark:bg-gray-800
+            dark:text-gray-300
+          "
+            ) do %>
+
+          <span>←</span>
+          Back to Entities
+
+        <% end %>
+
+        <%= link_to(
+              edit_entity_path,
+              class: "
+            inline-flex
+            items-center
+            justify-center
+            gap-2
+            rounded-xl
+            bg-violet-600
+            px-5
+            py-3
+            text-sm
+            font-semibold
+            text-white
+            shadow-sm
+            transition
+            hover:bg-violet-700
+            focus:outline-none
+            focus:ring-2
+            focus:ring-violet-500
+            focus:ring-offset-2
+          "
+            ) do %>
+
+          <span>✎</span>
+          Edit Entity
+
+        <% end %>
+
+      </div>
+
+    </div>
+
+  </div>
+<%# =========================================================================
+ENTITY IDENTITY PANEL
+========================================================================= %>
+
+  <div class=" mb-8 overflow-hidden rounded-2xl border-2 border-violet-100 bg-gradient-to-br from-violet-50 via-white to-indigo-50 shadow-sm dark:border-violet-900/40 dark:from-violet-950/30 dark:via-gray-900 dark:to-indigo-950/30 ">
+    <div class="relative p-6 sm:p-8">
+
+      <div
+        class="
+      pointer-events-none
+      absolute
+      -right-16
+      -top-16
+      h-48
+      w-48
+      rounded-full
+      bg-violet-200/30
+      blur-3xl
+      dark:bg-violet-500/10
+    "></div>
+
+      <div class="relative">
+
+        <div
+          class="
+        flex
+        flex-col
+        gap-6
+        lg:flex-row
+        lg:items-start
+        lg:justify-between
+      ">
+
+          <div class="min-w-0">
+
+            <div
+              class="
+            text-[11px]
+            font-black
+            uppercase
+            tracking-[0.2em]
+            text-violet-500
+          ">
+              Entity Identity
+            </div>
+
+            <div
+              class="
+            mt-2
+            break-words
+            text-2xl
+            font-black
+            text-gray-900
+            dark:text-white
+          ">
+
+              <%= entity_name %>
+
+            </div>
+
+            <% if entity_identifier.present? %>
+
+              <div
+                class="
+              mt-2
+              inline-flex
+              max-w-full
+              items-center
+              gap-2
+              rounded-lg
+              border
+              border-gray-200
+              bg-white
+              px-3
+              py-2
+              font-mono
+              text-xs
+              text-gray-500
+              shadow-sm
+              dark:border-gray-700
+              dark:bg-gray-800
+              dark:text-gray-400
+            ">
+
+            <span class="text-violet-500">
+              #
+            </span>
+
+                <span class="truncate">
+              <%= entity_identifier %>
+            </span>
+
+              </div>
+
+            <% end %>
+
+            <% if entity_description.present? %>
+
+              <p
+                class="
+              mt-4
+              max-w-3xl
+              text-sm
+              leading-6
+              text-gray-500
+              dark:text-gray-400
+            ">
+
+                <%= entity_description %>
+
+              </p>
+
+            <% end %>
+
+          </div>
+
+          <div class="shrink-0">
+
+        <span
+          class="
+            inline-flex
+            items-center
+            gap-2
+            rounded-full
+            px-4
+            py-2
+            text-sm
+            font-bold
+            <%= status_badge[:classes] %>
+          ">
+
+          <span>
+            <%= status_badge[:icon] %>
+          </span>
+
+          <%= status_badge[:label] %>
+
+        </span>
+
+          </div>
+
+        </div>
+
+        <%# IDENTITY METRICS %>
+
+        <div
+          class="
+        mt-7
+        grid
+        grid-cols-1
+        gap-3
+        sm:grid-cols-2
+        lg:grid-cols-4
+      ">
+
+          <div
+            class="
+          rounded-xl
+          border
+          border-gray-200
+          bg-white
+          p-4
+          dark:border-gray-700
+          dark:bg-gray-800
+        ">
+
+            <div class="text-xl">
+              ◈
+            </div>
+
+            <div
+              class="
+            mt-2
+            text-[10px]
+            font-black
+            uppercase
+            tracking-wider
+            text-gray-400
+          ">
+              Entity ID
+            </div>
+
+            <div
+              class="
+            mt-1
+            font-mono
+            text-sm
+            font-bold
+            text-gray-800
+            dark:text-gray-200
+          ">
+              #<%= entity_id %>
+            </div>
+
+          </div>
+
+          <div
+            class="
+          rounded-xl
+          border
+          border-violet-200
+          bg-violet-50
+          p-4
+          dark:border-violet-800
+          dark:bg-violet-900/20
+        ">
+
+            <div class="text-xl">
+              🧬
+            </div>
+
+            <div
+              class="
+            mt-2
+            text-[10px]
+            font-black
+            uppercase
+            tracking-wider
+            text-violet-500
+          ">
+              Template Version
+            </div>
+
+            <div
+              class="
+            mt-1
+            text-sm
+            font-bold
+            text-violet-700
+            dark:text-violet-300
+          ">
+
+              <% if version_number.present? %>
+                v<%= version_number %>
+              <% else %>
+                —
+              <% end %>
+
+            </div>
+
+          </div>
+
+          <div
+            class="
+          rounded-xl
+          border
+          border-indigo-200
+          bg-indigo-50
+          p-4
+          dark:border-indigo-800
+          dark:bg-indigo-900/20
+        ">
+
+            <div class="text-xl">
+              🧱
+            </div>
+
+            <div
+              class="
+            mt-2
+            text-[10px]
+            font-black
+            uppercase
+            tracking-wider
+            text-indigo-500
+          ">
+              Template
+            </div>
+
+            <div
+              class="
+            mt-1
+            truncate
+            text-sm
+            font-bold
+            text-indigo-700
+            dark:text-indigo-300
+          ">
+
+              <% if template.present? && template.respond_to?(:name) %>
+                <%= template.name %>
+              <% else %>
+                —
+              <% end %>
+
+            </div>
+
+          </div>
+
+          <div
+            class="
+          rounded-xl
+          border
+          border-emerald-200
+          bg-emerald-50
+          p-4
+          dark:border-emerald-800
+          dark:bg-emerald-900/20
+        ">
+
+            <div class="text-xl">
+              ●
+            </div>
+
+            <div
+              class="
+            mt-2
+            text-[10px]
+            font-black
+            uppercase
+            tracking-wider
+            text-emerald-500
+          ">
+              Fields
+            </div>
+
+            <div
+              class="
+            mt-1
+            text-sm
+            font-bold
+            text-emerald-700
+            dark:text-emerald-300
+          ">
+
+              <%= number_with_delimiter(field_count) %>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+<%# =========================================================================
+MAIN CONTENT
+========================================================================= %>
+
+  <div class=" grid grid-cols-1 gap-6 xl:grid-cols-3 ">
+<%# =======================================================================
+LEFT / PRIMARY CONTENT
+======================================================================== %>
+
+    <div class="space-y-6 xl:col-span-2">
+
+      <%# ---------------------------------------------------------------------
+  STRUCTURAL DEFINITION / ENTITY DATA
+  ---------------------------------------------------------------------- %>
+
+      <div
+        class="
+      overflow-hidden
+      rounded-2xl
+      border
+      border-gray-200
+      bg-white
+      shadow-sm
+      dark:border-gray-800
+      dark:bg-gray-800
+    ">
+
+        <div
+          class="
+        border-b
+        border-gray-100
+        px-6
+        py-5
+        dark:border-gray-700
+      ">
+
+          <div
+            class="
+          text-[11px]
+          font-black
+          uppercase
+          tracking-[0.2em]
+          text-gray-400
+        ">
+            Structural Definition
+          </div>
+
+          <h2
+            class="
+          mt-1
+          text-xl
+          font-black
+          text-gray-900
+          dark:text-white
+        ">
+            Entity Data
+          </h2>
+
+          <p
+            class="
+          mt-1
+          text-xs
+          text-gray-400
+        ">
+            Persisted entity values resolved against the fields defined by
+            template version
+            <% if version_number.present? %>
+              v<%= version_number %>
+            <% end %>.
+          </p>
+
+        </div>
+
+        <%# ===================================================================
+    NO TEMPLATE VERSION
+    ==================================================================== %>
+
+        <% if template_version.blank? %>
+
+          <div class="px-6 py-14 text-center">
+
+            <div
+              class="
+            mx-auto
+            flex
+            h-16
+            w-16
+            items-center
+            justify-center
+            rounded-2xl
+            bg-amber-50
+            text-3xl
+            dark:bg-amber-900/20
+          ">
+              !
+            </div>
+
+            <h3
+              class="
+            mt-4
+            text-sm
+            font-black
+            text-gray-900
+            dark:text-white
+          ">
+              No template version
+            </h3>
+
+            <p
+              class="
+            mx-auto
+            mt-1
+            max-w-md
+            text-xs
+            leading-5
+            text-gray-400
+          ">
+              This entity is not currently associated with an entity template
+              version, so its structural field definition cannot be resolved.
+            </p>
+
+          </div>
+
+          <%# ===================================================================
+    TEMPLATE VERSION EXISTS BUT HAS NO FIELDS
+    ==================================================================== %>
+
+        <% elsif template_fields.blank? %>
+
+          <div class="px-6 py-14 text-center">
+
+            <div
+              class="
+            mx-auto
+            flex
+            h-16
+            w-16
+            items-center
+            justify-center
+            rounded-2xl
+            bg-violet-50
+            text-3xl
+            dark:bg-violet-900/20
+          ">
+              ◈
+            </div>
+
+            <h3
+              class="
+            mt-4
+            text-sm
+            font-black
+            text-gray-900
+            dark:text-white
+          ">
+              No template fields
+            </h3>
+
+            <p
+              class="
+            mx-auto
+            mt-1
+            max-w-md
+            text-xs
+            leading-5
+            text-gray-400
+          ">
+              Template version
+              <% if version_number.present? %>
+                v<%= version_number %>
+              <% else %>
+                <%= template_version.respond_to?(:id) ? "##{template_version.id}" : "" %>
+              <% end %>
+              does not currently define any entity template fields.
+            </p>
+
+          </div>
+
+          <%# ===================================================================
+    TEMPLATE FIELDS EXIST
+    ==================================================================== %>
+
+        <% else %>
+
+          <div class="divide-y divide-gray-100 dark:divide-gray-700">
+
+            <% resolved_fields.each do |item| %>
+
+              <% field = item[:field] %>
+              <% key = item[:key] %>
+              <% label = item[:label] %>
+              <% type = item[:type] %>
+              <% value = item[:value] %>
+              <% has_value = item[:present] %>
+
+              <div
+                class="
+              px-6
+              py-5
+              transition
+              hover:bg-violet-50/40
+              dark:hover:bg-violet-950/10
+            ">
+
+                <div
+                  class="
+                flex
+                flex-col
+                gap-4
+                sm:flex-row
+                sm:items-start
+              ">
+
+                  <%# FIELD IDENTITY %>
+
+                  <div
+                    class="
+                  w-full
+                  shrink-0
+                  sm:w-56
+                ">
+
+                    <div
+                      class="
+                    text-sm
+                    font-black
+                    text-gray-900
+                    dark:text-white
+                  ">
+
+                      <%= label %>
+
+                    </div>
+
+                    <div
+                      class="
+                    mt-1
+                    break-all
+                    font-mono
+                    text-[11px]
+                    font-bold
+                    text-violet-600
+                    dark:text-violet-400
+                  ">
+
+                      <%= key %>
+
+                    </div>
+
+                    <div class="mt-2">
+
+                  <span
+                    class="
+                      inline-flex
+                      items-center
+                      rounded-full
+                      bg-gray-100
+                      px-2
+                      py-1
+                      text-[9px]
+                      font-black
+                      uppercase
+                      tracking-wider
+                      text-gray-500
+                      dark:bg-gray-900
+                      dark:text-gray-400
+                    ">
+
+                    <%= type.humanize %>
+
+                  </span>
+
+                    </div>
+
+                  </div>
+
+                  <%# FIELD VALUE %>
+
+                  <div class="min-w-0 flex-1">
+
+                    <% if has_value %>
+
+                      <% if value.is_a?(Hash) || value.is_a?(Array) %>
+
+                    <pre
+                      class="
+                        max-h-80
+                        overflow-auto
+                        rounded-xl
+                        border
+                        border-gray-200
+                        bg-gray-50
+                        p-4
+                        font-mono
+                        text-xs
+                        leading-5
+                        text-gray-700
+                        dark:border-gray-700
+                        dark:bg-gray-900
+                        dark:text-gray-300
+                      "><%= JSON.pretty_generate(value) rescue value.inspect %></pre>
+
+                      <% elsif value == true %>
+
+                    <span
+                      class="
+                        inline-flex
+                        items-center
+                        gap-2
+                        rounded-lg
+                        bg-emerald-50
+                        px-3
+                        py-2
+                        text-sm
+                        font-bold
+                        text-emerald-700
+                        dark:bg-emerald-900/20
+                        dark:text-emerald-300
+                      ">
+
+                      <span>✓</span>
+                      true
+
+                    </span>
+
+                      <% elsif value == false %>
+
+                    <span
+                      class="
+                        inline-flex
+                        items-center
+                        gap-2
+                        rounded-lg
+                        bg-gray-100
+                        px-3
+                        py-2
+                        text-sm
+                        font-bold
+                        text-gray-600
+                        dark:bg-gray-900
+                        dark:text-gray-400
+                      ">
+
+                      <span>○</span>
+                      false
+
+                    </span>
+
+                      <% elsif value.nil? %>
+
+                    <span
+                      class="
+                        inline-flex
+                        items-center
+                        rounded-lg
+                        bg-gray-100
+                        px-3
+                        py-2
+                        text-xs
+                        font-semibold
+                        text-gray-400
+                        dark:bg-gray-900
+                        dark:text-gray-500
+                      ">
+
+                      null
+
+                    </span>
+
+                      <% else %>
+
+                        <div
+                          class="
+                        break-words
+                        rounded-xl
+                        border
+                        border-gray-200
+                        bg-white
+                        px-4
+                        py-3
+                        text-sm
+                        font-semibold
+                        text-gray-700
+                        dark:border-gray-700
+                        dark:bg-gray-900/40
+                        dark:text-gray-300
+                      ">
+
+                          <%= value %>
+
+                        </div>
+
+                      <% end %>
+
+                    <% else %>
+
+                      <div
+                        class="
+                      flex
+                      items-center
+                      gap-3
+                      rounded-xl
+                      border
+                      border-dashed
+                      border-gray-200
+                      bg-gray-50
+                      px-4
+                      py-3
+                      dark:border-gray-700
+                      dark:bg-gray-900/40
+                    ">
+
+                    <span
+                      class="
+                        flex
+                        h-7
+                        w-7
+                        shrink-0
+                        items-center
+                        justify-center
+                        rounded-lg
+                        bg-gray-100
+                        text-xs
+                        text-gray-400
+                        dark:bg-gray-800
+                      ">
+                      —
+                    </span>
+
+                        <div>
+
+                          <div
+                            class="
+                          text-xs
+                          font-bold
+                          text-gray-500
+                          dark:text-gray-400
+                        ">
+                            No persisted value
+                          </div>
+
+                          <div
+                            class="
+                          mt-0.5
+                          text-[10px]
+                          text-gray-400
+                        ">
+                            This field is defined by the template version but
+                            currently has no stored entity value.
+                          </div>
+
+                        </div>
+
+                      </div>
+
+                    <% end %>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            <% end %>
+
+            <%# ===============================================================
+        EXTRA PERSISTED VALUES
+        ================================================================ %>
+
+            <% if extra_payload.present? %>
+
+              <div
+                class="
+              border-t-2
+              border-dashed
+              border-amber-100
+              bg-amber-50/40
+              px-6
+              py-5
+              dark:border-amber-900/30
+              dark:bg-amber-950/10
+            ">
+
+                <div
+                  class="
+                mb-4
+                flex
+                items-center
+                gap-3
+              ">
+
+                  <div
+                    class="
+                  flex
+                  h-9
+                  w-9
+                  items-center
+                  justify-center
+                  rounded-xl
+                  bg-amber-100
+                  text-amber-600
+                  dark:bg-amber-900/30
+                  dark:text-amber-400
+                ">
+                    +
+                  </div>
+
+                  <div>
+
+                    <div
+                      class="
+                    text-sm
+                    font-black
+                    text-amber-700
+                    dark:text-amber-300
+                  ">
+                      Additional persisted values
+                    </div>
+
+                    <div
+                      class="
+                    mt-0.5
+                    text-[10px]
+                    text-amber-600
+                    dark:text-amber-400
+                  ">
+                      Values stored on the entity that are not defined by the
+                      current template version.
+                    </div>
+
+                  </div>
+
+                </div>
+
+                <div class="space-y-3">
+
+                  <% extra_payload.each do |key, value| %>
+
+                    <div
+                      class="
+                    rounded-xl
+                    border
+                    border-amber-100
+                    bg-white
+                    p-4
+                    dark:border-amber-900/30
+                    dark:bg-gray-900/50
+                  ">
+
+                      <div
+                        class="
+                      flex
+                      flex-col
+                      gap-3
+                      sm:flex-row
+                      sm:items-start
+                    ">
+
+                        <div
+                          class="
+                        w-full
+                        shrink-0
+                        sm:w-56
+                      ">
+
+                          <div
+                            class="
+                          font-mono
+                          text-xs
+                          font-bold
+                          text-amber-700
+                          dark:text-amber-400
+                        ">
+
+                            <%= key %>
+
+                          </div>
+
+                        </div>
+
+                        <div class="min-w-0 flex-1">
+
+                          <% if value.is_a?(Hash) || value.is_a?(Array) %>
+
+                        <pre
+                          class="
+                            max-h-80
+                            overflow-auto
+                            rounded-xl
+                            border
+                            border-gray-200
+                            bg-gray-50
+                            p-4
+                            font-mono
+                            text-xs
+                            leading-5
+                            text-gray-700
+                            dark:border-gray-700
+                            dark:bg-gray-900
+                            dark:text-gray-300
+                          "><%= JSON.pretty_generate(value) rescue value.inspect %></pre>
+
+                          <% else %>
+
+                            <div
+                              class="
+                            break-words
+                            text-sm
+                            font-semibold
+                            text-gray-700
+                            dark:text-gray-300
+                          ">
+
+                              <%= value.present? ? value : "—" %>
+
+                            </div>
+
+                          <% end %>
+
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                  <% end %>
+
+                </div>
+
+              </div>
+
+            <% end %>
+
+          </div>
+
+        <% end %>
+
+      </div>
+
+      <%# ---------------------------------------------------------------------
+  VERSION LINEAGE
+  ---------------------------------------------------------------------- %>
+
+      <div
+        class="
+      overflow-hidden
+      rounded-2xl
+      border
+      border-gray-200
+      bg-white
+      shadow-sm
+      dark:border-gray-800
+      dark:bg-gray-800
+    ">
+
+        <div
+          class="
+        border-b
+        border-gray-100
+        px-6
+        py-5
+        dark:border-gray-700
+      ">
+
+          <div
+            class="
+          text-[11px]
+          font-black
+          uppercase
+          tracking-[0.2em]
+          text-violet-500
+        ">
+            Structural Lineage
+          </div>
+
+          <h2
+            class="
+          mt-1
+          text-xl
+          font-black
+          text-gray-900
+          dark:text-white
+        ">
+            Template Resolution
+          </h2>
+
+        </div>
+
+        <div class="p-6">
+
+          <div class="relative">
+
+            <div
+              class="
+            absolute
+            left-5
+            top-6
+            bottom-6
+            hidden
+            w-px
+            bg-gray-200
+            sm:block
+            dark:bg-gray-700
+          "></div>
+
+            <div class="space-y-6">
+
+              <%# TEMPLATE %>
+
+              <div class="relative flex gap-4">
+
+                <div
+                  class="
+                relative
+                z-10
+                flex
+                h-10
+                w-10
+                shrink-0
+                items-center
+                justify-center
+                rounded-xl
+                bg-indigo-100
+                text-lg
+                dark:bg-indigo-900/40
+              ">
+                  🧱
+                </div>
+
+                <div
+                  class="
+                min-w-0
+                flex-1
+                rounded-xl
+                border
+                border-gray-200
+                bg-gray-50
+                p-4
+                dark:border-gray-700
+                dark:bg-gray-900/50
+              ">
+
+                  <div
+                    class="
+                  text-[10px]
+                  font-black
+                  uppercase
+                  tracking-wider
+                  text-gray-400
+                ">
+                    Entity Template
+                  </div>
+
+                  <% if template.present? %>
+
+                    <div
+                      class="
+                    mt-1
+                    text-sm
+                    font-black
+                    text-gray-900
+                    dark:text-white
+                  ">
+
+                      <% if template_path.present? %>
+
+                        <%= link_to(
+                              template.respond_to?(:name) ?
+                                template.name :
+                                "Template ##{template.id}",
+                              template_path,
+                              class: "hover:text-violet-600"
+                            ) %>
+
+                      <% elsif template.respond_to?(:name) %>
+
+                        <%= template.name %>
+
+                      <% else %>
+
+                        Template #<%= template.id %>
+
+                      <% end %>
+
+                    </div>
+
+                  <% else %>
+
+                    <div class="mt-1 text-sm text-gray-400">
+                      No template association
+                    </div>
+
+                  <% end %>
+
+                </div>
+
+              </div>
+
+              <%# VERSION %>
+
+              <div class="relative flex gap-4">
+
+                <div
+                  class="
+                relative
+                z-10
+                flex
+                h-10
+                w-10
+                shrink-0
+                items-center
+                justify-center
+                rounded-xl
+                bg-violet-100
+                text-lg
+                dark:bg-violet-900/40
+              ">
+                  🧬
+                </div>
+
+                <div
+                  class="
+                min-w-0
+                flex-1
+                rounded-xl
+                border
+                border-violet-200
+                bg-violet-50
+                p-4
+                dark:border-violet-800
+                dark:bg-violet-900/20
+              ">
+
+                  <div
+                    class="
+                  text-[10px]
+                  font-black
+                  uppercase
+                  tracking-wider
+                  text-violet-500
+                ">
+                    Template Version
+                  </div>
+
+                  <% if template_version.present? %>
+
+                    <div
+                      class="
+                    mt-1
+                    text-sm
+                    font-black
+                    text-violet-700
+                    dark:text-violet-300
+                  ">
+
+                      <% if version_path.present? %>
+
+                        <%= link_to(
+                              "Version #{version_number.present? ? "v#{version_number}" : "##{template_version.id}"}",
+                              version_path,
+                              class: "hover:text-violet-500"
+                            ) %>
+
+                      <% else %>
+
+                        Version
+                        <%= version_number.present? ? "v#{version_number}" : "##{template_version.id}" %>
+
+                      <% end %>
+
+                    </div>
+
+                  <% else %>
+
+                    <div class="mt-1 text-sm text-gray-400">
+                      No version association
+                    </div>
+
+                  <% end %>
+
+                </div>
+
+              </div>
+
+              <%# ENTITY %>
+
+              <div class="relative flex gap-4">
+
+                <div
+                  class="
+                relative
+                z-10
+                flex
+                h-10
+                w-10
+                shrink-0
+                items-center
+                justify-center
+                rounded-xl
+                bg-emerald-100
+                text-lg
+                dark:bg-emerald-900/40
+              ">
+                  ◈
+                </div>
+
+                <div
+                  class="
+                min-w-0
+                flex-1
+                rounded-xl
+                border-2
+                border-emerald-200
+                bg-emerald-50
+                p-4
+                dark:border-emerald-800
+                dark:bg-emerald-900/20
+              ">
+
+                  <div
+                    class="
+                  text-[10px]
+                  font-black
+                  uppercase
+                  tracking-wider
+                  text-emerald-500
+                ">
+                    Current Entity
+                  </div>
+
+                  <div
+                    class="
+                  mt-1
+                  text-sm
+                  font-black
+                  text-emerald-700
+                  dark:text-emerald-300
+                ">
+
+                    <%= entity_name %>
+
+                  </div>
+
+                  <div
+                    class="
+                  mt-1
+                  font-mono
+                  text-[10px]
+                  text-emerald-600/70
+                  dark:text-emerald-400/70
+                ">
+
+                    Entity #<%= entity_id %>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+<%# =======================================================================
+RIGHT / METADATA
+======================================================================== %>
+
+    <div class="space-y-6">
+
+      <%# ---------------------------------------------------------------------
+  RECORD INFORMATION
+  ---------------------------------------------------------------------- %>
+
+      <div
+        class="
+      rounded-2xl
+      border
+      border-gray-200
+      bg-white
+      p-6
+      shadow-sm
+      dark:border-gray-800
+      dark:bg-gray-800
+    ">
+
+        <div
+          class="
+        text-[11px]
+        font-black
+        uppercase
+        tracking-[0.2em]
+        text-gray-400
+      ">
+          Record Information
+        </div>
+
+        <div class="mt-5 space-y-4">
+
+          <div>
+
+            <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+              Entity ID
+            </div>
+
+            <div class="mt-1 font-mono text-sm font-bold text-gray-700 dark:text-gray-300">
+              #<%= entity_id %>
+            </div>
+
+          </div>
+
+          <% if entity_identifier.present? %>
+
+            <div>
+
+              <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                Identifier
+              </div>
+
+              <div
+                class="
+              mt-1
+              break-all
+              font-mono
+              text-sm
+              font-bold
+              text-gray-700
+              dark:text-gray-300
+            ">
+
+                <%= entity_identifier %>
+
+              </div>
+
+            </div>
+
+          <% end %>
+
+          <div>
+
+            <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+              Status
+            </div>
+
+            <div class="mt-2">
+
+          <span
+            class="
+              inline-flex
+              items-center
+              gap-1.5
+              rounded-full
+              px-3
+              py-1.5
+              text-xs
+              font-bold
+              <%= status_badge[:classes] %>
+            ">
+
+            <span>
+              <%= status_badge[:icon] %>
+            </span>
+
+            <%= status_badge[:label] %>
+
+          </span>
+
+            </div>
+
+          </div>
+
+          <% if version_number.present? %>
+
+            <div>
+
+              <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                Schema Version
+              </div>
+
+              <div class="mt-1 text-sm font-bold text-gray-700 dark:text-gray-300">
+                v<%= version_number %>
+              </div>
+
+            </div>
+
+          <% end %>
+
+          <% if section_count.present? %>
+
+            <div>
+
+              <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                Sections
+              </div>
+
+              <div class="mt-1 text-sm font-bold text-gray-700 dark:text-gray-300">
+                <%= number_with_delimiter(section_count) %>
+              </div>
+
+            </div>
+
+          <% end %>
+
+          <div>
+
+            <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+              Defined Fields
+            </div>
+
+            <div class="mt-1 text-sm font-bold text-gray-700 dark:text-gray-300">
+              <%= number_with_delimiter(field_count) %>
+            </div>
+
+          </div>
+
+          <% if entity_payload.present? %>
+
+            <div>
+
+              <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                Persisted Values
+              </div>
+
+              <div class="mt-1 text-sm font-bold text-gray-700 dark:text-gray-300">
+                <%= number_with_delimiter(entity_payload.size) %>
+              </div>
+
+            </div>
+
+          <% end %>
+
+        </div>
+
+      </div>
+
+      <%# ---------------------------------------------------------------------
+  TIMELINE
+  ---------------------------------------------------------------------- %>
+
+      <div
+        class="
+      rounded-2xl
+      border
+      border-gray-200
+      bg-white
+      p-6
+      shadow-sm
+      dark:border-gray-800
+      dark:bg-gray-800
+    ">
+
+        <div
+          class="
+        text-[11px]
+        font-black
+        uppercase
+        tracking-[0.2em]
+        text-gray-400
+      ">
+          Lifecycle
+        </div>
+
+        <div class="mt-5 space-y-5">
+
+          <% if created_at.present? %>
+
+            <div class="flex gap-3">
+
+              <div
+                class="
+              mt-1
+              h-2
+              w-2
+              shrink-0
+              rounded-full
+              bg-violet-400
+              shadow-[0_0_8px_rgba(139,92,246,0.5)]
+            "></div>
+
+              <div>
+
+                <div class="text-xs font-bold text-gray-700 dark:text-gray-300">
+                  Created
+                </div>
+
+                <div class="mt-0.5 text-[10px] text-gray-400">
+                  <%= created_at.strftime("%b %-d, %Y at %H:%M") %>
+                </div>
+
+              </div>
+
+            </div>
+
+          <% end %>
+
+          <% if updated_at.present? %>
+
+            <div class="flex gap-3">
+
+              <div
+                class="
+              mt-1
+              h-2
+              w-2
+              shrink-0
+              rounded-full
+              bg-indigo-400
+            "></div>
+
+              <div>
+
+                <div class="text-xs font-bold text-gray-700 dark:text-gray-300">
+                  Last Updated
+                </div>
+
+                <div class="mt-0.5 text-[10px] text-gray-400">
+                  <%= updated_at.strftime("%b %-d, %Y at %H:%M") %>
+                  ·
+                  <%= time_ago_in_words(updated_at) %> ago
+                </div>
+
+              </div>
+
+            </div>
+
+          <% end %>
+
+          <% if published_at.present? %>
+
+            <div class="flex gap-3">
+
+              <div
+                class="
+              mt-1
+              h-2
+              w-2
+              shrink-0
+              rounded-full
+              bg-emerald-400
+              shadow-[0_0_8px_rgba(52,211,153,0.5)]
+            "></div>
+
+              <div>
+
+                <div class="text-xs font-bold text-gray-700 dark:text-gray-300">
+                  Published
+                </div>
+
+                <div class="mt-0.5 text-[10px] text-gray-400">
+                  <%= published_at.strftime("%b %-d, %Y at %H:%M") %>
+                </div>
+
+              </div>
+
+            </div>
+
+          <% end %>
+
+        </div>
+
+      </div>
+
+      <%# ---------------------------------------------------------------------
+  SYSTEM STATUS
+  ---------------------------------------------------------------------- %>
+
+      <div
+        class="
+      rounded-2xl
+      border
+      border-emerald-200
+      bg-emerald-50
+      p-6
+      dark:border-emerald-800
+      dark:bg-emerald-900/20
+    ">
+
+        <div class="flex items-start gap-3">
+
+          <div
+            class="
+          flex
+          h-10
+          w-10
+          shrink-0
+          items-center
+          justify-center
+          rounded-xl
+          bg-emerald-100
+          text-emerald-600
+          dark:bg-emerald-900/40
+          dark:text-emerald-400
+        ">
+            ✓
+          </div>
+
+          <div>
+
+            <div
+              class="
+            text-sm
+            font-black
+            text-emerald-700
+            dark:text-emerald-300
+          ">
+              Entity registry operational
+            </div>
+
+            <p
+              class="
+            mt-1
+            text-xs
+            leading-5
+            text-emerald-600
+            dark:text-emerald-400
+          ">
+              This entity record is available for administrative inspection
+              and structural resolution.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+<%# =========================================================================
+FOOTER
+========================================================================= %>
+
+  <div class=" mt-8 flex flex-col gap-3 border-t border-gray-100 pt-5 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800 ">
+    <div
+      class="
+    font-mono
+    text-[10px]
+    font-bold
+    uppercase
+    tracking-wider
+    text-gray-400
+  ">
+      ENTITY_PROTOCOL :: ENTITY_DETAIL_LAYER :: ONLINE
+    </div>
+
+    <div
+      class="
+    flex
+    items-center
+    gap-2
+    text-[10px]
+    font-black
+    uppercase
+    tracking-wider
+    text-emerald-500
+  ">
+
+  <span
+    class="
+      h-2
+      w-2
+      rounded-full
+      bg-emerald-400
+      shadow-[0_0_8px_rgba(52,211,153,0.6)]
+    "></span>
+
+      Entity record operational
+
+    </div>
+
+  </div> </div>

@@ -1,0 +1,786 @@
+<%# ================================================================
+ENTITY COMMAND CENTER
+STEP 11 — ELASTICSEARCH / FACETS / SORTING / PAGINATION
+================================================================ %>
+
+<div data-controller="entity-command-center" class="space-y-5">
+<%# ================================================================
+FIELD MANUAL HEADER
+================================================================= %>
+
+  <div class="relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 shadow-xl">
+    <div
+      class="pointer-events-none absolute inset-0 opacity-20"
+      style="
+      background-image:
+        linear-gradient(rgba(99,102,241,.18) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(99,102,241,.18) 1px, transparent 1px);
+        background-size: 24px 24px;
+      ">
+    </div>
+
+    <div
+      class="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl">
+    </div>
+
+    <div class="relative p-5 sm:p-6">
+
+      <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+
+        <div class="flex items-start gap-4">
+
+          <div
+            class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-indigo-400/30 bg-indigo-500/10 text-2xl shadow-inner">
+            🧬
+          </div>
+
+          <div class="min-w-0">
+
+            <div
+              class="mb-1 text-[10px] font-black uppercase tracking-[0.25em] text-indigo-400">
+              Field Manual // Ontology Command
+            </div>
+
+            <h1 class="text-xl font-black tracking-tight text-white sm:text-2xl">
+              Entity Command Center
+            </h1>
+
+            <p class="mt-1 max-w-3xl text-xs leading-relaxed text-slate-400">
+              Elasticsearch-powered registry for the living objects
+              of the encyclopedia.
+            </p>
+
+          </div>
+
+        </div>
+
+        <div class="flex shrink-0 items-center gap-2">
+
+      <span
+        class="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-[9px] font-black uppercase tracking-widest text-emerald-400">
+        ELASTICSEARCH ONLINE
+      </span>
+
+          <%= link_to(
+                new_admin_ecosystems_load_sources_entity_path,
+                class: "inline-flex items-center gap-2 rounded-xl bg-indigo-500 px-4 py-2.5 text-xs font-black text-white shadow-lg shadow-indigo-500/20 transition hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/50"
+              ) do %>
+
+            <span class="text-base">＋</span>
+
+            NEW ENTITY
+
+          <% end %>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+<%# ================================================================
+COMMAND STATS
+================================================================= %>
+
+  <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <% [
+         [
+           "SEARCH RESULTS",
+           @entity_total,
+           "⌕",
+           "indigo"
+         ],
+         [
+           "CONCEPTUAL",
+           @facets[:scopes].find { |f| f[:key].to_s == "conceptual" }&.dig(:count) || 0,
+           "◈",
+           "violet"
+         ],
+         [
+           "REAL WORLD",
+           @facets[:scopes].find { |f| f[:key].to_s == "real_world" }&.dig(:count) || 0,
+           "◉",
+           "emerald"
+         ],
+         [
+           "DRAFT",
+           @facets[:statuses].find { |f| f[:key].to_s == "draft" }&.dig(:count) || 0,
+           "✎",
+           "amber"
+         ]
+       ].each do |label, count, icon, color| %>
+
+      <div
+        class="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+
+        <div class="flex items-center justify-between">
+
+      <span
+        class="text-[9px] font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500">
+        <%= label %>
+      </span>
+
+          <span class="text-sm text-<%= color %>-500">
+        <%= icon %>
+      </span>
+
+        </div>
+
+        <div class="mt-2 text-2xl font-black text-gray-800 dark:text-white">
+          <%= number_with_delimiter(count) %>
+        </div>
+
+      </div>
+
+    <% end %>
+
+  </div>
+<%# ================================================================
+SEARCH / FILTER BAR
+================================================================= %>
+
+  <div class="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+    <%= form_with(
+          url: admin_ecosystems_load_sources_entities_path,
+          method: :get,
+          local: true,
+          class: "p-4"
+        ) do |form| %>
+
+      <div class="grid gap-3 xl:grid-cols-6">
+
+        <%# Search %>
+
+        <div class="relative xl:col-span-2">
+
+      <span
+        class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-400">
+        ⌕
+      </span>
+
+          <%= form.search_field(
+                :q,
+                value: params[:q],
+                placeholder: "Search entities, slugs, summaries...",
+                class: "w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-3 text-sm text-gray-800 outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100 dark:focus:border-indigo-500 dark:focus:ring-indigo-950"
+              ) %>
+
+        </div>
+
+        <%# Status %>
+
+        <%= form.select(
+              :status,
+              [
+                ["All statuses", ""],
+                ["Draft", "draft"],
+                ["Published", "published"],
+                ["Archived", "archived"],
+                ["Deprecated", "deprecated"]
+              ],
+              { selected: params[:status] },
+              class: "rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-xs font-bold text-gray-700 outline-none focus:border-indigo-400 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-200"
+            ) %>
+
+        <%# Scope %>
+
+        <%= form.select(
+              :scope,
+              [
+                ["All scopes", ""],
+                ["Conceptual", "conceptual"],
+                ["Real world", "real_world"],
+                ["Hybrid", "hybrid"]
+              ],
+              { selected: params[:scope] },
+              class: "rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-xs font-bold text-gray-700 outline-none focus:border-indigo-400 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-200"
+            ) %>
+
+        <%# Entity Type %>
+
+        <%= form.select(
+              :entity_type_id,
+              [["All types", ""]] +
+                @entity_types.map { |type| [type.name, type.id] },
+              { selected: params[:entity_type_id] },
+              class: "rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-xs font-bold text-gray-700 outline-none focus:border-indigo-400 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-200"
+            ) %>
+
+        <%# Entity Template %>
+
+        <%= form.select(
+              :entity_template_id,
+              [["All templates", ""]] +
+                @entity_templates.map { |template| [template.name, template.id] },
+              { selected: params[:entity_template_id] },
+              class: "rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-xs font-bold text-gray-700 outline-none focus:border-indigo-400 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-200"
+            ) %>
+
+        <div class="flex gap-2">
+
+          <%= form.submit(
+                "SCAN",
+                class: "flex-1 rounded-xl bg-gray-900 px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-white transition hover:bg-indigo-600 dark:bg-indigo-600 dark:hover:bg-indigo-500"
+              ) %>
+
+        </div>
+
+      </div>
+
+    <% end %>
+
+  </div>
+<%# ================================================================
+ACTIVE FILTER SUMMARY
+================================================================= %>
+
+  <% if params[:q].present? ||
+    params[:status].present? ||
+    params[:scope].present? ||
+    params[:entity_type_id].present? ||
+    params[:entity_template_id].present? %>
+
+    <div class="rounded-2xl border border-indigo-100 bg-indigo-50/70 px-4 py-3 dark:border-indigo-900/50 dark:bg-indigo-950/20">
+
+      <div class="flex flex-wrap items-center gap-2">
+
+    <span
+      class="text-[9px] font-black uppercase tracking-[0.18em] text-indigo-500 dark:text-indigo-400">
+      ACTIVE SEARCH
+    </span>
+
+        <% if params[:q].present? %>
+      <span
+        class="rounded-full border border-indigo-200 bg-white px-2.5 py-1 text-[9px] font-bold text-indigo-700 dark:border-indigo-800 dark:bg-gray-900 dark:text-indigo-300">
+        Query: <%= params[:q] %>
+      </span>
+        <% end %>
+
+        <% if params[:status].present? %>
+      <span
+        class="rounded-full border border-indigo-200 bg-white px-2.5 py-1 text-[9px] font-bold text-indigo-700 dark:border-indigo-800 dark:bg-gray-900 dark:text-indigo-300">
+        Status: <%= params[:status].to_s.titleize %>
+      </span>
+        <% end %>
+
+        <% if params[:scope].present? %>
+      <span
+        class="rounded-full border border-indigo-200 bg-white px-2.5 py-1 text-[9px] font-bold text-indigo-700 dark:border-indigo-800 dark:bg-gray-900 dark:text-indigo-300">
+        Scope: <%= params[:scope].to_s.titleize %>
+      </span>
+        <% end %>
+
+        <% if params[:entity_type_id].present? %>
+          <% selected_type =
+               @entity_types.find do |type|
+                 type.id.to_s == params[:entity_type_id].to_s
+               end
+          %>
+
+          <span
+            class="rounded-full border border-indigo-200 bg-white px-2.5 py-1 text-[9px] font-bold text-indigo-700 dark:border-indigo-800 dark:bg-gray-900 dark:text-indigo-300">
+        Type: <%= selected_type&.name || params[:entity_type_id] %>
+      </span>
+        <% end %>
+
+        <% if params[:entity_template_id].present? %>
+          <% selected_template =
+               @entity_templates.find do |template|
+                 template.id.to_s == params[:entity_template_id].to_s
+               end
+          %>
+
+          <span
+            class="rounded-full border border-indigo-200 bg-white px-2.5 py-1 text-[9px] font-bold text-indigo-700 dark:border-indigo-800 dark:bg-gray-900 dark:text-indigo-300">
+        Template: <%= selected_template&.name || params[:entity_template_id] %>
+      </span>
+        <% end %>
+
+        <%= link_to(
+              "CLEAR",
+              admin_ecosystems_load_sources_entities_path,
+              class: "ml-auto rounded-lg border border-indigo-200 bg-white px-2.5 py-1.5 text-[9px] font-black uppercase tracking-wider text-indigo-600 hover:bg-indigo-100 dark:border-indigo-800 dark:bg-gray-900 dark:text-indigo-400 dark:hover:bg-indigo-950"
+            ) %>
+
+      </div>
+
+    </div>
+
+  <% end %>
+
+<%# ================================================================
+BULK COMMAND BAR
+================================================================= %>
+
+  <div data-entity-command-center-target="bulkBar" class="hidden rounded-2xl border border-indigo-200 bg-indigo-50 p-3 dark:border-indigo-900 dark:bg-indigo-950/30">
+    <div class="flex flex-wrap items-center gap-3">
+
+  <span
+    data-entity-command-center-target="selectionCount"
+    class="text-xs font-black text-indigo-700 dark:text-indigo-300">
+    0
+  </span>
+
+      <span class="text-xs font-bold text-indigo-500">
+    selected
+  </span>
+
+      <div class="h-4 w-px bg-indigo-200 dark:bg-indigo-800"></div>
+
+      <button
+        type="button"
+        class="rounded-lg border border-indigo-200 bg-white px-3 py-1.5 text-[10px] font-black uppercase text-indigo-700 hover:bg-indigo-100 dark:border-indigo-800 dark:bg-gray-900 dark:text-indigo-300">
+        Publish
+      </button>
+
+      <button
+        type="button"
+        class="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-[10px] font-black uppercase text-gray-600 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300">
+        Archive
+      </button>
+
+      <button
+        type="button"
+        class="rounded-lg border border-red-200 bg-white px-3 py-1.5 text-[10px] font-black uppercase text-red-600 hover:bg-red-50 dark:border-red-900 dark:bg-gray-900 dark:text-red-400">
+        Delete
+      </button>
+
+    </div>
+
+  </div>
+<%# ================================================================
+REGISTRY
+================================================================= %>
+
+  <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+    <div
+      class="flex flex-col gap-3 border-b border-gray-200 bg-gray-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800 dark:bg-gray-950">
+
+      <div>
+
+        <div
+          class="text-[10px] font-black uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
+          Entity Registry
+        </div>
+
+        <div class="mt-0.5 text-[10px] text-gray-400 dark:text-gray-500">
+
+          <%= number_with_delimiter(@entity_total) %>
+          records found
+
+          <% if @entity_total.positive? %>
+            · page <%= @current_page %>
+            of <%= @total_pages %>
+          <% end %>
+
+        </div>
+
+      </div>
+
+      <%# Sorting %>
+
+      <div class="flex flex-wrap items-center gap-1">
+
+    <span
+      class="mr-1 text-[9px] font-black uppercase tracking-wider text-gray-400">
+      SORT
+    </span>
+
+        <%= link_to(
+              "RELEVANCE",
+              admin_ecosystems_load_sources_entities_path(
+                request.query_parameters.merge(
+                  sort: nil,
+                  page: 1
+                )
+              ),
+              class: "rounded-lg px-2.5 py-1.5 text-[9px] font-black uppercase tracking-wider #{params[:sort].blank? ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400' : 'text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-800'}"
+            ) %>
+
+        <%= link_to(
+              "A–Z",
+              admin_ecosystems_load_sources_entities_path(
+                request.query_parameters.merge(
+                  sort: "name",
+                  page: 1
+                )
+              ),
+              class: "rounded-lg px-2.5 py-1.5 text-[9px] font-black uppercase tracking-wider #{params[:sort] == 'name' ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400' : 'text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-800'}"
+            ) %>
+
+        <%= link_to(
+              "UPDATED",
+              admin_ecosystems_load_sources_entities_path(
+                request.query_parameters.merge(
+                  sort: "updated",
+                  page: 1
+                )
+              ),
+              class: "rounded-lg px-2.5 py-1.5 text-[9px] font-black uppercase tracking-wider #{params[:sort] == 'updated' ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400' : 'text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-800'}"
+            ) %>
+
+        <%= link_to(
+              "CREATED",
+              admin_ecosystems_load_sources_entities_path(
+                request.query_parameters.merge(
+                  sort: "created",
+                  page: 1
+                )
+              ),
+              class: "rounded-lg px-2.5 py-1.5 text-[9px] font-black uppercase tracking-wider #{params[:sort] == 'created' ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400' : 'text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-800'}"
+            ) %>
+
+      </div>
+
+    </div>
+
+    <% if @entities.any? %>
+
+      <div class="overflow-x-auto">
+
+        <table class="min-w-full">
+
+          <thead class="border-b border-gray-200 dark:border-gray-800">
+
+          <tr>
+
+            <th class="w-10 px-4 py-3 text-left">
+
+              <input
+                type="checkbox"
+                data-entity-command-center-target="selectAll"
+                data-action="change->entity-command-center#toggleAll"
+                class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900">
+
+            </th>
+
+            <th class="px-4 py-3 text-left text-[9px] font-black uppercase tracking-wider text-gray-400">
+              Entity
+            </th>
+
+            <th class="px-4 py-3 text-left text-[9px] font-black uppercase tracking-wider text-gray-400">
+              Type
+            </th>
+
+            <th class="px-4 py-3 text-left text-[9px] font-black uppercase tracking-wider text-gray-400">
+              Template
+            </th>
+
+            <th class="px-4 py-3 text-left text-[9px] font-black uppercase tracking-wider text-gray-400">
+              Scope
+            </th>
+
+            <th class="px-4 py-3 text-left text-[9px] font-black uppercase tracking-wider text-gray-400">
+              Status
+            </th>
+
+            <th class="w-20 px-4 py-3"></th>
+
+          </tr>
+
+          </thead>
+
+          <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+
+          <% @entities.each do |entity| %>
+
+            <tr
+              data-entity-command-center-target="row"
+              data-search="<%= [
+                                 entity.name,
+                                 entity.slug,
+                                 entity.summary,
+                                 entity.entity_type&.name,
+                                 entity.entity_template&.name
+                               ].compact.join(' ').downcase %>"
+              data-status="<%= entity.status.presence || 'draft' %>"
+              data-scope="<%= entity.scope %>"
+              data-entity-type-id="<%= entity.entity_type_id %>"
+              data-template-id="<%= entity.entity_template_id %>"
+              class="group transition hover:bg-indigo-50/40 dark:hover:bg-indigo-950/10">
+
+              <td class="px-4 py-4">
+
+                <input
+                  type="checkbox"
+                  value="<%= entity.id %>"
+                  data-entity-command-center-target="rowCheckbox"
+                  data-action="change->entity-command-center#updateSelection"
+                  class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900">
+
+              </td>
+
+              <td class="px-4 py-4">
+
+                <%= link_to(
+                      admin_ecosystems_load_sources_entity_path(entity),
+                      class: "block"
+                    ) do %>
+
+                  <div class="flex items-center gap-3">
+
+                    <div
+                      class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-indigo-100 bg-indigo-50 text-sm transition group-hover:scale-105 dark:border-indigo-900 dark:bg-indigo-950/40">
+                      🧬
+                    </div>
+
+                    <div class="min-w-0">
+
+                      <div
+                        class="truncate text-sm font-black text-gray-800 group-hover:text-indigo-600 dark:text-gray-100 dark:group-hover:text-indigo-400">
+                        <%= entity.name %>
+                      </div>
+
+                      <div
+                        class="mt-0.5 truncate font-mono text-[9px] text-gray-400 dark:text-gray-500">
+                        <%= entity.slug %>
+                        · ID #<%= entity.id %>
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                <% end %>
+
+              </td>
+
+              <td class="px-4 py-4">
+
+            <span
+              class="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-[9px] font-black uppercase tracking-wider text-slate-600 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-400">
+              <%= entity.entity_type&.name || "Unassigned" %>
+            </span>
+
+              </td>
+
+              <td class="px-4 py-4">
+
+                <div class="text-xs font-bold text-gray-700 dark:text-gray-300">
+                  <%= entity.entity_template&.name || "Unassigned" %>
+                </div>
+
+              </td>
+
+              <td class="px-4 py-4">
+
+                <% scope_label =
+                     if entity.respond_to?(:scope) && entity.scope.present?
+                       entity.scope.to_s.titleize
+                     else
+                       "Unspecified"
+                     end
+                %>
+
+                <span
+                  class="inline-flex items-center gap-1.5 rounded-full border border-violet-200 bg-violet-50 px-2 py-1 text-[9px] font-black uppercase tracking-wider text-violet-600 dark:border-violet-900 dark:bg-violet-950/30 dark:text-violet-400">
+
+              <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
+
+                  <%= scope_label %>
+
+            </span>
+
+              </td>
+
+              <td class="px-4 py-4">
+
+                <% status = entity.status.presence || "draft" %>
+
+                <% status_classes =
+                     case status.to_s
+                     when "published"
+                       "border-emerald-200 bg-emerald-50 text-emerald-600 dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-400"
+                     when "archived"
+                       "border-slate-200 bg-slate-50 text-slate-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-400"
+                     when "deprecated"
+                       "border-red-200 bg-red-50 text-red-600 dark:border-red-900 dark:bg-red-950/30 dark:text-red-400"
+                     else
+                       "border-amber-200 bg-amber-50 text-amber-600 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-400"
+                     end
+                %>
+
+                <span
+                  class="rounded-full border px-2 py-1 text-[9px] font-black uppercase tracking-wider <%= status_classes %>">
+              <%= status.to_s.titleize %>
+            </span>
+
+              </td>
+
+              <td class="px-4 py-4 text-right">
+
+                <%= link_to(
+                      "VIEW",
+                      admin_ecosystems_load_sources_entity_path(entity),
+                      class: "rounded-lg px-2 py-1 text-[9px] font-black text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950"
+                    ) %>
+
+              </td>
+
+            </tr>
+
+          <% end %>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+      <%# ============================================================
+  PAGINATION
+  ============================================================= %>
+
+      <div
+        class="flex flex-col gap-3 border-t border-gray-200 bg-gray-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800 dark:bg-gray-950">
+
+        <div class="text-[10px] font-bold text-gray-400 dark:text-gray-500">
+
+          Showing
+
+          <span class="text-gray-600 dark:text-gray-300">
+        <%= ((@current_page - 1) * @per_page) + 1 %>
+      </span>
+
+          –
+
+          <span class="text-gray-600 dark:text-gray-300">
+        <%= [@current_page * @per_page, @entity_total].min %>
+      </span>
+
+          of
+
+          <span class="text-gray-600 dark:text-gray-300">
+        <%= number_with_delimiter(@entity_total) %>
+      </span>
+
+        </div>
+
+        <div class="flex items-center gap-1">
+
+          <% if @current_page > 1 %>
+
+            <%= link_to(
+                  "←",
+                  admin_ecosystems_load_sources_entities_path(
+                    request.query_parameters.merge(
+                      page: @current_page - 1
+                    )
+                  ),
+                  class: "rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-black text-gray-600 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                ) %>
+
+          <% end %>
+
+          <% [
+               @current_page - 2,
+               @current_page - 1,
+               @current_page,
+               @current_page + 1,
+               @current_page + 2
+             ].each do |page_number| %>
+
+            <% next if page_number < 1 || page_number > @total_pages %>
+
+            <%= link_to(
+                  page_number,
+                  admin_ecosystems_load_sources_entities_path(
+                    request.query_parameters.merge(
+                      page: page_number
+                    )
+                  ),
+                  class: "rounded-lg px-3 py-1.5 text-[10px] font-black #{page_number == @current_page ? 'bg-indigo-600 text-white' : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800'}"
+                ) %>
+
+          <% end %>
+
+          <% if @current_page < @total_pages %>
+
+            <%= link_to(
+                  "→",
+                  admin_ecosystems_load_sources_entities_path(
+                    request.query_parameters.merge(
+                      page: @current_page + 1
+                    )
+                  ),
+                  class: "rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-black text-gray-600 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                ) %>
+
+          <% end %>
+
+        </div>
+
+      </div>
+
+    <% else %>
+
+      <%# ============================================================
+  EMPTY STATE
+  ============================================================= %>
+
+      <div class="px-6 py-16 text-center">
+
+        <div
+          class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-dashed border-indigo-300 bg-indigo-50 text-2xl dark:border-indigo-800 dark:bg-indigo-950/30">
+          ◈
+        </div>
+
+        <h3 class="mt-4 text-sm font-black text-gray-800 dark:text-white">
+          No entities found
+        </h3>
+
+        <p class="mx-auto mt-1 max-w-md text-xs leading-relaxed text-gray-400">
+          Elasticsearch returned no entities for the current
+          search and filter combination.
+        </p>
+
+        <%= link_to(
+              "CLEAR SEARCH",
+              admin_ecosystems_load_sources_entities_path,
+              class: "mt-5 inline-flex rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-indigo-600 hover:bg-indigo-100 dark:border-indigo-900 dark:bg-indigo-950/30 dark:text-indigo-400"
+            ) %>
+
+        <%= link_to(
+              "CREATE ENTITY",
+              new_admin_ecosystems_load_sources_entity_path,
+              class: "ml-2 mt-5 inline-flex rounded-xl bg-indigo-600 px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-white hover:bg-indigo-500"
+            ) %>
+
+      </div>
+
+    <% end %>
+
+  </div>
+<%# ================================================================
+FIELD MANUAL FOOTER
+================================================================= %>
+
+  <div class="rounded-2xl border border-indigo-100 bg-indigo-50/50 p-4 dark:border-indigo-900/50 dark:bg-indigo-950/20">
+    <div class="flex items-start gap-3">
+
+  <span
+    class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-100 text-sm dark:bg-indigo-900/50">
+    📖
+  </span>
+
+      <div>
+
+        <div
+          class="text-[9px] font-black uppercase tracking-[0.18em] text-indigo-500 dark:text-indigo-400">
+          Field Manual // Search Doctrine
+        </div>
+
+        <p class="mt-1 text-xs leading-relaxed text-gray-500 dark:text-gray-400">
+          Entity discovery is powered by Elasticsearch.
+          Search handles textual discovery while Elasticsearch
+          aggregations provide the registry's facet foundation.
+          Filters, sorting, and pagination operate against the
+          search index rather than scanning the relational table.
+        </p>
+
+      </div>
+
+    </div>
+
+  </div> </div>

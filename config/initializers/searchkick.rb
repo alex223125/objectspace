@@ -1,9 +1,29 @@
-# 1. Instruct the gem to use secure routing
-ENV["ELASTICSEARCH_URL"] = "http://localhost:9200"
+# frozen_string_literal: true
 
-# 2. Tell Faraday to ignore local development self-signed certificate constraints
+# ================================================================
+# SEARCHKICK / ELASTICSEARCH
+#
+# Entity Command Center uses Elasticsearch exclusively.
+# OpenSearch is intentionally not configured.
+# ================================================================
+
+Searchkick.client_type = :elasticsearch
+
 Searchkick.client_options = {
+  retry_on_failure: 2,
   transport_options: {
-    ssl: { verify: false } # Disables strict SSL verification for local development only
+    request: {
+      timeout: 10
+    }
   }
 }
+
+# Elasticsearch endpoint.
+#
+# Development:
+#   ELASTICSEARCH_URL=http://localhost:9200
+#
+# Production:
+#   ELASTICSEARCH_URL=https://user:password@your-host:9243
+#
+ENV["ELASTICSEARCH_URL"] ||= "http://localhost:9200"
