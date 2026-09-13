@@ -7,10 +7,6 @@ module Admin
 
         class EntityTemplateVersionsController < ::AdminController
 
-          # ============================================================
-          # CONSTANTS
-          # ============================================================
-
           VERSION_MODEL =
             ::Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion
 
@@ -50,7 +46,9 @@ module Admin
                           :update,
                           :destroy,
                           :compare,
-                          :clone
+                          :clone,
+                          :publish,
+                          :archive
                         ]
 
           before_action :set_entity_template,
@@ -62,7 +60,9 @@ module Admin
                           :new,
                           :create,
                           :compare,
-                          :clone
+                          :clone,
+                          :publish,
+                          :archive
                         ]
 
 
@@ -73,24 +73,20 @@ module Admin
           def index
 
             prepare_index_filters
-
             prepare_index_pagination
-
-            search_scope =
-              build_search_scope
 
             @entity_template_versions =
               execute_search(
-                search_scope
+                build_search_scope
               )
 
             prepare_index_statistics
-
             prepare_index_metadata
 
             render_index
 
           end
+
 
           # ============================================================
           # ENTITY TEMPLATE SEARCH
@@ -113,7 +109,7 @@ module Admin
 
 
             templates =
-              ::Ecosystems::LoadSources::EntityTemplates::EntityTemplate.search(
+              ENTITY_TEMPLATE_MODEL.search(
                 query,
                 fields: [
                   :name,
@@ -135,18 +131,9 @@ module Admin
 
                 {
                   id: template.id,
-                  name:
-                    template.respond_to?(:name) ?
-                      template.name :
-                      nil,
-                  title:
-                    template.respond_to?(:title) ?
-                      template.title :
-                      nil,
-                  slug:
-                    template.respond_to?(:slug) ?
-                      template.slug :
-                      nil
+                  name: template.respond_to?(:name) ? template.name : nil,
+                  title: template.respond_to?(:title) ? template.title : nil,
+                  slug: template.respond_to?(:slug) ? template.slug : nil
                 }
 
               end
@@ -164,7 +151,6 @@ module Admin
               "[EntityTemplate Search] #{e.class}: #{e.message}"
             )
 
-
             render(
               json: {
                 results: [],
@@ -178,7 +164,6 @@ module Admin
             Rails.logger.error(
               "[EntityTemplate Search] #{e.class}: #{e.message}"
             )
-
 
             render(
               json: {
@@ -199,13 +184,6 @@ module Admin
 
             @version =
               @entity_template_version
-
-            @entity_template_versions =
-              @entity_template
-                .entity_template_versions
-                .order(
-                  version: :desc
-                )
 
             content =
               render_to_string(
@@ -232,22 +210,6 @@ module Admin
 
           def new
 
-            # ----------------------------------------------------------
-            # IMPORTANT
-            #
-            # @entity_template is populated by set_entity_template.
-            #
-            # For a NEW version there is no @entity_template_version,
-            # therefore set_entity_template reads:
-            #
-            # params[:entity_template_id]
-            #
-            # Example:
-            #
-            # /entity_template_versions/new?entity_template_id=12
-            #
-            # ----------------------------------------------------------
-
             unless @entity_template.present?
 
               redirect_to(
@@ -259,82 +221,41 @@ module Admin
             end
 
 
-            # ----------------------------------------------------------
-            # AVAILABLE TEMPLATES
-            #
-            # Useful for the form if it displays a template selector.
-            # ----------------------------------------------------------
+            load_entity_templates
 
-            @entity_templates =
-              ENTITY_TEMPLATE_MODEL
-                .order(:name)
-
-
-            # ----------------------------------------------------------
-            # BUILD NEW VERSION
-            # ----------------------------------------------------------
 
             @version =
               @entity_template
                 .entity_template_versions
-                .build
+                .build(
+                  status: "draft",
+                  definition: {
+                    "fields" => []
+                  }
+                )
 
-
-            # ----------------------------------------------------------
-            # AUTOMATIC VERSION NUMBER
-            # ----------------------------------------------------------
 
             @version.version =
               next_version_number
 
 
             # ----------------------------------------------------------
-            # DEFAULT STATUS
-            # ----------------------------------------------------------
-
-            if @version.respond_to?(:status) &&
-              @version.status.blank?
-
-              @version.status =
-                "draft"
-
-            end
-
-
-            # ----------------------------------------------------------
-            # DEFAULT DEFINITION
+            # IMPORTANT
             #
-            # Keep the form safe when definition is a JSON/JSONB field.
+            # The existing application used @version in this controller.
+            # The new builder view uses @entity_template_version.
+            #
+            # Expose both variables so existing views/functionality
+            # continue working while the new builder can use the
+            # conventional @entity_template_version variable.
             # ----------------------------------------------------------
 
-            if @version.respond_to?(:definition) &&
-              @version.definition.blank?
-
-              @version.definition =
-                {}
-
-            end
+            @entity_template_version =
+              @version
 
 
-            # ----------------------------------------------------------
-            # RENDER THROUGH ADMIN ENTITY TEMPLATE LAYOUT
-            # ----------------------------------------------------------
-
-            content =
-              render_to_string(
-                template:
-                  "admin/ecosystems/load_sources/entity_templates/entity_template_versions/new",
-                layout: false
-              )
-
-
-            render(
-              template:
-                "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
-              layout: false,
-              locals: {
-                content: content
-              }
+            render_version_form(
+              "new"
             )
 
           end
@@ -346,29 +267,20 @@ module Admin
 
           def edit
 
-            @entity_templates =
-              ENTITY_TEMPLATE_MODEL
-                .order(:name)
+            load_entity_templates
 
             @version =
               @entity_template_version
 
 
-            content =
-              render_to_string(
-                template:
-                  "admin/ecosystems/load_sources/entity_templates/entity_template_versions/edit",
-                layout: false
-              )
+            # Keep both variables available to the views.
+
+            @entity_template_version =
+              @version
 
 
-            render(
-              template:
-                "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
-              layout: false,
-              locals: {
-                content: content
-              }
+            render_version_form(
+              "edit"
             )
 
           end
@@ -379,10 +291,6 @@ module Admin
           # ============================================================
 
           def create
-
-            # ----------------------------------------------------------
-            # SAFETY
-            # ----------------------------------------------------------
 
             unless @entity_template.present?
 
@@ -395,79 +303,107 @@ module Admin
             end
 
 
+            definition =
+              parse_definition_parameter
+
+
+            # ----------------------------------------------------------
+            # INVALID JSON
+            # ----------------------------------------------------------
+
+            if definition[:error].present?
+
+              @version =
+                @entity_template
+                  .entity_template_versions
+                  .build(
+                    status: "draft"
+                  )
+
+
+              @version.version =
+                params.dig(
+                  :ecosystems_load_sources_entity_templates_entity_template_version,
+                  :version
+                ).presence ||
+                next_version_number
+
+
+              @version.status =
+                params.dig(
+                  :ecosystems_load_sources_entity_templates_entity_template_version,
+                  :status
+                ).presence ||
+                "draft"
+
+
+              @version.definition =
+                params.dig(
+                  :ecosystems_load_sources_entity_templates_entity_template_version,
+                  :definition
+                )
+
+
+              @version.errors.add(
+                :definition,
+                definition[:error]
+              )
+
+
+              @entity_template_version =
+                @version
+
+
+              load_entity_templates
+
+
+              return render_version_form(
+                "new",
+                status: :unprocessable_entity
+              )
+
+            end
+
+
             # ----------------------------------------------------------
             # BUILD VERSION
             # ----------------------------------------------------------
+
+            version_attributes =
+              version_parameters
+
 
             @version =
               @entity_template
                 .entity_template_versions
                 .build(
-                  entity_template_version_params
+                  version_attributes
                 )
 
 
-            # ----------------------------------------------------------
-            # VERSION NUMBER
-            # ----------------------------------------------------------
-
-            @version.version ||=
-              next_version_number
+            @version.definition =
+              definition[:value]
 
 
-            # ----------------------------------------------------------
-            # DEFAULT STATUS
-            # ----------------------------------------------------------
+            # If version was not submitted, automatically calculate it.
 
-            if @version.respond_to?(:status) &&
+            @version.version =
+              next_version_number if
+              @version.version.blank?
+
+
+            @version.status =
+              "draft" if
               @version.status.blank?
 
-              @version.status =
-                "draft"
 
-            end
+            # Make the variable used by the builder view available.
 
-
-            # ----------------------------------------------------------
-            # DEFINITION JSON
-            # ----------------------------------------------------------
-
-            if @version.respond_to?(:definition)
-
-              definition =
-                @version.definition
+            @entity_template_version =
+              @version
 
 
-              if definition.is_a?(String) &&
-                definition.present?
-
-                begin
-
-                  @version.definition =
-                    JSON.parse(
-                      definition
-                    )
-
-                rescue JSON::ParserError => e
-
-                  @version.errors.add(
-                    :definition,
-                    "contains invalid JSON: #{e.message}"
-                  )
-
-                end
-
-              end
-
-            end
-
-
-            # ----------------------------------------------------------
-            # SAVE
-            # ----------------------------------------------------------
-
-            if @version.errors.empty? &&
-              @version.save
+            if @version.save
 
               redirect_to(
                 admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
@@ -477,46 +413,41 @@ module Admin
                   "Entity template version was successfully created."
               )
 
-              return
+            else
+
+              load_entity_templates
+
+
+              render_version_form(
+                "new",
+                status: :unprocessable_entity
+              )
 
             end
 
+          rescue ActiveRecord::RecordNotUnique
 
-            # ----------------------------------------------------------
-            # CREATE FAILED
-            #
-            # IMPORTANT:
-            #
-            # Do NOT use:
-            #
-            # render :new
-            #
-            # because your admin interface uses the custom
-            # entity_templates_layout.
-            # ----------------------------------------------------------
-
-            @entity_templates =
-              ENTITY_TEMPLATE_MODEL
-                .order(:name)
+            @version ||= @entity_template
+              .entity_template_versions
+              .build
 
 
-            content =
-              render_to_string(
-                template:
-                  "admin/ecosystems/load_sources/entity_templates/entity_template_versions/new",
-                layout: false
-              )
+            @version.errors.add(
+              :version,
+              "could not be assigned because another version was created concurrently."
+            )
 
 
-            render(
-              template:
-                "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
-              layout: false,
-              locals: {
-                content: content
-              },
-              status:
-                :unprocessable_entity
+            @entity_template_version =
+              @version
+
+
+            load_entity_templates
+
+
+            render_version_form(
+              "new",
+              status: :unprocessable_entity
             )
 
           end
@@ -528,64 +459,54 @@ module Admin
 
           def update
 
-            permitted_params =
-              entity_template_version_params
+            definition =
+              parse_definition_parameter
 
 
-            if permitted_params[:definition].present?
+            if definition[:error].present?
 
-              begin
-
-                permitted_params[:definition] =
-                  JSON.parse(
-                    permitted_params[:definition]
-                  )
-
-              rescue JSON::ParserError => e
-
-                @entity_template_version.errors.add(
-                  :definition,
-                  "contains invalid JSON: #{e.message}"
-                )
+              @entity_template_version.errors.add(
+                :definition,
+                definition[:error]
+              )
 
 
-                load_entity_templates
+              @version =
+                @entity_template_version
 
 
-                content =
-                  render_to_string(
-                    template:
-                      "admin/ecosystems/load_sources/entity_templates/entity_template_versions/edit",
-                    layout: false
-                  )
+              load_entity_templates
 
 
-                return render(
-                  template:
-                    "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
-                  layout: false,
-                  locals: {
-                    content: content
-                  },
-                  status:
-                    :unprocessable_entity
-                )
-
-              end
+              return render_version_form(
+                "edit",
+                status: :unprocessable_entity
+              )
 
             end
 
 
-            if @entity_template_version.update(
-              permitted_params
+            @entity_template_version.assign_attributes(
+              version_parameters.except(:version)
             )
+
+
+            @entity_template_version.definition =
+              definition[:value]
+
+
+            @version =
+              @entity_template_version
+
+
+            if @entity_template_version.save
 
               redirect_to(
                 admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
                   @entity_template_version
                 ),
                 notice:
-                  "Template version updated."
+                  "Template version updated successfully."
               )
 
             else
@@ -593,23 +514,9 @@ module Admin
               load_entity_templates
 
 
-              content =
-                render_to_string(
-                  template:
-                    "admin/ecosystems/load_sources/entity_templates/entity_template_versions/edit",
-                  layout: false
-                )
-
-
-              render(
-                template:
-                  "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
-                layout: false,
-                locals: {
-                  content: content
-                },
-                status:
-                  :unprocessable_entity
+              render_version_form(
+                "edit",
+                status: :unprocessable_entity
               )
 
             end
@@ -623,17 +530,103 @@ module Admin
 
           def destroy
 
-            @version =
-              @entity_template_version
+            if @entity_template_version.entities.exists?
+
+              redirect_to(
+                admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
+                  @entity_template_version
+                ),
+                alert:
+                  "This version cannot be deleted because entities are using it."
+              )
+
+              return
+
+            end
 
 
-            @version.destroy
+            @entity_template_version.destroy!
 
 
             redirect_to(
               admin_ecosystems_load_sources_entity_templates_entity_template_versions_path,
               notice:
                 "Entity template version was successfully deleted."
+            )
+
+          rescue ActiveRecord::RecordNotDestroyed => e
+
+            Rails.logger.error(
+              "[EntityTemplateVersion Destroy] #{e.class}: #{e.message}"
+            )
+
+
+            redirect_to(
+              admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
+                @entity_template_version
+              ),
+              alert:
+                "Unable to delete this entity template version."
+            )
+
+          end
+
+
+          # ============================================================
+          # PUBLISH
+          # ============================================================
+
+          def publish
+
+            @entity_template_version.publish!
+
+
+            redirect_to(
+              admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
+                @entity_template_version
+              ),
+              notice:
+                "Version #{@entity_template_version.version} was published successfully."
+            )
+
+          rescue ActiveRecord::RecordInvalid => e
+
+            redirect_to(
+              admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
+                @entity_template_version
+              ),
+              alert:
+                e.message
+            )
+
+          end
+
+
+          # ============================================================
+          # ARCHIVE
+          # ============================================================
+
+          def archive
+
+            @entity_template_version.archive!
+
+
+            redirect_to(
+              admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
+                @entity_template_version
+              ),
+              notice:
+                "Version #{@entity_template_version.version} was archived successfully."
+            )
+
+          rescue ActiveRecord::RecordInvalid => e
+
+            redirect_to(
+              admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
+                @entity_template_version
+              ),
+              alert:
+                e.message
             )
 
           end
@@ -648,9 +641,7 @@ module Admin
             @versions =
               @entity_template
                 .entity_template_versions
-                .order(
-                  version: :desc
-                )
+                .latest_first
 
 
             @left_version =
@@ -777,21 +768,13 @@ module Admin
                 @field_comparisons.map do |field|
 
                   field_hash =
-                    field.is_a?(Hash) ?
-                      field :
-                      {}
+                    field.is_a?(Hash) ? field : {}
 
 
                   changes =
                     field_hash[:changes] ||
                       field_hash["changes"] ||
                       {}
-
-
-                  normalized_changes =
-                    normalize_comparison_changes(
-                      changes
-                    )
 
 
                   {
@@ -839,7 +822,9 @@ module Admin
                         field_hash["version_b_text"],
 
                     changes:
-                      normalized_changes
+                      normalize_comparison_changes(
+                        changes
+                      )
                   }
 
                 end
@@ -847,22 +832,19 @@ module Admin
             else
 
               @left_definition = {}
-
               @right_definition = {}
-
               @field_comparisons = []
-
               @field_changes = []
-
               @definition_changes = []
 
-              @comparison_summary =
-                {
-                  added: 0,
-                  removed: 0,
-                  changed: 0,
-                  unchanged: 0
-                }
+
+              @comparison_summary = {
+                added: 0,
+                removed: 0,
+                changed: 0,
+                unchanged: 0
+              }
+
 
               @field_comparisons_json = []
 
@@ -908,11 +890,20 @@ module Admin
                 cloned_version
               ),
               notice:
-                "Entity template version #{source_version.version} was successfully cloned as draft version #{cloned_version.version}."
+                "Version #{source_version.version} was cloned as draft version #{cloned_version.version}."
             )
 
-
           rescue ActiveRecord::RecordInvalid => e
+
+            redirect_to(
+              admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
+                source_version
+              ),
+              alert:
+                "Unable to clone entity template version: #{e.record.errors.full_messages.to_sentence}"
+            )
+
+          rescue StandardError => e
 
             Rails.logger.error(
               "[EntityTemplateVersion Clone] #{e.class}: #{e.message}"
@@ -924,7 +915,7 @@ module Admin
                 source_version
               ),
               alert:
-                "Unable to clone entity template version: #{e.record.errors.full_messages.to_sentence}"
+                "Unable to clone entity template version."
             )
 
           end
@@ -934,15 +925,89 @@ module Admin
 
 
           # ============================================================
-          # INDEX — FILTERS
+          # VERSION FORM
+          # ============================================================
+
+          def render_version_form(
+            action,
+            status: nil
+          )
+
+            # ----------------------------------------------------------
+            # Ensure the view always has the same object.
+            #
+            # This prevents:
+            #
+            # undefined method `errors' for nil:NilClass
+            #
+            # when new.html.erb uses:
+            #
+            # @entity_template_version.errors
+            # ----------------------------------------------------------
+
+            @entity_template_version ||=
+              @version
+
+
+            @version ||=
+              @entity_template_version
+
+
+            content =
+              render_to_string(
+                template:
+                  "admin/ecosystems/load_sources/entity_templates/entity_template_versions/#{action}",
+                layout: false
+              )
+
+
+            render(
+              template:
+                "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
+              layout: false,
+              locals: {
+                content: content
+              },
+              status: status
+            )
+
+          end
+
+
+          # ============================================================
+          # STRONG PARAMETERS
+          # ============================================================
+
+          def version_parameters
+
+            permitted =
+              params.fetch(
+                :ecosystems_load_sources_entity_templates_entity_template_version,
+                {}
+              )
+
+
+            permitted =
+              permitted.permit(
+                :version,
+                :status
+              )
+
+
+            permitted.to_h.symbolize_keys
+
+          end
+
+
+          # ============================================================
+          # INDEX FILTERS
           # ============================================================
 
           def prepare_index_filters
 
             @filters =
               {
-                q:
-                  params[:q].to_s.strip,
+                q: params[:q].to_s.strip,
 
                 status:
                   normalize_status_filter(
@@ -964,7 +1029,7 @@ module Admin
 
 
           # ============================================================
-          # INDEX — SEARCH SCOPE
+          # SEARCH
           # ============================================================
 
           def build_search_scope
@@ -976,28 +1041,19 @@ module Admin
             where = {}
 
 
-            if @filters[:status].present?
-
-              where[:status] =
-                @filters[:status]
-
-            end
+            where[:status] =
+              @filters[:status] if
+              @filters[:status].present?
 
 
-            if @filters[:entity_template_id].present?
-
-              where[:entity_template_id] =
-                @filters[:entity_template_id]
-
-            end
+            where[:entity_template_id] =
+              @filters[:entity_template_id] if
+              @filters[:entity_template_id].present?
 
 
-            if @filters[:version].present?
-
-              where[:version] =
-                @filters[:version]
-
-            end
+            where[:version] =
+              @filters[:version] if
+              @filters[:version].present?
 
 
             VERSION_MODEL.search(
@@ -1012,10 +1068,6 @@ module Admin
           end
 
 
-          # ============================================================
-          # INDEX — EXECUTE SEARCH
-          # ============================================================
-
           def execute_search(search_scope)
 
             search_scope
@@ -1026,7 +1078,6 @@ module Admin
               "[EntityTemplateVersion Searchkick] #{e.class}: #{e.message}"
             )
 
-
             fallback_index_query
 
           rescue StandardError => e
@@ -1035,14 +1086,13 @@ module Admin
               "[EntityTemplateVersion Search] #{e.class}: #{e.message}"
             )
 
-
             fallback_index_query
 
           end
 
 
           # ============================================================
-          # INDEX — FALLBACK
+          # FALLBACK SEARCH
           # ============================================================
 
           def fallback_index_query
@@ -1052,36 +1102,23 @@ module Admin
                 .includes(:entity_template)
 
 
-            if @filters[:status].present?
-
-              scope =
-                scope.where(
-                  status: @filters[:status]
-                )
-
-            end
+            scope =
+              scope.where(
+                status: @filters[:status]
+              ) if @filters[:status].present?
 
 
-            if @filters[:entity_template_id].present?
-
-              scope =
-                scope.where(
-                  entity_template_id:
-                    @filters[:entity_template_id]
-                )
-
-            end
+            scope =
+              scope.where(
+                entity_template_id:
+                  @filters[:entity_template_id]
+              ) if @filters[:entity_template_id].present?
 
 
-            if @filters[:version].present?
-
-              scope =
-                scope.where(
-                  version:
-                    @filters[:version]
-                )
-
-            end
+            scope =
+              scope.where(
+                version: @filters[:version]
+              ) if @filters[:version].present?
 
 
             if @filters[:q].present?
@@ -1109,6 +1146,18 @@ module Admin
                       ecosystems_load_sources_entity_template_versions.definition
                       AS TEXT
                     ) ILIKE :query
+
+                    OR EXISTS (
+                      SELECT 1
+                      FROM ecosystems_load_sources_entity_templates
+                      WHERE ecosystems_load_sources_entity_templates.id =
+                        ecosystems_load_sources_entity_template_versions.entity_template_id
+                      AND (
+                        ecosystems_load_sources_entity_templates.name ILIKE :query
+                        OR ecosystems_load_sources_entity_templates.title ILIKE :query
+                        OR ecosystems_load_sources_entity_templates.slug ILIKE :query
+                      )
+                    )
                   SQL
                   query: query
                 )
@@ -1122,19 +1171,15 @@ module Admin
               )
 
 
-            scope =
-              scope
-                .page(@page)
-                .per(@per_page)
-
-
             scope
+              .page(@page)
+              .per(@per_page)
 
           end
 
 
           # ============================================================
-          # INDEX — SORT
+          # SORT
           # ============================================================
 
           def search_order
@@ -1169,10 +1214,7 @@ module Admin
 
 
             return DEFAULT_DIRECTION unless
-              %w[
-                asc
-                desc
-              ].include?(requested)
+              %w[asc desc].include?(requested)
 
 
             requested
@@ -1181,7 +1223,7 @@ module Admin
 
 
           # ============================================================
-          # INDEX — PAGINATION
+          # PAGINATION
           # ============================================================
 
           def prepare_index_pagination
@@ -1202,7 +1244,7 @@ module Admin
 
 
           # ============================================================
-          # INDEX — STATISTICS
+          # STATISTICS
           # ============================================================
 
           def prepare_index_statistics
@@ -1215,10 +1257,6 @@ module Admin
               elsif @entity_template_versions.respond_to?(:total_entries)
 
                 @entity_template_versions.total_entries
-
-              elsif @entity_template_versions.respond_to?(:count)
-
-                @entity_template_versions.count
 
               else
 
@@ -1258,49 +1296,28 @@ module Admin
 
 
             @showing_from =
-              if @filtered_count.zero?
-
-                0
-
-              else
-
+              @filtered_count.zero? ?
+                0 :
                 ((@page - 1) * @per_page) + 1
-
-              end
 
 
             @showing_to =
-              if @filtered_count.zero?
-
-                0
-
-              else
-
+              @filtered_count.zero? ?
+                0 :
                 [
                   @page * @per_page,
                   @filtered_count
                 ].min
 
-              end
-
 
             @total_pages =
-              if @filtered_count.zero?
-
-                1
-
-              else
-
+              [
                 (
                   @filtered_count.to_f /
                     @per_page
-                ).ceil
-
-              end
-
-
-            @total_pages =
-              1 if @total_pages < 1
+                ).ceil,
+                1
+              ].max
 
 
             @has_results =
@@ -1316,7 +1333,7 @@ module Admin
 
 
           # ============================================================
-          # INDEX — METADATA
+          # METADATA
           # ============================================================
 
           def prepare_index_metadata
@@ -1324,26 +1341,20 @@ module Admin
             @search_query =
               @filters[:q]
 
-
             @search_status =
               @filters[:status]
-
 
             @search_sort =
               safe_sort_column
 
-
             @search_direction =
               safe_sort_direction
-
 
             @available_statuses =
               STATUS_VALUES
 
-
             @available_sort_columns =
               SORT_COLUMNS
-
 
             @available_per_page_values =
               [
@@ -1353,13 +1364,11 @@ module Admin
                 200
               ]
 
-
             @search_applied =
               @search_query.present? ||
                 @search_status.present? ||
                 @filters[:entity_template_id].present? ||
                 @filters[:version].present?
-
 
             @search_message =
               build_search_message
@@ -1367,16 +1376,12 @@ module Admin
           end
 
 
-          # ============================================================
-          # INDEX — SEARCH MESSAGE
-          # ============================================================
-
           def build_search_message
 
             return nil unless @search_applied
 
 
-            if @search_result_count.to_i.zero?
+            if @search_result_count.zero?
 
               if @search_query.present?
 
@@ -1402,7 +1407,7 @@ module Admin
 
 
           # ============================================================
-          # INDEX — RENDER
+          # RENDER INDEX
           # ============================================================
 
           def render_index
@@ -1428,7 +1433,7 @@ module Admin
 
 
           # ============================================================
-          # ENTITY TEMPLATE VERSION
+          # SET VERSION
           # ============================================================
 
           def set_entity_template_version
@@ -1442,7 +1447,7 @@ module Admin
 
 
           # ============================================================
-          # ENTITY TEMPLATE
+          # SET TEMPLATE
           # ============================================================
 
           def set_entity_template
@@ -1461,10 +1466,6 @@ module Admin
           end
 
 
-          # ============================================================
-          # COLLECTION ENTITY TEMPLATE
-          # ============================================================
-
           def find_entity_template_for_collection_action
 
             return nil if
@@ -1472,15 +1473,14 @@ module Admin
 
 
             ENTITY_TEMPLATE_MODEL.find_by(
-              id:
-                params[:entity_template_id]
+              id: params[:entity_template_id]
             )
 
           end
 
 
           # ============================================================
-          # FIND COMPARISON VERSION
+          # COMPARISON
           # ============================================================
 
           def find_comparison_version(id)
@@ -1497,25 +1497,17 @@ module Admin
           end
 
 
-          # ============================================================
-          # PREVIOUS VERSION
-          # ============================================================
-
           def previous_version_for(version)
 
             return nil unless version.present?
 
 
-            @versions ||=
-              @entity_template
-                .entity_template_versions
-                .order(
-                  version: :desc
-                )
-
-
             versions =
-              @versions.to_a
+              @versions ||
+                @entity_template
+                  .entity_template_versions
+                  .latest_first
+                  .to_a
 
 
             current_index =
@@ -1573,6 +1565,16 @@ module Admin
               next if key == "fields"
 
 
+              left_exists =
+                left.key?(key) ||
+                  left.key?(key.to_sym)
+
+
+              right_exists =
+                right.key?(key) ||
+                  right.key?(key.to_sym)
+
+
               left_value =
                 fetch_hash_value(
                   left,
@@ -1590,8 +1592,7 @@ module Admin
               next if left_value == right_value
 
 
-              if !left.key?(key) &&
-                !left.key?(key.to_sym)
+              if !left_exists && right_exists
 
                 changes << {
                   key: key,
@@ -1600,8 +1601,7 @@ module Admin
                   right: right_value
                 }
 
-              elsif !right.key?(key) &&
-                !right.key?(key.to_sym)
+              elsif left_exists && !right_exists
 
                 changes << {
                   key: key,
@@ -1626,30 +1626,25 @@ module Admin
           end
 
 
-          # ============================================================
-          # HASH VALUE
-          # ============================================================
-
           def fetch_hash_value(hash, key)
 
             return nil unless hash.is_a?(Hash)
 
 
-            if hash.key?(key)
+            return hash[key] if hash.key?(key)
 
-              hash[key]
 
-            elsif hash.key?(key.to_sym)
+            return hash[key.to_sym] if
+              hash.key?(key.to_sym)
 
-              hash[key.to_sym]
 
-            end
+            nil
 
           end
 
 
           # ============================================================
-          # COMPARISON CHANGES
+          # COMPARISON NORMALIZATION
           # ============================================================
 
           def normalize_comparison_changes(changes)
@@ -1675,24 +1670,11 @@ module Admin
 
 
                 {
-                  key:
-                    attribute.to_s,
-
-                  from:
-                    from_value,
-
-                  to:
-                    to_value,
-
-                  from_text:
-                    format_comparison_value(
-                      from_value
-                    ),
-
-                  to_text:
-                    format_comparison_value(
-                      to_value
-                    )
+                  key: attribute.to_s,
+                  from: from_value,
+                  to: to_value,
+                  from_text: format_comparison_value(from_value),
+                  to_text: format_comparison_value(to_value)
                 }
 
               end
@@ -1730,21 +1712,10 @@ module Admin
                         change_hash["name"]
                     ).to_s,
 
-                  from:
-                    from_value,
-
-                  to:
-                    to_value,
-
-                  from_text:
-                    format_comparison_value(
-                      from_value
-                    ),
-
-                  to_text:
-                    format_comparison_value(
-                      to_value
-                    )
+                  from: from_value,
+                  to: to_value,
+                  from_text: format_comparison_value(from_value),
+                  to_text: format_comparison_value(to_value)
                 }
 
               end
@@ -1758,33 +1729,29 @@ module Admin
           end
 
 
-          # ============================================================
-          # FORMAT COMPARISON VALUE
-          # ============================================================
-
           def format_comparison_value(value)
 
             case value
 
             when nil
+
               "—"
 
             when true
+
               "true"
 
             when false
+
               "false"
 
             when String
 
-              value.presence ||
-                "empty"
+              value.presence || "empty"
 
             when Array, Hash
 
-              JSON.pretty_generate(
-                value
-              )
+              JSON.pretty_generate(value)
 
             else
 
@@ -1800,7 +1767,7 @@ module Admin
 
 
           # ============================================================
-          # STATUS NORMALIZATION
+          # STATUS
           # ============================================================
 
           def normalize_status_filter(value)
@@ -1822,7 +1789,7 @@ module Admin
 
 
           # ============================================================
-          # INTEGER PARAMETER
+          # INTEGER
           # ============================================================
 
           def normalize_integer_parameter(value)
@@ -1847,10 +1814,6 @@ module Admin
 
           end
 
-
-          # ============================================================
-          # POSITIVE INTEGER
-          # ============================================================
 
           def normalize_positive_integer(
             value,
@@ -1893,8 +1856,7 @@ module Admin
 
 
             requested =
-              DEFAULT_PER_PAGE if
-              requested < 1
+              DEFAULT_PER_PAGE if requested < 1
 
 
             [
@@ -1906,50 +1868,111 @@ module Admin
 
 
           # ============================================================
-          # STRONG PARAMETERS
+          # DEFINITION PARSING
           # ============================================================
 
-          def entity_template_version_params
+          def parse_definition_parameter
 
-            params
-              .require(
-                :ecosystems_load_sources_entity_templates_entity_template_version
-              )
-              .permit(
-                :version,
-                :status,
+            raw =
+              params.dig(
+                :ecosystems_load_sources_entity_templates_entity_template_version,
                 :definition
               )
+
+
+            # ----------------------------------------------------------
+            # Empty JSON is allowed and becomes an empty structure.
+            # ----------------------------------------------------------
+
+            if raw.is_a?(String)
+
+              stripped =
+                raw.strip
+
+
+              return {
+                value: {
+                  "fields" => []
+                }
+              } if stripped.blank?
+
+
+              parsed =
+                JSON.parse(
+                  stripped
+                )
+
+
+              # --------------------------------------------------------
+              # The builder expects an object at the root.
+              #
+              # Prevent arrays/scalars from silently becoming an
+              # invalid template definition.
+              # --------------------------------------------------------
+
+              unless parsed.is_a?(Hash)
+
+                return {
+                  value: parsed,
+                  error:
+                    "must contain a JSON object at the root."
+                }
+
+              end
+
+
+              return {
+                value:
+                  parsed.deep_stringify_keys
+              }
+
+            end
+
+
+            if raw.respond_to?(:to_h)
+
+              return {
+                value:
+                  raw.to_h.deep_stringify_keys
+              }
+
+            end
+
+
+            {
+              value:
+                raw.presence || {
+                  "fields" => []
+                }
+            }
+
+          rescue JSON::ParserError => e
+
+            {
+              value: {},
+              error:
+                "contains invalid JSON: #{e.message}"
+            }
 
           end
 
 
           # ============================================================
-          # NEXT VERSION NUMBER
+          # NEXT VERSION
           # ============================================================
 
           def next_version_number
 
-            latest =
-              @entity_template
-                .entity_template_versions
-                .order(
-                  version: :desc
-                )
-                .first
-
-
-            latest_version =
-              latest&.version.to_i
-
-
-            latest_version + 1
+            @entity_template
+              .entity_template_versions
+              .maximum(:version)
+              .to_i + 1
 
           end
 
 
           # ============================================================
-          # LOAD ENTITY TEMPLATES
+          # ENTITY TEMPLATES
           # ============================================================
 
           def load_entity_templates

@@ -435,6 +435,24 @@ application.register("entity_template_version_creator", EntityTemplateVersionCre
 
 
 
+
+import EntityDefinitionBuilderController from "./admin/ecosystems/load_sources/entity_templates/entity_template_versions/creation_new_version/entity_definition_builder_controller"
+application.register("entity-definition-builder", EntityDefinitionBuilderController)
+
+import DefinitionNotificationController from "./admin/ecosystems/load_sources/entity_templates/entity_template_versions/creation_new_version/definition_notification_controller"
+application.register("definition-notification", DefinitionNotificationController)
+
+import DefinitionJsonController from "./admin/ecosystems/load_sources/entity_templates/entity_template_versions/creation_new_version/definition_json_controller"
+application.register("definition-json", DefinitionJsonController)
+
+import DefinitionFieldController from "./admin/ecosystems/load_sources/entity_templates/entity_template_versions/creation_new_version/definition_field_controller"
+application.register("definition-field", DefinitionFieldController)
+
+import DefinitionLibraryController from "./admin/ecosystems/load_sources/entity_templates/entity_template_versions/creation_new_version/definition_library_controller"
+application.register("definition-library", DefinitionLibraryController)
+
+
+
 //
 // // ============================================================
 // // STIMULUS UNDERSCORE / KEBAB-CASE COMPATIBILITY ALIASES

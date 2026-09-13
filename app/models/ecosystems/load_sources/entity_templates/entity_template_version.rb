@@ -9,20 +9,6 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
   # ============================================================
   # SEARCHKICK
   # ============================================================
-  #
-  # Searchable fields:
-  #
-  # - version
-  # - status
-  # - entity_template_id
-  # - entity_template_name
-  # - display_name
-  # - definition
-  #
-  # The definition is flattened into searchable text so that
-  # searches can find field names, labels, descriptions, etc.
-  #
-  # ============================================================
 
   searchkick(
     word_start: [
@@ -32,6 +18,7 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
       :search_text
     ],
     searchable: [
+      :version,
       :display_name,
       :entity_template_name,
       :status,
@@ -50,7 +37,6 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
              inverse_of:
                :entity_template_versions
 
-
   has_many :entity_template_fields,
            class_name:
              "Ecosystems::LoadSources::EntityTemplates::EntityTemplateField",
@@ -65,7 +51,7 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
 
 
   # ============================================================
-  # ENUMS
+  # ENUM
   # ============================================================
 
   enum :status, {
@@ -92,11 +78,13 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
             }
 
   validates :status,
-            presence: true
+            presence: true,
+            inclusion: {
+              in: statuses.keys
+            }
 
   validates :definition,
             presence: true
-
 
   validate :definition_must_be_valid
 
@@ -118,104 +106,85 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
 
   scope :latest_first,
         -> {
-          order(
-            version: :desc
-          )
+          order(version: :desc)
         }
 
   scope :oldest_first,
         -> {
-          order(
-            version: :asc
-          )
+          order(version: :asc)
         }
 
   scope :published_versions,
         -> {
-          where(
-            status: "published"
-          )
+          where(status: "published")
         }
 
   scope :draft_versions,
         -> {
-          where(
-            status: "draft"
-          )
+          where(status: "draft")
         }
 
   scope :archived_versions,
         -> {
-          where(
-            status: "archived"
-          )
+          where(status: "archived")
         }
 
 
+  # ============================================================
+  # VERSION COLLECTION HELPERS
+  # ============================================================
+
   def latest_version
-    entity_template_versions.order(version: :desc).first
+    entity_template
+      &.entity_template_versions
+      &.latest_first
+      &.first
   end
 
   def published_version
-    entity_template_versions.published.order(version: :desc).first
+    entity_template
+      &.entity_template_versions
+      &.published_versions
+      &.latest_first
+      &.first
   end
 
   def versions_count
-    entity_template_versions.count
+    entity_template
+      &.entity_template_versions
+      &.count
+      .to_i
   end
 
+
   # ============================================================
-  # SEARCHKICK DATA
-  # ============================================================
-  #
-  # Searchkick calls this method when indexing the record.
-  #
-  # Keep this method deterministic and inexpensive.
-  #
+  # SEARCH DATA
   # ============================================================
 
   def search_data
 
     {
       id: id,
-
       version: version,
-
       status: status,
-
-      entity_template_id:
-        entity_template_id,
-
-      entity_template_name:
-        entity_template_name_for_search,
-
-      display_name:
-        display_name,
-
-      search_text:
-        search_text,
-
-      created_at:
-        created_at,
-
-      updated_at:
-        updated_at,
-
-      published_at:
-        published_at
+      entity_template_id: entity_template_id,
+      entity_template_name: entity_template_name_for_search,
+      display_name: display_name,
+      search_text: search_text,
+      created_at: created_at,
+      updated_at: updated_at,
+      published_at: published_at
     }
 
   end
 
 
   # ============================================================
-  # SEARCH DISPLAY HELPERS
+  # SEARCH HELPERS
   # ============================================================
 
   def entity_template_name_for_search
-
     entity_template&.name.to_s
-
   end
 
 
@@ -228,12 +197,7 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
     parts << status
     parts << "version #{version}"
 
-    definition_search_text =
-      definition_to_search_text(
-        definition
-      )
-
-    parts << definition_search_text
+    parts << definition_to_search_text(definition)
 
     parts
       .compact
@@ -250,6 +214,8 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
 
   def latest?
 
+    return false unless entity_template.present?
+
     version ==
       entity_template
         .entity_template_versions
@@ -259,23 +225,17 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
 
 
   def published?
-
     status == "published"
-
   end
 
 
   def draft?
-
     status == "draft"
-
   end
 
 
   def archived?
-
     status == "archived"
-
   end
 
 
@@ -294,7 +254,12 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
   # ============================================================
 
   def publish!
+
+    raise ActiveRecord::RecordInvalid,
+          "Only a draft version can be published." unless draft?
+
     transaction do
+
       entity_template
         .entity_template_versions
         .where(status: "published")
@@ -308,16 +273,10 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
         status: "published",
         published_at: Time.current
       )
+
     end
-  rescue ActiveRecord::RecordNotUnique
-    errors.add(
-      :status,
-      "could not be published because another version was published concurrently"
-    )
 
-    raise ActiveRecord::RecordInvalid.new(self)
   end
-
 
 
   # ============================================================
@@ -345,13 +304,33 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
   # ============================================================
 
   def create_next_version!
-    entity_template
-      .entity_template_versions
-      .create!(
-        version: next_version_number,
-        status: "draft",
-        definition: definition.deep_dup
-      )
+
+    raise ActiveRecord::RecordInvalid,
+          "Entity template is required." unless entity_template.present?
+
+    self.class.transaction(requires_new: true) do
+
+      next_version =
+        entity_template
+          .entity_template_versions
+          .lock
+          .maximum(:version)
+          .to_i + 1
+
+      entity_template
+        .entity_template_versions
+        .create!(
+          version: next_version,
+          status: "draft",
+          definition: definition.deep_dup
+        )
+
+    end
+
+  rescue ActiveRecord::RecordNotUnique
+
+    retry
+
   end
 
 
@@ -384,34 +363,26 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
 
 
   def field_count
-
     fields.size
-
   end
 
 
   def section_count
-
     sections.size
-
   end
 
 
   # ============================================================
-  # DISPLAY HELPERS
+  # DISPLAY
   # ============================================================
 
   def display_name
-
     "#{entity_template_name_for_search} v#{version}"
-
   end
 
 
   def status_label
-
     status.to_s.humanize
-
   end
 
 
@@ -433,10 +404,6 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
     end
 
 
-    # ----------------------------------------------------------
-    # FIELDS
-    # ----------------------------------------------------------
-
     if definition.key?("fields") &&
       !definition["fields"].is_a?(Array)
 
@@ -447,10 +414,6 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
 
     end
 
-
-    # ----------------------------------------------------------
-    # SECTIONS
-    # ----------------------------------------------------------
 
     if definition.key?("sections") &&
       !definition["sections"].is_a?(Array)
@@ -475,6 +438,7 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
   def assign_version_number
 
     return if entity_template.blank?
+    return if version.present?
 
     self.version =
       entity_template
@@ -510,36 +474,7 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
 
 
   # ============================================================
-  # DEFINITION → SEARCH TEXT
-  # ============================================================
-  #
-  # Converts nested JSONB into a searchable string.
-  #
-  # Example:
-  #
-  # {
-  #   "sections" => [
-  #     {
-  #       "name" => "Identity",
-  #       "fields" => [
-  #         {
-  #           "name" => "Scientific Name",
-  #           "label" => "Scientific Name"
-  #         }
-  #       ]
-  #     }
-  #   ]
-  # }
-  #
-  # becomes searchable text containing:
-  #
-  # Identity
-  # Scientific Name
-  # label
-  #
-  # This allows Searchkick to find records by content
-  # inside the JSON definition.
-  #
+  # DEFINITION -> SEARCH TEXT
   # ============================================================
 
   def definition_to_search_text(value)
@@ -563,26 +498,20 @@ class Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion < Applicat
 
       value
         .map do |child|
-
         definition_to_search_text(child)
-
       end
         .join(" ")
 
     when String
-
       value
 
     when Numeric, TrueClass, FalseClass
-
       value.to_s
 
     when NilClass
-
       ""
 
     else
-
       value.to_s
 
     end

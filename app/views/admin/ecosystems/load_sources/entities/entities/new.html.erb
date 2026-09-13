@@ -229,10 +229,13 @@
                   url: admin_ecosystems_load_sources_entities_path,
                   class: "grid gap-6 lg:grid-cols-[1fr_350px]",
                   data: {
-                    controller: "entity-template-version",
+                    controller: "entity-template-version entity-definition-builder",
                     entity_template_version_templates_value:
-                      template_versions_data.to_json
+                      template_versions_data.to_json,
+                    entity_definition_builder_initial_definition_value:
+                      {}.to_json
                   } do |form| %>
+
 
 
       <% if @entity.errors.any? %>

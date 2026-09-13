@@ -39,6 +39,9 @@ npx @herb-tools/linter app/views/admin/ecosystems/load_sources/entity_templates/
 npx @herb-tools/formatter app/views/admin/ecosystems/load_sources/entity_templates/entity_template_versions/compare.html.erb
 
 
+npx @herb-tools/linter javascript.js --fix
+npx @herb-tools/formatter javascript.js
+
 npx @herb-tools/linter app/views/admin/ecosystems/load_sources/entity_templates/entity_template_versions/_pagination.html.erb --fix
 npx @herb-tools/formatter app/views/admin/ecosystems/load_sources/entity_templates/entity_template_versions/_pagination.html.erb
 
