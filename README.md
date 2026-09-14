@@ -34,10 +34,13 @@ tree -I 'tmp|log|storage|node_modules|.git| css.gz'
 ## js lint
 npx eslint app/javascript/controllers/admin/ecosystems/load_sources/entity_templates/definitions/entity_template_definition_builder_controller.js --fix
 npx prettier app/javascript/controllers/admin/ecosystems/load_sources/entity_templates/definitions/entity_template_definition_builder_controller.js --write
+
+npx eslint app/javascript/controllers/admin/ecosystems/load_sources/entity_templates/entity_template_versions/creation_new_version/entity_definition_builder_controller.js --fix
+npx prettier app/javascript/controllers/admin/ecosystems/load_sources/entity_templates/entity_template_versions/creation_new_version/entity_definition_builder_controller.js --write
+
 eslint file.js --fix-broken-syntax
 npx @herb-tools/linter app/views/admin/ecosystems/load_sources/entity_templates/entity_template_versions/compare.html.erb --fix
 npx @herb-tools/formatter app/views/admin/ecosystems/load_sources/entity_templates/entity_template_versions/compare.html.erb
-
 
 npx @herb-tools/linter javascript.js --fix
 npx @herb-tools/formatter javascript.js

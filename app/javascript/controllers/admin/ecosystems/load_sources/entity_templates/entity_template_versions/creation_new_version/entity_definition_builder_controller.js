@@ -4,7 +4,6 @@ export default class extends Controller {
     static targets = [
         "builder",
         "json",
-        "jsonStatus",
         "jsonError",
         "jsonErrorMessage",
 
@@ -24,14 +23,9 @@ export default class extends Controller {
 
         "fieldCount",
         "syncBadge",
-
-        "statusDot",
         "status",
+        "statusDot",
         "activity",
-
-        "xp",
-        "progressBar",
-        "progressLabel",
 
         "sidebarStatus",
         "sidebarFieldCount",
@@ -40,13 +34,16 @@ export default class extends Controller {
         "health",
         "healthBar",
 
-        "headerStatusDot",
-        "headerStatus",
-
-        "submit",
-        "submitReadiness",
-
+        "progressLabel",
+        "progressBar",
+        "xp",
         "missionFieldIcon",
+
+        "submitReadiness",
+        "submit",
+
+        "headerStatus",
+        "headerStatusDot",
 
         "toast",
         "toastIcon",
@@ -57,215 +54,61 @@ export default class extends Controller {
     connect() {
         this.fields = []
         this.editingIndex = null
-
-        this.xpValue = 0
-        this.lastAction = null
-
         this.required = false
         this.multiple = false
         this.active = true
+        this.toastTimer = null
+        this.jsonValid = true
 
         this.initializeFromJson()
-        this.render()
-
-        this.dispatch("ready")
     }
 
     disconnect() {
-        clearTimeout(this.toastTimer)
+        if (this.toastTimer) {
+            window.clearTimeout(this.toastTimer)
+        }
     }
-
-    /* =========================================================
-       INITIALIZATION
-       ========================================================= */
 
     initializeFromJson() {
-        try {
-            const raw = this.jsonTarget.value.trim()
+        const initial = this.readJson()
 
-            if (!raw) {
-                this.fields = []
-                return
-            }
-
-            const parsed = JSON.parse(raw)
-
-            if (Array.isArray(parsed.fields)) {
-                this.fields = parsed.fields.map(field =>
-                    this.normalizeField(field)
-                )
-            }
-        } catch (_) {
+        if (!initial.valid) {
             this.fields = []
-        }
-    }
-
-    normalizeField(field) {
-        return {
-            name: field.name || "",
-            label: field.label || field.name || "",
-            type: field.type || "string",
-            description: field.description || "",
-            required: Boolean(field.required),
-            multiple: Boolean(field.multiple),
-            active: field.active !== false
-        }
-    }
-
-    /* =========================================================
-       LIBRARY
-       ========================================================= */
-
-    openLibrary() {
-        this.dispatch("library-open")
-    }
-
-    applyLibrary(event) {
-        const definition = event.detail.template
-
-        if (!definition || !Array.isArray(definition.fields)) {
-            this.showToast(
-                "The selected library definition is invalid.",
-                "LIBRARY ERROR",
-                "⚠",
-                "red"
-            )
-
+            this.setJsonError(initial.error)
+            this.render()
             return
         }
 
-        this.fields = definition.fields.map(field =>
-            this.normalizeField(field)
-        )
+        this.fields = this.normalizeFields(initial.value.fields)
 
-        this.addXp(20)
-
-        this.syncJson({
-            message: `${event.detail.title} definition loaded.`
-        })
+        this.clearJsonError()
+        this.render()
+        this.updateJsonFromFields()
+        this.setActivity("Definition builder ready.")
     }
 
-    /* =========================================================
-       FIELD EDITOR
-       ========================================================= */
+    // ---------------------------------------------------------------------------
+    // QUICK START
+    // ---------------------------------------------------------------------------
 
     openFieldEditor() {
         this.editingIndex = null
-
-        this.fieldEditorTitleTarget.textContent =
-            "Add definition field"
-
-        this.resetFieldEditor()
+        this.resetEditor()
+        this.fieldEditorTitleTarget.textContent = "Add definition field"
 
         this.fieldEditorTarget.classList.remove("hidden")
-
         this.fieldNameTarget.focus()
+
+        this.setActivity("Ready to add a definition field.")
     }
 
     closeFieldEditor() {
         this.fieldEditorTarget.classList.add("hidden")
         this.editingIndex = null
+        this.resetEditor()
     }
 
-    editField(event) {
-        const index = Number(event.detail.index)
-        const field = this.fields[index]
-
-        if (!field) return
-
-        this.editingIndex = index
-
-        this.fieldEditorTitleTarget.textContent =
-            `Edit definition field`
-
-        this.fieldNameTarget.value = field.name
-        this.fieldLabelTarget.value = field.label
-        this.fieldTypeTarget.value = field.type
-        this.fieldDescriptionTarget.value = field.description
-
-        this.required = field.required
-        this.multiple = field.multiple
-        this.active = field.active
-
-        this.renderFieldEditorState()
-
-        this.fieldEditorTarget.classList.remove("hidden")
-
-        this.fieldNameTarget.focus()
-    }
-
-    saveField() {
-        const field = {
-            name: this.fieldNameTarget.value.trim(),
-            label: this.fieldLabelTarget.value.trim(),
-            type: this.fieldTypeTarget.value,
-            description: this.fieldDescriptionTarget.value.trim(),
-            required: this.required,
-            multiple: this.multiple,
-            active: this.active
-        }
-
-        const error = this.validateField(field)
-
-        if (error) {
-            this.showToast(error, "FIELD NEEDS ATTENTION", "⚠", "orange")
-            return
-        }
-
-        if (this.editingIndex === null) {
-            this.fields.push(field)
-
-            this.addXp(10)
-
-            this.showToast(
-                `"${field.name}" added to the definition.`,
-                "FIELD ADDED",
-                "✦",
-                "emerald"
-            )
-        } else {
-            this.fields[this.editingIndex] = field
-
-            this.addXp(5)
-
-            this.showToast(
-                `"${field.name}" updated.`,
-                "FIELD UPDATED",
-                "✓",
-                "violet"
-            )
-        }
-
-        this.closeFieldEditor()
-        this.syncJson()
-    }
-
-    validateField(field) {
-        if (!field.name) {
-            return "Field name is required."
-        }
-
-        if (!/^[a-zA-Z][a-zA-Z0-9_]*$/.test(field.name)) {
-            return "Field name must start with a letter and contain only letters, numbers and underscores."
-        }
-
-        const duplicate = this.fields.findIndex((existing, index) => {
-            return existing.name === field.name &&
-                index !== this.editingIndex
-        })
-
-        if (duplicate !== -1) {
-            return `A field named "${field.name}" already exists.`
-        }
-
-        if (!field.label) {
-            field.label = field.name
-        }
-
-        return null
-    }
-
-    resetFieldEditor() {
+    resetEditor() {
         this.fieldNameTarget.value = ""
         this.fieldLabelTarget.value = ""
         this.fieldTypeTarget.value = "string"
@@ -275,554 +118,167 @@ export default class extends Controller {
         this.multiple = false
         this.active = true
 
-        this.renderFieldEditorState()
+        this.refreshToggleUI()
     }
 
     toggleFieldRequired() {
         this.required = !this.required
-        this.renderFieldEditorState()
+        this.refreshToggleUI()
     }
 
     toggleFieldMultiple() {
         this.multiple = !this.multiple
-        this.renderFieldEditorState()
+        this.refreshToggleUI()
     }
 
     toggleFieldActive() {
         this.active = !this.active
-        this.renderFieldEditorState()
+        this.refreshToggleUI()
     }
 
-    renderFieldEditorState() {
-        this.requiredIconTarget.textContent =
-            this.required ? "✓" : "○"
+    refreshToggleUI() {
+        this.setToggle(
+            this.requiredIconTarget,
+            this.requiredLabelTarget,
+            this.required,
+            "✓",
+            "Required",
+            "Optional",
+            "bg-emerald-50",
+            "text-emerald-500"
+        )
 
-        this.requiredLabelTarget.textContent =
-            this.required ? "Required" : "Optional"
+        this.setToggle(
+            this.multipleIconTarget,
+            this.multipleLabelTarget,
+            this.multiple,
+            "✓",
+            "Multiple",
+            "Single",
+            "bg-violet-50",
+            "text-violet-500"
+        )
 
-        this.multipleIconTarget.textContent =
-            this.multiple ? "✓" : "○"
-
-        this.multipleLabelTarget.textContent =
-            this.multiple ? "Multiple values" : "Single"
-
-        this.activeIconTarget.textContent =
-            this.active ? "●" : "○"
-
-        this.activeLabelTarget.textContent =
-            this.active ? "Enabled" : "Disabled"
-
-        this.requiredIconTarget.className =
-            this.required
-                ? "flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 text-emerald-500"
-                : "flex h-8 w-8 items-center justify-center rounded-xl bg-slate-50 text-slate-300"
-
-        this.multipleIconTarget.className =
-            this.multiple
-                ? "flex h-8 w-8 items-center justify-center rounded-xl bg-violet-100 text-violet-500"
-                : "flex h-8 w-8 items-center justify-center rounded-xl bg-slate-50 text-slate-300"
-
-        this.activeIconTarget.className =
-            this.active
-                ? "flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-400"
-                : "flex h-8 w-8 items-center justify-center rounded-xl bg-slate-50 text-slate-300"
+        this.setToggle(
+            this.activeIconTarget,
+            this.activeLabelTarget,
+            this.active,
+            "●",
+            "Enabled",
+            "Disabled",
+            "bg-emerald-50",
+            "text-emerald-500"
+        )
     }
 
-    /* =========================================================
-       FIELD INVENTORY
-       ========================================================= */
+    setToggle(
+        icon,
+        label,
+        enabled,
+        symbol,
+        enabledText,
+        disabledText,
+        bgClass,
+        textClass
+    ) {
+        icon.textContent = enabled ? symbol : "○"
+        label.textContent = enabled ? enabledText : disabledText
 
-    removeField(event) {
-        const index = Number(event.detail.index)
+        icon.classList.remove(
+            "bg-slate-50",
+            "text-slate-300",
+            "bg-emerald-50",
+            "text-emerald-500",
+            "bg-violet-50",
+            "text-violet-500"
+        )
 
-        if (!this.fields[index]) return
-
-        const removed = this.fields[index]
-
-        this.fields.splice(index, 1)
-
-        this.addXp(3)
-
-        this.syncJson({
-            message: `"${removed.name}" removed from the definition.`,
-            icon: "−"
-        })
+        if (enabled) {
+            icon.classList.add(bgClass, textClass)
+            label.classList.remove("text-slate-400")
+            label.classList.add(textClass)
+        } else {
+            icon.classList.add("bg-slate-50", "text-slate-300")
+            label.classList.remove(
+                "text-emerald-500",
+                "text-violet-500"
+            )
+            label.classList.add("text-slate-400")
+        }
     }
 
-    moveField(event) {
-        const index = Number(event.detail.index)
-        const direction = Number(event.detail.direction)
+    saveField() {
+        const name = this.fieldNameTarget.value.trim()
+        const label = this.fieldLabelTarget.value.trim()
+        const type = this.fieldTypeTarget.value
+        const description = this.fieldDescriptionTarget.value.trim()
 
-        const destination = index + direction
+        if (!name) {
+            this.showToast(
+                "FIELD REQUIRED",
+                "Enter a field name before saving.",
+                "warning"
+            )
 
-        if (
-            destination < 0 ||
-            destination >= this.fields.length
-        ) {
+            this.fieldNameTarget.focus()
             return
         }
 
-        const temporary = this.fields[index]
+        if (!/^[a-zA-Z][a-zA-Z0-9_]*$/.test(name)) {
+            this.showToast(
+                "INVALID FIELD NAME",
+                "Use letters, numbers and underscores. The name must begin with a letter.",
+                "warning"
+            )
 
-        this.fields[index] = this.fields[destination]
-        this.fields[destination] = temporary
-
-        this.addXp(2)
-
-        this.syncJson({
-            message: "Field order updated.",
-            icon: "↕"
-        })
-    }
-
-    /* =========================================================
-       JSON SYNCHRONIZATION
-       ========================================================= */
-
-    syncJson(options = {}) {
-        const definition = {
-            fields: this.fields
+            this.fieldNameTarget.focus()
+            return
         }
 
-        this.jsonTarget.value =
-            JSON.stringify(definition, null, 2)
-
-        this.setJsonValid()
-
-        this.render()
-
-        this.animateSync()
-
-        this.showToast(
-            options.message || "Visual definition synchronized with JSON.",
-            "DEFINITION UPDATED",
-            options.icon || "↻",
-            "violet"
+        const duplicateIndex = this.fields.findIndex(
+            (field, index) =>
+                field.name === name && index !== this.editingIndex
         )
 
-        this.dispatch("definition-changed", {
-            detail: {
-                definition
-            }
-        })
-    }
-
-    jsonChanged() {
-        this.setJsonWorking()
-
-        clearTimeout(this.jsonTimer)
-
-        this.jsonTimer = setTimeout(() => {
-            this.importJson()
-        }, 350)
-    }
-
-    importJson() {
-        try {
-            const parsed = JSON.parse(this.jsonTarget.value)
-
-            if (
-                !parsed ||
-                typeof parsed !== "object" ||
-                !Array.isArray(parsed.fields)
-            ) {
-                this.setJsonInvalid(
-                    'Definition must contain a "fields" array.'
-                )
-
-                return
-            }
-
-            const validationError =
-                this.validateImportedFields(parsed.fields)
-
-            if (validationError) {
-                this.setJsonInvalid(validationError)
-                return
-            }
-
-            this.fields = parsed.fields.map(field =>
-                this.normalizeField(field)
-            )
-
-            this.setJsonValid()
-
-            this.render()
-
+        if (duplicateIndex !== -1) {
             this.showToast(
-                "Manual JSON changes imported into the visual builder.",
-                "JSON IMPORTED",
-                "✓",
-                "emerald"
+                "DUPLICATE FIELD",
+                `A field named "${name}" already exists.`,
+                "warning"
             )
 
-            this.addXp(5)
-        } catch (error) {
-            this.setJsonInvalid(
-                this.formatJsonError(error)
-            )
-        }
-    }
-
-    validateImportedFields(fields) {
-        const names = new Set()
-
-        for (let index = 0; index < fields.length; index++) {
-            const field = fields[index]
-
-            if (!field || typeof field !== "object") {
-                return `Field ${index + 1} must be an object.`
-            }
-
-            if (!field.name) {
-                return `Field ${index + 1} is missing "name".`
-            }
-
-            if (!/^[a-zA-Z][a-zA-Z0-9_]*$/.test(field.name)) {
-                return `Field "${field.name}" has an invalid name.`
-            }
-
-            if (names.has(field.name)) {
-                return `Duplicate field "${field.name}".`
-            }
-
-            names.add(field.name)
-
-            if (!field.type) {
-                return `Field "${field.name}" is missing "type".`
-            }
+            this.fieldNameTarget.focus()
+            return
         }
 
-        return null
-    }
+        const wasEditing = this.editingIndex !== null
 
-    formatJsonError(error) {
-        const message = error?.message || "Invalid JSON."
-
-        const match = message.match(/position\s+(\d+)/i)
-
-        if (!match) {
-            return message
+        const field = {
+            name,
+            label: label || this.humanize(name),
+            type,
+            description,
+            required: this.required,
+            multiple: this.multiple,
+            active: this.active
         }
 
-        const position = Number(match[1])
-        const raw = this.jsonTarget.value
-
-        const before = raw.slice(0, position)
-        const line = before.split("\n").length
-        const column = position - before.lastIndexOf("\n")
-
-        return `${message} Line ${line}, column ${column}.`
-    }
-
-    formatJson() {
-        try {
-            const parsed = JSON.parse(this.jsonTarget.value)
-
-            this.jsonTarget.value =
-                JSON.stringify(parsed, null, 2)
-
-            this.setJsonValid()
-
-            this.showToast(
-                "JSON formatted successfully.",
-                "JSON FORMATTED",
-                "✓",
-                "emerald"
-            )
-        } catch (error) {
-            this.setJsonInvalid(
-                this.formatJsonError(error)
-            )
-
-            this.showToast(
-                "JSON could not be formatted because it is invalid.",
-                "FORMAT FAILED",
-                "⚠",
-                "red"
-            )
+        if (!wasEditing) {
+            this.fields.push(field)
+            this.setActivity(`Added "${field.name}".`)
+        } else {
+            this.fields[this.editingIndex] = field
+            this.setActivity(`Updated "${field.name}".`)
         }
-    }
 
-    setJsonWorking() {
-        this.jsonStatusTarget.textContent = "CHECKING..."
+        this.closeFieldEditor()
+        this.render()
+        this.updateJsonFromFields()
 
-        this.jsonStatusTarget.className =
-            "rounded-full border border-amber-500/20 bg-amber-500/10 px-3 py-1.5 text-[8px] font-black uppercase tracking-wider text-amber-400"
-    }
-
-    setJsonValid() {
-        this.jsonStatusTarget.textContent = "VALID JSON"
-
-        this.jsonStatusTarget.className =
-            "rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-[8px] font-black uppercase tracking-wider text-emerald-400"
-
-        this.jsonErrorTarget.classList.add("hidden")
-    }
-
-    setJsonInvalid(message) {
-        this.jsonStatusTarget.textContent = "INVALID JSON"
-
-        this.jsonStatusTarget.className =
-            "rounded-full border border-red-500/20 bg-red-500/10 px-3 py-1.5 text-[8px] font-black uppercase tracking-wider text-red-400"
-
-        this.jsonErrorTarget.classList.remove("hidden")
-        this.jsonErrorMessageTarget.textContent = message
-    }
-
-    /* =========================================================
-       RENDER
-       ========================================================= */
-
-    render() {
-        this.builderTarget.innerHTML = ""
-
-        this.fields.forEach((field, index) => {
-            this.builderTarget.insertAdjacentHTML(
-                "beforeend",
-                this.fieldCard(field, index)
-            )
-        })
-
-        this.updateStatistics()
-        this.updateMission()
-        this.updateProgress()
-    }
-
-    fieldCard(field, index) {
-        const statusClass = field.active
-            ? "bg-emerald-50 text-emerald-500 border-emerald-100"
-            : "bg-slate-100 text-slate-400 border-slate-200"
-
-        return `
-      <div
-        class="
-          group
-          rounded-[28px]
-          border-2
-          border-slate-100
-          bg-white
-          p-5
-          shadow-sm
-          transition-all
-          duration-300
-          hover:-translate-y-0.5
-          hover:border-violet-200
-          hover:shadow-md
-        "
-        data-field-index="${index}"
-      >
-
-        <div class="flex items-start gap-4">
-
-          <div class="
-            flex
-            h-11
-            w-11
-            shrink-0
-            items-center
-            justify-center
-            rounded-2xl
-            bg-gradient-to-br
-            from-violet-100
-            to-fuchsia-100
-            text-sm
-            font-black
-            text-violet-500
-          ">
-            ${String(index + 1).padStart(2, "0")}
-          </div>
-
-          <div class="min-w-0 flex-1">
-
-            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-
-              <div class="min-w-0">
-
-                <div class="flex flex-wrap items-center gap-2">
-
-                  <span class="font-mono text-sm font-black text-slate-700">
-                    ${this.escapeHtml(field.name)}
-                  </span>
-
-                  <span class="
-                    rounded-full
-                    border
-                    ${statusClass}
-                    px-2
-                    py-1
-                    text-[8px]
-                    font-black
-                    uppercase
-                    tracking-wider
-                  ">
-                    ${field.type}
-                  </span>
-
-                  ${field.required ? `
-                    <span class="
-                      rounded-full
-                      border
-                      border-orange-100
-                      bg-orange-50
-                      px-2
-                      py-1
-                      text-[8px]
-                      font-black
-                      uppercase
-                      tracking-wider
-                      text-orange-500
-                    ">
-                      REQUIRED
-                    </span>
-                  ` : ""}
-
-                  ${field.multiple ? `
-                    <span class="
-                      rounded-full
-                      border
-                      border-violet-100
-                      bg-violet-50
-                      px-2
-                      py-1
-                      text-[8px]
-                      font-black
-                      uppercase
-                      tracking-wider
-                      text-violet-500
-                    ">
-                      MULTIPLE
-                    </span>
-                  ` : ""}
-
-                </div>
-
-                <div class="mt-1 text-xs font-bold text-slate-500">
-                  ${this.escapeHtml(field.label || field.name)}
-                </div>
-
-                ${field.description ? `
-                  <div class="mt-1 text-[10px] leading-5 text-slate-400">
-                    ${this.escapeHtml(field.description)}
-                  </div>
-                ` : ""}
-
-              </div>
-
-              <div class="flex shrink-0 items-center gap-2">
-
-                <button
-                  type="button"
-                  class="
-                    flex
-                    h-9
-                    w-9
-                    items-center
-                    justify-center
-                    rounded-xl
-                    border
-                    border-slate-100
-                    bg-white
-                    text-slate-400
-                    transition
-                    hover:border-violet-200
-                    hover:bg-violet-50
-                    hover:text-violet-500
-                  "
-                  data-action="click->entity-definition-builder#editField"
-                  data-index="${index}"
-                >
-                  ✎
-                </button>
-
-                <button
-                  type="button"
-                  class="
-                    flex
-                    h-9
-                    w-9
-                    items-center
-                    justify-center
-                    rounded-xl
-                    border
-                    border-slate-100
-                    bg-white
-                    text-slate-400
-                    transition
-                    hover:border-red-200
-                    hover:bg-red-50
-                    hover:text-red-500
-                  "
-                  data-action="click->entity-definition-builder#removeField"
-                  data-index="${index}"
-                >
-                  ×
-                </button>
-
-              </div>
-
-            </div>
-
-            <div class="mt-4 flex flex-wrap items-center gap-2">
-
-              <button
-                type="button"
-                class="
-                  rounded-xl
-                  border
-                  border-slate-100
-                  bg-slate-50
-                  px-3
-                  py-2
-                  text-[8px]
-                  font-black
-                  uppercase
-                  tracking-wider
-                  text-slate-400
-                  transition
-                  hover:border-violet-200
-                  hover:bg-violet-50
-                  hover:text-violet-500
-                "
-                data-action="click->entity-definition-builder#moveFieldUp"
-                data-index="${index}"
-              >
-                ↑ MOVE
-              </button>
-
-              <button
-                type="button"
-                class="
-                  rounded-xl
-                  border
-                  border-slate-100
-                  bg-slate-50
-                  px-3
-                  py-2
-                  text-[8px]
-                  font-black
-                  uppercase
-                  tracking-wider
-                  text-slate-400
-                  transition
-                  hover:border-violet-200
-                  hover:bg-violet-50
-                  hover:text-violet-500
-                "
-                data-action="click->entity-definition-builder#moveFieldDown"
-                data-index="${index}"
-              >
-                ↓ MOVE
-              </button>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-    `
+        this.showToast(
+            wasEditing ? "FIELD UPDATED" : "FIELD ADDED",
+            `"${field.name}" is now part of the definition.`
+        )
     }
 
     editField(event) {
@@ -833,325 +289,784 @@ export default class extends Controller {
 
         this.editingIndex = index
 
-        this.fieldEditorTitleTarget.textContent =
-            `Edit field #${index + 1}`
+        this.fieldEditorTitleTarget.textContent = "Edit definition field"
 
-        this.fieldNameTarget.value = field.name
-        this.fieldLabelTarget.value = field.label
-        this.fieldTypeTarget.value = field.type
-        this.fieldDescriptionTarget.value = field.description
+        this.fieldNameTarget.value = field.name || ""
+        this.fieldLabelTarget.value = field.label || ""
+        this.fieldTypeTarget.value = field.type || "string"
+        this.fieldDescriptionTarget.value = field.description || ""
 
-        this.required = field.required
-        this.multiple = field.multiple
-        this.active = field.active
+        this.required = Boolean(field.required)
+        this.multiple = Boolean(field.multiple)
+        this.active = field.active !== false
 
-        this.renderFieldEditorState()
+        this.refreshToggleUI()
 
         this.fieldEditorTarget.classList.remove("hidden")
-
         this.fieldNameTarget.focus()
     }
 
-    removeField(event) {
+    deleteField(event) {
         const index = Number(event.currentTarget.dataset.index)
+        const field = this.fields[index]
 
-        if (!this.fields[index]) return
-
-        const removed = this.fields[index]
+        if (!field) return
 
         this.fields.splice(index, 1)
 
-        this.addXp(3)
+        this.render()
+        this.updateJsonFromFields()
 
-        this.syncJson({
-            message: `"${removed.name}" removed from the definition.`,
-            icon: "−"
-        })
+        this.setActivity(`Removed "${field.name}".`)
+        this.showToast(
+            "FIELD REMOVED",
+            `"${field.name}" was removed from the definition.`
+        )
     }
 
     moveFieldUp(event) {
         const index = Number(event.currentTarget.dataset.index)
 
-        if (index <= 0) return
+        if (index <= 0 || index >= this.fields.length) return
 
-        const temp = this.fields[index - 1]
+        const [field] = this.fields.splice(index, 1)
+        this.fields.splice(index - 1, 0, field)
 
-        this.fields[index - 1] = this.fields[index]
-        this.fields[index] = temp
-
-        this.syncJson({
-            message: "Field moved upward.",
-            icon: "↑"
-        })
+        this.render()
+        this.updateJsonFromFields()
+        this.setActivity(`Moved "${field.name}" up.`)
     }
 
     moveFieldDown(event) {
         const index = Number(event.currentTarget.dataset.index)
 
-        if (index >= this.fields.length - 1) return
+        if (index < 0 || index >= this.fields.length - 1) return
 
-        const temp = this.fields[index + 1]
+        const [field] = this.fields.splice(index, 1)
+        this.fields.splice(index + 1, 0, field)
 
-        this.fields[index + 1] = this.fields[index]
-        this.fields[index] = temp
-
-        this.syncJson({
-            message: "Field moved downward.",
-            icon: "↓"
-        })
+        this.render()
+        this.updateJsonFromFields()
+        this.setActivity(`Moved "${field.name}" down.`)
     }
 
-    /* =========================================================
-       STATISTICS / GAMIFICATION
-       ========================================================= */
+    // ---------------------------------------------------------------------------
+    // JSON
+    // ---------------------------------------------------------------------------
 
-    updateStatistics() {
-        const count = this.fields.length
+    jsonChanged() {
+        const result = this.readJson()
 
-        const required =
-            this.fields.filter(field => field.required).length
-
-        const active =
-            this.fields.filter(field => field.active).length
-
-        this.fieldCountTarget.textContent =
-            `${count} ${count === 1 ? "FIELD" : "FIELDS"}`
-
-        this.sidebarFieldCountTarget.textContent = count
-        this.sidebarRequiredCountTarget.textContent = required
-        this.sidebarActiveCountTarget.textContent = active
-
-        const health = count === 0
-            ? 70
-            : Math.min(
-                100,
-                70 +
-                Math.min(count * 4, 20) +
-                (required > 0 ? 5 : 0) +
-                (active === count ? 5 : 0)
-            )
-
-        this.healthTarget.textContent = `${health}%`
-        this.healthBarTarget.style.width = `${health}%`
-
-        if (count === 0) {
-            this.sidebarStatusTarget.textContent = "BUILDING"
-            this.sidebarStatusTarget.className =
-                "rounded-full border border-orange-100 bg-orange-50 px-2.5 py-1 text-[8px] font-black uppercase tracking-wider text-orange-500"
-        } else {
-            this.sidebarStatusTarget.textContent = "READY"
-            this.sidebarStatusTarget.className =
-                "rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-[8px] font-black uppercase tracking-wider text-emerald-500"
+        if (!result.valid) {
+            this.jsonValid = false
+            this.setJsonError(result.error)
+            this.updateStatus()
+            return
         }
 
-        this.syncBadgeTarget.textContent = "SYNCED"
+        const fields = this.normalizeFields(result.value.fields)
+
+        this.jsonValid = true
+        this.clearJsonError()
+
+        this.fields = fields
+        this.render()
+
+        this.setActivity("Imported changes from JSON.")
+        this.updateStatus()
     }
 
-    updateMission() {
-        const count = this.fields.length
+    formatJson() {
+        const result = this.readJson()
 
-        if (count > 0) {
-            this.missionFieldIconTarget.textContent = "✓"
-            this.missionFieldIconTarget.className =
-                "flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-[9px] font-black text-emerald-500"
-        } else {
-            this.missionFieldIconTarget.textContent = "01"
-            this.missionFieldIconTarget.className =
-                "flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-[9px] font-black text-slate-300"
-        }
-    }
-
-    updateProgress() {
-        const count = this.fields.length
-        const required =
-            this.fields.filter(field => field.required).length
-
-        let progress = 0
-
-        if (count > 0) progress += 35
-        if (count >= 3) progress += 20
-        if (required > 0) progress += 15
-        if (this.isJsonValid()) progress += 20
-        if (count >= 5) progress += 10
-
-        progress = Math.min(100, progress)
-
-        this.progressBarTarget.style.width =
-            `${progress}%`
-
-        this.progressLabelTarget.textContent =
-            `${progress}%`
-
-        this.xpTarget.textContent =
-            Math.min(100, this.xpValue)
-    }
-
-    addXp(amount) {
-        this.xpValue =
-            Math.min(100, this.xpValue + amount)
-
-        this.xpTarget.textContent =
-            this.xpValue
-
-        this.updateProgress()
-    }
-
-    /* =========================================================
-       SUBMIT
-       ========================================================= */
-
-    beforeSubmit(event) {
-        if (!this.isJsonValid()) {
-            event.preventDefault()
-
-            this.showToast(
-                "Fix the JSON definition before creating the version.",
-                "MISSION BLOCKED",
-                "⚠",
-                "red"
-            )
-
+        if (!result.valid) {
+            this.setJsonError(result.error)
             this.jsonTarget.focus()
-
-            return false
+            return
         }
 
-        this.jsonTarget.value =
-            JSON.stringify(
-                {
-                    fields: this.fields
-                },
-                null,
-                2
-            )
+        this.jsonTarget.value = JSON.stringify(result.value, null, 2)
+        this.clearJsonError()
 
-        this.submitTarget.disabled = true
-        this.submitTarget.value = "CREATING VERSION..."
-
+        this.setActivity("JSON formatted.")
         this.showToast(
-            "Definition validated. Creating template version...",
-            "DEPLOYING",
-            "🚀",
-            "emerald"
+            "JSON FORMATTED",
+            "The definition JSON has been formatted."
+        )
+    }
+
+    updateJsonFromFields() {
+        const definition = {
+            fields: this.fields.map((field) => this.serializeField(field))
+        }
+
+        this.jsonTarget.value = JSON.stringify(definition, null, 2)
+
+        this.jsonValid = true
+        this.clearJsonError()
+        this.updateStatus()
+    }
+
+    readJson() {
+        const raw = this.jsonTarget.value.trim()
+
+        if (!raw) {
+            return {
+                valid: true,
+                value: { fields: [] }
+            }
+        }
+
+        try {
+            const parsed = JSON.parse(raw)
+
+            if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+                return {
+                    valid: false,
+                    error: "Definition must be a JSON object."
+                }
+            }
+
+            if (!Array.isArray(parsed.fields)) {
+                return {
+                    valid: false,
+                    error: 'Definition must contain a "fields" array.'
+                }
+            }
+
+            return {
+                valid: true,
+                value: parsed
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                error: error.message || "Invalid JSON."
+            }
+        }
+    }
+
+    normalizeFields(fields) {
+        if (!Array.isArray(fields)) return []
+
+        return fields
+            .filter((field) => field && typeof field === "object")
+            .map((field) => ({
+                name: String(field.name || "").trim(),
+                label: String(field.label || "").trim(),
+                type: String(field.type || "string"),
+                description: String(field.description || "").trim(),
+                required: Boolean(field.required),
+                multiple: Boolean(field.multiple),
+                active: field.active !== false
+            }))
+            .filter((field) => field.name.length > 0)
+    }
+
+    serializeField(field) {
+        const serialized = {
+            name: field.name,
+            label: field.label || this.humanize(field.name),
+            type: field.type || "string",
+            required: Boolean(field.required),
+            multiple: Boolean(field.multiple),
+            active: field.active !== false
+        }
+
+        if (field.description) {
+            serialized.description = field.description
+        }
+
+        return serialized
+    }
+
+    applyLibrary(event) {
+        const definition = event.detail?.definition ?? event.detail
+
+        if (!definition) {
+            this.showToast(
+                "LIBRARY ERROR",
+                "The selected definition was empty.",
+                "warning"
+            )
+            return
+        }
+
+        let parsed = definition
+
+        if (typeof parsed === "string") {
+            try {
+                parsed = JSON.parse(parsed)
+            } catch (_error) {
+                this.showToast(
+                    "LIBRARY ERROR",
+                    "The selected library definition contains invalid JSON.",
+                    "warning"
+                )
+                return
+            }
+        }
+
+        if (
+            !parsed ||
+            typeof parsed !== "object" ||
+            Array.isArray(parsed) ||
+            !Array.isArray(parsed.fields)
+        ) {
+            this.showToast(
+                "INVALID DEFINITION",
+                'Library definitions must contain a "fields" array.',
+                "warning"
+            )
+            return
+        }
+
+        this.fields = this.normalizeFields(parsed.fields)
+        this.jsonValid = true
+
+        this.render()
+        this.updateJsonFromFields()
+
+        this.closeLibraryIfPossible()
+
+        this.setActivity("Loaded a ready definition from the library.")
+        this.showToast(
+            "DEFINITION LOADED",
+            "The ready definition has been imported."
+        )
+    }
+
+    // ---------------------------------------------------------------------------
+    // LIBRARY
+    // ---------------------------------------------------------------------------
+
+    openLibrary() {
+        const library = this.element.querySelector(
+            '[data-controller~="definition-library"]'
         )
 
-        return true
+        if (!library) {
+            this.showToast(
+                "LIBRARY UNAVAILABLE",
+                "The definition library controller could not be found.",
+                "warning"
+            )
+            return
+        }
+
+        const modal = library.querySelector(
+            '[data-definition-library-target="modal"]'
+        )
+
+        if (modal) {
+            modal.classList.remove("hidden")
+        }
+
+        window.dispatchEvent(
+            new CustomEvent("entity-definition-builder:library-opened")
+        )
     }
 
-    isJsonValid() {
-        try {
-            const parsed = JSON.parse(this.jsonTarget.value)
+    closeLibraryIfPossible() {
+        const modal = this.element.querySelector(
+            '[data-definition-library-target="modal"]'
+        )
 
-            if (
-                !parsed ||
-                typeof parsed !== "object" ||
-                !Array.isArray(parsed.fields)
-            ) {
-                return false
-            }
-
-            return true
-        } catch (_) {
-            return false
+        if (modal) {
+            modal.classList.add("hidden")
         }
     }
 
-    /* =========================================================
-       VISUAL STATE
-       ========================================================= */
+    // ---------------------------------------------------------------------------
+    // SUBMIT / VALIDATION
+    // ---------------------------------------------------------------------------
 
-    animateSync() {
-        this.syncBadgeTarget.textContent = "SYNCING..."
+    beforeSubmit(event) {
+        const result = this.readJson()
 
-        this.statusTarget.textContent =
-            "Synchronizing definition..."
+        if (!result.valid) {
+            event.preventDefault()
 
-        this.statusDotTarget.className =
-            "h-2.5 w-2.5 animate-pulse rounded-full bg-violet-400"
+            this.setJsonError(result.error)
+            this.jsonTarget.focus()
 
-        this.headerStatusTarget.textContent = "SYNCING"
-
-        this.headerStatusDotTarget.className =
-            "h-2.5 w-2.5 animate-pulse rounded-full bg-violet-400"
-
-        setTimeout(() => {
-            this.syncBadgeTarget.textContent = "SYNCED"
-
-            this.statusTarget.textContent =
-                "Definition builder ready"
-
-            this.statusDotTarget.className =
-                "h-2.5 w-2.5 rounded-full bg-emerald-400"
-
-            this.headerStatusTarget.textContent = "READY"
-
-            this.headerStatusDotTarget.className =
-                "h-2.5 w-2.5 animate-pulse rounded-full bg-emerald-400"
-
-            this.activityTarget.textContent =
-                "Definition synchronized successfully."
-        }, 350)
-    }
-
-    showToast(
-        message,
-        title = "DEFINITION UPDATED",
-        icon = "✦",
-        tone = "violet"
-    ) {
-        this.toastTitleTarget.textContent = title
-        this.toastMessageTarget.textContent = message
-        this.toastIconTarget.textContent = icon
-
-        const container =
-            this.toastTarget.querySelector(
-                "[data-notification-container]"
+            this.showToast(
+                "CANNOT CREATE VERSION",
+                result.error,
+                "warning"
             )
 
-        if (container) {
-            const tones = {
-                violet: [
-                    "border-violet-100",
-                    "shadow-violet-200/40"
-                ],
-                emerald: [
-                    "border-emerald-100",
-                    "shadow-emerald-200/40"
-                ],
-                orange: [
-                    "border-orange-100",
-                    "shadow-orange-200/40"
-                ],
-                red: [
-                    "border-red-100",
-                    "shadow-red-200/40"
-                ]
+            return
+        }
+
+        const fields = this.normalizeFields(result.value.fields)
+
+        const validationError = this.validateFields(fields)
+
+        if (validationError) {
+            event.preventDefault()
+
+            this.fields = fields
+            this.render()
+            this.setJsonError(validationError)
+
+            this.showToast(
+                "DEFINITION INVALID",
+                validationError,
+                "warning"
+            )
+
+            return
+        }
+
+        // Always normalize the submitted JSON immediately before Rails receives it.
+        this.fields = fields
+        this.jsonTarget.value = JSON.stringify(
+            {
+                ...result.value,
+                fields: fields.map((field) => this.serializeField(field))
+            },
+            null,
+            2
+        )
+
+        this.jsonValid = true
+        this.clearJsonError()
+        this.updateStatus()
+
+        this.setSubmittingState()
+    }
+
+    validateFields(fields) {
+        const names = new Set()
+
+        for (const field of fields) {
+            if (!field.name) {
+                return "Every field must have a name."
             }
 
-            Object.values(tones)
-                .flat()
-                .forEach(className => {
-                    container.classList.remove(className)
-                })
+            if (!/^[a-zA-Z][a-zA-Z0-9_]*$/.test(field.name)) {
+                return `Invalid field name "${field.name}".`
+            }
 
-            ;(tones[tone] || tones.violet)
-                .forEach(className => {
-                    container.classList.add(className)
-                })
+            if (names.has(field.name)) {
+                return `Duplicate field name "${field.name}".`
+            }
+
+            names.add(field.name)
+
+            if (!field.type) {
+                return `Field "${field.name}" must have a data type.`
+            }
         }
+
+        return null
+    }
+
+    setSubmittingState() {
+        if (this.hasSubmitTarget) {
+            this.submitTarget.disabled = true
+            this.submitTarget.value = "CREATING VERSION..."
+            this.submitTarget.classList.add("opacity-70", "cursor-wait")
+        }
+
+        if (this.hasHeaderStatusTarget) {
+            this.headerStatusTarget.textContent = "CREATING"
+        }
+
+        if (this.hasStatusTarget) {
+            this.statusTarget.textContent = "Creating version..."
+        }
+    }
+
+    // ---------------------------------------------------------------------------
+    // RENDER
+    // ---------------------------------------------------------------------------
+
+    render() {
+        this.builderTarget.innerHTML = ""
+
+        this.fields.forEach((field, index) => {
+            this.builderTarget.insertAdjacentHTML(
+                "beforeend",
+                this.fieldHtml(field, index)
+            )
+        })
+
+        this.updateStatus()
+    }
+
+    fieldHtml(field, index) {
+        const requiredClass = field.required
+            ? "border-orange-200 bg-orange-50/50"
+            : "border-slate-100 bg-white"
+
+        const activeClass = field.active
+            ? "bg-emerald-50 text-emerald-500"
+            : "bg-slate-100 text-slate-400"
+
+        const multipleText = field.multiple ? "Multiple" : "Single"
+        const requiredText = field.required ? "Required" : "Optional"
+        const activeText = field.active ? "Active" : "Inactive"
+
+        return `
+<div
+class="rounded-[26px] border-2 ${requiredClass} p-4 shadow-sm transition hover:shadow-md"
+data-field-index="${index}">
+
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+
+    <div class="flex min-w-0 items-start gap-4">
+
+    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-violet-50 font-mono text-sm font-black text-violet-500">
+    ${index + 1}
+</div>
+
+<div class="min-w-0">
+
+    <div class="flex flex-wrap items-center gap-2">
+
+            <span class="font-mono text-sm font-black text-slate-700">
+              ${this.escapeHtml(field.name)}
+            </span>
+
+        <span class="rounded-full bg-slate-100 px-2 py-1 text-[8px] font-black uppercase tracking-wider text-slate-500">
+              ${this.escapeHtml(field.type)}
+            </span>
+
+        ${
+        field.required
+            ? `<span class="rounded-full bg-orange-100 px-2 py-1 text-[8px] font-black uppercase tracking-wider text-orange-500">REQUIRED</span>`
+            : ""
+    }
+
+    </div>
+
+    <div class="mt-1 text-xs font-bold text-slate-600">
+        ${this.escapeHtml(field.label || this.humanize(field.name))}
+    </div>
+
+    ${
+    field.description
+        ? `<div class="mt-1 text-[10px] leading-5 text-slate-400">${this.escapeHtml(field.description)}</div>`
+        : ""
+}
+
+    <div class="mt-3 flex flex-wrap items-center gap-2">
+
+            <span class="rounded-full bg-slate-100 px-2 py-1 text-[8px] font-black uppercase tracking-wider text-slate-500">
+              ${requiredText}
+            </span>
+
+        <span class="rounded-full bg-violet-50 px-2 py-1 text-[8px] font-black uppercase tracking-wider text-violet-500">
+              ${multipleText}
+            </span>
+
+        <span class="rounded-full ${activeClass} px-2 py-1 text-[8px] font-black uppercase tracking-wider">
+              ${activeText}
+            </span>
+
+    </div>
+</div>
+</div>
+
+<div class="flex shrink-0 items-center gap-2">
+
+    <button
+        type="button"
+        title="Move up"
+        aria-label="Move field up"
+        class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 transition hover:border-violet-200 hover:text-violet-500 disabled:cursor-not-allowed disabled:opacity-30"
+        data-index="${index}"
+        data-action="click->entity-definition-builder#moveFieldUp"
+        ${index === 0 ? "disabled" : ""}>
+        ↑
+    </button>
+
+    <button
+        type="button"
+        title="Move down"
+        aria-label="Move field down"
+        class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 transition hover:border-violet-200 hover:text-violet-500 disabled:cursor-not-allowed disabled:opacity-30"
+        data-index="${index}"
+        data-action="click->entity-definition-builder#moveFieldDown"
+        ${index === this.fields.length - 1 ? "disabled" : ""}>
+        ↓
+    </button>
+
+    <button
+        type="button"
+        title="Edit field"
+        aria-label="Edit field"
+        class="rounded-xl border border-violet-100 bg-violet-50 px-3 py-2 text-[8px] font-black uppercase tracking-wider text-violet-500 transition hover:border-violet-300 hover:bg-violet-100"
+        data-index="${index}"
+        data-action="click->entity-definition-builder#editField">
+        EDIT
+    </button>
+
+    <button
+        type="button"
+        title="Delete field"
+        aria-label="Delete field"
+        class="rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-[8px] font-black uppercase tracking-wider text-red-400 transition hover:border-red-300 hover:bg-red-100"
+        data-index="${index}"
+        data-action="click->entity-definition-builder#deleteField">
+        DELETE
+    </button>
+
+</div>
+</div>
+</div>
+`
+    }
+
+    // ---------------------------------------------------------------------------
+    // STATUS / PROGRESS
+    // ---------------------------------------------------------------------------
+
+    updateStatus() {
+        const count = this.fields.length
+        const required = this.fields.filter((field) => field.required).length
+        const active = this.fields.filter((field) => field.active).length
+
+        const health = this.calculateHealth()
+        const progress = this.calculateProgress()
+        const xp = Math.min(100, progress)
+
+        if (this.hasFieldCountTarget) {
+            this.fieldCountTarget.textContent =
+                `${count} FIELD${count === 1 ? "" : "S"}`
+        }
+
+        if (this.hasSidebarFieldCountTarget) {
+            this.sidebarFieldCountTarget.textContent = count
+        }
+
+        if (this.hasSidebarRequiredCountTarget) {
+            this.sidebarRequiredCountTarget.textContent = required
+        }
+
+        if (this.hasSidebarActiveCountTarget) {
+            this.sidebarActiveCountTarget.textContent = active
+        }
+
+        if (this.hasHealthTarget) {
+            this.healthTarget.textContent = `${health}%`
+        }
+
+        if (this.hasHealthBarTarget) {
+            this.healthBarTarget.style.width = `${health}%`
+        }
+
+        if (this.hasProgressLabelTarget) {
+            this.progressLabelTarget.textContent = `${progress}%`
+        }
+
+        if (this.hasProgressBarTarget) {
+            this.progressBarTarget.style.width = `${progress}%`
+        }
+
+        if (this.hasXpTarget) {
+            this.xpTarget.textContent = xp
+        }
+
+        if (this.hasSyncBadgeTarget) {
+            this.syncBadgeTarget.textContent =
+                this.jsonValid ? "SYNCED" : "OUT OF SYNC"
+
+            this.syncBadgeTarget.classList.toggle(
+                "text-emerald-500",
+                this.jsonValid
+            )
+
+            this.syncBadgeTarget.classList.toggle(
+                "text-red-500",
+                !this.jsonValid
+            )
+        }
+
+        const ready = this.jsonValid && !this.validateFields(this.fields)
+
+        if (this.hasSubmitReadinessTarget) {
+            this.submitReadinessTarget.classList.toggle("hidden", !ready)
+            this.submitReadinessTarget.classList.toggle("flex", ready)
+        }
+
+        if (this.hasSidebarStatusTarget) {
+            this.sidebarStatusTarget.textContent =
+                ready ? "READY" : "CHECK"
+        }
+
+        if (this.hasHeaderStatusTarget) {
+            this.headerStatusTarget.textContent =
+                ready ? "READY" : "CHECK"
+        }
+
+        if (this.hasHeaderStatusDotTarget) {
+            this.headerStatusDotTarget.classList.toggle(
+                "bg-emerald-400",
+                ready
+            )
+
+            this.headerStatusDotTarget.classList.toggle(
+                "bg-orange-400",
+                !ready
+            )
+        }
+
+        if (this.hasStatusDotTarget) {
+            this.statusDotTarget.classList.toggle(
+                "bg-emerald-400",
+                ready
+            )
+
+            this.statusDotTarget.classList.toggle(
+                "bg-orange-400",
+                !ready
+            )
+        }
+
+        if (this.hasStatusTarget) {
+            this.statusTarget.textContent = ready
+                ? "Definition builder ready"
+                : "Definition needs attention"
+        }
+
+        if (this.hasMissionFieldIconTarget) {
+            this.missionFieldIconTarget.textContent = count > 0 ? "✓" : "01"
+
+            this.missionFieldIconTarget.classList.toggle(
+                "bg-emerald-100",
+                count > 0
+            )
+
+            this.missionFieldIconTarget.classList.toggle(
+                "text-emerald-500",
+                count > 0
+            )
+        }
+    }
+
+    calculateProgress() {
+        let score = 0
+
+        if (this.fields.length > 0) score += 35
+        if (this.fields.some((field) => field.required)) score += 20
+        if (this.fields.some((field) => field.description)) score += 15
+        if (this.fields.every((field) => field.active)) score += 15
+        if (this.jsonValid) score += 15
+
+        return Math.min(100, score)
+    }
+
+    calculateHealth() {
+        if (!this.jsonValid) return 0
+
+        if (this.fields.length === 0) return 100
+
+        const validFields = this.fields.filter(
+            (field) =>
+                field.name &&
+                /^[a-zA-Z][a-zA-Z0-9_]*$/.test(field.name) &&
+                field.type
+        ).length
+
+        return Math.round((validFields / this.fields.length) * 100)
+    }
+
+    // ---------------------------------------------------------------------------
+    // UI HELPERS
+    // ---------------------------------------------------------------------------
+
+    setJsonError(message) {
+        this.jsonValid = false
+
+        if (this.hasJsonErrorTarget) {
+            this.jsonErrorTarget.classList.remove("hidden")
+        }
+
+        if (this.hasJsonErrorMessageTarget) {
+            this.jsonErrorMessageTarget.textContent = message
+        }
+
+        this.updateStatus()
+    }
+
+    clearJsonError() {
+        this.jsonValid = true
+
+        if (this.hasJsonErrorTarget) {
+            this.jsonErrorTarget.classList.add("hidden")
+        }
+
+        if (this.hasJsonErrorMessageTarget) {
+            this.jsonErrorMessageTarget.textContent = ""
+        }
+    }
+
+    setActivity(message) {
+        if (this.hasActivityTarget) {
+            this.activityTarget.textContent = message
+        }
+    }
+
+    showToast(title, message, type = "success") {
+        if (!this.hasToastTarget) return
+
+        this.toastTitleTarget.textContent = title
+        this.toastMessageTarget.textContent = message
+
+        const colors = {
+            success: {
+                icon: "✦",
+                text: "text-violet-500",
+                bg: "bg-violet-50"
+            },
+            warning: {
+                icon: "⚠",
+                text: "text-orange-500",
+                bg: "bg-orange-50"
+            },
+            error: {
+                icon: "!",
+                text: "text-red-500",
+                bg: "bg-red-50"
+            }
+        }
+
+        const color = colors[type] || colors.success
+
+        this.toastIconTarget.textContent = color.icon
+
+        this.toastIconTarget.className =
+            `flex h-10 w-10 items-center justify-center rounded-xl ${color.bg} ${color.text}`
+
+        this.toastTitleTarget.className =
+            `text-[9px] font-black uppercase tracking-[0.2em] ${color.text}`
 
         this.toastTarget.classList.remove("hidden")
 
-        clearTimeout(this.toastTimer)
+        if (this.toastTimer) {
+            window.clearTimeout(this.toastTimer)
+        }
 
-        this.toastTimer = setTimeout(() => {
+        this.toastTimer = window.setTimeout(() => {
             this.toastTarget.classList.add("hidden")
-        }, tone === "red" ? 4500 : 2200)
+        }, 3200)
+    }
+
+    humanize(value) {
+        return String(value)
+            .replace(/[_-]+/g, " ")
+            .replace(/\b\w/g, (letter) => letter.toUpperCase())
     }
 
     escapeHtml(value) {
-        const div = document.createElement("div")
-        div.textContent = value ?? ""
-        return div.innerHTML
+        return String(value)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;")
     }
 }
