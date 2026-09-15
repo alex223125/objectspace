@@ -1,724 +1,960 @@
 import { Controller } from "@hotwired/stimulus"
 
+/*
+ * Entity Definition Builder
+ *
+ * Responsibilities:
+ * - Visual field builder
+ * - JSON editor synchronization
+ * - Definition library integration
+ * - Field add/edit/delete
+ * - Builder statistics
+ * - Form submit validation
+ * - Debug instrumentation
+ *
+ * Debugging:
+ * Open browser console and look for:
+ *
+ *   [ENTITY BUILDER]
+ *   [ENTITY BUILDER:JSON]
+ *   [ENTITY BUILDER:FIELD]
+ *   [ENTITY BUILDER:LIBRARY]
+ *   [ENTITY BUILDER:SUBMIT]
+ *
+ * Set:
+ *
+ *   window.ENTITY_BUILDER_DEBUG = true
+ *
+ * to enable extra DOM/state dumps.
+ */
+
 export default class extends Controller {
-    static targets = [
-        "builder",
-        "json",
-        "jsonError",
-        "jsonErrorMessage",
+  static targets = [
+    "headerStatusDot",
+    "headerStatus",
+    "xp",
+    "progressLabel",
+    "progressBar",
 
-        "fieldEditor",
-        "fieldEditorTitle",
-        "fieldName",
-        "fieldLabel",
-        "fieldType",
-        "fieldDescription",
+    "fieldEditor",
+    "fieldEditorTitle",
+    "fieldName",
+    "fieldLabel",
+    "fieldType",
+    "fieldDescription",
 
-        "requiredIcon",
-        "requiredLabel",
-        "multipleIcon",
-        "multipleLabel",
-        "activeIcon",
-        "activeLabel",
+    "requiredIcon",
+    "requiredLabel",
 
-        "fieldCount",
-        "syncBadge",
-        "status",
-        "statusDot",
-        "activity",
+    "multipleIcon",
+    "multipleLabel",
 
-        "sidebarStatus",
-        "sidebarFieldCount",
-        "sidebarRequiredCount",
-        "sidebarActiveCount",
-        "health",
-        "healthBar",
+    "activeIcon",
+    "activeLabel",
 
-        "progressLabel",
-        "progressBar",
-        "xp",
-        "missionFieldIcon",
+    "builder",
+    "fieldCount",
+    "syncBadge",
 
-        "submitReadiness",
-        "submit",
+    "statusDot",
+    "status",
+    "activity",
 
-        "headerStatus",
-        "headerStatusDot",
+    "json",
+    "jsonError",
+    "jsonErrorMessage",
 
-        "toast",
-        "toastIcon",
-        "toastTitle",
-        "toastMessage"
+    "sidebarStatus",
+    "sidebarFieldCount",
+    "sidebarRequiredCount",
+    "sidebarActiveCount",
+    "health",
+    "healthBar",
+
+    "missionFieldIcon",
+
+    "submitReadiness",
+    "submit",
+
+    "toast",
+    "toastIcon",
+    "toastTitle",
+    "toastMessage"
+  ]
+
+  connect() {
+    this.debug("CONNECT", {
+      identifier: this.identifier,
+      element: this.element,
+      elementTag: this.element?.tagName,
+      elementClasses: this.element?.className
+    })
+
+    this.debugTargetInventory()
+
+    this.fieldEditingIndex = null
+    this.fieldRequired = false
+    this.fieldMultiple = false
+    this.fieldActive = true
+
+    this.debug("STATE INITIALIZED", {
+      fieldEditingIndex: this.fieldEditingIndex,
+      fieldRequired: this.fieldRequired,
+      fieldMultiple: this.fieldMultiple,
+      fieldActive: this.fieldActive
+    })
+
+    this.initializeDefinition()
+
+    this.debug("CONNECT COMPLETE")
+  }
+
+  disconnect() {
+    this.debug("DISCONNECT")
+
+    if (this.toastTimer) {
+      clearTimeout(this.toastTimer)
+      this.toastTimer = null
+    }
+  }
+
+  // ============================================================
+  // DEBUGGING
+  // ============================================================
+
+  get debugEnabled() {
+    return window.ENTITY_BUILDER_DEBUG !== false
+  }
+
+  debug(message, payload = undefined) {
+    if (!this.debugEnabled) return
+
+    const prefix = "[ENTITY BUILDER]"
+
+    if (payload === undefined) {
+      console.log(`${prefix} ${message}`)
+    } else {
+      console.log(`${prefix} ${message}`, payload)
+    }
+  }
+
+  debugJson(message, payload = undefined) {
+    if (!this.debugEnabled) return
+
+    const prefix = "[ENTITY BUILDER:JSON]"
+
+    if (payload === undefined) {
+      console.log(`${prefix} ${message}`)
+    } else {
+      console.log(`${prefix} ${message}`, payload)
+    }
+  }
+
+  debugField(message, payload = undefined) {
+    if (!this.debugEnabled) return
+
+    const prefix = "[ENTITY BUILDER:FIELD]"
+
+    if (payload === undefined) {
+      console.log(`${prefix} ${message}`)
+    } else {
+      console.log(`${prefix} ${message}`, payload)
+    }
+  }
+
+  debugLibrary(message, payload = undefined) {
+    if (!this.debugEnabled) return
+
+    const prefix = "[ENTITY BUILDER:LIBRARY]"
+
+    if (payload === undefined) {
+      console.log(`${prefix} ${message}`)
+    } else {
+      console.log(`${prefix} ${message}`, payload)
+    }
+  }
+
+  debugSubmit(message, payload = undefined) {
+    if (!this.debugEnabled) return
+
+    const prefix = "[ENTITY BUILDER:SUBMIT]"
+
+    if (payload === undefined) {
+      console.log(`${prefix} ${message}`)
+    } else {
+      console.log(`${prefix} ${message}`, payload)
+    }
+  }
+
+  debugTargetInventory() {
+    const targets = [
+      "json",
+      "builder",
+      "fieldEditor",
+      "fieldName",
+      "fieldLabel",
+      "fieldType",
+      "fieldDescription",
+      "submit"
     ]
 
-    connect() {
-        this.fields = []
-        this.editingIndex = null
-        this.required = false
-        this.multiple = false
-        this.active = true
-        this.toastTimer = null
-        this.jsonValid = true
+    const inventory = {}
 
-        this.initializeFromJson()
+    targets.forEach((name) => {
+      const hasProperty = `has${name.charAt(0).toUpperCase()}${name.slice(1)}Target`
+
+      inventory[name] = this[hasProperty] ?? false
+    })
+
+    this.debug("TARGET INVENTORY", inventory)
+  }
+
+  // ============================================================
+  // INITIALIZATION
+  // ============================================================
+
+  initializeDefinition() {
+    this.debugJson("Initializing definition")
+
+    if (!this.hasJsonTarget) {
+      this.debugJson("ERROR: JSON target is missing")
+      this.setBuilderStatus("JSON target missing", "error")
+      return
     }
 
-    disconnect() {
-        if (this.toastTimer) {
-            window.clearTimeout(this.toastTimer)
-        }
+    const raw = this.jsonTarget.value
+
+    this.debugJson("Initial JSON textarea value", raw)
+
+    if (!raw || !raw.trim()) {
+      this.debugJson("JSON is empty. Using default definition.")
+
+      this.fields = []
+
+      this.renderFields()
+      this.syncJsonFromFields()
+
+      return
     }
 
-    initializeFromJson() {
-        const initial = this.readJson()
+    try {
+      const parsed = JSON.parse(raw)
 
-        if (!initial.valid) {
-            this.fields = []
-            this.setJsonError(initial.error)
-            this.render()
-            return
-        }
+      this.debugJson("Initial JSON parsed successfully", parsed)
 
-        this.fields = this.normalizeFields(initial.value.fields)
+      this.fields = this.extractFields(parsed)
 
-        this.clearJsonError()
-        this.render()
-        this.updateJsonFromFields()
-        this.setActivity("Definition builder ready.")
+      this.debugJson("Fields extracted from initial JSON", {
+        count: this.fields.length,
+        fields: this.fields
+      })
+
+      this.renderFields()
+      this.updateStats()
+
+      this.setBuilderStatus(
+        this.fields.length > 0
+          ? "Definition loaded"
+          : "Definition builder ready",
+        "success"
+      )
+    } catch (error) {
+      this.debugJson("INITIAL JSON PARSE FAILED", {
+        error,
+        message: error.message,
+        raw
+      })
+
+      this.fields = []
+
+      this.renderFields()
+      this.showJsonError(`Invalid JSON: ${error.message}`)
+      this.setBuilderStatus("Invalid JSON", "error")
+    }
+  }
+
+  extractFields(definition) {
+    if (!definition || typeof definition !== "object") {
+      this.debugJson("Definition is not an object", definition)
+      return []
     }
 
-    // ---------------------------------------------------------------------------
-    // QUICK START
-    // ---------------------------------------------------------------------------
-
-    openFieldEditor() {
-        this.editingIndex = null
-        this.resetEditor()
-        this.fieldEditorTitleTarget.textContent = "Add definition field"
-
-        this.fieldEditorTarget.classList.remove("hidden")
-        this.fieldNameTarget.focus()
-
-        this.setActivity("Ready to add a definition field.")
+    if (Array.isArray(definition.fields)) {
+      return definition.fields.map((field) =>
+        this.normalizeField(field)
+      )
     }
 
-    closeFieldEditor() {
-        this.fieldEditorTarget.classList.add("hidden")
-        this.editingIndex = null
-        this.resetEditor()
-    }
+    /*
+     * Also support definitions where fields are represented
+     * as an object:
+     *
+     * {
+     *   "fields": {
+     *     "email": {
+     *       "type": "string"
+     *     }
+     *   }
+     * }
+     */
 
-    resetEditor() {
-        this.fieldNameTarget.value = ""
-        this.fieldLabelTarget.value = ""
-        this.fieldTypeTarget.value = "string"
-        this.fieldDescriptionTarget.value = ""
-
-        this.required = false
-        this.multiple = false
-        this.active = true
-
-        this.refreshToggleUI()
-    }
-
-    toggleFieldRequired() {
-        this.required = !this.required
-        this.refreshToggleUI()
-    }
-
-    toggleFieldMultiple() {
-        this.multiple = !this.multiple
-        this.refreshToggleUI()
-    }
-
-    toggleFieldActive() {
-        this.active = !this.active
-        this.refreshToggleUI()
-    }
-
-    refreshToggleUI() {
-        this.setToggle(
-            this.requiredIconTarget,
-            this.requiredLabelTarget,
-            this.required,
-            "✓",
-            "Required",
-            "Optional",
-            "bg-emerald-50",
-            "text-emerald-500"
-        )
-
-        this.setToggle(
-            this.multipleIconTarget,
-            this.multipleLabelTarget,
-            this.multiple,
-            "✓",
-            "Multiple",
-            "Single",
-            "bg-violet-50",
-            "text-violet-500"
-        )
-
-        this.setToggle(
-            this.activeIconTarget,
-            this.activeLabelTarget,
-            this.active,
-            "●",
-            "Enabled",
-            "Disabled",
-            "bg-emerald-50",
-            "text-emerald-500"
-        )
-    }
-
-    setToggle(
-        icon,
-        label,
-        enabled,
-        symbol,
-        enabledText,
-        disabledText,
-        bgClass,
-        textClass
+    if (
+      definition.fields &&
+      typeof definition.fields === "object"
     ) {
-        icon.textContent = enabled ? symbol : "○"
-        label.textContent = enabled ? enabledText : disabledText
-
-        icon.classList.remove(
-            "bg-slate-50",
-            "text-slate-300",
-            "bg-emerald-50",
-            "text-emerald-500",
-            "bg-violet-50",
-            "text-violet-500"
-        )
-
-        if (enabled) {
-            icon.classList.add(bgClass, textClass)
-            label.classList.remove("text-slate-400")
-            label.classList.add(textClass)
-        } else {
-            icon.classList.add("bg-slate-50", "text-slate-300")
-            label.classList.remove(
-                "text-emerald-500",
-                "text-violet-500"
-            )
-            label.classList.add("text-slate-400")
-        }
-    }
-
-    saveField() {
-        const name = this.fieldNameTarget.value.trim()
-        const label = this.fieldLabelTarget.value.trim()
-        const type = this.fieldTypeTarget.value
-        const description = this.fieldDescriptionTarget.value.trim()
-
-        if (!name) {
-            this.showToast(
-                "FIELD REQUIRED",
-                "Enter a field name before saving.",
-                "warning"
-            )
-
-            this.fieldNameTarget.focus()
-            return
-        }
-
-        if (!/^[a-zA-Z][a-zA-Z0-9_]*$/.test(name)) {
-            this.showToast(
-                "INVALID FIELD NAME",
-                "Use letters, numbers and underscores. The name must begin with a letter.",
-                "warning"
-            )
-
-            this.fieldNameTarget.focus()
-            return
-        }
-
-        const duplicateIndex = this.fields.findIndex(
-            (field, index) =>
-                field.name === name && index !== this.editingIndex
-        )
-
-        if (duplicateIndex !== -1) {
-            this.showToast(
-                "DUPLICATE FIELD",
-                `A field named "${name}" already exists.`,
-                "warning"
-            )
-
-            this.fieldNameTarget.focus()
-            return
-        }
-
-        const wasEditing = this.editingIndex !== null
-
-        const field = {
+      return Object.entries(definition.fields).map(
+        ([name, field]) => {
+          return this.normalizeField({
             name,
-            label: label || this.humanize(name),
-            type,
-            description,
-            required: this.required,
-            multiple: this.multiple,
-            active: this.active
+            ...field
+          })
         }
+      )
+    }
 
-        if (!wasEditing) {
-            this.fields.push(field)
-            this.setActivity(`Added "${field.name}".`)
-        } else {
-            this.fields[this.editingIndex] = field
-            this.setActivity(`Updated "${field.name}".`)
+    this.debugJson("No fields array/object found in definition")
+
+    return []
+  }
+
+  normalizeField(field = {}) {
+    return {
+      name: String(field.name || "").trim(),
+      label: String(
+        field.label ||
+        field.title ||
+        field.name ||
+        ""
+      ).trim(),
+      type: String(field.type || "string"),
+      description: String(field.description || ""),
+      required: Boolean(field.required),
+      multiple: Boolean(
+        field.multiple ??
+        field.array ??
+        false
+      ),
+      active: field.active === undefined
+        ? true
+        : Boolean(field.active)
+    }
+  }
+
+  // ============================================================
+  // QUICK START
+  // ============================================================
+
+  openLibrary(event) {
+    event?.preventDefault()
+
+    this.debugLibrary("openLibrary action received", {
+      eventType: event?.type,
+      target: event?.currentTarget
+    })
+
+    const libraryElements = document.querySelectorAll(
+      '[data-controller~="definition-library"]'
+    )
+
+    this.debugLibrary(
+      "Definition library controller elements found",
+      {
+        count: libraryElements.length,
+        elements: Array.from(libraryElements)
+      }
+    )
+
+    if (libraryElements.length === 0) {
+      this.debugLibrary(
+        "ERROR: No definition-library controller found in DOM"
+      )
+
+      this.showToast(
+        "LIBRARY NOT FOUND",
+        "The definition library controller is not connected.",
+        "error"
+      )
+
+      return
+    }
+
+    const libraryElement = libraryElements[0]
+
+    this.debugLibrary(
+      "Dispatching open request to library",
+      libraryElement
+    )
+
+    libraryElement.dispatchEvent(
+      new CustomEvent("definition-library:open", {
+        bubbles: true,
+        detail: {
+          source: "entity-definition-builder"
         }
+      })
+    )
+  }
 
-        this.closeFieldEditor()
-        this.render()
-        this.updateJsonFromFields()
+  applyLibrary(event) {
+    this.debugLibrary(
+      "definition-library:apply event received",
+      event?.detail
+    )
 
-        this.showToast(
-            wasEditing ? "FIELD UPDATED" : "FIELD ADDED",
-            `"${field.name}" is now part of the definition.`
+    const definition =
+      event?.detail?.definition ??
+      event?.detail?.value ??
+      event?.detail
+
+    if (!definition) {
+      this.debugLibrary(
+        "ERROR: Library apply event contained no definition"
+      )
+
+      this.showToast(
+        "IMPORT FAILED",
+        "No definition was provided by the library.",
+        "error"
+      )
+
+      return
+    }
+
+    this.debugLibrary(
+      "Applying library definition",
+      definition
+    )
+
+    try {
+      const normalized = this.normalizeDefinition(definition)
+
+      this.fields = this.extractFields(normalized)
+
+      this.debugLibrary(
+        "Library definition normalized",
+        {
+          normalized,
+          fieldCount: this.fields.length,
+          fields: this.fields
+        }
+      )
+
+      this.renderFields()
+      this.syncJsonFromFields()
+      this.updateStats()
+
+      this.setBuilderStatus(
+        "Library definition imported",
+        "success"
+      )
+
+      this.showToast(
+        "DEFINITION IMPORTED",
+        `${this.fields.length} field${this.fields.length === 1 ? "" : "s"} imported.`,
+        "success"
+      )
+    } catch (error) {
+      this.debugLibrary(
+        "LIBRARY APPLY FAILED",
+        {
+          error,
+          message: error.message,
+          definition
+        }
+      )
+
+      this.showToast(
+        "IMPORT FAILED",
+        error.message,
+        "error"
+      )
+    }
+  }
+
+  normalizeDefinition(definition) {
+    if (typeof definition === "string") {
+      this.debugLibrary(
+        "Library definition is a string. Parsing JSON."
+      )
+
+      return JSON.parse(definition)
+    }
+
+    if (
+      definition &&
+      typeof definition === "object" &&
+      definition.definition
+    ) {
+      this.debugLibrary(
+        "Library payload contains nested definition property."
+      )
+
+      return this.normalizeDefinition(definition.definition)
+    }
+
+    if (!definition || typeof definition !== "object") {
+      throw new Error("Definition must be a JSON object.")
+    }
+
+    return definition
+  }
+
+  // ============================================================
+  // FIELD EDITOR
+  // ============================================================
+
+  openFieldEditor(event) {
+    event?.preventDefault()
+
+    this.debugField("Opening field editor")
+
+    if (!this.hasFieldEditorTarget) {
+      this.debugField("ERROR: fieldEditor target missing")
+      return
+    }
+
+    this.fieldEditingIndex = null
+
+    this.fieldEditorTitleTarget.textContent =
+      "Add definition field"
+
+    this.resetFieldEditor()
+
+    this.fieldEditorTarget.classList.remove("hidden")
+
+    this.fieldNameTarget.focus()
+
+    this.debugField("Field editor opened")
+  }
+
+  editField(event) {
+    event?.preventDefault()
+
+    const index = Number(
+      event?.currentTarget?.dataset?.fieldIndex
+    )
+
+    this.debugField("editField action", {
+      index,
+      dataset: event?.currentTarget?.dataset
+    })
+
+    if (
+      Number.isNaN(index) ||
+      !this.fields[index]
+    ) {
+      this.debugField(
+        "ERROR: Cannot edit field. Invalid index.",
+        {
+          index,
+          fields: this.fields
+        }
+      )
+
+      return
+    }
+
+    const field = this.fields[index]
+
+    this.fieldEditingIndex = index
+
+    this.fieldEditorTitleTarget.textContent =
+      "Edit definition field"
+
+    this.fieldNameTarget.value = field.name
+    this.fieldLabelTarget.value = field.label
+    this.fieldTypeTarget.value = field.type
+    this.fieldDescriptionTarget.value =
+      field.description
+
+    this.fieldRequired = field.required
+    this.fieldMultiple = field.multiple
+    this.fieldActive = field.active
+
+    this.refreshToggleUI()
+
+    this.fieldEditorTarget.classList.remove("hidden")
+
+    this.fieldNameTarget.focus()
+
+    this.debugField(
+      "Field editor populated",
+      {
+        index,
+        field
+      }
+    )
+  }
+
+  closeFieldEditor(event) {
+    event?.preventDefault()
+
+    this.debugField("Closing field editor")
+
+    if (this.hasFieldEditorTarget) {
+      this.fieldEditorTarget.classList.add("hidden")
+    }
+
+    this.fieldEditingIndex = null
+
+    this.resetFieldEditor()
+  }
+
+  resetFieldEditor() {
+    if (!this.hasFieldNameTarget) return
+
+    this.fieldNameTarget.value = ""
+    this.fieldLabelTarget.value = ""
+    this.fieldTypeTarget.value = "string"
+    this.fieldDescriptionTarget.value = ""
+
+    this.fieldRequired = false
+    this.fieldMultiple = false
+    this.fieldActive = true
+
+    this.refreshToggleUI()
+  }
+
+  toggleFieldRequired(event) {
+    event?.preventDefault()
+
+    this.fieldRequired = !this.fieldRequired
+
+    this.debugField(
+      "Required toggled",
+      this.fieldRequired
+    )
+
+    this.refreshToggleUI()
+  }
+
+  toggleFieldMultiple(event) {
+    event?.preventDefault()
+
+    this.fieldMultiple = !this.fieldMultiple
+
+    this.debugField(
+      "Multiple toggled",
+      this.fieldMultiple
+    )
+
+    this.refreshToggleUI()
+  }
+
+  toggleFieldActive(event) {
+    event?.preventDefault()
+
+    this.fieldActive = !this.fieldActive
+
+    this.debugField(
+      "Active toggled",
+      this.fieldActive
+    )
+
+    this.refreshToggleUI()
+  }
+
+  refreshToggleUI() {
+    if (this.hasRequiredIconTarget) {
+      this.requiredIconTarget.textContent =
+        this.fieldRequired ? "✓" : "○"
+
+      this.requiredIconTarget.classList.toggle(
+        "bg-orange-100",
+        this.fieldRequired
+      )
+
+      this.requiredIconTarget.classList.toggle(
+        "text-orange-500",
+        this.fieldRequired
+      )
+
+      this.requiredIconTarget.classList.toggle(
+        "bg-slate-50",
+        !this.fieldRequired
+      )
+
+      this.requiredIconTarget.classList.toggle(
+        "text-slate-300",
+        !this.fieldRequired
+      )
+    }
+
+    if (this.hasRequiredLabelTarget) {
+      this.requiredLabelTarget.textContent =
+        this.fieldRequired
+          ? "Required"
+          : "Optional"
+    }
+
+    if (this.hasMultipleIconTarget) {
+      this.multipleIconTarget.textContent =
+        this.fieldMultiple ? "✓" : "○"
+    }
+
+    if (this.hasMultipleLabelTarget) {
+      this.multipleLabelTarget.textContent =
+        this.fieldMultiple
+          ? "Multiple"
+          : "Single"
+    }
+
+    if (this.hasActiveIconTarget) {
+      this.activeIconTarget.textContent =
+        this.fieldActive ? "●" : "○"
+    }
+
+    if (this.hasActiveLabelTarget) {
+      this.activeLabelTarget.textContent =
+        this.fieldActive
+          ? "Enabled"
+          : "Disabled"
+    }
+  }
+
+  saveField(event) {
+    event?.preventDefault()
+
+    const field = {
+      name: this.fieldNameTarget.value.trim(),
+      label: this.fieldLabelTarget.value.trim(),
+      type: this.fieldTypeTarget.value,
+      description:
+        this.fieldDescriptionTarget.value.trim(),
+      required: this.fieldRequired,
+      multiple: this.fieldMultiple,
+      active: this.fieldActive
+    }
+
+    this.debugField("Attempting to save field", {
+      editingIndex: this.fieldEditingIndex,
+      field
+    })
+
+    const validation = this.validateField(field)
+
+    if (!validation.valid) {
+      this.debugField(
+        "FIELD VALIDATION FAILED",
+        validation
+      )
+
+      this.showToast(
+        "FIELD NOT SAVED",
+        validation.message,
+        "error"
+      )
+
+      return
+    }
+
+    if (this.fieldEditingIndex === null) {
+      this.fields.push(field)
+
+      this.debugField(
+        "New field added",
+        {
+          field,
+          newCount: this.fields.length
+        }
+      )
+    } else {
+      const oldField =
+        this.fields[this.fieldEditingIndex]
+
+      this.fields[this.fieldEditingIndex] = field
+
+      this.debugField(
+        "Existing field updated",
+        {
+          index: this.fieldEditingIndex,
+          oldField,
+          newField: field
+        }
+      )
+    }
+
+    this.renderFields()
+    this.syncJsonFromFields()
+    this.updateStats()
+
+    this.closeFieldEditor()
+
+    this.setBuilderStatus(
+      "Definition updated",
+      "success"
+    )
+
+    this.showToast(
+      "FIELD SAVED",
+      `${field.label || field.name} is now part of the definition.`,
+      "success"
+    )
+  }
+
+  validateField(field) {
+    if (!field.name) {
+      return {
+        valid: false,
+        message: "Field name is required."
+      }
+    }
+
+    if (!/^[a-zA-Z0-9_-]+$/.test(field.name)) {
+      return {
+        valid: false,
+        message:
+          "Field name may contain letters, numbers, underscores and hyphens only."
+      }
+    }
+
+    const duplicate = this.fields.some(
+      (existing, index) =>
+        existing.name === field.name &&
+        index !== this.fieldEditingIndex
+    )
+
+    if (duplicate) {
+      return {
+        valid: false,
+        message:
+          `A field named "${field.name}" already exists.`
+      }
+    }
+
+    if (!field.type) {
+      return {
+        valid: false,
+        message: "Field type is required."
+      }
+    }
+
+    return {
+      valid: true
+    }
+  }
+
+  deleteField(event) {
+    event?.preventDefault()
+
+    const index = Number(
+      event?.currentTarget?.dataset?.fieldIndex
+    )
+
+    this.debugField("deleteField action", {
+      index
+    })
+
+    if (
+      Number.isNaN(index) ||
+      !this.fields[index]
+    ) {
+      this.debugField(
+        "ERROR: Invalid delete index",
+        {
+          index,
+          fields: this.fields
+        }
+      )
+
+      return
+    }
+
+    const removed = this.fields.splice(index, 1)[0]
+
+    this.debugField(
+      "Field removed",
+      {
+        index,
+        removed,
+        remainingCount: this.fields.length
+      }
+    )
+
+    this.renderFields()
+    this.syncJsonFromFields()
+    this.updateStats()
+
+    this.setBuilderStatus(
+      "Definition updated",
+      "success"
+    )
+
+    this.showToast(
+      "FIELD REMOVED",
+      `${removed.label || removed.name} was removed.`,
+      "success"
+    )
+  }
+
+  // ============================================================
+  // RENDER FIELD INVENTORY
+  // ============================================================
+
+  renderFields() {
+    if (!this.hasBuilderTarget) {
+      this.debugField(
+        "ERROR: builder target missing"
+      )
+      return
+    }
+
+    this.debugField(
+      "Rendering field inventory",
+      {
+        count: this.fields.length,
+        fields: this.fields
+      }
+    )
+
+    if (this.fields.length === 0) {
+      this.builderTarget.innerHTML = `
+<div class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/70 p-8 text-center">
+    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-xl text-slate-300 shadow-sm">
+            ◈
+</div>
+
+<div class="mt-3 text-xs font-black text-slate-500">
+    No definition fields yet
+</div>
+
+<div class="mt-1 text-[9px] text-slate-400">
+    Add a field or import a ready definition.
+</div>
+</div>
+`
+
+      return
+    }
+
+    this.builderTarget.innerHTML =
+      this.fields
+        .map((field, index) =>
+          this.renderField(field, index)
         )
-    }
-
-    editField(event) {
-        const index = Number(event.currentTarget.dataset.index)
-        const field = this.fields[index]
-
-        if (!field) return
-
-        this.editingIndex = index
-
-        this.fieldEditorTitleTarget.textContent = "Edit definition field"
-
-        this.fieldNameTarget.value = field.name || ""
-        this.fieldLabelTarget.value = field.label || ""
-        this.fieldTypeTarget.value = field.type || "string"
-        this.fieldDescriptionTarget.value = field.description || ""
-
-        this.required = Boolean(field.required)
-        this.multiple = Boolean(field.multiple)
-        this.active = field.active !== false
-
-        this.refreshToggleUI()
-
-        this.fieldEditorTarget.classList.remove("hidden")
-        this.fieldNameTarget.focus()
-    }
-
-    deleteField(event) {
-        const index = Number(event.currentTarget.dataset.index)
-        const field = this.fields[index]
-
-        if (!field) return
-
-        this.fields.splice(index, 1)
-
-        this.render()
-        this.updateJsonFromFields()
-
-        this.setActivity(`Removed "${field.name}".`)
-        this.showToast(
-            "FIELD REMOVED",
-            `"${field.name}" was removed from the definition.`
-        )
-    }
-
-    moveFieldUp(event) {
-        const index = Number(event.currentTarget.dataset.index)
-
-        if (index <= 0 || index >= this.fields.length) return
-
-        const [field] = this.fields.splice(index, 1)
-        this.fields.splice(index - 1, 0, field)
-
-        this.render()
-        this.updateJsonFromFields()
-        this.setActivity(`Moved "${field.name}" up.`)
-    }
-
-    moveFieldDown(event) {
-        const index = Number(event.currentTarget.dataset.index)
-
-        if (index < 0 || index >= this.fields.length - 1) return
-
-        const [field] = this.fields.splice(index, 1)
-        this.fields.splice(index + 1, 0, field)
-
-        this.render()
-        this.updateJsonFromFields()
-        this.setActivity(`Moved "${field.name}" down.`)
-    }
-
-    // ---------------------------------------------------------------------------
-    // JSON
-    // ---------------------------------------------------------------------------
-
-    jsonChanged() {
-        const result = this.readJson()
-
-        if (!result.valid) {
-            this.jsonValid = false
-            this.setJsonError(result.error)
-            this.updateStatus()
-            return
-        }
-
-        const fields = this.normalizeFields(result.value.fields)
-
-        this.jsonValid = true
-        this.clearJsonError()
-
-        this.fields = fields
-        this.render()
-
-        this.setActivity("Imported changes from JSON.")
-        this.updateStatus()
-    }
-
-    formatJson() {
-        const result = this.readJson()
-
-        if (!result.valid) {
-            this.setJsonError(result.error)
-            this.jsonTarget.focus()
-            return
-        }
-
-        this.jsonTarget.value = JSON.stringify(result.value, null, 2)
-        this.clearJsonError()
-
-        this.setActivity("JSON formatted.")
-        this.showToast(
-            "JSON FORMATTED",
-            "The definition JSON has been formatted."
-        )
-    }
-
-    updateJsonFromFields() {
-        const definition = {
-            fields: this.fields.map((field) => this.serializeField(field))
-        }
-
-        this.jsonTarget.value = JSON.stringify(definition, null, 2)
-
-        this.jsonValid = true
-        this.clearJsonError()
-        this.updateStatus()
-    }
-
-    readJson() {
-        const raw = this.jsonTarget.value.trim()
-
-        if (!raw) {
-            return {
-                valid: true,
-                value: { fields: [] }
-            }
-        }
-
-        try {
-            const parsed = JSON.parse(raw)
-
-            if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-                return {
-                    valid: false,
-                    error: "Definition must be a JSON object."
-                }
-            }
-
-            if (!Array.isArray(parsed.fields)) {
-                return {
-                    valid: false,
-                    error: 'Definition must contain a "fields" array.'
-                }
-            }
-
-            return {
-                valid: true,
-                value: parsed
-            }
-        } catch (error) {
-            return {
-                valid: false,
-                error: error.message || "Invalid JSON."
-            }
-        }
-    }
-
-    normalizeFields(fields) {
-        if (!Array.isArray(fields)) return []
-
-        return fields
-            .filter((field) => field && typeof field === "object")
-            .map((field) => ({
-                name: String(field.name || "").trim(),
-                label: String(field.label || "").trim(),
-                type: String(field.type || "string"),
-                description: String(field.description || "").trim(),
-                required: Boolean(field.required),
-                multiple: Boolean(field.multiple),
-                active: field.active !== false
-            }))
-            .filter((field) => field.name.length > 0)
-    }
-
-    serializeField(field) {
-        const serialized = {
-            name: field.name,
-            label: field.label || this.humanize(field.name),
-            type: field.type || "string",
-            required: Boolean(field.required),
-            multiple: Boolean(field.multiple),
-            active: field.active !== false
-        }
-
-        if (field.description) {
-            serialized.description = field.description
-        }
-
-        return serialized
-    }
-
-    applyLibrary(event) {
-        const definition = event.detail?.definition ?? event.detail
-
-        if (!definition) {
-            this.showToast(
-                "LIBRARY ERROR",
-                "The selected definition was empty.",
-                "warning"
-            )
-            return
-        }
-
-        let parsed = definition
-
-        if (typeof parsed === "string") {
-            try {
-                parsed = JSON.parse(parsed)
-            } catch (_error) {
-                this.showToast(
-                    "LIBRARY ERROR",
-                    "The selected library definition contains invalid JSON.",
-                    "warning"
-                )
-                return
-            }
-        }
-
-        if (
-            !parsed ||
-            typeof parsed !== "object" ||
-            Array.isArray(parsed) ||
-            !Array.isArray(parsed.fields)
-        ) {
-            this.showToast(
-                "INVALID DEFINITION",
-                'Library definitions must contain a "fields" array.',
-                "warning"
-            )
-            return
-        }
-
-        this.fields = this.normalizeFields(parsed.fields)
-        this.jsonValid = true
-
-        this.render()
-        this.updateJsonFromFields()
-
-        this.closeLibraryIfPossible()
-
-        this.setActivity("Loaded a ready definition from the library.")
-        this.showToast(
-            "DEFINITION LOADED",
-            "The ready definition has been imported."
-        )
-    }
-
-    // ---------------------------------------------------------------------------
-    // LIBRARY
-    // ---------------------------------------------------------------------------
-
-    openLibrary() {
-        const library = this.element.querySelector(
-            '[data-controller~="definition-library"]'
-        )
-
-        if (!library) {
-            this.showToast(
-                "LIBRARY UNAVAILABLE",
-                "The definition library controller could not be found.",
-                "warning"
-            )
-            return
-        }
-
-        const modal = library.querySelector(
-            '[data-definition-library-target="modal"]'
-        )
-
-        if (modal) {
-            modal.classList.remove("hidden")
-        }
-
-        window.dispatchEvent(
-            new CustomEvent("entity-definition-builder:library-opened")
-        )
-    }
-
-    closeLibraryIfPossible() {
-        const modal = this.element.querySelector(
-            '[data-definition-library-target="modal"]'
-        )
-
-        if (modal) {
-            modal.classList.add("hidden")
-        }
-    }
-
-    // ---------------------------------------------------------------------------
-    // SUBMIT / VALIDATION
-    // ---------------------------------------------------------------------------
-
-    beforeSubmit(event) {
-        const result = this.readJson()
-
-        if (!result.valid) {
-            event.preventDefault()
-
-            this.setJsonError(result.error)
-            this.jsonTarget.focus()
-
-            this.showToast(
-                "CANNOT CREATE VERSION",
-                result.error,
-                "warning"
-            )
-
-            return
-        }
-
-        const fields = this.normalizeFields(result.value.fields)
-
-        const validationError = this.validateFields(fields)
-
-        if (validationError) {
-            event.preventDefault()
-
-            this.fields = fields
-            this.render()
-            this.setJsonError(validationError)
-
-            this.showToast(
-                "DEFINITION INVALID",
-                validationError,
-                "warning"
-            )
-
-            return
-        }
-
-        // Always normalize the submitted JSON immediately before Rails receives it.
-        this.fields = fields
-        this.jsonTarget.value = JSON.stringify(
-            {
-                ...result.value,
-                fields: fields.map((field) => this.serializeField(field))
-            },
-            null,
-            2
-        )
-
-        this.jsonValid = true
-        this.clearJsonError()
-        this.updateStatus()
-
-        this.setSubmittingState()
-    }
-
-    validateFields(fields) {
-        const names = new Set()
-
-        for (const field of fields) {
-            if (!field.name) {
-                return "Every field must have a name."
-            }
-
-            if (!/^[a-zA-Z][a-zA-Z0-9_]*$/.test(field.name)) {
-                return `Invalid field name "${field.name}".`
-            }
-
-            if (names.has(field.name)) {
-                return `Duplicate field name "${field.name}".`
-            }
-
-            names.add(field.name)
-
-            if (!field.type) {
-                return `Field "${field.name}" must have a data type.`
-            }
-        }
-
-        return null
-    }
-
-    setSubmittingState() {
-        if (this.hasSubmitTarget) {
-            this.submitTarget.disabled = true
-            this.submitTarget.value = "CREATING VERSION..."
-            this.submitTarget.classList.add("opacity-70", "cursor-wait")
-        }
-
-        if (this.hasHeaderStatusTarget) {
-            this.headerStatusTarget.textContent = "CREATING"
-        }
-
-        if (this.hasStatusTarget) {
-            this.statusTarget.textContent = "Creating version..."
-        }
-    }
-
-    // ---------------------------------------------------------------------------
-    // RENDER
-    // ---------------------------------------------------------------------------
-
-    render() {
-        this.builderTarget.innerHTML = ""
-
-        this.fields.forEach((field, index) => {
-            this.builderTarget.insertAdjacentHTML(
-                "beforeend",
-                this.fieldHtml(field, index)
-            )
-        })
-
-        this.updateStatus()
-    }
-
-    fieldHtml(field, index) {
-        const requiredClass = field.required
-            ? "border-orange-200 bg-orange-50/50"
-            : "border-slate-100 bg-white"
-
-        const activeClass = field.active
-            ? "bg-emerald-50 text-emerald-500"
-            : "bg-slate-100 text-slate-400"
-
-        const multipleText = field.multiple ? "Multiple" : "Single"
-        const requiredText = field.required ? "Required" : "Optional"
-        const activeText = field.active ? "Active" : "Inactive"
-
-        return `
+        .join("")
+  }
+
+  renderField(field, index) {
+    const requiredClass = field.required
+      ? "border-orange-200 bg-orange-50/50"
+      : "border-slate-100 bg-white"
+
+    const activeClass = field.active
+      ? "text-emerald-500"
+      : "text-slate-300"
+
+    return `
 <div
-class="rounded-[26px] border-2 ${requiredClass} p-4 shadow-sm transition hover:shadow-md"
-data-field-index="${index}">
+class="rounded-2xl border-2 ${requiredClass} p-4 shadow-sm transition hover:shadow-md"
+data-field-index="${index}"
+    >
 
-    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
-    <div class="flex min-w-0 items-start gap-4">
+    <div class="flex min-w-0 items-start gap-3">
 
-    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-violet-50 font-mono text-sm font-black text-violet-500">
+    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 font-mono text-xs font-black text-violet-500">
     ${index + 1}
 </div>
 
@@ -726,347 +962,606 @@ data-field-index="${index}">
 
     <div class="flex flex-wrap items-center gap-2">
 
-            <span class="font-mono text-sm font-black text-slate-700">
-              ${this.escapeHtml(field.name)}
-            </span>
+                <span class="truncate font-mono text-xs font-black text-slate-700">
+                  ${this.escapeHtml(field.name)}
+                </span>
 
-        <span class="rounded-full bg-slate-100 px-2 py-1 text-[8px] font-black uppercase tracking-wider text-slate-500">
-              ${this.escapeHtml(field.type)}
-            </span>
+        <span class="rounded-full bg-violet-50 px-2 py-1 text-[7px] font-black uppercase tracking-wider text-violet-500">
+                  ${this.escapeHtml(field.type)}
+                </span>
 
         ${
         field.required
-            ? `<span class="rounded-full bg-orange-100 px-2 py-1 text-[8px] font-black uppercase tracking-wider text-orange-500">REQUIRED</span>`
+            ? `
+                      <span class="rounded-full bg-orange-50 px-2 py-1 text-[7px] font-black uppercase tracking-wider text-orange-500">
+                        REQUIRED
+                      </span>
+                    `
+            : ""
+    }
+
+        ${
+        field.multiple
+            ? `
+                      <span class="rounded-full bg-sky-50 px-2 py-1 text-[7px] font-black uppercase tracking-wider text-sky-500">
+                        MULTIPLE
+                      </span>
+                    `
             : ""
     }
 
     </div>
 
-    <div class="mt-1 text-xs font-bold text-slate-600">
-        ${this.escapeHtml(field.label || this.humanize(field.name))}
+    <div class="mt-1 text-[10px] font-semibold text-slate-500">
+        ${this.escapeHtml(field.label || field.name)}
     </div>
 
     ${
     field.description
-        ? `<div class="mt-1 text-[10px] leading-5 text-slate-400">${this.escapeHtml(field.description)}</div>`
+        ? `
+                    <div class="mt-1 text-[9px] leading-4 text-slate-400">
+                      ${this.escapeHtml(field.description)}
+                    </div>
+                  `
         : ""
 }
 
-    <div class="mt-3 flex flex-wrap items-center gap-2">
-
-            <span class="rounded-full bg-slate-100 px-2 py-1 text-[8px] font-black uppercase tracking-wider text-slate-500">
-              ${requiredText}
-            </span>
-
-        <span class="rounded-full bg-violet-50 px-2 py-1 text-[8px] font-black uppercase tracking-wider text-violet-500">
-              ${multipleText}
-            </span>
-
-        <span class="rounded-full ${activeClass} px-2 py-1 text-[8px] font-black uppercase tracking-wider">
-              ${activeText}
-            </span>
-
-    </div>
 </div>
+
 </div>
 
 <div class="flex shrink-0 items-center gap-2">
 
-    <button
-        type="button"
-        title="Move up"
-        aria-label="Move field up"
-        class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 transition hover:border-violet-200 hover:text-violet-500 disabled:cursor-not-allowed disabled:opacity-30"
-        data-index="${index}"
-        data-action="click->entity-definition-builder#moveFieldUp"
-        ${index === 0 ? "disabled" : ""}>
-        ↑
-    </button>
+            <span class="text-[8px] font-black uppercase tracking-wider ${activeClass}">
+              ${field.active ? "ACTIVE" : "INACTIVE"}
+            </span>
 
     <button
         type="button"
-        title="Move down"
-        aria-label="Move field down"
-        class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 transition hover:border-violet-200 hover:text-violet-500 disabled:cursor-not-allowed disabled:opacity-30"
-        data-index="${index}"
-        data-action="click->entity-definition-builder#moveFieldDown"
-        ${index === this.fields.length - 1 ? "disabled" : ""}>
-        ↓
-    </button>
-
-    <button
-        type="button"
-        title="Edit field"
-        aria-label="Edit field"
-        class="rounded-xl border border-violet-100 bg-violet-50 px-3 py-2 text-[8px] font-black uppercase tracking-wider text-violet-500 transition hover:border-violet-300 hover:bg-violet-100"
-        data-index="${index}"
-        data-action="click->entity-definition-builder#editField">
+        class="rounded-xl border border-violet-100 bg-violet-50 px-3 py-2 text-[8px] font-black uppercase tracking-wider text-violet-500 transition hover:border-violet-200 hover:bg-violet-100"
+        data-field-index="${index}"
+        data-action="click->entity-definition-builder#editField"
+    >
         EDIT
     </button>
 
     <button
         type="button"
-        title="Delete field"
-        aria-label="Delete field"
-        class="rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-[8px] font-black uppercase tracking-wider text-red-400 transition hover:border-red-300 hover:bg-red-100"
-        data-index="${index}"
-        data-action="click->entity-definition-builder#deleteField">
+        class="rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-[8px] font-black uppercase tracking-wider text-red-400 transition hover:border-red-200 hover:bg-red-100"
+        data-field-index="${index}"
+        data-action="click->entity-definition-builder#deleteField"
+    >
         DELETE
     </button>
 
 </div>
+
 </div>
+
 </div>
 `
+  }
+
+  // ============================================================
+  // JSON
+  // ============================================================
+
+  jsonChanged(event) {
+    const value =
+      event?.currentTarget?.value ??
+      this.jsonTarget.value
+
+    this.debugJson(
+      "JSON input changed",
+      {
+        length: value.length,
+        preview: value.slice(0, 300)
+      }
+    )
+
+    try {
+      const parsed = JSON.parse(value)
+
+      this.debugJson(
+        "Manual JSON parsed successfully",
+        parsed
+      )
+
+      const fields = this.extractFields(parsed)
+
+      this.debugJson(
+        "Manual JSON fields extracted",
+        {
+          count: fields.length,
+          fields
+        }
+      )
+
+      this.fields = fields
+
+      this.renderFields()
+      this.updateStats()
+      this.clearJsonError()
+
+      this.setBuilderStatus(
+        "JSON synchronized",
+        "success"
+      )
+
+      this.debugJson(
+        "JSON -> visual builder synchronization complete"
+      )
+    } catch (error) {
+      this.debugJson(
+        "MANUAL JSON PARSE FAILED",
+        {
+          message: error.message,
+          error,
+          value
+        }
+      )
+
+      this.showJsonError(
+        `Invalid JSON: ${error.message}`
+      )
+
+      this.setBuilderStatus(
+        "JSON error",
+        "error"
+      )
+    }
+  }
+
+  syncJsonFromFields() {
+    if (!this.hasJsonTarget) {
+      this.debugJson(
+        "ERROR: Cannot sync. JSON target missing."
+      )
+      return
     }
 
-    // ---------------------------------------------------------------------------
-    // STATUS / PROGRESS
-    // ---------------------------------------------------------------------------
-
-    updateStatus() {
-        const count = this.fields.length
-        const required = this.fields.filter((field) => field.required).length
-        const active = this.fields.filter((field) => field.active).length
-
-        const health = this.calculateHealth()
-        const progress = this.calculateProgress()
-        const xp = Math.min(100, progress)
-
-        if (this.hasFieldCountTarget) {
-            this.fieldCountTarget.textContent =
-                `${count} FIELD${count === 1 ? "" : "S"}`
-        }
-
-        if (this.hasSidebarFieldCountTarget) {
-            this.sidebarFieldCountTarget.textContent = count
-        }
-
-        if (this.hasSidebarRequiredCountTarget) {
-            this.sidebarRequiredCountTarget.textContent = required
-        }
-
-        if (this.hasSidebarActiveCountTarget) {
-            this.sidebarActiveCountTarget.textContent = active
-        }
-
-        if (this.hasHealthTarget) {
-            this.healthTarget.textContent = `${health}%`
-        }
-
-        if (this.hasHealthBarTarget) {
-            this.healthBarTarget.style.width = `${health}%`
-        }
-
-        if (this.hasProgressLabelTarget) {
-            this.progressLabelTarget.textContent = `${progress}%`
-        }
-
-        if (this.hasProgressBarTarget) {
-            this.progressBarTarget.style.width = `${progress}%`
-        }
-
-        if (this.hasXpTarget) {
-            this.xpTarget.textContent = xp
-        }
-
-        if (this.hasSyncBadgeTarget) {
-            this.syncBadgeTarget.textContent =
-                this.jsonValid ? "SYNCED" : "OUT OF SYNC"
-
-            this.syncBadgeTarget.classList.toggle(
-                "text-emerald-500",
-                this.jsonValid
-            )
-
-            this.syncBadgeTarget.classList.toggle(
-                "text-red-500",
-                !this.jsonValid
-            )
-        }
-
-        const ready = this.jsonValid && !this.validateFields(this.fields)
-
-        if (this.hasSubmitReadinessTarget) {
-            this.submitReadinessTarget.classList.toggle("hidden", !ready)
-            this.submitReadinessTarget.classList.toggle("flex", ready)
-        }
-
-        if (this.hasSidebarStatusTarget) {
-            this.sidebarStatusTarget.textContent =
-                ready ? "READY" : "CHECK"
-        }
-
-        if (this.hasHeaderStatusTarget) {
-            this.headerStatusTarget.textContent =
-                ready ? "READY" : "CHECK"
-        }
-
-        if (this.hasHeaderStatusDotTarget) {
-            this.headerStatusDotTarget.classList.toggle(
-                "bg-emerald-400",
-                ready
-            )
-
-            this.headerStatusDotTarget.classList.toggle(
-                "bg-orange-400",
-                !ready
-            )
-        }
-
-        if (this.hasStatusDotTarget) {
-            this.statusDotTarget.classList.toggle(
-                "bg-emerald-400",
-                ready
-            )
-
-            this.statusDotTarget.classList.toggle(
-                "bg-orange-400",
-                !ready
-            )
-        }
-
-        if (this.hasStatusTarget) {
-            this.statusTarget.textContent = ready
-                ? "Definition builder ready"
-                : "Definition needs attention"
-        }
-
-        if (this.hasMissionFieldIconTarget) {
-            this.missionFieldIconTarget.textContent = count > 0 ? "✓" : "01"
-
-            this.missionFieldIconTarget.classList.toggle(
-                "bg-emerald-100",
-                count > 0
-            )
-
-            this.missionFieldIconTarget.classList.toggle(
-                "text-emerald-500",
-                count > 0
-            )
-        }
+    const definition = {
+      fields: this.fields
     }
 
-    calculateProgress() {
-        let score = 0
+    const json = JSON.stringify(
+      definition,
+      null,
+      2
+    )
 
-        if (this.fields.length > 0) score += 35
-        if (this.fields.some((field) => field.required)) score += 20
-        if (this.fields.some((field) => field.description)) score += 15
-        if (this.fields.every((field) => field.active)) score += 15
-        if (this.jsonValid) score += 15
+    this.debugJson(
+      "Synchronizing visual builder -> JSON",
+      {
+        definition,
+        json
+      }
+    )
 
-        return Math.min(100, score)
+    this.jsonTarget.value = json
+
+    this.jsonTarget.dispatchEvent(
+      new Event("input", {
+        bubbles: true
+      })
+    )
+
+    this.clearJsonError()
+
+    this.debugJson(
+      "Visual builder -> JSON synchronization complete"
+    )
+  }
+
+  formatJson(event) {
+    event?.preventDefault()
+
+    this.debugJson("FORMAT action")
+
+    if (!this.hasJsonTarget) {
+      this.debugJson(
+        "ERROR: JSON target missing"
+      )
+      return
     }
 
-    calculateHealth() {
-        if (!this.jsonValid) return 0
+    try {
+      const parsed = JSON.parse(
+        this.jsonTarget.value
+      )
 
-        if (this.fields.length === 0) return 100
+      this.jsonTarget.value =
+        JSON.stringify(parsed, null, 2)
 
-        const validFields = this.fields.filter(
-            (field) =>
-                field.name &&
-                /^[a-zA-Z][a-zA-Z0-9_]*$/.test(field.name) &&
-                field.type
-        ).length
+      this.clearJsonError()
 
-        return Math.round((validFields / this.fields.length) * 100)
-    }
+      this.debugJson(
+        "JSON formatted successfully"
+      )
 
-    // ---------------------------------------------------------------------------
-    // UI HELPERS
-    // ---------------------------------------------------------------------------
-
-    setJsonError(message) {
-        this.jsonValid = false
-
-        if (this.hasJsonErrorTarget) {
-            this.jsonErrorTarget.classList.remove("hidden")
+      this.jsonChanged({
+        currentTarget: this.jsonTarget
+      })
+    } catch (error) {
+      this.debugJson(
+        "FORMAT FAILED",
+        {
+          error,
+          message: error.message
         }
+      )
 
-        if (this.hasJsonErrorMessageTarget) {
-            this.jsonErrorMessageTarget.textContent = message
-        }
+      this.showJsonError(
+        `Cannot format invalid JSON: ${error.message}`
+      )
+    }
+  }
 
-        this.updateStatus()
+  showJsonError(message) {
+    if (!this.hasJsonErrorTarget) return
+
+    this.jsonErrorTarget.classList.remove(
+      "hidden"
+    )
+
+    if (this.hasJsonErrorMessageTarget) {
+      this.jsonErrorMessageTarget.textContent =
+        message
     }
 
-    clearJsonError() {
-        this.jsonValid = true
+    this.debugJson(
+      "JSON error displayed",
+      message
+    )
+  }
 
-        if (this.hasJsonErrorTarget) {
-            this.jsonErrorTarget.classList.add("hidden")
-        }
+  clearJsonError() {
+    if (!this.hasJsonErrorTarget) return
 
-        if (this.hasJsonErrorMessageTarget) {
-            this.jsonErrorMessageTarget.textContent = ""
-        }
+    this.jsonErrorTarget.classList.add(
+      "hidden"
+    )
+
+    if (this.hasJsonErrorMessageTarget) {
+      this.jsonErrorMessageTarget.textContent = ""
+    }
+  }
+
+  // ============================================================
+  // STATISTICS
+  // ============================================================
+
+  updateStats() {
+    const fieldCount = this.fields.length
+
+    const requiredCount =
+      this.fields.filter(
+        (field) => field.required
+      ).length
+
+    const activeCount =
+      this.fields.filter(
+        (field) => field.active
+      ).length
+
+    this.debug(
+      "Updating statistics",
+      {
+        fieldCount,
+        requiredCount,
+        activeCount
+      }
+    )
+
+    if (this.hasFieldCountTarget) {
+      this.fieldCountTarget.textContent =
+        `${fieldCount} FIELD${fieldCount === 1 ? "" : "S"}`
     }
 
-    setActivity(message) {
-        if (this.hasActivityTarget) {
-            this.activityTarget.textContent = message
+    if (this.hasSidebarFieldCountTarget) {
+      this.sidebarFieldCountTarget.textContent =
+        fieldCount
+    }
+
+    if (this.hasSidebarRequiredCountTarget) {
+      this.sidebarRequiredCountTarget.textContent =
+        requiredCount
+    }
+
+    if (this.hasSidebarActiveCountTarget) {
+      this.sidebarActiveCountTarget.textContent =
+        activeCount
+    }
+
+    const health =
+      fieldCount === 0
+        ? 100
+        : Math.round(
+            (activeCount / fieldCount) * 100
+          )
+
+    if (this.hasHealthTarget) {
+      this.healthTarget.textContent =
+        `${health}%`
+    }
+
+    if (this.hasHealthBarTarget) {
+      this.healthBarTarget.style.width =
+        `${health}%`
+    }
+
+    const progress =
+      Math.min(
+        100,
+        fieldCount > 0
+          ? 25 +
+            Math.min(requiredCount, 3) * 15 +
+            Math.min(activeCount, 3) * 10
+          : 0
+      )
+
+    if (this.hasProgressLabelTarget) {
+      this.progressLabelTarget.textContent =
+        `${progress}%`
+    }
+
+    if (this.hasProgressBarTarget) {
+      this.progressBarTarget.style.width =
+        `${progress}%`
+    }
+
+    const xp = Math.min(
+      100,
+      fieldCount * 15 +
+      requiredCount * 10 +
+      activeCount * 5
+    )
+
+    if (this.hasXpTarget) {
+      this.xpTarget.textContent = xp
+    }
+
+    if (this.hasMissionFieldIconTarget) {
+      this.missionFieldIconTarget.textContent =
+        fieldCount > 0 ? "✓" : "01"
+
+      this.missionFieldIconTarget.classList.toggle(
+        "bg-emerald-100",
+        fieldCount > 0
+      )
+
+      this.missionFieldIconTarget.classList.toggle(
+        "text-emerald-500",
+        fieldCount > 0
+      )
+    }
+
+    this.updateReadiness()
+  }
+
+  updateReadiness() {
+    const jsonValid = this.isJsonValid()
+
+    const ready =
+      jsonValid &&
+      this.fields.length > 0
+
+    this.debugSubmit(
+      "Readiness evaluated",
+      {
+        jsonValid,
+        fieldCount: this.fields.length,
+        ready
+      }
+    )
+
+    if (this.hasSubmitReadinessTarget) {
+      this.submitReadinessTarget.classList.toggle(
+        "hidden",
+        !ready
+      )
+    }
+
+    if (this.hasSidebarStatusTarget) {
+      this.sidebarStatusTarget.textContent =
+        ready ? "READY" : "CHECK"
+    }
+  }
+
+  isJsonValid() {
+    if (!this.hasJsonTarget) return false
+
+    try {
+      const parsed =
+        JSON.parse(this.jsonTarget.value)
+
+      return Boolean(
+        parsed &&
+        typeof parsed === "object" &&
+        !Array.isArray(parsed)
+      )
+    } catch {
+      return false
+    }
+  }
+
+  // ============================================================
+  // STATUS
+  // ============================================================
+
+  setBuilderStatus(message, type = "success") {
+    this.debug(
+      "Builder status changed",
+      {
+        message,
+        type
+      }
+    )
+
+    if (this.hasStatusTarget) {
+      this.statusTarget.textContent =
+        message
+    }
+
+    if (this.hasActivityTarget) {
+      this.activityTarget.textContent =
+        message
+    }
+
+    if (this.hasStatusDotTarget) {
+      this.statusDotTarget.className =
+        type === "error"
+          ? "h-2.5 w-2.5 rounded-full bg-red-400"
+          : "h-2.5 w-2.5 rounded-full bg-emerald-400"
+    }
+
+    if (this.hasHeaderStatusTarget) {
+      this.headerStatusTarget.textContent =
+        type === "error"
+          ? "CHECK"
+          : "READY"
+    }
+
+    if (this.hasHeaderStatusDotTarget) {
+      this.headerStatusDotTarget.className =
+        type === "error"
+          ? "h-2.5 w-2.5 rounded-full bg-red-400"
+          : "h-2.5 w-2.5 rounded-full bg-emerald-400"
+    }
+  }
+
+  // ============================================================
+  // FORM SUBMIT
+  // ============================================================
+
+  beforeSubmit(event) {
+    this.debugSubmit(
+      "FORM SUBMIT INTERCEPTED",
+      {
+        event,
+        fields: this.fields,
+        json: this.hasJsonTarget
+          ? this.jsonTarget.value
+          : null
+      }
+    )
+
+    const jsonValid = this.isJsonValid()
+
+    if (!jsonValid) {
+      event.preventDefault()
+
+      this.debugSubmit(
+        "SUBMIT BLOCKED: invalid JSON"
+      )
+
+      this.showJsonError(
+        "Please provide valid JSON before creating the version."
+      )
+
+      this.showToast(
+        "CANNOT CREATE VERSION",
+        "The definition JSON is invalid.",
+        "error"
+      )
+
+      return
+    }
+
+    if (this.fields.length === 0) {
+      event.preventDefault()
+
+      this.debugSubmit(
+        "SUBMIT BLOCKED: no fields"
+      )
+
+      this.showToast(
+        "CANNOT CREATE VERSION",
+        "Add at least one definition field.",
+        "error"
+      )
+
+      return
+    }
+
+    this.debugSubmit(
+      "SUBMIT VALIDATION PASSED"
+    )
+
+    this.setBuilderStatus(
+      "Creating version...",
+      "success"
+    )
+  }
+
+  // ============================================================
+  // TOAST
+  // ============================================================
+
+  showToast(title, message, type = "success") {
+    if (!this.hasToastTarget) {
+      this.debug(
+        "Toast target missing",
+        {
+          title,
+          message,
+          type
         }
+      )
+      return
     }
 
-    showToast(title, message, type = "success") {
-        if (!this.hasToastTarget) return
+    this.debug(
+      "Toast",
+      {
+        title,
+        message,
+        type
+      }
+    )
 
-        this.toastTitleTarget.textContent = title
-        this.toastMessageTarget.textContent = message
+    this.toastTarget.classList.remove(
+      "hidden"
+    )
 
-        const colors = {
-            success: {
-                icon: "✦",
-                text: "text-violet-500",
-                bg: "bg-violet-50"
-            },
-            warning: {
-                icon: "⚠",
-                text: "text-orange-500",
-                bg: "bg-orange-50"
-            },
-            error: {
-                icon: "!",
-                text: "text-red-500",
-                bg: "bg-red-50"
-            }
-        }
-
-        const color = colors[type] || colors.success
-
-        this.toastIconTarget.textContent = color.icon
-
-        this.toastIconTarget.className =
-            `flex h-10 w-10 items-center justify-center rounded-xl ${color.bg} ${color.text}`
-
-        this.toastTitleTarget.className =
-            `text-[9px] font-black uppercase tracking-[0.2em] ${color.text}`
-
-        this.toastTarget.classList.remove("hidden")
-
-        if (this.toastTimer) {
-            window.clearTimeout(this.toastTimer)
-        }
-
-        this.toastTimer = window.setTimeout(() => {
-            this.toastTarget.classList.add("hidden")
-        }, 3200)
+    if (this.hasToastTitleTarget) {
+      this.toastTitleTarget.textContent =
+        title
     }
 
-    humanize(value) {
-        return String(value)
-            .replace(/[_-]+/g, " ")
-            .replace(/\b\w/g, (letter) => letter.toUpperCase())
+    if (this.hasToastMessageTarget) {
+      this.toastMessageTarget.textContent =
+        message
     }
 
-    escapeHtml(value) {
-        return String(value)
-            .replaceAll("&", "&amp;")
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;")
-            .replaceAll('"', "&quot;")
-            .replaceAll("'", "&#039;")
+    if (this.hasToastIconTarget) {
+      this.toastIconTarget.textContent =
+        type === "error"
+          ? "⚠"
+          : "✦"
     }
+
+    if (this.toastTimer) {
+      clearTimeout(this.toastTimer)
+    }
+
+    this.toastTimer = setTimeout(() => {
+      this.toastTarget.classList.add(
+        "hidden"
+      )
+    }, 3500)
+  }
+
+  // ============================================================
+  // UTILITIES
+  // ============================================================
+
+  escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;")
+  }
 }
