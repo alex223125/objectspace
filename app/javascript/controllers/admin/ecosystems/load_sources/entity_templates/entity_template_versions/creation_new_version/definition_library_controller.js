@@ -5,16 +5,37 @@ export default class extends Controller {
     "modal",
     "dialog",
     "backdrop",
-    "status",
-
     "search",
     "clearSearch",
+
+    "favoritesButton",
+    "favoriteCount",
+    "recentButton",
+    "recentCount",
+    "recommendedButton",
+
     "sortButton",
     "resultCount",
+    "activeFilters",
+
+    "advancedFilters",
+    "filterType",
+    "filterStatus",
+    "filterPopularity",
+    "filterFeatured",
+    "filterNew",
+    "clearAllFilters",
+
     "categories",
+
+    "loadingState",
+    "errorState",
+    "errorMessage",
+
+    "libraryPanel",
+    "recommendations",
     "grid",
     "emptyState",
-    "libraryPanel",
 
     "previewEmpty",
     "preview",
@@ -26,2358 +47,1595 @@ export default class extends Controller {
     "previewFieldCount",
     "previewRequiredCount",
     "previewActiveCount",
-    "previewFieldSummary",
-    "fieldList",
 
     "fieldsTab",
     "jsonTab",
     "fieldsPanel",
     "jsonPanel",
+    "fieldList",
+    "previewFieldSummary",
     "previewJson",
 
-    "applyButton"
+    "analyticsStatus",
+    "applyButton",
+
+    "confirmation",
+    "confirmationTitle",
+    "confirmationDescription",
+    "confirmationCancel",
+    "confirmationConfirm",
+
+    "status"
   ]
 
   static values = {
-    catalog: {
-      type: Array,
-      default: []
-    },
-
     catalogUrl: String,
-
     catalogUsageUrl: String,
-
-    debug: {
-      type: Boolean,
-      default: true
-    },
-
-    autoLoad: {
-      type: Boolean,
-      default: true
-    }
+    catalog: Array
   }
 
   connect() {
-    this.debugLog("connect:start")
-
-    this.catalog = []
-    this.filteredCatalog = []
+    this.definitions = []
+    this.filteredDefinitions = []
 
     this.selectedDefinition = null
+    this.currentView = "recommended"
+    this.currentCategory = "ALL"
+    this.currentSort = "popular"
 
-    this.searchQuery = ""
-    this.selectedCategory = "ALL"
-    this.sortMode = "az"
-    this.activeTab = "fields"
-
-    this.loading = false
-    this.error = null
-
-    this.favorites = this.loadFavorites()
-    this.recentlyViewed = this.loadRecentlyViewed()
-
-    this.sessionIdValue = this.getOrCreateSessionId()
-
-    /*
-     * ------------------------------------------------------------
-     * INITIAL CATALOG
-     * ------------------------------------------------------------
-     */
-
-    if (this.hasCatalogUrlValue && this.catalogUrlValue) {
-      this.debugLog("connect:api-mode", {
-        catalogUrl: this.catalogUrlValue
-      })
-
-      if (this.autoLoadValue) {
-        this.loadCatalog()
-      }
-    } else {
-      this.debugLog("connect:inline-catalog-mode", {
-        count: this.catalogValue.length
-      })
-
-      this.catalog = this.normalizeCatalog(
-          Array.isArray(this.catalogValue)
-              ? this.catalogValue
-              : []
-      )
-
-      this.render()
+    this.filters = {
+      type: "ALL",
+      status: "ALL",
+      popularity: "ALL",
+      featured: "ALL",
+      newOnly: false
     }
 
-    /*
-     * ------------------------------------------------------------
-     * GLOBAL KEYBOARD HANDLER
-     * ------------------------------------------------------------
-     */
+    this.recentIds = this.loadStorage("definition-library-recent")
+    this.favoriteIds = this.loadStorage("definition-library-favorites")
 
-    this.boundKeydown =
-        this.handleGlobalKeydown.bind(this)
+    this.searchTimer = null
+    this.lastAppliedDefinition = null
 
-    document.addEventListener(
-        "keydown",
-        this.boundKeydown
-    )
-
-    /*
-     * ------------------------------------------------------------
-     * OPEN EVENT
-     * ------------------------------------------------------------
-     */
-
-    this.boundOpen =
-        this.handleOpenEvent.bind(this)
+    this.handleOpenEvent = this.handleOpenEvent.bind(this)
+    this.handleGlobalKeydown = this.handleGlobalKeydown.bind(this)
 
     this.element.addEventListener(
         "definition-library:open",
-        this.boundOpen
+        this.handleOpenEvent
     )
 
-    this.debugLog("connect:complete", {
-      catalogCount: this.catalog.length,
-      favoritesCount: this.favorites.length,
-      recentCount: this.recentlyViewed.length
-    })
+    document.addEventListener(
+        "definition-library:open",
+        this.handleOpenEvent
+    )
+
+    document.addEventListener(
+        "keydown",
+        this.handleGlobalKeydown
+    )
+
+    this.updateFavoriteCount()
+    this.updateRecentCount()
+    this.setConnectedStatus()
+
+    this.log("connected")
   }
 
   disconnect() {
-    this.debugLog("disconnect")
-
-    document.removeEventListener(
-        "keydown",
-        this.boundKeydown
-    )
+    if (this.searchTimer) {
+      clearTimeout(this.searchTimer)
+    }
 
     this.element.removeEventListener(
         "definition-library:open",
-        this.boundOpen
+        this.handleOpenEvent
     )
+
+    document.removeEventListener(
+        "definition-library:open",
+        this.handleOpenEvent
+    )
+
+    document.removeEventListener(
+        "keydown",
+        this.handleGlobalKeydown
+    )
+
+    this.enablePageScroll()
   }
 
-  /*
-   * ============================================================
-   * DEBUG
-   * ============================================================
-   */
-
-  debugLog(event, data = {}) {
-    if (!this.debugValue) {
-      return
-    }
-
-    console.groupCollapsed(
-        `%c[DefinitionLibrary] ${event}`,
-        "color:#8b5cf6;font-weight:bold;"
-    )
-
-    console.log({
-      timestamp: new Date().toISOString(),
-      event,
-      ...data
-    })
-
-    console.groupEnd()
-  }
-
-  debugError(event, error, data = {}) {
-    console.groupCollapsed(
-        `%c[DefinitionLibrary ERROR] ${event}`,
-        "color:#ef4444;font-weight:bold;"
-    )
-
-    console.error(error)
-
-    console.log({
-      timestamp: new Date().toISOString(),
-      event,
-      ...data
-    })
-
-    console.groupEnd()
-  }
-
-  debug(event, data = {}) {
-    this.debugLog(event, data)
-  }
-
-  /*
-   * ============================================================
-   * MODAL
-   * ============================================================
-   */
-
-  open(event = null) {
-    if (event) {
-      event.preventDefault?.()
-    }
-
-    this.debugLog("open:start", {
-      eventType: event?.type,
-      catalogCount: this.catalog.length
-    })
-
-    if (!this.hasModalTarget) {
-      this.debugError(
-          "open:no-modal-target",
-          new Error("Modal target is missing")
-      )
-
-      return
-    }
-
-    this.modalTarget.classList.remove("hidden")
-    this.modalTarget.setAttribute(
-        "aria-hidden",
-        "false"
-    )
-
-    document.body.classList.add(
-        "overflow-hidden"
-    )
-
-    this.setStatus("CONNECTED")
-
-    /*
-     * Re-render when opening.
-     *
-     * This is useful if the catalog was loaded asynchronously
-     * before the modal was opened.
-     */
-
-    this.render()
-
-    this.focusSearch()
-
-    this.debugLog("open:complete", {
-      catalogCount: this.catalog.length,
-      filteredCount: this.filteredCatalog.length
-    })
-  }
-
-  close(event = null) {
-    if (event) {
-      event.preventDefault()
-    }
-
-    this.debugLog("close:start")
-
-    if (!this.hasModalTarget) {
-      return
-    }
-
-    this.modalTarget.classList.add("hidden")
-
-    this.modalTarget.setAttribute(
-        "aria-hidden",
-        "true"
-    )
-
-    document.body.classList.remove(
-        "overflow-hidden"
-    )
-
-    this.debugLog("close:complete")
-  }
+  // ============================================================
+  // OPEN / CLOSE
+  // ============================================================
 
   handleOpenEvent(event) {
-    this.debugLog(
-        "event:definition-library:open",
-        {
-          detail: event.detail
-        }
-    )
-
-    this.open(event)
+    this.open(event.detail || {})
   }
 
-  /*
-   * ============================================================
-   * API CATALOG
-   * ============================================================
-   */
+  open(options = {}) {
+    this.modalTarget.classList.remove("hidden")
+    this.modalTarget.classList.add("flex")
 
-  async loadCatalog() {
-    this.debugLog("loadCatalog:start", {
-      url: this.catalogUrlValue
+    this.modalTarget.setAttribute("aria-hidden", "false")
+
+    document.body.classList.add("overflow-hidden")
+
+    if (options.definition) {
+      this.selectedDefinition = this.normalizeDefinition(options.definition)
+      this.renderPreview()
+    }
+
+    if (this.definitions.length === 0) {
+      this.loadDefinitions()
+    } else {
+      this.render()
+    }
+
+    requestAnimationFrame(() => {
+      if (this.hasSearchTarget) {
+        this.searchTarget.focus()
+      }
     })
 
-    this.error = null
+    this.log("open")
+  }
 
-    this.setLoadingState(true)
+  close() {
+    this.cancelImport()
+
+    this.modalTarget.classList.add("hidden")
+    this.modalTarget.classList.remove("flex")
+
+    this.modalTarget.setAttribute("aria-hidden", "true")
+
+    document.body.classList.remove("overflow-hidden")
+
+    this.selectedDefinition = null
+
+    if (this.hasPreviewTarget) {
+      this.previewTarget.classList.add("hidden")
+      this.previewTarget.classList.remove("flex")
+    }
+
+    if (this.hasPreviewEmptyTarget) {
+      this.previewEmptyTarget.classList.remove("hidden")
+    }
+
+    this.log("close")
+  }
+
+  handleGlobalKeydown(event) {
+    if (
+        event.key === "Escape" &&
+        this.modalTarget &&
+        !this.modalTarget.classList.contains("hidden")
+    ) {
+      this.close()
+    }
+  }
+
+  enablePageScroll() {
+    document.body.classList.remove("overflow-hidden")
+  }
+
+  // ============================================================
+  // LOAD
+  // ============================================================
+
+  async loadDefinitions() {
+    this.showLoading(true)
+    this.showError(false)
 
     try {
-      if (
-          !this.hasCatalogUrlValue ||
-          !this.catalogUrlValue
-      ) {
-        throw new Error(
-            "Definition catalog URL is missing."
-        )
-      }
+      let catalog = []
 
-      const response = await fetch(
-          this.catalogUrlValue,
-          {
-            method: "GET",
-            headers: {
-              Accept: "application/json"
-            },
-            credentials: "same-origin"
-          }
-      )
+      if (this.hasCatalogValue && this.catalogValue.length > 0) {
+        catalog = this.catalogValue
+      } else {
+        const response = await fetch(this.catalogUrlValue, {
+          method: "GET",
+          headers: {
+            "Accept": "application/json"
+          },
+          credentials: "same-origin"
+        })
 
-      this.debugLog(
-          "loadCatalog:response",
-          {
-            status: response.status,
-            statusText: response.statusText,
-            ok: response.ok,
-            url: response.url
-          }
-      )
-
-      if (!response.ok) {
-        throw new Error(
-            `Definition catalog request failed: ${response.status}`
-        )
-      }
-
-      const payload =
-          await response.json()
-
-      this.debugLog(
-          "loadCatalog:payload",
-          payload
-      )
-
-      if (
-          !payload ||
-          !Array.isArray(
-              payload.definitions
+        if (!response.ok) {
+          throw new Error(
+              `Definition catalog request failed: ${response.status}`
           )
-      ) {
-        throw new Error(
-            "Invalid definition catalog response. Expected { definitions: [] }."
-        )
+        }
+
+        const payload = await response.json()
+
+        catalog = this.extractDefinitions(payload)
       }
 
-      /*
-       * IMPORTANT:
-       *
-       * Normalize every definition as it enters
-       * the controller.
-       */
+      this.definitions = catalog
+          .map((definition) => this.normalizeDefinition(definition))
+          .filter(Boolean)
 
-      this.catalog =
-          this.normalizeCatalog(
-              payload.definitions
-          )
-
-      this.filteredCatalog =
-          [...this.catalog]
-
-      this.debugLog(
-          "loadCatalog:complete",
-          {
-            count: this.catalog.length,
-            source: payload.meta?.source,
-            apiVersion:
-            payload.meta?.api_version,
-            definitions:
-                this.catalog.map(
-                    definition => ({
-                      id: definition.id,
-                      name: definition.name,
-                      category:
-                      definition.category,
-                      fields:
-                      definition.fields.length
-                    })
-                )
-          }
-      )
+      this.log("definitions-loaded", {
+        count: this.definitions.length
+      })
 
       this.render()
     } catch (error) {
-      this.debugError(
-          "loadCatalog:error",
+      console.error(
+          "[DefinitionLibrary] Failed to load definitions",
           error
       )
 
       this.showError(
-          "Unable to load the definition library."
+          true,
+          "Unable to load definitions. Please try again."
       )
     } finally {
-      this.setLoadingState(false)
-
-      this.debugLog(
-          "loadCatalog:finally"
-      )
+      this.showLoading(false)
     }
   }
 
-  /*
-   * ============================================================
-   * NORMALIZATION
-   * ============================================================
-   */
+  extractDefinitions(payload) {
+    if (Array.isArray(payload)) {
+      return payload
+    }
 
-  normalizeCatalog(definitions) {
-    if (!Array.isArray(definitions)) {
+    if (!payload || typeof payload !== "object") {
       return []
     }
 
-    return definitions
-        .filter(Boolean)
-        .map(definition =>
-            this.normalizeDefinition(
-                definition
-            )
-        )
+    const possibleKeys = [
+      "definitions",
+      "definition_templates",
+      "definitionTemplates",
+      "items",
+      "results",
+      "data"
+    ]
+
+    for (const key of possibleKeys) {
+      if (Array.isArray(payload[key])) {
+        return payload[key]
+      }
+    }
+
+    return []
   }
 
-  normalizeDefinition(definition) {
-    const fields =
-        Array.isArray(definition.fields)
-            ? definition.fields
-            : []
+  // ============================================================
+  // NORMALIZATION
+  // ============================================================
 
-    const normalizedFields =
-        fields.map(field => ({
-          ...field,
+  normalizeDefinition(raw) {
+    if (!raw || typeof raw !== "object") {
+      return null
+    }
 
-          name:
-              field.name ||
-              field.key ||
-              "",
+    const source =
+        raw.definition ||
+        raw.template ||
+        raw.data ||
+        raw
 
-          label:
-              field.label ||
-              field.name ||
-              field.key ||
-              "Untitled Field",
-
-          type:
-              field.type ||
-              "string",
-
-          required:
-              Boolean(field.required),
-
-          active:
-              field.active !== false
-        }))
-
-    const requiredCount =
-        normalizedFields.filter(
-            field => field.required
-        ).length
-
-    const activeCount =
-        normalizedFields.filter(
-            field => field.active !== false
-        ).length
+    const fields = this.extractFields(source)
 
     const id =
-        definition.id ||
-        definition.slug ||
-        definition.key ||
-        `definition-${Math.random()
-            .toString(36)
-            .slice(2, 10)}`
+        source.id ??
+        raw.id ??
+        source.definition_id ??
+        raw.definition_id
 
-    return {
-      ...definition,
+    const name =
+        source.name ||
+        source.title ||
+        source.label ||
+        source.slug ||
+        `Definition ${id ?? ""}`.trim()
 
-      id,
+    const normalized = {
+      ...source,
 
-      version:
-          definition.version ||
-          "1.0",
+      id: id != null ? String(id) : null,
 
-      name:
-          definition.name ||
-          definition.title ||
-          definition.label ||
-          "Untitled Definition",
+      slug:
+          source.slug ||
+          raw.slug ||
+          this.slugify(name),
+
+      name,
 
       title:
-          definition.title ||
-          definition.name ||
-          definition.label ||
-          "Untitled Definition",
-
-      description:
-          definition.description ||
-          "Production-ready entity definition.",
+          source.title ||
+          name,
 
       category:
-          String(
-              definition.category ||
-              "OTHER"
-          ).toUpperCase(),
+          source.category ||
+          source.type ||
+          raw.category ||
+          "GENERAL",
 
-      tags:
-          Array.isArray(
-              definition.tags
-          )
-              ? definition.tags
-              : [],
+      description:
+          source.description ||
+          source.summary ||
+          raw.description ||
+          "",
 
       icon:
-          definition.icon ||
+          source.icon ||
+          source.emoji ||
+          raw.icon ||
           "✦",
 
-      color:
-          definition.color ||
-          "violet",
+      version:
+          source.version ||
+          raw.version ||
+          1,
 
-      fields:
-      normalizedFields,
-
-      field_count:
-          Number.isFinite(
-              Number(definition.field_count)
-          )
-              ? Number(definition.field_count)
-              : normalizedFields.length,
-
-      required_count:
-          Number.isFinite(
-              Number(definition.required_count)
-          )
-              ? Number(
-                  definition.required_count
-              )
-              : requiredCount,
-
-      active_count:
-          Number.isFinite(
-              Number(definition.active_count)
-          )
-              ? Number(
-                  definition.active_count
-              )
-              : activeCount,
-
-      popularity:
-          Number.isFinite(
-              Number(definition.popularity)
-          )
-              ? Number(
-                  definition.popularity
-              )
-              : 0,
+      status:
+          source.status ||
+          raw.status ||
+          "ACTIVE",
 
       featured:
-          Boolean(definition.featured),
+          Boolean(
+              source.featured ??
+              source.is_featured ??
+              raw.featured ??
+              false
+          ),
 
-      new:
-          Boolean(definition.new),
+      isNew:
+          Boolean(
+              source.new ??
+              source.is_new ??
+              raw.new ??
+              false
+          ),
 
-      is_new:
-          Boolean(definition.is_new),
+      popularity:
+          Number(
+              source.popularity ??
+              source.popularity_score ??
+              raw.popularity ??
+              0
+          ),
 
-      popular:
-          Boolean(definition.popular)
+      usageCount:
+          Number(
+              source.usage_count ??
+              source.usageCount ??
+              raw.usage_count ??
+              0
+          ),
+
+      tags:
+          this.extractTags(source),
+
+      fields
+    }
+
+    normalized.field_count = fields.length
+
+    return normalized
+  }
+
+  extractFields(definition) {
+    if (!definition || typeof definition !== "object") {
+      return []
+    }
+
+    const candidates = [
+      definition.fields,
+      definition.field_definitions,
+      definition.fieldDefinitions,
+      definition.properties,
+      definition.schema?.fields,
+      definition.schema?.properties,
+      definition.definition?.fields,
+      definition.template?.fields,
+      definition.structure?.fields,
+      definition.structure?.properties,
+      definition.config?.fields,
+      definition.config?.properties
+    ]
+
+    for (const candidate of candidates) {
+      const fields = this.normalizeFieldsCandidate(candidate)
+
+      if (fields.length > 0) {
+        return fields
+      }
+
+      if (Array.isArray(candidate) && candidate.length === 0) {
+        return []
+      }
+    }
+
+    /*
+     * Some APIs return the JSON structure itself as a string.
+     */
+    const jsonCandidates = [
+      definition.json,
+      definition.definition_json,
+      definition.schema_json,
+      definition.structure_json
+    ]
+
+    for (const value of jsonCandidates) {
+      if (!value) continue
+
+      try {
+        const parsed =
+            typeof value === "string"
+                ? JSON.parse(value)
+                : value
+
+        const fields = this.extractFields(parsed)
+
+        if (fields.length > 0) {
+          return fields
+        }
+      } catch (_error) {
+        // Ignore malformed optional JSON.
+      }
+    }
+
+    return []
+  }
+
+  normalizeFieldsCandidate(candidate) {
+    if (!candidate) {
+      return []
+    }
+
+    if (Array.isArray(candidate)) {
+      return candidate
+          .map((field, index) => this.normalizeField(field, index))
+          .filter(Boolean)
+    }
+
+    if (typeof candidate === "object") {
+      return Object.entries(candidate)
+          .map(([key, value], index) => {
+            if (
+                value &&
+                typeof value === "object" &&
+                !Array.isArray(value)
+            ) {
+              return this.normalizeField(
+                  {
+                    ...value,
+                    name:
+                        value.name ||
+                        value.key ||
+                        value.slug ||
+                        key
+                  },
+                  index
+              )
+            }
+
+            return this.normalizeField(
+                {
+                  name: key,
+                  type: this.inferFieldType(value),
+                  default: value
+                },
+                index
+            )
+          })
+          .filter(Boolean)
+    }
+
+    return []
+  }
+
+  normalizeField(raw, index = 0) {
+    if (!raw) {
+      return null
+    }
+
+    if (typeof raw === "string") {
+      return {
+        name: raw,
+        label: this.humanize(raw),
+        type: "string",
+        required: false,
+        active: true
+      }
+    }
+
+    const name =
+        raw.name ||
+        raw.key ||
+        raw.slug ||
+        raw.field ||
+        `field_${index + 1}`
+
+    return {
+      ...raw,
+
+      id:
+          raw.id ??
+          raw.field_id ??
+          `${name}-${index}`,
+
+      name: String(name),
+
+      label:
+          raw.label ||
+          raw.title ||
+          this.humanize(name),
+
+      type:
+          raw.type ||
+          raw.field_type ||
+          raw.data_type ||
+          "string",
+
+      required: Boolean(
+          raw.required ??
+          raw.is_required ??
+          false
+      ),
+
+      active:
+          raw.active === undefined
+              ? raw.status
+                  ? String(raw.status).toUpperCase() === "ACTIVE"
+                  : true
+              : Boolean(raw.active),
+
+      description:
+          raw.description ||
+          raw.help_text ||
+          raw.helpText ||
+          ""
     }
   }
 
-  /*
-   * ============================================================
-   * RENDER
-   * ============================================================
-   */
+  inferFieldType(value) {
+    if (typeof value === "boolean") return "boolean"
+    if (typeof value === "number") return "number"
+    if (Array.isArray(value)) return "array"
+    if (value && typeof value === "object") return "json"
 
-  render() {
-    this.debugLog("render:start", {
-      catalogCount:
-      this.catalog.length,
-      searchQuery:
-      this.searchQuery,
-      selectedCategory:
-      this.selectedCategory,
-      sortMode:
-      this.sortMode
-    })
-
-    this.renderCategories()
-
-    this.applyFilters()
-
-    this.renderGrid()
-
-    this.renderEmptyState()
-
-    this.renderResultCount()
-
-    this.renderClearSearch()
-
-    this.updateSortButton()
-
-    this.renderPreview()
-
-    this.debugLog("render:complete", {
-      catalogCount:
-      this.catalog.length,
-      filteredCount:
-      this.filteredCatalog.length
-    })
+    return "string"
   }
 
-  /*
-   * ============================================================
-   * SEARCH
-   * ============================================================
-   */
+  extractTags(definition) {
+    const tags =
+        definition.tags ||
+        definition.keywords ||
+        []
 
-  searchChanged(event) {
-    this.searchQuery =
-        event.currentTarget.value
-            .trim()
-            .toLowerCase()
+    if (Array.isArray(tags)) {
+      return tags
+          .map((tag) => String(tag))
+          .filter(Boolean)
+    }
 
-    this.debugLog(
-        "searchChanged",
-        {
-          query:
-          this.searchQuery
-        }
-    )
+    if (typeof tags === "string") {
+      return tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter(Boolean)
+    }
 
-    this.applyFilters()
-    this.renderGrid()
-    this.renderEmptyState()
-    this.renderResultCount()
-    this.renderClearSearch()
+    return []
+  }
+
+  // ============================================================
+  // SEARCH / FILTERS
+  // ============================================================
+
+  searchChanged() {
+    if (this.searchTimer) {
+      clearTimeout(this.searchTimer)
+    }
+
+    this.searchTimer = setTimeout(() => {
+      this.render()
+    }, 120)
   }
 
   searchKeydown(event) {
     if (event.key === "Escape") {
-      this.clearSearch(event)
-      return
-    }
-
-    if (event.key === "Enter") {
-      const first =
-          this.filteredCatalog[0]
-
-      if (first) {
-        this.selectDefinition(first)
-      }
+      event.stopPropagation()
+      this.clearSearch()
     }
   }
 
-  clearSearch(event = null) {
-    if (event) {
-      event.preventDefault()
-    }
-
-    this.searchQuery = ""
-
-    if (this.hasSearchTarget) {
-      this.searchTarget.value = ""
-    }
-
-    this.applyFilters()
-    this.renderGrid()
-    this.renderEmptyState()
-    this.renderResultCount()
-    this.renderClearSearch()
-
-    this.focusSearch()
+  clearSearch() {
+    this.searchTarget.value = ""
+    this.render()
+    this.searchTarget.focus()
   }
 
-  renderClearSearch() {
-    if (!this.hasClearSearchTarget) {
-      return
-    }
-
-    const visible =
-        this.searchQuery.length > 0
-
-    this.clearSearchTarget.classList.toggle(
-        "hidden",
-        !visible
-    )
-
-    this.clearSearchTarget.classList.toggle(
-        "flex",
-        visible
-    )
+  showFavorites() {
+    this.currentView = "favorites"
+    this.render()
   }
 
-  /*
-   * ============================================================
-   * CATEGORIES
-   * ============================================================
-   */
-
-  renderCategories() {
-    if (!this.hasCategoriesTarget) {
-      return
-    }
-
-    const categorySet =
-        new Set(
-            this.catalog
-                .map(
-                    definition =>
-                        String(
-                            definition.category ||
-                            "OTHER"
-                        ).toUpperCase()
-                )
-                .filter(Boolean)
-        )
-
-    const categories = [
-      "ALL",
-      ...categorySet
-    ]
-
-    this.categoriesTarget.innerHTML =
-        categories
-            .map(category => {
-              const active =
-                  category ===
-                  this.selectedCategory
-
-              return `
-<button
-  type="button"
-  class="shrink-0 rounded-xl border-2 px-3 py-2 text-[8px] font-black uppercase tracking-wider transition ${
-                  active
-                      ? "border-violet-300 bg-violet-100 text-violet-600"
-                      : "border-slate-200 bg-white text-slate-400 hover:border-violet-200 hover:bg-violet-50 hover:text-violet-500"
-              }"
-  data-category="${this.escapeAttribute(
-                  category
-              )}"
-  data-action="click->definition-library#selectCategory"
-  aria-pressed="${active}"
->
-  ${this.escapeHtml(category)}
-</button>
-`
-            })
-            .join("")
+  showRecent() {
+    this.currentView = "recent"
+    this.render()
   }
 
-  selectCategory(event) {
-    const category =
-        event.currentTarget.dataset.category ||
-        "ALL"
-
-    this.selectedCategory =
-        category
-
-    this.applyFilters()
-    this.renderCategories()
-    this.renderGrid()
-    this.renderEmptyState()
-    this.renderResultCount()
+  showRecommended() {
+    this.currentView = "recommended"
+    this.render()
   }
 
-  /*
-   * ============================================================
-   * FILTERING
-   * ============================================================
-   */
-
-  applyFilters() {
-    const query =
-        this.searchQuery
-
-    this.filteredCatalog =
-        this.catalog.filter(
-            definition => {
-              const category =
-                  String(
-                      definition.category ||
-                      "OTHER"
-                  ).toUpperCase()
-
-              const categoryMatches =
-                  this.selectedCategory ===
-                  "ALL" ||
-                  category ===
-                  this.selectedCategory
-
-              if (!categoryMatches) {
-                return false
-              }
-
-              if (!query) {
-                return true
-              }
-
-              const searchableText = [
-                definition.id,
-                definition.name,
-                definition.title,
-                definition.description,
-                definition.category,
-
-                ...(Array.isArray(
-                    definition.tags
-                )
-                    ? definition.tags
-                    : []),
-
-                ...(Array.isArray(
-                    definition.fields
-                )
-                    ? definition.fields.flatMap(
-                        field => [
-                          field.name,
-                          field.label,
-                          field.type
-                        ]
-                    )
-                    : [])
-              ]
-                  .filter(Boolean)
-                  .join(" ")
-                  .toLowerCase()
-
-              return searchableText.includes(
-                  query
-              )
-            }
-        )
-
-    this.sortDefinitions()
-
-    this.debugLog(
-        "applyFilters:complete",
-        {
-          resultCount:
-          this.filteredCatalog.length
-        }
-    )
+  showAll() {
+    this.currentView = "all"
+    this.render()
   }
 
-  /*
-   * ============================================================
-   * SORTING
-   * ============================================================
-   */
-
-  toggleSort(event = null) {
-    if (event) {
-      event.preventDefault()
-    }
-
-    const modes = [
-      "az",
-      "za",
-      "popular",
-      "newest",
-      "featured"
-    ]
-
-    const index =
-        modes.indexOf(
-            this.sortMode
-        )
-
-    this.sortMode =
-        modes[
-        (index + 1) %
-        modes.length
-            ]
-
-    this.sortDefinitions()
-    this.renderGrid()
-    this.updateSortButton()
+  toggleAdvancedFilters() {
+    this.advancedFiltersTarget.classList.toggle("hidden")
   }
 
-  sortDefinitions() {
-    const items =
-        [...this.filteredCatalog]
-
-    switch (this.sortMode) {
-      case "za":
-        items.sort(
-            (a, b) =>
-                this.definitionName(
-                    b
-                ).localeCompare(
-                    this.definitionName(a)
-                )
-        )
-        break
-
-      case "popular":
-        items.sort(
-            (a, b) =>
-                Number(
-                    b.popularity || 0
-                ) -
-                Number(
-                    a.popularity || 0
-                )
-        )
-        break
-
-      case "newest":
-        items.sort((a, b) => {
-          const dateA =
-              new Date(
-                  a.created_at ||
-                  a.createdAt ||
-                  0
-              ).getTime()
-
-          const dateB =
-              new Date(
-                  b.created_at ||
-                  b.createdAt ||
-                  0
-              ).getTime()
-
-          return dateB - dateA
-        })
-        break
-
-      case "featured":
-        items.sort((a, b) => {
-          const featuredA =
-              a.featured ? 1 : 0
-
-          const featuredB =
-              b.featured ? 1 : 0
-
-          if (
-              featuredA !==
-              featuredB
-          ) {
-            return (
-                featuredB -
-                featuredA
-            )
-          }
-
-          return (
-              Number(
-                  b.popularity || 0
-              ) -
-              Number(
-                  a.popularity || 0
-              )
-          )
-        })
-        break
-
-      case "az":
-      default:
-        items.sort(
-            (a, b) =>
-                this.definitionName(
-                    a
-                ).localeCompare(
-                    this.definitionName(b)
-                )
-        )
-    }
-
-    this.filteredCatalog =
-        items
-  }
-
-  updateSortButton() {
-    if (!this.hasSortButtonTarget) {
-      return
-    }
-
-    const labels = {
-      az: "A–Z",
-      za: "Z–A",
-      popular: "POPULAR",
-      newest: "NEWEST",
-      featured: "FEATURED"
-    }
-
-    const label =
-        labels[this.sortMode] ||
-        "A–Z"
-
-    this.sortButtonTarget.textContent =
-        label
-
-    this.sortButtonTarget.setAttribute(
-        "aria-label",
-        `Sort definitions: ${label}`
-    )
-  }
-
-  /*
-   * ============================================================
-   * GRID
-   * ============================================================
-   */
-
-  renderGrid() {
-    if (!this.hasGridTarget) {
-      this.debugLog(
-          "grid:no-target"
-      )
-
-      return
-    }
-
-    /*
-     * Always clear first.
-     */
-
-    this.gridTarget.innerHTML = ""
-
-    if (
-        !this.filteredCatalog.length
-    ) {
-      this.debugLog(
-          "grid:empty"
-      )
-
-      return
-    }
-
-    this.filteredCatalog.forEach(
-        (definition, index) => {
-          this.gridTarget.insertAdjacentHTML(
-              "beforeend",
-              this.definitionCardHtml(
-                  definition,
-                  index
-              )
-          )
-        }
-    )
-
-    this.debugLog(
-        "grid:rendered",
-        {
-          count:
-          this.filteredCatalog.length
-        }
-    )
-  }
-
-  definitionCardHtml(
-      definition,
-      index
-  ) {
-    const selected =
-        this.selectedDefinition?.id ===
-        definition.id
-
-    const favorite =
-        this.isFavorite(
-            definition.id
-        )
-
-    const tags =
-        Array.isArray(
-            definition.tags
-        )
-            ? definition.tags.slice(
-                0,
-                3
-            )
-            : []
-
-    const badges = []
-
-    if (definition.featured) {
-      badges.push("FEATURED")
-    }
-
-    if (
-        definition.new ||
-        definition.is_new
-    ) {
-      badges.push("NEW")
-    }
-
-    if (definition.popular) {
-      badges.push("POPULAR")
-    }
-
-    return `
-<article
-  class="group relative cursor-pointer overflow-hidden rounded-3xl border-2 ${
-        selected
-            ? "border-violet-400 bg-violet-50/50 shadow-lg shadow-violet-100"
-            : "border-slate-100 bg-white hover:border-violet-200 hover:shadow-lg hover:shadow-slate-200/50"
-    } p-5 transition-all duration-200"
-  tabindex="0"
-  role="button"
-  aria-label="Preview ${this.escapeAttribute(
-        this.definitionName(
-            definition
-        )
-    )}"
-  aria-pressed="${selected}"
-  data-definition-id="${this.escapeAttribute(
-        definition.id
-    )}"
-  data-action="
-    click->definition-library#selectDefinitionFromCard
-    keydown->definition-library#cardKeydown
-  "
->
-
-  <div class="flex items-start justify-between gap-3">
-
-    <div
-      class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border-2 border-violet-100 bg-violet-50 text-lg text-violet-500"
-    >
-      ${this.escapeHtml(
-        definition.icon || "✦"
-    )}
-    </div>
-
-    <button
-      type="button"
-      class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${
-        favorite
-            ? "border-amber-200 bg-amber-50 text-amber-500"
-            : "border-slate-100 bg-white text-slate-300"
-    } transition hover:border-amber-200 hover:bg-amber-50 hover:text-amber-500"
-      data-definition-id="${this.escapeAttribute(
-        definition.id
-    )}"
-      data-action="click->definition-library#toggleFavorite"
-      aria-label="${
-        favorite
-            ? "Remove from favorites"
-            : "Add to favorites"
-    }"
-    >
-      ${favorite ? "★" : "☆"}
-    </button>
-
-  </div>
-
-  <div class="mt-4">
-
-    <div class="flex flex-wrap gap-1.5">
-
-      <span class="rounded-full border border-violet-100 bg-violet-50 px-2 py-1 text-[7px] font-black uppercase tracking-wider text-violet-500">
-        ${this.escapeHtml(
-        definition.category ||
-        "OTHER"
-    )}
-      </span>
-
-      ${badges
-        .map(
-            badge => `
-            <span class="rounded-full border border-emerald-100 bg-emerald-50 px-2 py-1 text-[7px] font-black uppercase tracking-wider text-emerald-500">
-              ${badge}
-            </span>
-          `
-        )
-        .join("")}
-
-    </div>
-
-    <h3 class="mt-3 truncate text-sm font-black text-slate-800">
-      ${this.escapeHtml(
-        this.definitionName(
-            definition
-        )
-    )}
-    </h3>
-
-    <p class="mt-2 line-clamp-2 text-[10px] leading-5 text-slate-400">
-      ${this.escapeHtml(
-        definition.description ||
-        ""
-    )}
-    </p>
-
-  </div>
-
-  <div class="mt-4 grid grid-cols-2 gap-2">
-
-    <div class="rounded-xl bg-slate-50 p-2.5">
-      <div class="text-[7px] font-black uppercase tracking-wider text-slate-400">
-        FIELDS
-      </div>
-
-      <div class="mt-1 text-sm font-black text-slate-700">
-        ${Number(
-        definition.field_count ||
-        0
-    )}
-      </div>
-    </div>
-
-    <div class="rounded-xl bg-slate-50 p-2.5">
-      <div class="text-[7px] font-black uppercase tracking-wider text-slate-400">
-        REQUIRED
-      </div>
-
-      <div class="mt-1 text-sm font-black text-orange-500">
-        ${Number(
-        definition.required_count ||
-        0
-    )}
-      </div>
-    </div>
-
-  </div>
-
-  ${
-        tags.length
-            ? `
-        <div class="mt-4 flex flex-wrap gap-1">
-          ${tags
-                .map(
-                    tag => `
-                <span class="rounded-lg bg-slate-100 px-2 py-1 text-[7px] font-bold text-slate-400">
-                  #${this.escapeHtml(
-                        String(tag)
-                    )}
-                </span>
-              `
-                )
-                .join("")}
-        </div>
-      `
-            : ""
-    }
-
-</article>
-`
-  }
-
-  /*
-   * Separate action name makes the card action explicit.
-   */
-
-  selectDefinitionFromCard(event) {
-    if (
-        event.target.closest(
-            "button"
-        )
-    ) {
-      return
-    }
-
-    this.selectDefinitionFromElement(
-        event.currentTarget
-    )
-  }
-
-  cardKeydown(event) {
-    if (
-        event.key === "Enter" ||
-        event.key === " "
-    ) {
-      event.preventDefault()
-
-      this.selectDefinitionFromElement(
-          event.currentTarget
-      )
-    }
-  }
-
-  selectDefinitionFromElement(
-      element
-  ) {
-    const id =
-        element.dataset.definitionId
-
-    const definition =
-        this.findDefinition(id)
-
-    if (definition) {
-      this.selectDefinition(
-          definition
-      )
-    }
-  }
-
-  /*
-   * ============================================================
-   * PREVIEW
-   * ============================================================
-   */
-
-  selectDefinition(
-      definition
-  ) {
-    if (!definition) {
-      return
-    }
-
-    this.selectedDefinition =
-        this.normalizeDefinition(
-            definition
-        )
-
-    this.activeTab =
-        "fields"
-
-    this.debugLog(
-        "definition:selected",
-        {
-          id:
-          this.selectedDefinition.id,
-          name:
-              this.definitionName(
-                  this.selectedDefinition
-              )
-        }
-    )
-
-    this.addRecentlyViewed(
-        this.selectedDefinition
-    )
-
-    this.trackUsage(
-        this.selectedDefinition,
-        "preview"
-    )
-
-    this.renderGrid()
-    this.renderPreview()
-  }
-
-  renderPreview() {
-    if (
-        !this.hasPreviewTarget ||
-        !this.hasPreviewEmptyTarget
-    ) {
-      return
-    }
-
-    if (
-        !this.selectedDefinition
-    ) {
-      this.previewTarget.classList.add(
-          "hidden"
-      )
-
-      this.previewTarget.classList.remove(
-          "flex"
-      )
-
-      this.previewEmptyTarget.classList.remove(
-          "hidden"
-      )
-
-      this.previewEmptyTarget.classList.add(
-          "flex"
-      )
-
-      if (
-          this.hasApplyButtonTarget
-      ) {
-        this.applyButtonTarget.disabled =
-            true
-      }
-
-      return
-    }
-
-    const definition =
-        this.selectedDefinition
-
-    this.previewEmptyTarget.classList.add(
-        "hidden"
-    )
-
-    this.previewEmptyTarget.classList.remove(
-        "flex"
-    )
-
-    this.previewTarget.classList.remove(
-        "hidden"
-    )
-
-    this.previewTarget.classList.add(
-        "flex"
-    )
-
-    if (
-        this.hasPreviewIconTarget
-    ) {
-      this.previewIconTarget.textContent =
-          definition.icon || "✦"
-    }
-
-    if (
-        this.hasPreviewTitleTarget
-    ) {
-      this.previewTitleTarget.textContent =
-          this.definitionName(
-              definition
-          )
-    }
-
-    if (
-        this.hasPreviewCategoryTarget
-    ) {
-      this.previewCategoryTarget.textContent =
-          String(
-              definition.category ||
-              "OTHER"
-          ).toUpperCase()
-    }
-
-    if (
-        this.hasPreviewIdTarget
-    ) {
-      this.previewIdTarget.textContent =
-          `${definition.id} · v${definition.version}`
-    }
-
-    if (
-        this.hasPreviewDescriptionTarget
-    ) {
-      this.previewDescriptionTarget.textContent =
-          definition.description || ""
-    }
-
-    const fields =
-        Array.isArray(
-            definition.fields
-        )
-            ? definition.fields
-            : []
-
-    const requiredCount =
-        fields.filter(
-            field =>
-                Boolean(
-                    field.required
-                )
-        ).length
-
-    const activeCount =
-        fields.filter(
-            field =>
-                field.active !== false
-        ).length
-
-    if (
-        this.hasPreviewFieldCountTarget
-    ) {
-      this.previewFieldCountTarget.textContent =
-          fields.length
-    }
-
-    if (
-        this.hasPreviewRequiredCountTarget
-    ) {
-      this.previewRequiredCountTarget.textContent =
-          requiredCount
-    }
-
-    if (
-        this.hasPreviewActiveCountTarget
-    ) {
-      this.previewActiveCountTarget.textContent =
-          activeCount
-    }
-
-    if (
-        this.hasPreviewFieldSummaryTarget
-    ) {
-      this.previewFieldSummaryTarget.textContent =
-          `${fields.length} FIELDS · ${requiredCount} REQUIRED`
-    }
-
-    this.renderFields()
-    this.renderJson()
-    this.updateTabs()
-
-    if (
-        this.hasApplyButtonTarget
-    ) {
-      this.applyButtonTarget.disabled =
-          false
-    }
-  }
-
-  renderFields() {
-    if (!this.hasFieldListTarget) {
-      return
-    }
-
-    const fields =
-        Array.isArray(
-            this.selectedDefinition?.fields
-        )
-            ? this.selectedDefinition.fields
-            : []
-
-    if (!fields.length) {
-      this.fieldListTarget.innerHTML = `
-<div class="p-6 text-center text-[10px] text-slate-400">
-  No fields defined.
-</div>
-`
-
-      return
-    }
-
-    this.fieldListTarget.innerHTML =
-        fields
-            .map(
-                (field, index) => `
-<div class="flex items-start justify-between gap-4 border-b border-slate-100 p-4 last:border-b-0">
-
-  <div class="min-w-0">
-
-    <div class="flex items-center gap-2">
-
-      <span class="text-[10px] font-black text-slate-700">
-        ${this.escapeHtml(
-                    field.label ||
-                    field.name ||
-                    `Field ${index + 1}`
-                )}
-      </span>
-
-      ${
-                    field.required
-                        ? `
-            <span class="rounded-full bg-orange-50 px-1.5 py-0.5 text-[6px] font-black uppercase text-orange-500">
-              REQUIRED
-            </span>
-          `
-                        : ""
-                }
-
-    </div>
-
-    <div class="mt-1 text-[8px] font-mono text-slate-400">
-      ${this.escapeHtml(
-                    field.name || ""
-                )}
-    </div>
-
-  </div>
-
-  <div class="shrink-0 text-right">
-
-    <div class="rounded-lg bg-violet-50 px-2 py-1 text-[7px] font-black uppercase tracking-wider text-violet-500">
-      ${this.escapeHtml(
-                    field.type || "string"
-                )}
-    </div>
-
-    <div class="mt-1 text-[7px] font-bold ${
-                    field.active === false
-                        ? "text-slate-300"
-                        : "text-emerald-500"
-                }">
-      ${
-                    field.active === false
-                        ? "INACTIVE"
-                        : "ACTIVE"
-                }
-    </div>
-
-  </div>
-
-</div>
-`
-            )
-            .join("")
-  }
-
-  renderJson() {
-    if (
-        !this.hasPreviewJsonTarget ||
-        !this.selectedDefinition
-    ) {
-      return
-    }
-
-    this.previewJsonTarget.textContent =
-        JSON.stringify(
-            this.selectedDefinition,
-            null,
-            2
-        )
-  }
-
-  showFields(event = null) {
-    event?.preventDefault()
-
-    this.activeTab = "fields"
-
-    this.updateTabs()
-  }
-
-  showJson(event = null) {
-    event?.preventDefault()
-
-    this.activeTab = "json"
-
-    this.updateTabs()
-  }
-
-  updateTabs() {
-    const fieldsActive =
-        this.activeTab ===
-        "fields"
-
-    if (
-        this.hasFieldsPanelTarget
-    ) {
-      this.fieldsPanelTarget.classList.toggle(
-          "hidden",
-          !fieldsActive
-      )
-    }
-
-    if (
-        this.hasJsonPanelTarget
-    ) {
-      this.jsonPanelTarget.classList.toggle(
-          "hidden",
-          fieldsActive
-      )
-    }
-
-    if (
-        this.hasFieldsTabTarget
-    ) {
-      this.setTabState(
-          this.fieldsTabTarget,
-          fieldsActive
-      )
-    }
-
-    if (
-        this.hasJsonTabTarget
-    ) {
-      this.setTabState(
-          this.jsonTabTarget,
-          !fieldsActive
-      )
-    }
-  }
-
-  setTabState(
-      element,
-      active
-  ) {
-    element.setAttribute(
-        "aria-selected",
-        String(active)
-    )
-
-    element.classList.toggle(
-        "border-violet-500",
-        active
-    )
-
-    element.classList.toggle(
-        "text-violet-500",
-        active
-    )
-
-    element.classList.toggle(
-        "border-transparent",
-        !active
-    )
-
-    element.classList.toggle(
-        "text-slate-400",
-        !active
-    )
-  }
-
-  /*
-   * ============================================================
-   * COPY JSON
-   * ============================================================
-   */
-
-  async copyJson(event = null) {
-    event?.preventDefault()
-
-    if (
-        !this.selectedDefinition
-    ) {
-      return
-    }
-
-    const json =
-        JSON.stringify(
-            this.selectedDefinition,
-            null,
-            2
-        )
-
-    try {
-      await navigator.clipboard.writeText(
-          json
-      )
-
-      this.trackUsage(
-          this.selectedDefinition,
-          "copy_json"
-      )
-    } catch (error) {
-      this.debugError(
-          "json:copy-failed",
-          error
-      )
-    }
-  }
-
-  /*
-   * ============================================================
-   * APPLY / IMPORT
-   * ============================================================
-   */
-
-  apply(event = null) {
-    event?.preventDefault()
-
-    const definition =
-        this.selectedDefinition
-
-    if (!definition) {
-      return
-    }
-
-    const detail = {
-      definition,
-      definition_id:
-      definition.id,
-      version:
-      definition.version,
-      source:
-          "definition_library"
-    }
-
-    this.element.dispatchEvent(
-        new CustomEvent(
-            "definition-library:apply",
-            {
-              bubbles: true,
-              detail
-            }
-        )
-    )
-
-    document.dispatchEvent(
-        new CustomEvent(
-            "definition-library:import",
-            {
-              bubbles: true,
-              detail
-            }
-        )
-    )
-
-    window.dispatchEvent(
-        new CustomEvent(
-            "definition-library:definition-selected",
-            {
-              detail
-            }
-        )
-    )
-
-    this.trackUsage(
-        definition,
-        "import"
-    )
-
-    this.debugLog(
-        "apply:events-dispatched",
-        detail
-    )
-  }
-
-  /*
-   * ============================================================
-   * FAVORITES
-   * ============================================================
-   */
-
-  toggleFavorite(event) {
-    event.preventDefault()
-    event.stopPropagation()
-
-    const id =
-        event.currentTarget.dataset
-            .definitionId
-
-    if (!id) {
-      return
-    }
-
-    if (
-        this.isFavorite(id)
-    ) {
-      this.favorites =
-          this.favorites.filter(
-              favoriteId =>
-                  favoriteId !== id
-          )
-    } else {
-      this.favorites.push(id)
-    }
-
-    this.saveFavorites()
-
-    this.renderGrid()
-
-    const definition =
-        this.findDefinition(id)
-
-    if (definition) {
-      this.trackUsage(
-          definition,
-          this.isFavorite(id)
-              ? "favorite"
-              : "unfavorite"
-      )
-    }
-  }
-
-  isFavorite(id) {
-    return this.favorites.includes(
-        id
-    )
-  }
-
-  loadFavorites() {
-    try {
-      const value =
-          localStorage.getItem(
-              "definition-library:favorites"
-          )
-
-      const parsed =
-          value
-              ? JSON.parse(value)
-              : []
-
-      return Array.isArray(
-          parsed
-      )
-          ? parsed
-          : []
-    } catch (error) {
-      return []
-    }
-  }
-
-  saveFavorites() {
-    try {
-      localStorage.setItem(
-          "definition-library:favorites",
-          JSON.stringify(
-              this.favorites
-          )
-      )
-    } catch (error) {
-      this.debugError(
-          "favorites:save-failed",
-          error
-      )
-    }
-  }
-
-  /*
-   * ============================================================
-   * RECENT
-   * ============================================================
-   */
-
-  addRecentlyViewed(
-      definition
-  ) {
-    const id =
-        definition.id
-
-    this.recentlyViewed =
-        this.recentlyViewed.filter(
-            recentId =>
-                recentId !== id
-        )
-
-    this.recentlyViewed.unshift(
-        id
-    )
-
-    this.recentlyViewed =
-        this.recentlyViewed.slice(
-            0,
-            10
-        )
-
-    try {
-      localStorage.setItem(
-          "definition-library:recent",
-          JSON.stringify(
-              this.recentlyViewed
-          )
-      )
-    } catch (error) {
-      this.debugError(
-          "recent:save-failed",
-          error
-      )
-    }
-  }
-
-  loadRecentlyViewed() {
-    try {
-      const value =
-          localStorage.getItem(
-              "definition-library:recent"
-          )
-
-      const parsed =
-          value
-              ? JSON.parse(value)
-              : []
-
-      return Array.isArray(
-          parsed
-      )
-          ? parsed
-          : []
-    } catch (error) {
-      return []
-    }
-  }
-
-  /*
-   * ============================================================
-   * CLEAR FILTERS
-   * ============================================================
-   *
-   * IMPORTANT:
-   *
-   * Your HTML calls:
-   *
-   * definition-library#clearAllFilters
-   *
-   * Your old controller only had:
-   *
-   * clearFilters
-   *
-   * So Stimulus was throwing:
-   *
-   * "references undefined method clearAllFilters"
-   *
-   * We support BOTH names now.
-   */
-
-  clearAllFilters(
-      event = null
-  ) {
-    event?.preventDefault()
-
-    this.debugLog(
-        "filters:clear-all"
-    )
-
-    this.searchQuery = ""
-    this.selectedCategory = "ALL"
-    this.sortMode = "az"
-
-    if (this.hasSearchTarget) {
-      this.searchTarget.value = ""
+  advancedFilterChanged() {
+    this.filters = {
+      type: this.filterTypeTarget.value,
+      status: this.filterStatusTarget.value,
+      popularity: this.filterPopularityTarget.value,
+      featured: this.filterFeaturedTarget.value,
+      newOnly: this.filterNewTarget.checked
     }
 
     this.render()
   }
 
-  clearFilters(
-      event = null
-  ) {
-    this.clearAllFilters(
-        event
-    )
-  }
-
-  /*
-   * ============================================================
-   * RESULT COUNT
-   * ============================================================
-   */
-
-  renderResultCount() {
-    if (
-        !this.hasResultCountTarget
-    ) {
-      return
+  clearFilters() {
+    if (this.hasSearchTarget) {
+      this.searchTarget.value = ""
     }
 
-    const count =
-        this.filteredCatalog.length
+    this.currentView = "all"
+    this.currentCategory = "ALL"
+
+    this.filterTypeTarget.value = "ALL"
+    this.filterStatusTarget.value = "ALL"
+    this.filterPopularityTarget.value = "ALL"
+    this.filterFeaturedTarget.value = "ALL"
+    this.filterNewTarget.checked = false
+
+    this.filters = {
+      type: "ALL",
+      status: "ALL",
+      popularity: "ALL",
+      featured: "ALL",
+      newOnly: false
+    }
+
+    this.render()
+  }
+
+  toggleSort() {
+    const order = [
+      "popular",
+      "recent",
+      "name"
+    ]
+
+    const index = order.indexOf(this.currentSort)
+
+    this.currentSort =
+        order[(index + 1) % order.length]
+
+    this.sortButtonTarget.textContent =
+        this.currentSort === "popular"
+            ? "POPULAR"
+            : this.currentSort === "recent"
+                ? "RECENT"
+                : "NAME"
+
+    this.render()
+  }
+
+  selectCategory(category) {
+    this.currentCategory = category
+    this.render()
+  }
+
+  getFilteredDefinitions() {
+    const search =
+        this.hasSearchTarget
+            ? this.searchTarget.value.trim().toLowerCase()
+            : ""
+
+    let results = [...this.definitions]
+
+    if (search) {
+      results = results.filter((definition) => {
+        const haystack = [
+          definition.name,
+          definition.title,
+          definition.slug,
+          definition.category,
+          definition.description,
+          ...(definition.tags || []),
+          ...(definition.fields || []).map(
+              (field) =>
+                  `${field.name} ${field.label} ${field.type}`
+          )
+        ]
+            .join(" ")
+            .toLowerCase()
+
+        return haystack.includes(search)
+      })
+    }
+
+    if (this.currentCategory !== "ALL") {
+      results = results.filter(
+          (definition) =>
+              String(definition.category).toUpperCase() ===
+              String(this.currentCategory).toUpperCase()
+      )
+    }
+
+    if (this.currentView === "favorites") {
+      results = results.filter((definition) =>
+          this.favoriteIds.includes(String(definition.id))
+      )
+    }
+
+    if (this.currentView === "recent") {
+      results = results.filter((definition) =>
+          this.recentIds.includes(String(definition.id))
+      )
+    }
+
+    if (this.currentView === "recommended") {
+      results = results
+          .filter((definition) => {
+            return (
+                definition.featured ||
+                Number(definition.popularity) >= 50
+            )
+          })
+    }
+
+    if (this.filters.type !== "ALL") {
+      results = results.filter((definition) =>
+          definition.fields.some(
+              (field) =>
+                  String(field.type).toLowerCase() ===
+                  this.filters.type.toLowerCase()
+          )
+      )
+    }
+
+    if (this.filters.status !== "ALL") {
+      results = results.filter(
+          (definition) =>
+              String(definition.status).toUpperCase() ===
+              this.filters.status
+      )
+    }
+
+    if (this.filters.popularity !== "ALL") {
+      results = results.filter((definition) => {
+        const score = Number(definition.popularity || 0)
+
+        if (this.filters.popularity === "HIGH") {
+          return score >= 80
+        }
+
+        if (this.filters.popularity === "MEDIUM") {
+          return score >= 40 && score < 80
+        }
+
+        return score < 40
+      })
+    }
+
+    if (this.filters.featured !== "ALL") {
+      const expected =
+          this.filters.featured === "YES"
+
+      results = results.filter(
+          (definition) =>
+              definition.featured === expected
+      )
+    }
+
+    if (this.filters.newOnly) {
+      results = results.filter(
+          (definition) => definition.isNew
+      )
+    }
+
+    if (this.currentSort === "name") {
+      results.sort((a, b) =>
+          String(a.name).localeCompare(String(b.name))
+      )
+    } else if (this.currentSort === "recent") {
+      results.sort(
+          (a, b) =>
+              Number(b.updated_at_timestamp || 0) -
+              Number(a.updated_at_timestamp || 0)
+      )
+    } else {
+      results.sort(
+          (a, b) =>
+              Number(b.popularity || 0) -
+              Number(a.popularity || 0)
+      )
+    }
+
+    return results
+  }
+
+  // ============================================================
+  // RENDER
+  // ============================================================
+
+  render() {
+    this.renderCategories()
+
+    const results = this.getFilteredDefinitions()
+
+    this.filteredDefinitions = results
 
     this.resultCountTarget.textContent =
-        `${count} ${
-            count === 1
+        `${results.length} ${
+            results.length === 1
                 ? "DEFINITION"
                 : "DEFINITIONS"
         }`
-  }
 
-  /*
-   * ============================================================
-   * EMPTY STATE
-   * ============================================================
-   */
+    this.renderGrid(results)
+    this.renderRecommendations(results)
+    this.renderActiveFilters()
+    this.updateFavoriteCount()
+    this.updateRecentCount()
 
-  renderEmptyState() {
-    if (
-        !this.hasEmptyStateTarget ||
-        !this.hasGridTarget
-    ) {
-      return
-    }
-
-    const empty =
-        this.filteredCatalog.length ===
-        0
-
-    this.emptyStateTarget.classList.toggle(
-        "hidden",
-        !empty
-    )
-
-    this.emptyStateTarget.classList.toggle(
-        "flex",
-        empty
-    )
-
-    this.gridTarget.classList.toggle(
-        "hidden",
-        empty
-    )
-  }
-
-  /*
-   * ============================================================
-   * LOADING / ERROR
-   * ============================================================
-   */
-
-  setLoadingState(
-      loading
-  ) {
-    this.loading =
-        loading
-
-    this.debugLog(
-        "loading:changed",
-        {
-          loading
-        }
-    )
-
-    if (loading) {
-      this.setStatus(
-          "LOADING"
-      )
-
-      if (this.hasGridTarget) {
-        this.gridTarget.classList.remove(
-            "hidden"
-        )
-
-        this.gridTarget.innerHTML = `
-<div class="col-span-full flex min-h-[260px] items-center justify-center">
-  <div class="text-center">
-
-    <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-violet-100 border-t-violet-500"></div>
-
-    <div class="mt-4 text-[9px] font-black uppercase tracking-[0.18em] text-violet-500">
-      Loading definitions
-    </div>
-
-    <div class="mt-2 text-[10px] text-slate-400">
-      Connecting to the definition catalog...
-    </div>
-
-  </div>
-</div>
-`
-      }
-
-      if (
-          this.hasEmptyStateTarget
-      ) {
-        this.emptyStateTarget.classList.add(
-            "hidden"
-        )
-
-        this.emptyStateTarget.classList.remove(
-            "flex"
-        )
-      }
-
-      return
-    }
-
-    this.setStatus(
-        this.error
-            ? "ERROR"
-            : "CONNECTED"
-    )
-  }
-
-  showError(
-      message
-  ) {
-    this.error =
-        new Error(message)
-
-    this.setStatus(
-        "ERROR"
-    )
-
-    if (
-        !this.hasGridTarget
-    ) {
-      return
-    }
-
-    this.gridTarget.classList.remove(
-        "hidden"
-    )
-
-    this.gridTarget.innerHTML = `
-<div class="col-span-full flex min-h-[260px] items-center justify-center">
-  <div class="max-w-md rounded-3xl border-2 border-red-100 bg-red-50 p-7 text-center">
-
-    <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-xl text-red-400">
-      !
-    </div>
-
-    <div class="mt-4 text-sm font-black text-slate-700">
-      Unable to load definitions
-    </div>
-
-    <p class="mt-2 text-[10px] leading-5 text-slate-400">
-      ${this.escapeHtml(
-        message
-    )}
-    </p>
-
-    <button
-      type="button"
-      class="mt-5 rounded-xl bg-violet-500 px-4 py-2.5 text-[8px] font-black uppercase tracking-wider text-white"
-      data-action="click->definition-library#retryLoad"
-    >
-      TRY AGAIN
-    </button>
-
-  </div>
-</div>
-`
-  }
-
-  retryLoad(
-      event = null
-  ) {
-    event?.preventDefault()
-
-    this.error = null
-
-    if (
-        this.hasCatalogUrlValue &&
-        this.catalogUrlValue
-    ) {
-      this.loadCatalog()
+    if (results.length === 0) {
+      this.emptyStateTarget.classList.remove("hidden")
+      this.emptyStateTarget.classList.add("flex")
     } else {
-      this.render()
+      this.emptyStateTarget.classList.add("hidden")
+      this.emptyStateTarget.classList.remove("flex")
     }
   }
 
-  setStatus(
-      status
-  ) {
-    if (
-        !this.hasStatusTarget
-    ) {
-      return
-    }
-
-    this.statusTarget.textContent =
-        String(
-            status
-        ).toUpperCase()
-
-    const classes = [
-      "border-emerald-100",
-      "bg-emerald-50",
-      "text-emerald-500",
-
-      "border-orange-100",
-      "bg-orange-50",
-      "text-orange-500",
-
-      "border-red-100",
-      "bg-red-50",
-      "text-red-500"
+  renderCategories() {
+    const categories = [
+      "ALL",
+      ...new Set(
+          this.definitions
+              .map((definition) =>
+                  String(definition.category || "GENERAL")
+              )
+              .filter(Boolean)
+      )
     ]
 
-    this.statusTarget.classList.remove(
-        ...classes
-    )
+    this.categoriesTarget.innerHTML =
+        categories
+            .map((category) => {
+              const active =
+                  category === this.currentCategory
 
-    if (
-        status ===
-        "CONNECTED"
-    ) {
-      this.statusTarget.classList.add(
-          "border-emerald-100",
-          "bg-emerald-50",
-          "text-emerald-500"
-      )
-    } else if (
-        status === "LOADING"
-    ) {
-      this.statusTarget.classList.add(
-          "border-orange-100",
-          "bg-orange-50",
-          "text-orange-500"
-      )
-    } else {
-      this.statusTarget.classList.add(
-          "border-red-100",
-          "bg-red-50",
-          "text-red-500"
-      )
-    }
+              return `
+            <button
+              type="button"
+              class="
+                shrink-0 rounded-full border-2 px-4 py-2
+                text-xs font-bold uppercase tracking-wide
+                transition
+                ${
+                  active
+                      ? "border-violet-300 bg-violet-100 text-violet-700"
+                      : "border-slate-200 bg-white text-slate-500 hover:border-violet-200 hover:bg-violet-50 hover:text-violet-600"
+              }
+              "
+              data-category="${this.escapeHtml(category)}"
+              data-action="click->definition-library#categoryClicked"
+            >
+              ${this.escapeHtml(category)}
+            </button>
+          `
+            })
+            .join("")
   }
 
-  /*
-   * ============================================================
-   * USAGE TRACKING
-   * ============================================================
-   */
+  categoryClicked(event) {
+    this.selectCategory(
+        event.currentTarget.dataset.category
+    )
+  }
 
-  trackUsage(
-      definition,
-      eventType
-  ) {
-    if (!definition?.id) {
-      return
+  renderGrid(definitions) {
+    this.gridTarget.innerHTML = definitions
+        .map((definition) =>
+            this.definitionCard(definition)
+        )
+        .join("")
+  }
+
+  definitionCard(definition) {
+    const id = String(definition.id)
+
+    const favorite =
+        this.favoriteIds.includes(id)
+
+    const fields = definition.fields || []
+
+    return `
+      <article
+        class="
+          group relative flex flex-col overflow-hidden
+          rounded-3xl border-2 border-slate-200
+          bg-white shadow-sm
+          transition duration-200
+          hover:-translate-y-0.5
+          hover:border-violet-200
+          hover:shadow-xl hover:shadow-violet-100/60
+        "
+      >
+
+        <button
+          type="button"
+          class="
+            absolute right-4 top-4 z-10
+            flex h-9 w-9 items-center justify-center
+            rounded-xl border
+            ${
+        favorite
+            ? "border-amber-200 bg-amber-50 text-amber-500"
+            : "border-slate-200 bg-white text-slate-300 hover:text-amber-500"
+    }
+          "
+          title="${favorite ? "Remove favorite" : "Add favorite"}"
+          data-definition-id="${this.escapeHtml(id)}"
+          data-action="click->definition-library#toggleFavorite"
+        >
+          ★
+        </button>
+
+        <button
+          type="button"
+          class="flex flex-1 flex-col text-left"
+          data-definition-id="${this.escapeHtml(id)}"
+          data-action="click->definition-library#selectDefinition"
+        >
+
+          <div class="border-b border-slate-100 bg-gradient-to-br from-violet-50 via-white to-sky-50 p-5">
+
+            <div class="flex items-start gap-4 pr-10">
+
+              <div
+                class="
+                  flex h-12 w-12 shrink-0
+                  items-center justify-center
+                  rounded-2xl border-2 border-violet-100
+                  bg-white text-xl text-violet-500
+                  shadow-sm
+                "
+              >
+                ${this.escapeHtml(definition.icon)}
+              </div>
+
+              <div class="min-w-0">
+
+                <div class="truncate text-base font-extrabold text-slate-800">
+                  ${this.escapeHtml(definition.title)}
+                </div>
+
+                <div class="mt-2 flex flex-wrap gap-2">
+
+                  <span class="rounded-full border border-violet-200 bg-violet-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-violet-700">
+                    ${this.escapeHtml(definition.category)}
+                  </span>
+
+                  ${
+        definition.featured
+            ? `
+                        <span class="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-600">
+                          FEATURED
+                        </span>
+                      `
+            : ""
     }
 
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="flex flex-1 flex-col p-5">
+
+            <p class="line-clamp-3 text-sm leading-6 text-slate-500">
+              ${this.escapeHtml(
+        definition.description ||
+        "Production-ready entity definition."
+    )}
+            </p>
+
+            <div class="mt-5 grid grid-cols-2 gap-3">
+
+              <div class="rounded-2xl border border-violet-100 bg-violet-50/60 p-3">
+                <div class="text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                  FIELDS
+                </div>
+                <div class="mt-1 text-xl font-extrabold text-violet-600">
+                  ${fields.length}
+                </div>
+              </div>
+
+              <div class="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-3">
+                <div class="text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                  ACTIVE
+                </div>
+                <div class="mt-1 text-xl font-extrabold text-emerald-600">
+                  ${
+        fields.filter(
+            (field) => field.active
+        ).length
+    }
+                </div>
+              </div>
+
+            </div>
+
+            <div class="mt-5 flex items-center justify-between">
+
+              <span class="text-xs font-semibold text-slate-400">
+                v${this.escapeHtml(
+        String(definition.version || 1)
+    )}
+              </span>
+
+              <span class="text-xs font-bold text-violet-600">
+                VIEW STRUCTURE →
+              </span>
+
+            </div>
+
+          </div>
+
+        </button>
+
+      </article>
+    `
+  }
+
+  renderRecommendations(results) {
     if (
-        !this.hasCatalogUsageUrlValue ||
-        !this.catalogUsageUrlValue
+        this.currentView !== "recommended" ||
+        results.length === 0
     ) {
+      this.recommendationsTarget.innerHTML = ""
       return
     }
+
+    this.recommendationsTarget.innerHTML = `
+      <div class="rounded-2xl border-2 border-violet-100 bg-violet-50/60 px-5 py-4">
+
+        <div class="flex items-start gap-3">
+
+          <div class="mt-0.5 text-lg text-violet-500">
+            ✦
+          </div>
+
+          <div>
+            <div class="text-sm font-extrabold text-violet-800">
+              Recommended definitions
+            </div>
+
+            <p class="mt-1 text-xs leading-5 text-violet-600/80">
+              These structures are surfaced from featured and commonly used definitions.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+    `
+  }
+
+  renderActiveFilters() {
+    const active = []
+
+    if (this.currentCategory !== "ALL") {
+      active.push(this.currentCategory)
+    }
+
+    if (this.filters.type !== "ALL") {
+      active.push(this.filters.type)
+    }
+
+    if (this.filters.status !== "ALL") {
+      active.push(this.filters.status)
+    }
+
+    if (this.filters.popularity !== "ALL") {
+      active.push(this.filters.popularity)
+    }
+
+    if (this.filters.featured !== "ALL") {
+      active.push(
+          this.filters.featured === "YES"
+              ? "FEATURED"
+              : "NOT FEATURED"
+      )
+    }
+
+    if (this.filters.newOnly) {
+      active.push("NEW")
+    }
+
+    if (active.length === 0) {
+      this.activeFiltersTarget.innerHTML = ""
+      return
+    }
+
+    this.activeFiltersTarget.innerHTML = `
+      <div class="flex flex-wrap items-center gap-2">
+
+        ${active
+        .map(
+            (filter) => `
+              <span class="rounded-full border border-violet-200 bg-violet-50 px-3 py-1.5 text-[10px] font-bold text-violet-600">
+                ${this.escapeHtml(filter)}
+              </span>
+            `
+        )
+        .join("")}
+
+        <button
+          type="button"
+          class="text-xs font-bold text-slate-400 underline hover:text-slate-600"
+          data-action="click->definition-library#clearFilters"
+        >
+          Clear
+        </button>
+
+      </div>
+    `
+  }
+
+  // ============================================================
+  // PREVIEW
+  // ============================================================
+
+  selectDefinition(event) {
+    const id =
+        event.currentTarget.dataset.definitionId
+
+    const definition =
+        this.definitions.find(
+            (item) => String(item.id) === String(id)
+        )
+
+    if (!definition) return
+
+    this.selectedDefinition = definition
+
+    this.rememberRecent(id)
+    this.renderPreview()
+  }
+
+  renderPreview() {
+    const definition = this.selectedDefinition
+
+    if (!definition) {
+      this.previewTarget.classList.add("hidden")
+      this.previewEmptyTarget.classList.remove("hidden")
+      return
+    }
+
+    this.previewEmptyTarget.classList.add("hidden")
+
+    this.previewTarget.classList.remove("hidden")
+    this.previewTarget.classList.add("flex")
+
+    const fields = definition.fields || []
+
+    this.previewIconTarget.textContent =
+        definition.icon || "✦"
+
+    this.previewTitleTarget.textContent =
+        definition.title || definition.name
+
+    this.previewCategoryTarget.textContent =
+        definition.category || "GENERAL"
+
+    this.previewIdTarget.textContent =
+        `ID ${definition.id ?? "—"}`
+
+    this.previewDescriptionTarget.textContent =
+        definition.description ||
+        "Production-ready entity definition."
+
+    this.previewFieldCountTarget.textContent =
+        fields.length
+
+    this.previewRequiredCountTarget.textContent =
+        fields.filter(
+            (field) => field.required
+        ).length
+
+    this.previewActiveCountTarget.textContent =
+        fields.filter(
+            (field) => field.active
+        ).length
+
+    this.previewFieldSummaryTarget.textContent =
+        `${fields.length} ${
+            fields.length === 1
+                ? "field"
+                : "fields"
+        }`
+
+    this.fieldListTarget.innerHTML =
+        fields.length > 0
+            ? fields
+                .map(
+                    (field, index) =>
+                        this.fieldRow(field, index)
+                )
+                .join("")
+            : `
+          <div class="p-8 text-center">
+
+            <div class="text-sm font-bold text-slate-500">
+              No fields found
+            </div>
+
+            <p class="mt-2 text-xs leading-5 text-slate-400">
+              This definition does not currently contain any field definitions.
+            </p>
+
+          </div>
+        `
+
+    const json = this.definitionToJson(
+        definition
+    )
+
+    this.previewJsonTarget.textContent =
+        JSON.stringify(json, null, 2)
+
+    this.analyticsStatusTarget.textContent =
+        `${fields.length} ${
+            fields.length === 1
+                ? "field"
+                : "fields"
+        } ready to import into Definition Studio.`
+
+    this.applyButtonTarget.disabled = false
+
+    this.showFields()
+  }
+
+  fieldRow(field, index) {
+    const type = String(
+        field.type || "string"
+    ).toUpperCase()
+
+    return `
+      <div
+        class="
+          border-b border-slate-100
+          bg-white px-4 py-4
+          last:border-b-0
+        "
+      >
+
+        <div class="flex items-start gap-4">
+
+          <div
+            class="
+              flex h-9 w-9 shrink-0
+              items-center justify-center
+              rounded-xl bg-violet-50
+              text-xs font-extrabold
+              text-violet-600
+            "
+          >
+            ${index + 1}
+          </div>
+
+          <div class="min-w-0 flex-1">
+
+            <div class="flex flex-wrap items-center gap-2">
+
+              <span class="break-words text-sm font-extrabold text-slate-800">
+                ${this.escapeHtml(field.label || field.name)}
+              </span>
+
+              <span class="rounded-full border border-sky-200 bg-sky-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-sky-700">
+                ${this.escapeHtml(type)}
+              </span>
+
+              ${
+        field.required
+            ? `
+                    <span class="rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-orange-700">
+                      REQUIRED
+                    </span>
+                  `
+            : ""
+    }
+
+              ${
+        field.active
+            ? `
+                    <span class="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-700">
+                      ACTIVE
+                    </span>
+                  `
+            : `
+                    <span class="rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-500">
+                      INACTIVE
+                    </span>
+                  `
+    }
+
+            </div>
+
+            <div class="mt-1 break-all font-mono text-xs text-slate-400">
+              ${this.escapeHtml(field.name)}
+            </div>
+
+            ${
+        field.description
+            ? `
+                  <p class="mt-2 text-xs leading-5 text-slate-500">
+                    ${this.escapeHtml(
+                field.description
+            )}
+                  </p>
+                `
+            : ""
+    }
+
+          </div>
+
+        </div>
+
+      </div>
+    `
+  }
+
+  showFields() {
+    this.fieldsPanelTarget.classList.remove("hidden")
+    this.jsonPanelTarget.classList.add("hidden")
+
+    this.fieldsTabTarget.classList.add(
+        "border-violet-500",
+        "text-violet-600"
+    )
+
+    this.fieldsTabTarget.classList.remove(
+        "border-transparent",
+        "text-slate-400"
+    )
+
+    this.fieldsTabTarget.setAttribute(
+        "aria-selected",
+        "true"
+    )
+
+    this.jsonTabTarget.classList.remove(
+        "border-violet-500",
+        "text-violet-600"
+    )
+
+    this.jsonTabTarget.classList.add(
+        "border-transparent",
+        "text-slate-400"
+    )
+
+    this.jsonTabTarget.setAttribute(
+        "aria-selected",
+        "false"
+    )
+  }
+
+  showJson() {
+    this.fieldsPanelTarget.classList.add("hidden")
+    this.jsonPanelTarget.classList.remove("hidden")
+
+    this.jsonTabTarget.classList.add(
+        "border-violet-500",
+        "text-violet-600"
+    )
+
+    this.jsonTabTarget.classList.remove(
+        "border-transparent",
+        "text-slate-400"
+    )
+
+    this.jsonTabTarget.setAttribute(
+        "aria-selected",
+        "true"
+    )
+
+    this.fieldsTabTarget.classList.remove(
+        "border-violet-500",
+        "text-violet-600"
+    )
+
+    this.fieldsTabTarget.classList.add(
+        "border-transparent",
+        "text-slate-400"
+    )
+
+    this.fieldsTabTarget.setAttribute(
+        "aria-selected",
+        "false"
+    )
+  }
+
+  definitionToJson(definition) {
+    const result = {
+      id: definition.id,
+      slug: definition.slug,
+      name: definition.name,
+      title: definition.title,
+      category: definition.category,
+      version: definition.version,
+      fields: definition.fields || []
+    }
+
+    return result
+  }
+
+  // ============================================================
+  // APPLY
+  // ============================================================
+
+  apply() {
+    if (!this.selectedDefinition) {
+      return
+    }
+
+    const definition =
+        this.normalizeDefinition(
+            this.selectedDefinition
+        )
 
     const payload = {
-      event_type:
-      eventType,
-
-      source:
-          "definition_library",
-
-      session_id:
-          this.sessionId(),
-
-      metadata: {
-        definition_id:
-        definition.id,
-
-        version:
-        definition.version
-      }
+      definition,
+      definition_id: String(
+          definition.id
+      ),
+      version:
+          definition.version || 1,
+      source: "definition_library"
     }
 
-    fetch(
+    this.lastAppliedDefinition = definition
+
+    this.log("apply:start", {
+      id: definition.id,
+      fields: definition.fields?.length || 0
+    })
+
+    /*
+     * IMPORTANT:
+     *
+     * Dispatch first so the existing Entity Builder receives
+     * exactly the event it already listens for.
+     */
+    const event =
+        new CustomEvent(
+            "definition-library:apply",
+            {
+              bubbles: true,
+              detail: payload
+            }
+        )
+
+    document.dispatchEvent(event)
+
+    /*
+     * Also dispatch on the application element for integrations
+     * that listen there.
+     */
+    if (this.element !== document) {
+      this.element.dispatchEvent(
+          new CustomEvent(
+              "definition-library:applied",
+              {
+                bubbles: true,
+                detail: payload
+              }
+          )
+      )
+    }
+
+    this.log("apply:events-dispatched", {
+      id: definition.id,
+      fields: definition.fields?.length || 0
+    })
+
+    /*
+     * CLOSE IMMEDIATELY.
+     *
+     * Usage tracking must never block importing.
+     */
+    this.close()
+
+    /*
+     * Usage analytics is deliberately fire-and-forget.
+     * If the endpoint is unavailable, the definition has
+     * already been successfully applied and the modal is closed.
+     */
+    this.trackUsage(definition).catch((error) => {
+      console.warn(
+          "[DefinitionLibrary] Usage tracking failed",
+          error
+      )
+    })
+  }
+
+  // ============================================================
+  // USAGE TRACKING
+  // ============================================================
+
+  async trackUsage(definition) {
+    if (!this.catalogUsageUrlValue) {
+      return
+    }
+
+    const url =
         this.catalogUsageUrlValue.replace(
             ":id",
             encodeURIComponent(
-                definition.id
+                String(definition.id)
             )
-        ),
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-                "application/json",
-
-            Accept:
-                "application/json",
-
-            "X-CSRF-Token":
-                this.csrfToken()
-          },
-
-          credentials:
-              "same-origin",
-
-          body:
-              JSON.stringify(
-                  payload
-              )
-        }
-    ).catch(
-        error => {
-          console.warn(
-              "[DefinitionLibrary] Usage tracking failed",
-              error
-          )
-        }
-    )
-  }
-
-  /*
-   * ============================================================
-   * SESSION / CSRF
-   * ============================================================
-   */
-
-  sessionId() {
-    return this.sessionIdValue
-  }
-
-  getOrCreateSessionId() {
-    const storageKey =
-        "definition-library:session-id"
+        )
 
     try {
-      let id =
-          sessionStorage.getItem(
-              storageKey
-          )
+      const response = await fetch(url, {
+        method: "POST",
 
-      if (!id) {
-        id =
-            `dl-${Date.now()}-${Math.random()
-                .toString(36)
-                .slice(2, 12)}`
+        credentials: "same-origin",
 
-        sessionStorage.setItem(
-            storageKey,
-            id
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "X-CSRF-Token":
+              this.csrfToken()
+        },
+
+        body: JSON.stringify({
+          definition_id: definition.id,
+          version: definition.version || 1,
+          source: "definition_library"
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(
+            `Usage tracking failed: ${response.status}`
         )
       }
 
-      return id
+      this.log("usage-tracked", {
+        id: definition.id
+      })
     } catch (error) {
-      return `dl-${Date.now()}`
+      /*
+       * Do not throw this into the apply flow.
+       * Tracking is optional analytics.
+       */
+      console.warn(
+          "[DefinitionLibrary] Usage tracking unavailable",
+          error
+      )
     }
   }
 
@@ -2387,222 +1645,234 @@ export default class extends Controller {
             'meta[name="csrf-token"]'
         )
 
-    return meta?.content || ""
+    return meta
+        ? meta.content
+        : ""
   }
 
-  /*
-   * ============================================================
-   * KEYBOARD
-   * ============================================================
-   */
+  // ============================================================
+  // FAVORITES / RECENT
+  // ============================================================
 
-  handleGlobalKeydown(
-      event
-  ) {
-    if (
-        !this.hasModalTarget ||
-        this.modalTarget.classList.contains(
-            "hidden"
+  toggleFavorite(event) {
+    event.stopPropagation()
+
+    const id =
+        String(
+            event.currentTarget.dataset.definitionId
         )
-    ) {
+
+    if (this.favoriteIds.includes(id)) {
+      this.favoriteIds =
+          this.favoriteIds.filter(
+              (item) => item !== id
+          )
+    } else {
+      this.favoriteIds.push(id)
+    }
+
+    this.saveStorage(
+        "definition-library-favorites",
+        this.favoriteIds
+    )
+
+    this.updateFavoriteCount()
+    this.render()
+  }
+
+  rememberRecent(id) {
+    id = String(id)
+
+    this.recentIds =
+        [
+          id,
+          ...this.recentIds.filter(
+              (item) => item !== id
+          )
+        ].slice(0, 20)
+
+    this.saveStorage(
+        "definition-library-recent",
+        this.recentIds
+    )
+
+    this.updateRecentCount()
+  }
+
+  updateFavoriteCount() {
+    if (this.hasFavoriteCountTarget) {
+      this.favoriteCountTarget.textContent =
+          this.favoriteIds.length
+    }
+  }
+
+  updateRecentCount() {
+    if (this.hasRecentCountTarget) {
+      this.recentCountTarget.textContent =
+          this.recentIds.length
+    }
+  }
+
+  // ============================================================
+  // CONFIRMATION
+  // ============================================================
+
+  cancelImport() {
+    if (!this.hasConfirmationTarget) {
       return
     }
 
+    this.confirmationTarget.classList.add("hidden")
+    this.confirmationTarget.classList.remove("flex")
+    this.confirmationTarget.setAttribute(
+        "aria-hidden",
+        "true"
+    )
+  }
+
+  // Kept for compatibility with existing markup.
+  confirmImport() {
+    this.cancelImport()
+    this.apply()
+  }
+
+  // ============================================================
+  // UI STATE
+  // ============================================================
+
+  showLoading(show) {
+    if (!this.hasLoadingStateTarget) return
+
+    this.loadingStateTarget.classList.toggle(
+        "hidden",
+        !show
+    )
+  }
+
+  showError(show, message = null) {
+    if (!this.hasErrorStateTarget) return
+
+    this.errorStateTarget.classList.toggle(
+        "hidden",
+        !show
+    )
+
     if (
-        event.key === "/" &&
-        document.activeElement !==
-        this.searchTarget
+        show &&
+        message &&
+        this.hasErrorMessageTarget
     ) {
-      event.preventDefault()
-
-      this.focusSearch()
-
-      return
+      this.errorMessageTarget.textContent =
+          message
     }
+  }
 
-    if (
-        event.key === "Escape"
-    ) {
-      this.close(event)
+  setConnectedStatus() {
+    if (!this.hasStatusTarget) return
 
-      return
-    }
+    this.statusTarget.textContent =
+        "CONNECTED"
+  }
 
-    if (
-        event.key === "Enter" &&
-        (event.ctrlKey ||
-            event.metaKey)
-    ) {
-      if (
-          this.selectedDefinition
-      ) {
-        event.preventDefault()
+  // ============================================================
+  // STORAGE
+  // ============================================================
 
-        this.apply(event)
+  loadStorage(key) {
+    try {
+      const value =
+          window.localStorage.getItem(key)
+
+      if (!value) {
+        return []
       }
 
+      const parsed = JSON.parse(value)
+
+      return Array.isArray(parsed)
+          ? parsed.map(String)
+          : []
+    } catch (_error) {
+      return []
+    }
+  }
+
+  saveStorage(key, value) {
+    try {
+      window.localStorage.setItem(
+          key,
+          JSON.stringify(value)
+      )
+    } catch (_error) {
+      // Storage is optional.
+    }
+  }
+
+  // ============================================================
+  // HELPERS
+  // ============================================================
+
+  slugify(value) {
+    return String(value || "")
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+  }
+
+  humanize(value) {
+    return String(value || "")
+        .replace(/[_-]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .replace(/\b\w/g, (letter) =>
+            letter.toUpperCase()
+        )
+  }
+
+  escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;")
+  }
+
+  log(message, data = null) {
+    if (data) {
+      console.debug(
+          `[DefinitionLibrary] ${message}`,
+          data
+      )
+    } else {
+      console.debug(
+          `[DefinitionLibrary] ${message}`
+      )
+    }
+  }
+
+  copyJson() {
+    if (!this.hasPreviewJsonTarget) {
       return
     }
 
-    if (
-        event.key ===
-        "ArrowDown" ||
-        event.key ===
-        "ArrowRight" ||
-        event.key ===
-        "ArrowUp" ||
-        event.key ===
-        "ArrowLeft"
-    ) {
-      this.navigateCards(event)
-    }
-  }
+    const value =
+        this.previewJsonTarget.textContent || ""
 
-  navigateCards(
-      event
-  ) {
-    if (!this.hasGridTarget) {
+    if (!navigator.clipboard) {
       return
     }
 
-    const cards =
-        Array.from(
-            this.gridTarget.querySelectorAll(
-                "article[data-definition-id]"
-            )
-        )
-
-    if (!cards.length) {
-      return
-    }
-
-    const active =
-        document.activeElement
-
-    const currentIndex =
-        cards.indexOf(active)
-
-    if (
-        currentIndex === -1
-    ) {
-      return
-    }
-
-    let nextIndex =
-        currentIndex
-
-    if (
-        event.key ===
-        "ArrowDown" ||
-        event.key ===
-        "ArrowRight"
-    ) {
-      nextIndex =
-          Math.min(
-              cards.length - 1,
-              currentIndex + 1
-          )
-    }
-
-    if (
-        event.key ===
-        "ArrowUp" ||
-        event.key ===
-        "ArrowLeft"
-    ) {
-      nextIndex =
-          Math.max(
-              0,
-              currentIndex - 1
-          )
-    }
-
-    if (
-        nextIndex !==
-        currentIndex
-    ) {
-      event.preventDefault()
-
-      cards[
-          nextIndex
-          ].focus()
-    }
-  }
-
-  focusSearch() {
-    if (
-        !this.hasSearchTarget
-    ) {
-      return
-    }
-
-    window.requestAnimationFrame(
-        () => {
-          this.searchTarget.focus()
-          this.searchTarget.select()
-        }
-    )
-  }
-
-  /*
-   * ============================================================
-   * HELPERS
-   * ============================================================
-   */
-
-  findDefinition(id) {
-    return this.catalog.find(
-        definition =>
-            String(
-                definition.id
-            ) ===
-            String(id)
-    )
-  }
-
-  definitionName(
-      definition
-  ) {
-    return (
-        definition?.name ||
-        definition?.title ||
-        "Untitled Definition"
-    )
-  }
-
-  escapeHtml(
-      value
-  ) {
-    return String(
-        value ?? ""
-    )
-        .replaceAll(
-            "&",
-            "&amp;"
-        )
-        .replaceAll(
-            "<",
-            "&lt;"
-        )
-        .replaceAll(
-            ">",
-            "&gt;"
-        )
-        .replaceAll(
-            '"',
-            "&quot;"
-        )
-        .replaceAll(
-            "'",
-            "&#039;"
-        )
-  }
-
-  escapeAttribute(
-      value
-  ) {
-    return this.escapeHtml(
-        value
-    )
+    navigator.clipboard
+        .writeText(value)
+        .then(() => {
+          this.analyticsStatusTarget.textContent =
+              "JSON copied to clipboard."
+        })
+        .catch(() => {
+          this.analyticsStatusTarget.textContent =
+              "Unable to copy JSON."
+        })
   }
 }
