@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_09_10_213900) do
+ActiveRecord::Schema[7.0].define(version: 2026_09_16_024635) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -390,6 +390,23 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_10_213900) do
     t.index ["entity_type_id"], name: "idx_et_config_type"
   end
 
+  create_table "ecosystems_load_sources_entity_template_definition_versions", force: :cascade do |t|
+    t.bigint "definition_template_id", null: false
+    t.integer "version", null: false
+    t.string "status", default: "draft", null: false
+    t.text "change_summary"
+    t.jsonb "definition", default: {}, null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "published_at"
+    t.datetime "deprecated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["definition_template_id", "version"], name: "idx_def_template_versions_unique", unique: true
+    t.index ["definition_template_id"], name: "idx_def_template_versions_template"
+    t.index ["published_at"], name: "idx_def_template_versions_published"
+    t.index ["status"], name: "idx_def_template_versions_status"
+  end
+
   create_table "ecosystems_load_sources_entity_template_fields", force: :cascade do |t|
     t.bigint "entity_template_version_id", null: false
     t.string "name", null: false
@@ -425,6 +442,61 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_10_213900) do
     t.index ["updated_at"], name: "idx_entity_template_versions_updated_at"
   end
 
+  create_table "ecosystems_load_sources_entity_template_versions_definition_lib", force: :cascade do |t|
+    t.string "key", null: false
+    t.string "name", null: false
+    t.string "category", null: false
+    t.text "description"
+    t.jsonb "tags", default: [], null: false
+    t.string "icon"
+    t.integer "popularity", default: 0, null: false
+    t.boolean "featured", default: false, null: false
+    t.integer "version", default: 1, null: false
+    t.jsonb "fields", default: [], null: false
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "slug"
+    t.jsonb "definition_json", default: {}, null: false
+    t.boolean "library_new", default: false, null: false
+    t.index ["active"], name: "eld_active_idx"
+    t.index ["active"], name: "idx_def_lib_defs_active"
+    t.index ["category"], name: "eld_category_idx"
+    t.index ["category"], name: "idx_def_lib_defs_category"
+    t.index ["featured"], name: "eld_featured_idx"
+    t.index ["key"], name: "eld_key_uq", unique: true
+    t.index ["popularity"], name: "eld_popularity_idx"
+    t.index ["slug"], name: "idx_def_lib_defs_slug", unique: true
+  end
+
+  create_table "ecosystems_load_sources_entity_template_versions_definition_tem", force: :cascade do |t|
+    t.string "external_id", null: false
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.string "category", null: false
+    t.text "description"
+    t.string "icon"
+    t.string "color"
+    t.boolean "featured", default: false, null: false
+    t.boolean "active", default: true, null: false
+    t.boolean "is_new", default: false, null: false
+    t.integer "popularity_score", default: 0, null: false
+    t.integer "usage_count", default: 0, null: false
+    t.string "status", default: "published", null: false
+    t.jsonb "tags", default: [], null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "idx_def_templates_active"
+    t.index ["category"], name: "idx_def_templates_category"
+    t.index ["external_id"], name: "idx_def_templates_ext_id", unique: true
+    t.index ["featured"], name: "idx_def_templates_featured"
+    t.index ["is_new"], name: "idx_def_templates_is_new"
+    t.index ["popularity_score"], name: "idx_def_templates_popularity"
+    t.index ["slug"], name: "idx_def_templates_slug", unique: true
+    t.index ["status"], name: "idx_def_templates_status"
+  end
+
   create_table "ecosystems_load_sources_entity_templates", force: :cascade do |t|
     t.string "name", null: false
     t.string "slug", null: false
@@ -447,6 +519,24 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_10_213900) do
     t.datetime "updated_at", null: false
     t.index ["parent_id"], name: "index_ecosystems_load_sources_entity_types_on_parent_id"
     t.index ["slug"], name: "index_ecosystems_load_sources_entity_types_on_slug", unique: true
+  end
+
+  create_table "entity_template_usages", force: :cascade do |t|
+    t.bigint "definition_template_id", null: false
+    t.bigint "definition_template_version_id"
+    t.bigint "user_id"
+    t.string "event_type", null: false
+    t.string "source"
+    t.string "session_id"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.index ["created_at"], name: "idx_entity_template_usages_created_at"
+    t.index ["definition_template_id"], name: "index_entity_template_usages_on_definition_template_id"
+    t.index ["definition_template_version_id"], name: "index_entity_template_usages_on_definition_template_version_id"
+    t.index ["event_type"], name: "idx_entity_template_usages_event_type"
+    t.index ["session_id"], name: "idx_entity_template_usages_session"
+    t.index ["source"], name: "idx_entity_template_usages_source"
+    t.index ["user_id"], name: "index_entity_template_usages_on_user_id"
   end
 
   create_table "folder_hierarchies", id: false, force: :cascade do |t|
@@ -1037,10 +1127,14 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_10_213900) do
   add_foreign_key "ecosystems_load_sources_entities", "ecosystems_load_sources_entity_types", column: "entity_type_id"
   add_foreign_key "ecosystems_load_sources_entity_template_configurations", "ecosystems_load_sources_entity_templates", column: "entity_template_id", name: "fk_et_config_template"
   add_foreign_key "ecosystems_load_sources_entity_template_configurations", "ecosystems_load_sources_entity_types", column: "entity_type_id", name: "fk_et_config_type"
+  add_foreign_key "ecosystems_load_sources_entity_template_definition_versions", "ecosystems_load_sources_entity_template_versions_definition_tem", column: "definition_template_id"
   add_foreign_key "ecosystems_load_sources_entity_template_fields", "ecosystems_load_sources_entity_template_versions", column: "entity_template_version_id"
   add_foreign_key "ecosystems_load_sources_entity_template_versions", "ecosystems_load_sources_entity_templates", column: "entity_template_id"
   add_foreign_key "ecosystems_load_sources_entity_templates", "ecosystems_load_sources_entity_types", column: "entity_type_id"
   add_foreign_key "ecosystems_load_sources_entity_types", "ecosystems_load_sources_entity_types", column: "parent_id"
+  add_foreign_key "entity_template_usages", "ecosystems_load_sources_entity_template_definition_versions", column: "definition_template_version_id", name: "fk_entity_template_usages_definition_template_version"
+  add_foreign_key "entity_template_usages", "ecosystems_load_sources_entity_template_versions_definition_tem", column: "definition_template_id", name: "fk_entity_template_usages_definition_template"
+  add_foreign_key "entity_template_usages", "users", name: "fk_entity_template_usages_user"
   add_foreign_key "taggings", "tags"
   add_foreign_key "tenant_qr_assets", "algorithm_versions"
   add_foreign_key "unit_version_improvements", "improvements"

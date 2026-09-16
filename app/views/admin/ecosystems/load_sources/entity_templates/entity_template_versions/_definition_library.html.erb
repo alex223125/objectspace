@@ -1,27 +1,47 @@
-<div class="fixed inset-0 z-[100] hidden" data-controller="definition-library" data-definition-library-target="modal" data-definition-library-catalog-value="[]" data-action=" keydown.esc->definition-library#close definition-library:open->definition-library#open " aria-hidden="true" >
+<div
+  class="fixed inset-0 z-[100] hidden"
+  data-controller="definition-library"
+  data-definition-library-target="modal"
+  data-definition-library-catalog-url-value="<%= api_v1_admin_ecosystems_load_sources_entity_templates_entity_template_version_definition_templates_path %>"
+  data-definition-library-catalog-usage-url-value="/api/v1/admin/ecosystems/load_sources/entity_templates/entity_template_version/definition_templates/:id/usage"
+  data-definition-library-catalog-value="[]"
+  data-action="keydown.esc->definition-library#close definition-library:open->definition-library#open"
+  aria-hidden="true"
+>
 
-  <!-- BACKDROP -->
+  <!-- ============================================================
+       BACKDROP
+       ============================================================ -->
 
-  <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-md" data-definition-library-target="backdrop" data-action="click->definition-library#close" ></div>
+  <div
+    class="absolute inset-0 bg-slate-950/70 backdrop-blur-md"
+    data-definition-library-target="backdrop"
+    data-action="click->definition-library#close"
+    aria-hidden="true"
+  ></div>
 
-  <!-- DIALOG -->
+
+  <!-- ============================================================
+       DIALOG
+       ============================================================ -->
 
   <div class="relative flex min-h-screen items-center justify-center p-3 sm:p-6 lg:p-8">
 
     <div
       class="relative flex max-h-[94vh] w-full max-w-[1440px] flex-col overflow-hidden rounded-[34px] border-2 border-violet-100 bg-white shadow-[0_30px_100px_rgba(76,29,149,0.28)]"
+
       role="dialog"
       aria-modal="true"
       aria-labelledby="definition-library-title"
+
       data-definition-library-target="dialog"
     >
 
-
-      <!-- ============================================================
+      <!-- ========================================================
            HEADER
-           ============================================================ -->
+           ======================================================== -->
 
-      <div class="shrink-0 border-b border-violet-100 bg-gradient-to-br from-violet-50 via-white to-sky-50/70">
+      <header class="shrink-0 border-b border-violet-100 bg-gradient-to-br from-violet-50 via-white to-sky-50/70">
 
         <div class="px-5 py-5 sm:px-7 sm:py-6 lg:px-8">
 
@@ -44,16 +64,16 @@
                     DEFINITION LIBRARY
                   </div>
 
-                  <span class="rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-[7px] font-black uppercase tracking-wider text-emerald-500">
-                PRO
-              </span>
+                  <span class="rounded-full border border-violet-100 bg-violet-50 px-2.5 py-1 text-[7px] font-black uppercase tracking-wider text-violet-500">
+                    PRO
+                  </span>
 
                   <span
                     class="rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-[7px] font-black uppercase tracking-wider text-emerald-500"
                     data-definition-library-target="status"
                   >
-                CONNECTED
-              </span>
+                    CONNECTED
+                  </span>
 
                 </div>
 
@@ -66,7 +86,7 @@
 
                 <p class="mt-1 max-w-2xl text-[11px] leading-5 text-slate-400 sm:text-xs">
                   Select a production-ready entity definition, inspect its structure,
-                  then import it into the Definition Studio for customization.
+                  then import it into the Definition Studio.
                 </p>
 
               </div>
@@ -86,9 +106,11 @@
           </div>
 
 
-          <!-- SEARCH -->
+          <!-- ======================================================
+               SEARCH TOOLBAR
+               ====================================================== -->
 
-          <div class="mt-6 flex flex-col gap-3 lg:flex-row">
+          <div class="mt-6 flex flex-col gap-3 xl:flex-row">
 
             <div class="relative min-w-0 flex-1">
 
@@ -101,15 +123,19 @@
 
               <input
                 type="search"
-                placeholder="Search definitions, fields, categories..."
+                placeholder="Search definitions, fields, categories, tags..."
                 autocomplete="off"
                 spellcheck="false"
+
                 class="block w-full rounded-2xl border-2 border-slate-100 bg-white py-3.5 pl-11 pr-12 text-xs font-semibold text-slate-700 shadow-sm outline-none transition placeholder:text-slate-300 focus:border-violet-300 focus:ring-4 focus:ring-violet-100"
+
                 data-definition-library-target="search"
+
                 data-action="
-              input->definition-library#searchChanged
-              keydown->definition-library#searchKeydown
-            "
+                  input->definition-library#searchChanged
+                  keydown->definition-library#searchKeydown
+                "
+
                 aria-label="Search definitions"
                 />
 
@@ -126,72 +152,342 @@
             </div>
 
 
-            <div class="flex shrink-0 items-center gap-2">
+            <!-- View buttons -->
+
+            <div class="flex shrink-0 flex-wrap gap-2">
 
               <button
                 type="button"
-                class="rounded-2xl border-2 border-violet-200 bg-violet-50 px-4 py-3 text-[9px] font-black uppercase tracking-wider text-violet-500 transition hover:border-violet-300 hover:bg-violet-100 focus:outline-none focus:ring-4 focus:ring-violet-100"
-                data-definition-library-target="sortButton"
-                data-action="click->definition-library#toggleSort"
-                aria-label="Sort definitions"
+                class="rounded-2xl border-2 border-amber-100 bg-amber-50 px-3 py-3 text-[8px] font-black uppercase tracking-wider text-amber-500 transition hover:border-amber-200 hover:bg-amber-100"
+                data-definition-library-target="favoritesButton"
+                data-action="click->definition-library#showFavorites"
               >
-                A–Z
+                ★ FAVORITES
+                <span data-definition-library-target="favoriteCount">0</span>
               </button>
 
-              <div class="rounded-2xl border-2 border-slate-100 bg-white px-4 py-3 shadow-sm">
+              <button
+                type="button"
+                class="rounded-2xl border-2 border-slate-100 bg-white px-3 py-3 text-[8px] font-black uppercase tracking-wider text-slate-500 transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-500"
+                data-definition-library-target="recentButton"
+                data-action="click->definition-library#showRecent"
+              >
+                RECENT
+                <span data-definition-library-target="recentCount">0</span>
+              </button>
 
-            <span
-              class="text-[9px] font-black uppercase tracking-wider text-slate-400"
-              data-definition-library-target="resultCount"
-            >
-              0 DEFINITIONS
-            </span>
+              <button
+                type="button"
+                class="rounded-2xl border-2 border-violet-200 bg-violet-50 px-3 py-3 text-[8px] font-black uppercase tracking-wider text-violet-500 transition hover:border-violet-300 hover:bg-violet-100"
+                data-definition-library-target="recommendedButton"
+                data-action="click->definition-library#showRecommended"
+              >
+                ✦ FOR YOU
+              </button>
 
-              </div>
+              <button
+                type="button"
+                class="rounded-2xl border-2 border-slate-100 bg-white px-3 py-3 text-[8px] font-black uppercase tracking-wider text-slate-500 transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-500"
+                data-action="click->definition-library#showAll"
+              >
+                ALL
+              </button>
 
             </div>
 
           </div>
 
 
-          <!-- CATEGORIES -->
+          <!-- ======================================================
+               SECONDARY TOOLBAR
+               ====================================================== -->
+
+          <div class="mt-3 flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+
+            <div class="flex flex-wrap items-center gap-2">
+
+              <button
+                type="button"
+                class="rounded-xl border border-violet-200 bg-violet-50 px-3 py-2 text-[8px] font-black uppercase tracking-wider text-violet-500 transition hover:bg-violet-100"
+                data-action="click->definition-library#toggleAdvancedFilters"
+                aria-controls="definition-library-advanced-filters"
+              >
+                ⚙ FILTERS
+              </button>
+
+
+              <button
+                type="button"
+                class="rounded-xl border-2 border-violet-200 bg-violet-50 px-3 py-2 text-[8px] font-black uppercase tracking-wider text-violet-500 transition hover:border-violet-300 hover:bg-violet-100"
+                data-definition-library-target="sortButton"
+                data-action="click->definition-library#toggleSort"
+                aria-label="Change definition sorting"
+              >
+                POPULAR
+              </button>
+
+
+              <div
+                class="rounded-xl border-2 border-slate-100 bg-white px-3 py-2"
+                aria-live="polite"
+              >
+                <span
+                  class="text-[8px] font-black uppercase tracking-wider text-slate-400"
+                  data-definition-library-target="resultCount"
+                >
+                  0 DEFINITIONS
+                </span>
+              </div>
+
+            </div>
+
+
+            <div
+              data-definition-library-target="activeFilters"
+              aria-live="polite"
+            ></div>
+
+          </div>
+
+
+          <!-- ======================================================
+               ADVANCED FILTERS
+               ====================================================== -->
+
+          <div
+            id="definition-library-advanced-filters"
+            class="mt-3 hidden rounded-2xl border border-violet-100 bg-white p-4 shadow-sm"
+            data-definition-library-target="advancedFilters"
+          >
+
+            <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+
+              <label class="block">
+                <span class="mb-1 block text-[7px] font-black uppercase tracking-wider text-slate-400">
+                  FIELD TYPE
+                </span>
+
+                <select
+                  name="type"
+                  class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[9px] font-bold text-slate-600 outline-none focus:border-violet-300 focus:ring-4 focus:ring-violet-100"
+                  data-definition-library-target="filterType"
+                  data-action="change->definition-library#advancedFilterChanged"
+                >
+                  <option value="ALL">ALL TYPES</option>
+                  <option value="string">STRING</option>
+                  <option value="text">TEXT</option>
+                  <option value="number">NUMBER</option>
+                  <option value="integer">INTEGER</option>
+                  <option value="boolean">BOOLEAN</option>
+                  <option value="date">DATE</option>
+                  <option value="datetime">DATETIME</option>
+                  <option value="email">EMAIL</option>
+                  <option value="url">URL</option>
+                  <option value="select">SELECT</option>
+                  <option value="reference">REFERENCE</option>
+                  <option value="json">JSON</option>
+                </select>
+              </label>
+
+
+              <label class="block">
+                <span class="mb-1 block text-[7px] font-black uppercase tracking-wider text-slate-400">
+                  STATUS
+                </span>
+
+                <select
+                  name="status"
+                  class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[9px] font-bold text-slate-600 outline-none focus:border-violet-300 focus:ring-4 focus:ring-violet-100"
+                  data-definition-library-target="filterStatus"
+                  data-action="change->definition-library#advancedFilterChanged"
+                >
+                  <option value="ALL">ALL</option>
+                  <option value="ACTIVE">ACTIVE</option>
+                  <option value="INACTIVE">INACTIVE</option>
+                  <option value="MIXED">MIXED</option>
+                </select>
+              </label>
+
+
+              <label class="block">
+                <span class="mb-1 block text-[7px] font-black uppercase tracking-wider text-slate-400">
+                  POPULARITY
+                </span>
+
+                <select
+                  name="popularity"
+                  class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[9px] font-bold text-slate-600 outline-none focus:border-violet-300 focus:ring-4 focus:ring-violet-100"
+                  data-definition-library-target="filterPopularity"
+                  data-action="change->definition-library#advancedFilterChanged"
+                >
+                  <option value="ALL">ALL</option>
+                  <option value="HIGH">HIGH 80+</option>
+                  <option value="MEDIUM">MEDIUM</option>
+                  <option value="LOW">LOW</option>
+                </select>
+              </label>
+
+
+              <label class="block">
+                <span class="mb-1 block text-[7px] font-black uppercase tracking-wider text-slate-400">
+                  FEATURED
+                </span>
+
+                <select
+                  name="featured"
+                  class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[9px] font-bold text-slate-600 outline-none focus:border-violet-300 focus:ring-4 focus:ring-violet-100"
+                  data-definition-library-target="filterFeatured"
+                  data-action="change->definition-library#advancedFilterChanged"
+                >
+                  <option value="ALL">ALL</option>
+                  <option value="YES">FEATURED</option>
+                  <option value="NO">NOT FEATURED</option>
+                </select>
+              </label>
+
+
+              <label class="flex items-end">
+
+                <span class="flex w-full cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2">
+
+                  <input
+                    type="checkbox"
+                    name="new"
+                    class="h-3.5 w-3.5 rounded border-slate-300 text-violet-500 focus:ring-violet-200"
+                    data-definition-library-target="filterNew"
+                    data-action="change->definition-library#advancedFilterChanged"
+                    />
+
+                  <span class="text-[8px] font-black uppercase tracking-wider text-slate-500">
+                    NEW ONLY
+                  </span>
+
+                </span>
+
+              </label>
+
+            </div>
+
+
+            <div class="mt-3 flex justify-end">
+
+              <button
+                type="button"
+                class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-[8px] font-black uppercase tracking-wider text-slate-500 transition hover:bg-slate-50"
+                data-definition-library-target="clearAllFilters"
+                data-action="click->definition-library#clearFilters"
+              >
+                RESET ALL FILTERS
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <!-- ======================================================
+               CATEGORIES
+               ====================================================== -->
 
           <div
             class="mt-4 flex gap-2 overflow-x-auto pb-1"
             data-definition-library-target="categories"
+            aria-label="Definition categories"
           ></div>
 
         </div>
 
+      </header>
+
+
+      <!-- ==========================================================
+           LOADING
+           ========================================================== -->
+
+      <div
+        class="hidden border-b border-sky-100 bg-sky-50 px-5 py-3"
+        data-definition-library-target="loadingState"
+        role="status"
+        aria-live="polite"
+      >
+        <div class="flex items-center gap-2">
+
+          <span class="h-2 w-2 animate-pulse rounded-full bg-sky-400"></span>
+
+          <span class="text-[8px] font-black uppercase tracking-wider text-sky-500">
+            LOADING DEFINITIONS...
+          </span>
+
+        </div>
       </div>
 
 
-      <!-- ============================================================
+      <!-- ==========================================================
+           ERROR
+           ========================================================== -->
+
+      <div
+        class="hidden border-b border-red-100 bg-red-50 px-5 py-3"
+        data-definition-library-target="errorState"
+        role="alert"
+      >
+        <div class="flex items-center justify-between gap-3">
+
+          <div class="flex items-center gap-2">
+
+            <span class="text-red-500">
+              !
+            </span>
+
+            <span
+              class="text-[9px] font-bold text-red-500"
+              data-definition-library-target="errorMessage"
+            >
+              Unable to load definitions.
+            </span>
+
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- ==========================================================
            BODY
-           ============================================================ -->
+           ========================================================== -->
 
       <div class="min-h-0 flex-1 overflow-hidden">
 
         <div class="grid h-full min-h-0 lg:grid-cols-[minmax(0,1fr)_430px]">
 
 
-          <!-- ========================================================
-               LIBRARY GRID
-               ======================================================== -->
+          <!-- ======================================================
+               LIBRARY
+               ====================================================== -->
 
           <section
             class="min-h-0 overflow-y-auto bg-slate-50/60 p-4 sm:p-6 lg:p-7"
             data-definition-library-target="libraryPanel"
+            aria-label="Definition library"
           >
+
+            <!-- Recommendations -->
+
+            <div
+              class="mb-5"
+              data-definition-library-target="recommendations"
+            ></div>
+
 
             <div
               class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
               data-definition-library-target="grid"
               aria-live="polite"
+              aria-label="Definition results"
             ></div>
 
 
-            <!-- EMPTY STATE -->
+            <!-- Empty state -->
 
             <div
               class="hidden min-h-[300px] items-center justify-center"
@@ -209,12 +505,12 @@
                 </div>
 
                 <p class="mt-2 text-[10px] leading-5 text-slate-400">
-                  Try another search term or select a different category.
+                  Try another search term, category, or filter.
                 </p>
 
                 <button
                   type="button"
-                  class="mt-5 rounded-2xl border-2 border-violet-200 bg-violet-50 px-5 py-3 text-[9px] font-black uppercase tracking-wider text-violet-500 transition hover:border-violet-300 hover:bg-violet-100 focus:outline-none focus:ring-4 focus:ring-violet-100"
+                  class="mt-5 rounded-2xl border-2 border-violet-200 bg-violet-50 px-5 py-3 text-[9px] font-black uppercase tracking-wider text-violet-500 transition hover:border-violet-300 hover:bg-violet-100"
                   data-action="click->definition-library#clearFilters"
                 >
                   RESET FILTERS
@@ -227,16 +523,16 @@
           </section>
 
 
-          <!-- ========================================================
-               PREVIEW PANEL
-               ======================================================== -->
+          <!-- ======================================================
+               PREVIEW
+               ====================================================== -->
 
           <aside class="min-h-0 border-t border-slate-200 bg-white lg:border-l lg:border-t-0">
 
             <div class="flex h-full min-h-0 flex-col">
 
 
-              <!-- EMPTY PREVIEW -->
+              <!-- Empty preview -->
 
               <div
                 class="flex flex-1 items-center justify-center p-8"
@@ -262,56 +558,49 @@
               </div>
 
 
-              <!-- SELECTED PREVIEW -->
+              <!-- Selected preview -->
 
               <div
                 class="hidden min-h-0 flex-1 flex-col"
                 data-definition-library-target="preview"
               >
 
-
-                <!-- PREVIEW HEADER -->
-
                 <div class="shrink-0 border-b border-slate-100 bg-gradient-to-br from-white via-violet-50/30 to-sky-50/30 p-5 sm:p-6">
 
-                  <div class="flex items-start justify-between gap-4">
+                  <div class="flex items-start gap-3">
 
-                    <div class="flex min-w-0 items-start gap-3">
+                    <div
+                      class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-violet-100 bg-violet-50 text-xl text-violet-500"
+                      data-definition-library-target="previewIcon"
+                      aria-hidden="true"
+                    >
+                      ✦
+                    </div>
+
+                    <div class="min-w-0">
 
                       <div
-                        class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-violet-100 bg-violet-50 text-xl text-violet-500"
-                        data-definition-library-target="previewIcon"
-                        aria-hidden="true"
+                        class="truncate text-lg font-black text-slate-800"
+                        data-definition-library-target="previewTitle"
                       >
-                        ✦
+                        Definition
                       </div>
 
-                      <div class="min-w-0">
+                      <div class="mt-1 flex flex-wrap items-center gap-2">
 
-                        <div
-                          class="truncate text-lg font-black text-slate-800"
-                          data-definition-library-target="previewTitle"
+                        <span
+                          class="rounded-full border border-violet-100 bg-violet-50 px-2.5 py-1 text-[7px] font-black uppercase tracking-wider text-violet-500"
+                          data-definition-library-target="previewCategory"
                         >
-                          Definition
-                        </div>
+                          CATEGORY
+                        </span>
 
-                        <div class="mt-1 flex flex-wrap items-center gap-2">
-
-                      <span
-                        class="rounded-full border border-violet-100 bg-violet-50 px-2.5 py-1 text-[7px] font-black uppercase tracking-wider text-violet-500"
-                        data-definition-library-target="previewCategory"
-                      >
-                        CATEGORY
-                      </span>
-
-                          <span
-                            class="text-[8px] font-bold uppercase tracking-wider text-slate-400"
-                            data-definition-library-target="previewId"
-                          >
-                        ID
-                      </span>
-
-                        </div>
+                        <span
+                          class="text-[8px] font-bold uppercase tracking-wider text-slate-400"
+                          data-definition-library-target="previewId"
+                        >
+                          ID
+                        </span>
 
                       </div>
 
@@ -326,12 +615,9 @@
                   ></p>
 
 
-                  <!-- STATS -->
-
                   <div class="mt-5 grid grid-cols-3 gap-2">
 
                     <div class="rounded-2xl border border-violet-100 bg-white p-3">
-
                       <div class="text-[7px] font-black uppercase tracking-wider text-slate-400">
                         FIELDS
                       </div>
@@ -342,12 +628,10 @@
                       >
                         0
                       </div>
-
                     </div>
 
 
                     <div class="rounded-2xl border border-orange-100 bg-white p-3">
-
                       <div class="text-[7px] font-black uppercase tracking-wider text-slate-400">
                         REQUIRED
                       </div>
@@ -358,12 +642,10 @@
                       >
                         0
                       </div>
-
                     </div>
 
 
                     <div class="rounded-2xl border border-emerald-100 bg-white p-3">
-
                       <div class="text-[7px] font-black uppercase tracking-wider text-slate-400">
                         ACTIVE
                       </div>
@@ -374,7 +656,6 @@
                       >
                         0
                       </div>
-
                     </div>
 
                   </div>
@@ -382,7 +663,7 @@
                 </div>
 
 
-                <!-- PREVIEW TABS -->
+                <!-- Tabs -->
 
                 <div class="shrink-0 border-b border-slate-100 px-5 pt-4 sm:px-6">
 
@@ -413,12 +694,11 @@
                 </div>
 
 
-                <!-- PREVIEW CONTENT -->
+                <!-- Content -->
 
                 <div class="min-h-0 flex-1 overflow-y-auto">
 
-
-                  <!-- FIELDS -->
+                  <!-- Fields -->
 
                   <div
                     class="p-5 sm:p-6"
@@ -462,14 +742,14 @@
                           <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
 
                           <span class="text-[8px] font-black uppercase tracking-wider text-emerald-400">
-                        VALID JSON
-                      </span>
+                            VALID JSON
+                          </span>
 
                         </div>
 
                         <button
                           type="button"
-                          class="rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-[7px] font-black uppercase tracking-wider text-slate-300 transition hover:bg-slate-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
+                          class="rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-[7px] font-black uppercase tracking-wider text-slate-300 transition hover:bg-slate-700 hover:text-white"
                           data-action="click->definition-library#copyJson"
                         >
                           COPY
@@ -489,7 +769,7 @@
                 </div>
 
 
-                <!-- PREVIEW FOOTER -->
+                <!-- Footer -->
 
                 <div class="shrink-0 border-t border-slate-100 bg-slate-50/80 p-4 sm:p-5">
 
@@ -497,9 +777,12 @@
 
                     <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
 
-                    <span class="text-[8px] font-semibold leading-4 text-slate-400">
-                  This definition will be imported into the visual builder.
-                </span>
+                    <span
+                      class="text-[8px] font-semibold leading-4 text-slate-400"
+                      data-definition-library-target="analyticsStatus"
+                    >
+                      Ready to import into Definition Studio.
+                    </span>
 
                   </div>
 
@@ -530,23 +813,86 @@
       </div>
 
 
-      <!-- ============================================================
-           FOOTER
-           ============================================================ -->
+      <!-- ==========================================================
+           IMPORT CONFIRMATION
+           ========================================================== -->
 
-      <div class="shrink-0 border-t border-slate-100 bg-white px-5 py-3.5 sm:px-7 lg:px-8">
+      <div
+        class="absolute inset-0 z-50 hidden items-center justify-center bg-slate-950/50 p-5 backdrop-blur-sm"
+        data-definition-library-target="confirmation"
+        aria-hidden="true"
+      >
+
+        <div
+          class="w-full max-w-md rounded-3xl border-2 border-violet-100 bg-white p-6 shadow-[0_30px_100px_rgba(76,29,149,0.35)]"
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="definition-library-confirm-title"
+        >
+
+          <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-50 text-xl text-violet-500">
+            ↓
+          </div>
+
+          <h3
+            class="mt-5 text-lg font-black text-slate-800"
+            id="definition-library-confirm-title"
+            data-definition-library-target="confirmationTitle"
+          >
+            Import definition?
+          </h3>
+
+          <p
+            class="mt-2 text-[10px] leading-5 text-slate-400"
+            data-definition-library-target="confirmationDescription"
+          >
+            This definition will be loaded into Definition Studio.
+          </p>
+
+          <div class="mt-6 flex gap-2">
+
+            <button
+              type="button"
+              class="flex-1 rounded-2xl border-2 border-slate-200 bg-white px-4 py-3 text-[8px] font-black uppercase tracking-wider text-slate-500 transition hover:bg-slate-50"
+              data-definition-library-target="confirmationCancel"
+              data-action="click->definition-library#cancelImport"
+            >
+              CANCEL
+            </button>
+
+            <button
+              type="button"
+              class="flex-1 rounded-2xl bg-violet-500 px-4 py-3 text-[8px] font-black uppercase tracking-wider text-white transition hover:bg-violet-600 focus:outline-none focus:ring-4 focus:ring-violet-200"
+              data-definition-library-target="confirmationConfirm"
+              data-action="click->definition-library#confirmImport"
+            >
+              IMPORT
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ==========================================================
+           FOOTER
+           ========================================================== -->
+
+      <footer class="shrink-0 border-t border-slate-100 bg-white px-5 py-3.5 sm:px-7 lg:px-8">
 
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 
           <div class="flex items-center gap-2">
 
-        <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-xs text-emerald-500">
-          ✓
-        </span>
+            <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-xs text-emerald-500">
+              ✓
+            </span>
 
             <span class="text-[8px] font-semibold text-slate-400">
-          Library definitions are starting points — never locked structures.
-        </span>
+              Library definitions are starting points — never locked structures.
+            </span>
 
           </div>
 
@@ -560,7 +906,7 @@
 
         </div>
 
-      </div>
+      </footer>
 
     </div>
 

@@ -38,7 +38,25 @@ Rails.application.routes.draw do
         post :generate_passport
       end
     end
+
+    namespace :v1 do
+      namespace :admin do
+        namespace :ecosystems do
+          namespace :load_sources do
+            namespace :entity_templates do
+              namespace :entity_template_version do
+                resources :definition_templates,
+                          only: %i[index show],
+                          param: :id
+              end
+            end
+          end
+        end
+      end
+    end
+
   end
+
 
 
   # namespace :api, defaults: { format: :json } do

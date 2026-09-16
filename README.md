@@ -19,6 +19,9 @@ localtestadmin@test.com
 123456
 
 
+bin/rails runner db/seeds/definition_library.rb
+
+
 # work with server
 lsof -i :3000
 kill -QUIT PID_HERE

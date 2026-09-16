@@ -1,22 +1,11 @@
 import { Controller } from "@hotwired/stimulus"
 
-/*
- * Definition Library Controller
- *
- * Debug console prefixes:
- *
- *   [DEFINITION LIBRARY]
- *   [DEFINITION LIBRARY:CATALOG]
- *   [DEFINITION LIBRARY:SEARCH]
- *   [DEFINITION LIBRARY:PREVIEW]
- *   [DEFINITION LIBRARY:APPLY]
- */
-
 export default class extends Controller {
   static targets = [
     "modal",
-    "backdrop",
     "dialog",
+    "backdrop",
+    "status",
 
     "search",
     "clearSearch",
@@ -25,29 +14,25 @@ export default class extends Controller {
     "categories",
     "grid",
     "emptyState",
-
-    "status",
+    "libraryPanel",
 
     "previewEmpty",
     "preview",
-
     "previewIcon",
     "previewTitle",
     "previewCategory",
     "previewId",
     "previewDescription",
-
     "previewFieldCount",
     "previewRequiredCount",
     "previewActiveCount",
+    "previewFieldSummary",
+    "fieldList",
 
     "fieldsTab",
     "jsonTab",
     "fieldsPanel",
     "jsonPanel",
-
-    "previewFieldSummary",
-    "fieldList",
     "previewJson",
 
     "applyButton"
@@ -57,838 +42,1487 @@ export default class extends Controller {
     catalog: {
       type: Array,
       default: []
+    },
+
+    catalogUrl: String,
+
+    catalogUsageUrl: String,
+
+    debug: {
+      type: Boolean,
+      default: true
+    },
+
+    autoLoad: {
+      type: Boolean,
+      default: true
     }
   }
 
   connect() {
-    this.debug("CONNECT", {
-      identifier: this.identifier,
-      element: this.element,
-      controllerAttribute:
-        this.element?.getAttribute(
-          "data-controller"
-        )
-    })
+    this.debugLog("connect:start")
 
-    this.debugTargetInventory()
+    this.catalog = []
+    this.filteredCatalog = []
 
     this.selectedDefinition = null
-    this.currentCategory = "ALL"
+
+    this.searchQuery = ""
+    this.selectedCategory = "ALL"
     this.sortMode = "az"
+    this.activeTab = "fields"
 
-    this.debugCatalog(
-      "Initial catalog value",
-      this.catalogValue
+    this.loading = false
+    this.error = null
+
+    this.favorites = this.loadFavorites()
+    this.recentlyViewed = this.loadRecentlyViewed()
+
+    this.sessionIdValue = this.getOrCreateSessionId()
+
+    /*
+     * ------------------------------------------------------------
+     * INITIAL CATALOG
+     * ------------------------------------------------------------
+     */
+
+    if (this.hasCatalogUrlValue && this.catalogUrlValue) {
+      this.debugLog("connect:api-mode", {
+        catalogUrl: this.catalogUrlValue
+      })
+
+      if (this.autoLoadValue) {
+        this.loadCatalog()
+      }
+    } else {
+      this.debugLog("connect:inline-catalog-mode", {
+        count: this.catalogValue.length
+      })
+
+      this.catalog = this.normalizeCatalog(
+          Array.isArray(this.catalogValue)
+              ? this.catalogValue
+              : []
+      )
+
+      this.render()
+    }
+
+    /*
+     * ------------------------------------------------------------
+     * GLOBAL KEYBOARD HANDLER
+     * ------------------------------------------------------------
+     */
+
+    this.boundKeydown =
+        this.handleGlobalKeydown.bind(this)
+
+    document.addEventListener(
+        "keydown",
+        this.boundKeydown
     )
 
-    this.renderCategories()
-    this.renderCatalog()
-    this.showEmptyPreview()
+    /*
+     * ------------------------------------------------------------
+     * OPEN EVENT
+     * ------------------------------------------------------------
+     */
 
-    this.debug(
-      "CONNECT COMPLETE"
+    this.boundOpen =
+        this.handleOpenEvent.bind(this)
+
+    this.element.addEventListener(
+        "definition-library:open",
+        this.boundOpen
     )
+
+    this.debugLog("connect:complete", {
+      catalogCount: this.catalog.length,
+      favoritesCount: this.favorites.length,
+      recentCount: this.recentlyViewed.length
+    })
   }
 
   disconnect() {
-    this.debug(
-      "DISCONNECT"
+    this.debugLog("disconnect")
+
+    document.removeEventListener(
+        "keydown",
+        this.boundKeydown
+    )
+
+    this.element.removeEventListener(
+        "definition-library:open",
+        this.boundOpen
     )
   }
 
-  // ============================================================
-  // DEBUG
-  // ============================================================
+  /*
+   * ============================================================
+   * DEBUG
+   * ============================================================
+   */
 
-  get debugEnabled() {
-    return window.DEFINITION_LIBRARY_DEBUG !== false
-  }
-
-  debug(message, payload = undefined) {
-    if (!this.debugEnabled) return
-
-    if (payload === undefined) {
-      console.log(
-        `[DEFINITION LIBRARY] ${message}`
-      )
-    } else {
-      console.log(
-        `[DEFINITION LIBRARY] ${message}`,
-        payload
-      )
-    }
-  }
-
-  debugCatalog(message, payload = undefined) {
-    if (!this.debugEnabled) return
-
-    if (payload === undefined) {
-      console.log(
-        `[DEFINITION LIBRARY:CATALOG] ${message}`
-      )
-    } else {
-      console.log(
-        `[DEFINITION LIBRARY:CATALOG] ${message}`,
-        payload
-      )
-    }
-  }
-
-  debugSearch(message, payload = undefined) {
-    if (!this.debugEnabled) return
-
-    if (payload === undefined) {
-      console.log(
-        `[DEFINITION LIBRARY:SEARCH] ${message}`
-      )
-    } else {
-      console.log(
-        `[DEFINITION LIBRARY:SEARCH] ${message}`,
-        payload
-      )
-    }
-  }
-
-  debugPreview(message, payload = undefined) {
-    if (!this.debugEnabled) return
-
-    if (payload === undefined) {
-      console.log(
-        `[DEFINITION LIBRARY:PREVIEW] ${message}`
-      )
-    } else {
-      console.log(
-        `[DEFINITION LIBRARY:PREVIEW] ${message}`,
-        payload
-      )
-    }
-  }
-
-  debugApply(message, payload = undefined) {
-    if (!this.debugEnabled) return
-
-    if (payload === undefined) {
-      console.log(
-        `[DEFINITION LIBRARY:APPLY] ${message}`
-      )
-    } else {
-      console.log(
-        `[DEFINITION LIBRARY:APPLY] ${message}`,
-        payload
-      )
-    }
-  }
-
-  debugTargetInventory() {
-    const targetNames = [
-      "modal",
-      "search",
-      "grid",
-      "categories",
-      "preview",
-      "previewEmpty",
-      "applyButton"
-    ]
-
-    const result = {}
-
-    targetNames.forEach((name) => {
-      const property =
-        `has${name.charAt(0).toUpperCase()}${name.slice(1)}Target`
-
-      result[name] =
-        this[property] ?? false
-    })
-
-    this.debug(
-      "TARGET INVENTORY",
-      result
-    )
-  }
-
-  // ============================================================
-  // OPEN / CLOSE
-  // ============================================================
-
-  open(event) {
-    event?.preventDefault()
-
-    this.debug(
-      "OPEN action/event received",
-      {
-        eventType: event?.type,
-        detail: event?.detail
-      }
-    )
-
-    if (!this.hasModalTarget) {
-      this.debug(
-        "ERROR: modal target missing"
-      )
+  debugLog(event, data = {}) {
+    if (!this.debugValue) {
       return
     }
 
-    this.modalTarget.classList.remove(
-      "hidden"
+    console.groupCollapsed(
+        `%c[DefinitionLibrary] ${event}`,
+        "color:#8b5cf6;font-weight:bold;"
     )
 
+    console.log({
+      timestamp: new Date().toISOString(),
+      event,
+      ...data
+    })
+
+    console.groupEnd()
+  }
+
+  debugError(event, error, data = {}) {
+    console.groupCollapsed(
+        `%c[DefinitionLibrary ERROR] ${event}`,
+        "color:#ef4444;font-weight:bold;"
+    )
+
+    console.error(error)
+
+    console.log({
+      timestamp: new Date().toISOString(),
+      event,
+      ...data
+    })
+
+    console.groupEnd()
+  }
+
+  debug(event, data = {}) {
+    this.debugLog(event, data)
+  }
+
+  /*
+   * ============================================================
+   * MODAL
+   * ============================================================
+   */
+
+  open(event = null) {
+    if (event) {
+      event.preventDefault?.()
+    }
+
+    this.debugLog("open:start", {
+      eventType: event?.type,
+      catalogCount: this.catalog.length
+    })
+
+    if (!this.hasModalTarget) {
+      this.debugError(
+          "open:no-modal-target",
+          new Error("Modal target is missing")
+      )
+
+      return
+    }
+
+    this.modalTarget.classList.remove("hidden")
     this.modalTarget.setAttribute(
-      "aria-hidden",
-      "false"
+        "aria-hidden",
+        "false"
     )
 
     document.body.classList.add(
-      "overflow-hidden"
+        "overflow-hidden"
     )
 
-    this.debug(
-      "Modal is now visible"
-    )
+    this.setStatus("CONNECTED")
 
-    if (this.hasSearchTarget) {
-      requestAnimationFrame(() => {
-        this.searchTarget.focus()
-      })
-    }
+    /*
+     * Re-render when opening.
+     *
+     * This is useful if the catalog was loaded asynchronously
+     * before the modal was opened.
+     */
 
-    this.renderCatalog()
+    this.render()
+
+    this.focusSearch()
+
+    this.debugLog("open:complete", {
+      catalogCount: this.catalog.length,
+      filteredCount: this.filteredCatalog.length
+    })
   }
 
-  close(event) {
-    event?.preventDefault()
+  close(event = null) {
+    if (event) {
+      event.preventDefault()
+    }
 
-    this.debug(
-      "CLOSE action/event received",
-      {
-        eventType: event?.type
-      }
-    )
+    this.debugLog("close:start")
 
     if (!this.hasModalTarget) {
-      this.debug(
-        "ERROR: modal target missing"
-      )
       return
     }
 
-    this.modalTarget.classList.add(
-      "hidden"
-    )
+    this.modalTarget.classList.add("hidden")
 
     this.modalTarget.setAttribute(
-      "aria-hidden",
-      "true"
+        "aria-hidden",
+        "true"
     )
 
     document.body.classList.remove(
-      "overflow-hidden"
+        "overflow-hidden"
     )
 
-    this.debug(
-      "Modal closed"
-    )
+    this.debugLog("close:complete")
   }
 
-  // ============================================================
-  // CATALOG
-  // ============================================================
-
-  catalogValueChanged(current, previous) {
-    this.debugCatalog(
-      "catalogValueChanged",
-      {
-        current,
-        previous
-      }
+  handleOpenEvent(event) {
+    this.debugLog(
+        "event:definition-library:open",
+        {
+          detail: event.detail
+        }
     )
 
-    if (this.element.isConnected) {
-      this.renderCategories()
-      this.renderCatalog()
+    this.open(event)
+  }
+
+  /*
+   * ============================================================
+   * API CATALOG
+   * ============================================================
+   */
+
+  async loadCatalog() {
+    this.debugLog("loadCatalog:start", {
+      url: this.catalogUrlValue
+    })
+
+    this.error = null
+
+    this.setLoadingState(true)
+
+    try {
+      if (
+          !this.hasCatalogUrlValue ||
+          !this.catalogUrlValue
+      ) {
+        throw new Error(
+            "Definition catalog URL is missing."
+        )
+      }
+
+      const response = await fetch(
+          this.catalogUrlValue,
+          {
+            method: "GET",
+            headers: {
+              Accept: "application/json"
+            },
+            credentials: "same-origin"
+          }
+      )
+
+      this.debugLog(
+          "loadCatalog:response",
+          {
+            status: response.status,
+            statusText: response.statusText,
+            ok: response.ok,
+            url: response.url
+          }
+      )
+
+      if (!response.ok) {
+        throw new Error(
+            `Definition catalog request failed: ${response.status}`
+        )
+      }
+
+      const payload =
+          await response.json()
+
+      this.debugLog(
+          "loadCatalog:payload",
+          payload
+      )
+
+      if (
+          !payload ||
+          !Array.isArray(
+              payload.definitions
+          )
+      ) {
+        throw new Error(
+            "Invalid definition catalog response. Expected { definitions: [] }."
+        )
+      }
+
+      /*
+       * IMPORTANT:
+       *
+       * Normalize every definition as it enters
+       * the controller.
+       */
+
+      this.catalog =
+          this.normalizeCatalog(
+              payload.definitions
+          )
+
+      this.filteredCatalog =
+          [...this.catalog]
+
+      this.debugLog(
+          "loadCatalog:complete",
+          {
+            count: this.catalog.length,
+            source: payload.meta?.source,
+            apiVersion:
+            payload.meta?.api_version,
+            definitions:
+                this.catalog.map(
+                    definition => ({
+                      id: definition.id,
+                      name: definition.name,
+                      category:
+                      definition.category,
+                      fields:
+                      definition.fields.length
+                    })
+                )
+          }
+      )
+
+      this.render()
+    } catch (error) {
+      this.debugError(
+          "loadCatalog:error",
+          error
+      )
+
+      this.showError(
+          "Unable to load the definition library."
+      )
+    } finally {
+      this.setLoadingState(false)
+
+      this.debugLog(
+          "loadCatalog:finally"
+      )
     }
   }
 
-  get catalog() {
-    const value = this.catalogValue
+  /*
+   * ============================================================
+   * NORMALIZATION
+   * ============================================================
+   */
 
-    if (!Array.isArray(value)) {
-      this.debugCatalog(
-        "Catalog value is not an array",
-        value
-      )
-
+  normalizeCatalog(definitions) {
+    if (!Array.isArray(definitions)) {
       return []
     }
 
-    return value
+    return definitions
+        .filter(Boolean)
+        .map(definition =>
+            this.normalizeDefinition(
+                definition
+            )
+        )
   }
 
-  get filteredCatalog() {
-    const query = this.hasSearchTarget
-      ? this.searchTarget.value
-          .trim()
-          .toLowerCase()
-      : ""
+  normalizeDefinition(definition) {
+    const fields =
+        Array.isArray(definition.fields)
+            ? definition.fields
+            : []
 
-    let result = [...this.catalog]
+    const normalizedFields =
+        fields.map(field => ({
+          ...field,
 
-    if (this.currentCategory !== "ALL") {
-      result = result.filter(
-        (definition) =>
+          name:
+              field.name ||
+              field.key ||
+              "",
+
+          label:
+              field.label ||
+              field.name ||
+              field.key ||
+              "Untitled Field",
+
+          type:
+              field.type ||
+              "string",
+
+          required:
+              Boolean(field.required),
+
+          active:
+              field.active !== false
+        }))
+
+    const requiredCount =
+        normalizedFields.filter(
+            field => field.required
+        ).length
+
+    const activeCount =
+        normalizedFields.filter(
+            field => field.active !== false
+        ).length
+
+    const id =
+        definition.id ||
+        definition.slug ||
+        definition.key ||
+        `definition-${Math.random()
+            .toString(36)
+            .slice(2, 10)}`
+
+    return {
+      ...definition,
+
+      id,
+
+      version:
+          definition.version ||
+          "1.0",
+
+      name:
+          definition.name ||
+          definition.title ||
+          definition.label ||
+          "Untitled Definition",
+
+      title:
+          definition.title ||
+          definition.name ||
+          definition.label ||
+          "Untitled Definition",
+
+      description:
+          definition.description ||
+          "Production-ready entity definition.",
+
+      category:
           String(
-            definition.category || ""
-          ).toUpperCase() ===
-          this.currentCategory
-      )
+              definition.category ||
+              "OTHER"
+          ).toUpperCase(),
+
+      tags:
+          Array.isArray(
+              definition.tags
+          )
+              ? definition.tags
+              : [],
+
+      icon:
+          definition.icon ||
+          "✦",
+
+      color:
+          definition.color ||
+          "violet",
+
+      fields:
+      normalizedFields,
+
+      field_count:
+          Number.isFinite(
+              Number(definition.field_count)
+          )
+              ? Number(definition.field_count)
+              : normalizedFields.length,
+
+      required_count:
+          Number.isFinite(
+              Number(definition.required_count)
+          )
+              ? Number(
+                  definition.required_count
+              )
+              : requiredCount,
+
+      active_count:
+          Number.isFinite(
+              Number(definition.active_count)
+          )
+              ? Number(
+                  definition.active_count
+              )
+              : activeCount,
+
+      popularity:
+          Number.isFinite(
+              Number(definition.popularity)
+          )
+              ? Number(
+                  definition.popularity
+              )
+              : 0,
+
+      featured:
+          Boolean(definition.featured),
+
+      new:
+          Boolean(definition.new),
+
+      is_new:
+          Boolean(definition.is_new),
+
+      popular:
+          Boolean(definition.popular)
     }
+  }
 
-    if (query) {
-      result = result.filter(
-        (definition) =>
-          this.searchableText(
-            definition
-          ).includes(query)
-      )
-    }
+  /*
+   * ============================================================
+   * RENDER
+   * ============================================================
+   */
 
-    result.sort((a, b) => {
-      const aName =
-        String(
-          a.name ||
-          a.title ||
-          a.id ||
-          ""
-        ).toLowerCase()
-
-      const bName =
-        String(
-          b.name ||
-          b.title ||
-          b.id ||
-          ""
-        ).toLowerCase()
-
-      return aName.localeCompare(
-        bName
-      )
+  render() {
+    this.debugLog("render:start", {
+      catalogCount:
+      this.catalog.length,
+      searchQuery:
+      this.searchQuery,
+      selectedCategory:
+      this.selectedCategory,
+      sortMode:
+      this.sortMode
     })
 
-    return result
-  }
-
-  searchableText(definition) {
-    const fields =
-      Array.isArray(definition.fields)
-        ? definition.fields
-        : []
-
-    return [
-      definition.id,
-      definition.name,
-      definition.title,
-      definition.description,
-      definition.category,
-      ...fields.flatMap(
-        (field) => [
-          field.name,
-          field.label,
-          field.description,
-          field.type
-        ]
-      )
-    ]
-      .filter(Boolean)
-      .join(" ")
-      .toLowerCase()
-  }
-
-  renderCategories() {
-    if (!this.hasCategoriesTarget) {
-      this.debugCatalog(
-        "categories target missing"
-      )
-      return
-    }
-
-    const categories = [
-      "ALL",
-      ...new Set(
-        this.catalog
-          .map((definition) =>
-            String(
-              definition.category || ""
-            )
-              .trim()
-              .toUpperCase()
-          )
-          .filter(Boolean)
-      )
-    ]
-
-    this.debugCatalog(
-      "Rendering categories",
-      categories
-    )
-
-    this.categoriesTarget.innerHTML =
-      categories
-        .map((category) => {
-          const active =
-            category ===
-            this.currentCategory
-
-          return `
-<button
-type="button"
-class="shrink-0 rounded-xl border-2 px-3 py-2 text-[8px] font-black uppercase tracking-wider transition ${
-active
-    ? "border-violet-300 bg-violet-100 text-violet-600"
-    : "border-slate-100 bg-white text-slate-400 hover:border-violet-200 hover:text-violet-500"
-}"
-data-category="${this.escapeHtml(category)}"
-data-action="click->definition-library#selectCategory"
-    >
-    ${this.escapeHtml(category)}
-</button>
-`
-        })
-        .join("")
-  }
-
-  selectCategory(event) {
-    event?.preventDefault()
-
-    const category =
-      event?.currentTarget?.dataset?.category
-
-    this.debugSearch(
-      "Category selected",
-      {
-        category
-      }
-    )
-
-    this.currentCategory =
-      category || "ALL"
-
     this.renderCategories()
-    this.renderCatalog()
+
+    this.applyFilters()
+
+    this.renderGrid()
+
+    this.renderEmptyState()
+
+    this.renderResultCount()
+
+    this.renderClearSearch()
+
+    this.updateSortButton()
+
+    this.renderPreview()
+
+    this.debugLog("render:complete", {
+      catalogCount:
+      this.catalog.length,
+      filteredCount:
+      this.filteredCatalog.length
+    })
   }
 
-  renderCatalog() {
-    if (!this.hasGridTarget) {
-      this.debugCatalog(
-        "ERROR: grid target missing"
-      )
-      return
-    }
-
-    const definitions =
-      this.filteredCatalog
-
-    this.debugCatalog(
-      "Rendering catalog",
-      {
-        total: this.catalog.length,
-        visible: definitions.length,
-        category: this.currentCategory,
-        search: this.hasSearchTarget
-          ? this.searchTarget.value
-          : ""
-      }
-    )
-
-    if (this.hasResultCountTarget) {
-      this.resultCountTarget.textContent =
-        `${definitions.length} DEFINITION${definitions.length === 1 ? "" : "S"}`
-    }
-
-    if (definitions.length === 0) {
-      this.gridTarget.innerHTML = ""
-
-      if (this.hasEmptyStateTarget) {
-        this.emptyStateTarget.classList.remove(
-          "hidden"
-        )
-        this.emptyStateTarget.classList.add(
-          "flex"
-        )
-      }
-
-      return
-    }
-
-    if (this.hasEmptyStateTarget) {
-      this.emptyStateTarget.classList.add(
-        "hidden"
-      )
-      this.emptyStateTarget.classList.remove(
-        "flex"
-      )
-    }
-
-    this.gridTarget.innerHTML =
-      definitions
-        .map(
-          (definition, index) =>
-            this.renderCard(
-              definition,
-              index
-            )
-        )
-        .join("")
-  }
-
-  renderCard(definition, index) {
-    const id =
-      definition.id ||
-      definition.key ||
-      `definition-${index}`
-
-    const name =
-      definition.name ||
-      definition.title ||
-      id
-
-    const category =
-      definition.category ||
-      "GENERAL"
-
-    const fields =
-      this.extractFields(definition)
-
-    const required =
-      fields.filter(
-        (field) => field.required
-      ).length
-
-    return `
-<button
-type="button"
-class="group w-full rounded-[26px] border-2 border-slate-100 bg-white p-5 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-violet-200 hover:shadow-lg hover:shadow-violet-100/50"
-data-definition-id="${this.escapeHtml(String(id))}"
-data-action="click->definition-library#selectDefinition"
-    >
-
-    <div class="flex items-start justify-between gap-3">
-
-    <div class="flex h-11 w-11 items-center justify-center rounded-2xl border border-violet-100 bg-violet-50 text-lg text-violet-500">
-    ${this.escapeHtml(
-    definition.icon || "✦"
-)}
-</div>
-
-<span class="rounded-full border border-violet-100 bg-violet-50 px-2.5 py-1 text-[7px] font-black uppercase tracking-wider text-violet-500">
-            ${this.escapeHtml(category)}
-          </span>
-
-</div>
-
-<div class="mt-4 text-sm font-black text-slate-700">
-    ${this.escapeHtml(name)}
-</div>
-
-<div class="mt-1 text-[9px] font-mono text-slate-400">
-    ${this.escapeHtml(String(id))}
-</div>
-
-<p class="mt-3 line-clamp-3 text-[10px] leading-5 text-slate-400">
-    ${this.escapeHtml(
-    definition.description || ""
-)}
-</p>
-
-<div class="mt-5 flex items-center gap-2">
-
-          <span class="rounded-full bg-violet-50 px-2 py-1 text-[7px] font-black uppercase tracking-wider text-violet-500">
-            ${fields.length} FIELDS
-          </span>
-
-    <span class="rounded-full bg-orange-50 px-2 py-1 text-[7px] font-black uppercase tracking-wider text-orange-500">
-            ${required} REQUIRED
-          </span>
-
-</div>
-
-</button>
-`
-  }
-
-  // ============================================================
-  // SEARCH
-  // ============================================================
+  /*
+   * ============================================================
+   * SEARCH
+   * ============================================================
+   */
 
   searchChanged(event) {
-    const value =
-      event?.currentTarget?.value ?? ""
+    this.searchQuery =
+        event.currentTarget.value
+            .trim()
+            .toLowerCase()
 
-    this.debugSearch(
-      "Search changed",
-      {
-        value
-      }
+    this.debugLog(
+        "searchChanged",
+        {
+          query:
+          this.searchQuery
+        }
     )
 
-    if (this.hasClearSearchTarget) {
-      this.clearSearchTarget.classList.toggle(
-        "hidden",
-        !value
-      )
-
-      this.clearSearchTarget.classList.toggle(
-        "flex",
-        Boolean(value)
-      )
-    }
-
-    this.renderCatalog()
+    this.applyFilters()
+    this.renderGrid()
+    this.renderEmptyState()
+    this.renderResultCount()
+    this.renderClearSearch()
   }
 
   searchKeydown(event) {
     if (event.key === "Escape") {
-      event.preventDefault()
+      this.clearSearch(event)
+      return
+    }
 
-      this.debugSearch(
-        "Escape pressed in search"
-      )
+    if (event.key === "Enter") {
+      const first =
+          this.filteredCatalog[0]
 
-      this.clearSearch()
+      if (first) {
+        this.selectDefinition(first)
+      }
     }
   }
 
-  clearSearch(event) {
-    event?.preventDefault()
+  clearSearch(event = null) {
+    if (event) {
+      event.preventDefault()
+    }
 
-    this.debugSearch(
-      "Clearing search"
-    )
+    this.searchQuery = ""
 
     if (this.hasSearchTarget) {
       this.searchTarget.value = ""
     }
 
-    this.currentCategory = "ALL"
+    this.applyFilters()
+    this.renderGrid()
+    this.renderEmptyState()
+    this.renderResultCount()
+    this.renderClearSearch()
 
-    this.renderCategories()
-    this.renderCatalog()
+    this.focusSearch()
   }
 
-  clearFilters(event) {
-    event?.preventDefault()
-
-    this.debugSearch(
-      "Resetting all filters"
-    )
-
-    this.clearSearch()
-  }
-
-  toggleSort(event) {
-    event?.preventDefault()
-
-    this.sortMode =
-      this.sortMode === "az"
-        ? "za"
-        : "az"
-
-    this.debugSearch(
-      "Sort toggled",
-      this.sortMode
-    )
-
-    if (this.hasSortButtonTarget) {
-      this.sortButtonTarget.textContent =
-        this.sortMode === "az"
-          ? "A–Z"
-          : "Z–A"
+  renderClearSearch() {
+    if (!this.hasClearSearchTarget) {
+      return
     }
 
-    this.renderCatalog()
-  }
+    const visible =
+        this.searchQuery.length > 0
 
-  // ============================================================
-  // PREVIEW
-  // ============================================================
-
-  selectDefinition(event) {
-    event?.preventDefault()
-
-    const id =
-      event?.currentTarget?.dataset
-        ?.definitionId
-
-    this.debugPreview(
-      "Definition selected",
-      {
-        id,
-        dataset:
-          event?.currentTarget?.dataset
-      }
+    this.clearSearchTarget.classList.toggle(
+        "hidden",
+        !visible
     )
 
-    const definition =
-      this.catalog.find(
-        (item) =>
-          String(
-            item.id ||
-            item.key ||
-            ""
-          ) === String(id)
-      )
+    this.clearSearchTarget.classList.toggle(
+        "flex",
+        visible
+    )
+  }
 
-    if (!definition) {
-      this.debugPreview(
-        "ERROR: Definition not found in catalog",
+  /*
+   * ============================================================
+   * CATEGORIES
+   * ============================================================
+   */
+
+  renderCategories() {
+    if (!this.hasCategoriesTarget) {
+      return
+    }
+
+    const categorySet =
+        new Set(
+            this.catalog
+                .map(
+                    definition =>
+                        String(
+                            definition.category ||
+                            "OTHER"
+                        ).toUpperCase()
+                )
+                .filter(Boolean)
+        )
+
+    const categories = [
+      "ALL",
+      ...categorySet
+    ]
+
+    this.categoriesTarget.innerHTML =
+        categories
+            .map(category => {
+              const active =
+                  category ===
+                  this.selectedCategory
+
+              return `
+<button
+  type="button"
+  class="shrink-0 rounded-xl border-2 px-3 py-2 text-[8px] font-black uppercase tracking-wider transition ${
+                  active
+                      ? "border-violet-300 bg-violet-100 text-violet-600"
+                      : "border-slate-200 bg-white text-slate-400 hover:border-violet-200 hover:bg-violet-50 hover:text-violet-500"
+              }"
+  data-category="${this.escapeAttribute(
+                  category
+              )}"
+  data-action="click->definition-library#selectCategory"
+  aria-pressed="${active}"
+>
+  ${this.escapeHtml(category)}
+</button>
+`
+            })
+            .join("")
+  }
+
+  selectCategory(event) {
+    const category =
+        event.currentTarget.dataset.category ||
+        "ALL"
+
+    this.selectedCategory =
+        category
+
+    this.applyFilters()
+    this.renderCategories()
+    this.renderGrid()
+    this.renderEmptyState()
+    this.renderResultCount()
+  }
+
+  /*
+   * ============================================================
+   * FILTERING
+   * ============================================================
+   */
+
+  applyFilters() {
+    const query =
+        this.searchQuery
+
+    this.filteredCatalog =
+        this.catalog.filter(
+            definition => {
+              const category =
+                  String(
+                      definition.category ||
+                      "OTHER"
+                  ).toUpperCase()
+
+              const categoryMatches =
+                  this.selectedCategory ===
+                  "ALL" ||
+                  category ===
+                  this.selectedCategory
+
+              if (!categoryMatches) {
+                return false
+              }
+
+              if (!query) {
+                return true
+              }
+
+              const searchableText = [
+                definition.id,
+                definition.name,
+                definition.title,
+                definition.description,
+                definition.category,
+
+                ...(Array.isArray(
+                    definition.tags
+                )
+                    ? definition.tags
+                    : []),
+
+                ...(Array.isArray(
+                    definition.fields
+                )
+                    ? definition.fields.flatMap(
+                        field => [
+                          field.name,
+                          field.label,
+                          field.type
+                        ]
+                    )
+                    : [])
+              ]
+                  .filter(Boolean)
+                  .join(" ")
+                  .toLowerCase()
+
+              return searchableText.includes(
+                  query
+              )
+            }
+        )
+
+    this.sortDefinitions()
+
+    this.debugLog(
+        "applyFilters:complete",
         {
-          id,
-          catalog: this.catalog
+          resultCount:
+          this.filteredCatalog.length
         }
+    )
+  }
+
+  /*
+   * ============================================================
+   * SORTING
+   * ============================================================
+   */
+
+  toggleSort(event = null) {
+    if (event) {
+      event.preventDefault()
+    }
+
+    const modes = [
+      "az",
+      "za",
+      "popular",
+      "newest",
+      "featured"
+    ]
+
+    const index =
+        modes.indexOf(
+            this.sortMode
+        )
+
+    this.sortMode =
+        modes[
+        (index + 1) %
+        modes.length
+            ]
+
+    this.sortDefinitions()
+    this.renderGrid()
+    this.updateSortButton()
+  }
+
+  sortDefinitions() {
+    const items =
+        [...this.filteredCatalog]
+
+    switch (this.sortMode) {
+      case "za":
+        items.sort(
+            (a, b) =>
+                this.definitionName(
+                    b
+                ).localeCompare(
+                    this.definitionName(a)
+                )
+        )
+        break
+
+      case "popular":
+        items.sort(
+            (a, b) =>
+                Number(
+                    b.popularity || 0
+                ) -
+                Number(
+                    a.popularity || 0
+                )
+        )
+        break
+
+      case "newest":
+        items.sort((a, b) => {
+          const dateA =
+              new Date(
+                  a.created_at ||
+                  a.createdAt ||
+                  0
+              ).getTime()
+
+          const dateB =
+              new Date(
+                  b.created_at ||
+                  b.createdAt ||
+                  0
+              ).getTime()
+
+          return dateB - dateA
+        })
+        break
+
+      case "featured":
+        items.sort((a, b) => {
+          const featuredA =
+              a.featured ? 1 : 0
+
+          const featuredB =
+              b.featured ? 1 : 0
+
+          if (
+              featuredA !==
+              featuredB
+          ) {
+            return (
+                featuredB -
+                featuredA
+            )
+          }
+
+          return (
+              Number(
+                  b.popularity || 0
+              ) -
+              Number(
+                  a.popularity || 0
+              )
+          )
+        })
+        break
+
+      case "az":
+      default:
+        items.sort(
+            (a, b) =>
+                this.definitionName(
+                    a
+                ).localeCompare(
+                    this.definitionName(b)
+                )
+        )
+    }
+
+    this.filteredCatalog =
+        items
+  }
+
+  updateSortButton() {
+    if (!this.hasSortButtonTarget) {
+      return
+    }
+
+    const labels = {
+      az: "A–Z",
+      za: "Z–A",
+      popular: "POPULAR",
+      newest: "NEWEST",
+      featured: "FEATURED"
+    }
+
+    const label =
+        labels[this.sortMode] ||
+        "A–Z"
+
+    this.sortButtonTarget.textContent =
+        label
+
+    this.sortButtonTarget.setAttribute(
+        "aria-label",
+        `Sort definitions: ${label}`
+    )
+  }
+
+  /*
+   * ============================================================
+   * GRID
+   * ============================================================
+   */
+
+  renderGrid() {
+    if (!this.hasGridTarget) {
+      this.debugLog(
+          "grid:no-target"
       )
 
       return
     }
 
-    this.selectedDefinition =
-      definition
+    /*
+     * Always clear first.
+     */
 
-    this.debugPreview(
-      "Selected definition resolved",
-      definition
+    this.gridTarget.innerHTML = ""
+
+    if (
+        !this.filteredCatalog.length
+    ) {
+      this.debugLog(
+          "grid:empty"
+      )
+
+      return
+    }
+
+    this.filteredCatalog.forEach(
+        (definition, index) => {
+          this.gridTarget.insertAdjacentHTML(
+              "beforeend",
+              this.definitionCardHtml(
+                  definition,
+                  index
+              )
+          )
+        }
     )
 
-    this.renderPreview(
-      definition
+    this.debugLog(
+        "grid:rendered",
+        {
+          count:
+          this.filteredCatalog.length
+        }
     )
   }
 
-  renderPreview(definition) {
-    this.debugPreview(
-      "Rendering preview",
-      definition
-    )
+  definitionCardHtml(
+      definition,
+      index
+  ) {
+    const selected =
+        this.selectedDefinition?.id ===
+        definition.id
 
-    if (this.hasPreviewEmptyTarget) {
-      this.previewEmptyTarget.classList.add(
-        "hidden"
-      )
+    const favorite =
+        this.isFavorite(
+            definition.id
+        )
+
+    const tags =
+        Array.isArray(
+            definition.tags
+        )
+            ? definition.tags.slice(
+                0,
+                3
+            )
+            : []
+
+    const badges = []
+
+    if (definition.featured) {
+      badges.push("FEATURED")
     }
 
-    if (this.hasPreviewTarget) {
-      this.previewTarget.classList.remove(
-        "hidden"
+    if (
+        definition.new ||
+        definition.is_new
+    ) {
+      badges.push("NEW")
+    }
+
+    if (definition.popular) {
+      badges.push("POPULAR")
+    }
+
+    return `
+<article
+  class="group relative cursor-pointer overflow-hidden rounded-3xl border-2 ${
+        selected
+            ? "border-violet-400 bg-violet-50/50 shadow-lg shadow-violet-100"
+            : "border-slate-100 bg-white hover:border-violet-200 hover:shadow-lg hover:shadow-slate-200/50"
+    } p-5 transition-all duration-200"
+  tabindex="0"
+  role="button"
+  aria-label="Preview ${this.escapeAttribute(
+        this.definitionName(
+            definition
+        )
+    )}"
+  aria-pressed="${selected}"
+  data-definition-id="${this.escapeAttribute(
+        definition.id
+    )}"
+  data-action="
+    click->definition-library#selectDefinitionFromCard
+    keydown->definition-library#cardKeydown
+  "
+>
+
+  <div class="flex items-start justify-between gap-3">
+
+    <div
+      class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border-2 border-violet-100 bg-violet-50 text-lg text-violet-500"
+    >
+      ${this.escapeHtml(
+        definition.icon || "✦"
+    )}
+    </div>
+
+    <button
+      type="button"
+      class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${
+        favorite
+            ? "border-amber-200 bg-amber-50 text-amber-500"
+            : "border-slate-100 bg-white text-slate-300"
+    } transition hover:border-amber-200 hover:bg-amber-50 hover:text-amber-500"
+      data-definition-id="${this.escapeAttribute(
+        definition.id
+    )}"
+      data-action="click->definition-library#toggleFavorite"
+      aria-label="${
+        favorite
+            ? "Remove from favorites"
+            : "Add to favorites"
+    }"
+    >
+      ${favorite ? "★" : "☆"}
+    </button>
+
+  </div>
+
+  <div class="mt-4">
+
+    <div class="flex flex-wrap gap-1.5">
+
+      <span class="rounded-full border border-violet-100 bg-violet-50 px-2 py-1 text-[7px] font-black uppercase tracking-wider text-violet-500">
+        ${this.escapeHtml(
+        definition.category ||
+        "OTHER"
+    )}
+      </span>
+
+      ${badges
+        .map(
+            badge => `
+            <span class="rounded-full border border-emerald-100 bg-emerald-50 px-2 py-1 text-[7px] font-black uppercase tracking-wider text-emerald-500">
+              ${badge}
+            </span>
+          `
+        )
+        .join("")}
+
+    </div>
+
+    <h3 class="mt-3 truncate text-sm font-black text-slate-800">
+      ${this.escapeHtml(
+        this.definitionName(
+            definition
+        )
+    )}
+    </h3>
+
+    <p class="mt-2 line-clamp-2 text-[10px] leading-5 text-slate-400">
+      ${this.escapeHtml(
+        definition.description ||
+        ""
+    )}
+    </p>
+
+  </div>
+
+  <div class="mt-4 grid grid-cols-2 gap-2">
+
+    <div class="rounded-xl bg-slate-50 p-2.5">
+      <div class="text-[7px] font-black uppercase tracking-wider text-slate-400">
+        FIELDS
+      </div>
+
+      <div class="mt-1 text-sm font-black text-slate-700">
+        ${Number(
+        definition.field_count ||
+        0
+    )}
+      </div>
+    </div>
+
+    <div class="rounded-xl bg-slate-50 p-2.5">
+      <div class="text-[7px] font-black uppercase tracking-wider text-slate-400">
+        REQUIRED
+      </div>
+
+      <div class="mt-1 text-sm font-black text-orange-500">
+        ${Number(
+        definition.required_count ||
+        0
+    )}
+      </div>
+    </div>
+
+  </div>
+
+  ${
+        tags.length
+            ? `
+        <div class="mt-4 flex flex-wrap gap-1">
+          ${tags
+                .map(
+                    tag => `
+                <span class="rounded-lg bg-slate-100 px-2 py-1 text-[7px] font-bold text-slate-400">
+                  #${this.escapeHtml(
+                        String(tag)
+                    )}
+                </span>
+              `
+                )
+                .join("")}
+        </div>
+      `
+            : ""
+    }
+
+</article>
+`
+  }
+
+  /*
+   * Separate action name makes the card action explicit.
+   */
+
+  selectDefinitionFromCard(event) {
+    if (
+        event.target.closest(
+            "button"
+        )
+    ) {
+      return
+    }
+
+    this.selectDefinitionFromElement(
+        event.currentTarget
+    )
+  }
+
+  cardKeydown(event) {
+    if (
+        event.key === "Enter" ||
+        event.key === " "
+    ) {
+      event.preventDefault()
+
+      this.selectDefinitionFromElement(
+          event.currentTarget
       )
+    }
+  }
+
+  selectDefinitionFromElement(
+      element
+  ) {
+    const id =
+        element.dataset.definitionId
+
+    const definition =
+        this.findDefinition(id)
+
+    if (definition) {
+      this.selectDefinition(
+          definition
+      )
+    }
+  }
+
+  /*
+   * ============================================================
+   * PREVIEW
+   * ============================================================
+   */
+
+  selectDefinition(
+      definition
+  ) {
+    if (!definition) {
+      return
+    }
+
+    this.selectedDefinition =
+        this.normalizeDefinition(
+            definition
+        )
+
+    this.activeTab =
+        "fields"
+
+    this.debugLog(
+        "definition:selected",
+        {
+          id:
+          this.selectedDefinition.id,
+          name:
+              this.definitionName(
+                  this.selectedDefinition
+              )
+        }
+    )
+
+    this.addRecentlyViewed(
+        this.selectedDefinition
+    )
+
+    this.trackUsage(
+        this.selectedDefinition,
+        "preview"
+    )
+
+    this.renderGrid()
+    this.renderPreview()
+  }
+
+  renderPreview() {
+    if (
+        !this.hasPreviewTarget ||
+        !this.hasPreviewEmptyTarget
+    ) {
+      return
+    }
+
+    if (
+        !this.selectedDefinition
+    ) {
       this.previewTarget.classList.add(
-        "flex"
+          "hidden"
       )
+
+      this.previewTarget.classList.remove(
+          "flex"
+      )
+
+      this.previewEmptyTarget.classList.remove(
+          "hidden"
+      )
+
+      this.previewEmptyTarget.classList.add(
+          "flex"
+      )
+
+      if (
+          this.hasApplyButtonTarget
+      ) {
+        this.applyButtonTarget.disabled =
+            true
+      }
+
+      return
+    }
+
+    const definition =
+        this.selectedDefinition
+
+    this.previewEmptyTarget.classList.add(
+        "hidden"
+    )
+
+    this.previewEmptyTarget.classList.remove(
+        "flex"
+    )
+
+    this.previewTarget.classList.remove(
+        "hidden"
+    )
+
+    this.previewTarget.classList.add(
+        "flex"
+    )
+
+    if (
+        this.hasPreviewIconTarget
+    ) {
+      this.previewIconTarget.textContent =
+          definition.icon || "✦"
+    }
+
+    if (
+        this.hasPreviewTitleTarget
+    ) {
+      this.previewTitleTarget.textContent =
+          this.definitionName(
+              definition
+          )
+    }
+
+    if (
+        this.hasPreviewCategoryTarget
+    ) {
+      this.previewCategoryTarget.textContent =
+          String(
+              definition.category ||
+              "OTHER"
+          ).toUpperCase()
+    }
+
+    if (
+        this.hasPreviewIdTarget
+    ) {
+      this.previewIdTarget.textContent =
+          `${definition.id} · v${definition.version}`
+    }
+
+    if (
+        this.hasPreviewDescriptionTarget
+    ) {
+      this.previewDescriptionTarget.textContent =
+          definition.description || ""
     }
 
     const fields =
-      this.extractFields(
-        definition
-      )
-
-    const required =
-      fields.filter(
-        (field) => field.required
-      ).length
-
-    const active =
-      fields.filter(
-        (field) =>
-          field.active !== false
-      ).length
-
-    const id =
-      definition.id ||
-      definition.key ||
-      ""
-
-    const name =
-      definition.name ||
-      definition.title ||
-      id
-
-    if (this.hasPreviewIconTarget) {
-      this.previewIconTarget.textContent =
-        definition.icon || "✦"
-    }
-
-    if (this.hasPreviewTitleTarget) {
-      this.previewTitleTarget.textContent =
-        name
-    }
-
-    if (this.hasPreviewCategoryTarget) {
-      this.previewCategoryTarget.textContent =
-        definition.category ||
-        "GENERAL"
-    }
-
-    if (this.hasPreviewIdTarget) {
-      this.previewIdTarget.textContent =
-        id
-    }
-
-    if (this.hasPreviewDescriptionTarget) {
-      this.previewDescriptionTarget.textContent =
-        definition.description || ""
-    }
-
-    if (this.hasPreviewFieldCountTarget) {
-      this.previewFieldCountTarget.textContent =
-        fields.length
-    }
-
-    if (this.hasPreviewRequiredCountTarget) {
-      this.previewRequiredCountTarget.textContent =
-        required
-    }
-
-    if (this.hasPreviewActiveCountTarget) {
-      this.previewActiveCountTarget.textContent =
-        active
-    }
-
-    if (this.hasPreviewFieldSummaryTarget) {
-      this.previewFieldSummaryTarget.textContent =
-        `${fields.length} fields`
-    }
-
-    if (this.hasPreviewJsonTarget) {
-      this.previewJsonTarget.textContent =
-        JSON.stringify(
-          this.normalizeDefinition(
-            definition
-          ),
-          null,
-          2
+        Array.isArray(
+            definition.fields
         )
+            ? definition.fields
+            : []
+
+    const requiredCount =
+        fields.filter(
+            field =>
+                Boolean(
+                    field.required
+                )
+        ).length
+
+    const activeCount =
+        fields.filter(
+            field =>
+                field.active !== false
+        ).length
+
+    if (
+        this.hasPreviewFieldCountTarget
+    ) {
+      this.previewFieldCountTarget.textContent =
+          fields.length
     }
 
-    this.renderPreviewFields(
-      fields
-    )
+    if (
+        this.hasPreviewRequiredCountTarget
+    ) {
+      this.previewRequiredCountTarget.textContent =
+          requiredCount
+    }
 
-    this.showFields()
+    if (
+        this.hasPreviewActiveCountTarget
+    ) {
+      this.previewActiveCountTarget.textContent =
+          activeCount
+    }
 
-    this.debugPreview(
-      "Preview rendered",
-      {
-        id,
-        fieldCount: fields.length,
-        required,
-        active
-      }
-    )
+    if (
+        this.hasPreviewFieldSummaryTarget
+    ) {
+      this.previewFieldSummaryTarget.textContent =
+          `${fields.length} FIELDS · ${requiredCount} REQUIRED`
+    }
+
+    this.renderFields()
+    this.renderJson()
+    this.updateTabs()
+
+    if (
+        this.hasApplyButtonTarget
+    ) {
+      this.applyButtonTarget.disabled =
+          false
+    }
   }
 
-  renderPreviewFields(fields) {
-    if (!this.hasFieldListTarget) return
+  renderFields() {
+    if (!this.hasFieldListTarget) {
+      return
+    }
 
-    if (fields.length === 0) {
+    const fields =
+        Array.isArray(
+            this.selectedDefinition?.fields
+        )
+            ? this.selectedDefinition.fields
+            : []
+
+    if (!fields.length) {
       this.fieldListTarget.innerHTML = `
-<div class="p-5 text-center text-[9px] text-slate-400">
-    No fields in this definition.
+<div class="p-6 text-center text-[10px] text-slate-400">
+  No fields defined.
 </div>
 `
 
@@ -896,367 +1530,1079 @@ data-action="click->definition-library#selectDefinition"
     }
 
     this.fieldListTarget.innerHTML =
-      fields
-        .map(
-          (field, index) => `
-<div class="flex items-start justify-between gap-3 border-b border-slate-100 bg-white p-4 last:border-b-0">
+        fields
+            .map(
+                (field, index) => `
+<div class="flex items-start justify-between gap-4 border-b border-slate-100 p-4 last:border-b-0">
 
-    <div class="flex min-w-0 items-start gap-3">
+  <div class="min-w-0">
 
-    <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-[8px] font-black text-violet-500">
-    ${index + 1}
-</div>
+    <div class="flex items-center gap-2">
 
-<div class="min-w-0">
-
-    <div class="truncate font-mono text-[10px] font-black text-slate-700">
+      <span class="text-[10px] font-black text-slate-700">
         ${this.escapeHtml(
-        field.name
-    )}
-    </div>
-
-    <div class="mt-1 text-[9px] text-slate-400">
-        ${this.escapeHtml(
-        field.label ||
-        field.name
-    )}
-    </div>
-
-</div>
-
-</div>
-
-<div class="flex shrink-0 flex-wrap justify-end gap-1">
-
-                <span class="rounded-full bg-violet-50 px-2 py-1 text-[7px] font-black uppercase text-violet-500">
-                  ${this.escapeHtml(
-                    field.type ||
-                    "string"
+                    field.label ||
+                    field.name ||
+                    `Field ${index + 1}`
                 )}
-                </span>
+      </span>
 
-    ${
-    field.required
-        ? `
-                      <span class="rounded-full bg-orange-50 px-2 py-1 text-[7px] font-black uppercase text-orange-500">
-                        REQUIRED
-                      </span>
-                    `
-        : ""
-}
+      ${
+                    field.required
+                        ? `
+            <span class="rounded-full bg-orange-50 px-1.5 py-0.5 text-[6px] font-black uppercase text-orange-500">
+              REQUIRED
+            </span>
+          `
+                        : ""
+                }
 
-</div>
+    </div>
+
+    <div class="mt-1 text-[8px] font-mono text-slate-400">
+      ${this.escapeHtml(
+                    field.name || ""
+                )}
+    </div>
+
+  </div>
+
+  <div class="shrink-0 text-right">
+
+    <div class="rounded-lg bg-violet-50 px-2 py-1 text-[7px] font-black uppercase tracking-wider text-violet-500">
+      ${this.escapeHtml(
+                    field.type || "string"
+                )}
+    </div>
+
+    <div class="mt-1 text-[7px] font-bold ${
+                    field.active === false
+                        ? "text-slate-300"
+                        : "text-emerald-500"
+                }">
+      ${
+                    field.active === false
+                        ? "INACTIVE"
+                        : "ACTIVE"
+                }
+    </div>
+
+  </div>
 
 </div>
 `
-        )
-        .join("")
+            )
+            .join("")
   }
 
-  showFields(event) {
-    event?.preventDefault()
-
-    this.debugPreview(
-      "Showing Fields tab"
-    )
-
-    if (this.hasFieldsPanelTarget) {
-      this.fieldsPanelTarget.classList.remove(
-        "hidden"
-      )
-    }
-
-    if (this.hasJsonPanelTarget) {
-      this.jsonPanelTarget.classList.add(
-        "hidden"
-      )
-    }
-
-    this.setActiveTab(
-      "fields"
-    )
-  }
-
-  showJson(event) {
-    event?.preventDefault()
-
-    this.debugPreview(
-      "Showing JSON tab"
-    )
-
-    if (this.hasFieldsPanelTarget) {
-      this.fieldsPanelTarget.classList.add(
-        "hidden"
-      )
-    }
-
-    if (this.hasJsonPanelTarget) {
-      this.jsonPanelTarget.classList.remove(
-        "hidden"
-      )
-    }
-
-    this.setActiveTab(
-      "json"
-    )
-  }
-
-  setActiveTab(tab) {
+  renderJson() {
     if (
-      this.hasFieldsTabTarget &&
-      this.hasJsonTabTarget
+        !this.hasPreviewJsonTarget ||
+        !this.selectedDefinition
     ) {
-      this.fieldsTabTarget.classList.toggle(
-        "border-violet-500",
-        tab === "fields"
-      )
-
-      this.fieldsTabTarget.classList.toggle(
-        "text-violet-500",
-        tab === "fields"
-      )
-
-      this.fieldsTabTarget.classList.toggle(
-        "border-transparent",
-        tab !== "fields"
-      )
-
-      this.fieldsTabTarget.classList.toggle(
-        "text-slate-400",
-        tab !== "fields"
-      )
-
-      this.jsonTabTarget.classList.toggle(
-        "border-violet-500",
-        tab === "json"
-      )
-
-      this.jsonTabTarget.classList.toggle(
-        "text-violet-500",
-        tab === "json"
-      )
-
-      this.jsonTabTarget.classList.toggle(
-        "border-transparent",
-        tab !== "json"
-      )
-
-      this.jsonTabTarget.classList.toggle(
-        "text-slate-400",
-        tab !== "json"
-      )
-    }
-  }
-
-  showEmptyPreview() {
-    if (this.hasPreviewEmptyTarget) {
-      this.previewEmptyTarget.classList.remove(
-        "hidden"
-      )
-    }
-
-    if (this.hasPreviewTarget) {
-      this.previewTarget.classList.add(
-        "hidden"
-      )
-      this.previewTarget.classList.remove(
-        "flex"
-      )
-    }
-  }
-
-  // ============================================================
-  // APPLY
-  // ============================================================
-
-  apply(event) {
-    event?.preventDefault()
-
-    this.debugApply(
-      "APPLY action received"
-    )
-
-    if (!this.selectedDefinition) {
-      this.debugApply(
-        "ERROR: No definition selected"
-      )
-
       return
     }
 
-    const definition =
-      this.normalizeDefinition(
-        this.selectedDefinition
+    this.previewJsonTarget.textContent =
+        JSON.stringify(
+            this.selectedDefinition,
+            null,
+            2
+        )
+  }
+
+  showFields(event = null) {
+    event?.preventDefault()
+
+    this.activeTab = "fields"
+
+    this.updateTabs()
+  }
+
+  showJson(event = null) {
+    event?.preventDefault()
+
+    this.activeTab = "json"
+
+    this.updateTabs()
+  }
+
+  updateTabs() {
+    const fieldsActive =
+        this.activeTab ===
+        "fields"
+
+    if (
+        this.hasFieldsPanelTarget
+    ) {
+      this.fieldsPanelTarget.classList.toggle(
+          "hidden",
+          !fieldsActive
       )
+    }
 
-    this.debugApply(
-      "Definition being dispatched to builder",
-      definition
-    )
-
-    const applyEvent =
-      new CustomEvent(
-        "definition-library:apply",
-        {
-          bubbles: true,
-          detail: {
-            definition,
-            source: "definition-library",
-            id:
-              definition.id ||
-              definition.key ||
-              null
-          }
-        }
+    if (
+        this.hasJsonPanelTarget
+    ) {
+      this.jsonPanelTarget.classList.toggle(
+          "hidden",
+          fieldsActive
       )
+    }
 
-    this.debugApply(
-      "Dispatching definition-library:apply",
-      {
-        event: applyEvent,
-        detail: applyEvent.detail
-      }
+    if (
+        this.hasFieldsTabTarget
+    ) {
+      this.setTabState(
+          this.fieldsTabTarget,
+          fieldsActive
+      )
+    }
+
+    if (
+        this.hasJsonTabTarget
+    ) {
+      this.setTabState(
+          this.jsonTabTarget,
+          !fieldsActive
+      )
+    }
+  }
+
+  setTabState(
+      element,
+      active
+  ) {
+    element.setAttribute(
+        "aria-selected",
+        String(active)
     )
 
-    this.element.dispatchEvent(
-      applyEvent
+    element.classList.toggle(
+        "border-violet-500",
+        active
     )
 
-    this.debugApply(
-      "Apply event dispatched"
+    element.classList.toggle(
+        "text-violet-500",
+        active
     )
 
-    this.close()
+    element.classList.toggle(
+        "border-transparent",
+        !active
+    )
 
-    this.setStatus(
-      "IMPORTED"
+    element.classList.toggle(
+        "text-slate-400",
+        !active
     )
   }
 
-  // ============================================================
-  // COPY
-  // ============================================================
+  /*
+   * ============================================================
+   * COPY JSON
+   * ============================================================
+   */
 
-  async copyJson(event) {
+  async copyJson(event = null) {
     event?.preventDefault()
 
-    if (!this.selectedDefinition) {
-      this.debugPreview(
-        "COPY requested but no definition selected"
-      )
+    if (
+        !this.selectedDefinition
+    ) {
       return
     }
 
     const json =
-      JSON.stringify(
-        this.normalizeDefinition(
-          this.selectedDefinition
-        ),
-        null,
-        2
-      )
-
-    this.debugPreview(
-      "Copying JSON",
-      {
-        length: json.length
-      }
-    )
+        JSON.stringify(
+            this.selectedDefinition,
+            null,
+            2
+        )
 
     try {
       await navigator.clipboard.writeText(
-        json
+          json
       )
 
-      this.debugPreview(
-        "JSON copied successfully"
-      )
-
-      this.setStatus(
-        "COPIED"
+      this.trackUsage(
+          this.selectedDefinition,
+          "copy_json"
       )
     } catch (error) {
-      this.debugPreview(
-        "COPY FAILED",
-        {
-          error,
-          message: error.message
-        }
-      )
-
-      this.setStatus(
-        "COPY FAILED"
+      this.debugError(
+          "json:copy-failed",
+          error
       )
     }
   }
 
-  // ============================================================
-  // STATUS
-  // ============================================================
+  /*
+   * ============================================================
+   * APPLY / IMPORT
+   * ============================================================
+   */
 
-  setStatus(value) {
-    if (!this.hasStatusTarget) return
+  apply(event = null) {
+    event?.preventDefault()
+
+    const definition =
+        this.selectedDefinition
+
+    if (!definition) {
+      return
+    }
+
+    const detail = {
+      definition,
+      definition_id:
+      definition.id,
+      version:
+      definition.version,
+      source:
+          "definition_library"
+    }
+
+    this.element.dispatchEvent(
+        new CustomEvent(
+            "definition-library:apply",
+            {
+              bubbles: true,
+              detail
+            }
+        )
+    )
+
+    document.dispatchEvent(
+        new CustomEvent(
+            "definition-library:import",
+            {
+              bubbles: true,
+              detail
+            }
+        )
+    )
+
+    window.dispatchEvent(
+        new CustomEvent(
+            "definition-library:definition-selected",
+            {
+              detail
+            }
+        )
+    )
+
+    this.trackUsage(
+        definition,
+        "import"
+    )
+
+    this.debugLog(
+        "apply:events-dispatched",
+        detail
+    )
+  }
+
+  /*
+   * ============================================================
+   * FAVORITES
+   * ============================================================
+   */
+
+  toggleFavorite(event) {
+    event.preventDefault()
+    event.stopPropagation()
+
+    const id =
+        event.currentTarget.dataset
+            .definitionId
+
+    if (!id) {
+      return
+    }
+
+    if (
+        this.isFavorite(id)
+    ) {
+      this.favorites =
+          this.favorites.filter(
+              favoriteId =>
+                  favoriteId !== id
+          )
+    } else {
+      this.favorites.push(id)
+    }
+
+    this.saveFavorites()
+
+    this.renderGrid()
+
+    const definition =
+        this.findDefinition(id)
+
+    if (definition) {
+      this.trackUsage(
+          definition,
+          this.isFavorite(id)
+              ? "favorite"
+              : "unfavorite"
+      )
+    }
+  }
+
+  isFavorite(id) {
+    return this.favorites.includes(
+        id
+    )
+  }
+
+  loadFavorites() {
+    try {
+      const value =
+          localStorage.getItem(
+              "definition-library:favorites"
+          )
+
+      const parsed =
+          value
+              ? JSON.parse(value)
+              : []
+
+      return Array.isArray(
+          parsed
+      )
+          ? parsed
+          : []
+    } catch (error) {
+      return []
+    }
+  }
+
+  saveFavorites() {
+    try {
+      localStorage.setItem(
+          "definition-library:favorites",
+          JSON.stringify(
+              this.favorites
+          )
+      )
+    } catch (error) {
+      this.debugError(
+          "favorites:save-failed",
+          error
+      )
+    }
+  }
+
+  /*
+   * ============================================================
+   * RECENT
+   * ============================================================
+   */
+
+  addRecentlyViewed(
+      definition
+  ) {
+    const id =
+        definition.id
+
+    this.recentlyViewed =
+        this.recentlyViewed.filter(
+            recentId =>
+                recentId !== id
+        )
+
+    this.recentlyViewed.unshift(
+        id
+    )
+
+    this.recentlyViewed =
+        this.recentlyViewed.slice(
+            0,
+            10
+        )
+
+    try {
+      localStorage.setItem(
+          "definition-library:recent",
+          JSON.stringify(
+              this.recentlyViewed
+          )
+      )
+    } catch (error) {
+      this.debugError(
+          "recent:save-failed",
+          error
+      )
+    }
+  }
+
+  loadRecentlyViewed() {
+    try {
+      const value =
+          localStorage.getItem(
+              "definition-library:recent"
+          )
+
+      const parsed =
+          value
+              ? JSON.parse(value)
+              : []
+
+      return Array.isArray(
+          parsed
+      )
+          ? parsed
+          : []
+    } catch (error) {
+      return []
+    }
+  }
+
+  /*
+   * ============================================================
+   * CLEAR FILTERS
+   * ============================================================
+   *
+   * IMPORTANT:
+   *
+   * Your HTML calls:
+   *
+   * definition-library#clearAllFilters
+   *
+   * Your old controller only had:
+   *
+   * clearFilters
+   *
+   * So Stimulus was throwing:
+   *
+   * "references undefined method clearAllFilters"
+   *
+   * We support BOTH names now.
+   */
+
+  clearAllFilters(
+      event = null
+  ) {
+    event?.preventDefault()
+
+    this.debugLog(
+        "filters:clear-all"
+    )
+
+    this.searchQuery = ""
+    this.selectedCategory = "ALL"
+    this.sortMode = "az"
+
+    if (this.hasSearchTarget) {
+      this.searchTarget.value = ""
+    }
+
+    this.render()
+  }
+
+  clearFilters(
+      event = null
+  ) {
+    this.clearAllFilters(
+        event
+    )
+  }
+
+  /*
+   * ============================================================
+   * RESULT COUNT
+   * ============================================================
+   */
+
+  renderResultCount() {
+    if (
+        !this.hasResultCountTarget
+    ) {
+      return
+    }
+
+    const count =
+        this.filteredCatalog.length
+
+    this.resultCountTarget.textContent =
+        `${count} ${
+            count === 1
+                ? "DEFINITION"
+                : "DEFINITIONS"
+        }`
+  }
+
+  /*
+   * ============================================================
+   * EMPTY STATE
+   * ============================================================
+   */
+
+  renderEmptyState() {
+    if (
+        !this.hasEmptyStateTarget ||
+        !this.hasGridTarget
+    ) {
+      return
+    }
+
+    const empty =
+        this.filteredCatalog.length ===
+        0
+
+    this.emptyStateTarget.classList.toggle(
+        "hidden",
+        !empty
+    )
+
+    this.emptyStateTarget.classList.toggle(
+        "flex",
+        empty
+    )
+
+    this.gridTarget.classList.toggle(
+        "hidden",
+        empty
+    )
+  }
+
+  /*
+   * ============================================================
+   * LOADING / ERROR
+   * ============================================================
+   */
+
+  setLoadingState(
+      loading
+  ) {
+    this.loading =
+        loading
+
+    this.debugLog(
+        "loading:changed",
+        {
+          loading
+        }
+    )
+
+    if (loading) {
+      this.setStatus(
+          "LOADING"
+      )
+
+      if (this.hasGridTarget) {
+        this.gridTarget.classList.remove(
+            "hidden"
+        )
+
+        this.gridTarget.innerHTML = `
+<div class="col-span-full flex min-h-[260px] items-center justify-center">
+  <div class="text-center">
+
+    <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-violet-100 border-t-violet-500"></div>
+
+    <div class="mt-4 text-[9px] font-black uppercase tracking-[0.18em] text-violet-500">
+      Loading definitions
+    </div>
+
+    <div class="mt-2 text-[10px] text-slate-400">
+      Connecting to the definition catalog...
+    </div>
+
+  </div>
+</div>
+`
+      }
+
+      if (
+          this.hasEmptyStateTarget
+      ) {
+        this.emptyStateTarget.classList.add(
+            "hidden"
+        )
+
+        this.emptyStateTarget.classList.remove(
+            "flex"
+        )
+      }
+
+      return
+    }
+
+    this.setStatus(
+        this.error
+            ? "ERROR"
+            : "CONNECTED"
+    )
+  }
+
+  showError(
+      message
+  ) {
+    this.error =
+        new Error(message)
+
+    this.setStatus(
+        "ERROR"
+    )
+
+    if (
+        !this.hasGridTarget
+    ) {
+      return
+    }
+
+    this.gridTarget.classList.remove(
+        "hidden"
+    )
+
+    this.gridTarget.innerHTML = `
+<div class="col-span-full flex min-h-[260px] items-center justify-center">
+  <div class="max-w-md rounded-3xl border-2 border-red-100 bg-red-50 p-7 text-center">
+
+    <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-xl text-red-400">
+      !
+    </div>
+
+    <div class="mt-4 text-sm font-black text-slate-700">
+      Unable to load definitions
+    </div>
+
+    <p class="mt-2 text-[10px] leading-5 text-slate-400">
+      ${this.escapeHtml(
+        message
+    )}
+    </p>
+
+    <button
+      type="button"
+      class="mt-5 rounded-xl bg-violet-500 px-4 py-2.5 text-[8px] font-black uppercase tracking-wider text-white"
+      data-action="click->definition-library#retryLoad"
+    >
+      TRY AGAIN
+    </button>
+
+  </div>
+</div>
+`
+  }
+
+  retryLoad(
+      event = null
+  ) {
+    event?.preventDefault()
+
+    this.error = null
+
+    if (
+        this.hasCatalogUrlValue &&
+        this.catalogUrlValue
+    ) {
+      this.loadCatalog()
+    } else {
+      this.render()
+    }
+  }
+
+  setStatus(
+      status
+  ) {
+    if (
+        !this.hasStatusTarget
+    ) {
+      return
+    }
 
     this.statusTarget.textContent =
+        String(
+            status
+        ).toUpperCase()
+
+    const classes = [
+      "border-emerald-100",
+      "bg-emerald-50",
+      "text-emerald-500",
+
+      "border-orange-100",
+      "bg-orange-50",
+      "text-orange-500",
+
+      "border-red-100",
+      "bg-red-50",
+      "text-red-500"
+    ]
+
+    this.statusTarget.classList.remove(
+        ...classes
+    )
+
+    if (
+        status ===
+        "CONNECTED"
+    ) {
+      this.statusTarget.classList.add(
+          "border-emerald-100",
+          "bg-emerald-50",
+          "text-emerald-500"
+      )
+    } else if (
+        status === "LOADING"
+    ) {
+      this.statusTarget.classList.add(
+          "border-orange-100",
+          "bg-orange-50",
+          "text-orange-500"
+      )
+    } else {
+      this.statusTarget.classList.add(
+          "border-red-100",
+          "bg-red-50",
+          "text-red-500"
+      )
+    }
+  }
+
+  /*
+   * ============================================================
+   * USAGE TRACKING
+   * ============================================================
+   */
+
+  trackUsage(
+      definition,
+      eventType
+  ) {
+    if (!definition?.id) {
+      return
+    }
+
+    if (
+        !this.hasCatalogUsageUrlValue ||
+        !this.catalogUsageUrlValue
+    ) {
+      return
+    }
+
+    const payload = {
+      event_type:
+      eventType,
+
+      source:
+          "definition_library",
+
+      session_id:
+          this.sessionId(),
+
+      metadata: {
+        definition_id:
+        definition.id,
+
+        version:
+        definition.version
+      }
+    }
+
+    fetch(
+        this.catalogUsageUrlValue.replace(
+            ":id",
+            encodeURIComponent(
+                definition.id
+            )
+        ),
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+                "application/json",
+
+            Accept:
+                "application/json",
+
+            "X-CSRF-Token":
+                this.csrfToken()
+          },
+
+          credentials:
+              "same-origin",
+
+          body:
+              JSON.stringify(
+                  payload
+              )
+        }
+    ).catch(
+        error => {
+          console.warn(
+              "[DefinitionLibrary] Usage tracking failed",
+              error
+          )
+        }
+    )
+  }
+
+  /*
+   * ============================================================
+   * SESSION / CSRF
+   * ============================================================
+   */
+
+  sessionId() {
+    return this.sessionIdValue
+  }
+
+  getOrCreateSessionId() {
+    const storageKey =
+        "definition-library:session-id"
+
+    try {
+      let id =
+          sessionStorage.getItem(
+              storageKey
+          )
+
+      if (!id) {
+        id =
+            `dl-${Date.now()}-${Math.random()
+                .toString(36)
+                .slice(2, 12)}`
+
+        sessionStorage.setItem(
+            storageKey,
+            id
+        )
+      }
+
+      return id
+    } catch (error) {
+      return `dl-${Date.now()}`
+    }
+  }
+
+  csrfToken() {
+    const meta =
+        document.querySelector(
+            'meta[name="csrf-token"]'
+        )
+
+    return meta?.content || ""
+  }
+
+  /*
+   * ============================================================
+   * KEYBOARD
+   * ============================================================
+   */
+
+  handleGlobalKeydown(
+      event
+  ) {
+    if (
+        !this.hasModalTarget ||
+        this.modalTarget.classList.contains(
+            "hidden"
+        )
+    ) {
+      return
+    }
+
+    if (
+        event.key === "/" &&
+        document.activeElement !==
+        this.searchTarget
+    ) {
+      event.preventDefault()
+
+      this.focusSearch()
+
+      return
+    }
+
+    if (
+        event.key === "Escape"
+    ) {
+      this.close(event)
+
+      return
+    }
+
+    if (
+        event.key === "Enter" &&
+        (event.ctrlKey ||
+            event.metaKey)
+    ) {
+      if (
+          this.selectedDefinition
+      ) {
+        event.preventDefault()
+
+        this.apply(event)
+      }
+
+      return
+    }
+
+    if (
+        event.key ===
+        "ArrowDown" ||
+        event.key ===
+        "ArrowRight" ||
+        event.key ===
+        "ArrowUp" ||
+        event.key ===
+        "ArrowLeft"
+    ) {
+      this.navigateCards(event)
+    }
+  }
+
+  navigateCards(
+      event
+  ) {
+    if (!this.hasGridTarget) {
+      return
+    }
+
+    const cards =
+        Array.from(
+            this.gridTarget.querySelectorAll(
+                "article[data-definition-id]"
+            )
+        )
+
+    if (!cards.length) {
+      return
+    }
+
+    const active =
+        document.activeElement
+
+    const currentIndex =
+        cards.indexOf(active)
+
+    if (
+        currentIndex === -1
+    ) {
+      return
+    }
+
+    let nextIndex =
+        currentIndex
+
+    if (
+        event.key ===
+        "ArrowDown" ||
+        event.key ===
+        "ArrowRight"
+    ) {
+      nextIndex =
+          Math.min(
+              cards.length - 1,
+              currentIndex + 1
+          )
+    }
+
+    if (
+        event.key ===
+        "ArrowUp" ||
+        event.key ===
+        "ArrowLeft"
+    ) {
+      nextIndex =
+          Math.max(
+              0,
+              currentIndex - 1
+          )
+    }
+
+    if (
+        nextIndex !==
+        currentIndex
+    ) {
+      event.preventDefault()
+
+      cards[
+          nextIndex
+          ].focus()
+    }
+  }
+
+  focusSearch() {
+    if (
+        !this.hasSearchTarget
+    ) {
+      return
+    }
+
+    window.requestAnimationFrame(
+        () => {
+          this.searchTarget.focus()
+          this.searchTarget.select()
+        }
+    )
+  }
+
+  /*
+   * ============================================================
+   * HELPERS
+   * ============================================================
+   */
+
+  findDefinition(id) {
+    return this.catalog.find(
+        definition =>
+            String(
+                definition.id
+            ) ===
+            String(id)
+    )
+  }
+
+  definitionName(
+      definition
+  ) {
+    return (
+        definition?.name ||
+        definition?.title ||
+        "Untitled Definition"
+    )
+  }
+
+  escapeHtml(
       value
+  ) {
+    return String(
+        value ?? ""
+    )
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+        .replaceAll(
+            "'",
+            "&#039;"
+        )
   }
 
-  // ============================================================
-  // DATA HELPERS
-  // ============================================================
-
-  normalizeDefinition(definition) {
-    if (
-      definition &&
-      typeof definition === "object" &&
-      definition.definition
-    ) {
-      return this.normalizeDefinition(
-        definition.definition
-      )
-    }
-
-    if (typeof definition === "string") {
-      return JSON.parse(definition)
-    }
-
-    return definition
-  }
-
-  extractFields(definition) {
-    if (!definition) return []
-
-    if (
-      Array.isArray(
-        definition.fields
-      )
-    ) {
-      return definition.fields
-    }
-
-    if (
-      definition.fields &&
-      typeof definition.fields === "object"
-    ) {
-      return Object.entries(
-        definition.fields
-      ).map(
-        ([name, field]) => ({
-          name,
-          ...field
-        })
-      )
-    }
-
-    return []
-  }
-
-  escapeHtml(value) {
-    return String(value ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;")
+  escapeAttribute(
+      value
+  ) {
+    return this.escapeHtml(
+        value
+    )
   }
 }
