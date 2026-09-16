@@ -1,5 +1,5 @@
 <div
-  class="fixed inset-0 z-[100] hidden"
+  class="fixed inset-0 z-[100] hidden overflow-y-auto"
   data-controller="definition-library"
   data-definition-library-target="modal"
   data-definition-library-catalog-url-value="<%= api_v1_admin_ecosystems_load_sources_entity_templates_entity_template_version_definition_templates_path %>"
@@ -8,117 +8,118 @@
   data-action="keydown.esc->definition-library#close definition-library:open->definition-library#open"
   aria-hidden="true"
 >
-
-  <!-- ============================================================
-       BACKDROP
-       ============================================================ -->
-
+  <!-- BACKDROP -->
   <div
-    class="absolute inset-0 bg-slate-950/70 backdrop-blur-md"
+    class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm"
     data-definition-library-target="backdrop"
     data-action="click->definition-library#close"
     aria-hidden="true"
   ></div>
 
-
-  <!-- ============================================================
-       DIALOG
-       ============================================================ -->
-
-  <div class="relative flex min-h-screen items-center justify-center p-3 sm:p-6 lg:p-8">
+  <!-- MODAL WRAPPER -->
+  <div class="relative z-10 flex min-h-full w-full items-start justify-center p-2 sm:p-4 lg:p-6">
 
     <div
-      class="relative flex max-h-[94vh] w-full max-w-[1440px] flex-col overflow-hidden rounded-[34px] border-2 border-violet-100 bg-white shadow-[0_30px_100px_rgba(76,29,149,0.28)]"
-
+      class="relative my-2 flex w-full max-w-[1500px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_25px_100px_rgba(15,23,42,0.30)] sm:my-4 sm:rounded-3xl lg:my-6"
+      style="max-height: calc(100vh - 1rem);"
       role="dialog"
       aria-modal="true"
       aria-labelledby="definition-library-title"
-
       data-definition-library-target="dialog"
     >
 
-      <!-- ========================================================
+      <!-- ==========================================================
            HEADER
-           ======================================================== -->
+           ========================================================== -->
 
-      <header class="shrink-0 border-b border-violet-100 bg-gradient-to-br from-violet-50 via-white to-sky-50/70">
+      <header class="shrink-0 border-b border-slate-200 bg-white">
 
-        <div class="px-5 py-5 sm:px-7 sm:py-6 lg:px-8">
+        <!-- Brand/header -->
+        <div class="bg-gradient-to-r from-violet-50 via-white to-sky-50">
 
-          <div class="flex items-start justify-between gap-5">
+          <div class="px-4 py-4 sm:px-6 sm:py-5 lg:px-7">
 
-            <div class="flex min-w-0 items-start gap-4">
+            <div class="flex items-start justify-between gap-4">
 
-              <div
-                class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-violet-200 bg-violet-100 text-xl text-violet-500 shadow-sm sm:h-14 sm:w-14 sm:text-2xl"
-                aria-hidden="true"
-              >
-                ✦
-              </div>
+              <div class="flex min-w-0 items-start gap-3 sm:gap-4">
 
-              <div class="min-w-0">
+                <div
+                  class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-violet-200 bg-violet-100 text-xl text-violet-600 shadow-sm sm:h-14 sm:w-14 sm:rounded-2xl sm:text-2xl"
+                  aria-hidden="true"
+                >
+                  ✦
+                </div>
 
-                <div class="flex flex-wrap items-center gap-2">
+                <div class="min-w-0">
 
-                  <div class="text-[9px] font-black uppercase tracking-[0.28em] text-violet-500">
-                    DEFINITION LIBRARY
+                  <div class="flex flex-wrap items-center gap-2">
+
+                    <div class="text-[11px] font-extrabold uppercase tracking-[0.18em] text-violet-600 sm:text-xs">
+                      Definition Library
+                    </div>
+
+                    <span class="rounded-full border border-violet-200 bg-violet-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-violet-600">
+                      PRO
+                    </span>
+
+                    <span
+                      class="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-600"
+                      data-definition-library-target="status"
+                    >
+                      CONNECTED
+                    </span>
+
                   </div>
 
-                  <span class="rounded-full border border-violet-100 bg-violet-50 px-2.5 py-1 text-[7px] font-black uppercase tracking-wider text-violet-500">
-                    PRO
-                  </span>
-
-                  <span
-                    class="rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-[7px] font-black uppercase tracking-wider text-emerald-500"
-                    data-definition-library-target="status"
+                  <h2
+                    id="definition-library-title"
+                    class="mt-1 text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl lg:text-3xl"
                   >
-                    CONNECTED
-                  </span>
+                    Start with a proven structure
+                  </h2>
+
+                  <p class="mt-1.5 max-w-3xl text-sm leading-6 text-slate-500 sm:text-base">
+                    Select a production-ready entity definition, inspect its structure,
+                    then import it into the Definition Studio.
+                  </p>
 
                 </div>
 
-                <h2
-                  id="definition-library-title"
-                  class="mt-1 text-xl font-black tracking-tight text-slate-800 sm:text-2xl"
-                >
-                  Start with a proven structure
-                </h2>
-
-                <p class="mt-1 max-w-2xl text-[11px] leading-5 text-slate-400 sm:text-xs">
-                  Select a production-ready entity definition, inspect its structure,
-                  then import it into the Definition Studio.
-                </p>
-
               </div>
+
+              <button
+                type="button"
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-xl text-slate-400 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700 focus:outline-none focus:ring-4 focus:ring-violet-100 sm:h-11 sm:w-11"
+                aria-label="Close definition library"
+                data-action="click->definition-library#close"
+              >
+                ×
+              </button>
 
             </div>
 
-
-            <button
-              type="button"
-              class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-lg text-slate-400 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700 focus:outline-none focus:ring-4 focus:ring-violet-100"
-              aria-label="Close definition library"
-              data-action="click->definition-library#close"
-            >
-              ×
-            </button>
-
           </div>
 
+        </div>
 
-          <!-- ======================================================
-               SEARCH TOOLBAR
-               ====================================================== -->
 
-          <div class="mt-6 flex flex-col gap-3 xl:flex-row">
+        <!-- ========================================================
+             SEARCH / MAIN TOOLBAR
+             ======================================================== -->
+
+        <div class="border-t border-slate-100 bg-white px-4 py-4 sm:px-6 lg:px-7">
+
+          <div class="flex flex-col gap-3 xl:flex-row">
+
+            <!-- Search -->
 
             <div class="relative min-w-0 flex-1">
 
               <div
-                class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-slate-300"
+                class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-slate-400"
                 aria-hidden="true"
               >
-                <span class="text-base">⌕</span>
+                <span class="text-xl">⌕</span>
               </div>
 
               <input
@@ -126,22 +127,18 @@
                 placeholder="Search definitions, fields, categories, tags..."
                 autocomplete="off"
                 spellcheck="false"
-
-                class="block w-full rounded-2xl border-2 border-slate-100 bg-white py-3.5 pl-11 pr-12 text-xs font-semibold text-slate-700 shadow-sm outline-none transition placeholder:text-slate-300 focus:border-violet-300 focus:ring-4 focus:ring-violet-100"
-
+                class="block w-full rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-11 pr-12 text-sm font-medium text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-violet-400 focus:bg-white focus:ring-4 focus:ring-violet-100 sm:rounded-2xl sm:py-4 sm:text-base"
                 data-definition-library-target="search"
-
                 data-action="
                   input->definition-library#searchChanged
                   keydown->definition-library#searchKeydown
                 "
-
                 aria-label="Search definitions"
                 />
 
               <button
                 type="button"
-                class="absolute inset-y-0 right-3 my-auto hidden h-7 w-7 items-center justify-center rounded-lg bg-slate-100 text-xs text-slate-400 transition hover:bg-slate-200 hover:text-slate-600"
+                class="absolute inset-y-0 right-3 my-auto hidden h-8 w-8 items-center justify-center rounded-lg bg-slate-200 text-sm text-slate-500 transition hover:bg-slate-300 hover:text-slate-700"
                 aria-label="Clear search"
                 data-definition-library-target="clearSearch"
                 data-action="click->definition-library#clearSearch"
@@ -152,13 +149,13 @@
             </div>
 
 
-            <!-- View buttons -->
+            <!-- Views -->
 
-            <div class="flex shrink-0 flex-wrap gap-2">
+            <div class="flex flex-wrap gap-2">
 
               <button
                 type="button"
-                class="rounded-2xl border-2 border-amber-100 bg-amber-50 px-3 py-3 text-[8px] font-black uppercase tracking-wider text-amber-500 transition hover:border-amber-200 hover:bg-amber-100"
+                class="rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-3 text-[11px] font-extrabold uppercase tracking-wide text-amber-700 transition hover:border-amber-300 hover:bg-amber-100"
                 data-definition-library-target="favoritesButton"
                 data-action="click->definition-library#showFavorites"
               >
@@ -168,7 +165,7 @@
 
               <button
                 type="button"
-                class="rounded-2xl border-2 border-slate-100 bg-white px-3 py-3 text-[8px] font-black uppercase tracking-wider text-slate-500 transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-500"
+                class="rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-[11px] font-extrabold uppercase tracking-wide text-slate-600 transition hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700"
                 data-definition-library-target="recentButton"
                 data-action="click->definition-library#showRecent"
               >
@@ -178,7 +175,7 @@
 
               <button
                 type="button"
-                class="rounded-2xl border-2 border-violet-200 bg-violet-50 px-3 py-3 text-[8px] font-black uppercase tracking-wider text-violet-500 transition hover:border-violet-300 hover:bg-violet-100"
+                class="rounded-xl border border-violet-200 bg-violet-50 px-3.5 py-3 text-[11px] font-extrabold uppercase tracking-wide text-violet-700 transition hover:border-violet-300 hover:bg-violet-100"
                 data-definition-library-target="recommendedButton"
                 data-action="click->definition-library#showRecommended"
               >
@@ -187,7 +184,7 @@
 
               <button
                 type="button"
-                class="rounded-2xl border-2 border-slate-100 bg-white px-3 py-3 text-[8px] font-black uppercase tracking-wider text-slate-500 transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-500"
+                class="rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-[11px] font-extrabold uppercase tracking-wide text-slate-600 transition hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700"
                 data-action="click->definition-library#showAll"
               >
                 ALL
@@ -198,27 +195,24 @@
           </div>
 
 
-          <!-- ======================================================
-               SECONDARY TOOLBAR
-               ====================================================== -->
+          <!-- Secondary toolbar -->
 
-          <div class="mt-3 flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+          <div class="mt-3 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
 
             <div class="flex flex-wrap items-center gap-2">
 
               <button
                 type="button"
-                class="rounded-xl border border-violet-200 bg-violet-50 px-3 py-2 text-[8px] font-black uppercase tracking-wider text-violet-500 transition hover:bg-violet-100"
+                class="rounded-xl border border-violet-200 bg-violet-50 px-3.5 py-2.5 text-[11px] font-extrabold uppercase tracking-wide text-violet-700 transition hover:bg-violet-100"
                 data-action="click->definition-library#toggleAdvancedFilters"
                 aria-controls="definition-library-advanced-filters"
               >
                 ⚙ FILTERS
               </button>
 
-
               <button
                 type="button"
-                class="rounded-xl border-2 border-violet-200 bg-violet-50 px-3 py-2 text-[8px] font-black uppercase tracking-wider text-violet-500 transition hover:border-violet-300 hover:bg-violet-100"
+                class="rounded-xl border border-violet-200 bg-violet-50 px-3.5 py-2.5 text-[11px] font-extrabold uppercase tracking-wide text-violet-700 transition hover:border-violet-300 hover:bg-violet-100"
                 data-definition-library-target="sortButton"
                 data-action="click->definition-library#toggleSort"
                 aria-label="Change definition sorting"
@@ -226,13 +220,12 @@
                 POPULAR
               </button>
 
-
               <div
-                class="rounded-xl border-2 border-slate-100 bg-white px-3 py-2"
+                class="rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5"
                 aria-live="polite"
               >
                 <span
-                  class="text-[8px] font-black uppercase tracking-wider text-slate-400"
+                  class="text-[11px] font-extrabold uppercase tracking-wide text-slate-500"
                   data-definition-library-target="resultCount"
                 >
                   0 DEFINITIONS
@@ -240,7 +233,6 @@
               </div>
 
             </div>
-
 
             <div
               data-definition-library-target="activeFilters"
@@ -250,26 +242,24 @@
           </div>
 
 
-          <!-- ======================================================
-               ADVANCED FILTERS
-               ====================================================== -->
+          <!-- Advanced filters -->
 
           <div
             id="definition-library-advanced-filters"
-            class="mt-3 hidden rounded-2xl border border-violet-100 bg-white p-4 shadow-sm"
+            class="mt-3 hidden rounded-2xl border border-violet-100 bg-violet-50/40 p-4 sm:p-5"
             data-definition-library-target="advancedFilters"
           >
 
-            <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
 
               <label class="block">
-                <span class="mb-1 block text-[7px] font-black uppercase tracking-wider text-slate-400">
-                  FIELD TYPE
+                <span class="mb-1.5 block text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
+                  Field Type
                 </span>
 
                 <select
                   name="type"
-                  class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[9px] font-bold text-slate-600 outline-none focus:border-violet-300 focus:ring-4 focus:ring-violet-100"
+                  class="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm font-semibold text-slate-700 outline-none focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
                   data-definition-library-target="filterType"
                   data-action="change->definition-library#advancedFilterChanged"
                 >
@@ -291,13 +281,13 @@
 
 
               <label class="block">
-                <span class="mb-1 block text-[7px] font-black uppercase tracking-wider text-slate-400">
-                  STATUS
+                <span class="mb-1.5 block text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
+                  Status
                 </span>
 
                 <select
                   name="status"
-                  class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[9px] font-bold text-slate-600 outline-none focus:border-violet-300 focus:ring-4 focus:ring-violet-100"
+                  class="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm font-semibold text-slate-700 outline-none focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
                   data-definition-library-target="filterStatus"
                   data-action="change->definition-library#advancedFilterChanged"
                 >
@@ -310,13 +300,13 @@
 
 
               <label class="block">
-                <span class="mb-1 block text-[7px] font-black uppercase tracking-wider text-slate-400">
-                  POPULARITY
+                <span class="mb-1.5 block text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
+                  Popularity
                 </span>
 
                 <select
                   name="popularity"
-                  class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[9px] font-bold text-slate-600 outline-none focus:border-violet-300 focus:ring-4 focus:ring-violet-100"
+                  class="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm font-semibold text-slate-700 outline-none focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
                   data-definition-library-target="filterPopularity"
                   data-action="change->definition-library#advancedFilterChanged"
                 >
@@ -329,13 +319,13 @@
 
 
               <label class="block">
-                <span class="mb-1 block text-[7px] font-black uppercase tracking-wider text-slate-400">
-                  FEATURED
+                <span class="mb-1.5 block text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
+                  Featured
                 </span>
 
                 <select
                   name="featured"
-                  class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[9px] font-bold text-slate-600 outline-none focus:border-violet-300 focus:ring-4 focus:ring-violet-100"
+                  class="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm font-semibold text-slate-700 outline-none focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
                   data-definition-library-target="filterFeatured"
                   data-action="change->definition-library#advancedFilterChanged"
                 >
@@ -348,18 +338,18 @@
 
               <label class="flex items-end">
 
-                <span class="flex w-full cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2">
+                <span class="flex w-full cursor-pointer items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-3">
 
                   <input
                     type="checkbox"
                     name="new"
-                    class="h-3.5 w-3.5 rounded border-slate-300 text-violet-500 focus:ring-violet-200"
+                    class="h-4 w-4 rounded border-slate-300 text-violet-600 focus:ring-violet-200"
                     data-definition-library-target="filterNew"
                     data-action="change->definition-library#advancedFilterChanged"
                     />
 
-                  <span class="text-[8px] font-black uppercase tracking-wider text-slate-500">
-                    NEW ONLY
+                  <span class="text-[11px] font-extrabold uppercase tracking-wide text-slate-600">
+                    New Only
                   </span>
 
                 </span>
@@ -369,11 +359,11 @@
             </div>
 
 
-            <div class="mt-3 flex justify-end">
+            <div class="mt-4 flex justify-end">
 
               <button
                 type="button"
-                class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-[8px] font-black uppercase tracking-wider text-slate-500 transition hover:bg-slate-50"
+                class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-wide text-slate-600 transition hover:bg-slate-50"
                 data-definition-library-target="clearAllFilters"
                 data-action="click->definition-library#clearFilters"
               >
@@ -385,9 +375,7 @@
           </div>
 
 
-          <!-- ======================================================
-               CATEGORIES
-               ====================================================== -->
+          <!-- Categories -->
 
           <div
             class="mt-4 flex gap-2 overflow-x-auto pb-1"
@@ -405,17 +393,17 @@
            ========================================================== -->
 
       <div
-        class="hidden border-b border-sky-100 bg-sky-50 px-5 py-3"
+        class="hidden shrink-0 border-b border-sky-100 bg-sky-50 px-5 py-3.5"
         data-definition-library-target="loadingState"
         role="status"
         aria-live="polite"
       >
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-3">
 
-          <span class="h-2 w-2 animate-pulse rounded-full bg-sky-400"></span>
+          <span class="h-2.5 w-2.5 animate-pulse rounded-full bg-sky-500"></span>
 
-          <span class="text-[8px] font-black uppercase tracking-wider text-sky-500">
-            LOADING DEFINITIONS...
+          <span class="text-xs font-extrabold uppercase tracking-wide text-sky-700">
+            Loading definitions...
           </span>
 
         </div>
@@ -427,38 +415,34 @@
            ========================================================== -->
 
       <div
-        class="hidden border-b border-red-100 bg-red-50 px-5 py-3"
+        class="hidden shrink-0 border-b border-red-100 bg-red-50 px-5 py-3.5"
         data-definition-library-target="errorState"
         role="alert"
       >
-        <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
 
-          <div class="flex items-center gap-2">
+          <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-red-100 text-sm font-black text-red-600">
+            !
+          </span>
 
-            <span class="text-red-500">
-              !
-            </span>
-
-            <span
-              class="text-[9px] font-bold text-red-500"
-              data-definition-library-target="errorMessage"
-            >
-              Unable to load definitions.
-            </span>
-
-          </div>
+          <span
+            class="text-sm font-semibold text-red-600"
+            data-definition-library-target="errorMessage"
+          >
+            Unable to load definitions.
+          </span>
 
         </div>
       </div>
 
 
       <!-- ==========================================================
-           BODY
+           SCROLLABLE CONTENT
            ========================================================== -->
 
-      <div class="min-h-0 flex-1 overflow-hidden">
+      <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-slate-50">
 
-        <div class="grid h-full min-h-0 lg:grid-cols-[minmax(0,1fr)_430px]">
+        <div class="grid min-h-0 lg:grid-cols-[minmax(0,1fr)_460px]">
 
 
           <!-- ======================================================
@@ -466,7 +450,7 @@
                ====================================================== -->
 
           <section
-            class="min-h-0 overflow-y-auto bg-slate-50/60 p-4 sm:p-6 lg:p-7"
+            class="min-w-0 bg-slate-50 p-4 sm:p-6 lg:p-7"
             data-definition-library-target="libraryPanel"
             aria-label="Definition library"
           >
@@ -474,10 +458,12 @@
             <!-- Recommendations -->
 
             <div
-              class="mb-5"
+              class="mb-6"
               data-definition-library-target="recommendations"
             ></div>
 
+
+            <!-- Definition grid -->
 
             <div
               class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
@@ -490,27 +476,27 @@
             <!-- Empty state -->
 
             <div
-              class="hidden min-h-[300px] items-center justify-center"
+              class="hidden min-h-[320px] items-center justify-center"
               data-definition-library-target="emptyState"
             >
 
               <div class="max-w-md text-center">
 
-                <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl border-2 border-slate-200 bg-white text-2xl text-slate-300 shadow-sm">
+                <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl border-2 border-slate-200 bg-white text-3xl text-slate-300 shadow-sm">
                   ⌕
                 </div>
 
-                <div class="mt-5 text-sm font-black text-slate-700">
+                <div class="mt-6 text-lg font-extrabold text-slate-800">
                   No definitions found
                 </div>
 
-                <p class="mt-2 text-[10px] leading-5 text-slate-400">
+                <p class="mt-2 text-sm leading-6 text-slate-500">
                   Try another search term, category, or filter.
                 </p>
 
                 <button
                   type="button"
-                  class="mt-5 rounded-2xl border-2 border-violet-200 bg-violet-50 px-5 py-3 text-[9px] font-black uppercase tracking-wider text-violet-500 transition hover:border-violet-300 hover:bg-violet-100"
+                  class="mt-6 rounded-xl border border-violet-200 bg-violet-50 px-5 py-3 text-sm font-extrabold uppercase tracking-wide text-violet-700 transition hover:border-violet-300 hover:bg-violet-100"
                   data-action="click->definition-library#clearFilters"
                 >
                   RESET FILTERS
@@ -527,29 +513,29 @@
                PREVIEW
                ====================================================== -->
 
-          <aside class="min-h-0 border-t border-slate-200 bg-white lg:border-l lg:border-t-0">
+          <aside class="min-w-0 border-t border-slate-200 bg-white lg:border-l lg:border-t-0">
 
-            <div class="flex h-full min-h-0 flex-col">
+            <div class="flex min-h-0 flex-col">
 
 
               <!-- Empty preview -->
 
               <div
-                class="flex flex-1 items-center justify-center p-8"
+                class="flex min-h-[420px] items-center justify-center p-8"
                 data-definition-library-target="previewEmpty"
               >
 
-                <div class="max-w-xs text-center">
+                <div class="max-w-sm text-center">
 
-                  <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl border-2 border-violet-100 bg-violet-50 text-2xl text-violet-300">
+                  <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl border-2 border-violet-100 bg-violet-50 text-3xl text-violet-300">
                     ◈
                   </div>
 
-                  <div class="mt-5 text-sm font-black text-slate-700">
+                  <div class="mt-6 text-lg font-extrabold text-slate-800">
                     Choose a definition
                   </div>
 
-                  <p class="mt-2 text-[10px] leading-5 text-slate-400">
+                  <p class="mt-2 text-sm leading-6 text-slate-500">
                     Select a library item to inspect its fields and JSON structure.
                   </p>
 
@@ -561,16 +547,18 @@
               <!-- Selected preview -->
 
               <div
-                class="hidden min-h-0 flex-1 flex-col"
+                class="hidden min-h-0 flex-col"
                 data-definition-library-target="preview"
               >
 
-                <div class="shrink-0 border-b border-slate-100 bg-gradient-to-br from-white via-violet-50/30 to-sky-50/30 p-5 sm:p-6">
+                <!-- Preview header -->
 
-                  <div class="flex items-start gap-3">
+                <div class="border-b border-slate-200 bg-gradient-to-br from-white via-violet-50/40 to-sky-50/40 p-5 sm:p-6">
+
+                  <div class="flex items-start gap-4">
 
                     <div
-                      class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-violet-100 bg-violet-50 text-xl text-violet-500"
+                      class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-violet-200 bg-violet-50 text-2xl text-violet-600"
                       data-definition-library-target="previewIcon"
                       aria-hidden="true"
                     >
@@ -580,23 +568,23 @@
                     <div class="min-w-0">
 
                       <div
-                        class="truncate text-lg font-black text-slate-800"
+                        class="break-words text-xl font-extrabold text-slate-900"
                         data-definition-library-target="previewTitle"
                       >
                         Definition
                       </div>
 
-                      <div class="mt-1 flex flex-wrap items-center gap-2">
+                      <div class="mt-2 flex flex-wrap items-center gap-2">
 
                         <span
-                          class="rounded-full border border-violet-100 bg-violet-50 px-2.5 py-1 text-[7px] font-black uppercase tracking-wider text-violet-500"
+                          class="rounded-full border border-violet-200 bg-violet-50 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wide text-violet-700"
                           data-definition-library-target="previewCategory"
                         >
                           CATEGORY
                         </span>
 
                         <span
-                          class="text-[8px] font-bold uppercase tracking-wider text-slate-400"
+                          class="text-[10px] font-bold uppercase tracking-wide text-slate-400"
                           data-definition-library-target="previewId"
                         >
                           ID
@@ -610,20 +598,22 @@
 
 
                   <p
-                    class="mt-4 text-[10px] leading-5 text-slate-400"
+                    class="mt-4 text-sm leading-6 text-slate-600"
                     data-definition-library-target="previewDescription"
                   ></p>
 
 
-                  <div class="mt-5 grid grid-cols-3 gap-2">
+                  <!-- Stats -->
 
-                    <div class="rounded-2xl border border-violet-100 bg-white p-3">
-                      <div class="text-[7px] font-black uppercase tracking-wider text-slate-400">
-                        FIELDS
+                  <div class="mt-5 grid grid-cols-3 gap-2 sm:gap-3">
+
+                    <div class="rounded-2xl border border-violet-100 bg-white p-3.5 shadow-sm">
+                      <div class="text-[10px] font-extrabold uppercase tracking-wide text-slate-400">
+                        Fields
                       </div>
 
                       <div
-                        class="mt-1 text-xl font-black text-violet-500"
+                        class="mt-1 text-2xl font-extrabold text-violet-600"
                         data-definition-library-target="previewFieldCount"
                       >
                         0
@@ -631,13 +621,13 @@
                     </div>
 
 
-                    <div class="rounded-2xl border border-orange-100 bg-white p-3">
-                      <div class="text-[7px] font-black uppercase tracking-wider text-slate-400">
-                        REQUIRED
+                    <div class="rounded-2xl border border-orange-100 bg-white p-3.5 shadow-sm">
+                      <div class="text-[10px] font-extrabold uppercase tracking-wide text-slate-400">
+                        Required
                       </div>
 
                       <div
-                        class="mt-1 text-xl font-black text-orange-500"
+                        class="mt-1 text-2xl font-extrabold text-orange-600"
                         data-definition-library-target="previewRequiredCount"
                       >
                         0
@@ -645,13 +635,13 @@
                     </div>
 
 
-                    <div class="rounded-2xl border border-emerald-100 bg-white p-3">
-                      <div class="text-[7px] font-black uppercase tracking-wider text-slate-400">
-                        ACTIVE
+                    <div class="rounded-2xl border border-emerald-100 bg-white p-3.5 shadow-sm">
+                      <div class="text-[10px] font-extrabold uppercase tracking-wide text-slate-400">
+                        Active
                       </div>
 
                       <div
-                        class="mt-1 text-xl font-black text-emerald-500"
+                        class="mt-1 text-2xl font-extrabold text-emerald-600"
                         data-definition-library-target="previewActiveCount"
                       >
                         0
@@ -665,13 +655,13 @@
 
                 <!-- Tabs -->
 
-                <div class="shrink-0 border-b border-slate-100 px-5 pt-4 sm:px-6">
+                <div class="border-b border-slate-200 bg-white px-5 pt-4 sm:px-6">
 
-                  <div class="flex gap-5">
+                  <div class="flex gap-6">
 
                     <button
                       type="button"
-                      class="border-b-2 border-violet-500 pb-3 text-[8px] font-black uppercase tracking-[0.15em] text-violet-500"
+                      class="border-b-2 border-violet-600 pb-3 text-sm font-extrabold text-violet-700"
                       data-definition-library-target="fieldsTab"
                       data-action="click->definition-library#showFields"
                       aria-selected="true"
@@ -681,7 +671,7 @@
 
                     <button
                       type="button"
-                      class="border-b-2 border-transparent pb-3 text-[8px] font-black uppercase tracking-[0.15em] text-slate-400 transition hover:text-slate-600"
+                      class="border-b-2 border-transparent pb-3 text-sm font-extrabold text-slate-400 transition hover:text-slate-700"
                       data-definition-library-target="jsonTab"
                       data-action="click->definition-library#showJson"
                       aria-selected="false"
@@ -696,7 +686,7 @@
 
                 <!-- Content -->
 
-                <div class="min-h-0 flex-1 overflow-y-auto">
+                <div class="min-h-0">
 
                   <!-- Fields -->
 
@@ -705,21 +695,21 @@
                     data-definition-library-target="fieldsPanel"
                   >
 
-                    <div class="mb-3 flex items-center justify-between">
+                    <div class="mb-4 flex items-center justify-between gap-3">
 
-                      <div class="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400">
-                        STRUCTURE
+                      <div class="text-xs font-extrabold uppercase tracking-[0.15em] text-slate-500">
+                        Structure
                       </div>
 
                       <div
-                        class="text-[8px] font-bold text-slate-400"
+                        class="text-xs font-semibold text-slate-400"
                         data-definition-library-target="previewFieldSummary"
                       ></div>
 
                     </div>
 
                     <div
-                      class="overflow-hidden rounded-2xl border border-slate-100"
+                      class="overflow-hidden rounded-2xl border border-slate-200 bg-white"
                       data-definition-library-target="fieldList"
                     ></div>
 
@@ -733,23 +723,23 @@
                     data-definition-library-target="jsonPanel"
                   >
 
-                    <div class="overflow-hidden rounded-2xl border border-slate-800 bg-slate-950">
+                    <div class="overflow-hidden rounded-2xl border border-slate-700 bg-slate-950 shadow-lg">
 
-                      <div class="flex items-center justify-between border-b border-slate-800 bg-slate-900 px-4 py-3">
+                      <div class="flex items-center justify-between border-b border-slate-800 bg-slate-900 px-4 py-3.5">
 
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2.5">
 
-                          <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+                          <span class="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.7)]"></span>
 
-                          <span class="text-[8px] font-black uppercase tracking-wider text-emerald-400">
-                            VALID JSON
+                          <span class="text-xs font-extrabold uppercase tracking-wide text-emerald-400">
+                            Valid JSON
                           </span>
 
                         </div>
 
                         <button
                           type="button"
-                          class="rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-[7px] font-black uppercase tracking-wider text-slate-300 transition hover:bg-slate-700 hover:text-white"
+                          class="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-[10px] font-extrabold uppercase tracking-wide text-slate-300 transition hover:bg-slate-700 hover:text-white"
                           data-action="click->definition-library#copyJson"
                         >
                           COPY
@@ -757,10 +747,12 @@
 
                       </div>
 
-                      <pre
-                        class="max-h-[420px] overflow-auto p-4 font-mono text-[9px] leading-5 text-emerald-300"
-                        data-definition-library-target="previewJson"
-                      ></pre>
+                      <div class="overflow-x-auto">
+                        <pre
+                          class="max-h-[600px] min-w-max overflow-y-auto p-5 font-mono text-xs leading-6 text-emerald-300 sm:text-sm sm:leading-7"
+                          data-definition-library-target="previewJson"
+                        ></pre>
+                      </div>
 
                     </div>
 
@@ -771,14 +763,14 @@
 
                 <!-- Footer -->
 
-                <div class="shrink-0 border-t border-slate-100 bg-slate-50/80 p-4 sm:p-5">
+                <div class="border-t border-slate-200 bg-slate-50 p-4 sm:p-5">
 
-                  <div class="mb-3 flex items-center gap-2">
+                  <div class="mb-3 flex items-start gap-2.5">
 
-                    <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+                    <span class="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-500"></span>
 
                     <span
-                      class="text-[8px] font-semibold leading-4 text-slate-400"
+                      class="text-xs font-medium leading-5 text-slate-500"
                       data-definition-library-target="analyticsStatus"
                     >
                       Ready to import into Definition Studio.
@@ -788,7 +780,7 @@
 
                   <button
                     type="button"
-                    class="w-full rounded-2xl border-2 border-violet-300 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-violet-500 px-5 py-4 text-[9px] font-black uppercase tracking-[0.18em] text-white shadow-lg shadow-violet-200/60 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-violet-200/70 focus:outline-none focus:ring-4 focus:ring-violet-200 disabled:cursor-not-allowed disabled:opacity-50"
+                    class="w-full rounded-2xl border border-violet-400 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-violet-600 px-5 py-4 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-lg shadow-violet-200/60 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-violet-200/70 focus:outline-none focus:ring-4 focus:ring-violet-200 disabled:cursor-not-allowed disabled:opacity-50"
                     data-definition-library-target="applyButton"
                     data-action="click->definition-library#apply"
                     disabled
@@ -796,7 +788,7 @@
                     USE THIS DEFINITION →
                   </button>
 
-                  <div class="mt-2 text-center text-[8px] font-medium text-slate-400">
+                  <div class="mt-2 text-center text-xs font-medium text-slate-400">
                     You can customize every field after importing.
                   </div>
 
@@ -824,18 +816,18 @@
       >
 
         <div
-          class="w-full max-w-md rounded-3xl border-2 border-violet-100 bg-white p-6 shadow-[0_30px_100px_rgba(76,29,149,0.35)]"
+          class="w-full max-w-md rounded-3xl border border-violet-100 bg-white p-6 shadow-[0_30px_100px_rgba(76,29,149,0.35)] sm:p-7"
           role="alertdialog"
           aria-modal="true"
           aria-labelledby="definition-library-confirm-title"
         >
 
-          <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-50 text-xl text-violet-500">
+          <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-50 text-2xl text-violet-600">
             ↓
           </div>
 
           <h3
-            class="mt-5 text-lg font-black text-slate-800"
+            class="mt-5 text-xl font-extrabold text-slate-900"
             id="definition-library-confirm-title"
             data-definition-library-target="confirmationTitle"
           >
@@ -843,17 +835,17 @@
           </h3>
 
           <p
-            class="mt-2 text-[10px] leading-5 text-slate-400"
+            class="mt-2 text-sm leading-6 text-slate-500"
             data-definition-library-target="confirmationDescription"
           >
             This definition will be loaded into Definition Studio.
           </p>
 
-          <div class="mt-6 flex gap-2">
+          <div class="mt-6 flex gap-3">
 
             <button
               type="button"
-              class="flex-1 rounded-2xl border-2 border-slate-200 bg-white px-4 py-3 text-[8px] font-black uppercase tracking-wider text-slate-500 transition hover:bg-slate-50"
+              class="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-extrabold uppercase tracking-wide text-slate-600 transition hover:bg-slate-50"
               data-definition-library-target="confirmationCancel"
               data-action="click->definition-library#cancelImport"
             >
@@ -862,7 +854,7 @@
 
             <button
               type="button"
-              class="flex-1 rounded-2xl bg-violet-500 px-4 py-3 text-[8px] font-black uppercase tracking-wider text-white transition hover:bg-violet-600 focus:outline-none focus:ring-4 focus:ring-violet-200"
+              class="flex-1 rounded-xl bg-violet-600 px-4 py-3 text-sm font-extrabold uppercase tracking-wide text-white transition hover:bg-violet-700 focus:outline-none focus:ring-4 focus:ring-violet-200"
               data-definition-library-target="confirmationConfirm"
               data-action="click->definition-library#confirmImport"
             >
@@ -880,17 +872,17 @@
            FOOTER
            ========================================================== -->
 
-      <footer class="shrink-0 border-t border-slate-100 bg-white px-5 py-3.5 sm:px-7 lg:px-8">
+      <footer class="shrink-0 border-t border-slate-200 bg-white px-4 py-3.5 sm:px-6 lg:px-7">
 
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2.5">
 
-            <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-xs text-emerald-500">
+            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-sm font-black text-emerald-600">
               ✓
             </span>
 
-            <span class="text-[8px] font-semibold text-slate-400">
+            <span class="text-xs font-medium text-slate-500 sm:text-sm">
               Library definitions are starting points — never locked structures.
             </span>
 
@@ -898,7 +890,7 @@
 
           <button
             type="button"
-            class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-[8px] font-black uppercase tracking-wider text-slate-500 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700 focus:outline-none focus:ring-4 focus:ring-violet-100"
+            class="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-xs font-extrabold uppercase tracking-wide text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-800 focus:outline-none focus:ring-4 focus:ring-violet-100"
             data-action="click->definition-library#close"
           >
             CLOSE
