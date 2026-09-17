@@ -12,20 +12,19 @@ import { Controller } from "@hotwired/stimulus"
  * - Form submit validation
  * - Debug instrumentation
  *
- * Debugging:
- * Open browser console and look for:
+ * Important library behavior:
  *
- *   [ENTITY BUILDER]
- *   [ENTITY BUILDER:JSON]
- *   [ENTITY BUILDER:FIELD]
- *   [ENTITY BUILDER:LIBRARY]
- *   [ENTITY BUILDER:SUBMIT]
+ * Library records may look like:
  *
- * Set:
+ * {
+ *   fields: [],
+ *   definition_json: {
+ *     fields: [...]
+ *   }
+ * }
  *
- *   window.ENTITY_BUILDER_DEBUG = true
- *
- * to enable extra DOM/state dumps.
+ * This controller therefore explicitly unwraps definition_json
+ * before extracting fields.
  */
 
 export default class extends Controller {
@@ -96,6 +95,32 @@ export default class extends Controller {
     this.fieldRequired = false
     this.fieldMultiple = false
     this.fieldActive = true
+    this.toastTimer = null
+
+    /*
+     * Listen globally for the definition library event.
+     *
+     * This makes the builder independent of whether the library
+     * modal is nested inside the builder element or elsewhere
+     * in the DOM.
+     */
+    this.handleLibraryApply = this.handleLibraryApply.bind(this)
+
+    document.addEventListener(
+      "definition-library:apply",
+      this.handleLibraryApply
+    )
+
+    /*
+     * Also listen for the open event so the library can be opened
+     * reliably from the builder.
+     */
+    this.handleLibraryOpen = this.handleLibraryOpen.bind(this)
+
+    document.addEventListener(
+      "definition-library:open",
+      this.handleLibraryOpen
+    )
 
     this.debug("STATE INITIALIZED", {
       fieldEditingIndex: this.fieldEditingIndex,
@@ -111,6 +136,16 @@ export default class extends Controller {
 
   disconnect() {
     this.debug("DISCONNECT")
+
+    document.removeEventListener(
+      "definition-library:apply",
+      this.handleLibraryApply
+    )
+
+    document.removeEventListener(
+      "definition-library:open",
+      this.handleLibraryOpen
+    )
 
     if (this.toastTimer) {
       clearTimeout(this.toastTimer)
@@ -201,7 +236,8 @@ export default class extends Controller {
     const inventory = {}
 
     targets.forEach((name) => {
-      const hasProperty = `has${name.charAt(0).toUpperCase()}${name.slice(1)}Target`
+      const hasProperty =
+        `has${name.charAt(0).toUpperCase()}${name.slice(1)}Target`
 
       inventory[name] = this[hasProperty] ?? false
     })
@@ -217,7 +253,10 @@ export default class extends Controller {
     this.debugJson("Initializing definition")
 
     if (!this.hasJsonTarget) {
-      this.debugJson("ERROR: JSON target is missing")
+      this.debugJson("JSON target is missing")
+      this.fields = []
+      this.renderFields()
+      this.updateStats()
       this.setBuilderStatus("JSON target missing", "error")
       return
     }
@@ -227,12 +266,15 @@ export default class extends Controller {
     this.debugJson("Initial JSON textarea value", raw)
 
     if (!raw || !raw.trim()) {
-      this.debugJson("JSON is empty. Using default definition.")
+      this.debugJson(
+        "JSON is empty. Using default definition."
+      )
 
       this.fields = []
 
       this.renderFields()
       this.syncJsonFromFields()
+      this.updateStats()
 
       return
     }
@@ -240,14 +282,20 @@ export default class extends Controller {
     try {
       const parsed = JSON.parse(raw)
 
-      this.debugJson("Initial JSON parsed successfully", parsed)
+      this.debugJson(
+        "Initial JSON parsed successfully",
+        parsed
+      )
 
       this.fields = this.extractFields(parsed)
 
-      this.debugJson("Fields extracted from initial JSON", {
-        count: this.fields.length,
-        fields: this.fields
-      })
+      this.debugJson(
+        "Fields extracted from initial JSON",
+        {
+          count: this.fields.length,
+          fields: this.fields
+        }
+      )
 
       this.renderFields()
       this.updateStats()
@@ -259,102 +307,332 @@ export default class extends Controller {
         "success"
       )
     } catch (error) {
-      this.debugJson("INITIAL JSON PARSE FAILED", {
-        error,
-        message: error.message,
-        raw
-      })
+      this.debugJson(
+        "INITIAL JSON PARSE FAILED",
+        {
+          error,
+          message: error.message,
+          raw
+        }
+      )
 
       this.fields = []
 
       this.renderFields()
-      this.showJsonError(`Invalid JSON: ${error.message}`)
-      this.setBuilderStatus("Invalid JSON", "error")
+      this.updateStats()
+
+      this.showJsonError(
+        `Invalid JSON: ${error.message}`
+      )
+
+      this.setBuilderStatus(
+        "Invalid JSON",
+        "error"
+      )
     }
   }
 
+  // ============================================================
+  // DEFINITION / FIELD EXTRACTION
+  // ============================================================
+
   extractFields(definition) {
     if (!definition || typeof definition !== "object") {
-      this.debugJson("Definition is not an object", definition)
+      this.debugJson(
+        "Definition is not an object",
+        definition
+      )
+
       return []
     }
 
-    if (Array.isArray(definition.fields)) {
-      return definition.fields.map((field) =>
+    /*
+     * IMPORTANT:
+     *
+     * Your database object currently looks like:
+     *
+     * {
+     *   fields: [],
+     *   definition_json: {
+     *     fields: [...]
+     *   }
+     * }
+     *
+     * We must prefer definition_json when the top-level fields
+     * array is empty and definition_json contains fields.
+     */
+
+    const unwrapped = this.unwrapDefinitionJson(definition)
+
+    this.debugJson(
+      "Definition after unwrapping",
+      unwrapped
+    )
+
+    if (
+      Array.isArray(unwrapped.fields)
+    ) {
+      return unwrapped.fields.map((field) =>
         this.normalizeField(field)
       )
     }
 
     /*
-     * Also support definitions where fields are represented
-     * as an object:
+     * Support:
      *
      * {
-     *   "fields": {
-     *     "email": {
-     *       "type": "string"
+     *   fields: {
+     *     email: {
+     *       type: "string"
      *     }
      *   }
      * }
      */
 
     if (
-      definition.fields &&
-      typeof definition.fields === "object"
+      unwrapped.fields &&
+      typeof unwrapped.fields === "object" &&
+      !Array.isArray(unwrapped.fields)
     ) {
-      return Object.entries(definition.fields).map(
-        ([name, field]) => {
-          return this.normalizeField({
-            name,
-            ...field
-          })
-        }
-      )
+      return Object.entries(
+        unwrapped.fields
+      ).map(([name, field]) => {
+        return this.normalizeField({
+          ...(field || {}),
+          name
+        })
+      })
     }
 
-    this.debugJson("No fields array/object found in definition")
+    this.debugJson(
+      "No fields array/object found in definition",
+      unwrapped
+    )
 
     return []
   }
 
+  unwrapDefinitionJson(definition) {
+    if (
+      !definition ||
+      typeof definition !== "object"
+    ) {
+      return definition
+    }
+
+    /*
+     * Handle:
+     *
+     * {
+     *   definition_json: {
+     *     fields: [...]
+     *   }
+     * }
+     */
+
+    if (definition.definition_json) {
+      const nested =
+        this.parsePossibleJson(
+          definition.definition_json
+        )
+
+      if (
+        nested &&
+        typeof nested === "object"
+      ) {
+        /*
+         * If nested definition actually has fields,
+         * use it.
+         */
+        if (
+          Array.isArray(nested.fields) &&
+          nested.fields.length > 0
+        ) {
+          this.debugLibrary(
+            "Using fields from definition_json",
+            nested
+          )
+
+          return nested
+        }
+
+        if (
+          nested.fields &&
+          typeof nested.fields === "object"
+        ) {
+          this.debugLibrary(
+            "Using object fields from definition_json",
+            nested
+          )
+
+          return nested
+        }
+      }
+    }
+
+    /*
+     * Handle nested:
+     *
+     * {
+     *   definition: {
+     *     fields: [...]
+     *   }
+     * }
+     */
+
+    if (
+      definition.definition &&
+      typeof definition.definition === "object"
+    ) {
+      return this.unwrapDefinitionJson(
+        definition.definition
+      )
+    }
+
+    return definition
+  }
+
+  parsePossibleJson(value) {
+    if (typeof value !== "string") {
+      return value
+    }
+
+    try {
+      return JSON.parse(value)
+    } catch (error) {
+      this.debugJson(
+        "Could not parse nested JSON string",
+        {
+          value,
+          error: error.message
+        }
+      )
+
+      return value
+    }
+  }
+
   normalizeField(field = {}) {
     return {
-      name: String(field.name || "").trim(),
+      name: String(
+        field.name ||
+        field.key ||
+        ""
+      ).trim(),
+
       label: String(
         field.label ||
         field.title ||
         field.name ||
+        field.key ||
         ""
       ).trim(),
-      type: String(field.type || "string"),
-      description: String(field.description || ""),
-      required: Boolean(field.required),
+
+      type: String(
+        field.type ||
+        "string"
+      ),
+
+      description: String(
+        field.description ||
+        ""
+      ),
+
+      required: Boolean(
+        field.required
+      ),
+
       multiple: Boolean(
         field.multiple ??
         field.array ??
         false
       ),
-      active: field.active === undefined
-        ? true
-        : Boolean(field.active)
+
+      active:
+        field.active === undefined
+          ? true
+          : Boolean(field.active)
     }
   }
 
+  normalizeDefinition(definition) {
+    if (typeof definition === "string") {
+      this.debugLibrary(
+        "Library definition is a string. Parsing JSON."
+      )
+
+      return this.normalizeDefinition(
+        JSON.parse(definition)
+      )
+    }
+
+    if (
+      definition &&
+      typeof definition === "object" &&
+      definition.definition
+    ) {
+      this.debugLibrary(
+        "Library payload contains nested definition property."
+      )
+
+      return this.normalizeDefinition(
+        definition.definition
+      )
+    }
+
+    if (
+      definition &&
+      typeof definition === "object" &&
+      definition.definition_json
+    ) {
+      this.debugLibrary(
+        "Library payload contains definition_json."
+      )
+
+      const nested =
+        this.parsePossibleJson(
+          definition.definition_json
+        )
+
+      if (
+        nested &&
+        typeof nested === "object"
+      ) {
+        return nested
+      }
+    }
+
+    if (
+      !definition ||
+      typeof definition !== "object"
+    ) {
+      throw new Error(
+        "Definition must be a JSON object."
+      )
+    }
+
+    return definition
+  }
+
   // ============================================================
-  // QUICK START
+  // QUICK START / LIBRARY
   // ============================================================
 
   openLibrary(event) {
     event?.preventDefault()
 
-    this.debugLibrary("openLibrary action received", {
-      eventType: event?.type,
-      target: event?.currentTarget
-    })
-
-    const libraryElements = document.querySelectorAll(
-      '[data-controller~="definition-library"]'
+    this.debugLibrary(
+      "openLibrary action received",
+      {
+        eventType: event?.type,
+        target: event?.currentTarget
+      }
     )
+
+    const libraryElements =
+      document.querySelectorAll(
+        '[data-controller~="definition-library"]'
+      )
 
     this.debugLibrary(
       "Definition library controller elements found",
@@ -378,7 +656,8 @@ export default class extends Controller {
       return
     }
 
-    const libraryElement = libraryElements[0]
+    const libraryElement =
+      libraryElements[0]
 
     this.debugLibrary(
       "Dispatching open request to library",
@@ -386,13 +665,48 @@ export default class extends Controller {
     )
 
     libraryElement.dispatchEvent(
-      new CustomEvent("definition-library:open", {
-        bubbles: true,
-        detail: {
-          source: "entity-definition-builder"
+      new CustomEvent(
+        "definition-library:open",
+        {
+          bubbles: true,
+          detail: {
+            source:
+              "entity-definition-builder"
+          }
         }
-      })
+      )
     )
+  }
+
+  /*
+   * Receives the open event if the library controller listens
+   * at document level.
+   */
+  handleLibraryOpen(event) {
+    this.debugLibrary(
+      "definition-library:open received",
+      event?.detail
+    )
+  }
+
+  /*
+   * Global event handler.
+   *
+   * This is intentionally separate from applyLibrary so that
+   * the library event works even when the modal is outside the
+   * builder DOM element.
+   */
+  handleLibraryApply(event) {
+    this.debugLibrary(
+      "GLOBAL definition-library:apply received",
+      {
+        detail: event?.detail,
+        target: event?.target,
+        currentTarget: event?.currentTarget
+      }
+    )
+
+    this.applyLibrary(event)
   }
 
   applyLibrary(event) {
@@ -401,10 +715,25 @@ export default class extends Controller {
       event?.detail
     )
 
-    const definition =
-      event?.detail?.definition ??
-      event?.detail?.value ??
-      event?.detail
+    const detail =
+      event?.detail ?? null
+
+    /*
+     * Support all common payload shapes:
+     *
+     * detail.definition
+     * detail.value
+     * detail.template
+     * detail.selectedDefinition
+     * detail itself
+     */
+
+    let definition =
+      detail?.definition ??
+      detail?.value ??
+      detail?.template ??
+      detail?.selectedDefinition ??
+      detail
 
     if (!definition) {
       this.debugLibrary(
@@ -421,44 +750,134 @@ export default class extends Controller {
     }
 
     this.debugLibrary(
-      "Applying library definition",
+      "Raw library definition received",
       definition
     )
 
     try {
-      const normalized = this.normalizeDefinition(definition)
-
-      this.fields = this.extractFields(normalized)
+      const normalized =
+        this.normalizeDefinition(
+          definition
+        )
 
       this.debugLibrary(
-        "Library definition normalized",
+        "Normalized library definition",
+        normalized
+      )
+
+      /*
+       * extractFields now understands:
+       *
+       * fields
+       * definition_json.fields
+       * object-style fields
+       */
+      const fields =
+        this.extractFields(
+          normalized
+        )
+
+      this.debugLibrary(
+        "Fields extracted from library definition",
         {
-          normalized,
-          fieldCount: this.fields.length,
-          fields: this.fields
+          count: fields.length,
+          fields
+        }
+      )
+
+      if (fields.length === 0) {
+        /*
+         * One more fallback in case the library sends the full
+         * ActiveRecord-style object:
+         *
+         * {
+         *   fields: [],
+         *   definition_json: {
+         *     fields: [...]
+         *   }
+         * }
+         */
+
+        const fallbackFields =
+          this.extractFields(
+            definition
+          )
+
+        if (fallbackFields.length > 0) {
+          this.debugLibrary(
+            "Fallback extraction succeeded",
+            {
+              count:
+                fallbackFields.length,
+              fields:
+                fallbackFields
+            }
+          )
+
+          this.fields =
+            fallbackFields
+        } else {
+          this.fields = []
+        }
+      } else {
+        this.fields = fields
+      }
+
+      this.debugLibrary(
+        "FINAL IMPORT FIELD STATE",
+        {
+          count:
+            this.fields.length,
+          fields:
+            this.fields
         }
       )
 
       this.renderFields()
+
       this.syncJsonFromFields()
+
       this.updateStats()
 
+      /*
+       * Close the library after successful import if the
+       * library exposes a close method through its DOM/controller.
+       */
+      this.closeLibraryModal()
+
       this.setBuilderStatus(
-        "Library definition imported",
-        "success"
+        this.fields.length > 0
+          ? "Library definition imported"
+          : "Library definition contains no fields",
+        this.fields.length > 0
+          ? "success"
+          : "error"
       )
 
-      this.showToast(
-        "DEFINITION IMPORTED",
-        `${this.fields.length} field${this.fields.length === 1 ? "" : "s"} imported.`,
-        "success"
-      )
+      if (this.fields.length > 0) {
+        this.showToast(
+          "DEFINITION IMPORTED",
+          `${this.fields.length} field${
+  this.fields.length === 1
+      ? ""
+      : "s"
+} imported.`,
+          "success"
+        )
+      } else {
+        this.showToast(
+          "NO FIELDS FOUND",
+          "The selected definition does not contain any importable fields.",
+          "error"
+        )
+      }
     } catch (error) {
       this.debugLibrary(
         "LIBRARY APPLY FAILED",
         {
           error,
-          message: error.message,
+          message:
+            error.message,
           definition
         }
       )
@@ -471,32 +890,16 @@ export default class extends Controller {
     }
   }
 
-  normalizeDefinition(definition) {
-    if (typeof definition === "string") {
-      this.debugLibrary(
-        "Library definition is a string. Parsing JSON."
-      )
-
-      return JSON.parse(definition)
-    }
-
-    if (
-      definition &&
-      typeof definition === "object" &&
-      definition.definition
-    ) {
-      this.debugLibrary(
-        "Library payload contains nested definition property."
-      )
-
-      return this.normalizeDefinition(definition.definition)
-    }
-
-    if (!definition || typeof definition !== "object") {
-      throw new Error("Definition must be a JSON object.")
-    }
-
-    return definition
+  closeLibraryModal() {
+    /*
+     * The library normally closes itself when APPLY is clicked.
+     *
+     * This method intentionally does not force-close arbitrary
+     * elements. It only logs that the import completed.
+     */
+    this.debugLibrary(
+      "Library import completed; library modal may now close."
+    )
   }
 
   // ============================================================
@@ -506,10 +909,15 @@ export default class extends Controller {
   openFieldEditor(event) {
     event?.preventDefault()
 
-    this.debugField("Opening field editor")
+    this.debugField(
+      "Opening field editor"
+    )
 
     if (!this.hasFieldEditorTarget) {
-      this.debugField("ERROR: fieldEditor target missing")
+      this.debugField(
+        "ERROR: fieldEditor target missing"
+      )
+
       return
     }
 
@@ -520,11 +928,17 @@ export default class extends Controller {
 
     this.resetFieldEditor()
 
-    this.fieldEditorTarget.classList.remove("hidden")
+    this.fieldEditorTarget.classList.remove(
+      "hidden"
+    )
 
-    this.fieldNameTarget.focus()
+    if (this.hasFieldNameTarget) {
+      this.fieldNameTarget.focus()
+    }
 
-    this.debugField("Field editor opened")
+    this.debugField(
+      "Field editor opened"
+    )
   }
 
   editField(event) {
@@ -534,10 +948,14 @@ export default class extends Controller {
       event?.currentTarget?.dataset?.fieldIndex
     )
 
-    this.debugField("editField action", {
-      index,
-      dataset: event?.currentTarget?.dataset
-    })
+    this.debugField(
+      "editField action",
+      {
+        index,
+        dataset:
+          event?.currentTarget?.dataset
+      }
+    )
 
     if (
       Number.isNaN(index) ||
@@ -547,33 +965,49 @@ export default class extends Controller {
         "ERROR: Cannot edit field. Invalid index.",
         {
           index,
-          fields: this.fields
+          fields:
+            this.fields
         }
       )
 
       return
     }
 
-    const field = this.fields[index]
+    const field =
+      this.fields[index]
 
-    this.fieldEditingIndex = index
+    this.fieldEditingIndex =
+      index
 
     this.fieldEditorTitleTarget.textContent =
       "Edit definition field"
 
-    this.fieldNameTarget.value = field.name
-    this.fieldLabelTarget.value = field.label
-    this.fieldTypeTarget.value = field.type
+    this.fieldNameTarget.value =
+      field.name
+
+    this.fieldLabelTarget.value =
+      field.label
+
+    this.fieldTypeTarget.value =
+      field.type
+
     this.fieldDescriptionTarget.value =
       field.description
 
-    this.fieldRequired = field.required
-    this.fieldMultiple = field.multiple
-    this.fieldActive = field.active
+    this.fieldRequired =
+      field.required
+
+    this.fieldMultiple =
+      field.multiple
+
+    this.fieldActive =
+      field.active
 
     this.refreshToggleUI()
 
-    this.fieldEditorTarget.classList.remove("hidden")
+    this.fieldEditorTarget.classList.remove(
+      "hidden"
+    )
 
     this.fieldNameTarget.focus()
 
@@ -589,10 +1023,14 @@ export default class extends Controller {
   closeFieldEditor(event) {
     event?.preventDefault()
 
-    this.debugField("Closing field editor")
+    this.debugField(
+      "Closing field editor"
+    )
 
     if (this.hasFieldEditorTarget) {
-      this.fieldEditorTarget.classList.add("hidden")
+      this.fieldEditorTarget.classList.add(
+        "hidden"
+      )
     }
 
     this.fieldEditingIndex = null
@@ -601,7 +1039,9 @@ export default class extends Controller {
   }
 
   resetFieldEditor() {
-    if (!this.hasFieldNameTarget) return
+    if (!this.hasFieldNameTarget) {
+      return
+    }
 
     this.fieldNameTarget.value = ""
     this.fieldLabelTarget.value = ""
@@ -618,7 +1058,8 @@ export default class extends Controller {
   toggleFieldRequired(event) {
     event?.preventDefault()
 
-    this.fieldRequired = !this.fieldRequired
+    this.fieldRequired =
+      !this.fieldRequired
 
     this.debugField(
       "Required toggled",
@@ -631,7 +1072,8 @@ export default class extends Controller {
   toggleFieldMultiple(event) {
     event?.preventDefault()
 
-    this.fieldMultiple = !this.fieldMultiple
+    this.fieldMultiple =
+      !this.fieldMultiple
 
     this.debugField(
       "Multiple toggled",
@@ -644,7 +1086,8 @@ export default class extends Controller {
   toggleFieldActive(event) {
     event?.preventDefault()
 
-    this.fieldActive = !this.fieldActive
+    this.fieldActive =
+      !this.fieldActive
 
     this.debugField(
       "Active toggled",
@@ -657,7 +1100,9 @@ export default class extends Controller {
   refreshToggleUI() {
     if (this.hasRequiredIconTarget) {
       this.requiredIconTarget.textContent =
-        this.fieldRequired ? "✓" : "○"
+        this.fieldRequired
+          ? "✓"
+          : "○"
 
       this.requiredIconTarget.classList.toggle(
         "bg-orange-100",
@@ -689,7 +1134,9 @@ export default class extends Controller {
 
     if (this.hasMultipleIconTarget) {
       this.multipleIconTarget.textContent =
-        this.fieldMultiple ? "✓" : "○"
+        this.fieldMultiple
+          ? "✓"
+          : "○"
     }
 
     if (this.hasMultipleLabelTarget) {
@@ -701,7 +1148,9 @@ export default class extends Controller {
 
     if (this.hasActiveIconTarget) {
       this.activeIconTarget.textContent =
-        this.fieldActive ? "●" : "○"
+        this.fieldActive
+          ? "●"
+          : "○"
     }
 
     if (this.hasActiveLabelTarget) {
@@ -716,22 +1165,39 @@ export default class extends Controller {
     event?.preventDefault()
 
     const field = {
-      name: this.fieldNameTarget.value.trim(),
-      label: this.fieldLabelTarget.value.trim(),
-      type: this.fieldTypeTarget.value,
+      name:
+        this.fieldNameTarget.value.trim(),
+
+      label:
+        this.fieldLabelTarget.value.trim(),
+
+      type:
+        this.fieldTypeTarget.value,
+
       description:
         this.fieldDescriptionTarget.value.trim(),
-      required: this.fieldRequired,
-      multiple: this.fieldMultiple,
-      active: this.fieldActive
+
+      required:
+        this.fieldRequired,
+
+      multiple:
+        this.fieldMultiple,
+
+      active:
+        this.fieldActive
     }
 
-    this.debugField("Attempting to save field", {
-      editingIndex: this.fieldEditingIndex,
-      field
-    })
+    this.debugField(
+      "Attempting to save field",
+      {
+        editingIndex:
+          this.fieldEditingIndex,
+        field
+      }
+    )
 
-    const validation = this.validateField(field)
+    const validation =
+      this.validateField(field)
 
     if (!validation.valid) {
       this.debugField(
@@ -748,28 +1214,37 @@ export default class extends Controller {
       return
     }
 
-    if (this.fieldEditingIndex === null) {
+    if (
+      this.fieldEditingIndex === null
+    ) {
       this.fields.push(field)
 
       this.debugField(
         "New field added",
         {
           field,
-          newCount: this.fields.length
+          newCount:
+            this.fields.length
         }
       )
     } else {
       const oldField =
-        this.fields[this.fieldEditingIndex]
+        this.fields[
+          this.fieldEditingIndex
+        ]
 
-      this.fields[this.fieldEditingIndex] = field
+      this.fields[
+        this.fieldEditingIndex
+      ] = field
 
       this.debugField(
         "Existing field updated",
         {
-          index: this.fieldEditingIndex,
+          index:
+            this.fieldEditingIndex,
           oldField,
-          newField: field
+          newField:
+            field
         }
       )
     }
@@ -787,7 +1262,10 @@ export default class extends Controller {
 
     this.showToast(
       "FIELD SAVED",
-      `${field.label || field.name} is now part of the definition.`,
+      `${
+  field.label ||
+  field.name
+} is now part of the definition.`,
       "success"
     )
   }
@@ -796,11 +1274,16 @@ export default class extends Controller {
     if (!field.name) {
       return {
         valid: false,
-        message: "Field name is required."
+        message:
+          "Field name is required."
       }
     }
 
-    if (!/^[a-zA-Z0-9_-]+$/.test(field.name)) {
+    if (
+      !/^[a-zA-Z0-9_-]+$/.test(
+        field.name
+      )
+    ) {
       return {
         valid: false,
         message:
@@ -808,11 +1291,13 @@ export default class extends Controller {
       }
     }
 
-    const duplicate = this.fields.some(
-      (existing, index) =>
-        existing.name === field.name &&
-        index !== this.fieldEditingIndex
-    )
+    const duplicate =
+      this.fields.some(
+        (existing, index) =>
+          existing.name === field.name &&
+          index !==
+            this.fieldEditingIndex
+      )
 
     if (duplicate) {
       return {
@@ -825,7 +1310,8 @@ export default class extends Controller {
     if (!field.type) {
       return {
         valid: false,
-        message: "Field type is required."
+        message:
+          "Field type is required."
       }
     }
 
@@ -841,9 +1327,12 @@ export default class extends Controller {
       event?.currentTarget?.dataset?.fieldIndex
     )
 
-    this.debugField("deleteField action", {
-      index
-    })
+    this.debugField(
+      "deleteField action",
+      {
+        index
+      }
+    )
 
     if (
       Number.isNaN(index) ||
@@ -853,21 +1342,27 @@ export default class extends Controller {
         "ERROR: Invalid delete index",
         {
           index,
-          fields: this.fields
+          fields:
+            this.fields
         }
       )
 
       return
     }
 
-    const removed = this.fields.splice(index, 1)[0]
+    const removed =
+      this.fields.splice(
+        index,
+        1
+      )[0]
 
     this.debugField(
       "Field removed",
       {
         index,
         removed,
-        remainingCount: this.fields.length
+        remainingCount:
+          this.fields.length
       }
     )
 
@@ -882,7 +1377,10 @@ export default class extends Controller {
 
     this.showToast(
       "FIELD REMOVED",
-      `${removed.label || removed.name} was removed.`,
+      `${
+  removed.label ||
+  removed.name
+} was removed.`,
       "success"
     )
   }
@@ -896,14 +1394,17 @@ export default class extends Controller {
       this.debugField(
         "ERROR: builder target missing"
       )
+
       return
     }
 
     this.debugField(
       "Rendering field inventory",
       {
-        count: this.fields.length,
-        fields: this.fields
+        count:
+          this.fields.length,
+        fields:
+          this.fields
       }
     )
 
@@ -911,15 +1412,15 @@ export default class extends Controller {
       this.builderTarget.innerHTML = `
 <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/70 p-8 text-center">
     <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-xl text-slate-300 shadow-sm">
-            ◈
+    ◈
 </div>
 
 <div class="mt-3 text-xs font-black text-slate-500">
-    No definition fields yet
+  No definition fields yet
 </div>
 
 <div class="mt-1 text-[9px] text-slate-400">
-    Add a field or import a ready definition.
+  Add a field or import a ready definition.
 </div>
 </div>
 `
@@ -930,26 +1431,30 @@ export default class extends Controller {
     this.builderTarget.innerHTML =
       this.fields
         .map((field, index) =>
-          this.renderField(field, index)
+          this.renderField(
+            field,
+            index
+          )
         )
         .join("")
   }
 
   renderField(field, index) {
-    const requiredClass = field.required
-      ? "border-orange-200 bg-orange-50/50"
-      : "border-slate-100 bg-white"
+    const requiredClass =
+      field.required
+        ? "border-orange-200 bg-orange-50/50"
+        : "border-slate-100 bg-white"
 
-    const activeClass = field.active
-      ? "text-emerald-500"
-      : "text-slate-300"
+    const activeClass =
+      field.active
+        ? "text-emerald-500"
+        : "text-slate-300"
 
     return `
 <div
 class="rounded-2xl border-2 ${requiredClass} p-4 shadow-sm transition hover:shadow-md"
 data-field-index="${index}"
     >
-
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
     <div class="flex min-w-0 items-start gap-3">
@@ -960,50 +1465,55 @@ data-field-index="${index}"
 
 <div class="min-w-0">
 
-    <div class="flex flex-wrap items-center gap-2">
+  <div class="flex flex-wrap items-center gap-2">
 
-                <span class="truncate font-mono text-xs font-black text-slate-700">
-                  ${this.escapeHtml(field.name)}
-                </span>
+          <span class="truncate font-mono text-xs font-black text-slate-700">
+            ${this.escapeHtml(field.name)}
+          </span>
 
-        <span class="rounded-full bg-violet-50 px-2 py-1 text-[7px] font-black uppercase tracking-wider text-violet-500">
-                  ${this.escapeHtml(field.type)}
-                </span>
-
-        ${
-        field.required
-            ? `
-                      <span class="rounded-full bg-orange-50 px-2 py-1 text-[7px] font-black uppercase tracking-wider text-orange-500">
-                        REQUIRED
-                      </span>
-                    `
-            : ""
-    }
-
-        ${
-        field.multiple
-            ? `
-                      <span class="rounded-full bg-sky-50 px-2 py-1 text-[7px] font-black uppercase tracking-wider text-sky-500">
-                        MULTIPLE
-                      </span>
-                    `
-            : ""
-    }
-
-    </div>
-
-    <div class="mt-1 text-[10px] font-semibold text-slate-500">
-        ${this.escapeHtml(field.label || field.name)}
-    </div>
+    <span class="rounded-full bg-violet-50 px-2 py-1 text-[7px] font-black uppercase tracking-wider text-violet-500">
+            ${this.escapeHtml(field.type)}
+          </span>
 
     ${
-    field.description
+    field.required
         ? `
-                    <div class="mt-1 text-[9px] leading-4 text-slate-400">
-                      ${this.escapeHtml(field.description)}
-                    </div>
-                  `
+                <span class="rounded-full bg-orange-50 px-2 py-1 text-[7px] font-black uppercase tracking-wider text-orange-500">
+                  REQUIRED
+                </span>
+              `
         : ""
+  }
+
+    ${
+    field.multiple
+        ? `
+                <span class="rounded-full bg-sky-50 px-2 py-1 text-[7px] font-black uppercase tracking-wider text-sky-500">
+                  MULTIPLE
+                </span>
+              `
+        : ""
+  }
+
+  </div>
+
+  <div class="mt-1 text-[10px] font-semibold text-slate-500">
+    ${this.escapeHtml(
+      field.label ||
+      field.name
+  )}
+  </div>
+
+  ${
+  field.description
+      ? `
+              <div class="mt-1 text-[9px] leading-4 text-slate-400">
+                ${this.escapeHtml(
+          field.description
+      )}
+              </div>
+            `
+      : ""
 }
 
 </div>
@@ -1012,32 +1522,35 @@ data-field-index="${index}"
 
 <div class="flex shrink-0 items-center gap-2">
 
-            <span class="text-[8px] font-black uppercase tracking-wider ${activeClass}">
-              ${field.active ? "ACTIVE" : "INACTIVE"}
-            </span>
+      <span class="text-[8px] font-black uppercase tracking-wider ${activeClass}">
+        ${
+        field.active
+            ? "ACTIVE"
+            : "INACTIVE"
+      }
+      </span>
 
-    <button
-        type="button"
-        class="rounded-xl border border-violet-100 bg-violet-50 px-3 py-2 text-[8px] font-black uppercase tracking-wider text-violet-500 transition hover:border-violet-200 hover:bg-violet-100"
-        data-field-index="${index}"
-        data-action="click->entity-definition-builder#editField"
-    >
-        EDIT
-    </button>
+  <button
+      type="button"
+      class="rounded-xl border border-violet-100 bg-violet-50 px-3 py-2 text-[8px] font-black uppercase tracking-wider text-violet-500 transition hover:border-violet-200 hover:bg-violet-100"
+      data-field-index="${index}"
+      data-action="click->entity-definition-builder#editField"
+  >
+    EDIT
+  </button>
 
-    <button
-        type="button"
-        class="rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-[8px] font-black uppercase tracking-wider text-red-400 transition hover:border-red-200 hover:bg-red-100"
-        data-field-index="${index}"
-        data-action="click->entity-definition-builder#deleteField"
-    >
-        DELETE
-    </button>
+  <button
+      type="button"
+      class="rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-[8px] font-black uppercase tracking-wider text-red-400 transition hover:border-red-200 hover:bg-red-100"
+      data-field-index="${index}"
+      data-action="click->entity-definition-builder#deleteField"
+  >
+    DELETE
+  </button>
 
 </div>
 
 </div>
-
 </div>
 `
   }
@@ -1054,30 +1567,41 @@ data-field-index="${index}"
     this.debugJson(
       "JSON input changed",
       {
-        length: value.length,
-        preview: value.slice(0, 300)
+        length:
+          value.length,
+        preview:
+          value.slice(
+            0,
+            300
+          )
       }
     )
 
     try {
-      const parsed = JSON.parse(value)
+      const parsed =
+        JSON.parse(value)
 
       this.debugJson(
         "Manual JSON parsed successfully",
         parsed
       )
 
-      const fields = this.extractFields(parsed)
+      const fields =
+        this.extractFields(
+          parsed
+        )
 
       this.debugJson(
         "Manual JSON fields extracted",
         {
-          count: fields.length,
+          count:
+            fields.length,
           fields
         }
       )
 
-      this.fields = fields
+      this.fields =
+        fields
 
       this.renderFields()
       this.updateStats()
@@ -1087,15 +1611,12 @@ data-field-index="${index}"
         "JSON synchronized",
         "success"
       )
-
-      this.debugJson(
-        "JSON -> visual builder synchronization complete"
-      )
     } catch (error) {
       this.debugJson(
         "MANUAL JSON PARSE FAILED",
         {
-          message: error.message,
+          message:
+            error.message,
           error,
           value
         }
@@ -1117,18 +1638,32 @@ data-field-index="${index}"
       this.debugJson(
         "ERROR: Cannot sync. JSON target missing."
       )
+
       return
     }
 
+    /*
+     * IMPORTANT:
+     *
+     * The builder's canonical representation is:
+     *
+     * {
+     *   fields: [...]
+     * }
+     *
+     * This is what will be submitted by the form.
+     */
     const definition = {
-      fields: this.fields
+      fields:
+        this.fields
     }
 
-    const json = JSON.stringify(
-      definition,
-      null,
-      2
-    )
+    const json =
+      JSON.stringify(
+        definition,
+        null,
+        2
+      )
 
     this.debugJson(
       "Synchronizing visual builder -> JSON",
@@ -1138,12 +1673,16 @@ data-field-index="${index}"
       }
     )
 
-    this.jsonTarget.value = json
+    this.jsonTarget.value =
+      json
 
     this.jsonTarget.dispatchEvent(
-      new Event("input", {
-        bubbles: true
-      })
+      new Event(
+        "input",
+        {
+          bubbles: true
+        }
+      )
     )
 
     this.clearJsonError()
@@ -1156,22 +1695,30 @@ data-field-index="${index}"
   formatJson(event) {
     event?.preventDefault()
 
-    this.debugJson("FORMAT action")
+    this.debugJson(
+      "FORMAT action"
+    )
 
     if (!this.hasJsonTarget) {
       this.debugJson(
         "ERROR: JSON target missing"
       )
+
       return
     }
 
     try {
-      const parsed = JSON.parse(
-        this.jsonTarget.value
-      )
+      const parsed =
+        JSON.parse(
+          this.jsonTarget.value
+        )
 
       this.jsonTarget.value =
-        JSON.stringify(parsed, null, 2)
+        JSON.stringify(
+          parsed,
+          null,
+          2
+        )
 
       this.clearJsonError()
 
@@ -1180,14 +1727,16 @@ data-field-index="${index}"
       )
 
       this.jsonChanged({
-        currentTarget: this.jsonTarget
+        currentTarget:
+          this.jsonTarget
       })
     } catch (error) {
       this.debugJson(
         "FORMAT FAILED",
         {
           error,
-          message: error.message
+          message:
+            error.message
         }
       )
 
@@ -1198,13 +1747,17 @@ data-field-index="${index}"
   }
 
   showJsonError(message) {
-    if (!this.hasJsonErrorTarget) return
+    if (!this.hasJsonErrorTarget) {
+      return
+    }
 
     this.jsonErrorTarget.classList.remove(
       "hidden"
     )
 
-    if (this.hasJsonErrorMessageTarget) {
+    if (
+      this.hasJsonErrorMessageTarget
+    ) {
       this.jsonErrorMessageTarget.textContent =
         message
     }
@@ -1216,14 +1769,19 @@ data-field-index="${index}"
   }
 
   clearJsonError() {
-    if (!this.hasJsonErrorTarget) return
+    if (!this.hasJsonErrorTarget) {
+      return
+    }
 
     this.jsonErrorTarget.classList.add(
       "hidden"
     )
 
-    if (this.hasJsonErrorMessageTarget) {
-      this.jsonErrorMessageTarget.textContent = ""
+    if (
+      this.hasJsonErrorMessageTarget
+    ) {
+      this.jsonErrorMessageTarget.textContent =
+        ""
     }
   }
 
@@ -1232,16 +1790,19 @@ data-field-index="${index}"
   // ============================================================
 
   updateStats() {
-    const fieldCount = this.fields.length
+    const fieldCount =
+      this.fields.length
 
     const requiredCount =
       this.fields.filter(
-        (field) => field.required
+        (field) =>
+          field.required
       ).length
 
     const activeCount =
       this.fields.filter(
-        (field) => field.active
+        (field) =>
+          field.active
       ).length
 
     this.debug(
@@ -1255,20 +1816,30 @@ data-field-index="${index}"
 
     if (this.hasFieldCountTarget) {
       this.fieldCountTarget.textContent =
-        `${fieldCount} FIELD${fieldCount === 1 ? "" : "S"}`
+        `${fieldCount} FIELD${
+  fieldCount === 1
+      ? ""
+      : "S"
+}`
     }
 
-    if (this.hasSidebarFieldCountTarget) {
+    if (
+      this.hasSidebarFieldCountTarget
+    ) {
       this.sidebarFieldCountTarget.textContent =
         fieldCount
     }
 
-    if (this.hasSidebarRequiredCountTarget) {
+    if (
+      this.hasSidebarRequiredCountTarget
+    ) {
       this.sidebarRequiredCountTarget.textContent =
         requiredCount
     }
 
-    if (this.hasSidebarActiveCountTarget) {
+    if (
+      this.hasSidebarActiveCountTarget
+    ) {
       this.sidebarActiveCountTarget.textContent =
         activeCount
     }
@@ -1277,7 +1848,9 @@ data-field-index="${index}"
       fieldCount === 0
         ? 100
         : Math.round(
-            (activeCount / fieldCount) * 100
+            (activeCount /
+              fieldCount) *
+              100
           )
 
     if (this.hasHealthTarget) {
@@ -1295,35 +1868,53 @@ data-field-index="${index}"
         100,
         fieldCount > 0
           ? 25 +
-            Math.min(requiredCount, 3) * 15 +
-            Math.min(activeCount, 3) * 10
+            Math.min(
+              requiredCount,
+              3
+            ) *
+              15 +
+            Math.min(
+              activeCount,
+              3
+            ) *
+              10
           : 0
       )
 
-    if (this.hasProgressLabelTarget) {
+    if (
+      this.hasProgressLabelTarget
+    ) {
       this.progressLabelTarget.textContent =
         `${progress}%`
     }
 
-    if (this.hasProgressBarTarget) {
+    if (
+      this.hasProgressBarTarget
+    ) {
       this.progressBarTarget.style.width =
         `${progress}%`
     }
 
-    const xp = Math.min(
-      100,
-      fieldCount * 15 +
-      requiredCount * 10 +
-      activeCount * 5
-    )
+    const xp =
+      Math.min(
+        100,
+        fieldCount * 15 +
+          requiredCount * 10 +
+          activeCount * 5
+      )
 
     if (this.hasXpTarget) {
-      this.xpTarget.textContent = xp
+      this.xpTarget.textContent =
+        xp
     }
 
-    if (this.hasMissionFieldIconTarget) {
+    if (
+      this.hasMissionFieldIconTarget
+    ) {
       this.missionFieldIconTarget.textContent =
-        fieldCount > 0 ? "✓" : "01"
+        fieldCount > 0
+          ? "✓"
+          : "01"
 
       this.missionFieldIconTarget.classList.toggle(
         "bg-emerald-100",
@@ -1340,7 +1931,8 @@ data-field-index="${index}"
   }
 
   updateReadiness() {
-    const jsonValid = this.isJsonValid()
+    const jsonValid =
+      this.isJsonValid()
 
     const ready =
       jsonValid &&
@@ -1350,35 +1942,47 @@ data-field-index="${index}"
       "Readiness evaluated",
       {
         jsonValid,
-        fieldCount: this.fields.length,
+        fieldCount:
+          this.fields.length,
         ready
       }
     )
 
-    if (this.hasSubmitReadinessTarget) {
+    if (
+      this.hasSubmitReadinessTarget
+    ) {
       this.submitReadinessTarget.classList.toggle(
         "hidden",
         !ready
       )
     }
 
-    if (this.hasSidebarStatusTarget) {
+    if (
+      this.hasSidebarStatusTarget
+    ) {
       this.sidebarStatusTarget.textContent =
-        ready ? "READY" : "CHECK"
+        ready
+          ? "READY"
+          : "CHECK"
     }
   }
 
   isJsonValid() {
-    if (!this.hasJsonTarget) return false
+    if (!this.hasJsonTarget) {
+      return false
+    }
 
     try {
       const parsed =
-        JSON.parse(this.jsonTarget.value)
+        JSON.parse(
+          this.jsonTarget.value
+        )
 
       return Boolean(
         parsed &&
-        typeof parsed === "object" &&
-        !Array.isArray(parsed)
+          typeof parsed ===
+            "object" &&
+          !Array.isArray(parsed)
       )
     } catch {
       return false
@@ -1389,7 +1993,10 @@ data-field-index="${index}"
   // STATUS
   // ============================================================
 
-  setBuilderStatus(message, type = "success") {
+  setBuilderStatus(
+    message,
+    type = "success"
+  ) {
     this.debug(
       "Builder status changed",
       {
@@ -1415,14 +2022,18 @@ data-field-index="${index}"
           : "h-2.5 w-2.5 rounded-full bg-emerald-400"
     }
 
-    if (this.hasHeaderStatusTarget) {
+    if (
+      this.hasHeaderStatusTarget
+    ) {
       this.headerStatusTarget.textContent =
         type === "error"
           ? "CHECK"
           : "READY"
     }
 
-    if (this.hasHeaderStatusDotTarget) {
+    if (
+      this.hasHeaderStatusDotTarget
+    ) {
       this.headerStatusDotTarget.className =
         type === "error"
           ? "h-2.5 w-2.5 rounded-full bg-red-400"
@@ -1439,14 +2050,28 @@ data-field-index="${index}"
       "FORM SUBMIT INTERCEPTED",
       {
         event,
-        fields: this.fields,
-        json: this.hasJsonTarget
-          ? this.jsonTarget.value
-          : null
+        fields:
+          this.fields,
+        json:
+          this.hasJsonTarget
+            ? this.jsonTarget.value
+            : null
       }
     )
 
-    const jsonValid = this.isJsonValid()
+    /*
+     * Always make sure the JSON submitted by Rails matches
+     * the current visual field state.
+     */
+    if (
+      this.hasJsonTarget &&
+      this.fields
+    ) {
+      this.syncJsonFromFields()
+    }
+
+    const jsonValid =
+      this.isJsonValid()
 
     if (!jsonValid) {
       event.preventDefault()
@@ -1468,7 +2093,9 @@ data-field-index="${index}"
       return
     }
 
-    if (this.fields.length === 0) {
+    if (
+      this.fields.length === 0
+    ) {
       event.preventDefault()
 
       this.debugSubmit(
@@ -1498,7 +2125,11 @@ data-field-index="${index}"
   // TOAST
   // ============================================================
 
-  showToast(title, message, type = "success") {
+  showToast(
+    title,
+    message,
+    type = "success"
+  ) {
     if (!this.hasToastTarget) {
       this.debug(
         "Toast target missing",
@@ -1508,6 +2139,7 @@ data-field-index="${index}"
           type
         }
       )
+
       return
     }
 
@@ -1524,17 +2156,23 @@ data-field-index="${index}"
       "hidden"
     )
 
-    if (this.hasToastTitleTarget) {
+    if (
+      this.hasToastTitleTarget
+    ) {
       this.toastTitleTarget.textContent =
         title
     }
 
-    if (this.hasToastMessageTarget) {
+    if (
+      this.hasToastMessageTarget
+    ) {
       this.toastMessageTarget.textContent =
         message
     }
 
-    if (this.hasToastIconTarget) {
+    if (
+      this.hasToastIconTarget
+    ) {
       this.toastIconTarget.textContent =
         type === "error"
           ? "⚠"
@@ -1542,14 +2180,17 @@ data-field-index="${index}"
     }
 
     if (this.toastTimer) {
-      clearTimeout(this.toastTimer)
+      clearTimeout(
+        this.toastTimer
+      )
     }
 
-    this.toastTimer = setTimeout(() => {
-      this.toastTarget.classList.add(
-        "hidden"
-      )
-    }, 3500)
+    this.toastTimer =
+      setTimeout(() => {
+        this.toastTarget.classList.add(
+          "hidden"
+        )
+      }, 3500)
   }
 
   // ============================================================
@@ -1557,11 +2198,28 @@ data-field-index="${index}"
   // ============================================================
 
   escapeHtml(value) {
-    return String(value ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;")
+    return String(
+      value ?? ""
+    )
+      .replaceAll(
+        "&",
+        "&amp;"
+      )
+      .replaceAll(
+        "<",
+        "&lt;"
+      )
+      .replaceAll(
+        ">",
+        "&gt;"
+      )
+      .replaceAll(
+        '"',
+        "&quot;"
+      )
+      .replaceAll(
+        "'",
+        "&#039;"
+      )
   }
 }
