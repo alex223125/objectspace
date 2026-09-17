@@ -93,6 +93,14 @@ module Api
                 end
 
                 def serialize(definition)
+                  Rails.logger.info(
+                    "[DefinitionLibrary API] serialize " \
+                      "id=#{definition.id} " \
+                      "name=#{definition.name.inspect} " \
+                      "fields=#{definition.respond_to?(:fields) ? definition.fields.inspect : 'NO_FIELDS_METHOD'} " \
+                      "definition=#{definition.respond_to?(:definition) ? definition.definition.inspect : 'NO_DEFINITION_METHOD'}"
+                  )
+
                   Api::V1::Admin::Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion::DefinitionTemplateSerializer
                     .new(definition)
                     .as_json

@@ -91,28 +91,36 @@ export default class extends Controller {
       newOnly: false
     }
 
-    this.recentIds = this.loadStorage("definition-library-recent")
-    this.favoriteIds = this.loadStorage("definition-library-favorites")
+    this.recentIds = this.loadStorage(
+      "definition-library-recent"
+    )
+
+    this.favoriteIds = this.loadStorage(
+      "definition-library-favorites"
+    )
 
     this.searchTimer = null
     this.lastAppliedDefinition = null
 
-    this.handleOpenEvent = this.handleOpenEvent.bind(this)
-    this.handleGlobalKeydown = this.handleGlobalKeydown.bind(this)
+    this.handleOpenEvent =
+      this.handleOpenEvent.bind(this)
+
+    this.handleGlobalKeydown =
+      this.handleGlobalKeydown.bind(this)
 
     this.element.addEventListener(
-        "definition-library:open",
-        this.handleOpenEvent
+      "definition-library:open",
+      this.handleOpenEvent
     )
 
     document.addEventListener(
-        "definition-library:open",
-        this.handleOpenEvent
+      "definition-library:open",
+      this.handleOpenEvent
     )
 
     document.addEventListener(
-        "keydown",
-        this.handleGlobalKeydown
+      "keydown",
+      this.handleGlobalKeydown
     )
 
     this.updateFavoriteCount()
@@ -128,18 +136,18 @@ export default class extends Controller {
     }
 
     this.element.removeEventListener(
-        "definition-library:open",
-        this.handleOpenEvent
+      "definition-library:open",
+      this.handleOpenEvent
     )
 
     document.removeEventListener(
-        "definition-library:open",
-        this.handleOpenEvent
+      "definition-library:open",
+      this.handleOpenEvent
     )
 
     document.removeEventListener(
-        "keydown",
-        this.handleGlobalKeydown
+      "keydown",
+      this.handleGlobalKeydown
     )
 
     this.enablePageScroll()
@@ -157,12 +165,19 @@ export default class extends Controller {
     this.modalTarget.classList.remove("hidden")
     this.modalTarget.classList.add("flex")
 
-    this.modalTarget.setAttribute("aria-hidden", "false")
+    this.modalTarget.setAttribute(
+      "aria-hidden",
+      "false"
+    )
 
     document.body.classList.add("overflow-hidden")
 
     if (options.definition) {
-      this.selectedDefinition = this.normalizeDefinition(options.definition)
+      this.selectedDefinition =
+        this.normalizeDefinition(
+          options.definition
+        )
+
       this.renderPreview()
     }
 
@@ -187,7 +202,10 @@ export default class extends Controller {
     this.modalTarget.classList.add("hidden")
     this.modalTarget.classList.remove("flex")
 
-    this.modalTarget.setAttribute("aria-hidden", "true")
+    this.modalTarget.setAttribute(
+      "aria-hidden",
+      "true"
+    )
 
     document.body.classList.remove("overflow-hidden")
 
@@ -207,9 +225,9 @@ export default class extends Controller {
 
   handleGlobalKeydown(event) {
     if (
-        event.key === "Escape" &&
-        this.modalTarget &&
-        !this.modalTarget.classList.contains("hidden")
+      event.key === "Escape" &&
+      this.modalTarget &&
+      !this.modalTarget.classList.contains("hidden")
     ) {
       this.close()
     }
@@ -230,46 +248,83 @@ export default class extends Controller {
     try {
       let catalog = []
 
-      if (this.hasCatalogValue && this.catalogValue.length > 0) {
+      if (
+        this.hasCatalogValue &&
+        Array.isArray(this.catalogValue) &&
+        this.catalogValue.length > 0
+      ) {
         catalog = this.catalogValue
       } else {
-        const response = await fetch(this.catalogUrlValue, {
-          method: "GET",
-          headers: {
-            "Accept": "application/json"
-          },
-          credentials: "same-origin"
-        })
+        const response = await fetch(
+          this.catalogUrlValue,
+          {
+            method: "GET",
+            headers: {
+              Accept: "application/json"
+            },
+            credentials: "same-origin"
+          }
+        )
 
         if (!response.ok) {
           throw new Error(
-              `Definition catalog request failed: ${response.status}`
+            `Definition catalog request failed: ${response.status}`
           )
         }
 
         const payload = await response.json()
 
-        catalog = this.extractDefinitions(payload)
+        catalog =
+          this.extractDefinitions(payload)
+
+        /*
+         * Debug the actual API shape.
+         */
+        this.log(
+          "catalog-payload",
+          payload
+        )
       }
 
-      this.definitions = catalog
-          .map((definition) => this.normalizeDefinition(definition))
+      this.definitions =
+        catalog
+          .map((definition) =>
+            this.normalizeDefinition(
+              definition
+            )
+          )
           .filter(Boolean)
 
-      this.log("definitions-loaded", {
-        count: this.definitions.length
-      })
+      this.log(
+        "definitions-loaded",
+        {
+          count:
+            this.definitions.length,
+
+          definitions:
+            this.definitions.map(
+              (definition) => ({
+                id: definition.id,
+                name: definition.name,
+                fields:
+                  definition.fields,
+                fieldCount:
+                  definition.fields.length
+              })
+            )
+        }
+      )
 
       this.render()
     } catch (error) {
       console.error(
-          "[DefinitionLibrary] Failed to load definitions",
-          error
+        "[DefinitionLibrary] Failed to load definitions",
+        error
       )
 
       this.showError(
-          true,
-          "Unable to load definitions. Please try again."
+        true,
+        "Unable to load definitions. Please try again."
       )
     } finally {
       this.showLoading(false)
@@ -281,7 +336,10 @@ export default class extends Controller {
       return payload
     }
 
-    if (!payload || typeof payload !== "object") {
+    if (
+      !payload ||
+      typeof payload !== "object"
+    ) {
       return []
     }
 
@@ -300,6 +358,25 @@ export default class extends Controller {
       }
     }
 
+    /*
+     * Support APIs where data itself contains
+     * another collection.
+     */
+    if (
+      payload.data &&
+      typeof payload.data === "object"
+    ) {
+      for (const key of possibleKeys) {
+        if (
+          Array.isArray(
+            payload.data[key]
+          )
+        ) {
+          return payload.data[key]
+        }
+      }
+    }
+
     return []
   }
 
@@ -308,319 +385,614 @@ export default class extends Controller {
   // ============================================================
 
   normalizeDefinition(raw) {
-    if (!raw || typeof raw !== "object") {
+    if (
+      !raw ||
+      typeof raw !== "object"
+    ) {
       return null
     }
 
+    /*
+     * IMPORTANT:
+     *
+     * Do not use only `raw.definition`.
+     *
+     * Some API responses put metadata on the wrapper
+     * and fields inside definition/template/data.
+     *
+     * Keep the entire object available and search all
+     * possible locations for fields.
+     */
     const source =
-        raw.definition ||
-        raw.template ||
-        raw.data ||
-        raw
+      raw.definition ||
+      raw.template ||
+      raw.data ||
+      raw
 
-    const fields = this.extractFields(source)
+    const fields =
+      this.extractFields(raw)
 
     const id =
-        source.id ??
-        raw.id ??
-        source.definition_id ??
-        raw.definition_id
+      source.id ??
+      raw.id ??
+      source.definition_id ??
+      raw.definition_id
 
     const name =
-        source.name ||
-        source.title ||
-        source.label ||
-        source.slug ||
-        `Definition ${id ?? ""}`.trim()
+      source.name ||
+      raw.name ||
+      source.title ||
+      raw.title ||
+      source.label ||
+      raw.label ||
+      source.slug ||
+      raw.slug ||
+      `Definition ${id ?? ""}`.trim()
 
     const normalized = {
+      /*
+       * Preserve the original response.
+       */
+      ...raw,
+
+      /*
+       * Then overlay nested source values.
+       */
       ...source,
 
-      id: id != null ? String(id) : null,
+      id:
+        id != null
+          ? String(id)
+          : null,
 
       slug:
-          source.slug ||
-          raw.slug ||
-          this.slugify(name),
+        source.slug ||
+        raw.slug ||
+        this.slugify(name),
 
       name,
 
       title:
-          source.title ||
-          name,
+        source.title ||
+        raw.title ||
+        name,
 
       category:
-          source.category ||
-          source.type ||
-          raw.category ||
-          "GENERAL",
+        source.category ||
+        raw.category ||
+        source.type ||
+        raw.type ||
+        "GENERAL",
 
       description:
-          source.description ||
-          source.summary ||
-          raw.description ||
-          "",
+        source.description ||
+        raw.description ||
+        source.summary ||
+        raw.summary ||
+        "",
 
       icon:
-          source.icon ||
-          source.emoji ||
-          raw.icon ||
-          "✦",
+        source.icon ||
+        raw.icon ||
+        source.emoji ||
+        raw.emoji ||
+        "✦",
 
       version:
-          source.version ||
-          raw.version ||
-          1,
+        source.version ??
+        raw.version ??
+        1,
 
       status:
-          source.status ||
-          raw.status ||
-          "ACTIVE",
+        source.status ||
+        raw.status ||
+        "ACTIVE",
 
       featured:
-          Boolean(
-              source.featured ??
-              source.is_featured ??
-              raw.featured ??
-              false
-          ),
+        Boolean(
+          source.featured ??
+          raw.featured ??
+          source.is_featured ??
+          raw.is_featured ??
+          false
+        ),
 
       isNew:
-          Boolean(
-              source.new ??
-              source.is_new ??
-              raw.new ??
-              false
-          ),
+        Boolean(
+          source.new ??
+          raw.new ??
+          source.is_new ??
+          raw.is_new ??
+          false
+        ),
 
       popularity:
-          Number(
-              source.popularity ??
-              source.popularity_score ??
-              raw.popularity ??
-              0
-          ),
+        Number(
+          source.popularity ??
+          raw.popularity ??
+          source.popularity_score ??
+          raw.popularity_score ??
+          0
+        ),
 
       usageCount:
-          Number(
-              source.usage_count ??
-              source.usageCount ??
-              raw.usage_count ??
-              0
-          ),
+        Number(
+          source.usage_count ??
+          raw.usage_count ??
+          source.usageCount ??
+          raw.usageCount ??
+          0
+        ),
 
       tags:
-          this.extractTags(source),
+        this.extractTags(source),
 
+      /*
+       * THIS IS THE IMPORTANT PART.
+       *
+       * Both the Fields tab and JSON tab use this
+       * normalized fields array.
+       */
       fields
     }
 
-    normalized.field_count = fields.length
+    normalized.field_count =
+      fields.length
+
+    this.log(
+      "definition-normalized",
+      {
+        id: normalized.id,
+        name: normalized.name,
+        fieldCount: fields.length,
+        fields
+      }
+    )
 
     return normalized
   }
 
+  // ============================================================
+  // FIELD EXTRACTION
+  // ============================================================
+
   extractFields(definition) {
-    if (!definition || typeof definition !== "object") {
+    if (
+      !definition ||
+      typeof definition !== "object"
+    ) {
       return []
     }
 
+    /*
+     * Check direct and nested field locations.
+     */
     const candidates = [
+      /*
+       * Direct
+       */
       definition.fields,
       definition.field_definitions,
       definition.fieldDefinitions,
-      definition.properties,
+
+      /*
+       * definition
+       */
+      definition.definition?.fields,
+      definition.definition?.field_definitions,
+      definition.definition?.fieldDefinitions,
+
+      /*
+       * template
+       */
+      definition.template?.fields,
+      definition.template?.field_definitions,
+      definition.template?.fieldDefinitions,
+
+      /*
+       * data
+       */
+      definition.data?.fields,
+      definition.data?.field_definitions,
+      definition.data?.fieldDefinitions,
+
+      /*
+       * schema
+       */
       definition.schema?.fields,
       definition.schema?.properties,
-      definition.definition?.fields,
-      definition.template?.fields,
+
+      definition.definition?.schema?.fields,
+      definition.definition?.schema?.properties,
+
+      definition.template?.schema?.fields,
+      definition.template?.schema?.properties,
+
+      definition.data?.schema?.fields,
+      definition.data?.schema?.properties,
+
+      /*
+       * structure
+       */
       definition.structure?.fields,
       definition.structure?.properties,
+
+      definition.definition?.structure?.fields,
+      definition.definition?.structure?.properties,
+
+      definition.template?.structure?.fields,
+      definition.template?.structure?.properties,
+
+      definition.data?.structure?.fields,
+      definition.data?.structure?.properties,
+
+      /*
+       * config
+       */
       definition.config?.fields,
-      definition.config?.properties
+      definition.config?.properties,
+
+      definition.definition?.config?.fields,
+      definition.definition?.config?.properties,
+
+      definition.template?.config?.fields,
+      definition.template?.config?.properties,
+
+      definition.data?.config?.fields,
+      definition.data?.config?.properties
     ]
 
-    for (const candidate of candidates) {
-      const fields = this.normalizeFieldsCandidate(candidate)
-
-      if (fields.length > 0) {
-        return fields
+    for (
+      const candidate of candidates
+    ) {
+      if (candidate == null) {
+        continue
       }
 
-      if (Array.isArray(candidate) && candidate.length === 0) {
-        return []
+      const fields =
+        this.normalizeFieldsCandidate(
+          candidate
+        )
+
+      if (fields.length > 0) {
+        this.log(
+          "fields-found",
+          {
+            count:
+              fields.length,
+            fields
+          }
+        )
+
+        return fields
       }
     }
 
     /*
-     * Some APIs return the JSON structure itself as a string.
+     * Some APIs return JSON as a string.
      */
     const jsonCandidates = [
       definition.json,
       definition.definition_json,
       definition.schema_json,
-      definition.structure_json
+      definition.structure_json,
+
+      definition.definition?.json,
+      definition.definition?.definition_json,
+      definition.definition?.schema_json,
+      definition.definition?.structure_json,
+
+      definition.template?.json,
+      definition.template?.definition_json,
+      definition.template?.schema_json,
+      definition.template?.structure_json,
+
+      definition.data?.json,
+      definition.data?.definition_json,
+      definition.data?.schema_json,
+      definition.data?.structure_json
     ]
 
-    for (const value of jsonCandidates) {
-      if (!value) continue
+    for (
+      const value of jsonCandidates
+    ) {
+      if (!value) {
+        continue
+      }
 
       try {
         const parsed =
-            typeof value === "string"
-                ? JSON.parse(value)
-                : value
+          typeof value === "string"
+            ? JSON.parse(value)
+            : value
 
-        const fields = this.extractFields(parsed)
+        const fields =
+          this.extractFields(parsed)
 
         if (fields.length > 0) {
           return fields
         }
       } catch (_error) {
-        // Ignore malformed optional JSON.
+        /*
+         * Ignore malformed optional JSON.
+         */
       }
     }
+
+    /*
+     * Some backends return a JSON string in a
+     * generic `definition` or `template` property.
+     */
+    const stringCandidates = [
+      definition.definition,
+      definition.template,
+      definition.data
+    ]
+
+    for (
+      const value of stringCandidates
+    ) {
+      if (
+        typeof value !== "string"
+      ) {
+        continue
+      }
+
+      try {
+        const parsed =
+          JSON.parse(value)
+
+        const fields =
+          this.extractFields(parsed)
+
+        if (fields.length > 0) {
+          return fields
+        }
+      } catch (_error) {
+        // Ignore malformed JSON.
+      }
+    }
+
+    this.log(
+      "no-fields-found",
+      definition
+    )
 
     return []
   }
 
-  normalizeFieldsCandidate(candidate) {
+  normalizeFieldsCandidate(
+    candidate
+  ) {
     if (!candidate) {
       return []
     }
 
+    /*
+     * Array:
+     *
+     * fields: [
+     *   { name: "email", type: "string" }
+     * ]
+     */
     if (Array.isArray(candidate)) {
       return candidate
-          .map((field, index) => this.normalizeField(field, index))
-          .filter(Boolean)
+        .map(
+          (field, index) =>
+            this.normalizeField(
+              field,
+              index
+            )
+        )
+        .filter(Boolean)
     }
 
-    if (typeof candidate === "object") {
-      return Object.entries(candidate)
-          .map(([key, value], index) => {
+    /*
+     * Object:
+     *
+     * fields: {
+     *   email: {
+     *     type: "string"
+     *   }
+     * }
+     */
+    if (
+      typeof candidate === "object"
+    ) {
+      return Object.entries(
+        candidate
+      )
+        .map(
+          (
+            [key, value],
+            index
+          ) => {
             if (
-                value &&
-                typeof value === "object" &&
-                !Array.isArray(value)
+              value &&
+              typeof value ===
+                "object" &&
+              !Array.isArray(value)
             ) {
               return this.normalizeField(
-                  {
-                    ...value,
-                    name:
-                        value.name ||
-                        value.key ||
-                        value.slug ||
-                        key
-                  },
-                  index
+                {
+                  ...value,
+
+                  name:
+                    value.name ||
+                    value.key ||
+                    value.slug ||
+                    key
+                },
+                index
               )
             }
 
             return this.normalizeField(
-                {
-                  name: key,
-                  type: this.inferFieldType(value),
-                  default: value
-                },
-                index
+              {
+                name: key,
+                type:
+                  this.inferFieldType(
+                    value
+                  ),
+                default: value
+              },
+              index
             )
-          })
-          .filter(Boolean)
+          }
+        )
+        .filter(Boolean)
     }
 
     return []
   }
 
-  normalizeField(raw, index = 0) {
+  normalizeField(
+    raw,
+    index = 0
+  ) {
     if (!raw) {
       return null
     }
 
-    if (typeof raw === "string") {
+    /*
+     * Support simple:
+     *
+     * fields: ["name", "email"]
+     */
+    if (
+      typeof raw === "string"
+    ) {
       return {
         name: raw,
-        label: this.humanize(raw),
+
+        label:
+          this.humanize(raw),
+
         type: "string",
+
         required: false,
+
         active: true
       }
     }
 
+    /*
+     * Support:
+     *
+     * { field: "email" }
+     */
     const name =
-        raw.name ||
-        raw.key ||
-        raw.slug ||
-        raw.field ||
-        `field_${index + 1}`
+      raw.name ||
+      raw.key ||
+      raw.slug ||
+      raw.field ||
+      raw.field_name ||
+      `field_${index + 1}`
 
     return {
       ...raw,
 
       id:
-          raw.id ??
-          raw.field_id ??
-          `${name}-${index}`,
+        raw.id ??
+        raw.field_id ??
+        `${name}-${index}`,
 
-      name: String(name),
+      name:
+        String(name),
 
       label:
-          raw.label ||
-          raw.title ||
-          this.humanize(name),
+        raw.label ||
+        raw.title ||
+        this.humanize(name),
 
       type:
-          raw.type ||
-          raw.field_type ||
-          raw.data_type ||
-          "string",
+        raw.type ||
+        raw.field_type ||
+        raw.data_type ||
+        "string",
 
-      required: Boolean(
+      required:
+        Boolean(
           raw.required ??
           raw.is_required ??
           false
-      ),
+        ),
 
       active:
-          raw.active === undefined
-              ? raw.status
-                  ? String(raw.status).toUpperCase() === "ACTIVE"
-                  : true
-              : Boolean(raw.active),
+        raw.active === undefined
+          ? raw.status
+            ? String(
+                raw.status
+              ).toUpperCase() ===
+              "ACTIVE"
+            : true
+          : Boolean(raw.active),
 
       description:
-          raw.description ||
-          raw.help_text ||
-          raw.helpText ||
-          ""
+        raw.description ||
+        raw.help_text ||
+        raw.helpText ||
+        ""
     }
   }
 
   inferFieldType(value) {
-    if (typeof value === "boolean") return "boolean"
-    if (typeof value === "number") return "number"
-    if (Array.isArray(value)) return "array"
-    if (value && typeof value === "object") return "json"
+    if (
+      typeof value ===
+      "boolean"
+    ) {
+      return "boolean"
+    }
+
+    if (
+      typeof value ===
+      "number"
+    ) {
+      return "number"
+    }
+
+    if (
+      Array.isArray(value)
+    ) {
+      return "array"
+    }
+
+    if (
+      value &&
+      typeof value ===
+        "object"
+    ) {
+      return "json"
+    }
 
     return "string"
   }
 
   extractTags(definition) {
     const tags =
-        definition.tags ||
-        definition.keywords ||
-        []
+      definition.tags ||
+      definition.keywords ||
+      []
 
-    if (Array.isArray(tags)) {
+    if (
+      Array.isArray(tags)
+    ) {
       return tags
-          .map((tag) => String(tag))
-          .filter(Boolean)
+        .map((tag) =>
+          String(tag)
+        )
+        .filter(Boolean)
     }
 
-    if (typeof tags === "string") {
+    if (
+      typeof tags === "string"
+    ) {
       return tags
-          .split(",")
-          .map((tag) => tag.trim())
-          .filter(Boolean)
+        .split(",")
+        .map((tag) =>
+          tag.trim()
+        )
+        .filter(Boolean)
     }
 
     return []
@@ -632,16 +1004,21 @@ export default class extends Controller {
 
   searchChanged() {
     if (this.searchTimer) {
-      clearTimeout(this.searchTimer)
+      clearTimeout(
+        this.searchTimer
+      )
     }
 
-    this.searchTimer = setTimeout(() => {
-      this.render()
-    }, 120)
+    this.searchTimer =
+      setTimeout(() => {
+        this.render()
+      }, 120)
   }
 
   searchKeydown(event) {
-    if (event.key === "Escape") {
+    if (
+      event.key === "Escape"
+    ) {
       event.stopPropagation()
       this.clearSearch()
     }
@@ -649,59 +1026,93 @@ export default class extends Controller {
 
   clearSearch() {
     this.searchTarget.value = ""
+
     this.render()
+
     this.searchTarget.focus()
   }
 
   showFavorites() {
-    this.currentView = "favorites"
+    this.currentView =
+      "favorites"
+
     this.render()
   }
 
   showRecent() {
-    this.currentView = "recent"
+    this.currentView =
+      "recent"
+
     this.render()
   }
 
   showRecommended() {
-    this.currentView = "recommended"
+    this.currentView =
+      "recommended"
+
     this.render()
   }
 
   showAll() {
-    this.currentView = "all"
+    this.currentView =
+      "all"
+
     this.render()
   }
 
   toggleAdvancedFilters() {
-    this.advancedFiltersTarget.classList.toggle("hidden")
+    this.advancedFiltersTarget
+      .classList.toggle(
+        "hidden"
+      )
   }
 
   advancedFilterChanged() {
     this.filters = {
-      type: this.filterTypeTarget.value,
-      status: this.filterStatusTarget.value,
-      popularity: this.filterPopularityTarget.value,
-      featured: this.filterFeaturedTarget.value,
-      newOnly: this.filterNewTarget.checked
+      type:
+        this.filterTypeTarget.value,
+
+      status:
+        this.filterStatusTarget.value,
+
+      popularity:
+        this.filterPopularityTarget.value,
+
+      featured:
+        this.filterFeaturedTarget.value,
+
+      newOnly:
+        this.filterNewTarget.checked
     }
 
     this.render()
   }
 
   clearFilters() {
-    if (this.hasSearchTarget) {
-      this.searchTarget.value = ""
+    if (
+      this.hasSearchTarget
+    ) {
+      this.searchTarget.value =
+        ""
     }
 
     this.currentView = "all"
     this.currentCategory = "ALL"
 
-    this.filterTypeTarget.value = "ALL"
-    this.filterStatusTarget.value = "ALL"
-    this.filterPopularityTarget.value = "ALL"
-    this.filterFeaturedTarget.value = "ALL"
-    this.filterNewTarget.checked = false
+    this.filterTypeTarget.value =
+      "ALL"
+
+    this.filterStatusTarget.value =
+      "ALL"
+
+    this.filterPopularityTarget.value =
+      "ALL"
+
+    this.filterFeaturedTarget.value =
+      "ALL"
+
+    this.filterNewTarget.checked =
+      false
 
     this.filters = {
       type: "ALL",
@@ -721,150 +1132,269 @@ export default class extends Controller {
       "name"
     ]
 
-    const index = order.indexOf(this.currentSort)
+    const index =
+      order.indexOf(
+        this.currentSort
+      )
 
     this.currentSort =
-        order[(index + 1) % order.length]
+      order[
+        (index + 1) %
+          order.length
+      ]
 
     this.sortButtonTarget.textContent =
-        this.currentSort === "popular"
-            ? "POPULAR"
-            : this.currentSort === "recent"
-                ? "RECENT"
-                : "NAME"
+      this.currentSort ===
+      "popular"
+        ? "POPULAR"
+        : this.currentSort ===
+          "recent"
+        ? "RECENT"
+        : "NAME"
 
     this.render()
   }
 
   selectCategory(category) {
-    this.currentCategory = category
+    this.currentCategory =
+      category
+
     this.render()
   }
 
   getFilteredDefinitions() {
     const search =
-        this.hasSearchTarget
-            ? this.searchTarget.value.trim().toLowerCase()
-            : ""
+      this.hasSearchTarget
+        ? this.searchTarget.value
+            .trim()
+            .toLowerCase()
+        : ""
 
-    let results = [...this.definitions]
+    let results = [
+      ...this.definitions
+    ]
 
     if (search) {
-      results = results.filter((definition) => {
-        const haystack = [
-          definition.name,
-          definition.title,
-          definition.slug,
-          definition.category,
-          definition.description,
-          ...(definition.tags || []),
-          ...(definition.fields || []).map(
-              (field) =>
-                  `${field.name} ${field.label} ${field.type}`
-          )
-        ]
-            .join(" ")
-            .toLowerCase()
+      results =
+        results.filter(
+          (definition) => {
+            const haystack = [
+              definition.name,
+              definition.title,
+              definition.slug,
+              definition.category,
+              definition.description,
 
-        return haystack.includes(search)
-      })
-    }
+              ...(definition.tags ||
+                []),
 
-    if (this.currentCategory !== "ALL") {
-      results = results.filter(
-          (definition) =>
-              String(definition.category).toUpperCase() ===
-              String(this.currentCategory).toUpperCase()
-      )
-    }
+              ...(definition.fields ||
+                [])
+                .map(
+                  (field) =>
+                    `${field.name} ${field.label} ${field.type}`
+                )
+            ]
+              .join(" ")
+              .toLowerCase()
 
-    if (this.currentView === "favorites") {
-      results = results.filter((definition) =>
-          this.favoriteIds.includes(String(definition.id))
-      )
-    }
-
-    if (this.currentView === "recent") {
-      results = results.filter((definition) =>
-          this.recentIds.includes(String(definition.id))
-      )
-    }
-
-    if (this.currentView === "recommended") {
-      results = results
-          .filter((definition) => {
-            return (
-                definition.featured ||
-                Number(definition.popularity) >= 50
+            return haystack.includes(
+              search
             )
-          })
+          }
+        )
     }
 
-    if (this.filters.type !== "ALL") {
-      results = results.filter((definition) =>
-          definition.fields.some(
+    if (
+      this.currentCategory !==
+      "ALL"
+    ) {
+      results =
+        results.filter(
+          (definition) =>
+            String(
+              definition.category
+            ).toUpperCase() ===
+            String(
+              this.currentCategory
+            ).toUpperCase()
+        )
+    }
+
+    if (
+      this.currentView ===
+      "favorites"
+    ) {
+      results =
+        results.filter(
+          (definition) =>
+            this.favoriteIds.includes(
+              String(
+                definition.id
+              )
+            )
+        )
+    }
+
+    if (
+      this.currentView ===
+      "recent"
+    ) {
+      results =
+        results.filter(
+          (definition) =>
+            this.recentIds.includes(
+              String(
+                definition.id
+              )
+            )
+        )
+    }
+
+    if (
+      this.currentView ===
+      "recommended"
+    ) {
+      results =
+        results.filter(
+          (definition) =>
+            definition.featured ||
+            Number(
+              definition.popularity
+            ) >= 50
+        )
+    }
+
+    if (
+      this.filters.type !==
+      "ALL"
+    ) {
+      results =
+        results.filter(
+          (definition) =>
+            definition.fields.some(
               (field) =>
-                  String(field.type).toLowerCase() ===
-                  this.filters.type.toLowerCase()
+                String(
+                  field.type
+                ).toLowerCase() ===
+                this.filters.type.toLowerCase()
+            )
+        )
+    }
+
+    if (
+      this.filters.status !==
+      "ALL"
+    ) {
+      results =
+        results.filter(
+          (definition) =>
+            String(
+              definition.status
+            ).toUpperCase() ===
+            this.filters.status
+        )
+    }
+
+    if (
+      this.filters.popularity !==
+      "ALL"
+    ) {
+      results =
+        results.filter(
+          (definition) => {
+            const score =
+              Number(
+                definition.popularity ||
+                  0
+              )
+
+            if (
+              this.filters.popularity ===
+              "HIGH"
+            ) {
+              return score >= 80
+            }
+
+            if (
+              this.filters.popularity ===
+              "MEDIUM"
+            ) {
+              return (
+                score >= 40 &&
+                score < 80
+              )
+            }
+
+            return score < 40
+          }
+        )
+    }
+
+    if (
+      this.filters.featured !==
+      "ALL"
+    ) {
+      const expected =
+        this.filters.featured ===
+        "YES"
+
+      results =
+        results.filter(
+          (definition) =>
+            definition.featured ===
+            expected
+        )
+    }
+
+    if (
+      this.filters.newOnly
+    ) {
+      results =
+        results.filter(
+          (definition) =>
+            definition.isNew
+        )
+    }
+
+    if (
+      this.currentSort ===
+      "name"
+    ) {
+      results.sort(
+        (a, b) =>
+          String(
+            a.name
+          ).localeCompare(
+            String(b.name)
           )
       )
-    }
-
-    if (this.filters.status !== "ALL") {
-      results = results.filter(
-          (definition) =>
-              String(definition.status).toUpperCase() ===
-              this.filters.status
-      )
-    }
-
-    if (this.filters.popularity !== "ALL") {
-      results = results.filter((definition) => {
-        const score = Number(definition.popularity || 0)
-
-        if (this.filters.popularity === "HIGH") {
-          return score >= 80
-        }
-
-        if (this.filters.popularity === "MEDIUM") {
-          return score >= 40 && score < 80
-        }
-
-        return score < 40
-      })
-    }
-
-    if (this.filters.featured !== "ALL") {
-      const expected =
-          this.filters.featured === "YES"
-
-      results = results.filter(
-          (definition) =>
-              definition.featured === expected
-      )
-    }
-
-    if (this.filters.newOnly) {
-      results = results.filter(
-          (definition) => definition.isNew
-      )
-    }
-
-    if (this.currentSort === "name") {
-      results.sort((a, b) =>
-          String(a.name).localeCompare(String(b.name))
-      )
-    } else if (this.currentSort === "recent") {
+    } else if (
+      this.currentSort ===
+      "recent"
+    ) {
       results.sort(
-          (a, b) =>
-              Number(b.updated_at_timestamp || 0) -
-              Number(a.updated_at_timestamp || 0)
+        (a, b) =>
+          Number(
+            b.updated_at_timestamp ||
+              0
+          ) -
+          Number(
+            a.updated_at_timestamp ||
+              0
+          )
       )
     } else {
       results.sort(
-          (a, b) =>
-              Number(b.popularity || 0) -
-              Number(a.popularity || 0)
+        (a, b) =>
+          Number(
+            b.popularity ||
+              0
+          ) -
+          Number(
+            a.popularity ||
+              0
+          )
       )
     }
 
@@ -878,29 +1408,52 @@ export default class extends Controller {
   render() {
     this.renderCategories()
 
-    const results = this.getFilteredDefinitions()
+    const results =
+      this.getFilteredDefinitions()
 
-    this.filteredDefinitions = results
+    this.filteredDefinitions =
+      results
 
     this.resultCountTarget.textContent =
-        `${results.length} ${
-            results.length === 1
-                ? "DEFINITION"
-                : "DEFINITIONS"
-        }`
+      `${results.length} ${
+    results.length === 1
+        ? "DEFINITION"
+        : "DEFINITIONS"
+}`
 
     this.renderGrid(results)
-    this.renderRecommendations(results)
+
+    this.renderRecommendations(
+      results
+    )
+
     this.renderActiveFilters()
+
     this.updateFavoriteCount()
     this.updateRecentCount()
 
-    if (results.length === 0) {
-      this.emptyStateTarget.classList.remove("hidden")
-      this.emptyStateTarget.classList.add("flex")
+    if (
+      results.length === 0
+    ) {
+      this.emptyStateTarget
+        .classList.remove(
+          "hidden"
+        )
+
+      this.emptyStateTarget
+        .classList.add(
+          "flex"
+        )
     } else {
-      this.emptyStateTarget.classList.add("hidden")
-      this.emptyStateTarget.classList.remove("flex")
+      this.emptyStateTarget
+        .classList.add(
+          "hidden"
+        )
+
+      this.emptyStateTarget
+        .classList.remove(
+          "flex"
+        )
     }
   }
 
@@ -908,109 +1461,146 @@ export default class extends Controller {
     const categories = [
       "ALL",
       ...new Set(
-          this.definitions
-              .map((definition) =>
-                  String(definition.category || "GENERAL")
+        this.definitions
+          .map(
+            (definition) =>
+              String(
+                definition.category ||
+                  "GENERAL"
               )
-              .filter(Boolean)
+          )
+          .filter(Boolean)
       )
     ]
 
     this.categoriesTarget.innerHTML =
-        categories
-            .map((category) => {
-              const active =
-                  category === this.currentCategory
+      categories
+        .map(
+          (category) => {
+            const active =
+              category ===
+              this.currentCategory
 
-              return `
-            <button
-              type="button"
-              class="
-                shrink-0 rounded-full border-2 px-4 py-2
-                text-xs font-bold uppercase tracking-wide
-                transition
-                ${
-                  active
-                      ? "border-violet-300 bg-violet-100 text-violet-700"
-                      : "border-slate-200 bg-white text-slate-500 hover:border-violet-200 hover:bg-violet-50 hover:text-violet-600"
-              }
-              "
-              data-category="${this.escapeHtml(category)}"
-              data-action="click->definition-library#categoryClicked"
-            >
-              ${this.escapeHtml(category)}
-            </button>
-          `
-            })
-            .join("")
+            return `
+<button
+type="button"
+class="
+shrink-0 rounded-full border-2 px-4 py-2
+text-xs font-bold uppercase tracking-wide
+transition
+${
+    active
+        ? "border-violet-300 bg-violet-100 text-violet-700"
+        : "border-slate-200 bg-white text-slate-500 hover:border-violet-200 hover:bg-violet-50 hover:text-violet-600"
+}
+"
+data-category="${this.escapeHtml(
+category
+)}"
+data-action="click->definition-library#categoryClicked"
+    >
+    ${this.escapeHtml(
+    category
+)}
+</button>
+`
+          }
+        )
+        .join("")
   }
 
   categoryClicked(event) {
     this.selectCategory(
-        event.currentTarget.dataset.category
+      event.currentTarget.dataset
+        .category
     )
   }
 
   renderGrid(definitions) {
-    this.gridTarget.innerHTML = definitions
-        .map((definition) =>
-            this.definitionCard(definition)
+    this.gridTarget.innerHTML =
+      definitions
+        .map(
+          (definition) =>
+            this.definitionCard(
+              definition
+            )
         )
         .join("")
   }
 
   definitionCard(definition) {
-    const id = String(definition.id)
+    const id =
+      String(
+        definition.id
+      )
 
     const favorite =
-        this.favoriteIds.includes(id)
+      this.favoriteIds.includes(
+        id
+      )
 
-    const fields = definition.fields || []
+    /*
+     * Use normalized fields.
+     */
+    const fields =
+      Array.isArray(
+        definition.fields
+      )
+        ? definition.fields
+        : []
 
     return `
-      <article
-        class="
-          group relative flex flex-col overflow-hidden
-          rounded-3xl border-2 border-slate-200
-          bg-white shadow-sm
-          transition duration-200
-          hover:-translate-y-0.5
-          hover:border-violet-200
-          hover:shadow-xl hover:shadow-violet-100/60
-        "
-      >
+<article
+class="
+group relative flex flex-col overflow-hidden
+rounded-3xl border-2 border-slate-200
+bg-white shadow-sm
+transition duration-200
+hover:-translate-y-0.5
+hover:border-violet-200
+hover:shadow-xl hover:shadow-violet-100/60
+"
+>
 
-        <button
-          type="button"
-          class="
-            absolute right-4 top-4 z-10
-            flex h-9 w-9 items-center justify-center
-            rounded-xl border
-            ${
-        favorite
-            ? "border-amber-200 bg-amber-50 text-amber-500"
-            : "border-slate-200 bg-white text-slate-300 hover:text-amber-500"
-    }
-          "
-          title="${favorite ? "Remove favorite" : "Add favorite"}"
-          data-definition-id="${this.escapeHtml(id)}"
-          data-action="click->definition-library#toggleFavorite"
-        >
+<button
+type="button"
+class="
+absolute right-4 top-4 z-10
+flex h-9 w-9 items-center justify-center
+rounded-xl border
+${
+    favorite
+        ? "border-amber-200 bg-amber-50 text-amber-500"
+        : "border-slate-200 bg-white text-slate-300 hover:text-amber-500"
+}
+"
+title="${
+favorite
+    ? "Remove favorite"
+    : "Add favorite"
+}"
+data-definition-id="${this.escapeHtml(
+id
+)}"
+data-action="click->definition-library#toggleFavorite"
+    >
           ★
-        </button>
+</button>
 
-        <button
-          type="button"
-          class="flex flex-1 flex-col text-left"
-          data-definition-id="${this.escapeHtml(id)}"
-          data-action="click->definition-library#selectDefinition"
-        >
+<button
+    type="button"
+    class="flex flex-1 flex-col text-left"
+    data-definition-id="${this.escapeHtml(
+            id
+          )}"
+    data-action="click->definition-library#selectDefinition"
+>
 
-          <div class="border-b border-slate-100 bg-gradient-to-br from-violet-50 via-white to-sky-50 p-5">
+    <div class="border-b border-slate-100 bg-gradient-to-br from-violet-50 via-white to-sky-50 p-5">
 
-            <div class="flex items-start gap-4 pr-10">
+        <div class="flex items-start gap-4 pr-10">
 
-              <div
+            <div
                 class="
                   flex h-12 w-12 shrink-0
                   items-center justify-center
@@ -1018,190 +1608,237 @@ export default class extends Controller {
                   bg-white text-xl text-violet-500
                   shadow-sm
                 "
-              >
-                ${this.escapeHtml(definition.icon)}
-              </div>
+            >
+                ${this.escapeHtml(
+                definition.icon
+            )}
+            </div>
 
-              <div class="min-w-0">
+            <div class="min-w-0">
 
                 <div class="truncate text-base font-extrabold text-slate-800">
-                  ${this.escapeHtml(definition.title)}
+                    ${this.escapeHtml(
+                    definition.title
+                )}
                 </div>
 
                 <div class="mt-2 flex flex-wrap gap-2">
 
                   <span class="rounded-full border border-violet-200 bg-violet-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-violet-700">
-                    ${this.escapeHtml(definition.category)}
+                    ${this.escapeHtml(
+                      definition.category
+                  )}
                   </span>
 
-                  ${
-        definition.featured
-            ? `
+                    ${
+                    definition.featured
+                        ? `
                         <span class="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-600">
                           FEATURED
                         </span>
                       `
-            : ""
-    }
+                        : ""
+                }
 
                 </div>
-
-              </div>
 
             </div>
 
-          </div>
+        </div>
 
-          <div class="flex flex-1 flex-col p-5">
+    </div>
 
-            <p class="line-clamp-3 text-sm leading-6 text-slate-500">
-              ${this.escapeHtml(
-        definition.description ||
-        "Production-ready entity definition."
-    )}
-            </p>
+    <div class="flex flex-1 flex-col p-5">
 
-            <div class="mt-5 grid grid-cols-2 gap-3">
+        <p class="line-clamp-3 text-sm leading-6 text-slate-500">
+            ${this.escapeHtml(
+            definition.description ||
+            "Production-ready entity definition."
+        )}
+        </p>
 
-              <div class="rounded-2xl border border-violet-100 bg-violet-50/60 p-3">
+        <div class="mt-5 grid grid-cols-2 gap-3">
+
+            <div class="rounded-2xl border border-violet-100 bg-violet-50/60 p-3">
                 <div class="text-[10px] font-bold uppercase tracking-wide text-slate-400">
-                  FIELDS
+                    FIELDS
                 </div>
+
                 <div class="mt-1 text-xl font-extrabold text-violet-600">
-                  ${fields.length}
+                    ${fields.length}
                 </div>
-              </div>
-
-              <div class="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-3">
-                <div class="text-[10px] font-bold uppercase tracking-wide text-slate-400">
-                  ACTIVE
-                </div>
-                <div class="mt-1 text-xl font-extrabold text-emerald-600">
-                  ${
-        fields.filter(
-            (field) => field.active
-        ).length
-    }
-                </div>
-              </div>
-
             </div>
 
-            <div class="mt-5 flex items-center justify-between">
+            <div class="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-3">
+                <div class="text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                    ACTIVE
+                </div>
+
+                <div class="mt-1 text-xl font-extrabold text-emerald-600">
+                    ${
+                    fields.filter(
+                        (field) =>
+                            field.active
+                    ).length
+                }
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-5 flex items-center justify-between">
 
               <span class="text-xs font-semibold text-slate-400">
                 v${this.escapeHtml(
-        String(definition.version || 1)
-    )}
+                  String(
+                      definition.version ||
+                      1
+                  )
+              )}
               </span>
 
-              <span class="text-xs font-bold text-violet-600">
+            <span class="text-xs font-bold text-violet-600">
                 VIEW STRUCTURE →
               </span>
 
-            </div>
+        </div>
 
-          </div>
+    </div>
 
-        </button>
+</button>
 
-      </article>
-    `
+</article>
+`
   }
 
   renderRecommendations(results) {
     if (
-        this.currentView !== "recommended" ||
-        results.length === 0
+      this.currentView !==
+        "recommended" ||
+      results.length === 0
     ) {
-      this.recommendationsTarget.innerHTML = ""
+      this.recommendationsTarget.innerHTML =
+        ""
+
       return
     }
 
     this.recommendationsTarget.innerHTML = `
-      <div class="rounded-2xl border-2 border-violet-100 bg-violet-50/60 px-5 py-4">
+<div class="rounded-2xl border-2 border-violet-100 bg-violet-50/60 px-5 py-4">
 
-        <div class="flex items-start gap-3">
+    <div class="flex items-start gap-3">
 
-          <div class="mt-0.5 text-lg text-violet-500">
+    <div class="mt-0.5 text-lg text-violet-500">
             ✦
-          </div>
+</div>
 
-          <div>
-            <div class="text-sm font-extrabold text-violet-800">
-              Recommended definitions
-            </div>
+<div>
+    <div class="text-sm font-extrabold text-violet-800">
+        Recommended definitions
+    </div>
 
-            <p class="mt-1 text-xs leading-5 text-violet-600/80">
-              These structures are surfaced from featured and commonly used definitions.
-            </p>
-          </div>
+    <p class="mt-1 text-xs leading-5 text-violet-600/80">
+        These structures are surfaced from featured and commonly used definitions.
+    </p>
+</div>
 
-        </div>
+</div>
 
-      </div>
-    `
+</div>
+`
   }
 
   renderActiveFilters() {
     const active = []
 
-    if (this.currentCategory !== "ALL") {
-      active.push(this.currentCategory)
-    }
-
-    if (this.filters.type !== "ALL") {
-      active.push(this.filters.type)
-    }
-
-    if (this.filters.status !== "ALL") {
-      active.push(this.filters.status)
-    }
-
-    if (this.filters.popularity !== "ALL") {
-      active.push(this.filters.popularity)
-    }
-
-    if (this.filters.featured !== "ALL") {
+    if (
+      this.currentCategory !==
+      "ALL"
+    ) {
       active.push(
-          this.filters.featured === "YES"
-              ? "FEATURED"
-              : "NOT FEATURED"
+        this.currentCategory
       )
     }
 
-    if (this.filters.newOnly) {
+    if (
+      this.filters.type !==
+      "ALL"
+    ) {
+      active.push(
+        this.filters.type
+      )
+    }
+
+    if (
+      this.filters.status !==
+      "ALL"
+    ) {
+      active.push(
+        this.filters.status
+      )
+    }
+
+    if (
+      this.filters.popularity !==
+      "ALL"
+    ) {
+      active.push(
+        this.filters.popularity
+      )
+    }
+
+    if (
+      this.filters.featured !==
+      "ALL"
+    ) {
+      active.push(
+        this.filters.featured ===
+          "YES"
+          ? "FEATURED"
+          : "NOT FEATURED"
+      )
+    }
+
+    if (
+      this.filters.newOnly
+    ) {
       active.push("NEW")
     }
 
-    if (active.length === 0) {
-      this.activeFiltersTarget.innerHTML = ""
+    if (
+      active.length === 0
+    ) {
+      this.activeFiltersTarget.innerHTML =
+        ""
+
       return
     }
 
     this.activeFiltersTarget.innerHTML = `
-      <div class="flex flex-wrap items-center gap-2">
+<div class="flex flex-wrap items-center gap-2">
 
-        ${active
-        .map(
-            (filter) => `
+    ${active
+    .map(
+        (filter) => `
               <span class="rounded-full border border-violet-200 bg-violet-50 px-3 py-1.5 text-[10px] font-bold text-violet-600">
-                ${this.escapeHtml(filter)}
+                ${this.escapeHtml(
+            filter
+        )}
               </span>
             `
-        )
-        .join("")}
+    )
+    .join("")}
 
-        <button
-          type="button"
-          class="text-xs font-bold text-slate-400 underline hover:text-slate-600"
-          data-action="click->definition-library#clearFilters"
-        >
-          Clear
-        </button>
+<button
+    type="button"
+    class="text-xs font-bold text-slate-400 underline hover:text-slate-600"
+    data-action="click->definition-library#clearFilters"
+>
+    Clear
+</button>
 
-      </div>
-    `
+</div>
+`
   }
 
   // ============================================================
@@ -1210,155 +1847,221 @@ export default class extends Controller {
 
   selectDefinition(event) {
     const id =
-        event.currentTarget.dataset.definitionId
+      event.currentTarget
+        .dataset
+        .definitionId
 
     const definition =
-        this.definitions.find(
-            (item) => String(item.id) === String(id)
-        )
+      this.definitions.find(
+        (item) =>
+          String(item.id) ===
+          String(id)
+      )
 
-    if (!definition) return
+    if (!definition) {
+      return
+    }
 
-    this.selectedDefinition = definition
+    this.selectedDefinition =
+      definition
 
     this.rememberRecent(id)
+
     this.renderPreview()
   }
 
   renderPreview() {
-    const definition = this.selectedDefinition
+    const definition =
+      this.selectedDefinition
 
     if (!definition) {
-      this.previewTarget.classList.add("hidden")
-      this.previewEmptyTarget.classList.remove("hidden")
+      this.previewTarget
+        .classList.add(
+          "hidden"
+        )
+
+      this.previewEmptyTarget
+        .classList.remove(
+          "hidden"
+        )
+
       return
     }
 
-    this.previewEmptyTarget.classList.add("hidden")
+    this.previewEmptyTarget
+      .classList.add(
+        "hidden"
+      )
 
-    this.previewTarget.classList.remove("hidden")
-    this.previewTarget.classList.add("flex")
+    this.previewTarget
+      .classList.remove(
+        "hidden"
+      )
 
-    const fields = definition.fields || []
+    this.previewTarget
+      .classList.add(
+        "flex"
+      )
+
+    /*
+     * Always use normalized fields.
+     */
+    const fields =
+      Array.isArray(
+        definition.fields
+      )
+        ? definition.fields
+        : []
 
     this.previewIconTarget.textContent =
-        definition.icon || "✦"
+      definition.icon || "✦"
 
     this.previewTitleTarget.textContent =
-        definition.title || definition.name
+      definition.title ||
+      definition.name
 
     this.previewCategoryTarget.textContent =
-        definition.category || "GENERAL"
+      definition.category ||
+      "GENERAL"
 
     this.previewIdTarget.textContent =
-        `ID ${definition.id ?? "—"}`
+      `ID ${definition.id ?? "—"}`
 
     this.previewDescriptionTarget.textContent =
-        definition.description ||
-        "Production-ready entity definition."
+      definition.description ||
+      "Production-ready entity definition."
 
     this.previewFieldCountTarget.textContent =
-        fields.length
+      fields.length
 
     this.previewRequiredCountTarget.textContent =
-        fields.filter(
-            (field) => field.required
-        ).length
+      fields.filter(
+        (field) =>
+          field.required
+      ).length
 
     this.previewActiveCountTarget.textContent =
-        fields.filter(
-            (field) => field.active
-        ).length
+      fields.filter(
+        (field) =>
+          field.active
+      ).length
 
     this.previewFieldSummaryTarget.textContent =
-        `${fields.length} ${
-            fields.length === 1
-                ? "field"
-                : "fields"
-        }`
+      `${fields.length} ${
+    fields.length === 1
+        ? "field"
+        : "fields"
+}`
 
     this.fieldListTarget.innerHTML =
-        fields.length > 0
-            ? fields
-                .map(
-                    (field, index) =>
-                        this.fieldRow(field, index)
+      fields.length > 0
+        ? fields
+            .map(
+              (field, index) =>
+                this.fieldRow(
+                  field,
+                  index
                 )
-                .join("")
-            : `
-          <div class="p-8 text-center">
+            )
+            .join("")
+        : `
+<div class="p-8 text-center">
 
-            <div class="text-sm font-bold text-slate-500">
-              No fields found
-            </div>
+    <div class="text-sm font-bold text-slate-500">
+    No fields found
+</div>
 
-            <p class="mt-2 text-xs leading-5 text-slate-400">
-              This definition does not currently contain any field definitions.
-            </p>
+<p class="mt-2 text-xs leading-5 text-slate-400">
+    This definition does not currently contain any field definitions.
+</p>
 
-          </div>
-        `
+</div>
+`
 
-    const json = this.definitionToJson(
+    /*
+     * JSON and Fields are generated from the SAME
+     * normalized definition.
+     */
+    const json =
+      this.definitionToJson(
         definition
-    )
+      )
 
     this.previewJsonTarget.textContent =
-        JSON.stringify(json, null, 2)
+      JSON.stringify(
+        json,
+        null,
+        2
+      )
 
     this.analyticsStatusTarget.textContent =
-        `${fields.length} ${
-            fields.length === 1
-                ? "field"
-                : "fields"
-        } ready to import into Definition Studio.`
+      `${fields.length} ${
+    fields.length === 1
+        ? "field"
+        : "fields"
+} ready to import into Definition Studio.`
 
-    this.applyButtonTarget.disabled = false
+    this.applyButtonTarget.disabled =
+      false
 
+    /*
+     * Default to Fields tab after selecting
+     * a definition.
+     */
     this.showFields()
   }
 
-  fieldRow(field, index) {
-    const type = String(
-        field.type || "string"
-    ).toUpperCase()
+  fieldRow(
+    field,
+    index
+  ) {
+    const type =
+      String(
+        field.type ||
+          "string"
+      ).toUpperCase()
 
     return `
-      <div
-        class="
-          border-b border-slate-100
-          bg-white px-4 py-4
-          last:border-b-0
-        "
-      >
+<div
+class="
+border-b border-slate-100
+bg-white px-4 py-4
+last:border-b-0
+"
+>
 
-        <div class="flex items-start gap-4">
+<div class="flex items-start gap-4">
 
-          <div
-            class="
-              flex h-9 w-9 shrink-0
-              items-center justify-center
-              rounded-xl bg-violet-50
-              text-xs font-extrabold
-              text-violet-600
-            "
-          >
-            ${index + 1}
-          </div>
+    <div
+class="
+flex h-9 w-9 shrink-0
+items-center justify-center
+rounded-xl bg-violet-50
+text-xs font-extrabold
+text-violet-600
+"
+>
+${index + 1}
+</div>
 
-          <div class="min-w-0 flex-1">
+<div class="min-w-0 flex-1">
 
-            <div class="flex flex-wrap items-center gap-2">
+    <div class="flex flex-wrap items-center gap-2">
 
               <span class="break-words text-sm font-extrabold text-slate-800">
-                ${this.escapeHtml(field.label || field.name)}
+                ${this.escapeHtml(
+                  field.label ||
+                  field.name
+              )}
               </span>
 
-              <span class="rounded-full border border-sky-200 bg-sky-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-sky-700">
-                ${this.escapeHtml(type)}
+        <span class="rounded-full border border-sky-200 bg-sky-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-sky-700">
+                ${this.escapeHtml(
+            type
+        )}
               </span>
 
-              ${
+        ${
         field.required
             ? `
                     <span class="rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-orange-700">
@@ -1368,7 +2071,7 @@ export default class extends Controller {
             : ""
     }
 
-              ${
+        ${
         field.active
             ? `
                     <span class="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-700">
@@ -1382,114 +2085,201 @@ export default class extends Controller {
                   `
     }
 
-            </div>
+    </div>
 
-            <div class="mt-1 break-all font-mono text-xs text-slate-400">
-              ${this.escapeHtml(field.name)}
-            </div>
+    <div class="mt-1 break-all font-mono text-xs text-slate-400">
+        ${this.escapeHtml(
+        field.name
+    )}
+    </div>
 
-            ${
-        field.description
-            ? `
+    ${
+    field.description
+        ? `
                   <p class="mt-2 text-xs leading-5 text-slate-500">
                     ${this.escapeHtml(
-                field.description
-            )}
+            field.description
+        )}
                   </p>
                 `
-            : ""
-    }
+        : ""
+}
 
-          </div>
+</div>
 
-        </div>
+</div>
 
-      </div>
-    `
+</div>
+`
   }
 
-  showFields() {
-    this.fieldsPanelTarget.classList.remove("hidden")
-    this.jsonPanelTarget.classList.add("hidden")
+  // ============================================================
+  // TABS
+  // ============================================================
 
-    this.fieldsTabTarget.classList.add(
+  showFields() {
+    this.fieldsPanelTarget
+      .classList.remove(
+        "hidden"
+      )
+
+    this.jsonPanelTarget
+      .classList.add(
+        "hidden"
+      )
+
+    this.fieldsTabTarget
+      .classList.add(
         "border-violet-500",
         "text-violet-600"
-    )
+      )
 
-    this.fieldsTabTarget.classList.remove(
+    this.fieldsTabTarget
+      .classList.remove(
         "border-transparent",
         "text-slate-400"
-    )
+      )
 
-    this.fieldsTabTarget.setAttribute(
+    this.fieldsTabTarget
+      .setAttribute(
         "aria-selected",
         "true"
-    )
+      )
 
-    this.jsonTabTarget.classList.remove(
+    this.jsonTabTarget
+      .classList.remove(
         "border-violet-500",
         "text-violet-600"
-    )
+      )
 
-    this.jsonTabTarget.classList.add(
+    this.jsonTabTarget
+      .classList.add(
         "border-transparent",
         "text-slate-400"
-    )
+      )
 
-    this.jsonTabTarget.setAttribute(
+    this.jsonTabTarget
+      .setAttribute(
         "aria-selected",
         "false"
-    )
+      )
   }
 
   showJson() {
-    this.fieldsPanelTarget.classList.add("hidden")
-    this.jsonPanelTarget.classList.remove("hidden")
+    this.fieldsPanelTarget
+      .classList.add(
+        "hidden"
+      )
 
-    this.jsonTabTarget.classList.add(
+    this.jsonPanelTarget
+      .classList.remove(
+        "hidden"
+      )
+
+    this.jsonTabTarget
+      .classList.add(
         "border-violet-500",
         "text-violet-600"
-    )
+      )
 
-    this.jsonTabTarget.classList.remove(
+    this.jsonTabTarget
+      .classList.remove(
         "border-transparent",
         "text-slate-400"
-    )
+      )
 
-    this.jsonTabTarget.setAttribute(
+    this.jsonTabTarget
+      .setAttribute(
         "aria-selected",
         "true"
-    )
+      )
 
-    this.fieldsTabTarget.classList.remove(
+    this.fieldsTabTarget
+      .classList.remove(
         "border-violet-500",
         "text-violet-600"
-    )
+      )
 
-    this.fieldsTabTarget.classList.add(
+    this.fieldsTabTarget
+      .classList.add(
         "border-transparent",
         "text-slate-400"
-    )
+      )
 
-    this.fieldsTabTarget.setAttribute(
+    this.fieldsTabTarget
+      .setAttribute(
         "aria-selected",
         "false"
-    )
+      )
   }
 
-  definitionToJson(definition) {
-    const result = {
+  // ============================================================
+  // JSON
+  // ============================================================
+
+  definitionToJson(
+    definition
+  ) {
+    /*
+     * IMPORTANT:
+     *
+     * JSON is generated from the same normalized
+     * fields array used by the Fields tab.
+     */
+    return {
       id: definition.id,
-      slug: definition.slug,
-      name: definition.name,
-      title: definition.title,
-      category: definition.category,
-      version: definition.version,
-      fields: definition.fields || []
+
+      slug:
+        definition.slug,
+
+      name:
+        definition.name,
+
+      title:
+        definition.title,
+
+      category:
+        definition.category,
+
+      version:
+        definition.version,
+
+      fields:
+        Array.isArray(
+          definition.fields
+        )
+          ? definition.fields
+          : []
+    }
+  }
+
+  copyJson() {
+    if (
+      !this.hasPreviewJsonTarget
+    ) {
+      return
     }
 
-    return result
+    const value =
+      this.previewJsonTarget
+        .textContent || ""
+
+    if (
+      !navigator.clipboard
+    ) {
+      return
+    }
+
+    navigator.clipboard
+      .writeText(value)
+      .then(() => {
+        this.analyticsStatusTarget.textContent =
+          "JSON copied to clipboard."
+      })
+      .catch(() => {
+        this.analyticsStatusTarget.textContent =
+          "Unable to copy JSON."
+      })
   }
 
   // ============================================================
@@ -1497,157 +2287,200 @@ export default class extends Controller {
   // ============================================================
 
   apply() {
-    if (!this.selectedDefinition) {
+    if (
+      !this.selectedDefinition
+    ) {
       return
     }
 
     const definition =
-        this.normalizeDefinition(
-            this.selectedDefinition
-        )
+      this.normalizeDefinition(
+        this.selectedDefinition
+      )
 
     const payload = {
       definition,
-      definition_id: String(
+
+      definition_id:
+        String(
           definition.id
-      ),
+        ),
+
       version:
-          definition.version || 1,
-      source: "definition_library"
+        definition.version ||
+        1,
+
+      source:
+        "definition_library"
     }
 
-    this.lastAppliedDefinition = definition
+    this.lastAppliedDefinition =
+      definition
 
-    this.log("apply:start", {
-      id: definition.id,
-      fields: definition.fields?.length || 0
-    })
+    this.log(
+      "apply:start",
+      {
+        id:
+          definition.id,
 
-    /*
-     * IMPORTANT:
-     *
-     * Dispatch first so the existing Entity Builder receives
-     * exactly the event it already listens for.
-     */
+        fields:
+          definition.fields?.length ||
+          0
+      }
+    )
+
     const event =
-        new CustomEvent(
-            "definition-library:apply",
-            {
-              bubbles: true,
-              detail: payload
-            }
-        )
+      new CustomEvent(
+        "definition-library:apply",
+        {
+          bubbles: true,
 
-    document.dispatchEvent(event)
+          detail:
+            payload
+        }
+      )
 
-    /*
-     * Also dispatch on the application element for integrations
-     * that listen there.
-     */
-    if (this.element !== document) {
+    document.dispatchEvent(
+      event
+    )
+
+    if (
+      this.element !==
+      document
+    ) {
       this.element.dispatchEvent(
-          new CustomEvent(
-              "definition-library:applied",
-              {
-                bubbles: true,
-                detail: payload
-              }
-          )
+        new CustomEvent(
+          "definition-library:applied",
+          {
+            bubbles: true,
+
+            detail:
+              payload
+          }
+        )
       )
     }
 
-    this.log("apply:events-dispatched", {
-      id: definition.id,
-      fields: definition.fields?.length || 0
-    })
+    this.log(
+      "apply:events-dispatched",
+      {
+        id:
+          definition.id,
 
-    /*
-     * CLOSE IMMEDIATELY.
-     *
-     * Usage tracking must never block importing.
-     */
+        fields:
+          definition.fields?.length ||
+          0
+      }
+    )
+
     this.close()
 
-    /*
-     * Usage analytics is deliberately fire-and-forget.
-     * If the endpoint is unavailable, the definition has
-     * already been successfully applied and the modal is closed.
-     */
-    this.trackUsage(definition).catch((error) => {
-      console.warn(
+    this.trackUsage(
+      definition
+    ).catch(
+      (error) => {
+        console.warn(
           "[DefinitionLibrary] Usage tracking failed",
           error
-      )
-    })
+        )
+      }
+    )
   }
 
   // ============================================================
   // USAGE TRACKING
   // ============================================================
 
-  async trackUsage(definition) {
-    if (!this.catalogUsageUrlValue) {
+  async trackUsage(
+    definition
+  ) {
+    if (
+      !this.catalogUsageUrlValue
+    ) {
       return
     }
 
     const url =
-        this.catalogUsageUrlValue.replace(
-            ":id",
-            encodeURIComponent(
-                String(definition.id)
-            )
+      this.catalogUsageUrlValue.replace(
+        ":id",
+        encodeURIComponent(
+          String(
+            definition.id
+          )
         )
+      )
 
     try {
-      const response = await fetch(url, {
-        method: "POST",
+      const response =
+        await fetch(
+          url,
+          {
+            method:
+              "POST",
 
-        credentials: "same-origin",
+            credentials:
+              "same-origin",
 
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-          "X-CSRF-Token":
-              this.csrfToken()
-        },
+            headers: {
+              Accept:
+                "application/json",
 
-        body: JSON.stringify({
-          definition_id: definition.id,
-          version: definition.version || 1,
-          source: "definition_library"
-        })
-      })
+              "Content-Type":
+                "application/json",
 
-      if (!response.ok) {
+              "X-CSRF-Token":
+                this.csrfToken()
+            },
+
+            body:
+              JSON.stringify(
+                {
+                  definition_id:
+                    definition.id,
+
+                  version:
+                    definition.version ||
+                    1,
+
+                  source:
+                    "definition_library"
+                }
+              )
+          }
+        )
+
+      if (
+        !response.ok
+      ) {
         throw new Error(
-            `Usage tracking failed: ${response.status}`
+          `Usage tracking failed: ${response.status}`
         )
       }
 
-      this.log("usage-tracked", {
-        id: definition.id
-      })
+      this.log(
+        "usage-tracked",
+        {
+          id:
+            definition.id
+        }
+      )
     } catch (error) {
-      /*
-       * Do not throw this into the apply flow.
-       * Tracking is optional analytics.
-       */
       console.warn(
-          "[DefinitionLibrary] Usage tracking unavailable",
-          error
+        "[DefinitionLibrary] Usage tracking unavailable",
+        error
       )
     }
   }
 
   csrfToken() {
     const meta =
-        document.querySelector(
-            'meta[name="csrf-token"]'
-        )
+      document.querySelector(
+        'meta[name="csrf-token"]'
+      )
 
     return meta
-        ? meta.content
-        : ""
+      ? meta.content
+      : ""
   }
 
   // ============================================================
@@ -1658,58 +2491,73 @@ export default class extends Controller {
     event.stopPropagation()
 
     const id =
-        String(
-            event.currentTarget.dataset.definitionId
-        )
+      String(
+        event.currentTarget
+          .dataset
+          .definitionId
+      )
 
-    if (this.favoriteIds.includes(id)) {
+    if (
+      this.favoriteIds.includes(
+        id
+      )
+    ) {
       this.favoriteIds =
-          this.favoriteIds.filter(
-              (item) => item !== id
-          )
+        this.favoriteIds.filter(
+          (item) =>
+            item !== id
+        )
     } else {
-      this.favoriteIds.push(id)
+      this.favoriteIds.push(
+        id
+      )
     }
 
     this.saveStorage(
-        "definition-library-favorites",
-        this.favoriteIds
+      "definition-library-favorites",
+      this.favoriteIds
     )
 
     this.updateFavoriteCount()
+
     this.render()
   }
 
   rememberRecent(id) {
     id = String(id)
 
-    this.recentIds =
-        [
-          id,
-          ...this.recentIds.filter(
-              (item) => item !== id
-          )
-        ].slice(0, 20)
+    this.recentIds = [
+      id,
+
+      ...this.recentIds.filter(
+        (item) =>
+          item !== id
+      )
+    ].slice(0, 20)
 
     this.saveStorage(
-        "definition-library-recent",
-        this.recentIds
+      "definition-library-recent",
+      this.recentIds
     )
 
     this.updateRecentCount()
   }
 
   updateFavoriteCount() {
-    if (this.hasFavoriteCountTarget) {
+    if (
+      this.hasFavoriteCountTarget
+    ) {
       this.favoriteCountTarget.textContent =
-          this.favoriteIds.length
+        this.favoriteIds.length
     }
   }
 
   updateRecentCount() {
-    if (this.hasRecentCountTarget) {
+    if (
+      this.hasRecentCountTarget
+    ) {
       this.recentCountTarget.textContent =
-          this.recentIds.length
+        this.recentIds.length
     }
   }
 
@@ -1718,19 +2566,29 @@ export default class extends Controller {
   // ============================================================
 
   cancelImport() {
-    if (!this.hasConfirmationTarget) {
+    if (
+      !this.hasConfirmationTarget
+    ) {
       return
     }
 
-    this.confirmationTarget.classList.add("hidden")
-    this.confirmationTarget.classList.remove("flex")
-    this.confirmationTarget.setAttribute(
+    this.confirmationTarget
+      .classList.add(
+        "hidden"
+      )
+
+    this.confirmationTarget
+      .classList.remove(
+        "flex"
+      )
+
+    this.confirmationTarget
+      .setAttribute(
         "aria-hidden",
         "true"
-    )
+      )
   }
 
-  // Kept for compatibility with existing markup.
   confirmImport() {
     this.cancelImport()
     this.apply()
@@ -1741,37 +2599,54 @@ export default class extends Controller {
   // ============================================================
 
   showLoading(show) {
-    if (!this.hasLoadingStateTarget) return
+    if (
+      !this.hasLoadingStateTarget
+    ) {
+      return
+    }
 
-    this.loadingStateTarget.classList.toggle(
+    this.loadingStateTarget
+      .classList.toggle(
         "hidden",
         !show
-    )
+      )
   }
 
-  showError(show, message = null) {
-    if (!this.hasErrorStateTarget) return
+  showError(
+    show,
+    message = null
+  ) {
+    if (
+      !this.hasErrorStateTarget
+    ) {
+      return
+    }
 
-    this.errorStateTarget.classList.toggle(
+    this.errorStateTarget
+      .classList.toggle(
         "hidden",
         !show
-    )
+      )
 
     if (
-        show &&
-        message &&
-        this.hasErrorMessageTarget
+      show &&
+      message &&
+      this.hasErrorMessageTarget
     ) {
       this.errorMessageTarget.textContent =
-          message
+        message
     }
   }
 
   setConnectedStatus() {
-    if (!this.hasStatusTarget) return
+    if (
+      !this.hasStatusTarget
+    ) {
+      return
+    }
 
     this.statusTarget.textContent =
-        "CONNECTED"
+      "CONNECTED"
   }
 
   // ============================================================
@@ -1781,27 +2656,35 @@ export default class extends Controller {
   loadStorage(key) {
     try {
       const value =
-          window.localStorage.getItem(key)
+        window.localStorage.getItem(
+          key
+        )
 
       if (!value) {
         return []
       }
 
-      const parsed = JSON.parse(value)
+      const parsed =
+        JSON.parse(value)
 
-      return Array.isArray(parsed)
-          ? parsed.map(String)
-          : []
+      return Array.isArray(
+        parsed
+      )
+        ? parsed.map(String)
+        : []
     } catch (_error) {
       return []
     }
   }
 
-  saveStorage(key, value) {
+  saveStorage(
+    key,
+    value
+  ) {
     try {
       window.localStorage.setItem(
-          key,
-          JSON.stringify(value)
+        key,
+        JSON.stringify(value)
       )
     } catch (_error) {
       // Storage is optional.
@@ -1813,66 +2696,80 @@ export default class extends Controller {
   // ============================================================
 
   slugify(value) {
-    return String(value || "")
-        .toLowerCase()
-        .trim()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "")
+    return String(
+      value || ""
+    )
+      .toLowerCase()
+      .trim()
+      .replace(
+        /[^a-z0-9]+/g,
+        "-"
+      )
+      .replace(
+        /^-+|-+$/g,
+        ""
+      )
   }
 
   humanize(value) {
-    return String(value || "")
-        .replace(/[_-]+/g, " ")
-        .replace(/\s+/g, " ")
-        .trim()
-        .replace(/\b\w/g, (letter) =>
-            letter.toUpperCase()
-        )
+    return String(
+      value || ""
+    )
+      .replace(
+        /[_-]+/g,
+        " "
+      )
+      .replace(
+        /\s+/g,
+        " "
+      )
+      .trim()
+      .replace(
+        /\b\w/g,
+        (letter) =>
+          letter.toUpperCase()
+      )
   }
 
   escapeHtml(value) {
-    return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;")
+    return String(
+      value ?? ""
+    )
+      .replace(
+        /&/g,
+        "&amp;"
+      )
+      .replace(
+        /</g,
+        "&lt;"
+      )
+      .replace(
+        />/g,
+        "&gt;"
+      )
+      .replace(
+        /"/g,
+        "&quot;"
+      )
+      .replace(
+        /'/g,
+        "&#039;"
+      )
   }
 
-  log(message, data = null) {
+  log(
+    message,
+    data = null
+  ) {
     if (data) {
       console.debug(
-          `[DefinitionLibrary] ${message}`,
-          data
+        `[DefinitionLibrary] ${message}`,
+        data
       )
     } else {
       console.debug(
-          `[DefinitionLibrary] ${message}`
+        `[DefinitionLibrary] ${message}`
       )
     }
-  }
-
-  copyJson() {
-    if (!this.hasPreviewJsonTarget) {
-      return
-    }
-
-    const value =
-        this.previewJsonTarget.textContent || ""
-
-    if (!navigator.clipboard) {
-      return
-    }
-
-    navigator.clipboard
-        .writeText(value)
-        .then(() => {
-          this.analyticsStatusTarget.textContent =
-              "JSON copied to clipboard."
-        })
-        .catch(() => {
-          this.analyticsStatusTarget.textContent =
-              "Unable to copy JSON."
-        })
   }
 }
