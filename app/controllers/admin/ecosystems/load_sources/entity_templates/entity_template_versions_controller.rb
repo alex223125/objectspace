@@ -239,17 +239,6 @@ module Admin
               next_version_number
 
 
-            # ----------------------------------------------------------
-            # IMPORTANT
-            #
-            # The existing application used @version in this controller.
-            # The new builder view uses @entity_template_version.
-            #
-            # Expose both variables so existing views/functionality
-            # continue working while the new builder can use the
-            # conventional @entity_template_version variable.
-            # ----------------------------------------------------------
-
             @entity_template_version =
               @version
 
@@ -271,9 +260,6 @@ module Admin
 
             @version =
               @entity_template_version
-
-
-            # Keep both variables available to the views.
 
             @entity_template_version =
               @version
@@ -309,6 +295,10 @@ module Admin
 
             # ----------------------------------------------------------
             # INVALID JSON
+            #
+            # There is no persisted version yet, so this must remain
+            # on the NEW form. Redirecting to edit is not possible
+            # because the record does not have an ID yet.
             # ----------------------------------------------------------
 
             if definition[:error].present?
@@ -397,23 +387,38 @@ module Admin
               @version.status.blank?
 
 
-            # Make the variable used by the builder view available.
-
             @entity_template_version =
               @version
 
 
+            # ----------------------------------------------------------
+            # SAVE
+            # ----------------------------------------------------------
+
             if @version.save
+
+              Rails.logger.info(
+                "[EntityTemplateVersion Create] Created version " \
+                "id=#{@version.id} " \
+                "entity_template_id=#{@version.entity_template_id} " \
+                "version=#{@version.version}"
+              )
+
+
+              # Successful CREATE always goes directly to SHOW.
 
               redirect_to(
                 admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
                   @version
                 ),
                 notice:
-                  "Entity template version was successfully created."
+                  "Entity template version #{@version.version} was successfully created."
               )
 
             else
+
+              # The record has not been persisted, so keep the user
+              # on NEW and preserve validation errors.
 
               load_entity_templates
 
@@ -427,9 +432,10 @@ module Admin
 
           rescue ActiveRecord::RecordNotUnique
 
-            @version ||= @entity_template
-              .entity_template_versions
-              .build
+            @version ||=
+              @entity_template
+                .entity_template_versions
+                .build
 
 
             @version.errors.add(
@@ -462,6 +468,13 @@ module Admin
             definition =
               parse_definition_parameter
 
+
+            # ----------------------------------------------------------
+            # INVALID JSON
+            #
+            # UPDATE operates on an existing persisted version, so
+            # validation errors remain on the EDIT form.
+            # ----------------------------------------------------------
 
             if definition[:error].present?
 
@@ -501,6 +514,8 @@ module Admin
 
             if @entity_template_version.save
 
+              # Successful UPDATE goes to SHOW.
+
               redirect_to(
                 admin_ecosystems_load_sources_entity_templates_entity_template_version_path(
                   @entity_template_version
@@ -510,6 +525,8 @@ module Admin
               )
 
             else
+
+              # Failed UPDATE stays on EDIT and preserves errors.
 
               load_entity_templates
 
@@ -933,18 +950,6 @@ module Admin
             status: nil
           )
 
-            # ----------------------------------------------------------
-            # Ensure the view always has the same object.
-            #
-            # This prevents:
-            #
-            # undefined method `errors' for nil:NilClass
-            #
-            # when new.html.erb uses:
-            #
-            # @entity_template_version.errors
-            # ----------------------------------------------------------
-
             @entity_template_version ||=
               @version
 
@@ -1125,8 +1130,8 @@ module Admin
 
               query =
                 "%#{ActiveRecord::Base.sanitize_sql_like(
-                  @filters[:q]
-                )}%"
+  @filters[:q]
+)}%"
 
 
               scope =
@@ -1436,6 +1441,17 @@ module Admin
           # SET VERSION
           # ============================================================
 
+          # IMPORTANT:
+          #
+          # This method MUST exist because it is referenced by the
+          # before_action at the top of the controller.
+          #
+          # The previous controller had this method commented out,
+          # which caused:
+          #
+          # NoMethodError:
+          # undefined method `set_entity_template_version'
+          #
           def set_entity_template_version
 
             @entity_template_version =
@@ -1447,8 +1463,16 @@ module Admin
 
 
           # ============================================================
-          # SET TEMPLATE
+          # SET ENTITY TEMPLATE
           # ============================================================
+
+          # There must only be ONE definition of set_entity_template.
+          #
+          # For member actions, the template is obtained from the
+          # loaded version.
+          #
+          # For new/create, there is no version yet, so the template
+          # is obtained from params[:entity_template_id].
 
           def set_entity_template
 
@@ -1880,10 +1904,6 @@ module Admin
               )
 
 
-            # ----------------------------------------------------------
-            # Empty JSON is allowed and becomes an empty structure.
-            # ----------------------------------------------------------
-
             if raw.is_a?(String)
 
               stripped =
@@ -1902,13 +1922,6 @@ module Admin
                   stripped
                 )
 
-
-              # --------------------------------------------------------
-              # The builder expects an object at the root.
-              #
-              # Prevent arrays/scalars from silently becoming an
-              # invalid template definition.
-              # --------------------------------------------------------
 
               unless parsed.is_a?(Hash)
 

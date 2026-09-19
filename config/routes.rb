@@ -45,6 +45,8 @@ Rails.application.routes.draw do
           namespace :load_sources do
             namespace :entity_templates do
               namespace :entity_template_version do
+                post "definition_templates/:id/usage",
+                     to: "definition_templates#usage"
                 resources :definition_templates,
                           only: %i[index show],
                           param: :id

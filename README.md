@@ -48,6 +48,11 @@ npx @herb-tools/formatter app/views/admin/ecosystems/load_sources/entity_templat
 npx @herb-tools/linter javascript.js --fix
 npx @herb-tools/formatter javascript.js
 
+
+npx @herb-tools/linter app/javascript/controllers/admin/ecosystems/load_sources/entity_templates/entity_template_versions/creation_new_version/entity_definition_builder_controller.js --fix
+npx @herb-tools/formatter app/javascript/controllers/admin/ecosystems/load_sources/entity_templates/entity_template_versions/creation_new_version/entity_definition_builder_controller.js
+eslint app/javascript/controllers/admin/ecosystems/load_sources/entity_templates/entity_template_versions/creation_new_version/entity_definition_builder_controller.js --fix-broken-syntax
+
 npx @herb-tools/linter app/views/admin/ecosystems/load_sources/entity_templates/entity_template_versions/_pagination.html.erb --fix
 npx @herb-tools/formatter app/views/admin/ecosystems/load_sources/entity_templates/entity_template_versions/_pagination.html.erb
 

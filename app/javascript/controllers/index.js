@@ -451,7 +451,8 @@ application.register("definition-field", DefinitionFieldController)
 import DefinitionLibraryController from "./admin/ecosystems/load_sources/entity_templates/entity_template_versions/creation_new_version/definition_library_controller"
 application.register("definition-library", DefinitionLibraryController)
 
-
+import JsonDefinitionFormatterController from "./admin/ecosystems/load_sources/entity_templates/entity_template_versions/creation_new_version/json_definition_formatter_controller"
+application.register("json-definition-formatter", JsonDefinitionFormatterController)
 
 //
 // // ============================================================

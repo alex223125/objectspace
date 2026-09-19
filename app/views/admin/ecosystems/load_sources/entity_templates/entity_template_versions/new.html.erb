@@ -1,103 +1,1659 @@
-<div class="min-h-screen bg-gradient-to-b from-white via-violet-50/20 to-slate-50/70 px-4 py-8 sm:px-6 lg:px-8"> <div class="mx-auto max-w-7xl">
+<div class="min-h-screen bg-gradient-to-b from-white via-violet-50/20 to-slate-50/70 px-4 py-8 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-7xl">
 
-  <!-- ============================================================
-       PAGE HEADER
-       ============================================================ -->
+    <!-- ============================================================
+         PAGE HEADER
+         ============================================================ -->
 
-  <div class="mb-8 rounded-[38px] border-2 border-violet-100 bg-gradient-to-br from-white via-violet-50/30 to-sky-50/30 p-6 shadow-md shadow-violet-100/30 sm:p-8">
-    <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-
-      <div class="flex items-start gap-4">
-
-        <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-[22px] border-2 border-violet-200 bg-violet-100 text-2xl text-violet-600 shadow-sm shadow-violet-100">
-          ✦
-        </div>
-
-        <div>
-          <div class="text-[9px] font-black uppercase tracking-[0.3em] text-violet-500">
-            ECOSYSTEM / ENTITY TEMPLATES / VERSION
-          </div>
-
-          <h1 class="mt-1 text-2xl font-black tracking-tight text-slate-800 sm:text-3xl">
-            Create <span class="text-violet-500">Template Version</span>
-          </h1>
-
-          <p class="mt-2 max-w-2xl text-xs font-medium leading-5 text-slate-400">
-            Define the structure, intelligence fields and lifecycle state
-            for a new version of this entity template.
-          </p>
-        </div>
-
-      </div>
-
-      <div class="flex w-fit items-center gap-3 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 shadow-sm">
-
-      <span
-        class="h-2.5 w-2.5 rounded-full bg-emerald-400"
-        data-entity-definition-builder-target="headerStatusDot">
-      </span>
-
-        <div>
-          <div
-            class="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-500"
-            data-entity-definition-builder-target="headerStatus">
-            READY
-          </div>
-
-          <div class="mt-0.5 text-[9px] font-medium text-emerald-600/70">
-            Definition Studio
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-  </div>
-
-
-  <!-- ============================================================
-       MAIN FORM
-       ============================================================ -->
-
-  <%= form_with model: @entity_template_version,
-                scope: :ecosystems_load_sources_entity_templates_entity_template_version,
-                url: admin_ecosystems_load_sources_entity_templates_entity_template_versions_path,
-                class: "space-y-6",
-                data: {
-                  controller: "entity-definition-builder",
-                  action: [
-                    "submit->entity-definition-builder#beforeSubmit",
-                    "definition-library:apply->entity-definition-builder#applyLibrary"
-                  ].join(" ")
-                } do |form| %>
-
-
-    <!-- ==========================================================
-         VALIDATION ERRORS
-         ========================================================== -->
-
-    <% if @entity_template_version.errors.any? %>
-
-      <div class="rounded-[32px] border-2 border-red-100 bg-red-50 p-6 shadow-sm shadow-red-100">
+    <div class="mb-8 rounded-[38px] border-2 border-violet-100 bg-gradient-to-br from-white via-violet-50/30 to-sky-50/30 p-6 shadow-md shadow-violet-100/30 sm:p-8">
+      <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
 
         <div class="flex items-start gap-4">
 
-          <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-red-100 text-lg text-red-500">
-            ⚠
+          <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-[22px] border-2 border-violet-200 bg-violet-100 text-2xl text-violet-600 shadow-sm shadow-violet-100">
+            ✦
           </div>
 
           <div>
-
-            <div class="text-[9px] font-black uppercase tracking-[0.2em] text-red-500">
-              VERSION CREATION FAILED
+            <div class="text-xs font-black uppercase tracking-[0.25em] text-violet-500">
+              ECOSYSTEM / ENTITY TEMPLATES / VERSION
             </div>
 
-            <div class="mt-2 space-y-1">
-              <% @entity_template_version.errors.full_messages.each do |message| %>
-                <p class="text-xs font-semibold text-red-700">
-                  <%= message %>
-                </p>
-              <% end %>
+            <h1 class="mt-1 text-2xl font-black tracking-tight text-slate-800 sm:text-3xl">
+              Create <span class="text-violet-500">Template Version</span>
+            </h1>
+
+            <p class="mt-2 max-w-2xl text-sm font-medium leading-6 text-slate-500">
+              Define the structure, intelligence fields and lifecycle state
+              for a new version of this entity template.
+            </p>
+          </div>
+
+        </div>
+
+        <div
+          class="flex w-fit items-center gap-3 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 shadow-sm"
+          data-entity-definition-builder-target="headerStatusContainer">
+
+          <span
+            class="h-2.5 w-2.5 rounded-full bg-emerald-400"
+            data-entity-definition-builder-target="headerStatusDot">
+          </span>
+
+          <div>
+            <div
+              class="text-xs font-black uppercase tracking-[0.15em] text-emerald-600"
+              data-entity-definition-builder-target="headerStatus">
+              READY
+            </div>
+
+            <div class="mt-0.5 text-xs font-medium text-emerald-700">
+              Definition Studio
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ============================================================
+         MAIN FORM
+         ============================================================ -->
+
+    <%= form_with model: @entity_template_version,
+                  scope: :ecosystems_load_sources_entity_templates_entity_template_version,
+                  url: admin_ecosystems_load_sources_entity_templates_entity_template_versions_path,
+                  class: "space-y-6",
+                  data: {
+                    controller: "entity-definition-builder",
+                    action: [
+                      "submit->entity-definition-builder#beforeSubmit",
+                      "definition-library:apply->entity-definition-builder#applyLibrary",
+                      "definition-json:valid->entity-definition-builder#jsonValidated"
+                    ].join(" ")
+                  } do |form| %>
+
+
+      <!-- ==========================================================
+           VALIDATION ERRORS
+           ========================================================== -->
+
+      <% if @entity_template_version.errors.any? %>
+
+        <div class="rounded-[32px] border-2 border-red-200 bg-red-50 p-6 shadow-sm shadow-red-100">
+
+          <div class="flex items-start gap-4">
+
+            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-red-100 text-lg text-red-600">
+              ⚠
+            </div>
+
+            <div>
+
+              <div class="text-sm font-black uppercase tracking-[0.15em] text-red-700">
+                Version creation failed
+              </div>
+
+              <div class="mt-2 space-y-1">
+                <% @entity_template_version.errors.full_messages.each do |message| %>
+                  <p class="text-sm font-semibold leading-6 text-red-800">
+                    <%= message %>
+                  </p>
+                <% end %>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      <% end %>
+
+
+      <!-- ==========================================================
+           DEFINITION LIBRARY MODAL
+           ========================================================== -->
+
+      <div
+        data-entity-definition-builder-target="libraryModal"
+        data-definition-library-modal-container>
+
+        <%= render "admin/ecosystems/load_sources/entity_templates/entity_template_versions/definition_library" %>
+
+      </div>
+
+
+      <!-- ============================================================
+           MAIN GRID
+           ============================================================ -->
+
+      <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_350px]">
+
+        <div class="space-y-6">
+
+
+          <!-- ======================================================
+               VERSION DATA
+               ====================================================== -->
+
+          <div class="overflow-hidden rounded-[36px] border-2 border-violet-100 bg-white shadow-md shadow-violet-100/20">
+
+            <div class="border-b-2 border-violet-100 bg-gradient-to-r from-violet-50/80 via-white to-transparent px-6 py-6 sm:px-8">
+
+              <div class="flex items-center gap-4">
+
+                <div class="flex h-11 w-11 items-center justify-center rounded-2xl border border-violet-200 bg-violet-100 text-lg text-violet-500">
+                  ◈
+                </div>
+
+                <div>
+
+                  <div class="text-xs font-black uppercase tracking-[0.2em] text-violet-500">
+                    VERSION CONTROL
+                  </div>
+
+                  <h2 class="mt-1 text-xl font-black text-slate-700">
+                    Version Data
+                  </h2>
+
+                  <p class="mt-1 text-sm text-slate-500">
+                    Configure the version number and lifecycle state.
+                  </p>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="p-6 sm:p-8">
+
+              <div class="grid gap-6 md:grid-cols-2">
+
+                <div>
+
+                  <div class="mb-2 flex items-center justify-between">
+
+                    <%= form.label :version,
+                                   "Version",
+                                   class: "text-xs font-black uppercase tracking-[0.15em] text-slate-600" %>
+
+                    <span class="rounded-full bg-violet-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-violet-600">
+                      AUTO
+                    </span>
+
+                  </div>
+
+                  <%= form.number_field :version,
+                                        min: 1,
+                                        class: "block w-full rounded-2xl border-2 border-slate-100 bg-slate-50/70 px-4 py-4 font-mono text-sm font-bold text-slate-700 outline-none transition focus:border-violet-400 focus:bg-white focus:ring-4 focus:ring-violet-100" %>
+
+                  <p class="mt-2 text-xs leading-5 text-slate-500">
+                    Automatically initialized to the next available version number.
+                  </p>
+
+                </div>
+
+
+                <div>
+
+                  <div class="mb-2 flex items-center justify-between">
+
+                    <%= form.label :status,
+                                   "Status",
+                                   class: "text-xs font-black uppercase tracking-[0.15em] text-slate-600" %>
+
+                    <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-600">
+                      LIFECYCLE
+                    </span>
+
+                  </div>
+
+                  <%= form.select :status,
+                                  [
+                                    ["Draft", "draft"],
+                                    ["Published", "published"],
+                                    ["Archived", "archived"]
+                                  ],
+                                  {},
+                                  class: "block w-full appearance-none rounded-2xl border-2 border-slate-100 bg-slate-50/70 px-4 py-4 text-sm font-bold text-slate-700 outline-none transition focus:border-violet-400 focus:bg-white focus:ring-4 focus:ring-violet-100" %>
+
+                  <p class="mt-2 text-xs leading-5 text-slate-500">
+                    New template versions normally begin as drafts.
+                  </p>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- ======================================================
+               DEFINITION STUDIO
+               ====================================================== -->
+
+          <div class="overflow-hidden rounded-[36px] border-2 border-violet-100 bg-white shadow-md shadow-violet-100/20">
+
+            <div class="border-b-2 border-violet-100 bg-gradient-to-br from-violet-50/80 via-white to-sky-50/30 px-6 py-6 sm:px-8">
+
+              <div class="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
+
+                <div class="flex items-start gap-4">
+
+                  <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-violet-200 bg-violet-100 text-xl text-violet-600 shadow-sm">
+                    ✦
+                  </div>
+
+                  <div>
+
+                    <div class="text-xs font-black uppercase tracking-[0.2em] text-violet-500">
+                      DEFINITION STUDIO
+                    </div>
+
+                    <h2 class="mt-1 text-xl font-black text-slate-700">
+                      Build the intelligence structure
+                    </h2>
+
+                    <p class="mt-1 max-w-xl text-sm leading-6 text-slate-500">
+                      Build visually, start from a ready template, or edit
+                      the JSON directly.
+                    </p>
+
+                  </div>
+
+                </div>
+
+
+                <div class="rounded-2xl border border-orange-100 bg-orange-50 px-4 py-3">
+
+                  <div class="flex items-center justify-between gap-8">
+
+                    <div>
+                      <div class="text-xs font-black uppercase tracking-[0.15em] text-orange-600">
+                        DEFINITION XP
+                      </div>
+
+                      <div
+                        class="mt-1 text-2xl font-black text-orange-600"
+                        data-entity-definition-builder-target="xp">
+                        0
+                      </div>
+                    </div>
+
+                    <div class="text-right">
+
+                      <div class="text-xs font-black uppercase tracking-wider text-orange-500">
+                        MAX
+                      </div>
+
+                      <div class="text-sm font-black text-orange-500">
+                        100
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <div class="mt-6">
+
+                <div class="mb-2 flex items-center justify-between">
+
+                  <span class="text-xs font-black uppercase tracking-[0.15em] text-slate-500">
+                    Mission Progress
+                  </span>
+
+                  <span
+                    class="text-sm font-black text-violet-600"
+                    data-entity-definition-builder-target="progressLabel">
+                    0%
+                  </span>
+
+                </div>
+
+                <div class="h-3 overflow-hidden rounded-full border border-violet-100 bg-violet-50">
+
+                  <div
+                    class="h-full w-0 rounded-full bg-gradient-to-r from-violet-400 via-fuchsia-400 to-emerald-400 shadow-sm transition-all duration-500"
+                    data-entity-definition-builder-target="progressBar">
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div class="p-6 sm:p-8">
+
+
+              <!-- ==================================================
+                   QUICK START
+                   ================================================== -->
+
+              <div class="rounded-[28px] border-2 border-slate-100 bg-slate-50/70 p-5">
+
+                <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+                  <div>
+
+                    <div class="text-xs font-black uppercase tracking-[0.15em] text-slate-500">
+                      QUICK START
+                    </div>
+
+                    <div class="mt-1 text-base font-black text-slate-700">
+                      How do you want to begin?
+                    </div>
+
+                  </div>
+
+                  <span class="rounded-full border border-violet-100 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-violet-600">
+                    BUILDER READY
+                  </span>
+
+                </div>
+
+
+                <div class="grid gap-3 sm:grid-cols-2">
+
+                  <button
+                    type="button"
+                    class="group flex items-center gap-4 rounded-2xl border-2 border-violet-100 bg-white p-4 text-left shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-300 hover:shadow-md hover:shadow-violet-100"
+                    data-action="click->entity-definition-builder#openLibrary">
+
+                    <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-violet-200 bg-violet-50 text-lg text-violet-500 transition group-hover:scale-110">
+                      ✦
+                    </span>
+
+                    <span class="min-w-0">
+
+                      <span class="block text-sm font-black text-slate-700">
+                        Use ready definition
+                      </span>
+
+                      <span class="mt-1 block text-xs leading-5 text-slate-500">
+                        Choose from prepared entity structures.
+                      </span>
+
+                    </span>
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    class="group flex items-center gap-4 rounded-2xl border-2 border-orange-100 bg-white p-4 text-left shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-orange-300 hover:shadow-md hover:shadow-orange-100"
+                    data-action="click->entity-definition-builder#openFieldEditor">
+
+                    <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-orange-50 text-lg text-orange-500 transition group-hover:scale-110">
+                      +
+                    </span>
+
+                    <span class="min-w-0">
+
+                      <span class="block text-sm font-black text-slate-700">
+                        Add a field
+                      </span>
+
+                      <span class="mt-1 block text-xs leading-5 text-slate-500">
+                        Build your own definition from scratch.
+                      </span>
+
+                    </span>
+
+                  </button>
+
+                </div>
+
+              </div>
+
+
+              <!-- ==================================================
+                   FIELD EDITOR
+                   ================================================== -->
+
+              <div
+                class="mt-6 hidden rounded-[30px] border-2 border-orange-100 bg-gradient-to-br from-orange-50/60 via-white to-amber-50/30 p-5"
+                data-entity-definition-builder-target="fieldEditor">
+
+                <div class="mb-5 flex items-start justify-between gap-4">
+
+                  <div class="flex items-center gap-3">
+
+                    <div class="flex h-10 w-10 items-center justify-center rounded-2xl border border-orange-200 bg-orange-100 text-orange-600">
+                      ✎
+                    </div>
+
+                    <div>
+
+                      <div class="text-xs font-black uppercase tracking-[0.15em] text-orange-600">
+                        FIELD BUILDER
+                      </div>
+
+                      <div
+                        class="mt-1 text-base font-black text-slate-700"
+                        data-entity-definition-builder-target="fieldEditorTitle">
+                        Add definition field
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                  <button
+                    type="button"
+                    class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-600"
+                    data-action="click->entity-definition-builder#closeFieldEditor">
+                    ×
+                  </button>
+
+                </div>
+
+
+                <div class="grid gap-5 md:grid-cols-2">
+
+                  <div>
+                    <label class="block text-xs font-black uppercase tracking-[0.15em] text-slate-500">
+                      Field name
+                    </label>
+
+                    <input
+                      type="text"
+                      placeholder="email"
+                      autocomplete="off"
+                      class="mt-2 block w-full rounded-2xl border-2 border-slate-100 bg-white px-4 py-3.5 font-mono text-sm font-bold text-slate-700 outline-none transition focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                      data-entity-definition-builder-target="fieldName">
+                  </div>
+
+
+                  <div>
+                    <label class="block text-xs font-black uppercase tracking-[0.15em] text-slate-500">
+                      Label
+                    </label>
+
+                    <input
+                      type="text"
+                      placeholder="Email address"
+                      autocomplete="off"
+                      class="mt-2 block w-full rounded-2xl border-2 border-slate-100 bg-white px-4 py-3.5 text-sm font-bold text-slate-700 outline-none transition focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                      data-entity-definition-builder-target="fieldLabel">
+                  </div>
+
+
+                  <div>
+                    <label class="block text-xs font-black uppercase tracking-[0.15em] text-slate-500">
+                      Data type
+                    </label>
+
+                    <select
+                      class="mt-2 block w-full rounded-2xl border-2 border-slate-100 bg-white px-4 py-3.5 text-sm font-bold text-slate-700 outline-none transition focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                      data-entity-definition-builder-target="fieldType">
+
+                      <option value="string">Aa — Text</option>
+                      <option value="text">¶ — Long text</option>
+                      <option value="integer"># — Integer</option>
+                      <option value="number">123 — Number</option>
+                      <option value="boolean">◉ — Boolean</option>
+                      <option value="date">◷ — Date</option>
+                      <option value="datetime">◴ — Date &amp; time</option>
+                      <option value="email">✉ — Email</option>
+                      <option value="url">↗ — URL</option>
+                      <option value="json">{ } — JSON</option>
+
+                    </select>
+                  </div>
+
+
+                  <div>
+                    <label class="block text-xs font-black uppercase tracking-[0.15em] text-slate-500">
+                      Description
+                    </label>
+
+                    <input
+                      type="text"
+                      placeholder="Primary email address"
+                      autocomplete="off"
+                      class="mt-2 block w-full rounded-2xl border-2 border-slate-100 bg-white px-4 py-3.5 text-sm font-medium text-slate-700 outline-none transition focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                      data-entity-definition-builder-target="fieldDescription">
+                  </div>
+
+                </div>
+
+
+                <div class="mt-5 grid gap-3 sm:grid-cols-3">
+
+                  <button
+                    type="button"
+                    class="flex items-center gap-3 rounded-2xl border-2 border-slate-100 bg-white p-4 text-left transition hover:border-emerald-200"
+                    data-action="click->entity-definition-builder#toggleFieldRequired">
+
+                    <span
+                      class="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-50 text-slate-300"
+                      data-entity-definition-builder-target="requiredIcon">
+                      ○
+                    </span>
+
+                    <span>
+
+                      <span class="block text-xs font-black text-slate-600">
+                        Required
+                      </span>
+
+                      <span
+                        class="mt-0.5 block text-[10px] uppercase tracking-wider text-slate-400"
+                        data-entity-definition-builder-target="requiredLabel">
+                        Optional
+                      </span>
+
+                    </span>
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    class="flex items-center gap-3 rounded-2xl border-2 border-slate-100 bg-white p-4 text-left transition hover:border-violet-200"
+                    data-action="click->entity-definition-builder#toggleFieldMultiple">
+
+                    <span
+                      class="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-50 text-slate-300"
+                      data-entity-definition-builder-target="multipleIcon">
+                      ○
+                    </span>
+
+                    <span>
+
+                      <span class="block text-xs font-black text-slate-600">
+                        Multiple
+                      </span>
+
+                      <span
+                        class="mt-0.5 block text-[10px] uppercase tracking-wider text-slate-400"
+                        data-entity-definition-builder-target="multipleLabel">
+                        Single
+                      </span>
+
+                    </span>
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    class="flex items-center gap-3 rounded-2xl border-2 border-slate-100 bg-white p-4 text-left transition hover:border-sky-200"
+                    data-action="click->entity-definition-builder#toggleFieldActive">
+
+                    <span
+                      class="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-400"
+                      data-entity-definition-builder-target="activeIcon">
+                      ●
+                    </span>
+
+                    <span>
+
+                      <span class="block text-xs font-black text-slate-600">
+                        Active
+                      </span>
+
+                      <span
+                        class="mt-0.5 block text-[10px] uppercase tracking-wider text-emerald-400"
+                        data-entity-definition-builder-target="activeLabel">
+                        Enabled
+                      </span>
+
+                    </span>
+
+                  </button>
+
+                </div>
+
+
+                <div class="mt-5 flex flex-col-reverse gap-3 border-t border-orange-100 pt-5 sm:flex-row sm:justify-end">
+
+                  <button
+                    type="button"
+                    class="rounded-2xl border-2 border-slate-100 bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.12em] text-slate-500 transition hover:border-slate-200 hover:text-slate-700"
+                    data-action="click->entity-definition-builder#closeFieldEditor">
+                    Cancel
+                  </button>
+
+                  <button
+                    type="button"
+                    class="rounded-2xl border-2 border-orange-300 bg-gradient-to-r from-orange-400 to-amber-400 px-6 py-3 text-xs font-black uppercase tracking-[0.12em] text-white shadow-sm shadow-orange-200 transition hover:-translate-y-0.5 hover:from-orange-500 hover:to-amber-500"
+                    data-action="click->entity-definition-builder#saveField">
+                    ✦ SAVE FIELD
+                  </button>
+
+                </div>
+
+              </div>
+
+
+              <!-- ==================================================
+                   FIELD INVENTORY
+                   ================================================== -->
+
+              <div class="mt-8">
+
+                <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+                  <div>
+
+                    <div class="text-xs font-black uppercase tracking-[0.15em] text-slate-500">
+                      FIELD INVENTORY
+                    </div>
+
+                    <div class="mt-1 text-base font-black text-slate-700">
+                      Definition fields
+                    </div>
+
+                  </div>
+
+                  <div class="flex items-center gap-2">
+
+                    <span
+                      class="rounded-full border border-violet-100 bg-violet-50 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-violet-600"
+                      data-entity-definition-builder-target="fieldCount">
+                      0 FIELDS
+                    </span>
+
+                    <span
+                      class="rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-emerald-600"
+                      data-entity-definition-builder-target="syncBadge">
+                      SYNCED
+                    </span>
+
+                  </div>
+
+                </div>
+
+
+                <div
+                  class="space-y-4"
+                  data-entity-definition-builder-target="builder">
+                </div>
+
+              </div>
+
+
+              <button
+                type="button"
+                class="group mt-5 flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-violet-200 bg-violet-50/40 px-5 py-4 text-xs font-black uppercase tracking-[0.15em] text-violet-600 transition-all duration-300 hover:border-violet-400 hover:bg-violet-50 hover:shadow-sm"
+                data-action="click->entity-definition-builder#openFieldEditor">
+
+                <span class="text-lg transition-transform duration-300 group-hover:scale-125">
+                  +
+                </span>
+
+                ADD ANOTHER FIELD
+
+              </button>
+
+
+              <div class="mt-6 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+
+                <div class="flex items-center gap-3">
+
+                  <span
+                    class="h-2.5 w-2.5 rounded-full bg-emerald-500"
+                    data-entity-definition-builder-target="statusDot">
+                  </span>
+
+                  <div
+                    class="text-sm font-bold text-emerald-700"
+                    data-entity-definition-builder-target="status">
+                    Definition builder ready
+                  </div>
+
+                </div>
+
+                <div
+                  class="text-sm font-medium text-slate-600"
+                  data-entity-definition-builder-target="activity">
+                  Waiting for your first definition change.
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- ======================================================
+               JSON MIRROR
+               ====================================================== -->
+
+          <div
+            class="overflow-hidden rounded-[36px] border-2 border-slate-800 bg-slate-950 shadow-md shadow-slate-200/40"
+            data-controller="definition-json">
+
+            <div class="border-b border-slate-700 bg-slate-900 px-6 py-5 sm:px-8">
+
+              <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
+                <div class="flex items-center gap-3">
+
+                  <div class="flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-500/30 bg-emerald-500/10 font-mono text-sm font-bold text-emerald-300">
+                    { }
+                  </div>
+
+                  <div>
+
+                    <div class="text-xs font-black uppercase tracking-[0.18em] text-emerald-300">
+                      JSON MIRROR
+                    </div>
+
+                    <div class="mt-1 text-sm font-bold text-slate-200">
+                      Definition source
+                    </div>
+
+                  </div>
+
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+
+                  <span
+                    class="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-emerald-300"
+                    data-definition-json-target="status"
+                    data-entity-definition-builder-target="jsonStatus">
+                    VALID JSON
+                  </span>
+
+                  <button
+                    type="button"
+                    class="rounded-xl border border-slate-600 bg-slate-800 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-slate-100 transition hover:border-violet-400 hover:bg-slate-700 hover:text-white focus:outline-none focus:ring-4 focus:ring-violet-500/20"
+                    data-action="click->entity-definition-builder#formatJson">
+                    Format JSON
+                  </button>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div class="p-4 sm:p-6">
+
+              <div class="relative">
+
+                <%= form.text_area :definition,
+                                   rows: 22,
+                                   spellcheck: false,
+                                   value: (
+                                     if @entity_template_version.definition.present?
+                                       @entity_template_version.definition.is_a?(String) ?
+                                         @entity_template_version.definition :
+                                         JSON.pretty_generate(@entity_template_version.definition)
+                                     else
+                                       JSON.pretty_generate({ "fields" => [] })
+                                     end
+                                   ),
+                                   class: "block min-h-[480px] w-full resize-y rounded-2xl border-2 border-slate-700 bg-slate-950 px-5 py-5 font-mono text-sm leading-7 text-emerald-200 outline-none transition placeholder:text-slate-600 focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10",
+                                   data: {
+                                     entity_definition_builder_target: "json",
+                                     definition_json_target: "input",
+                                     action: "input->definition-json#changed"
+                                   } %>
+
+              </div>
+
+
+              <!-- ====================================================
+                   JSON ERROR / REPAIR PANEL
+                   ==================================================== -->
+
+              <div
+                class="mt-5 hidden overflow-hidden rounded-[28px] border-2 border-rose-200 bg-white shadow-lg shadow-rose-100/40"
+                data-entity-definition-builder-target="jsonError"
+                data-definition-json-target="error">
+
+                <div class="border-b border-rose-100 bg-gradient-to-r from-rose-50 via-white to-orange-50 px-5 py-5 sm:px-6">
+
+                  <div class="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+
+                    <div class="flex items-start gap-4">
+
+                      <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-rose-200 bg-rose-100 text-xl font-black text-rose-600 shadow-sm">
+                        !
+                      </div>
+
+                      <div class="min-w-0">
+
+                        <div class="flex flex-wrap items-center gap-2">
+
+                          <div class="text-xs font-black uppercase tracking-[0.18em] text-rose-600">
+                            JSON VALIDATION
+                          </div>
+
+                          <span
+                            class="rounded-full border border-rose-200 bg-rose-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-rose-700"
+                            data-entity-definition-builder-target="jsonProblemBadge">
+                            INVALID DEFINITION
+                          </span>
+
+                        </div>
+
+                        <h3 class="mt-1 text-xl font-black tracking-tight text-slate-800 sm:text-2xl">
+                          Invalid definition
+                        </h3>
+
+                        <p class="mt-1.5 max-w-2xl text-sm leading-6 text-slate-600">
+                          The JSON was parsed and checked against the definition
+                          rules required by the visual builder.
+                        </p>
+
+                      </div>
+
+                    </div>
+
+
+                    <div class="flex shrink-0 items-center gap-3 rounded-2xl border border-rose-200 bg-white px-4 py-3 shadow-sm">
+
+                      <div class="text-right">
+
+                        <div class="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
+                          Problems
+                        </div>
+
+                        <div
+                          class="mt-0.5 text-2xl font-black leading-none text-rose-600"
+                          data-entity-definition-builder-target="jsonProblemCount">
+                          1
+                        </div>
+
+                      </div>
+
+                      <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-50 text-sm font-black text-rose-500">
+                        !
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+
+                <div class="p-5 sm:p-6">
+
+                  <div class="rounded-2xl border border-rose-100 bg-rose-50/60 p-4">
+
+                    <div class="flex items-start gap-3">
+
+                      <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white text-sm font-black text-rose-500 shadow-sm">
+                        ?
+                      </span>
+
+                      <div class="min-w-0">
+
+                        <div class="text-xs font-black uppercase tracking-[0.15em] text-rose-600">
+                          What needs fixing
+                        </div>
+
+                        <div
+                          class="mt-1.5 text-sm font-semibold leading-6 text-slate-700"
+                          data-entity-definition-builder-target="jsonErrorMessage"
+                          data-definition-json-target="errorMessage">
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+
+                  <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+                    <div class="text-xs font-medium leading-5 text-slate-500">
+                      Review the proposed changes before applying automatic repair.
+                    </div>
+
+                    <div class="flex flex-col gap-2 sm:flex-row">
+
+                      <button
+                        type="button"
+                        class="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-white px-4 py-2.5 text-xs font-black uppercase tracking-wider text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-100"
+                        data-entity-definition-builder-target="formatOnlyButton"
+                        data-action="click->entity-definition-builder#formatJson">
+
+                        <span class="text-sm">
+                          { }
+                        </span>
+
+                        Format Only
+
+                      </button>
+
+
+                      <button
+                        type="button"
+                        class="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-emerald-300 bg-emerald-500 px-5 py-2.5 text-xs font-black uppercase tracking-wider text-white shadow-sm shadow-emerald-200 transition hover:-translate-y-0.5 hover:bg-emerald-600 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-emerald-100"
+                        data-entity-definition-builder-target="autoRepairButton"
+                        data-action="click->entity-definition-builder#autoRepair">
+
+                        <span class="text-sm">
+                          ✦
+                        </span>
+
+                        Auto Repair
+
+                      </button>
+
+                    </div>
+
+                  </div>
+
+
+                  <div
+                    class="mt-5 hidden rounded-2xl border-2 border-amber-200 bg-amber-50 p-4"
+                    data-entity-definition-builder-target="jsonRepairWarning">
+
+                    <div class="flex items-start gap-3">
+
+                      <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-sm font-black text-amber-700">
+                        !
+                      </span>
+
+                      <div class="min-w-0">
+
+                        <div class="text-sm font-black text-amber-800">
+                          Review before applying repair
+                        </div>
+
+                        <p
+                          class="mt-1 text-sm leading-6 text-amber-800/80"
+                          data-entity-definition-builder-target="jsonRepairWarningMessage">
+                          Some automatic changes may alter the meaning or structure
+                          of your definition. Review the proposed changes before applying them.
+                        </p>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+
+                  <div
+                    class="mt-5 hidden overflow-hidden rounded-2xl border-2 border-slate-200 bg-slate-50"
+                    data-entity-definition-builder-target="jsonRepairPreview">
+
+                    <div class="border-b border-slate-200 bg-white px-4 py-4 sm:px-5">
+
+                      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+                        <div>
+
+                          <div class="text-xs font-black uppercase tracking-[0.15em] text-violet-600">
+                            REPAIR PREVIEW
+                          </div>
+
+                          <div class="mt-1 text-sm font-black text-slate-700">
+                            Proposed changes
+                          </div>
+
+                        </div>
+
+                        <span
+                          class="rounded-full border border-violet-100 bg-violet-50 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-violet-600"
+                          data-entity-definition-builder-target="jsonRepairChangeCount">
+                          0 CHANGES
+                        </span>
+
+                      </div>
+
+                    </div>
+
+
+                    <div class="hidden border-b border-slate-200 bg-slate-100 px-4 py-3 text-[10px] font-black uppercase tracking-[0.12em] text-slate-500 md:grid md:grid-cols-[1fr_1.25fr_1.25fr_1.5fr] md:gap-4">
+
+                      <div>Field</div>
+                      <div>Original value</div>
+                      <div>Repaired value</div>
+                      <div>Reason</div>
+
+                    </div>
+
+
+                    <div
+                      class="divide-y divide-slate-200"
+                      data-entity-definition-builder-target="jsonRepairChanges">
+                    </div>
+
+
+                    <div
+                      class="hidden border-t border-slate-200 bg-white px-4 py-4 sm:px-5"
+                      data-entity-definition-builder-target="jsonRepairActions">
+
+                      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+                        <div class="text-xs leading-5 text-slate-500">
+                          The repaired JSON will replace the current JSON only after
+                          you apply the proposed changes.
+                        </div>
+
+                        <div class="flex flex-col gap-2 sm:flex-row">
+
+                          <button
+                            type="button"
+                            class="rounded-xl border-2 border-slate-200 bg-white px-4 py-2.5 text-xs font-black uppercase tracking-wider text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"
+                            data-action="click->entity-definition-builder#cancelRepair">
+                            Keep Current JSON
+                          </button>
+
+                          <button
+                            type="button"
+                            class="rounded-xl border-2 border-emerald-300 bg-emerald-500 px-5 py-2.5 text-xs font-black uppercase tracking-wider text-white shadow-sm shadow-emerald-200 transition hover:bg-emerald-600"
+                            data-entity-definition-builder-target="applyRepairButton"
+                            data-action="click->entity-definition-builder#applyRepair">
+                            ✓ APPLY REPAIR
+                          </button>
+
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+
+                  <div
+                    class="mt-5 hidden rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-4"
+                    data-entity-definition-builder-target="jsonRepairSuccess">
+
+                    <div class="flex items-start gap-3">
+
+                      <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-sm font-black text-emerald-700">
+                        ✓
+                      </span>
+
+                      <div class="min-w-0">
+
+                        <div class="text-sm font-black text-emerald-800">
+                          Definition repaired successfully
+                        </div>
+
+                        <p
+                          class="mt-1 text-sm leading-6 text-emerald-800/80"
+                          data-entity-definition-builder-target="jsonRepairSuccessMessage">
+                          The definition has been repaired, validated again,
+                          and synchronized with the visual builder.
+                        </p>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+
+                  <div
+                    class="mt-5 hidden rounded-2xl border-2 border-sky-200 bg-sky-50 p-4"
+                    data-entity-definition-builder-target="postRepairValidation">
+
+                    <div class="flex items-start gap-3">
+
+                      <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sky-100 text-sm font-black text-sky-700">
+                        ✓
+                      </span>
+
+                      <div class="min-w-0">
+
+                        <div class="text-sm font-black text-sky-800">
+                          Validation completed
+                        </div>
+
+                        <p
+                          class="mt-1 text-sm leading-6 text-sky-800/80"
+                          data-entity-definition-builder-target="postRepairValidationMessage">
+                          The repaired definition was validated after repair.
+                        </p>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+
+                  <div
+                    class="hidden"
+                    data-entity-definition-builder-target="jsonRepairSummary">
+
+                    <div
+                      data-entity-definition-builder-target="jsonRepairMessage">
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <div
+                class="mt-5 hidden rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-4"
+                data-entity-definition-builder-target="jsonValidState">
+
+                <div class="flex items-start gap-3">
+
+                  <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-sm font-black text-emerald-700">
+                    ✓
+                  </span>
+
+                  <div class="min-w-0">
+
+                    <div class="text-sm font-black text-emerald-800">
+                      Definition is valid
+                    </div>
+
+                    <p
+                      class="mt-1 text-sm leading-6 text-emerald-800/80"
+                      data-entity-definition-builder-target="jsonValidMessage">
+                      JSON syntax and definition structure are valid.
+                    </p>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <div
+                class="mt-5 flex flex-col gap-3 rounded-2xl border border-slate-700 bg-slate-900 p-4 sm:flex-row sm:items-center sm:justify-between"
+                data-entity-definition-builder-target="jsonSyncStatus">
+
+                <div class="flex items-start gap-3">
+
+                  <span
+                    class="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50"
+                    data-entity-definition-builder-target="jsonSyncDot">
+                  </span>
+
+                  <div>
+
+                    <div
+                      class="text-sm font-bold text-slate-100"
+                      data-entity-definition-builder-target="jsonSyncTitle">
+                      Visual builder and JSON stay synchronized.
+                    </div>
+
+                    <div
+                      class="mt-1 text-sm leading-6 text-slate-300"
+                      data-entity-definition-builder-target="jsonSyncMessage">
+                      Manual JSON changes are checked before they are imported
+                      into the visual builder.
+                    </div>
+
+                  </div>
+
+                </div>
+
+                <span class="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  JSON / STRUCTURE
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- ======================================================
+               FORM ACTIONS
+               ====================================================== -->
+
+          <div class="flex flex-col-reverse gap-3 border-t-2 border-slate-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
+
+            <%= link_to admin_ecosystems_load_sources_entity_templates_entity_template_versions_path(
+                          entity_template_id: params[:entity_template_id]
+                        ),
+                        class: "inline-flex items-center justify-center rounded-2xl border-2 border-slate-100 bg-white px-6 py-3.5 text-xs font-black uppercase tracking-[0.12em] text-slate-500 transition hover:border-slate-200 hover:bg-slate-50 hover:text-slate-700" do %>
+              ← Cancel
+            <% end %>
+
+
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+
+              <div
+                class="hidden items-center gap-2 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 sm:flex"
+                data-entity-definition-builder-target="submitReadiness">
+
+                <span
+                  class="h-2 w-2 rounded-full bg-emerald-500"
+                  data-entity-definition-builder-target="submitReadinessDot">
+                </span>
+
+                <span
+                  class="text-xs font-black uppercase tracking-wider text-emerald-700"
+                  data-entity-definition-builder-target="submitReadinessText">
+                  Ready to create
+                </span>
+
+              </div>
+
+
+              <%= hidden_field_tag :entity_template_id, @entity_template.id %>
+
+              <%= form.submit "CREATE VERSION  →",
+                              class: "cursor-pointer rounded-2xl border-2 border-violet-300 bg-gradient-to-r from-violet-500 to-fuchsia-500 px-8 py-4 text-xs font-black uppercase tracking-[0.15em] text-white shadow-md shadow-violet-200/70 transition-all duration-300 hover:-translate-y-1 hover:from-violet-600 hover:to-fuchsia-600 hover:shadow-lg hover:shadow-violet-200/80",
+                              data: {
+                                entity_definition_builder_target: "submit"
+                              } %>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- ========================================================
+             SIDEBAR
+             ======================================================== -->
+
+        <div class="space-y-6">
+
+          <!-- ======================================================
+               DEFINITION STATUS
+               ====================================================== -->
+
+          <div class="relative overflow-hidden rounded-[36px] border-2 border-violet-100 bg-gradient-to-b from-white via-violet-50/30 to-slate-50 p-6 shadow-md shadow-violet-100/30">
+
+            <div class="relative">
+
+              <div class="mb-6 flex items-center justify-between">
+
+                <div class="text-xs font-black uppercase tracking-[0.2em] text-violet-600">
+                  DEFINITION STATUS
+                </div>
+
+                <span
+                  class="rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-600"
+                  data-entity-definition-builder-target="sidebarStatus">
+                  READY
+                </span>
+
+              </div>
+
+
+              <div class="rounded-2xl border border-violet-100 bg-white p-4 shadow-sm">
+
+                <div class="flex items-center justify-between">
+
+                  <div>
+
+                    <div class="text-xs font-black uppercase tracking-[0.15em] text-slate-500">
+                      FIELDS
+                    </div>
+
+                    <div
+                      class="mt-1 text-3xl font-black text-violet-600"
+                      data-entity-definition-builder-target="sidebarFieldCount">
+                      0
+                    </div>
+
+                  </div>
+
+                  <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-50 text-xl text-violet-500">
+                    ◈
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <div class="mt-3 rounded-2xl border border-orange-100 bg-white p-4 shadow-sm">
+
+                <div class="flex items-center justify-between">
+
+                  <div>
+
+                    <div class="text-xs font-black uppercase tracking-[0.15em] text-slate-500">
+                      REQUIRED
+                    </div>
+
+                    <div
+                      class="mt-1 text-2xl font-black text-orange-600"
+                      data-entity-definition-builder-target="sidebarRequiredCount">
+                      0
+                    </div>
+
+                  </div>
+
+                  <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-lg text-orange-500">
+                    ✓
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <div class="mt-3 rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm">
+
+                <div class="flex items-center justify-between">
+
+                  <div>
+
+                    <div class="text-xs font-black uppercase tracking-[0.15em] text-slate-500">
+                      ACTIVE
+                    </div>
+
+                    <div
+                      class="mt-1 text-2xl font-black text-emerald-600"
+                      data-entity-definition-builder-target="sidebarActiveCount">
+                      0
+                    </div>
+
+                  </div>
+
+                  <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-lg text-emerald-500">
+                    ●
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <div class="mt-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+
+                <div class="mb-2 flex items-center justify-between">
+
+                  <span class="text-xs font-black uppercase tracking-[0.15em] text-slate-500">
+                    STRUCTURE HEALTH
+                  </span>
+
+                  <span
+                    class="text-sm font-black text-emerald-600"
+                    data-entity-definition-builder-target="health">
+                    100%
+                  </span>
+
+                </div>
+
+                <div class="h-2 overflow-hidden rounded-full bg-slate-100">
+
+                  <div
+                    class="h-full w-full rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all duration-500"
+                    data-entity-definition-builder-target="healthBar">
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <div
+                class="mt-4 hidden rounded-2xl border border-rose-100 bg-rose-50 p-4"
+                data-entity-definition-builder-target="sidebarValidationError">
+
+                <div class="text-xs font-black uppercase tracking-[0.15em] text-rose-600">
+                  VALIDATION
+                </div>
+
+                <div
+                  class="mt-1 text-sm font-bold leading-5 text-rose-700"
+                  data-entity-definition-builder-target="sidebarValidationErrorMessage">
+                  Definition requires attention.
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- ======================================================
+               BUILD MISSION
+               ====================================================== -->
+
+          <div class="rounded-[32px] border-2 border-orange-100 bg-white p-6 shadow-sm shadow-orange-100/20">
+
+            <div class="mb-5 flex items-center justify-between">
+
+              <div class="text-sm font-black uppercase tracking-[0.15em] text-orange-600">
+                BUILD MISSION
+              </div>
+
+              <span class="rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-[10px] font-black text-orange-600">
+                +100 XP
+              </span>
+
+            </div>
+
+            <div class="space-y-5">
+
+              <div class="flex items-start gap-3">
+
+                <span
+                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-xs font-black text-slate-500"
+                  data-entity-definition-builder-target="missionFieldIcon">
+                  01
+                </span>
+
+                <div>
+
+                  <div class="text-sm font-bold text-slate-700">
+                    Add your first field
+                  </div>
+
+                  <div class="mt-1 text-xs leading-5 text-slate-500">
+                    Give the definition its first piece of structure.
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <div class="flex items-start gap-3">
+
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-xs font-black text-slate-500">
+                  02
+                </span>
+
+                <div>
+
+                  <div class="text-sm font-bold text-slate-700">
+                    Define required attributes
+                  </div>
+
+                  <div class="mt-1 text-xs leading-5 text-slate-500">
+                    Decide which information is essential.
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <div class="flex items-start gap-3">
+
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-xs font-black text-slate-500">
+                  03
+                </span>
+
+                <div>
+
+                  <div class="text-sm font-bold text-slate-700">
+                    Validate the structure
+                  </div>
+
+                  <div class="mt-1 text-xs leading-5 text-slate-500">
+                    Keep the JSON definition valid and consistent.
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <div class="flex items-start gap-3">
+
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-xs font-black text-slate-500">
+                  04
+                </span>
+
+                <div>
+
+                  <div class="text-sm font-bold text-slate-700">
+                    Deploy the version
+                  </div>
+
+                  <div class="mt-1 text-xs leading-5 text-slate-500">
+                    Save the completed definition as a new version.
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- ======================================================
+               JSON INTELLIGENCE
+               ====================================================== -->
+
+          <div class="rounded-[32px] border-2 border-sky-100 bg-gradient-to-b from-white to-sky-50/40 p-6 shadow-sm">
+
+            <div class="mb-5 flex items-center gap-3">
+
+              <div class="flex h-10 w-10 items-center justify-center rounded-2xl border border-sky-100 bg-sky-50 text-sm font-bold text-sky-600">
+                { }
+              </div>
+
+              <div>
+
+                <div class="text-sm font-black uppercase tracking-[0.15em] text-sky-600">
+                  JSON INTELLIGENCE
+                </div>
+
+                <div class="mt-1 text-sm font-black text-slate-700">
+                  You can still edit manually
+                </div>
+
+              </div>
+
+            </div>
+
+            <p class="text-sm leading-6 text-slate-600">
+              The visual builder and JSON editor work together.
+              Manual JSON changes are parsed and validated before they are
+              imported into the visual builder.
+            </p>
+
+            <div class="mt-4 space-y-3">
+
+              <div class="flex items-start gap-3">
+                <span class="mt-0.5 text-base font-bold text-emerald-500">✓</span>
+                <span class="text-sm font-semibold leading-5 text-slate-600">
+                  JSON syntax validation
+                </span>
+              </div>
+
+              <div class="flex items-start gap-3">
+                <span class="mt-0.5 text-base font-bold text-emerald-500">✓</span>
+                <span class="text-sm font-semibold leading-5 text-slate-600">
+                  Definition structure validation
+                </span>
+              </div>
+
+              <div class="flex items-start gap-3">
+                <span class="mt-0.5 text-base font-bold text-emerald-500">✓</span>
+                <span class="text-sm font-semibold leading-5 text-slate-600">
+                  Conservative automatic repair
+                </span>
+              </div>
+
+              <div class="flex items-start gap-3">
+                <span class="mt-0.5 text-base font-bold text-emerald-500">✓</span>
+                <span class="text-sm font-semibold leading-5 text-slate-600">
+                  Repair preview and change log
+                </span>
+              </div>
+
+              <div class="flex items-start gap-3">
+                <span class="mt-0.5 text-base font-bold text-emerald-500">✓</span>
+                <span class="text-sm font-semibold leading-5 text-slate-600">
+                  Validation after repair
+                </span>
+              </div>
+
+              <div class="flex items-start gap-3">
+                <span class="mt-0.5 text-base font-bold text-emerald-500">✓</span>
+                <span class="text-sm font-semibold leading-5 text-slate-600">
+                  Visual builder synchronization
+                </span>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ============================================================
+           TOAST
+           ============================================================ -->
+
+      <div
+        class="pointer-events-none fixed bottom-6 right-6 z-50 hidden w-[min(420px,calc(100vw-3rem))]"
+        data-entity-definition-builder-target="toast">
+
+        <div
+          data-notification-container
+          class="rounded-2xl border-2 bg-white p-4 shadow-xl shadow-violet-200/40">
+
+          <div class="flex items-center gap-3">
+
+            <div
+              class="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-50 text-violet-500"
+              data-entity-definition-builder-target="toastIcon">
+              ✦
+            </div>
+
+            <div class="min-w-0">
+
+              <div
+                class="text-xs font-black uppercase tracking-[0.15em] text-violet-600"
+                data-entity-definition-builder-target="toastTitle">
+                DEFINITION UPDATED
+              </div>
+
+              <div
+                class="mt-1 text-sm font-semibold text-slate-600"
+                data-entity-definition-builder-target="toastMessage">
+                Definition synchronized.
+              </div>
+
             </div>
 
           </div>
@@ -109,1186 +1665,49 @@
     <% end %>
 
 
-    <!-- ==========================================================
-         DEFINITION LIBRARY
-
-         IMPORTANT:
-         Render this ONCE only.
-         The partial owns the definition-library controller.
-         ========================================================== -->
-
-    <%= render "admin/ecosystems/load_sources/entity_templates/entity_template_versions/definition_library" %>
-
-
-    <!-- ==========================================================
-         MAIN GRID
-         ========================================================== -->
-
-    <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_350px]">
-
-      <div class="space-y-6">
-
-
-        <!-- ======================================================
-             VERSION DATA
-             ====================================================== -->
-
-        <div class="overflow-hidden rounded-[36px] border-2 border-violet-100 bg-white shadow-md shadow-violet-100/20">
-
-          <div class="border-b-2 border-violet-100 bg-gradient-to-r from-violet-50/80 via-white to-transparent px-6 py-6 sm:px-8">
-
-            <div class="flex items-center gap-4">
-
-              <div class="flex h-11 w-11 items-center justify-center rounded-2xl border border-violet-200 bg-violet-100 text-lg text-violet-500">
-                ◈
-              </div>
-
-              <div>
-
-                <div class="text-[9px] font-black uppercase tracking-[0.25em] text-violet-500">
-                  VERSION CONTROL
-                </div>
-
-                <h2 class="mt-1 text-lg font-black text-slate-700">
-                  Version Data
-                </h2>
-
-                <p class="mt-1 text-xs text-slate-400">
-                  Configure the version number and lifecycle state.
-                </p>
-
-              </div>
-
-            </div>
-
-          </div>
-
-          <div class="p-6 sm:p-8">
-
-            <div class="grid gap-6 md:grid-cols-2">
-
-              <div>
-
-                <div class="mb-2 flex items-center justify-between">
-
-                  <%= form.label :version,
-                                 "Version",
-                                 class: "text-[10px] font-black uppercase tracking-[0.2em] text-slate-500" %>
-
-                  <span class="rounded-full bg-violet-50 px-2.5 py-1 text-[8px] font-black uppercase tracking-wider text-violet-500">
-                  AUTO
-                </span>
-
-                </div>
-
-                <%= form.number_field :version,
-                                      min: 1,
-                                      class: "block w-full rounded-2xl border-2 border-slate-100 bg-slate-50/70 px-4 py-4 font-mono text-sm font-bold text-slate-700 outline-none transition focus:border-violet-400 focus:bg-white focus:ring-4 focus:ring-violet-100" %>
-
-                <p class="mt-2 text-[10px] leading-5 text-slate-400">
-                  Automatically initialized to the next available version number.
-                </p>
-
-              </div>
-
-
-              <div>
-
-                <div class="mb-2 flex items-center justify-between">
-
-                  <%= form.label :status,
-                                 "Status",
-                                 class: "text-[10px] font-black uppercase tracking-[0.2em] text-slate-500" %>
-
-                  <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-[8px] font-black uppercase tracking-wider text-emerald-500">
-                  LIFECYCLE
-                </span>
-
-                </div>
-
-                <%= form.select :status,
-                                [
-                                  ["Draft", "draft"],
-                                  ["Published", "published"],
-                                  ["Archived", "archived"]
-                                ],
-                                {},
-                                class: "block w-full appearance-none rounded-2xl border-2 border-slate-100 bg-slate-50/70 px-4 py-4 text-sm font-bold text-slate-700 outline-none transition focus:border-violet-400 focus:bg-white focus:ring-4 focus:ring-violet-100" %>
-
-                <p class="mt-2 text-[10px] leading-5 text-slate-400">
-                  New template versions normally begin as drafts.
-                </p>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <!-- ======================================================
-             DEFINITION STUDIO
-             ====================================================== -->
-
-        <div class="overflow-hidden rounded-[36px] border-2 border-violet-100 bg-white shadow-md shadow-violet-100/20">
-
-          <div class="border-b-2 border-violet-100 bg-gradient-to-br from-violet-50/80 via-white to-sky-50/30 px-6 py-6 sm:px-8">
-
-            <div class="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
-
-              <div class="flex items-start gap-4">
-
-                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-violet-200 bg-violet-100 text-xl text-violet-600 shadow-sm">
-                  ✦
-                </div>
-
-                <div>
-
-                  <div class="text-[9px] font-black uppercase tracking-[0.25em] text-violet-500">
-                    DEFINITION STUDIO
-                  </div>
-
-                  <h2 class="mt-1 text-xl font-black text-slate-700">
-                    Build the intelligence structure
-                  </h2>
-
-                  <p class="mt-1 max-w-xl text-xs leading-5 text-slate-400">
-                    Build visually, start from a ready template, or edit
-                    the JSON directly.
-                  </p>
-
-                </div>
-
-              </div>
-
-
-              <div class="rounded-2xl border border-orange-100 bg-orange-50 px-4 py-3">
-
-                <div class="flex items-center justify-between gap-8">
-
-                  <div>
-                    <div class="text-[8px] font-black uppercase tracking-[0.2em] text-orange-500">
-                      DEFINITION XP
-                    </div>
-
-                    <div
-                      class="mt-1 text-2xl font-black text-orange-500"
-                      data-entity-definition-builder-target="xp">
-                      0
-                    </div>
-                  </div>
-
-                  <div class="text-right">
-
-                    <div class="text-[8px] font-black uppercase tracking-wider text-orange-400">
-                      MAX
-                    </div>
-
-                    <div class="text-sm font-black text-orange-400">
-                      100
-                    </div>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
-
-
-            <div class="mt-6">
-
-              <div class="mb-2 flex items-center justify-between">
-
-              <span class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
-                Mission Progress
-              </span>
-
-                <span
-                  class="text-[10px] font-black text-violet-500"
-                  data-entity-definition-builder-target="progressLabel">
-                0%
-              </span>
-
-              </div>
-
-              <div class="h-3 overflow-hidden rounded-full border border-violet-100 bg-violet-50">
-
-                <div
-                  class="h-full w-0 rounded-full bg-gradient-to-r from-violet-400 via-fuchsia-400 to-emerald-400 shadow-sm transition-all duration-500"
-                  data-entity-definition-builder-target="progressBar">
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-
-
-          <div class="p-6 sm:p-8">
-
-
-            <!-- QUICK START -->
-
-            <div class="rounded-[28px] border-2 border-slate-100 bg-slate-50/70 p-5">
-
-              <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-
-                <div>
-
-                  <div class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
-                    QUICK START
-                  </div>
-
-                  <div class="mt-1 text-sm font-black text-slate-700">
-                    How do you want to begin?
-                  </div>
-
-                </div>
-
-                <span class="rounded-full border border-violet-100 bg-white px-3 py-1 text-[8px] font-black uppercase tracking-wider text-violet-400">
-                BUILDER READY
-              </span>
-
-              </div>
-
-
-              <div class="grid gap-3 sm:grid-cols-2">
-
-                <button
-                  type="button"
-                  class="group flex items-center gap-4 rounded-2xl border-2 border-violet-100 bg-white p-4 text-left shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-300 hover:shadow-md hover:shadow-violet-100"
-                  data-action="click->entity-definition-builder#openLibrary">
-
-                <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-violet-200 bg-violet-50 text-lg text-violet-500 transition group-hover:scale-110">
-                  ✦
-                </span>
-
-                  <span class="min-w-0">
-
-                  <span class="block text-xs font-black text-slate-700">
-                    Use ready definition
-                  </span>
-
-                  <span class="mt-1 block text-[10px] leading-4 text-slate-400">
-                    Choose from prepared entity structures.
-                  </span>
-
-                </span>
-
-                </button>
-
-
-                <button
-                  type="button"
-                  class="group flex items-center gap-4 rounded-2xl border-2 border-orange-100 bg-white p-4 text-left shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-orange-300 hover:shadow-md hover:shadow-orange-100"
-                  data-action="click->entity-definition-builder#openFieldEditor">
-
-                <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-orange-50 text-lg text-orange-500 transition group-hover:scale-110">
-                  +
-                </span>
-
-                  <span class="min-w-0">
-
-                  <span class="block text-xs font-black text-slate-700">
-                    Add a field
-                  </span>
-
-                  <span class="mt-1 block text-[10px] leading-4 text-slate-400">
-                    Build your own definition from scratch.
-                  </span>
-
-                </span>
-
-                </button>
-
-              </div>
-
-            </div>
-
-
-            <!-- FIELD EDITOR -->
-
-            <div
-              class="mt-6 hidden rounded-[30px] border-2 border-orange-100 bg-gradient-to-br from-orange-50/60 via-white to-amber-50/30 p-5"
-              data-entity-definition-builder-target="fieldEditor">
-
-              <div class="mb-5 flex items-start justify-between gap-4">
-
-                <div class="flex items-center gap-3">
-
-                  <div class="flex h-10 w-10 items-center justify-center rounded-2xl border border-orange-200 bg-orange-100 text-orange-500">
-                    ✎
-                  </div>
-
-                  <div>
-
-                    <div class="text-[9px] font-black uppercase tracking-[0.2em] text-orange-500">
-                      FIELD BUILDER
-                    </div>
-
-                    <div
-                      class="mt-1 text-sm font-black text-slate-700"
-                      data-entity-definition-builder-target="fieldEditorTitle">
-                      Add definition field
-                    </div>
-
-                  </div>
-
-                </div>
-
-                <button
-                  type="button"
-                  class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-600"
-                  data-action="click->entity-definition-builder#closeFieldEditor">
-                  ×
-                </button>
-
-              </div>
-
-
-              <div class="grid gap-5 md:grid-cols-2">
-
-                <div>
-                  <label class="block text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
-                    Field name
-                  </label>
-
-                  <input
-                    type="text"
-                    placeholder="email"
-                    autocomplete="off"
-                    class="mt-2 block w-full rounded-2xl border-2 border-slate-100 bg-white px-4 py-3.5 font-mono text-xs font-bold text-slate-700 outline-none transition focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
-                    data-entity-definition-builder-target="fieldName">
-                </div>
-
-
-                <div>
-                  <label class="block text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
-                    Label
-                  </label>
-
-                  <input
-                    type="text"
-                    placeholder="Email address"
-                    autocomplete="off"
-                    class="mt-2 block w-full rounded-2xl border-2 border-slate-100 bg-white px-4 py-3.5 text-xs font-bold text-slate-700 outline-none transition focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
-                    data-entity-definition-builder-target="fieldLabel">
-                </div>
-
-
-                <div>
-                  <label class="block text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
-                    Data type
-                  </label>
-
-                  <select
-                    class="mt-2 block w-full rounded-2xl border-2 border-slate-100 bg-white px-4 py-3.5 text-xs font-bold text-slate-700 outline-none transition focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
-                    data-entity-definition-builder-target="fieldType">
-
-                    <option value="string">Aa — Text</option>
-                    <option value="text">¶ — Long text</option>
-                    <option value="integer"># — Integer</option>
-                    <option value="number">123 — Number</option>
-                    <option value="boolean">◉ — Boolean</option>
-                    <option value="date">◷ — Date</option>
-                    <option value="datetime">◴ — Date &amp; time</option>
-                    <option value="email">✉ — Email</option>
-                    <option value="url">↗ — URL</option>
-                    <option value="json">{ } — JSON</option>
-
-                  </select>
-                </div>
-
-
-                <div>
-                  <label class="block text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
-                    Description
-                  </label>
-
-                  <input
-                    type="text"
-                    placeholder="Primary email address"
-                    autocomplete="off"
-                    class="mt-2 block w-full rounded-2xl border-2 border-slate-100 bg-white px-4 py-3.5 text-xs font-medium text-slate-700 outline-none transition focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
-                    data-entity-definition-builder-target="fieldDescription">
-                </div>
-
-              </div>
-
-
-              <div class="mt-5 grid gap-3 sm:grid-cols-3">
-
-                <button
-                  type="button"
-                  class="flex items-center gap-3 rounded-2xl border-2 border-slate-100 bg-white p-4 text-left transition hover:border-emerald-200"
-                  data-action="click->entity-definition-builder#toggleFieldRequired">
-
-                <span
-                  class="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-50 text-slate-300"
-                  data-entity-definition-builder-target="requiredIcon">
-                  ○
-                </span>
-
-                  <span>
-
-                  <span class="block text-[10px] font-black text-slate-600">
-                    Required
-                  </span>
-
-                  <span
-                    class="mt-0.5 block text-[8px] uppercase tracking-wider text-slate-400"
-                    data-entity-definition-builder-target="requiredLabel">
-                    Optional
-                  </span>
-
-                </span>
-
-                </button>
-
-
-                <button
-                  type="button"
-                  class="flex items-center gap-3 rounded-2xl border-2 border-slate-100 bg-white p-4 text-left transition hover:border-violet-200"
-                  data-action="click->entity-definition-builder#toggleFieldMultiple">
-
-                <span
-                  class="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-50 text-slate-300"
-                  data-entity-definition-builder-target="multipleIcon">
-                  ○
-                </span>
-
-                  <span>
-
-                  <span class="block text-[10px] font-black text-slate-600">
-                    Multiple
-                  </span>
-
-                  <span
-                    class="mt-0.5 block text-[8px] uppercase tracking-wider text-slate-400"
-                    data-entity-definition-builder-target="multipleLabel">
-                    Single
-                  </span>
-
-                </span>
-
-                </button>
-
-
-                <button
-                  type="button"
-                  class="flex items-center gap-3 rounded-2xl border-2 border-slate-100 bg-white p-4 text-left transition hover:border-sky-200"
-                  data-action="click->entity-definition-builder#toggleFieldActive">
-
-                <span
-                  class="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-400"
-                  data-entity-definition-builder-target="activeIcon">
-                  ●
-                </span>
-
-                  <span>
-
-                  <span class="block text-[10px] font-black text-slate-600">
-                    Active
-                  </span>
-
-                  <span
-                    class="mt-0.5 block text-[8px] uppercase tracking-wider text-emerald-400"
-                    data-entity-definition-builder-target="activeLabel">
-                    Enabled
-                  </span>
-
-                </span>
-
-                </button>
-
-              </div>
-
-
-              <div class="mt-5 flex flex-col-reverse gap-3 border-t border-orange-100 pt-5 sm:flex-row sm:justify-end">
-
-                <button
-                  type="button"
-                  class="rounded-2xl border-2 border-slate-100 bg-white px-5 py-3 text-[9px] font-black uppercase tracking-[0.15em] text-slate-400 transition hover:border-slate-200 hover:text-slate-600"
-                  data-action="click->entity-definition-builder#closeFieldEditor">
-                  Cancel
-                </button>
-
-                <button
-                  type="button"
-                  class="rounded-2xl border-2 border-orange-300 bg-gradient-to-r from-orange-400 to-amber-400 px-6 py-3 text-[9px] font-black uppercase tracking-[0.15em] text-white shadow-sm shadow-orange-200 transition hover:-translate-y-0.5 hover:from-orange-500 hover:to-amber-500"
-                  data-action="click->entity-definition-builder#saveField">
-                  ✦ SAVE FIELD
-                </button>
-
-              </div>
-
-            </div>
-
-
-            <!-- FIELD INVENTORY -->
-
-            <div class="mt-8">
-
-              <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-
-                <div>
-
-                  <div class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
-                    FIELD INVENTORY
-                  </div>
-
-                  <div class="mt-1 text-sm font-black text-slate-700">
-                    Definition fields
-                  </div>
-
-                </div>
-
-                <div class="flex items-center gap-2">
-
-                <span
-                  class="rounded-full border border-violet-100 bg-violet-50 px-3 py-1 text-[8px] font-black uppercase tracking-wider text-violet-500"
-                  data-entity-definition-builder-target="fieldCount">
-                  0 FIELDS
-                </span>
-
-                  <span
-                    class="rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-[8px] font-black uppercase tracking-wider text-emerald-500"
-                    data-entity-definition-builder-target="syncBadge">
-                  SYNCED
-                </span>
-
-                </div>
-
-              </div>
-
-
-              <div
-                class="space-y-4"
-                data-entity-definition-builder-target="builder">
-              </div>
-
-            </div>
-
-
-            <button
-              type="button"
-              class="group mt-5 flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-violet-200 bg-violet-50/40 px-5 py-4 text-[9px] font-black uppercase tracking-[0.2em] text-violet-500 transition-all duration-300 hover:border-violet-400 hover:bg-violet-50 hover:shadow-sm"
-              data-action="click->entity-definition-builder#openFieldEditor">
-
-            <span class="text-lg transition-transform duration-300 group-hover:scale-125">
-              +
-            </span>
-
-              ADD ANOTHER FIELD
-
-            </button>
-
-
-            <div class="mt-6 flex flex-col gap-3 rounded-2xl border border-slate-100 bg-slate-50/70 p-4 sm:flex-row sm:items-center sm:justify-between">
-
-              <div class="flex items-center gap-3">
-
-              <span
-                class="h-2.5 w-2.5 rounded-full bg-emerald-400"
-                data-entity-definition-builder-target="statusDot">
-              </span>
-
-                <div
-                  class="text-[9px] font-black uppercase tracking-[0.15em] text-emerald-500"
-                  data-entity-definition-builder-target="status">
-                  Definition builder ready
-                </div>
-
-              </div>
-
-              <div
-                class="text-[9px] font-medium text-slate-400"
-                data-entity-definition-builder-target="activity">
-                Waiting for your first definition change.
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <!-- ======================================================
-             JSON MIRROR
-             ====================================================== -->
-
-        <div
-          class="overflow-hidden rounded-[36px] border-2 border-slate-200 bg-slate-950 shadow-md shadow-slate-200/40"
-          data-controller="definition-json">
-
-          <div class="border-b border-slate-800 bg-slate-900 px-6 py-5 sm:px-8">
-
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-
-              <div class="flex items-center gap-3">
-
-                <div class="flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-500/20 bg-emerald-500/10 font-mono text-sm text-emerald-400">
-                  { }
-                </div>
-
-                <div>
-
-                  <div class="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-400">
-                    JSON MIRROR
-                  </div>
-
-                  <div class="mt-1 text-xs font-bold text-slate-300">
-                    Definition source
-                  </div>
-
-                </div>
-
-              </div>
-
-              <div class="flex items-center gap-2">
-
-              <span
-                class="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-[8px] font-black uppercase tracking-wider text-emerald-400"
-                data-definition-json-target="status">
-                VALID JSON
-              </span>
-
-                <button
-                  type="button"
-                  class="rounded-xl border border-slate-700 bg-slate-800 px-3 py-2 text-[8px] font-black uppercase tracking-wider text-slate-300 transition hover:border-slate-600 hover:bg-slate-700 hover:text-white"
-                  data-action="click->entity-definition-builder#formatJson">
-                  FORMAT
-                </button>
-
-              </div>
-
-            </div>
-
-          </div>
-
-
-          <div class="p-4 sm:p-6">
-
-            <div class="relative">
-
-              <%= form.text_area :definition,
-                                 rows: 22,
-                                 spellcheck: false,
-                                 value: (
-                                   if @entity_template_version.definition.present?
-                                     @entity_template_version.definition.is_a?(String) ?
-                                       @entity_template_version.definition :
-                                       JSON.pretty_generate(@entity_template_version.definition)
-                                   else
-                                     JSON.pretty_generate({ "fields" => [] })
-                                   end
-                                 ),
-                                 class: "block min-h-[480px] w-full resize-y rounded-2xl border-2 border-slate-800 bg-slate-950 px-5 py-5 font-mono text-xs leading-6 text-emerald-300 outline-none transition placeholder:text-slate-700 focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10",
-                                 data: {
-                                   entity_definition_builder_target: "json",
-                                   definition_json_target: "input",
-                                   action: "input->entity-definition-builder#jsonChanged input->definition-json#changed"
-                                 } %>
-
-            </div>
-
-
-            <div
-              class="mt-4 hidden rounded-2xl border border-red-500/20 bg-red-500/10 p-4"
-              data-entity-definition-builder-target="jsonError"
-              data-definition-json-target="error">
-
-              <div class="flex items-start gap-3">
-
-              <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-red-500/10 text-red-400">
-                ⚠
-              </span>
-
-                <div>
-
-                  <div class="text-[9px] font-black uppercase tracking-[0.2em] text-red-400">
-                    DEFINITION ERROR
-                  </div>
-
-                  <div
-                    class="mt-1 text-[10px] leading-5 text-red-300"
-                    data-entity-definition-builder-target="jsonErrorMessage"
-                    data-definition-json-target="errorMessage">
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
-
-
-            <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-
-              <div class="flex items-center gap-2">
-
-                <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
-
-                <span class="text-[9px] font-medium text-slate-500">
-                Visual builder and JSON stay synchronized automatically.
-              </span>
-
-              </div>
-
-              <span class="font-mono text-[8px] uppercase tracking-wider text-slate-600">
-              JSON / STRUCTURE
-            </span>
-
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <!-- ======================================================
-             FORM ACTIONS
-             ====================================================== -->
-
-        <div class="flex flex-col-reverse gap-3 border-t-2 border-slate-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
-
-          <%= link_to admin_ecosystems_load_sources_entity_templates_entity_template_versions_path(
-                        entity_template_id: params[:entity_template_id]
-                      ),
-                      class: "inline-flex items-center justify-center rounded-2xl border-2 border-slate-100 bg-white px-6 py-3.5 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 transition hover:border-slate-200 hover:bg-slate-50 hover:text-slate-600" do %>
-            ← Cancel
-          <% end %>
-
-
-          <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
-
-            <div
-              class="hidden items-center gap-2 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 sm:flex"
-              data-entity-definition-builder-target="submitReadiness">
-
-              <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
-
-              <span class="text-[8px] font-black uppercase tracking-wider text-emerald-500">
-              Ready to create
-            </span>
-
-            </div>
-
-
-            <%= form.submit "CREATE VERSION  →",
-                            class: "cursor-pointer rounded-2xl border-2 border-violet-300 bg-gradient-to-r from-violet-500 to-fuchsia-500 px-8 py-4 text-[10px] font-black uppercase tracking-[0.18em] text-white shadow-md shadow-violet-200/70 transition-all duration-300 hover:-translate-y-1 hover:from-violet-600 hover:to-fuchsia-600 hover:shadow-lg hover:shadow-violet-200/80",
-                            data: {
-                              entity_definition_builder_target: "submit"
-                            } %>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <!-- ========================================================
-           SIDEBAR
-           ======================================================== -->
-
-      <div class="space-y-6">
-
-
-        <!-- Definition Status -->
-
-        <div class="relative overflow-hidden rounded-[36px] border-2 border-violet-100 bg-gradient-to-b from-white via-violet-50/30 to-slate-50 p-6 shadow-md shadow-violet-100/30">
-
-          <div class="relative">
-
-            <div class="mb-6 flex items-center justify-between">
-
-              <div class="text-[9px] font-black uppercase tracking-[0.25em] text-violet-500">
-                DEFINITION STATUS
-              </div>
-
-              <span
-                class="rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-[8px] font-black uppercase tracking-wider text-emerald-500"
-                data-entity-definition-builder-target="sidebarStatus">
-              READY
-            </span>
-
-            </div>
-
-
-            <div class="rounded-2xl border border-violet-100 bg-white p-4 shadow-sm">
-
-              <div class="flex items-center justify-between">
-
-                <div>
-
-                  <div class="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400">
-                    FIELDS
-                  </div>
-
-                  <div
-                    class="mt-1 text-3xl font-black text-violet-500"
-                    data-entity-definition-builder-target="sidebarFieldCount">
-                    0
-                  </div>
-
-                </div>
-
-                <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-50 text-xl text-violet-400">
-                  ◈
-                </div>
-
-              </div>
-
-            </div>
-
-
-            <div class="mt-3 rounded-2xl border border-orange-100 bg-white p-4 shadow-sm">
-
-              <div class="flex items-center justify-between">
-
-                <div>
-
-                  <div class="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400">
-                    REQUIRED
-                  </div>
-
-                  <div
-                    class="mt-1 text-2xl font-black text-orange-500"
-                    data-entity-definition-builder-target="sidebarRequiredCount">
-                    0
-                  </div>
-
-                </div>
-
-                <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-lg text-orange-400">
-                  ✓
-                </div>
-
-              </div>
-
-            </div>
-
-
-            <div class="mt-3 rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm">
-
-              <div class="flex items-center justify-between">
-
-                <div>
-
-                  <div class="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400">
-                    ACTIVE
-                  </div>
-
-                  <div
-                    class="mt-1 text-2xl font-black text-emerald-500"
-                    data-entity-definition-builder-target="sidebarActiveCount">
-                    0
-                  </div>
-
-                </div>
-
-                <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-lg text-emerald-400">
-                  ●
-                </div>
-
-              </div>
-
-            </div>
-
-
-            <div class="mt-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
-
-              <div class="mb-2 flex items-center justify-between">
-
-              <span class="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400">
-                STRUCTURE HEALTH
-              </span>
-
-                <span
-                  class="text-[9px] font-black text-emerald-500"
-                  data-entity-definition-builder-target="health">
-                100%
-              </span>
-
-              </div>
-
-              <div class="h-2 overflow-hidden rounded-full bg-slate-100">
-
-                <div
-                  class="h-full w-full rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all duration-500"
-                  data-entity-definition-builder-target="healthBar">
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <!-- Build Mission -->
-
-        <div class="rounded-[32px] border-2 border-orange-100 bg-white p-6 shadow-sm shadow-orange-100/20">
-
-          <div class="mb-5 flex items-center justify-between">
-
-            <div class="text-[9px] font-black uppercase tracking-[0.25em] text-orange-500">
-              BUILD MISSION
-            </div>
-
-            <span class="rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-[8px] font-black text-orange-500">
-            +100 XP
-          </span>
-
-          </div>
-
-          <div class="space-y-4">
-
-            <div class="flex items-start gap-3">
-
-            <span
-              class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-[9px] font-black text-slate-300"
-              data-entity-definition-builder-target="missionFieldIcon">
-              01
-            </span>
-
-              <div>
-
-                <div class="text-[10px] font-bold text-slate-600">
-                  Add your first field
-                </div>
-
-                <div class="mt-1 text-[9px] leading-4 text-slate-400">
-                  Give the definition its first piece of structure.
-                </div>
-
-              </div>
-
-            </div>
-
-
-            <div class="flex items-start gap-3">
-
-            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-[9px] font-black text-slate-300">
-              02
-            </span>
-
-              <div>
-
-                <div class="text-[10px] font-bold text-slate-600">
-                  Define required attributes
-                </div>
-
-                <div class="mt-1 text-[9px] leading-4 text-slate-400">
-                  Decide which information is essential.
-                </div>
-
-              </div>
-
-            </div>
-
-
-            <div class="flex items-start gap-3">
-
-            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-[9px] font-black text-slate-300">
-              03
-            </span>
-
-              <div>
-
-                <div class="text-[10px] font-bold text-slate-600">
-                  Validate the structure
-                </div>
-
-                <div class="mt-1 text-[9px] leading-4 text-slate-400">
-                  Keep the JSON definition valid and consistent.
-                </div>
-
-              </div>
-
-            </div>
-
-
-            <div class="flex items-start gap-3">
-
-            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-[9px] font-black text-slate-300">
-              04
-            </span>
-
-              <div>
-
-                <div class="text-[10px] font-bold text-slate-600">
-                  Deploy the version
-                </div>
-
-                <div class="mt-1 text-[9px] leading-4 text-slate-400">
-                  Save the completed definition as a new version.
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <!-- JSON Intelligence -->
-
-        <div class="rounded-[32px] border-2 border-sky-100 bg-gradient-to-b from-white to-sky-50/40 p-6 shadow-sm">
-
-          <div class="mb-5 flex items-center gap-3">
-
-            <div class="flex h-10 w-10 items-center justify-center rounded-2xl border border-sky-100 bg-sky-50 text-sm text-sky-500">
-              { }
-            </div>
-
-            <div>
-
-              <div class="text-[9px] font-black uppercase tracking-[0.2em] text-sky-500">
-                JSON INTELLIGENCE
-              </div>
-
-              <div class="mt-1 text-xs font-black text-slate-600">
-                You can still edit manually
-              </div>
-
-            </div>
-
-          </div>
-
-          <p class="text-[10px] leading-5 text-slate-400">
-            The visual builder and JSON editor work together.
-            Manual JSON changes are validated before they are imported
-            into the visual builder.
-          </p>
-
-          <div class="mt-4 space-y-2">
-
-            <div class="flex items-center gap-2">
-              <span class="text-emerald-400">✓</span>
-              <span class="text-[9px] font-semibold text-slate-500">
-              JSON syntax validation
-            </span>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <span class="text-emerald-400">✓</span>
-              <span class="text-[9px] font-semibold text-slate-500">
-              Definition structure validation
-            </span>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <span class="text-emerald-400">✓</span>
-              <span class="text-[9px] font-semibold text-slate-500">
-              Visual builder synchronization
-            </span>
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
     <!-- ============================================================
-         TOAST
+         TEMPLATE EVOLUTION
          ============================================================ -->
 
-    <div
-      class="pointer-events-none fixed bottom-6 right-6 z-50 hidden w-[min(380px,calc(100vw-3rem))]"
-      data-entity-definition-builder-target="toast">
+    <div class="mt-8 rounded-[32px] border-2 border-violet-100 bg-gradient-to-r from-violet-50/70 via-white to-emerald-50/50 p-6 shadow-sm">
 
-      <div
-        data-notification-container
-        class="rounded-2xl border-2 bg-white p-4 shadow-xl shadow-violet-200/40">
+      <div class="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-start gap-4">
+
+          <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-violet-200 bg-violet-100 text-lg shadow-sm">
+            🧬
+          </div>
+
+          <div>
+
+            <div class="text-base font-black text-slate-700">
+              Template evolution
+            </div>
+
+            <p class="mt-1 max-w-3xl text-sm leading-6 text-slate-500">
+              Each template version creates a stable structural snapshot.
+              Build carefully, validate the definition and publish only when
+              the structure is ready for the ecosystem.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="shrink-0 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-center">
+
+          <div class="text-xs font-black uppercase tracking-[0.15em] text-emerald-600">
+            VERSION BUILDER
+          </div>
 
           <div
-            class="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-50 text-violet-500"
-            data-entity-definition-builder-target="toastIcon">
-            ✦
+            class="mt-1 text-sm font-black text-emerald-700"
+            data-entity-definition-builder-target="footerBuilderStatus">
+            READY
           </div>
 
-          <div class="min-w-0">
-
-            <div
-              class="text-[9px] font-black uppercase tracking-[0.2em] text-violet-500"
-              data-entity-definition-builder-target="toastTitle">
-              DEFINITION UPDATED
-            </div>
-
-            <div
-              class="mt-1 text-xs font-semibold text-slate-600"
-              data-entity-definition-builder-target="toastMessage">
-              Definition synchronized.
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  <% end %>
-
-
-  <!-- ============================================================
-       TEMPLATE EVOLUTION
-       ============================================================ -->
-
-  <div class="mt-8 rounded-[32px] border-2 border-violet-100 bg-gradient-to-r from-violet-50/70 via-white to-emerald-50/50 p-6 shadow-sm">
-
-    <div class="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-
-      <div class="flex items-start gap-4">
-
-        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-violet-200 bg-violet-100 text-lg shadow-sm">
-          🧬
-        </div>
-
-        <div>
-
-          <div class="text-sm font-black text-slate-700">
-            Template evolution
-          </div>
-
-          <p class="mt-1 max-w-3xl text-xs leading-6 text-slate-400">
-            Each template version creates a stable structural snapshot.
-            Build carefully, validate the definition and publish only when
-            the structure is ready for the ecosystem.
-          </p>
-
-        </div>
-
-      </div>
-
-
-      <div class="shrink-0 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-center">
-
-        <div class="text-[8px] font-black uppercase tracking-[0.2em] text-emerald-500">
-          VERSION BUILDER
-        </div>
-
-        <div class="mt-1 text-xs font-black text-emerald-600">
-          READY
         </div>
 
       </div>
@@ -1296,5 +1715,4 @@
     </div>
 
   </div>
-
-</div> </div>
+</div>
