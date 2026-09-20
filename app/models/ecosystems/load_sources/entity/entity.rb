@@ -62,6 +62,87 @@ module Ecosystems
         validate :entity_template_version_matches_template
 
         # ==========================================================
+        # VERSIONING / HISTORY
+        # ==========================================================
+
+        has_many :versions,
+                 class_name:
+                   "Ecosystems::LoadSources::Entity::EntityVersion",
+                 foreign_key: :entity_id,
+                 dependent: :restrict_with_exception
+
+        belongs_to :current_version,
+                   class_name:
+                     "Ecosystems::LoadSources::Entity::EntityVersion",
+                   foreign_key: :current_version_id,
+                   optional: true
+
+        has_many :events,
+                 class_name:
+                   "Ecosystems::LoadSources::Entity::EntityEvent",
+                 foreign_key: :entity_id,
+                 dependent: :restrict_with_exception
+
+        # ==========================================================
+        # LIFECYCLE
+        # ==========================================================
+
+        def published?
+          status.to_s == "published"
+        end
+
+        def archived?
+          status.to_s == "archived"
+        end
+
+        def deprecated?
+          status.to_s == "deprecated"
+        end
+
+        def draft?
+          status.to_s == "draft"
+        end
+
+        # ==========================================================
+        # VERSION HELPERS
+        # ==========================================================
+
+        def next_version_number
+          versions.maximum(:version_number).to_i + 1
+        end
+
+        def latest_version
+          versions.order(version_number: :desc).first
+        end
+
+        def version_count
+          versions.count
+        end
+
+        # ==========================================================
+        # EVENT HELPERS
+        # ==========================================================
+
+        def record_event!(
+          event_type:,
+          entity_version: nil,
+          from_status: nil,
+          to_status: nil,
+          actor: nil,
+          metadata: {}
+        )
+          events.create!(
+            event_type: event_type,
+            entity_version: entity_version,
+            from_status: from_status,
+            to_status: to_status,
+            actor: actor,
+            occurred_at: Time.current,
+            metadata: metadata || {}
+          )
+        end
+
+        # ==========================================================
         # SEARCHKICK
         # ==========================================================
 

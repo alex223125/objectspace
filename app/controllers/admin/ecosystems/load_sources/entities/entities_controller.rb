@@ -241,21 +241,45 @@ compare
             end
           end
 
+          # ==========================================================
+          # LIFECYCLE / COMMAND ACTIONS
+          # ==========================================================
+
           def archive
+            if @entity.status.to_s == "archived"
+              redirect_to(
+                admin_ecosystems_load_sources_entity_path(@entity),
+                notice: "Entity is already archived."
+              )
+
+              return
+            end
+
             if @entity.update(status: "archived")
               redirect_to(
                 admin_ecosystems_load_sources_entity_path(@entity),
-                notice: "Entity archived."
+                notice: "Entity archived successfully."
               )
             else
               redirect_to(
                 admin_ecosystems_load_sources_entity_path(@entity),
-                alert: "Unable to archive entity."
+                alert:
+                  "Unable to archive entity: " \
+                  "#{@entity.errors.full_messages.to_sentence}"
               )
             end
           end
 
           def restore
+            unless @entity.status.to_s == "archived"
+              redirect_to(
+                admin_ecosystems_load_sources_entity_path(@entity),
+                notice: "Entity is not archived."
+              )
+
+              return
+            end
+
             if @entity.update(status: "draft")
               redirect_to(
                 admin_ecosystems_load_sources_entity_path(@entity),
@@ -264,21 +288,9 @@ compare
             else
               redirect_to(
                 admin_ecosystems_load_sources_entity_path(@entity),
-                alert: "Unable to restore entity."
-              )
-            end
-          end
-
-          def publish
-            if @entity.update(status: "published")
-              redirect_to(
-                admin_ecosystems_load_sources_entity_path(@entity),
-                notice: "Entity published."
-              )
-            else
-              redirect_to(
-                admin_ecosystems_load_sources_entity_path(@entity),
-                alert: "Unable to publish entity."
+                alert:
+                  "Unable to restore entity: " \
+                  "#{@entity.errors.full_messages.to_sentence}"
               )
             end
           end
@@ -303,6 +315,98 @@ compare
                 .where.not(id: @entity.id)
                 .order(:name)
           end
+
+          def publish
+            if @entity.status.to_s == "published"
+              redirect_to(
+                admin_ecosystems_load_sources_entity_path(@entity),
+                notice: "Entity is already published."
+              )
+
+              return
+            end
+
+            EntityVersion = ::Ecosystems::LoadSources::Entity::EntityVersion
+
+            EntityEvent = ::Ecosystems::LoadSources::Entity::EntityEvent
+
+            ActiveRecord::Base.transaction do
+
+              previous_status =
+                @entity.status.to_s
+
+              now =
+                Time.current
+
+              version_number =
+                @entity.next_version_number
+
+              snapshot = {
+                "entity" => {
+                  "id" => @entity.id,
+                  "name" => @entity.name,
+                  "slug" => @entity.slug,
+                  "entity_type_id" => @entity.entity_type_id,
+                  "entity_template_id" => @entity.entity_template_id,
+                  "entity_template_version_id" =>
+                    @entity.entity_template_version_id,
+                  "status" => "published",
+                  "scope" => @entity.scope,
+                  "summary" => @entity.summary,
+                  "metadata" => @entity.metadata,
+                  "valid_from" => @entity.valid_from&.iso8601,
+                  "valid_until" => @entity.valid_until&.iso8601,
+                  "observed_at" => @entity.observed_at&.iso8601
+                }
+              }
+
+              version =
+                EntityVersion.create!(
+                  entity: @entity,
+                  version_number: version_number,
+                  status: "published",
+                  reason: "publish",
+                  snapshot: snapshot,
+                  published_at: now
+                )
+
+              @entity.update!(
+                status: "published",
+                published_at: now,
+                archived_at: nil,
+                deprecated_at: nil,
+                current_version_id: version.id
+              )
+
+              EntityEvent.create!(
+                entity: @entity,
+                entity_version: version,
+                event_type: EntityEvent::PUBLISHED,
+                from_status: previous_status,
+                to_status: "published",
+                occurred_at: now,
+                metadata: {
+                  "version_number" => version_number,
+                  "version_id" => version.id
+                }
+              )
+            end
+
+            redirect_to(
+              admin_ecosystems_load_sources_entity_path(@entity),
+              notice: "Entity was published successfully."
+            )
+
+          rescue ActiveRecord::RecordInvalid => e
+
+            redirect_to(
+              admin_ecosystems_load_sources_entity_path(@entity),
+              alert:
+                "Unable to publish entity: " \
+                "#{e.record.errors.full_messages.to_sentence}"
+            )
+          end
+
 
           private
 

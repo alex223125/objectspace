@@ -374,7 +374,7 @@ Rails.application.routes.draw do
             post :clone
             patch :archive
             patch :restore
-            patch :publish
+            post :publish
             patch :deprecate
             get :compare
           end

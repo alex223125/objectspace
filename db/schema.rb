@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_09_16_024635) do
+ActiveRecord::Schema[7.0].define(version: 2026_09_20_011610) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -367,10 +367,39 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_16_024635) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "entity_template_version_id"
+    t.datetime "published_at"
+    t.datetime "archived_at"
+    t.datetime "deprecated_at"
+    t.bigint "current_version_id"
+    t.index ["archived_at"], name: "index_ecosystems_load_sources_entities_on_archived_at"
+    t.index ["current_version_id"], name: "index_ecosystems_load_sources_entities_on_current_version_id"
+    t.index ["deprecated_at"], name: "index_ecosystems_load_sources_entities_on_deprecated_at"
     t.index ["entity_template_id"], name: "index_ecosystems_load_sources_entities_on_entity_template_id"
     t.index ["entity_template_version_id"], name: "idx_entities_template_version"
     t.index ["entity_type_id"], name: "index_ecosystems_load_sources_entities_on_entity_type_id"
+    t.index ["published_at"], name: "index_ecosystems_load_sources_entities_on_published_at"
     t.index ["slug"], name: "index_ecosystems_load_sources_entities_on_slug", unique: true
+  end
+
+  create_table "ecosystems_load_sources_entity_events", force: :cascade do |t|
+    t.bigint "entity_id", null: false
+    t.bigint "entity_version_id"
+    t.string "event_type", null: false
+    t.string "from_status"
+    t.string "to_status"
+    t.string "actor_type"
+    t.bigint "actor_id"
+    t.string "message"
+    t.jsonb "metadata", default: {}, null: false
+    t.jsonb "snapshot", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.index ["actor_id"], name: "idx_entity_events_actor"
+    t.index ["created_at"], name: "idx_entity_events_created_at"
+    t.index ["entity_id", "created_at"], name: "idx_entity_events_entity_time"
+    t.index ["entity_id", "event_type"], name: "idx_entity_events_entity_type"
+    t.index ["entity_id"], name: "idx_entity_events_entity"
+    t.index ["entity_version_id"], name: "idx_entity_events_version"
+    t.index ["event_type"], name: "idx_entity_events_type"
   end
 
   create_table "ecosystems_load_sources_entity_template_configurations", force: :cascade do |t|
@@ -519,6 +548,25 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_16_024635) do
     t.datetime "updated_at", null: false
     t.index ["parent_id"], name: "index_ecosystems_load_sources_entity_types_on_parent_id"
     t.index ["slug"], name: "index_ecosystems_load_sources_entity_types_on_slug", unique: true
+  end
+
+  create_table "ecosystems_load_sources_entity_versions", force: :cascade do |t|
+    t.bigint "entity_id", null: false
+    t.integer "version_number", null: false
+    t.string "status", null: false
+    t.string "reason"
+    t.jsonb "snapshot", default: {}, null: false
+    t.string "checksum"
+    t.datetime "published_at"
+    t.string "created_by_type"
+    t.bigint "created_by_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["checksum"], name: "index_ecosystems_load_sources_entity_versions_on_checksum"
+    t.index ["created_by_type", "created_by_id"], name: "index_ecosystems_load_sources_entity_versions_on_created_by"
+    t.index ["entity_id", "version_number"], name: "idx_entity_versions_entity_and_number", unique: true
+    t.index ["entity_id"], name: "index_ecosystems_load_sources_entity_versions_on_entity_id"
+    t.index ["published_at"], name: "index_ecosystems_load_sources_entity_versions_on_published_at"
   end
 
   create_table "entity_template_usages", force: :cascade do |t|
@@ -1125,6 +1173,9 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_16_024635) do
   add_foreign_key "ecosystems_load_sources_entities", "ecosystems_load_sources_entity_template_versions", column: "entity_template_version_id"
   add_foreign_key "ecosystems_load_sources_entities", "ecosystems_load_sources_entity_templates", column: "entity_template_id"
   add_foreign_key "ecosystems_load_sources_entities", "ecosystems_load_sources_entity_types", column: "entity_type_id"
+  add_foreign_key "ecosystems_load_sources_entities", "ecosystems_load_sources_entity_versions", column: "current_version_id"
+  add_foreign_key "ecosystems_load_sources_entity_events", "ecosystems_load_sources_entities", column: "entity_id"
+  add_foreign_key "ecosystems_load_sources_entity_events", "ecosystems_load_sources_entity_versions", column: "entity_version_id"
   add_foreign_key "ecosystems_load_sources_entity_template_configurations", "ecosystems_load_sources_entity_templates", column: "entity_template_id", name: "fk_et_config_template"
   add_foreign_key "ecosystems_load_sources_entity_template_configurations", "ecosystems_load_sources_entity_types", column: "entity_type_id", name: "fk_et_config_type"
   add_foreign_key "ecosystems_load_sources_entity_template_definition_versions", "ecosystems_load_sources_entity_template_versions_definition_tem", column: "definition_template_id"
@@ -1132,6 +1183,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_16_024635) do
   add_foreign_key "ecosystems_load_sources_entity_template_versions", "ecosystems_load_sources_entity_templates", column: "entity_template_id"
   add_foreign_key "ecosystems_load_sources_entity_templates", "ecosystems_load_sources_entity_types", column: "entity_type_id"
   add_foreign_key "ecosystems_load_sources_entity_types", "ecosystems_load_sources_entity_types", column: "parent_id"
+  add_foreign_key "ecosystems_load_sources_entity_versions", "ecosystems_load_sources_entities", column: "entity_id"
   add_foreign_key "entity_template_usages", "ecosystems_load_sources_entity_template_definition_versions", column: "definition_template_version_id", name: "fk_entity_template_usages_definition_template_version"
   add_foreign_key "entity_template_usages", "ecosystems_load_sources_entity_template_versions_definition_tem", column: "definition_template_id", name: "fk_entity_template_usages_definition_template"
   add_foreign_key "entity_template_usages", "users", name: "fk_entity_template_usages_user"

@@ -6,22 +6,13 @@ app/views/admin/ecosystems/load_sources/entities/entities/show.html.erb
 
 Purpose:
 Administrative detail view for an Entity.
-
-Important structural resolution:
-
-Entity belongs to EntityTemplateVersion
-EntityTemplateVersion has_many EntityTemplateFields
-EntityTemplateField belongs_to EntityTemplateVersion
-Entity values are resolved from the persisted entity payload/attributes
-Template fields are used as the structural definition
-This view is intentionally defensive so it can work while the underlying
-Entity storage evolves.
 ============================================================================ %>
 
 <%
-  # ==========================================================================
+  # ============================================================================
   # SAFE DEFAULTS
-  # ==========================================================================
+  # ============================================================================
+
   entity = @entity
 
   template =
@@ -65,6 +56,8 @@ Entity storage evolves.
       "unknown"
     end
 
+  normalized_status = entity_status.to_s.downcase
+
   entity_identifier =
     if entity.respond_to?(:identifier) && entity.identifier.present?
       entity.identifier.to_s
@@ -72,8 +65,6 @@ Entity storage evolves.
       entity.slug.to_s
     elsif entity.respond_to?(:external_id) && entity.external_id.present?
       entity.external_id.to_s
-    else
-      nil
     end
 
   entity_description =
@@ -81,8 +72,6 @@ Entity storage evolves.
       entity.description.to_s
     elsif entity.respond_to?(:summary) && entity.summary.present?
       entity.summary.to_s
-    else
-      nil
     end
 
   version_number =
@@ -95,172 +84,125 @@ Entity storage evolves.
     end
 
   created_at =
-    if entity.respond_to?(:created_at)
-      entity.created_at
-    end
+    entity.created_at if entity.respond_to?(:created_at)
 
   updated_at =
-    if entity.respond_to?(:updated_at)
-      entity.updated_at
-    end
+    entity.updated_at if entity.respond_to?(:updated_at)
 
   published_at =
-    if entity.respond_to?(:published_at)
-      entity.published_at
-    end
+    entity.published_at if entity.respond_to?(:published_at)
 
-  # ==========================================================================
+  # ============================================================================
   # STATUS PRESENTATION
-  # ==========================================================================
+  # ============================================================================
+
   status_badge =
-    case entity_status.downcase
-
+    case normalized_status
     when "published"
-
       {
         label: "Published",
-        classes:
-          "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+        classes: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
         icon: "✓"
       }
-
     when "draft"
-
       {
         label: "Draft",
-        classes:
-          "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+        classes: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
         icon: "◐"
       }
-
     when "archived"
-
       {
         label: "Archived",
-        classes:
-          "bg-gray-100 text-gray-600 dark:bg-gray-900 dark:text-gray-400",
+        classes: "bg-gray-100 text-gray-600 dark:bg-gray-900 dark:text-gray-400",
         icon: "◌"
       }
-
+    when "deprecated"
+      {
+        label: "Deprecated",
+        classes: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400",
+        icon: "!"
+      }
     when "active"
-
       {
         label: "Active",
-        classes:
-          "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+        classes: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
         icon: "●"
       }
-
     else
-
       {
-        label: entity_status.humanize,
-        classes:
-          "bg-gray-100 text-gray-600 dark:bg-gray-900 dark:text-gray-400",
+        label: entity_status.to_s.humanize,
+        classes: "bg-gray-100 text-gray-600 dark:bg-gray-900 dark:text-gray-400",
         icon: "?"
       }
-
     end
 
-#   ==========================================================================
-#   ENTITY PAYLOAD
-#   Do NOT use entity.attributes directly as the displayed entity data.
-#     ActiveRecord's attributes contains database columns and would therefore
-# expose id/status/timestamps/etc.
-# We first look for dedicated payload columns such as data and
-# attributes_data.
-# ==========================================================================
-entity_payload = {}
+  # ============================================================================
+  # ENTITY PAYLOAD
+  #
+  # Do NOT use entity.attributes directly as displayed entity data.
+  # ActiveRecord's attributes contains database columns.
+  # ============================================================================
 
-if entity.respond_to?(:data)
+  entity_payload = {}
 
-candidate = entity.data
+  if entity.respond_to?(:data)
+    candidate = entity.data
+    candidate = candidate.to_h if candidate.respond_to?(:to_h)
 
-if candidate.respond_to?(:to_h)
-  candidate = candidate.to_h
-end
+    entity_payload = candidate if candidate.is_a?(Hash)
+  end
 
-entity_payload = candidate if candidate.is_a?(Hash)
+  if entity_payload.blank? && entity.respond_to?(:attributes_data)
+    candidate = entity.attributes_data
+    candidate = candidate.to_h if candidate.respond_to?(:to_h)
 
-end
+    entity_payload = candidate if candidate.is_a?(Hash)
+  end
 
-if entity_payload.blank? && entity.respond_to?(:attributes_data)
+  # ============================================================================
+  # FALLBACK PAYLOAD RESOLUTION
+  # ============================================================================
 
-candidate = entity.attributes_data
+  if entity_payload.blank? && entity.respond_to?(:entity_attributes)
+    candidate = entity.entity_attributes
+    candidate = candidate.to_h if candidate.respond_to?(:to_h)
 
-if candidate.respond_to?(:to_h)
-  candidate = candidate.to_h
-end
+    entity_payload = candidate if candidate.is_a?(Hash)
+  end
 
-entity_payload = candidate if candidate.is_a?(Hash)
+  if entity_payload.blank? && entity.respond_to?(:fields)
+    candidate = entity.fields
+    candidate = candidate.to_h if candidate.respond_to?(:to_h)
 
-end
+    entity_payload = candidate if candidate.is_a?(Hash)
+  end
 
-# ==========================================================================
-# FALLBACK PAYLOAD RESOLUTION
-# Some Entity implementations may expose the dynamic values through
-# methods such as entity_attributes or fields.
-# ==========================================================================
-if entity_payload.blank? && entity.respond_to?(:entity_attributes)
+  entity_payload = {} unless entity_payload.is_a?(Hash)
 
-candidate = entity.entity_attributes
+  normalized_entity_payload = {}
 
-if candidate.respond_to?(:to_h)
-  candidate = candidate.to_h
-end
+  entity_payload.each do |key, value|
+    normalized_entity_payload[key.to_s] = value
+  end
 
-entity_payload = candidate if candidate.is_a?(Hash)
+  # ============================================================================
+  # TEMPLATE FIELDS
+  # ============================================================================
 
-end
-
-if entity_payload.blank? && entity.respond_to?(:fields)
-
-candidate = entity.fields
-
-if candidate.respond_to?(:to_h)
-  candidate = candidate.to_h
-end
-
-entity_payload = candidate if candidate.is_a?(Hash)
-
-end
-
-entity_payload =
-{} unless entity_payload.is_a?(Hash)
-
-# Normalize keys so lookup works regardless of string/symbol JSON keys.
-normalized_entity_payload = {}
-
-entity_payload.each do |key, value|
-normalized_entity_payload[key.to_s] = value
-end
-
-# ==========================================================================
-# TEMPLATE FIELDS
-# THIS IS THE IMPORTANT FIX.
-# EntityTemplateVersion has_many :entity_template_fields.
-# Therefore the fields displayed under "Entity Data" should be resolved
-# from the entity's template version.
-#   ==========================================================================
-                                              template_fields = []
+  template_fields = []
 
   if template_version.present? &&
     template_version.respond_to?(:entity_template_fields)
 
-    candidate_fields =
-      template_version.entity_template_fields
-
-    template_fields =
-      candidate_fields.to_a
-
+    template_fields = template_version.entity_template_fields.to_a
   end
 
-  # ==========================================================================
+  # ============================================================================
   # FIELD HELPERS
-  # ==========================================================================
+  # ============================================================================
+
   field_name_for =
     lambda do |field|
-
       if field.respond_to?(:name) && field.name.present?
         field.name.to_s
       elsif field.respond_to?(:key) && field.key.present?
@@ -272,12 +214,10 @@ end
       else
         "field_#{field.respond_to?(:id) ? field.id : "unknown"}"
       end
-
     end
 
   field_label_for =
     lambda do |field|
-
       if field.respond_to?(:label) && field.label.present?
         field.label.to_s
       elsif field.respond_to?(:display_name) && field.display_name.present?
@@ -293,12 +233,10 @@ end
       else
         field_name_for.call(field).humanize
       end
-
     end
 
   field_type_for =
     lambda do |field|
-
       if field.respond_to?(:field_type) && field.field_type.present?
         field.field_type.to_s
       elsif field.respond_to?(:data_type) && field.data_type.present?
@@ -310,115 +248,68 @@ end
       else
         "value"
       end
-
     end
 
-  # ==========================================================================
+  # ============================================================================
   # VALUE RESOLUTION
-  # Try several common key forms:
-  #                          field.name
-  # field.key
-  # field.identifier
-  # field.slug
-  # This lets the template definition and persisted JSON remain compatible
-  # even if they use different naming conventions.
-  #   ==========================================================================
-                                      value_for_field =
-                                        lambda do |field|
+  # ============================================================================
 
-    possible_keys = []
+  value_for_field =
+    lambda do |field|
+      possible_keys = []
 
-    %i[name key identifier slug].each do |attribute_name|
-
-      if field.respond_to?(attribute_name)
-
-        candidate =
-          field.public_send(attribute_name)
-
-        if candidate.present?
-          possible_keys << candidate.to_s
+      %i[name key identifier slug].each do |attribute_name|
+        if field.respond_to?(attribute_name)
+          candidate = field.public_send(attribute_name)
+          possible_keys << candidate.to_s if candidate.present?
         end
-
       end
 
-    end
+      possible_keys = possible_keys.uniq
 
-    possible_keys =
-      possible_keys.uniq
-
-    found = false
-    value = nil
-
-    possible_keys.each do |key|
-
-      if normalized_entity_payload.key?(key)
-
-        value = normalized_entity_payload[key]
-        found = true
-        break
-
-      end
-
-    end
-
-    unless found
-
-      # Also support nested string/symbol keys in case the original payload
-
-      # was not normalized deeply.
+      found = false
+      value = nil
 
       possible_keys.each do |key|
-
-        symbol_key =
-          begin
-            key.to_sym
-          rescue
-            nil
-          end
-
-        if symbol_key && entity_payload.key?(symbol_key)
-
-          value = entity_payload[symbol_key]
+        if normalized_entity_payload.key?(key)
+          value = normalized_entity_payload[key]
           found = true
           break
-
         end
-
       end
 
+      unless found
+        possible_keys.each do |key|
+          symbol_key =
+            begin
+              key.to_sym
+            rescue StandardError
+              nil
+            end
+
+          if symbol_key && entity_payload.key?(symbol_key)
+            value = entity_payload[symbol_key]
+            found = true
+            break
+          end
+        end
+      end
+
+      [found, value]
     end
 
-    [found, value]
+  # ============================================================================
+  # RESOLVED ENTITY DATA
+  # ============================================================================
 
-  end
-
-  # ==========================================================================
-  #   RESOLVED ENTITY DATA
-  # Each item contains:
-  #             field
-  # key
-  # label
-  # type
-  # value
-  # present
-  # This allows the view to show the structural definition even when a field
-  # currently has no persisted value.
-  #   ==========================================================================
-                               resolved_fields = []
+  resolved_fields = []
 
   template_fields.each do |field|
+    key = field_name_for.call(field)
+    label = field_label_for.call(field)
+    type = field_type_for.call(field)
 
-    key =
-      field_name_for.call(field)
-
-    label =
-      field_label_for.call(field)
-
-    type =
-      field_type_for.call(field)
-
-    present_value, value =
-      value_for_field.call(field)
+    present_value, value = value_for_field.call(field)
 
     resolved_fields << {
       field: field,
@@ -428,67 +319,53 @@ end
       value: value,
       present: present_value
     }
-
   end
 
-  # ==========================================================================
+  # ============================================================================
   # EXTRA PAYLOAD VALUES
-  # If the entity contains persisted values that are NOT currently represented
-  # by the template version, show them under "Additional persisted values".
-  # ==========================================================================
-                                             defined_field_keys =
-                                               resolved_fields.map { |item| item[:key].to_s }
+  # ============================================================================
+
+  defined_field_keys =
+    resolved_fields.map { |item| item[:key].to_s }
 
   extra_payload =
     normalized_entity_payload.reject do |key, _value|
-
       key.to_s.in?(defined_field_keys) ||
         key.to_s.in?(%w[
-      id
-      created_at
-      updated_at
-      deleted_at
-    ])
-
+        id
+        created_at
+        updated_at
+        deleted_at
+      ])
     end
 
-  # ==========================================================================
+  # ============================================================================
   # DISPLAY COUNTS
-  # ==========================================================================
+  # ============================================================================
+
   field_count =
     if template_fields.present?
-
       template_fields.size
-
-    elsif entity.respond_to?(:field_count) &&
-      entity.field_count.present?
-
+    elsif entity.respond_to?(:field_count) && entity.field_count.present?
       entity.field_count
-
     elsif entity_payload.present?
-
       entity_payload.size
-
     else
-
       0
     end
 
   section_count =
     if entity.respond_to?(:section_count)
-
       entity.section_count
-
     elsif entity.respond_to?(:sections) &&
       entity.sections.respond_to?(:size)
-
       entity.sections.size
-
     end
 
-  # ==========================================================================
+  # ============================================================================
   # URLS
-  # ==========================================================================
+  # ============================================================================
+
   entities_path =
     admin_ecosystems_load_sources_entities_path
 
@@ -518,149 +395,75 @@ end
 
   template_path =
     if template.present?
-
       begin
-
         admin_ecosystems_load_sources_entity_templates_entity_template_path(template)
-
-      rescue
-
+      rescue StandardError
         nil
-
       end
-
     end
 
   version_path =
     if template_version.present?
-
       begin
-
         admin_ecosystems_load_sources_entity_templates_entity_template_version_path(template_version)
-
-      rescue
-
+      rescue StandardError
         nil
-
       end
-
     end
 %>
 
-<div class=" mx-auto w-full max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8 ">
-<%# =========================================================================
-HEADER
-========================================================================= %>
+<div class="mx-auto w-full max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8">
+
+  <%# =========================================================================
+  HEADER
+  ========================================================================= %>
 
   <div class="mb-8">
-    <div
-      class="
-    flex
-    flex-col
-    gap-5
-    xl:flex-row
-    xl:items-center
-    xl:justify-between
-  ">
+
+    <div class="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
 
       <div class="min-w-0">
 
         <div class="flex items-center gap-4">
 
-          <div
-            class="
-          flex
-          h-14
-          w-14
-          shrink-0
-          items-center
-          justify-center
-          rounded-2xl
-          bg-violet-100
-          text-2xl
-          shadow-sm
-          dark:bg-violet-900/40
-        ">
+          <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-violet-100 text-2xl shadow-sm dark:bg-violet-900/40">
             ◈
           </div>
 
           <div class="min-w-0">
 
-            <div
-              class="
-            mb-1
-            text-[11px]
-            font-black
-            uppercase
-            tracking-[0.2em]
-            text-violet-500
-          ">
+            <div class="mb-1 text-[11px] font-black uppercase tracking-[0.2em] text-violet-500">
               Entity Registry
             </div>
 
             <h1
-              class="
-            truncate
-            text-2xl
-            font-black
-            tracking-tight
-            text-gray-900
-            sm:text-3xl
-            dark:text-white
-          "
+              class="truncate text-2xl font-black tracking-tight text-gray-900 sm:text-3xl dark:text-white"
               title="<%= entity_name %>">
-
               <%= entity_name %>
-
             </h1>
 
-            <p
-              class="
-            mt-1
-            max-w-3xl
-            text-sm
-            text-gray-500
-            dark:text-gray-400
-          ">
-
-              Inspect the entity record, structural definition, version
-              lineage and persisted attributes.
-
+            <p class="mt-1 max-w-3xl text-sm text-gray-500 dark:text-gray-400">
+              Inspect the entity record, structural definition, version lineage
+              and persisted attributes.
             </p>
 
           </div>
 
         </div>
 
-        <%# BREADCRUMB %>
-
-        <div
-          class="
-        mt-4
-        flex
-        flex-wrap
-        items-center
-        gap-2
-        text-xs
-        text-gray-400
-      ">
-
+        <div class="mt-4 flex flex-wrap items-center gap-2 text-xs text-gray-400">
           <span>Encyclopedia</span>
           <span>›</span>
-
           <span>Ecosystems</span>
           <span>›</span>
-
           <span>Load Sources</span>
           <span>›</span>
-
           <span>Entities</span>
           <span>›</span>
 
           <span class="font-semibold text-violet-500">
-        <%= entity_name %>
-      </span>
-
+            <%= entity_name %>
+          </span>
         </div>
 
       </div>
@@ -669,64 +472,16 @@ HEADER
 
       <div class="flex shrink-0 flex-wrap items-center gap-2">
 
-        <%= link_to(
-              entities_path,
-              class: "
-            inline-flex
-            items-center
-            justify-center
-            gap-2
-            rounded-xl
-            border
-            border-gray-200
-            bg-white
-            px-4
-            py-3
-            text-sm
-            font-semibold
-            text-gray-700
-            shadow-sm
-            transition
-            hover:border-violet-200
-            hover:text-violet-600
-            dark:border-gray-700
-            dark:bg-gray-800
-            dark:text-gray-300
-          "
-            ) do %>
-
+        <%= link_to entities_path,
+                    class: "inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-violet-200 hover:text-violet-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300" do %>
           <span>←</span>
           Back to Entities
-
         <% end %>
 
-        <%= link_to(
-              edit_entity_path,
-              class: "
-            inline-flex
-            items-center
-            justify-center
-            gap-2
-            rounded-xl
-            bg-violet-600
-            px-5
-            py-3
-            text-sm
-            font-semibold
-            text-white
-            shadow-sm
-            transition
-            hover:bg-violet-700
-            focus:outline-none
-            focus:ring-2
-            focus:ring-violet-500
-            focus:ring-offset-2
-          "
-            ) do %>
-
+        <%= link_to edit_entity_path,
+                    class: "inline-flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2" do %>
           <span>✎</span>
           Edit Entity
-
         <% end %>
 
       </div>
@@ -734,116 +489,47 @@ HEADER
     </div>
 
   </div>
-<%# =========================================================================
-ENTITY IDENTITY PANEL
-========================================================================= %>
 
-  <div class=" mb-8 overflow-hidden rounded-2xl border-2 border-violet-100 bg-gradient-to-br from-violet-50 via-white to-indigo-50 shadow-sm dark:border-violet-900/40 dark:from-violet-950/30 dark:via-gray-900 dark:to-indigo-950/30 ">
+  <%# =========================================================================
+  ENTITY IDENTITY PANEL
+  ========================================================================= %>
+
+  <div class="mb-8 overflow-hidden rounded-2xl border-2 border-violet-100 bg-gradient-to-br from-violet-50 via-white to-indigo-50 shadow-sm dark:border-violet-900/40 dark:from-violet-950/30 dark:via-gray-900 dark:to-indigo-950/30">
+
     <div class="relative p-6 sm:p-8">
 
-      <div
-        class="
-      pointer-events-none
-      absolute
-      -right-16
-      -top-16
-      h-48
-      w-48
-      rounded-full
-      bg-violet-200/30
-      blur-3xl
-      dark:bg-violet-500/10
-    "></div>
+      <div class="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-violet-200/30 blur-3xl dark:bg-violet-500/10"></div>
 
       <div class="relative">
 
-        <div
-          class="
-        flex
-        flex-col
-        gap-6
-        lg:flex-row
-        lg:items-start
-        lg:justify-between
-      ">
+        <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
 
           <div class="min-w-0">
 
-            <div
-              class="
-            text-[11px]
-            font-black
-            uppercase
-            tracking-[0.2em]
-            text-violet-500
-          ">
+            <div class="text-[11px] font-black uppercase tracking-[0.2em] text-violet-500">
               Entity Identity
             </div>
 
-            <div
-              class="
-            mt-2
-            break-words
-            text-2xl
-            font-black
-            text-gray-900
-            dark:text-white
-          ">
-
+            <div class="mt-2 break-words text-2xl font-black text-gray-900 dark:text-white">
               <%= entity_name %>
-
             </div>
 
             <% if entity_identifier.present? %>
 
-              <div
-                class="
-              mt-2
-              inline-flex
-              max-w-full
-              items-center
-              gap-2
-              rounded-lg
-              border
-              border-gray-200
-              bg-white
-              px-3
-              py-2
-              font-mono
-              text-xs
-              text-gray-500
-              shadow-sm
-              dark:border-gray-700
-              dark:bg-gray-800
-              dark:text-gray-400
-            ">
-
-            <span class="text-violet-500">
-              #
-            </span>
+              <div class="mt-2 inline-flex max-w-full items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 font-mono text-xs text-gray-500 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                <span class="text-violet-500">#</span>
 
                 <span class="truncate">
-              <%= entity_identifier %>
-            </span>
-
+                  <%= entity_identifier %>
+                </span>
               </div>
 
             <% end %>
 
             <% if entity_description.present? %>
 
-              <p
-                class="
-              mt-4
-              max-w-3xl
-              text-sm
-              leading-6
-              text-gray-500
-              dark:text-gray-400
-            ">
-
+              <p class="mt-4 max-w-3xl text-sm leading-6 text-gray-500 dark:text-gray-400">
                 <%= entity_description %>
-
               </p>
 
             <% end %>
@@ -852,26 +538,93 @@ ENTITY IDENTITY PANEL
 
           <div class="shrink-0">
 
-        <span
-          class="
-            inline-flex
-            items-center
-            gap-2
-            rounded-full
-            px-4
-            py-2
-            text-sm
-            font-bold
-            <%= status_badge[:classes] %>
-          ">
+            <span class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold <%= status_badge[:classes] %>">
+              <span><%= status_badge[:icon] %></span>
+              <%= status_badge[:label] %>
+            </span>
 
-          <span>
-            <%= status_badge[:icon] %>
-          </span>
+          </div>
 
-          <%= status_badge[:label] %>
+        </div>
 
-        </span>
+        <%# ACTION TOOLBAR %>
+
+        <div class="mt-7 rounded-2xl border border-gray-200 bg-white/80 p-4 shadow-sm backdrop-blur dark:border-gray-700 dark:bg-gray-900/50">
+
+          <div class="mb-3 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+
+            <div>
+
+              <div class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">
+                Entity Actions
+              </div>
+
+              <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Manage lifecycle, create a copy, or inspect differences.
+              </div>
+
+            </div>
+
+            <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+              ID #<%= entity_id %>
+            </div>
+
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+
+            <% unless normalized_status == "published" %>
+
+              <%= link_to publish_entity_path,
+                          method: :post,
+                          class: "inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-700" do %>
+                <span>✓</span>
+                Publish
+              <% end %>
+
+            <% end %>
+
+            <% unless normalized_status == "archived" %>
+
+              <%= link_to archive_entity_path,
+                          class: "inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-bold text-gray-700 shadow-sm transition hover:border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700" do %>
+                <span>◌</span>
+                Archive
+              <% end %>
+
+            <% end %>
+
+            <% if normalized_status == "archived" %>
+
+              <%= link_to restore_entity_path,
+                          class: "inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-indigo-700" do %>
+                <span>↺</span>
+                Restore
+              <% end %>
+
+            <% end %>
+
+            <% unless normalized_status == "deprecated" %>
+
+              <%= link_to deprecate_entity_path,
+                          class: "inline-flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-xs font-bold text-rose-700 shadow-sm transition hover:bg-rose-100 dark:border-rose-900/40 dark:bg-rose-950/20 dark:text-rose-400" do %>
+                <span>!</span>
+                Deprecate
+              <% end %>
+
+            <% end %>
+
+            <%= link_to clone_entity_path,
+                        class: "inline-flex items-center gap-2 rounded-xl border border-violet-200 bg-violet-50 px-4 py-2.5 text-xs font-bold text-violet-700 shadow-sm transition hover:bg-violet-100 dark:border-violet-800 dark:bg-violet-900/20 dark:text-violet-300" do %>
+              <span>⧉</span>
+              Clone
+            <% end %>
+
+            <%= link_to compare_entity_path,
+                        class: "inline-flex items-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-2.5 text-xs font-bold text-indigo-700 shadow-sm transition hover:bg-indigo-100 dark:border-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-300" do %>
+              <span>⇄</span>
+              Compare
+            <% end %>
 
           </div>
 
@@ -879,190 +632,58 @@ ENTITY IDENTITY PANEL
 
         <%# IDENTITY METRICS %>
 
-        <div
-          class="
-        mt-7
-        grid
-        grid-cols-1
-        gap-3
-        sm:grid-cols-2
-        lg:grid-cols-4
-      ">
+        <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
 
-          <div
-            class="
-          rounded-xl
-          border
-          border-gray-200
-          bg-white
-          p-4
-          dark:border-gray-700
-          dark:bg-gray-800
-        ">
+          <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
+            <div class="text-xl">◈</div>
 
-            <div class="text-xl">
-              ◈
-            </div>
-
-            <div
-              class="
-            mt-2
-            text-[10px]
-            font-black
-            uppercase
-            tracking-wider
-            text-gray-400
-          ">
+            <div class="mt-2 text-[10px] font-black uppercase tracking-wider text-gray-400">
               Entity ID
             </div>
 
-            <div
-              class="
-            mt-1
-            font-mono
-            text-sm
-            font-bold
-            text-gray-800
-            dark:text-gray-200
-          ">
+            <div class="mt-1 font-mono text-sm font-bold text-gray-800 dark:text-gray-200">
               #<%= entity_id %>
             </div>
-
           </div>
 
-          <div
-            class="
-          rounded-xl
-          border
-          border-violet-200
-          bg-violet-50
-          p-4
-          dark:border-violet-800
-          dark:bg-violet-900/20
-        ">
+          <div class="rounded-xl border border-violet-200 bg-violet-50 p-4 dark:border-violet-800 dark:bg-violet-900/20">
+            <div class="text-xl">🧬</div>
 
-            <div class="text-xl">
-              🧬
-            </div>
-
-            <div
-              class="
-            mt-2
-            text-[10px]
-            font-black
-            uppercase
-            tracking-wider
-            text-violet-500
-          ">
+            <div class="mt-2 text-[10px] font-black uppercase tracking-wider text-violet-500">
               Template Version
             </div>
 
-            <div
-              class="
-            mt-1
-            text-sm
-            font-bold
-            text-violet-700
-            dark:text-violet-300
-          ">
-
-              <% if version_number.present? %>
-                v<%= version_number %>
-              <% else %>
-                —
-              <% end %>
-
+            <div class="mt-1 text-sm font-bold text-violet-700 dark:text-violet-300">
+              <%= version_number.present? ? "v#{version_number}" : "—" %>
             </div>
-
           </div>
 
-          <div
-            class="
-          rounded-xl
-          border
-          border-indigo-200
-          bg-indigo-50
-          p-4
-          dark:border-indigo-800
-          dark:bg-indigo-900/20
-        ">
+          <div class="rounded-xl border border-indigo-200 bg-indigo-50 p-4 dark:border-indigo-800 dark:bg-indigo-900/20">
+            <div class="text-xl">🧱</div>
 
-            <div class="text-xl">
-              🧱
-            </div>
-
-            <div
-              class="
-            mt-2
-            text-[10px]
-            font-black
-            uppercase
-            tracking-wider
-            text-indigo-500
-          ">
+            <div class="mt-2 text-[10px] font-black uppercase tracking-wider text-indigo-500">
               Template
             </div>
 
-            <div
-              class="
-            mt-1
-            truncate
-            text-sm
-            font-bold
-            text-indigo-700
-            dark:text-indigo-300
-          ">
-
+            <div class="mt-1 truncate text-sm font-bold text-indigo-700 dark:text-indigo-300">
               <% if template.present? && template.respond_to?(:name) %>
                 <%= template.name %>
               <% else %>
                 —
               <% end %>
-
             </div>
-
           </div>
 
-          <div
-            class="
-          rounded-xl
-          border
-          border-emerald-200
-          bg-emerald-50
-          p-4
-          dark:border-emerald-800
-          dark:bg-emerald-900/20
-        ">
+          <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-900/20">
+            <div class="text-xl">●</div>
 
-            <div class="text-xl">
-              ●
-            </div>
-
-            <div
-              class="
-            mt-2
-            text-[10px]
-            font-black
-            uppercase
-            tracking-wider
-            text-emerald-500
-          ">
+            <div class="mt-2 text-[10px] font-black uppercase tracking-wider text-emerald-500">
               Fields
             </div>
 
-            <div
-              class="
-            mt-1
-            text-sm
-            font-bold
-            text-emerald-700
-            dark:text-emerald-300
-          ">
-
+            <div class="mt-1 text-sm font-bold text-emerald-700 dark:text-emerald-300">
               <%= number_with_delimiter(field_count) %>
-
             </div>
-
           </div>
 
         </div>
@@ -1072,193 +693,173 @@ ENTITY IDENTITY PANEL
     </div>
 
   </div>
-<%# =========================================================================
-MAIN CONTENT
-========================================================================= %>
 
-  <div class=" grid grid-cols-1 gap-6 xl:grid-cols-3 ">
-<%# =======================================================================
-LEFT / PRIMARY CONTENT
-======================================================================== %>
+  <%# =========================================================================
+  MAIN CONTENT
+  ========================================================================= %>
+
+  <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+
+    <%# =========================================================================
+    LEFT / PRIMARY CONTENT
+    ========================================================================= %>
 
     <div class="space-y-6 xl:col-span-2">
 
-      <%# ---------------------------------------------------------------------
-  STRUCTURAL DEFINITION / ENTITY DATA
-  ---------------------------------------------------------------------- %>
+      <%# STRUCTURAL DEFINITION / ENTITY DATA %>
 
-      <div
-        class="
-      overflow-hidden
-      rounded-2xl
-      border
-      border-gray-200
-      bg-white
-      shadow-sm
-      dark:border-gray-800
-      dark:bg-gray-800
-    ">
+      <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-800">
 
-        <div
-          class="
-        border-b
-        border-gray-100
-        px-6
-        py-5
-        dark:border-gray-700
-      ">
+        <div class="border-b border-gray-100 px-6 py-5 dark:border-gray-700">
 
-          <div
-            class="
-          text-[11px]
-          font-black
-          uppercase
-          tracking-[0.2em]
-          text-gray-400
-        ">
-            Structural Definition
+          <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+
+            <div>
+
+              <div class="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400">
+                Structural Definition
+              </div>
+
+              <h2 class="mt-1 text-xl font-black text-gray-900 dark:text-white">
+                Entity Data
+              </h2>
+
+              <p class="mt-1 text-xs text-gray-400">
+                Persisted entity values resolved against the fields defined by
+                template version
+                <% if version_number.present? %>
+                  v<%= version_number %>
+                <% end %>.
+              </p>
+
+            </div>
+
+            <% if template_fields.present? %>
+
+              <div class="flex w-full flex-col gap-2 sm:flex-row lg:w-auto">
+
+                <div class="relative">
+
+                  <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-400">
+                    ⌕
+                  </span>
+
+                  <input
+                    id="entity-field-search"
+                    type="search"
+                    placeholder="Search fields..."
+                    autocomplete="off"
+                    class="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-xs font-semibold text-gray-700 outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-100 sm:w-52 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:focus:ring-violet-900/30"
+                  >
+
+                </div>
+
+                <select
+                  id="entity-field-type-filter"
+                  class="rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-xs font-bold text-gray-600 outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-100 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300">
+
+                  <option value="">All field types</option>
+
+                  <% resolved_fields.map { |item| item[:type].to_s }.uniq.sort.each do |type| %>
+                    <option value="<%= type.downcase %>">
+                      <%= type.humanize %>
+                    </option>
+                  <% end %>
+
+                </select>
+
+                <select
+                  id="entity-field-value-filter"
+                  class="rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-xs font-bold text-gray-600 outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-100 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300">
+
+                  <option value="">All values</option>
+                  <option value="present">With value</option>
+                  <option value="missing">Missing value</option>
+
+                </select>
+
+              </div>
+
+            <% end %>
+
           </div>
 
-          <h2
-            class="
-          mt-1
-          text-xl
-          font-black
-          text-gray-900
-          dark:text-white
-        ">
-            Entity Data
-          </h2>
+          <% if template_fields.present? %>
 
-          <p
-            class="
-          mt-1
-          text-xs
-          text-gray-400
-        ">
-            Persisted entity values resolved against the fields defined by
-            template version
-            <% if version_number.present? %>
-              v<%= version_number %>
-            <% end %>.
-          </p>
+            <div class="mt-4 flex flex-wrap items-center justify-between gap-2">
+
+              <div
+                id="entity-field-result-count"
+                class="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                <%= template_fields.size %> fields
+              </div>
+
+              <div class="text-[10px] font-semibold text-gray-400">
+                Search and filters apply to the current entity fields.
+              </div>
+
+            </div>
+
+          <% end %>
 
         </div>
 
-        <%# ===================================================================
-    NO TEMPLATE VERSION
-    ==================================================================== %>
+        <%# NO TEMPLATE VERSION %>
 
         <% if template_version.blank? %>
 
           <div class="px-6 py-14 text-center">
 
-            <div
-              class="
-            mx-auto
-            flex
-            h-16
-            w-16
-            items-center
-            justify-center
-            rounded-2xl
-            bg-amber-50
-            text-3xl
-            dark:bg-amber-900/20
-          ">
+            <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-50 text-3xl dark:bg-amber-900/20">
               !
             </div>
 
-            <h3
-              class="
-            mt-4
-            text-sm
-            font-black
-            text-gray-900
-            dark:text-white
-          ">
+            <h3 class="mt-4 text-sm font-black text-gray-900 dark:text-white">
               No template version
             </h3>
 
-            <p
-              class="
-            mx-auto
-            mt-1
-            max-w-md
-            text-xs
-            leading-5
-            text-gray-400
-          ">
+            <p class="mx-auto mt-1 max-w-md text-xs leading-5 text-gray-400">
               This entity is not currently associated with an entity template
               version, so its structural field definition cannot be resolved.
             </p>
 
           </div>
 
-          <%# ===================================================================
-    TEMPLATE VERSION EXISTS BUT HAS NO FIELDS
-    ==================================================================== %>
-
         <% elsif template_fields.blank? %>
+
+          <%# TEMPLATE VERSION EXISTS BUT HAS NO FIELDS %>
 
           <div class="px-6 py-14 text-center">
 
-            <div
-              class="
-            mx-auto
-            flex
-            h-16
-            w-16
-            items-center
-            justify-center
-            rounded-2xl
-            bg-violet-50
-            text-3xl
-            dark:bg-violet-900/20
-          ">
+            <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-50 text-3xl dark:bg-violet-900/20">
               ◈
             </div>
 
-            <h3
-              class="
-            mt-4
-            text-sm
-            font-black
-            text-gray-900
-            dark:text-white
-          ">
+            <h3 class="mt-4 text-sm font-black text-gray-900 dark:text-white">
               No template fields
             </h3>
 
-            <p
-              class="
-            mx-auto
-            mt-1
-            max-w-md
-            text-xs
-            leading-5
-            text-gray-400
-          ">
+            <p class="mx-auto mt-1 max-w-md text-xs leading-5 text-gray-400">
               Template version
               <% if version_number.present? %>
                 v<%= version_number %>
-              <% else %>
-                <%= template_version.respond_to?(:id) ? "##{template_version.id}" : "" %>
+              <% elsif template_version.respond_to?(:id) %>
+                #<%= template_version.id %>
               <% end %>
               does not currently define any entity template fields.
             </p>
 
           </div>
 
-          <%# ===================================================================
-    TEMPLATE FIELDS EXIST
-    ==================================================================== %>
-
         <% else %>
 
-          <div class="divide-y divide-gray-100 dark:divide-gray-700">
+          <%# TEMPLATE FIELDS %>
 
-            <% resolved_fields.each do |item| %>
+          <div
+            id="entity-fields-container"
+            class="divide-y divide-gray-100 dark:divide-gray-700">
+
+            <% resolved_fields.each_with_index do |item, index| %>
 
               <% field = item[:field] %>
               <% key = item[:key] %>
@@ -1268,81 +869,32 @@ LEFT / PRIMARY CONTENT
               <% has_value = item[:present] %>
 
               <div
-                class="
-              px-6
-              py-5
-              transition
-              hover:bg-violet-50/40
-              dark:hover:bg-violet-950/10
-            ">
+                class="entity-field-row px-6 py-5 transition hover:bg-violet-50/40 dark:hover:bg-violet-950/10"
+                data-field-index="<%= index %>"
+                data-field-key="<%= key.to_s.downcase %>"
+                data-field-label="<%= label.to_s.downcase %>"
+                data-field-type="<%= type.to_s.downcase %>"
+                data-field-value-state="<%= has_value ? "present" : "missing" %>">
 
-                <div
-                  class="
-                flex
-                flex-col
-                gap-4
-                sm:flex-row
-                sm:items-start
-              ">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-start">
 
                   <%# FIELD IDENTITY %>
 
-                  <div
-                    class="
-                  w-full
-                  shrink-0
-                  sm:w-56
-                ">
+                  <div class="w-full shrink-0 sm:w-56">
 
-                    <div
-                      class="
-                    text-sm
-                    font-black
-                    text-gray-900
-                    dark:text-white
-                  ">
-
+                    <div class="text-sm font-black text-gray-900 dark:text-white">
                       <%= label %>
-
                     </div>
 
-                    <div
-                      class="
-                    mt-1
-                    break-all
-                    font-mono
-                    text-[11px]
-                    font-bold
-                    text-violet-600
-                    dark:text-violet-400
-                  ">
-
+                    <div class="mt-1 break-all font-mono text-[11px] font-bold text-violet-600 dark:text-violet-400">
                       <%= key %>
-
                     </div>
 
                     <div class="mt-2">
 
-                  <span
-                    class="
-                      inline-flex
-                      items-center
-                      rounded-full
-                      bg-gray-100
-                      px-2
-                      py-1
-                      text-[9px]
-                      font-black
-                      uppercase
-                      tracking-wider
-                      text-gray-500
-                      dark:bg-gray-900
-                      dark:text-gray-400
-                    ">
-
-                    <%= type.humanize %>
-
-                  </span>
+                      <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-[9px] font-black uppercase tracking-wider text-gray-500 dark:bg-gray-900 dark:text-gray-400">
+                        <%= type.humanize %>
+                      </span>
 
                     </div>
 
@@ -1356,169 +908,55 @@ LEFT / PRIMARY CONTENT
 
                       <% if value.is_a?(Hash) || value.is_a?(Array) %>
 
-                    <pre
-                      class="
-                        max-h-80
-                        overflow-auto
-                        rounded-xl
-                        border
-                        border-gray-200
-                        bg-gray-50
-                        p-4
-                        font-mono
-                        text-xs
-                        leading-5
-                        text-gray-700
-                        dark:border-gray-700
-                        dark:bg-gray-900
-                        dark:text-gray-300
-                      "><%= JSON.pretty_generate(value) rescue value.inspect %></pre>
+                        <pre class="max-h-80 overflow-auto rounded-xl border border-gray-200 bg-gray-50 p-4 font-mono text-xs leading-5 text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"><%= begin
+                                                                                                                                                                                                                      JSON.pretty_generate(value)
+                                                                                                                                                                                                                    rescue StandardError
+                                                                                                                                                                                                                      value.inspect
+                                                                                                                                                                                                                    end %></pre>
 
                       <% elsif value == true %>
 
-                    <span
-                      class="
-                        inline-flex
-                        items-center
-                        gap-2
-                        rounded-lg
-                        bg-emerald-50
-                        px-3
-                        py-2
-                        text-sm
-                        font-bold
-                        text-emerald-700
-                        dark:bg-emerald-900/20
-                        dark:text-emerald-300
-                      ">
-
-                      <span>✓</span>
-                      true
-
-                    </span>
+                        <span class="inline-flex items-center gap-2 rounded-lg bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300">
+                          <span>✓</span>
+                          true
+                        </span>
 
                       <% elsif value == false %>
 
-                    <span
-                      class="
-                        inline-flex
-                        items-center
-                        gap-2
-                        rounded-lg
-                        bg-gray-100
-                        px-3
-                        py-2
-                        text-sm
-                        font-bold
-                        text-gray-600
-                        dark:bg-gray-900
-                        dark:text-gray-400
-                      ">
-
-                      <span>○</span>
-                      false
-
-                    </span>
+                        <span class="inline-flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-2 text-sm font-bold text-gray-600 dark:bg-gray-900 dark:text-gray-400">
+                          <span>○</span>
+                          false
+                        </span>
 
                       <% elsif value.nil? %>
 
-                    <span
-                      class="
-                        inline-flex
-                        items-center
-                        rounded-lg
-                        bg-gray-100
-                        px-3
-                        py-2
-                        text-xs
-                        font-semibold
-                        text-gray-400
-                        dark:bg-gray-900
-                        dark:text-gray-500
-                      ">
-
-                      null
-
-                    </span>
+                        <span class="inline-flex items-center rounded-lg bg-gray-100 px-3 py-2 text-xs font-semibold text-gray-400 dark:bg-gray-900 dark:text-gray-500">
+                          null
+                        </span>
 
                       <% else %>
 
-                        <div
-                          class="
-                        break-words
-                        rounded-xl
-                        border
-                        border-gray-200
-                        bg-white
-                        px-4
-                        py-3
-                        text-sm
-                        font-semibold
-                        text-gray-700
-                        dark:border-gray-700
-                        dark:bg-gray-900/40
-                        dark:text-gray-300
-                      ">
-
+                        <div class="break-words rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-700 dark:border-gray-700 dark:bg-gray-900/40 dark:text-gray-300">
                           <%= value %>
-
                         </div>
 
                       <% end %>
 
                     <% else %>
 
-                      <div
-                        class="
-                      flex
-                      items-center
-                      gap-3
-                      rounded-xl
-                      border
-                      border-dashed
-                      border-gray-200
-                      bg-gray-50
-                      px-4
-                      py-3
-                      dark:border-gray-700
-                      dark:bg-gray-900/40
-                    ">
+                      <div class="flex items-center gap-3 rounded-xl border border-dashed border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-700 dark:bg-gray-900/40">
 
-                    <span
-                      class="
-                        flex
-                        h-7
-                        w-7
-                        shrink-0
-                        items-center
-                        justify-center
-                        rounded-lg
-                        bg-gray-100
-                        text-xs
-                        text-gray-400
-                        dark:bg-gray-800
-                      ">
-                      —
-                    </span>
+                        <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs text-gray-400 dark:bg-gray-800">
+                          —
+                        </span>
 
                         <div>
 
-                          <div
-                            class="
-                          text-xs
-                          font-bold
-                          text-gray-500
-                          dark:text-gray-400
-                        ">
+                          <div class="text-xs font-bold text-gray-500 dark:text-gray-400">
                             No persisted value
                           </div>
 
-                          <div
-                            class="
-                          mt-0.5
-                          text-[10px]
-                          text-gray-400
-                        ">
+                          <div class="mt-0.5 text-[10px] text-gray-400">
                             This field is defined by the template version but
                             currently has no stored entity value.
                           </div>
@@ -1537,67 +975,45 @@ LEFT / PRIMARY CONTENT
 
             <% end %>
 
-            <%# ===============================================================
-        EXTRA PERSISTED VALUES
-        ================================================================ %>
+            <%# NO SEARCH RESULTS %>
+
+            <div
+              id="entity-fields-empty"
+              class="hidden px-6 py-14 text-center">
+
+              <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-100 text-2xl text-gray-400 dark:bg-gray-900">
+                ⌕
+              </div>
+
+              <h3 class="mt-4 text-sm font-black text-gray-900 dark:text-white">
+                No matching fields
+              </h3>
+
+              <p class="mx-auto mt-1 max-w-md text-xs leading-5 text-gray-400">
+                Try a different search term or change the field filters.
+              </p>
+
+            </div>
+
+            <%# EXTRA PERSISTED VALUES %>
 
             <% if extra_payload.present? %>
 
-              <div
-                class="
-              border-t-2
-              border-dashed
-              border-amber-100
-              bg-amber-50/40
-              px-6
-              py-5
-              dark:border-amber-900/30
-              dark:bg-amber-950/10
-            ">
+              <div class="border-t-2 border-dashed border-amber-100 bg-amber-50/40 px-6 py-5 dark:border-amber-900/30 dark:bg-amber-950/10">
 
-                <div
-                  class="
-                mb-4
-                flex
-                items-center
-                gap-3
-              ">
+                <div class="mb-4 flex items-center gap-3">
 
-                  <div
-                    class="
-                  flex
-                  h-9
-                  w-9
-                  items-center
-                  justify-center
-                  rounded-xl
-                  bg-amber-100
-                  text-amber-600
-                  dark:bg-amber-900/30
-                  dark:text-amber-400
-                ">
+                  <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400">
                     +
                   </div>
 
                   <div>
 
-                    <div
-                      class="
-                    text-sm
-                    font-black
-                    text-amber-700
-                    dark:text-amber-300
-                  ">
+                    <div class="text-sm font-black text-amber-700 dark:text-amber-300">
                       Additional persisted values
                     </div>
 
-                    <div
-                      class="
-                    mt-0.5
-                    text-[10px]
-                    text-amber-600
-                    dark:text-amber-400
-                  ">
+                    <div class="mt-0.5 text-[10px] text-amber-600 dark:text-amber-400">
                       Values stored on the entity that are not defined by the
                       current template version.
                     </div>
@@ -1610,44 +1026,14 @@ LEFT / PRIMARY CONTENT
 
                   <% extra_payload.each do |key, value| %>
 
-                    <div
-                      class="
-                    rounded-xl
-                    border
-                    border-amber-100
-                    bg-white
-                    p-4
-                    dark:border-amber-900/30
-                    dark:bg-gray-900/50
-                  ">
+                    <div class="rounded-xl border border-amber-100 bg-white p-4 dark:border-amber-900/30 dark:bg-gray-900/50">
 
-                      <div
-                        class="
-                      flex
-                      flex-col
-                      gap-3
-                      sm:flex-row
-                      sm:items-start
-                    ">
+                      <div class="flex flex-col gap-3 sm:flex-row sm:items-start">
 
-                        <div
-                          class="
-                        w-full
-                        shrink-0
-                        sm:w-56
-                      ">
+                        <div class="w-full shrink-0 sm:w-56">
 
-                          <div
-                            class="
-                          font-mono
-                          text-xs
-                          font-bold
-                          text-amber-700
-                          dark:text-amber-400
-                        ">
-
+                          <div class="font-mono text-xs font-bold text-amber-700 dark:text-amber-400">
                             <%= key %>
-
                           </div>
 
                         </div>
@@ -1656,37 +1042,16 @@ LEFT / PRIMARY CONTENT
 
                           <% if value.is_a?(Hash) || value.is_a?(Array) %>
 
-                        <pre
-                          class="
-                            max-h-80
-                            overflow-auto
-                            rounded-xl
-                            border
-                            border-gray-200
-                            bg-gray-50
-                            p-4
-                            font-mono
-                            text-xs
-                            leading-5
-                            text-gray-700
-                            dark:border-gray-700
-                            dark:bg-gray-900
-                            dark:text-gray-300
-                          "><%= JSON.pretty_generate(value) rescue value.inspect %></pre>
+                            <pre class="max-h-80 overflow-auto rounded-xl border border-gray-200 bg-gray-50 p-4 font-mono text-xs leading-5 text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"><%= begin
+                                                                                                                                                                                                                          JSON.pretty_generate(value)
+                                                                                                                                                                                                                        rescue StandardError
+                                                                                                                                                                                                                          value.inspect
+                                                                                                                                                                                                                        end %></pre>
 
                           <% else %>
 
-                            <div
-                              class="
-                            break-words
-                            text-sm
-                            font-semibold
-                            text-gray-700
-                            dark:text-gray-300
-                          ">
-
+                            <div class="break-words text-sm font-semibold text-gray-700 dark:text-gray-300">
                               <%= value.present? ? value : "—" %>
-
                             </div>
 
                           <% end %>
@@ -1707,54 +1072,63 @@ LEFT / PRIMARY CONTENT
 
           </div>
 
+          <%# PAGINATION %>
+
+          <div
+            id="entity-fields-pagination"
+            class="border-t border-gray-100 bg-gray-50/70 px-6 py-4 dark:border-gray-700 dark:bg-gray-900/30">
+
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+              <div
+                id="entity-pagination-summary"
+                class="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+              </div>
+
+              <div class="flex items-center gap-1">
+
+                <button
+                  type="button"
+                  id="entity-fields-prev"
+                  class="inline-flex h-9 items-center justify-center rounded-lg border border-gray-200 bg-white px-3 text-xs font-bold text-gray-600 transition hover:border-violet-300 hover:text-violet-600 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                  ←
+                </button>
+
+                <div
+                  id="entity-fields-pages"
+                  class="flex items-center gap-1">
+                </div>
+
+                <button
+                  type="button"
+                  id="entity-fields-next"
+                  class="inline-flex h-9 items-center justify-center rounded-lg border border-gray-200 bg-white px-3 text-xs font-bold text-gray-600 transition hover:border-violet-300 hover:text-violet-600 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                  →
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+
         <% end %>
 
       </div>
 
-      <%# ---------------------------------------------------------------------
-  VERSION LINEAGE
-  ---------------------------------------------------------------------- %>
+      <%# =========================================================================
+      VERSION LINEAGE
+      ========================================================================= %>
 
-      <div
-        class="
-      overflow-hidden
-      rounded-2xl
-      border
-      border-gray-200
-      bg-white
-      shadow-sm
-      dark:border-gray-800
-      dark:bg-gray-800
-    ">
+      <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-800">
 
-        <div
-          class="
-        border-b
-        border-gray-100
-        px-6
-        py-5
-        dark:border-gray-700
-      ">
+        <div class="border-b border-gray-100 px-6 py-5 dark:border-gray-700">
 
-          <div
-            class="
-          text-[11px]
-          font-black
-          uppercase
-          tracking-[0.2em]
-          text-violet-500
-        ">
+          <div class="text-[11px] font-black uppercase tracking-[0.2em] text-violet-500">
             Structural Lineage
           </div>
 
-          <h2
-            class="
-          mt-1
-          text-xl
-          font-black
-          text-gray-900
-          dark:text-white
-        ">
+          <h2 class="mt-1 text-xl font-black text-gray-900 dark:text-white">
             Template Resolution
           </h2>
 
@@ -1764,18 +1138,7 @@ LEFT / PRIMARY CONTENT
 
           <div class="relative">
 
-            <div
-              class="
-            absolute
-            left-5
-            top-6
-            bottom-6
-            hidden
-            w-px
-            bg-gray-200
-            sm:block
-            dark:bg-gray-700
-          "></div>
+            <div class="absolute bottom-6 left-5 top-6 hidden w-px bg-gray-200 sm:block dark:bg-gray-700"></div>
 
             <div class="space-y-6">
 
@@ -1783,65 +1146,24 @@ LEFT / PRIMARY CONTENT
 
               <div class="relative flex gap-4">
 
-                <div
-                  class="
-                relative
-                z-10
-                flex
-                h-10
-                w-10
-                shrink-0
-                items-center
-                justify-center
-                rounded-xl
-                bg-indigo-100
-                text-lg
-                dark:bg-indigo-900/40
-              ">
+                <div class="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-100 text-lg dark:bg-indigo-900/40">
                   🧱
                 </div>
 
-                <div
-                  class="
-                min-w-0
-                flex-1
-                rounded-xl
-                border
-                border-gray-200
-                bg-gray-50
-                p-4
-                dark:border-gray-700
-                dark:bg-gray-900/50
-              ">
+                <div class="min-w-0 flex-1 rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900/50">
 
-                  <div
-                    class="
-                  text-[10px]
-                  font-black
-                  uppercase
-                  tracking-wider
-                  text-gray-400
-                ">
+                  <div class="text-[10px] font-black uppercase tracking-wider text-gray-400">
                     Entity Template
                   </div>
 
                   <% if template.present? %>
 
-                    <div
-                      class="
-                    mt-1
-                    text-sm
-                    font-black
-                    text-gray-900
-                    dark:text-white
-                  ">
+                    <div class="mt-1 text-sm font-black text-gray-900 dark:text-white">
 
                       <% if template_path.present? %>
 
                         <%= link_to(
-                              template.respond_to?(:name) ?
-                                template.name :
-                                "Template ##{template.id}",
+                              template.respond_to?(:name) ? template.name : "Template ##{template.id}",
                               template_path,
                               class: "hover:text-violet-600"
                             ) %>
@@ -1850,9 +1172,13 @@ LEFT / PRIMARY CONTENT
 
                         <%= template.name %>
 
-                      <% else %>
+                      <% elsif template.respond_to?(:id) %>
 
                         Template #<%= template.id %>
+
+                      <% else %>
+
+                        Template
 
                       <% end %>
 
@@ -1874,58 +1200,19 @@ LEFT / PRIMARY CONTENT
 
               <div class="relative flex gap-4">
 
-                <div
-                  class="
-                relative
-                z-10
-                flex
-                h-10
-                w-10
-                shrink-0
-                items-center
-                justify-center
-                rounded-xl
-                bg-violet-100
-                text-lg
-                dark:bg-violet-900/40
-              ">
+                <div class="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-100 text-lg dark:bg-violet-900/40">
                   🧬
                 </div>
 
-                <div
-                  class="
-                min-w-0
-                flex-1
-                rounded-xl
-                border
-                border-violet-200
-                bg-violet-50
-                p-4
-                dark:border-violet-800
-                dark:bg-violet-900/20
-              ">
+                <div class="min-w-0 flex-1 rounded-xl border border-violet-200 bg-violet-50 p-4 dark:border-violet-800 dark:bg-violet-900/20">
 
-                  <div
-                    class="
-                  text-[10px]
-                  font-black
-                  uppercase
-                  tracking-wider
-                  text-violet-500
-                ">
+                  <div class="text-[10px] font-black uppercase tracking-wider text-violet-500">
                     Template Version
                   </div>
 
                   <% if template_version.present? %>
 
-                    <div
-                      class="
-                    mt-1
-                    text-sm
-                    font-black
-                    text-violet-700
-                    dark:text-violet-300
-                  ">
+                    <div class="mt-1 text-sm font-black text-violet-700 dark:text-violet-300">
 
                       <% if version_path.present? %>
 
@@ -1935,10 +1222,15 @@ LEFT / PRIMARY CONTENT
                               class: "hover:text-violet-500"
                             ) %>
 
-                      <% else %>
+                      <% elsif template_version.respond_to?(:id) %>
 
                         Version
                         <%= version_number.present? ? "v#{version_number}" : "##{template_version.id}" %>
+
+                      <% else %>
+
+                        Version
+                        <%= version_number.present? ? "v#{version_number}" : "" %>
 
                       <% end %>
 
@@ -1960,72 +1252,22 @@ LEFT / PRIMARY CONTENT
 
               <div class="relative flex gap-4">
 
-                <div
-                  class="
-                relative
-                z-10
-                flex
-                h-10
-                w-10
-                shrink-0
-                items-center
-                justify-center
-                rounded-xl
-                bg-emerald-100
-                text-lg
-                dark:bg-emerald-900/40
-              ">
+                <div class="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-lg dark:bg-emerald-900/40">
                   ◈
                 </div>
 
-                <div
-                  class="
-                min-w-0
-                flex-1
-                rounded-xl
-                border-2
-                border-emerald-200
-                bg-emerald-50
-                p-4
-                dark:border-emerald-800
-                dark:bg-emerald-900/20
-              ">
+                <div class="min-w-0 flex-1 rounded-xl border-2 border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-900/20">
 
-                  <div
-                    class="
-                  text-[10px]
-                  font-black
-                  uppercase
-                  tracking-wider
-                  text-emerald-500
-                ">
+                  <div class="text-[10px] font-black uppercase tracking-wider text-emerald-500">
                     Current Entity
                   </div>
 
-                  <div
-                    class="
-                  mt-1
-                  text-sm
-                  font-black
-                  text-emerald-700
-                  dark:text-emerald-300
-                ">
-
+                  <div class="mt-1 text-sm font-black text-emerald-700 dark:text-emerald-300">
                     <%= entity_name %>
-
                   </div>
 
-                  <div
-                    class="
-                  mt-1
-                  font-mono
-                  text-[10px]
-                  text-emerald-600/70
-                  dark:text-emerald-400/70
-                ">
-
+                  <div class="mt-1 font-mono text-[10px] text-emerald-600/70 dark:text-emerald-400/70">
                     Entity #<%= entity_id %>
-
                   </div>
 
                 </div>
@@ -2042,43 +1284,23 @@ LEFT / PRIMARY CONTENT
 
     </div>
 
-<%# =======================================================================
-RIGHT / METADATA
-======================================================================== %>
+    <%# =========================================================================
+    RIGHT / METADATA
+    ========================================================================= %>
 
     <div class="space-y-6">
 
-      <%# ---------------------------------------------------------------------
-  RECORD INFORMATION
-  ---------------------------------------------------------------------- %>
+      <%# RECORD INFORMATION %>
 
-      <div
-        class="
-      rounded-2xl
-      border
-      border-gray-200
-      bg-white
-      p-6
-      shadow-sm
-      dark:border-gray-800
-      dark:bg-gray-800
-    ">
+      <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-800">
 
-        <div
-          class="
-        text-[11px]
-        font-black
-        uppercase
-        tracking-[0.2em]
-        text-gray-400
-      ">
+        <div class="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400">
           Record Information
         </div>
 
         <div class="mt-5 space-y-4">
 
           <div>
-
             <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400">
               Entity ID
             </div>
@@ -2086,7 +1308,6 @@ RIGHT / METADATA
             <div class="mt-1 font-mono text-sm font-bold text-gray-700 dark:text-gray-300">
               #<%= entity_id %>
             </div>
-
           </div>
 
           <% if entity_identifier.present? %>
@@ -2097,19 +1318,8 @@ RIGHT / METADATA
                 Identifier
               </div>
 
-              <div
-                class="
-              mt-1
-              break-all
-              font-mono
-              text-sm
-              font-bold
-              text-gray-700
-              dark:text-gray-300
-            ">
-
+              <div class="mt-1 break-all font-mono text-sm font-bold text-gray-700 dark:text-gray-300">
                 <%= entity_identifier %>
-
               </div>
 
             </div>
@@ -2124,26 +1334,10 @@ RIGHT / METADATA
 
             <div class="mt-2">
 
-          <span
-            class="
-              inline-flex
-              items-center
-              gap-1.5
-              rounded-full
-              px-3
-              py-1.5
-              text-xs
-              font-bold
-              <%= status_badge[:classes] %>
-            ">
-
-            <span>
-              <%= status_badge[:icon] %>
-            </span>
-
-            <%= status_badge[:label] %>
-
-          </span>
+              <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold <%= status_badge[:classes] %>">
+                <span><%= status_badge[:icon] %></span>
+                <%= status_badge[:label] %>
+              </span>
 
             </div>
 
@@ -2213,30 +1407,61 @@ RIGHT / METADATA
 
       </div>
 
-      <%# ---------------------------------------------------------------------
-  TIMELINE
-  ---------------------------------------------------------------------- %>
+      <%# QUICK ACTIONS %>
 
-      <div
-        class="
-      rounded-2xl
-      border
-      border-gray-200
-      bg-white
-      p-6
-      shadow-sm
-      dark:border-gray-800
-      dark:bg-gray-800
-    ">
+      <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-800">
 
-        <div
-          class="
-        text-[11px]
-        font-black
-        uppercase
-        tracking-[0.2em]
-        text-gray-400
-      ">
+        <div class="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400">
+          Quick Actions
+        </div>
+
+        <div class="mt-4 space-y-2">
+
+          <%= link_to edit_entity_path,
+                      class: "flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-xs font-bold text-gray-700 transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700 dark:border-gray-700 dark:bg-gray-900/50 dark:text-gray-300 dark:hover:bg-violet-900/20" do %>
+
+            <span class="flex items-center gap-2">
+              <span>✎</span>
+              Edit entity
+            </span>
+
+            <span>→</span>
+
+          <% end %>
+
+          <%= link_to clone_entity_path,
+                      class: "flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-xs font-bold text-gray-700 transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700 dark:border-gray-700 dark:bg-gray-900/50 dark:text-gray-300 dark:hover:bg-violet-900/20" do %>
+
+            <span class="flex items-center gap-2">
+              <span>⧉</span>
+              Clone entity
+            </span>
+
+            <span>→</span>
+
+          <% end %>
+
+          <%= link_to compare_entity_path,
+                      class: "flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-xs font-bold text-gray-700 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700 dark:border-gray-700 dark:bg-gray-900/50 dark:text-gray-300 dark:hover:bg-indigo-900/20" do %>
+
+            <span class="flex items-center gap-2">
+              <span>⇄</span>
+              Compare entity
+            </span>
+
+            <span>→</span>
+
+          <% end %>
+
+        </div>
+
+      </div>
+
+      <%# TIMELINE %>
+
+      <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-800">
+
+        <div class="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400">
           Lifecycle
         </div>
 
@@ -2246,16 +1471,7 @@ RIGHT / METADATA
 
             <div class="flex gap-3">
 
-              <div
-                class="
-              mt-1
-              h-2
-              w-2
-              shrink-0
-              rounded-full
-              bg-violet-400
-              shadow-[0_0_8px_rgba(139,92,246,0.5)]
-            "></div>
+              <div class="mt-1 h-2 w-2 shrink-0 rounded-full bg-violet-400 shadow-[0_0_8px_rgba(139,92,246,0.5)]"></div>
 
               <div>
 
@@ -2277,15 +1493,7 @@ RIGHT / METADATA
 
             <div class="flex gap-3">
 
-              <div
-                class="
-              mt-1
-              h-2
-              w-2
-              shrink-0
-              rounded-full
-              bg-indigo-400
-            "></div>
+              <div class="mt-1 h-2 w-2 shrink-0 rounded-full bg-indigo-400"></div>
 
               <div>
 
@@ -2309,16 +1517,7 @@ RIGHT / METADATA
 
             <div class="flex gap-3">
 
-              <div
-                class="
-              mt-1
-              h-2
-              w-2
-              shrink-0
-              rounded-full
-              bg-emerald-400
-              shadow-[0_0_8px_rgba(52,211,153,0.5)]
-            "></div>
+              <div class="mt-1 h-2 w-2 shrink-0 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]"></div>
 
               <div>
 
@@ -2340,60 +1539,23 @@ RIGHT / METADATA
 
       </div>
 
-      <%# ---------------------------------------------------------------------
-  SYSTEM STATUS
-  ---------------------------------------------------------------------- %>
+      <%# SYSTEM STATUS %>
 
-      <div
-        class="
-      rounded-2xl
-      border
-      border-emerald-200
-      bg-emerald-50
-      p-6
-      dark:border-emerald-800
-      dark:bg-emerald-900/20
-    ">
+      <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 dark:border-emerald-800 dark:bg-emerald-900/20">
 
         <div class="flex items-start gap-3">
 
-          <div
-            class="
-          flex
-          h-10
-          w-10
-          shrink-0
-          items-center
-          justify-center
-          rounded-xl
-          bg-emerald-100
-          text-emerald-600
-          dark:bg-emerald-900/40
-          dark:text-emerald-400
-        ">
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400">
             ✓
           </div>
 
           <div>
 
-            <div
-              class="
-            text-sm
-            font-black
-            text-emerald-700
-            dark:text-emerald-300
-          ">
+            <div class="text-sm font-black text-emerald-700 dark:text-emerald-300">
               Entity registry operational
             </div>
 
-            <p
-              class="
-            mt-1
-            text-xs
-            leading-5
-            text-emerald-600
-            dark:text-emerald-400
-          ">
+            <p class="mt-1 text-xs leading-5 text-emerald-600 dark:text-emerald-400">
               This entity record is available for administrative inspection
               and structural resolution.
             </p>
@@ -2407,46 +1569,335 @@ RIGHT / METADATA
     </div>
 
   </div>
-<%# =========================================================================
-FOOTER
-========================================================================= %>
 
-  <div class=" mt-8 flex flex-col gap-3 border-t border-gray-100 pt-5 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800 ">
-    <div
-      class="
-    font-mono
-    text-[10px]
-    font-bold
-    uppercase
-    tracking-wider
-    text-gray-400
-  ">
+  <%# =========================================================================
+  FOOTER
+  ========================================================================= %>
+
+  <div class="mt-8 flex flex-col gap-3 border-t border-gray-100 pt-5 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800">
+
+    <div class="font-mono text-[10px] font-bold uppercase tracking-wider text-gray-400">
       ENTITY_PROTOCOL :: ENTITY_DETAIL_LAYER :: ONLINE
     </div>
 
-    <div
-      class="
-    flex
-    items-center
-    gap-2
-    text-[10px]
-    font-black
-    uppercase
-    tracking-wider
-    text-emerald-500
-  ">
+    <div class="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-emerald-500">
 
-  <span
-    class="
-      h-2
-      w-2
-      rounded-full
-      bg-emerald-400
-      shadow-[0_0_8px_rgba(52,211,153,0.6)]
-    "></span>
+      <span class="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]"></span>
 
       Entity record operational
 
     </div>
 
-  </div> </div>
+  </div>
+
+</div>
+
+<%# ============================================================================
+CLIENT-SIDE FIELD SEARCH / FILTER / PAGINATION
+
+This intentionally operates only on the already-rendered template fields.
+No existing server-side functionality is removed.
+============================================================================ %>
+
+<% if template_fields.present? %>
+
+  <script>
+      (() => {
+          const initializeEntityFieldControls = () => {
+              const rows = Array.from(
+                  document.querySelectorAll(".entity-field-row")
+              );
+
+              const searchInput =
+                  document.getElementById("entity-field-search");
+
+              const typeFilter =
+                  document.getElementById("entity-field-type-filter");
+
+              const valueFilter =
+                  document.getElementById("entity-field-value-filter");
+
+              const emptyState =
+                  document.getElementById("entity-fields-empty");
+
+              const resultCount =
+                  document.getElementById("entity-field-result-count");
+
+              const pagination =
+                  document.getElementById("entity-fields-pagination");
+
+              const paginationSummary =
+                  document.getElementById("entity-pagination-summary");
+
+              const pagesContainer =
+                  document.getElementById("entity-fields-pages");
+
+              const previousButton =
+                  document.getElementById("entity-fields-prev");
+
+              const nextButton =
+                  document.getElementById("entity-fields-next");
+
+              if (!rows.length) return;
+
+              const pageSize = 10;
+
+              let currentPage = 1;
+              let filteredRows = rows.slice();
+
+              const normalize = (value) =>
+                  String(value || "")
+                      .trim()
+                      .toLowerCase();
+
+              const matchesFilters = (row) => {
+                  const searchTerm =
+                      normalize(searchInput ? searchInput.value : "");
+
+                  const type =
+                      normalize(typeFilter ? typeFilter.value : "");
+
+                  const valueState =
+                      normalize(valueFilter ? valueFilter.value : "");
+
+                  const searchableText = [
+                      row.dataset.fieldKey,
+                      row.dataset.fieldLabel,
+                      row.dataset.fieldType
+                  ]
+                      .map(normalize)
+                      .join(" ");
+
+                  const searchMatches =
+                      !searchTerm ||
+                      searchableText.includes(searchTerm);
+
+                  const typeMatches =
+                      !type ||
+                      normalize(row.dataset.fieldType) === type;
+
+                  const valueMatches =
+                      !valueState ||
+                      normalize(row.dataset.fieldValueState) === valueState;
+
+                  return searchMatches && typeMatches && valueMatches;
+              };
+
+              const createPageButton = (page) => {
+                  const button =
+                      document.createElement("button");
+
+                  button.type = "button";
+                  button.textContent = page;
+
+                  button.className =
+                      "inline-flex h-9 min-w-9 items-center justify-center rounded-lg border px-2.5 text-xs font-bold transition";
+
+                  if (page === currentPage) {
+                      button.className +=
+                          " border-violet-600 bg-violet-600 text-white";
+                  } else {
+                      button.className +=
+                          " border-gray-200 bg-white text-gray-600 hover:border-violet-300 hover:text-violet-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300";
+                  }
+
+                  button.addEventListener("click", () => {
+                      currentPage = page;
+                      render();
+                  });
+
+                  return button;
+              };
+
+              const renderPagination = (totalPages) => {
+                  if (!pagesContainer) return;
+
+                  pagesContainer.innerHTML = "";
+
+                  if (totalPages <= 1) {
+                      if (pagination) {
+                          pagination.classList.add("hidden");
+                      }
+
+                      return;
+                  }
+
+                  if (pagination) {
+                      pagination.classList.remove("hidden");
+                  }
+
+                  const pages = [];
+
+                  if (totalPages <= 7) {
+                      for (let page = 1; page <= totalPages; page += 1) {
+                          pages.push(page);
+                      }
+                  } else {
+                      pages.push(1);
+
+                      if (currentPage > 4) {
+                          const spacer =
+                              document.createElement("span");
+
+                          spacer.className =
+                              "px-1 text-xs text-gray-400";
+
+                          spacer.textContent = "…";
+
+                          pagesContainer.appendChild(spacer);
+                      }
+
+                      const start =
+                          Math.max(2, currentPage - 1);
+
+                      const end =
+                          Math.min(totalPages - 1, currentPage + 1);
+
+                      for (let page = start; page <= end; page += 1) {
+                          pages.push(page);
+                      }
+
+                      if (currentPage < totalPages - 3) {
+                          const spacer =
+                              document.createElement("span");
+
+                          spacer.className =
+                              "px-1 text-xs text-gray-400";
+
+                          spacer.textContent = "…";
+
+                          pagesContainer.appendChild(spacer);
+                      }
+
+                      pages.push(totalPages);
+                  }
+
+                  pages.forEach((page) => {
+                      pagesContainer.appendChild(
+                          createPageButton(page)
+                      );
+                  });
+
+                  if (previousButton) {
+                      previousButton.disabled =
+                          currentPage <= 1;
+                  }
+
+                  if (nextButton) {
+                      nextButton.disabled =
+                          currentPage >= totalPages;
+                  }
+              };
+
+              const render = () => {
+                  filteredRows =
+                      rows.filter(matchesFilters);
+
+                  const total =
+                      filteredRows.length;
+
+                  const totalPages =
+                      Math.max(1, Math.ceil(total / pageSize));
+
+                  if (currentPage > totalPages) {
+                      currentPage = totalPages;
+                  }
+
+                  rows.forEach((row) => {
+                      row.classList.add("hidden");
+                  });
+
+                  const start =
+                      (currentPage - 1) * pageSize;
+
+                  const end =
+                      start + pageSize;
+
+                  filteredRows
+                      .slice(start, end)
+                      .forEach((row) => {
+                          row.classList.remove("hidden");
+                      });
+
+                  if (emptyState) {
+                      if (total === 0) {
+                          emptyState.classList.remove("hidden");
+                      } else {
+                          emptyState.classList.add("hidden");
+                      }
+                  }
+
+                  if (resultCount) {
+                      resultCount.textContent =
+                          `${total} ${total === 1 ? "field" : "fields"}`;
+                  }
+
+                  if (paginationSummary) {
+                      if (total === 0) {
+                          paginationSummary.textContent =
+                              "No matching fields";
+                      } else {
+                          const visibleStart =
+                              start + 1;
+
+                          const visibleEnd =
+                              Math.min(end, total);
+
+                          paginationSummary.textContent =
+                              `Showing ${visibleStart}–${visibleEnd} of ${total} fields`;
+                      }
+                  }
+
+                  renderPagination(totalPages);
+              };
+
+              searchInput?.addEventListener("input", () => {
+                  currentPage = 1;
+                  render();
+              });
+
+              typeFilter?.addEventListener("change", () => {
+                  currentPage = 1;
+                  render();
+              });
+
+              valueFilter?.addEventListener("change", () => {
+                  currentPage = 1;
+                  render();
+              });
+
+              previousButton?.addEventListener("click", () => {
+                  if (currentPage > 1) {
+                      currentPage -= 1;
+                      render();
+                  }
+              });
+
+              nextButton?.addEventListener("click", () => {
+                  const totalPages =
+                      Math.max(
+                          1,
+                          Math.ceil(filteredRows.length / pageSize)
+                      );
+
+                  if (currentPage < totalPages) {
+                      currentPage += 1;
+                      render();
+                  }
+              });
+
+              render();
+          };
+
+          if (document.readyState === "loading") {
+              document.addEventListener(
+                  "DOMContentLoaded",
+                  initializeEntityFieldControls
+              );
+          } else {
+              initializeEntityFieldControls();
+          }
+      })();
+  </script>
+
+<% end %>
