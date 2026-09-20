@@ -395,7 +395,7 @@ compare
             case params[:sort].to_s
             when "name"
               {
-                name: :asc
+                "name.keyword": :asc
               }
 
             when "updated"
@@ -415,6 +415,7 @@ compare
               }
             end
           end
+
 
           # ==========================================================
           # FACETS

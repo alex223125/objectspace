@@ -3,32 +3,36 @@
 module Ecosystems
   module LoadSources
     module Entity
+
       class Entity < ApplicationRecord
+
         self.table_name = "ecosystems_load_sources_entities"
+
+        # ==========================================================
+        # CALLBACKS
+        # ==========================================================
 
         after_initialize :set_default_scope, if: :new_record?
 
-        before_validation :assign_entity_template_version,
-                          on: :create
+        before_validation :assign_entity_template_version, on: :create
 
-        # ---------------------------------------------------------
+        # ==========================================================
         # ASSOCIATIONS
-        # ---------------------------------------------------------
+        # ==========================================================
 
         belongs_to :entity_type,
                    class_name: "Ecosystems::LoadSources::EntityTypes::EntityType"
 
         belongs_to :entity_template,
                    class_name: "Ecosystems::LoadSources::EntityTemplates::EntityTemplate"
+
         belongs_to :entity_template_version,
                    class_name: "Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion",
                    optional: true
 
-
-
-        # ---------------------------------------------------------
+        # ==========================================================
         # ENUMS
-        # ---------------------------------------------------------
+        # ==========================================================
 
         enum scope: {
           conceptual: "conceptual",
@@ -43,71 +47,192 @@ module Ecosystems
           deprecated: "deprecated"
         }, _prefix: true
 
-        # ---------------------------------------------------------
+        # ==========================================================
         # VALIDATIONS
-        # ---------------------------------------------------------
+        # ==========================================================
 
         validates :name, presence: true
         validates :slug, presence: true, uniqueness: true
+
         validates :entity_type, presence: true
         validates :entity_template, presence: true
         validates :entity_template_version, presence: true
         validates :scope, presence: true
 
-        # ---------------------------------------------------------
+        validate :entity_template_version_matches_template
+
+        # ==========================================================
         # SEARCHKICK
-        # ---------------------------------------------------------
+        # ==========================================================
 
         searchkick(
           word_start: [
             :name,
             :slug
           ],
+
           searchable: [
             :name,
             :slug,
             :summary
           ],
+
+          settings: {
+            analysis: {
+              analyzer: {
+                searchkick_search: {
+                  type: "custom",
+                  tokenizer: "standard",
+                  filter: [
+                    "lowercase"
+                  ]
+                },
+
+                searchkick_search2: {
+                  type: "custom",
+                  tokenizer: "standard",
+                  filter: [
+                    "lowercase",
+                    "asciifolding"
+                  ]
+                },
+
+                searchkick_word_start_index: {
+                  type: "custom",
+                  tokenizer: "keyword",
+                  filter: [
+                    "lowercase",
+                    "asciifolding"
+                  ]
+                },
+
+                searchkick_word_start_search: {
+                  type: "custom",
+                  tokenizer: "standard",
+                  filter: [
+                    "lowercase",
+                    "asciifolding"
+                  ]
+                }
+              },
+
+              normalizer: {
+                searchkick_lowercase: {
+                  type: "custom",
+                  filter: [
+                    "lowercase",
+                    "asciifolding"
+                  ]
+                }
+              }
+            }
+          },
+
           mappings: {
             properties: {
               id: { type: "integer" },
-              name: { type: "text" },
-              slug: { type: "keyword" },
-              summary: { type: "text" },
 
-              status: { type: "keyword" },
-              scope: { type: "keyword" },
+              name: {
+                type: "text",
+                analyzer: "searchkick_search",
+                search_analyzer: "searchkick_search",
+                fields: {
+                  keyword: {
+                    type: "keyword"
+                  }
+                }
+              },
 
-              entity_type_id: { type: "integer" },
-              entity_type_name: { type: "keyword" },
+              slug: {
+                type: "text",
+                analyzer: "searchkick_word_start_index",
+                search_analyzer: "searchkick_word_start_search",
+                fields: {
+                  keyword: {
+                    type: "keyword"
+                  }
+                }
+              },
 
-              entity_template_id: { type: "integer" },
-              entity_template_name: { type: "keyword" },
+              summary: {
+                type: "text",
+                analyzer: "searchkick_search",
+                search_analyzer: "searchkick_search"
+              },
 
-              health_score: { type: "integer" },
-              health_level: { type: "keyword" },
+              status: {
+                type: "keyword"
+              },
 
-              quality_complete: { type: "boolean" },
-              quality_flags: { type: "keyword" },
+              scope: {
+                type: "keyword"
+              },
 
-              created_at: { type: "date" },
-              updated_at: { type: "date" }
+              entity_type_id: {
+                type: "integer"
+              },
+
+              entity_type_name: {
+                type: "keyword"
+              },
+
+              entity_template_id: {
+                type: "integer"
+              },
+
+              entity_template_name: {
+                type: "keyword"
+              },
+
+              entity_template_version_id: {
+                type: "long"
+              },
+
+              health_score: {
+                type: "integer"
+              },
+
+              health_level: {
+                type: "keyword"
+              },
+
+              quality_complete: {
+                type: "boolean"
+              },
+
+              quality_flags: {
+                type: "keyword"
+              },
+
+              created_at: {
+                type: "date"
+              },
+
+              updated_at: {
+                type: "date"
+              }
             }
           }
         )
 
-        # ---------------------------------------------------------
+        # ==========================================================
         # ENTITY HEALTH
-        # ---------------------------------------------------------
+        # ==========================================================
 
         def health_score
           checks = health_checks
 
           return 0 if checks.empty?
 
-          completed = checks.count { |_key, check| check[:complete] }
+          completed = checks.count do |_key, check|
+            check[:complete]
+          end
 
-          ((completed.to_f / checks.length) * 100).round
+          (
+            completed.to_f /
+              checks.length *
+              100
+          ).round
         end
 
         def health_level
@@ -171,7 +296,10 @@ module Ecosystems
 
             temporal: {
               label: "Temporal Data",
-              complete: valid_from.present? || valid_until.present? || observed_at.present?,
+              complete:
+                valid_from.present? ||
+                  valid_until.present? ||
+                  observed_at.present?,
               weight: 10
             }
           }
@@ -185,9 +313,9 @@ module Ecosystems
           }
         end
 
-        # ---------------------------------------------------------
+        # ==========================================================
         # QUALITY FLAGS
-        # ---------------------------------------------------------
+        # ==========================================================
 
         def quality_flags
           flags = []
@@ -227,9 +355,9 @@ module Ecosystems
           quality_flags.empty?
         end
 
-        # ---------------------------------------------------------
+        # ==========================================================
         # SEARCHKICK DATA
-        # ---------------------------------------------------------
+        # ==========================================================
 
         def search_data
           {
@@ -237,7 +365,6 @@ module Ecosystems
             name: name,
             slug: slug,
             summary: summary,
-
             status: status,
             scope: scope,
 
@@ -246,6 +373,8 @@ module Ecosystems
 
             entity_template_id: entity_template_id,
             entity_template_name: entity_template&.name,
+
+            entity_template_version_id: entity_template_version_id,
 
             health_score: health_score,
             health_level: health_level.to_s,
@@ -260,9 +389,17 @@ module Ecosystems
 
         private
 
+        # ==========================================================
+        # DEFAULT SCOPE
+        # ==========================================================
+
         def set_default_scope
           self.scope ||= "conceptual"
         end
+
+        # ==========================================================
+        # TEMPLATE VERSION
+        # ==========================================================
 
         def assign_entity_template_version
           return if entity_template_version.present?
@@ -273,7 +410,30 @@ module Ecosystems
               entity_template.latest_version
         end
 
+        # ==========================================================
+        # TEMPLATE / VERSION CONSISTENCY
+        # ==========================================================
+
+        def entity_template_version_matches_template
+          return if entity_template_version.blank?
+          return if entity_template.blank?
+
+          version_template_id =
+            if entity_template_version.respond_to?(:entity_template_id)
+              entity_template_version.entity_template_id
+            end
+
+          return if version_template_id.blank?
+          return if version_template_id == entity_template_id
+
+          errors.add(
+            :entity_template_version,
+            "must belong to the selected entity template."
+          )
+        end
+
       end
+
     end
   end
 end
