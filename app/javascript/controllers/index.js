@@ -454,6 +454,16 @@ application.register("definition-library", DefinitionLibraryController)
 import JsonDefinitionFormatterController from "./admin/ecosystems/load_sources/entity_templates/entity_template_versions/creation_new_version/json_definition_formatter_controller"
 application.register("json-definition-formatter", JsonDefinitionFormatterController)
 
+import EntityVersionCompareController from "./admin/ecosystems/load_sources/entites/entity_version_compare_controller"
+application.register("entity-version-compare", EntityVersionCompareController)
+
+import EntityVersionComparisonController from "./admin/ecosystems/load_sources/entites/entity_version_comparison_controller"
+application.register("entity-version-comparison", EntityVersionComparisonController)
+
+import EntityVersionDiffController from "./admin/ecosystems/load_sources/entites/entity_version_diff_controller"
+application.register("entity-version-diff", EntityVersionDiffController)
+
+
 //
 // // ============================================================
 // // STIMULUS UNDERSCORE / KEBAB-CASE COMPATIBILITY ALIASES

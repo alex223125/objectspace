@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_09_20_011610) do
+ActiveRecord::Schema[7.0].define(version: 2026_09_22_223418) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -371,14 +371,38 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_20_011610) do
     t.datetime "archived_at"
     t.datetime "deprecated_at"
     t.bigint "current_version_id"
+    t.string "workflow_state", default: "draft", null: false
+    t.datetime "submitted_for_review_at", precision: nil
+    t.datetime "approved_at", precision: nil
+    t.datetime "rejected_at", precision: nil
+    t.bigint "submitted_by_id"
+    t.bigint "approved_by_id"
+    t.bigint "rejected_by_id"
+    t.text "review_comment"
+    t.text "rejection_reason"
+    t.datetime "publish_at", precision: nil
+    t.bigint "published_by_id"
+    t.bigint "last_published_by_id"
+    t.bigint "assigned_reviewer_id"
+    t.datetime "review_requested_at", precision: nil
+    t.datetime "reviewed_at", precision: nil
+    t.index ["approved_by_id"], name: "idx_entities_approved_by"
     t.index ["archived_at"], name: "index_ecosystems_load_sources_entities_on_archived_at"
+    t.index ["assigned_reviewer_id"], name: "index_ecosystems_load_sources_entities_on_assigned_reviewer_id"
     t.index ["current_version_id"], name: "index_ecosystems_load_sources_entities_on_current_version_id"
     t.index ["deprecated_at"], name: "index_ecosystems_load_sources_entities_on_deprecated_at"
     t.index ["entity_template_id"], name: "index_ecosystems_load_sources_entities_on_entity_template_id"
     t.index ["entity_template_version_id"], name: "idx_entities_template_version"
     t.index ["entity_type_id"], name: "index_ecosystems_load_sources_entities_on_entity_type_id"
+    t.index ["last_published_by_id"], name: "index_ecosystems_load_sources_entities_on_last_published_by_id"
+    t.index ["publish_at"], name: "idx_entities_publish_at"
     t.index ["published_at"], name: "index_ecosystems_load_sources_entities_on_published_at"
+    t.index ["published_by_id"], name: "idx_entities_published_by"
+    t.index ["rejected_by_id"], name: "idx_entities_rejected_by"
     t.index ["slug"], name: "index_ecosystems_load_sources_entities_on_slug", unique: true
+    t.index ["submitted_by_id"], name: "idx_entities_submitted_by"
+    t.index ["workflow_state", "publish_at"], name: "idx_entities_workflow_publish"
+    t.index ["workflow_state"], name: "idx_entities_workflow_state"
   end
 
   create_table "ecosystems_load_sources_entity_events", force: :cascade do |t|
@@ -1174,6 +1198,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_20_011610) do
   add_foreign_key "ecosystems_load_sources_entities", "ecosystems_load_sources_entity_templates", column: "entity_template_id"
   add_foreign_key "ecosystems_load_sources_entities", "ecosystems_load_sources_entity_types", column: "entity_type_id"
   add_foreign_key "ecosystems_load_sources_entities", "ecosystems_load_sources_entity_versions", column: "current_version_id"
+  add_foreign_key "ecosystems_load_sources_entities", "users", column: "assigned_reviewer_id", on_delete: :nullify
   add_foreign_key "ecosystems_load_sources_entity_events", "ecosystems_load_sources_entities", column: "entity_id"
   add_foreign_key "ecosystems_load_sources_entity_events", "ecosystems_load_sources_entity_versions", column: "entity_version_id"
   add_foreign_key "ecosystems_load_sources_entity_template_configurations", "ecosystems_load_sources_entity_templates", column: "entity_template_id", name: "fk_et_config_template"

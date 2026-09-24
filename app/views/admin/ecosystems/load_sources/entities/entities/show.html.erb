@@ -484,6 +484,32 @@ Administrative detail view for an Entity.
           Edit Entity
         <% end %>
 
+        <%= link_to(
+              "History",
+              history_admin_ecosystems_load_sources_entity_path(@entity)
+            ) %>
+
+        <% if @entity.current_version %>
+
+          <p>
+            Current version:
+            <strong>
+              Version <%= @entity.current_version.version_number %>
+            </strong>
+          </p>
+
+        <% end %>
+
+        <p>
+          Versions:
+          <strong>
+            <%= @entity.versions.count %>
+          </strong>
+        </p>
+
+
+
+
       </div>
 
     </div>
@@ -1454,6 +1480,17 @@ Administrative detail view for an Entity.
           <% end %>
 
         </div>
+
+      </div>
+
+      <div class="entity-actions">
+
+        <%= link_to(
+              "History",
+              history_admin_ecosystems_load_sources_entity_path(@entity)
+            ) %>
+
+        <%# existing actions remain here %>
 
       </div>
 

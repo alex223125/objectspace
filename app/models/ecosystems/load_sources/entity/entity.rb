@@ -21,14 +21,151 @@ module Ecosystems
         # ==========================================================
 
         belongs_to :entity_type,
-                   class_name: "Ecosystems::LoadSources::EntityTypes::EntityType"
+                   class_name:
+                     "Ecosystems::LoadSources::EntityTypes::EntityType"
 
         belongs_to :entity_template,
-                   class_name: "Ecosystems::LoadSources::EntityTemplates::EntityTemplate"
+                   class_name:
+                     "Ecosystems::LoadSources::EntityTemplates::EntityTemplate"
 
         belongs_to :entity_template_version,
-                   class_name: "Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion",
+                   class_name:
+                     "Ecosystems::LoadSources::EntityTemplates::EntityTemplateVersion",
                    optional: true
+
+        has_many :versions,
+                 class_name:
+                   "Ecosystems::LoadSources::Entity::EntityVersion",
+                 foreign_key: :entity_id,
+                 dependent: :restrict_with_exception
+
+        has_many :events,
+                 class_name:
+                   "Ecosystems::LoadSources::Entity::EntityEvent",
+                 foreign_key: :entity_id,
+                 dependent: :restrict_with_exception
+
+        has_many :entity_versions,
+                 -> { order(version_number: :asc) },
+                 dependent: :restrict_with_exception
+
+        has_one :current_version,
+                class_name: "Ecosystems::LoadSources::Entity::EntityVersion",
+                foreign_key: :id,
+                primary_key: :current_version_id
+
+        has_many :entity_events,
+                 -> { order(occurred_at: :asc) },
+                 dependent: :restrict_with_exception
+
+
+        # Add these associations to your existing Entity class.
+
+        belongs_to :reviewer,
+                   class_name: "User",
+                   optional: true
+
+        belongs_to :reviewer_assigned_by,
+                   class_name: "User",
+                   optional: true
+
+        belongs_to :change_requested_by,
+                   class_name: "User",
+                   optional: true
+
+        has_many :editorial_comments,
+                 class_name:
+                   "Ecosystems::LoadSources::Entity::EntityEditorialComment",
+                 foreign_key: :entity_id,
+                 dependent: :restrict_with_exception
+
+
+        # ==========================================================
+        # EDITORIAL WORKFLOW
+        # ==========================================================
+
+        has_many :editorial_events,
+                 -> {
+                   where(
+                     event_type: [
+                       "submitted_for_review",
+                       "reviewer_assigned",
+                       "comment_added",
+                       "approved",
+                       "rejected",
+                       "change_requested"
+                     ]
+                   )
+                 },
+                 class_name:
+                   "Ecosystems::LoadSources::Entity::EntityEvent",
+                 foreign_key: :entity_id
+
+
+        # ==========================================================
+        # EDITORIAL WORKFLOW
+        # ==========================================================
+
+        belongs_to :reviewer,
+                   class_name: "User",
+                   foreign_key: :reviewer_id,
+                   optional: true
+
+        belongs_to :submitted_by,
+                   class_name: "User",
+                   foreign_key: :submitted_by_id,
+                   optional: true
+
+        belongs_to :approved_by,
+                   class_name: "User",
+                   foreign_key: :approved_by_id,
+                   optional: true
+
+        belongs_to :rejected_by,
+                   class_name: "User",
+                   foreign_key: :rejected_by_id,
+                   optional: true
+
+        belongs_to :reviewer_assigned_by,
+                   class_name: "User",
+                   foreign_key: :reviewer_assigned_by_id,
+                   optional: true
+
+        belongs_to :published_by,
+                   class_name: "User",
+                   foreign_key: :published_by_id,
+                   optional: true
+
+        def editorial_state?
+          %w[
+    draft
+    review
+    approved
+    rejected
+    published
+  ].include?(workflow_state.to_s)
+        end
+
+
+        # ==========================================================
+        # EDITORIAL ASSOCIATIONS
+        # ==========================================================
+
+        belongs_to :assigned_reviewer,
+                   class_name: "User",
+                   optional: true
+
+        has_many :editorial_comments,
+                 class_name:
+                   "Ecosystems::LoadSources::Entity::EditorialComment",
+                 foreign_key: :entity_id,
+                 dependent: :restrict_with_exception
+
+        has_many :change_requests,
+                 class_name:
+                   "Ecosystems::LoadSources::Entity::ChangeRequest",
+                 foreign_key: :entity_id,
+                 dependent: :restrict_with_exception
 
         # ==========================================================
         # ENUMS
@@ -47,6 +184,14 @@ module Ecosystems
           deprecated: "deprecated"
         }, _prefix: true
 
+        enum workflow_state: {
+          draft: "draft",
+          review: "review",
+          approved: "approved",
+          published: "published",
+          rejected: "rejected"
+        }, _prefix: true
+
         # ==========================================================
         # VALIDATIONS
         # ==========================================================
@@ -62,239 +207,65 @@ module Ecosystems
         validate :entity_template_version_matches_template
 
         # ==========================================================
-        # VERSIONING / HISTORY
+        # WORKFLOW
         # ==========================================================
 
-        has_many :versions,
-                 class_name:
-                   "Ecosystems::LoadSources::Entity::EntityVersion",
-                 foreign_key: :entity_id,
-                 dependent: :restrict_with_exception
-
-        belongs_to :current_version,
-                   class_name:
-                     "Ecosystems::LoadSources::Entity::EntityVersion",
-                   foreign_key: :current_version_id,
-                   optional: true
-
-        has_many :events,
-                 class_name:
-                   "Ecosystems::LoadSources::Entity::EntityEvent",
-                 foreign_key: :entity_id,
-                 dependent: :restrict_with_exception
-
-        # ==========================================================
-        # LIFECYCLE
-        # ==========================================================
-
-        def published?
-          status.to_s == "published"
+        def can_submit_for_review?
+          workflow_state_draft? ||
+            workflow_state_rejected?
         end
 
-        def archived?
-          status.to_s == "archived"
+        def can_approve?
+          workflow_state_review?
         end
 
-        def deprecated?
-          status.to_s == "deprecated"
+        def can_reject?
+          workflow_state_review?
         end
 
-        def draft?
-          status.to_s == "draft"
+        def can_publish?
+          workflow_state_approved?
         end
 
-        # ==========================================================
-        # VERSION HELPERS
-        # ==========================================================
-
-        def next_version_number
-          versions.maximum(:version_number).to_i + 1
+        def can_schedule_publish?
+          workflow_state_approved? &&
+            publish_at.blank?
         end
 
-        def latest_version
-          versions.order(version_number: :desc).first
+        def can_unschedule_publish?
+          publish_at.present? &&
+            publish_at > Time.current
         end
 
-        def version_count
-          versions.count
+        def reviewer_assigned?
+          reviewer_id.present?
         end
 
-        # ==========================================================
-        # EVENT HELPERS
-        # ==========================================================
+        # ----------------------------------------------------------
+        # Scheduling
+        # ----------------------------------------------------------
 
-        def record_event!(
-          event_type:,
-          entity_version: nil,
-          from_status: nil,
-          to_status: nil,
-          actor: nil,
-          metadata: {}
-        )
-          events.create!(
-            event_type: event_type,
-            entity_version: entity_version,
-            from_status: from_status,
-            to_status: to_status,
-            actor: actor,
-            occurred_at: Time.current,
-            metadata: metadata || {}
-          )
+        def scheduled_for_publish?
+          publish_at.present? &&
+            publish_at > Time.current &&
+            !status_published? &&
+            !status_archived? &&
+            !status_deprecated?
         end
 
-        # ==========================================================
-        # SEARCHKICK
-        # ==========================================================
+        def publish_scheduled?
+          scheduled_for_publish?
+        end
 
-        searchkick(
-          word_start: [
-            :name,
-            :slug
-          ],
+        def schedule_overdue?
+          publish_at.present? &&
+            publish_at <= Time.current &&
+            !status_published?
+        end
 
-          searchable: [
-            :name,
-            :slug,
-            :summary
-          ],
-
-          settings: {
-            analysis: {
-              analyzer: {
-                searchkick_search: {
-                  type: "custom",
-                  tokenizer: "standard",
-                  filter: [
-                    "lowercase"
-                  ]
-                },
-
-                searchkick_search2: {
-                  type: "custom",
-                  tokenizer: "standard",
-                  filter: [
-                    "lowercase",
-                    "asciifolding"
-                  ]
-                },
-
-                searchkick_word_start_index: {
-                  type: "custom",
-                  tokenizer: "keyword",
-                  filter: [
-                    "lowercase",
-                    "asciifolding"
-                  ]
-                },
-
-                searchkick_word_start_search: {
-                  type: "custom",
-                  tokenizer: "standard",
-                  filter: [
-                    "lowercase",
-                    "asciifolding"
-                  ]
-                }
-              },
-
-              normalizer: {
-                searchkick_lowercase: {
-                  type: "custom",
-                  filter: [
-                    "lowercase",
-                    "asciifolding"
-                  ]
-                }
-              }
-            }
-          },
-
-          mappings: {
-            properties: {
-              id: { type: "integer" },
-
-              name: {
-                type: "text",
-                analyzer: "searchkick_search",
-                search_analyzer: "searchkick_search",
-                fields: {
-                  keyword: {
-                    type: "keyword"
-                  }
-                }
-              },
-
-              slug: {
-                type: "text",
-                analyzer: "searchkick_word_start_index",
-                search_analyzer: "searchkick_word_start_search",
-                fields: {
-                  keyword: {
-                    type: "keyword"
-                  }
-                }
-              },
-
-              summary: {
-                type: "text",
-                analyzer: "searchkick_search",
-                search_analyzer: "searchkick_search"
-              },
-
-              status: {
-                type: "keyword"
-              },
-
-              scope: {
-                type: "keyword"
-              },
-
-              entity_type_id: {
-                type: "integer"
-              },
-
-              entity_type_name: {
-                type: "keyword"
-              },
-
-              entity_template_id: {
-                type: "integer"
-              },
-
-              entity_template_name: {
-                type: "keyword"
-              },
-
-              entity_template_version_id: {
-                type: "long"
-              },
-
-              health_score: {
-                type: "integer"
-              },
-
-              health_level: {
-                type: "keyword"
-              },
-
-              quality_complete: {
-                type: "boolean"
-              },
-
-              quality_flags: {
-                type: "keyword"
-              },
-
-              created_at: {
-                type: "date"
-              },
-
-              updated_at: {
-                type: "date"
-              }
-            }
-          }
-        )
+        def workflow_terminal?
+          workflow_state_published?
+        end
 
         # ==========================================================
         # ENTITY HEALTH
@@ -437,6 +408,48 @@ module Ecosystems
         end
 
         # ==========================================================
+        # EDITORIAL WORKFLOW
+        # ==========================================================
+
+        def awaiting_review?
+          workflow_state_review?
+        end
+
+        def assigned_reviewer?
+          assigned_reviewer_id.present?
+        end
+
+        def can_request_changes?
+          workflow_state_review?
+        end
+
+        def open_change_requests
+          change_requests.open
+        end
+
+        def has_open_change_requests?
+          change_requests.open.exists?
+        end
+
+        def editorial_queue?
+          workflow_state_review?
+        end
+
+        # ----------------------------------------------------------
+        # EDITORIAL STATE HELPERS
+        # ----------------------------------------------------------
+
+        def can_assign_reviewer?
+          workflow_state_review?
+        end
+
+        def changes_requested?
+          workflow_state_rejected?
+        end
+
+
+
+        # ==========================================================
         # SEARCHKICK DATA
         # ==========================================================
 
@@ -446,7 +459,9 @@ module Ecosystems
             name: name,
             slug: slug,
             summary: summary,
+
             status: status,
+            workflow_state: workflow_state,
             scope: scope,
 
             entity_type_id: entity_type_id,
@@ -455,7 +470,8 @@ module Ecosystems
             entity_template_id: entity_template_id,
             entity_template_name: entity_template&.name,
 
-            entity_template_version_id: entity_template_version_id,
+            entity_template_version_id:
+            entity_template_version_id,
 
             health_score: health_score,
             health_level: health_level.to_s,
@@ -463,19 +479,27 @@ module Ecosystems
             quality_complete: complete?,
             quality_flags: quality_flags.map(&:to_s),
 
+            publish_at: publish_at&.iso8601,
+            published_at: published_at&.iso8601,
+
             created_at: created_at&.iso8601,
-            updated_at: updated_at&.iso8601
+            updated_at: updated_at&.iso8601,
+
+            assigned_reviewer_id: assigned_reviewer_id,
+            review_requested_at: review_requested_at&.iso8601,
+            reviewed_at: reviewed_at&.iso8601
           }
         end
 
         private
 
         # ==========================================================
-        # DEFAULT SCOPE
+        # DEFAULTS
         # ==========================================================
 
         def set_default_scope
           self.scope ||= "conceptual"
+          self.workflow_state ||= "draft"
         end
 
         # ==========================================================
@@ -512,6 +536,7 @@ module Ecosystems
             "must belong to the selected entity template."
           )
         end
+
 
       end
 

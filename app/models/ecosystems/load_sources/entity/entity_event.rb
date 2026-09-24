@@ -9,27 +9,55 @@ module Ecosystems
         self.table_name =
           "ecosystems_load_sources_entity_events"
 
-        # ==========================================================
-        # EVENT TYPES
-        # ==========================================================
+        TYPES = {
+          created: "created",
+          updated: "updated",
 
-        CREATED = "created".freeze
-        UPDATED = "updated".freeze
+          submitted_for_review:
+            "submitted_for_review",
 
-        PUBLISHED = "published".freeze
-        UNPUBLISHED = "unpublished".freeze
+          reviewer_assigned:
+            "reviewer_assigned",
 
-        ARCHIVED = "archived".freeze
-        RESTORED = "restored".freeze
+          comment_added:
+            "comment_added",
 
-        DEPRECATED = "deprecated".freeze
+          approved:
+            "approved",
 
-        CLONED = "cloned".freeze
+          rejected:
+            "rejected",
 
-        VERSION_CREATED = "version_created".freeze
-        VERSION_RESTORED = "version_restored".freeze
+          change_requested:
+            "change_requested",
 
-        STATUS_CHANGED = "status_changed".freeze
+          approval_invalidated:
+            "approval_invalidated",
+
+          publish_scheduled:
+            "publish_scheduled",
+
+          publish_schedule_cancelled:
+            "publish_schedule_cancelled",
+
+          published:
+            "published",
+
+          archived:
+            "archived",
+
+          restored:
+            "restored",
+
+          deprecated:
+            "deprecated",
+
+          cloned:
+            "cloned",
+
+          rollback:
+            "rollback"
+        }.freeze
 
         # ==========================================================
         # ASSOCIATIONS
@@ -45,7 +73,8 @@ module Ecosystems
                    optional: true
 
         belongs_to :actor,
-                   polymorphic: true,
+                   class_name: "User",
+                   foreign_key: :actor_id,
                    optional: true
 
         # ==========================================================
@@ -53,6 +82,12 @@ module Ecosystems
         # ==========================================================
 
         validates :event_type,
+                  presence: true,
+                  inclusion: {
+                    in: TYPES.values
+                  }
+
+        validates :metadata,
                   presence: true
 
         validates :occurred_at,
@@ -62,17 +97,127 @@ module Ecosystems
         # IMMUTABILITY
         # ==========================================================
 
-        before_update :prevent_update
-        before_destroy :prevent_destroy
+        before_update :prevent_modification
+        before_destroy :prevent_destruction
+
+        # ==========================================================
+        # SCOPES
+        # ==========================================================
+
+        scope :chronological,
+              -> {
+                order(created_at: :asc)
+              }
+
+        scope :recent_first,
+              -> {
+                order(created_at: :desc)
+              }
+
+        # ==========================================================
+        # EVENT CREATION
+        # ==========================================================
+
+        def self.type_for(name)
+          TYPES.fetch(name.to_sym)
+        end
+
+        def self.record!(
+          entity:,
+          event_type:,
+          entity_version: nil,
+          actor: nil,
+          metadata: {},
+          from_status: nil,
+          to_status: nil,
+          message: nil,
+          snapshot: {}
+        )
+          create!(
+            entity: entity,
+            entity_version: entity_version,
+
+            event_type:
+              type_for(event_type),
+
+            from_status:
+              from_status,
+
+            to_status:
+              to_status,
+
+            actor_type:
+              actor_type_for(actor),
+
+            actor_id:
+              actor_id_for(actor),
+
+            message:
+              message,
+
+            metadata:
+              metadata || {},
+
+            snapshot:
+              snapshot || {},
+
+            created_at:
+              Time.current
+          )
+        end
+
+        # ==========================================================
+        # ACTOR
+        # ==========================================================
+
+        def self.actor_id_for(actor)
+          return nil unless actor
+
+          if actor.respond_to?(:id)
+            actor.id
+          elsif actor.is_a?(Integer)
+            actor
+          else
+            nil
+          end
+        end
+
+        def self.actor_type_for(actor)
+          return nil unless actor
+
+          if actor.respond_to?(:id)
+            actor.class.name
+          else
+            "User"
+          end
+        end
+
+        # ==========================================================
+        # HELPERS
+        # ==========================================================
+
+        def self.type_for_name(name)
+          type_for(name)
+        end
+
+        def chronological?
+          true
+        end
+
+        # ==========================================================
+        # IMMUTABILITY
+        # ==========================================================
 
         private
 
-        def prevent_update
-          throw :abort
+        def prevent_modification
+          raise ActiveRecord::ReadOnlyRecord,
+                "Entity events are immutable and cannot be modified"
         end
 
-        def prevent_destroy
-          throw :abort
+        def prevent_destruction
+          raise ActiveRecord::ReadOnlyRecord,
+                "Entity events are immutable and cannot be destroyed"
         end
 
       end

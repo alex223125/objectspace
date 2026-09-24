@@ -1,0 +1,263 @@
+.entity-history-page {
+    padding: 24px;
+}
+
+.entity-history-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.entity-history-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: #6b7280;
+    margin-bottom: 6px;
+}
+
+.entity-history-header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+.entity-history-meta {
+    display: flex;
+    gap: 16px;
+    margin-top: 10px;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.entity-history-section {
+    margin-bottom: 32px;
+}
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.section-heading h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.lifecycle-grid {
+    display: grid;
+    grid-template-columns:
+    repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.lifecycle-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px;
+    background: #fff;
+}
+
+.lifecycle-label {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 6px;
+}
+
+.lifecycle-value {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.current-version-card {
+    border: 1px solid #c7d2fe;
+    background: #eef2ff;
+    border-radius: 8px;
+    padding: 18px;
+    display: grid;
+    gap: 8px;
+}
+
+.version-history {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.version-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 16px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #fff;
+}
+
+.version-row:last-child {
+    border-bottom: 0;
+}
+
+.version-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.version-summary {
+    margin-top: 6px;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.version-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #6b7280;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.version-badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    background: #dcfce7;
+    color: #166534;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 7px;
+}
+
+.activity-timeline {
+    position: relative;
+    margin-left: 10px;
+}
+
+.activity-timeline::before {
+    content: "";
+    position: absolute;
+    left: 15px;
+    top: 8px;
+    bottom: 8px;
+    width: 1px;
+    background: #e5e7eb;
+}
+
+.activity-event {
+    position: relative;
+    display: flex;
+    gap: 16px;
+    padding-bottom: 24px;
+}
+
+.activity-marker {
+    position: relative;
+    z-index: 2;
+
+    width: 30px;
+    height: 30px;
+
+    flex: 0 0 30px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #fff;
+    border: 2px solid #d1d5db;
+
+    font-size: 11px;
+}
+
+.activity-marker-blue {
+    border-color: #60a5fa;
+    color: #2563eb;
+}
+
+.activity-marker-green {
+    border-color: #4ade80;
+    color: #16a34a;
+}
+
+.activity-marker-orange {
+    border-color: #fb923c;
+    color: #ea580c;
+}
+
+.activity-marker-red {
+    border-color: #f87171;
+    color: #dc2626;
+}
+
+.activity-marker-purple {
+    border-color: #a78bfa;
+    color: #7c3aed;
+}
+
+.activity-marker-indigo {
+    border-color: #818cf8;
+    color: #4f46e5;
+}
+
+.activity-marker-gray {
+    border-color: #d1d5db;
+    color: #6b7280;
+}
+
+.activity-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.activity-title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.activity-time {
+    color: #9ca3af;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.activity-actor,
+.activity-version {
+    margin-top: 5px;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.activity-details {
+    margin-top: 10px;
+}
+
+.activity-details summary {
+    cursor: pointer;
+    color: #4f46e5;
+    font-size: 12px;
+}
+
+.activity-details pre {
+    margin-top: 8px;
+    padding: 12px;
+    overflow: auto;
+    border-radius: 6px;
+    background: #111827;
+    color: #e5e7eb;
+    font-size: 11px;
+}
+
+.empty-state {
+    padding: 30px;
+    text-align: center;
+    color: #6b7280;
+    border: 1px dashed #d1d5db;
+    border-radius: 8px;
+}

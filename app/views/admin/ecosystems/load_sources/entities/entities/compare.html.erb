@@ -1,0 +1,781 @@
+<% diff_json = @diff.to_json %>
+
+<div
+  class="
+    max-w-7xl
+    mx-auto
+    my-8
+    px-4
+    sm:px-6
+    lg:px-8
+  "
+  data-controller="entity-version-diff"
+  data-entity-version-diff-diff-value="<%= ERB::Util.html_escape(diff_json) %>"
+>
+
+  <!-- ========================================================= -->
+  <!-- HEADER -->
+  <!-- ========================================================= -->
+
+  <div
+    class="
+      overflow-hidden
+      rounded-[38px]
+      border-2
+      border-orange-100
+      bg-gradient-to-b
+      from-white
+      via-orange-50/20
+      to-slate-50/60
+      shadow-md
+      shadow-orange-100/40
+    "
+  >
+
+    <div
+      class="
+        flex
+        flex-col
+        gap-6
+        border-b-2
+        border-orange-100
+        p-6
+        lg:flex-row
+        lg:items-center
+        lg:justify-between
+        lg:p-8
+      "
+    >
+
+      <div class="flex items-start gap-4">
+
+        <div
+          class="
+            flex
+            h-12
+            w-12
+            shrink-0
+            items-center
+            justify-center
+            rounded-2xl
+            border
+            border-orange-200
+            bg-orange-100
+            text-lg
+            shadow-sm
+          "
+        >
+          ⇄
+        </div>
+
+        <div>
+
+          <div
+            class="
+              text-[10px]
+              font-black
+              uppercase
+              tracking-[0.18em]
+              text-orange-500
+            "
+          >
+            Semantic Version Comparison
+          </div>
+
+          <h1
+            class="
+              mt-1
+              text-2xl
+              font-black
+              tracking-tight
+              text-slate-800
+            "
+          >
+            <%= @entity.name %>
+          </h1>
+
+          <p
+            class="
+              mt-2
+              max-w-3xl
+              text-xs
+              leading-6
+              text-slate-400
+            "
+          >
+            Inspect nested changes, additions, removals and
+            array movement between two immutable entity snapshots.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div
+        class="
+          flex
+          items-center
+          gap-3
+          rounded-2xl
+          border
+          border-emerald-200
+          bg-emerald-50
+          px-4
+          py-3
+        "
+      >
+
+        <span
+          class="
+            h-2.5
+            w-2.5
+            rounded-full
+            bg-emerald-400
+            shadow-[0_0_10px_rgba(52,211,153,0.7)]
+          "
+        ></span>
+
+        <span
+          class="
+            text-[10px]
+            font-black
+            uppercase
+            tracking-widest
+            text-emerald-700
+          "
+        >
+          Immutable snapshots
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================================= -->
+    <!-- VERSION SELECTORS -->
+    <!-- ======================================================= -->
+
+    <div class="p-6 lg:p-8">
+
+      <form
+        method="get"
+        action="<%= compare_admin_ecosystems_load_sources_entity_path(@entity) %>"
+        class="
+          grid
+          grid-cols-1
+          gap-4
+          lg:grid-cols-[1fr_auto_1fr_auto]
+          lg:items-end
+        "
+      >
+
+        <div>
+
+          <label
+            for="from_version"
+            class="
+              mb-2
+              block
+              text-[10px]
+              font-black
+              uppercase
+              tracking-widest
+              text-slate-400
+            "
+          >
+            Previous version
+          </label>
+
+          <select
+            id="from_version"
+            name="from_version"
+            class="
+              w-full
+              rounded-2xl
+              border-2
+              border-rose-100
+              bg-white
+              px-4
+              py-3
+              text-sm
+              font-bold
+              text-slate-700
+              outline-none
+              transition
+              focus:border-rose-300
+              focus:ring-4
+              focus:ring-rose-50
+            "
+          >
+
+            <% @versions.order(version_number: :asc).each do |version| %>
+
+              <option
+                value="<%= version.id %>"
+                <%= "selected" if @old_version&.id == version.id %>
+              >
+                Version <%= version.version_number %>
+                <% if version.published_at.present? %>
+                  · <%= version.published_at.strftime("%Y-%m-%d %H:%M") %>
+                <% end %>
+              </option>
+
+            <% end %>
+
+          </select>
+
+        </div>
+
+
+        <div
+          class="
+            hidden
+            items-center
+            justify-center
+            pb-3
+            text-2xl
+            font-black
+            text-slate-300
+            lg:flex
+          "
+        >
+          →
+        </div>
+
+
+        <div>
+
+          <label
+            for="to_version"
+            class="
+              mb-2
+              block
+              text-[10px]
+              font-black
+              uppercase
+              tracking-widest
+              text-slate-400
+            "
+          >
+            Current version
+          </label>
+
+          <select
+            id="to_version"
+            name="to_version"
+            class="
+              w-full
+              rounded-2xl
+              border-2
+              border-emerald-100
+              bg-white
+              px-4
+              py-3
+              text-sm
+              font-bold
+              text-slate-700
+              outline-none
+              transition
+              focus:border-emerald-300
+              focus:ring-4
+              focus:ring-emerald-50
+            "
+          >
+
+            <% @versions.order(version_number: :desc).each do |version| %>
+
+              <option
+                value="<%= version.id %>"
+                <%= "selected" if @new_version&.id == version.id %>
+              >
+                Version <%= version.version_number %>
+                <% if version.published_at.present? %>
+                  · <%= version.published_at.strftime("%Y-%m-%d %H:%M") %>
+                <% end %>
+              </option>
+
+            <% end %>
+
+          </select>
+
+        </div>
+
+
+        <button
+          type="submit"
+          class="
+            flex
+            items-center
+            justify-center
+            gap-2
+            rounded-2xl
+            border-2
+            border-orange-300
+            bg-gradient-to-r
+            from-orange-400
+            to-amber-400
+            px-6
+            py-3
+            text-sm
+            font-black
+            text-white
+            shadow-md
+            shadow-orange-200/60
+            transition-all
+            duration-300
+            hover:-translate-y-0.5
+            hover:from-orange-500
+            hover:to-amber-500
+            hover:shadow-lg
+          "
+        >
+          <span>Compare</span>
+          <span>→</span>
+        </button>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- VERSION CONTEXT -->
+  <!-- ========================================================= -->
+
+  <% if @old_version && @new_version %>
+
+    <div
+      class="
+        mt-6
+        grid
+        grid-cols-1
+        gap-4
+        lg:grid-cols-2
+      "
+    >
+
+      <div
+        class="
+          rounded-[28px]
+          border-2
+          border-rose-100
+          bg-gradient-to-br
+          from-rose-50
+          via-white
+          to-white
+          p-5
+          shadow-sm
+        "
+      >
+
+        <div
+          class="
+            text-[9px]
+            font-black
+            uppercase
+            tracking-widest
+            text-rose-400
+          "
+        >
+          Previous snapshot
+        </div>
+
+        <div
+          class="
+            mt-2
+            text-lg
+            font-black
+            text-slate-700
+          "
+        >
+          Version <%= @old_version.version_number %>
+        </div>
+
+        <div
+          class="
+            mt-1
+            text-xs
+            text-slate-400
+          "
+        >
+          <%= @old_version.created_at&.strftime("%B %d, %Y at %H:%M") %>
+        </div>
+
+      </div>
+
+
+      <div
+        class="
+          rounded-[28px]
+          border-2
+          border-emerald-100
+          bg-gradient-to-br
+          from-emerald-50
+          via-white
+          to-white
+          p-5
+          shadow-sm
+        "
+      >
+
+        <div
+          class="
+            text-[9px]
+            font-black
+            uppercase
+            tracking-widest
+            text-emerald-500
+          "
+        >
+          Current snapshot
+        </div>
+
+        <div
+          class="
+            mt-2
+            text-lg
+            font-black
+            text-slate-700
+          "
+        >
+          Version <%= @new_version.version_number %>
+        </div>
+
+        <div
+          class="
+            mt-1
+            text-xs
+            text-slate-400
+          "
+        >
+          <%= @new_version.created_at&.strftime("%B %d, %Y at %H:%M") %>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================================= -->
+    <!-- SUMMARY -->
+    <!-- ======================================================= -->
+
+    <div
+      class="
+        mt-6
+        rounded-[30px]
+        border-2
+        border-orange-100
+        bg-white
+        p-5
+        shadow-sm
+      "
+      data-entity-version-diff-target="summary"
+    ></div>
+
+
+    <!-- ======================================================= -->
+    <!-- CONTROLS -->
+    <!-- ======================================================= -->
+
+    <div
+      class="
+        mt-6
+        rounded-[30px]
+        border-2
+        border-slate-100
+        bg-white
+        p-5
+        shadow-sm
+      "
+    >
+
+      <div
+        class="
+          flex
+          flex-col
+          gap-4
+          lg:flex-row
+          lg:items-center
+          lg:justify-between
+        "
+      >
+
+        <div class="relative flex-1">
+
+          <span
+            class="
+              pointer-events-none
+              absolute
+              left-4
+              top-1/2
+              -translate-y-1/2
+              text-slate-300
+            "
+          >
+            ⌕
+          </span>
+
+          <input
+            type="search"
+            placeholder="Search paths, fields, semantic keys..."
+            class="
+              w-full
+              rounded-2xl
+              border-2
+              border-slate-100
+              bg-slate-50/60
+              py-3
+              pl-11
+              pr-4
+              text-sm
+              font-medium
+              text-slate-700
+              outline-none
+              transition
+              focus:border-orange-200
+              focus:bg-white
+              focus:ring-4
+              focus:ring-orange-50
+            "
+            data-entity-version-diff-target="search"
+            data-action="input->entity-version-diff#search"
+            />
+
+        </div>
+
+
+        <label
+          class="
+            flex
+            cursor-pointer
+            items-center
+            gap-3
+            rounded-2xl
+            border-2
+            border-slate-100
+            bg-slate-50
+            px-4
+            py-3
+          "
+        >
+
+          <input
+            type="checkbox"
+            class="
+              h-4
+              w-4
+              rounded
+              border-slate-300
+              text-orange-500
+              focus:ring-orange-300
+            "
+            data-entity-version-diff-target="changesOnly"
+            data-action="change->entity-version-diff#toggleChangesOnly"
+            />
+
+          <span
+            class="
+              text-xs
+              font-black
+              text-slate-600
+            "
+          >
+            Changes only
+          </span>
+
+        </label>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================================= -->
+    <!-- DIFF TREE -->
+    <!-- ======================================================= -->
+
+    <div
+      class="
+        mt-6
+        overflow-hidden
+        rounded-[34px]
+        border-2
+        border-slate-100
+        bg-white
+        shadow-md
+        shadow-slate-100
+      "
+    >
+
+      <div
+        class="
+          flex
+          items-center
+          justify-between
+          border-b-2
+          border-slate-100
+          bg-gradient-to-r
+          from-slate-50
+          via-white
+          to-orange-50/30
+          px-5
+          py-4
+        "
+      >
+
+        <div>
+
+          <div
+            class="
+              text-[10px]
+              font-black
+              uppercase
+              tracking-widest
+              text-slate-500
+            "
+          >
+            Semantic changes
+          </div>
+
+          <div
+            class="
+              mt-1
+              text-xs
+              text-slate-400
+            "
+          >
+            Nested paths and array-aware changes
+          </div>
+
+        </div>
+
+        <div
+          class="
+            rounded-full
+            bg-orange-50
+            px-3
+            py-1
+            text-[9px]
+            font-black
+            uppercase
+            tracking-widest
+            text-orange-600
+          "
+        >
+          Live filtering
+        </div>
+
+      </div>
+
+
+      <div
+        data-entity-version-diff-target="tree"
+      ></div>
+
+
+      <div
+        class="
+          hidden
+          px-6
+          py-16
+          text-center
+        "
+        data-entity-version-diff-target="empty"
+      >
+
+        <div
+          class="
+            mx-auto
+            flex
+            h-14
+            w-14
+            items-center
+            justify-center
+            rounded-2xl
+            bg-slate-100
+            text-xl
+          "
+        >
+          ✓
+        </div>
+
+        <div
+          class="
+            mt-4
+            text-sm
+            font-black
+            text-slate-700
+          "
+        >
+          No matching changes
+        </div>
+
+        <p
+          class="
+            mx-auto
+            mt-2
+            max-w-md
+            text-xs
+            leading-6
+            text-slate-400
+          "
+        >
+          Try another search term or disable
+          the changes-only filter.
+        </p>
+
+      </div>
+
+    </div>
+
+  <% else %>
+
+    <div
+      class="
+        mt-6
+        rounded-[34px]
+        border-2
+        border-dashed
+        border-slate-200
+        bg-white
+        p-12
+        text-center
+      "
+    >
+
+      <div class="text-3xl">⇄</div>
+
+      <div
+        class="
+          mt-4
+          text-lg
+          font-black
+          text-slate-700
+        "
+      >
+        Two versions are required
+      </div>
+
+      <p
+        class="
+          mx-auto
+          mt-2
+          max-w-lg
+          text-xs
+          leading-6
+          text-slate-400
+        "
+      >
+        Create at least two immutable versions before
+        comparing snapshots.
+      </p>
+
+    </div>
+
+  <% end %>
+
+</div>

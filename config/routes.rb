@@ -369,16 +369,89 @@ Rails.application.routes.draw do
         end
 
 
-        resources :entities, controller: "entities/entities" do
+
+
+
+
+        resources :entities,
+                  controller: "entities/entities" do
+
+          get "editorial_queue",
+              to: "editorial_queue#index",
+              as: :editorial_queue
+
+          # ==========================================================
+          # EDITORIAL WORKFLOW
+          # ==========================================================
+
+          post ":entity_id/submit",
+               to: "editorial#submit",
+               as: :submit
+
+          post ":entity_id/assign_reviewer",
+               to: "editorial#assign_reviewer",
+               as: :assign_reviewer
+
+          post ":entity_id/approve",
+               to: "editorial#approve",
+               as: :approve
+
+          post ":entity_id/reject",
+               to: "editorial#reject",
+               as: :reject
+
+          post ":entity_id/request_changes",
+               to: "editorial#request_changes",
+               as: :request_changes
+
+          post ":entity_id/comment",
+               to: "editorial#comment",
+               as: :comment
+
+          # ==========================================================
+          # ENTITY LIFECYCLE
+          # ==========================================================
+
           member do
+
             post :clone
+
             patch :archive
             patch :restore
-            post :publish
             patch :deprecate
+
+            post :schedule_publish
+            delete :cancel_schedule
+
             get :compare
+            get :history
+
+            get "versions/:version_id",
+                action: :version,
+                as: :version
+
+            post "versions/:version_id/rollback",
+                 action: :rollback,
+                 as: :rollback
+
+            post :schedule,
+                 to: "lifecycle#schedule",
+                 as: :schedule
+
+            delete :schedule,
+                   to: "lifecycle#unschedule",
+                   as: :unschedule_schedule
+
+            post :publish,
+                 to: "lifecycle#publish",
+                 as: :publish
           end
         end
+
+
+
+
+
       end
     end
   end

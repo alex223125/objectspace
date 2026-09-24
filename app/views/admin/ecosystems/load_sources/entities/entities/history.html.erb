@@ -1,0 +1,219 @@
+<div class="entity-history-page">
+
+  <div class="entity-history-header">
+    <div>
+
+      <div class="entity-history-breadcrumb">
+
+        <%= link_to(
+              "← Back to Entity",
+              admin_ecosystems_load_sources_entity_path(@entity)
+            ) %>
+
+      </div>
+
+      <h1>Version History</h1>
+
+      <p>
+        <strong><%= @entity.name %></strong>
+      </p>
+
+      <p>
+        Browse the immutable content versions stored for this entity.
+      </p>
+
+    </div>
+
+
+    <% if @versions.size >= 2 %>
+
+      <div class="entity-history-header-actions">
+
+        <%= link_to(
+              "Compare Versions",
+              compare_admin_ecosystems_load_sources_entity_path(@entity)
+            ) %>
+
+      </div>
+
+    <% end %>
+  </div>
+
+  <% if @versions.empty? %>
+    <div class="entity-history-empty">
+
+      <h2>No versions yet</h2>
+
+      <p>
+        This entity does not have any stored versions yet.
+      </p>
+
+      <%= link_to(
+            "Back to Entity",
+            admin_ecosystems_load_sources_entity_path(@entity)
+          ) %>
+
+    </div>
+  <% else %>
+
+    <div class="entity-history-list">
+
+      <% @versions.each do |version| %>
+
+        <div class="entity-history-item">
+
+          <div class="entity-history-item-main">
+
+            <div class="entity-history-version">
+
+              <h2>
+                Version <%= version.version_number %>
+              </h2>
+
+              <% if version.id == @entity.current_version_id %>
+
+            <span class="entity-history-current">
+              Current Version
+            </span>
+
+              <% end %>
+
+            </div>
+
+
+            <div class="entity-history-details">
+
+              <div class="entity-history-detail">
+
+                <strong>Status</strong>
+
+                <span>
+              <%= version.status.to_s.humanize %>
+            </span>
+
+              </div>
+
+
+              <% if version.reason.present? %>
+
+                <div class="entity-history-detail">
+
+                  <strong>Reason</strong>
+
+                  <span>
+                <%= version.reason %>
+              </span>
+
+                </div>
+
+              <% end %>
+
+
+              <div class="entity-history-detail">
+
+                <strong>Created</strong>
+
+                <span>
+              <%= version.created_at&.strftime("%Y-%m-%d %H:%M:%S") %>
+            </span>
+
+              </div>
+
+
+              <% if version.published_at.present? %>
+
+                <div class="entity-history-detail">
+
+                  <strong>Published</strong>
+
+                  <span>
+                <%= version.published_at.strftime("%Y-%m-%d %H:%M:%S") %>
+              </span>
+
+                </div>
+
+              <% end %>
+
+
+              <% if version.created_by_id.present? %>
+
+                <div class="entity-history-detail">
+
+                  <strong>Created By</strong>
+
+                  <span>
+                <%= version.created_by_type.presence || "User" %>
+                    #<%= version.created_by_id %>
+              </span>
+
+                </div>
+
+              <% end %>
+
+            </div>
+
+
+            <% if version.checksum.present? %>
+
+              <div class="entity-history-checksum">
+
+                <strong>Checksum:</strong>
+
+                <code>
+                  <%= version.checksum %>
+                </code>
+
+              </div>
+
+            <% end %>
+
+          </div>
+
+
+          <div class="entity-history-actions">
+
+            <%= link_to(
+                  "View Version",
+                  version_admin_ecosystems_load_sources_entity_path(
+                    @entity,
+                    version_id: version.id
+                  )
+                ) %>
+
+            <% if @versions.size >= 2 %>
+
+              <%= link_to(
+                    "Compare",
+                    compare_admin_ecosystems_load_sources_entity_path(
+                      @entity,
+                      version_a: version.id,
+                      version_b: (
+                        @versions.find do |other_version|
+                          other_version.id != version.id
+                        end&.id
+                      )
+                    )
+                  ) %>
+
+            <% end %>
+
+          </div>
+
+        </div>
+
+      <% end %>
+
+    </div>
+
+  <% end %>
+
+  <div class="entity-history-footer">
+
+    <%= link_to(
+          "← Back to Entity",
+          admin_ecosystems_load_sources_entity_path(@entity)
+        ) %>
+
+  </div>
+
+</div>

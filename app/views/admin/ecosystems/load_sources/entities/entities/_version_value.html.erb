@@ -1,0 +1,98 @@
+<% if value.nil? %>
+
+  <span
+    class="italic text-slate-300">
+
+    null
+
+  </span>
+
+<% elsif value.is_a?(Hash) %>
+
+  <div class="space-y-2">
+
+    <% value.each do |key, nested_value| %>
+
+      <div
+        class="
+          rounded-xl
+          border border-slate-100
+          bg-slate-50/60
+          p-3">
+
+        <div
+          class="
+            text-[9px]
+            font-black
+            uppercase
+            tracking-wider
+            text-slate-400">
+
+          <%= key %>
+
+        </div>
+
+        <div class="mt-1">
+
+          <%= render(
+                "version_value",
+                value: nested_value
+              ) %>
+
+        </div>
+
+      </div>
+
+    <% end %>
+
+  </div>
+
+<% elsif value.is_a?(Array) %>
+
+  <div class="space-y-2">
+
+    <% value.each_with_index do |item, index| %>
+
+      <div
+        class="
+          rounded-xl
+          border border-slate-100
+          bg-slate-50/60
+          p-3">
+
+        <div
+          class="
+            mb-1
+            text-[9px]
+            font-black
+            uppercase
+            tracking-wider
+            text-slate-300">
+
+          Item <%= index + 1 %>
+
+        </div>
+
+        <%= render(
+              "version_value",
+              value: item
+            ) %>
+
+      </div>
+
+    <% end %>
+
+  </div>
+
+<% else %>
+
+  <span
+    class="
+      break-words
+      <%= "text-slate-700" if value.present? %>">
+
+    <%= value %>
+
+  </span>
+
+<% end %>

@@ -1,0 +1,144 @@
+<div class="entity-version-page">
+
+  <div class="entity-version-header">
+
+    <div>
+      <div class="entity-version-breadcrumb">
+        <%= link_to(
+              "← Back to Entity",
+              admin_ecosystems_load_sources_entity_path(@entity)
+            ) %>
+      </div>
+
+      <h1>
+        Version <%= @version.version_number %>
+      </h1>
+
+      <p>
+        <strong><%= @entity.name %></strong>
+      </p>
+    </div>
+
+    <div class="entity-version-status">
+  <span>
+    <%= @version.status.to_s.humanize %>
+  </span>
+    </div>
+
+  </div>
+
+  <div class="entity-version-meta">
+
+    <div class="entity-version-meta-item">
+      <strong>Version</strong>
+
+      <span>
+    v<%= @version.version_number %>
+  </span>
+    </div>
+
+
+    <div class="entity-version-meta-item">
+      <strong>Status</strong>
+
+      <span>
+    <%= @version.status.to_s.humanize %>
+  </span>
+    </div>
+
+
+    <% if @version.reason.present? %>
+      <div class="entity-version-meta-item">
+        <strong>Reason</strong>
+
+        <span>
+      <%= @version.reason %>
+    </span>
+      </div>
+    <% end %>
+
+
+    <div class="entity-version-meta-item">
+      <strong>Created</strong>
+
+      <span>
+    <%= @version.created_at&.strftime("%Y-%m-%d %H:%M:%S") %>
+  </span>
+    </div>
+
+
+    <% if @version.published_at.present? %>
+      <div class="entity-version-meta-item">
+        <strong>Published</strong>
+
+        <span>
+      <%= @version.published_at.strftime("%Y-%m-%d %H:%M:%S") %>
+    </span>
+      </div>
+    <% end %>
+
+
+    <% if @version.created_by_id.present? %>
+      <div class="entity-version-meta-item">
+        <strong>Created By</strong>
+
+        <span>
+      <%= @version.created_by_type.presence || "User" %>
+          #<%= @version.created_by_id %>
+    </span>
+      </div>
+    <% end %>
+
+
+    <% if @version.checksum.present? %>
+      <div class="entity-version-meta-item">
+        <strong>Checksum</strong>
+
+        <code>
+          <%= @version.checksum %>
+        </code>
+      </div>
+    <% end %>
+
+
+  </div>
+
+  <div class="entity-version-content">
+
+
+    <div class="entity-version-content-header">
+      <h2>Snapshot</h2>
+
+      <p>
+        This is the immutable content snapshot stored for this version.
+      </p>
+    </div>
+
+
+    <div class="entity-version-snapshot">
+
+      <pre><%= JSON.pretty_generate(@version.snapshot || {}) %></pre>
+
+    </div>
+
+
+  </div>
+
+  <div class="entity-version-footer">
+
+
+    <%= link_to(
+          "Back to Version History",
+          history_admin_ecosystems_load_sources_entity_path(@entity)
+        ) %>
+
+    <span>·</span>
+
+    <%= link_to(
+          "Back to Entity",
+          admin_ecosystems_load_sources_entity_path(@entity)
+        ) %>
+
+  </div>
+
+</div>

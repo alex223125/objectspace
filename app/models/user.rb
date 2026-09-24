@@ -17,6 +17,34 @@ class User < ApplicationRecord
          # for Google OmniAuth
         :omniauthable, omniauth_providers: [:google_oauth2]
 
+  has_many :assigned_editorial_entities,
+           class_name:
+             "Ecosystems::LoadSources::Entity::Entity",
+           foreign_key: :reviewer_id,
+           inverse_of: :reviewer
+
+  has_many :entities_reviewed,
+           class_name:
+             "Ecosystems::LoadSources::Entity::Entity",
+           foreign_key: :reviewer_id
+
+  has_many :editorial_comments,
+           class_name:
+             "Ecosystems::LoadSources::Entity::EntityEditorialComment",
+           foreign_key: :author_id,
+           dependent: :restrict_with_exception
+
+
+  has_many :reviewed_entities,
+           class_name:
+             "Ecosystems::LoadSources::Entity::Entity",
+           foreign_key: :reviewer_id
+
+  has_many :reviewer_assignments,
+           class_name:
+             "Ecosystems::LoadSources::Entity::Entity",
+           foreign_key: :reviewer_assigned_by_id
+
   has_one :dashboard
   # has_many :articles, class_name: "Articles::Article"
   # has_many :folders
@@ -27,6 +55,42 @@ class User < ApplicationRecord
   has_one_attached :cropped_avatar
 
   has_many :permissions, as: :actorable, class_name: "Permission"
+
+
+  # ==========================================================
+  # ENTITY EDITORIAL WORKFLOW
+  # ==========================================================
+
+  has_many :reviewed_entities,
+           class_name:
+             "Ecosystems::LoadSources::Entity::Entity",
+           foreign_key: :reviewer_id
+
+  has_many :submitted_entities,
+           class_name:
+             "Ecosystems::LoadSources::Entity::Entity",
+           foreign_key: :submitted_by_id
+
+  has_many :approved_entities,
+           class_name:
+             "Ecosystems::LoadSources::Entity::Entity",
+           foreign_key: :approved_by_id
+
+  has_many :rejected_entities,
+           class_name:
+             "Ecosystems::LoadSources::Entity::Entity",
+           foreign_key: :rejected_by_id
+
+  has_many :reviewer_assignments,
+           class_name:
+             "Ecosystems::LoadSources::Entity::Entity",
+           foreign_key: :reviewer_assigned_by_id
+
+  has_many :published_entities,
+           class_name:
+             "Ecosystems::LoadSources::Entity::Entity",
+           foreign_key: :published_by_id
+
 
   validates :name, presence: true, allow_blank: false
   validates :email, presence: true, allow_blank: false
@@ -39,6 +103,8 @@ class User < ApplicationRecord
   validates_acceptance_of :tos_agreement, allow_nil: false, on: :create, :message => "Terms and privacy policy must be accepted."
 
   attr_reader :cropped_image_result
+
+
 
   def tos_agreement_signed?
     self.tos_agreement == true
@@ -69,7 +135,6 @@ class User < ApplicationRecord
       user
     end
   end
-
 
   def has_resource_modify_permissions?(entity)
     if entity.class == Articles::Article
