@@ -1,241 +1,334 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = [
-    "row",
-    "search",
-    "empty",
-    "counter",
-    "filterButton"
-  ]
+    connect() {
+        this.oldVersionSelect = this.element.querySelector(
+            "[data-version-old-select]"
+        )
 
-  connect() {
-    this.currentFilter = "all"
-    this.refresh()
-  }
+        this.newVersionSelect = this.element.querySelector(
+            "[data-version-new-select]"
+        )
 
-  // ==========================================================
-  // FILTER
-  // ==========================================================
+        this.versionForm = this.element.querySelector(
+            "[data-version-selection-form]"
+        )
 
-  filter(event) {
-    event.preventDefault()
+        this.clientVersionError = this.element.querySelector(
+            "[data-version-selection-client-error]"
+        )
 
-    this.currentFilter =
-      event.currentTarget.dataset.filter || "all"
+        this.searchInput = this.element.querySelector(
+            "[data-comparison-search]"
+        )
 
-    this.filterButtonTargets.forEach((button) => {
-      const active =
-        button.dataset.filter === this.currentFilter
+        this.typeFilter = this.element.querySelector(
+            "[data-comparison-type-filter]"
+        )
 
-      button.classList.toggle(
-        "bg-slate-900",
-        active
-      )
+        this.rowsContainer = this.element.querySelector(
+            "[data-comparison-rows]"
+        )
 
-      button.classList.toggle(
-        "text-white",
-        active
-      )
+        this.emptyState = this.element.querySelector(
+            "[data-comparison-empty]"
+        )
 
-      button.classList.toggle(
-        "bg-white",
-        !active
-      )
+        this.noFactsState = this.element.querySelector(
+            "[data-comparison-no-facts]"
+        )
 
-      button.classList.toggle(
-        "text-slate-600",
-        !active
-      )
-    })
+        this.visibleCount = this.element.querySelector(
+            "[data-comparison-visible-count]"
+        )
 
-    this.refresh()
-  }
+        this.rows = this.rowsContainer
+            ? Array.from(
+                this.rowsContainer.querySelectorAll(
+                    "[data-comparison-row]"
+                )
+            )
+            : []
 
-  // ==========================================================
-  // SEARCH
-  // ==========================================================
+        this.applyFilters()
+        this.validateVersionSelection()
+    }
 
-  search() {
-    this.refresh()
-  }
+    // ============================================================
+    // VERSION SELECTION
+    // ============================================================
 
-  // ==========================================================
-  // REFRESH
-  // ==========================================================
+    versionChanged() {
+        this.validateVersionSelection()
+    }
 
-  refresh() {
-    const query =
-      this.hasSearchTarget
-        ? this.searchTarget.value
+    submitVersionSelection(event) {
+        if (!this.oldVersionSelect || !this.newVersionSelect) {
+            return
+        }
+
+        const oldVersion = this.oldVersionSelect.value
+        const newVersion = this.newVersionSelect.value
+
+        if (!oldVersion || !newVersion) {
+            event.preventDefault()
+
+            this.showVersionError(
+                "Please select both an old version and a new version."
+            )
+
+            return
+        }
+
+        if (oldVersion === newVersion) {
+            event.preventDefault()
+
+            this.showVersionError(
+                "Old version and new version must be different."
+            )
+
+            return
+        }
+
+        this.hideVersionError()
+    }
+
+    resetVersionSelection(event) {
+        if (event) {
+            event.preventDefault()
+        }
+
+        if (!this.versionForm) {
+            return
+        }
+
+        if (this.oldVersionSelect) {
+            this.oldVersionSelect.selectedIndex = 0
+        }
+
+        if (this.newVersionSelect) {
+            this.newVersionSelect.selectedIndex =
+                Math.max(
+                    0,
+                    this.newVersionSelect.options.length - 1
+                )
+        }
+
+        this.hideVersionError()
+
+        this.versionForm.submit()
+    }
+
+    validateVersionSelection() {
+        if (!this.oldVersionSelect || !this.newVersionSelect) {
+            return true
+        }
+
+        const oldVersion = this.oldVersionSelect.value
+        const newVersion = this.newVersionSelect.value
+
+        if (!oldVersion || !newVersion) {
+            return false
+        }
+
+        if (oldVersion === newVersion) {
+            this.showVersionError(
+                "Old version and new version must be different."
+            )
+
+            return false
+        }
+
+        this.hideVersionError()
+
+        return true
+    }
+
+    showVersionError(message) {
+        if (!this.clientVersionError) {
+            return
+        }
+
+        this.clientVersionError.textContent = message
+        this.clientVersionError.hidden = false
+
+        if (this.oldVersionSelect) {
+            this.oldVersionSelect.setAttribute(
+                "aria-invalid",
+                "true"
+            )
+        }
+
+        if (this.newVersionSelect) {
+            this.newVersionSelect.setAttribute(
+                "aria-invalid",
+                "true"
+            )
+        }
+    }
+
+    hideVersionError() {
+        if (this.clientVersionError) {
+            this.clientVersionError.hidden = true
+            this.clientVersionError.textContent = ""
+        }
+
+        if (this.oldVersionSelect) {
+            this.oldVersionSelect.removeAttribute(
+                "aria-invalid"
+            )
+        }
+
+        if (this.newVersionSelect) {
+            this.newVersionSelect.removeAttribute(
+                "aria-invalid"
+            )
+        }
+    }
+
+    // ============================================================
+    // COMPARISON FILTERING
+    // ============================================================
+
+    filterChanged() {
+        this.applyFilters()
+    }
+
+    applyFilters() {
+        if (!this.rows.length) {
+            this.updateVisibleCount(0)
+            this.updateEmptyState(0)
+
+            return
+        }
+
+        const searchTerm = this.normalizedSearchTerm()
+        const selectedType = this.selectedType()
+
+        let visibleCount = 0
+
+        this.rows.forEach((row) => {
+            const matchesSearch =
+                this.rowMatchesSearch(
+                    row,
+                    searchTerm
+                )
+
+            const matchesType =
+                this.rowMatchesType(
+                    row,
+                    selectedType
+                )
+
+            const visible =
+                matchesSearch &&
+                matchesType
+
+            row.hidden = !visible
+
+            if (visible) {
+                visibleCount += 1
+            }
+        })
+
+        this.updateVisibleCount(visibleCount)
+        this.updateEmptyState(visibleCount)
+    }
+
+    normalizedSearchTerm() {
+        if (!this.searchInput) {
+            return ""
+        }
+
+        return this.searchInput.value
             .trim()
             .toLowerCase()
-        : ""
-
-    let visible = 0
-
-    this.rowTargets.forEach((row) => {
-      const type =
-        row.dataset.changeType
-
-      const path =
-        row.dataset.path?.toLowerCase() || ""
-
-      const oldValue =
-        row.dataset.oldValue?.toLowerCase() || ""
-
-      const newValue =
-        row.dataset.newValue?.toLowerCase() || ""
-
-      const matchesFilter =
-        this.currentFilter === "all" ||
-        type === this.currentFilter
-
-      const matchesSearch =
-        query.length === 0 ||
-        path.includes(query) ||
-        oldValue.includes(query) ||
-        newValue.includes(query)
-
-      const show =
-        matchesFilter &&
-        matchesSearch
-
-      row.classList.toggle(
-        "hidden",
-        !show
-      )
-
-      if (show) {
-        visible += 1
-      }
-    })
-
-    if (this.hasCounterTarget) {
-      this.counterTarget.textContent =
-        `${visible} visible`
     }
 
-    if (this.hasEmptyTarget) {
-      this.emptyTarget.classList.toggle(
-        "hidden",
-        visible > 0
-      )
-    }
-  }
+    selectedType() {
+        if (!this.typeFilter) {
+            return "all"
+        }
 
-  // ==========================================================
-  // EXPAND / COLLAPSE
-  // ==========================================================
-
-  toggleDetails(event) {
-    const button =
-      event.currentTarget
-
-    const targetId =
-      button.dataset.target
-
-    const target =
-      document.getElementById(targetId)
-
-    if (!target) return
-
-    const expanded =
-      button.getAttribute("aria-expanded") === "true"
-
-    button.setAttribute(
-      "aria-expanded",
-      (!expanded).toString()
-    )
-
-    target.classList.toggle(
-      "hidden",
-      expanded
-    )
-
-    const icon =
-      button.querySelector(
-        "[data-expand-icon]"
-      )
-
-    if (icon) {
-      icon.textContent =
-        expanded ? "+" : "−"
-    }
-  }
-
-  // ==========================================================
-  // COPY VALUE
-  // ==========================================================
-
-  async copy(event) {
-    event.preventDefault()
-
-    const value =
-      event.currentTarget.dataset.copyValue || ""
-
-    try {
-      await navigator.clipboard.writeText(
-        value
-      )
-
-      const button =
-        event.currentTarget
-
-      const original =
-        button.textContent
-
-      button.textContent =
-        "Copied"
-
-      setTimeout(() => {
-        button.textContent =
-          original
-      }, 1200)
-
-    } catch (_) {
-      // Clipboard may be unavailable.
-    }
-  }
-
-  // ==========================================================
-  // RESET
-  // ==========================================================
-
-  reset() {
-    if (this.hasSearchTarget) {
-      this.searchTarget.value = ""
+        return this.typeFilter.value || "all"
     }
 
-    this.currentFilter = "all"
+    rowMatchesSearch(row, searchTerm) {
+        if (!searchTerm) {
+            return true
+        }
 
-    this.filterButtonTargets.forEach(
-      (button) => {
-        const active =
-          button.dataset.filter === "all"
+        const searchableText = [
+            row.dataset.comparisonPath || "",
+            row.dataset.comparisonIdentity || "",
+            row.dataset.oldValue || "",
+            row.dataset.newValue || "",
+            row.dataset.changeType || "",
+            row.textContent || ""
+        ]
+            .join(" ")
+            .toLowerCase()
 
-        button.classList.toggle(
-          "bg-slate-900",
-          active
+        return searchableText.includes(searchTerm)
+    }
+
+    rowMatchesType(row, selectedType) {
+        if (!selectedType || selectedType === "all") {
+            return true
+        }
+
+        return (
+            row.dataset.changeType === selectedType
         )
+    }
 
-        button.classList.toggle(
-          "text-white",
-          active
-        )
+    updateVisibleCount(count) {
+        if (!this.visibleCount) {
+            return
+        }
 
-        button.classList.toggle(
-          "bg-white",
-          !active
-        )
+        this.visibleCount.textContent =
+            count.toString()
+    }
 
-        button.classList.toggle(
-          "text-slate-600",
-          !active
-        )
-      }
-    )
+    updateEmptyState(visibleCount) {
+        if (!this.emptyState) {
+            return
+        }
 
-    this.refresh()
-  }
+        const hasRows = this.rows.length > 0
+
+        if (!hasRows) {
+            this.emptyState.hidden = true
+
+            if (this.noFactsState) {
+                this.noFactsState.hidden = false
+            }
+
+            return
+        }
+
+        if (this.noFactsState) {
+            this.noFactsState.hidden = true
+        }
+
+        this.emptyState.hidden =
+            visibleCount !== 0
+    }
+
+    resetFilters(event) {
+        if (event) {
+            event.preventDefault()
+        }
+
+        if (this.searchInput) {
+            this.searchInput.value = ""
+        }
+
+        if (this.typeFilter) {
+            this.typeFilter.value = "all"
+        }
+
+        this.applyFilters()
+    }
 }

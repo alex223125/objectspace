@@ -463,62 +463,104 @@ application.register("entity-version-comparison", EntityVersionComparisonControl
 import EntityVersionDiffController from "./admin/ecosystems/load_sources/entites/entity_version_diff_controller"
 application.register("entity-version-diff", EntityVersionDiffController)
 
+import DiffIntelligenceController from "./admin/ecosystems/load_sources/entites/diff_intelligence_controller"
+application.register("diff-intelligence", DiffIntelligenceController)
 
-//
-// // ============================================================
-// // STIMULUS UNDERSCORE / KEBAB-CASE COMPATIBILITY ALIASES
-// // ============================================================
-// //
-// // Existing registrations in this file use identifiers such as:
-// //
-// //   entity_template_builder
-// //
-// // This additionally registers:
-// //
-// //   entity-template-builder
-// //
-// // Both identifiers point to the same controller.
-// //
-// // IMPORTANT:
-// // This works by reading the controllers already registered
-// // with Stimulus and creating aliases after registration.
-// // ============================================================
-//
-// setTimeout(() => {
-//     application.controllers.forEach((controller) => {
-//         const identifier = controller.identifier
-//
-//         if (!identifier) {
-//             return
-//         }
-//
-//         const kebabIdentifier = identifier.replace(/_/g, "-")
-//         const underscoreIdentifier = identifier.replace(/-/g, "_")
-//
-//         if (
-//             kebabIdentifier !== identifier &&
-//             !application.controllers.some(
-//                 (existingController) =>
-//                     existingController.identifier === kebabIdentifier
-//             )
-//         ) {
-//             application.register(
-//                 kebabIdentifier,
-//                 controller.constructor
-//             )
-//         }
-//
-//         if (
-//             underscoreIdentifier !== identifier &&
-//             !application.controllers.some(
-//                 (existingController) =>
-//                     existingController.identifier === underscoreIdentifier
-//             )
-//         ) {
-//             application.register(
-//                 underscoreIdentifier,
-//                 controller.constructor
-//             )
-//         }
-//     })
-// }, 0)
+import DiffIntelligenceConfigurationController from "./admin/ecosystems/load_sources/entites/diff_intelligence_configuration_controller"
+application.register("diff-intelligence-configuration", DiffIntelligenceConfigurationController)
+
+import EntityDiffController from "./admin/ecosystems/load_sources/entites/entity_diff_controller"
+application.register("entity-diff", EntityDiffController)
+
+import EntityComparisonController from "./admin/ecosystems/load_sources/entites/entity_comparison_controller"
+application.register("entity-comparison", EntityComparisonController)
+
+import EntityVersionSelectionController from "./admin/ecosystems/load_sources/entites/entity_version_selection_controller"
+application.register("entity-version-selection", EntityVersionSelectionController)
+
+import EntityVersionHistoryController from "./admin/ecosystems/load_sources/entites/entity_version_history_controller"
+application.register("entity-version-history", EntityVersionHistoryController)
+
+import EntityComparisonExperienceController from "./admin/ecosystems/load_sources/entites/entity_comparison_experience_controller"
+application.register("entity-comparison-experience", EntityComparisonExperienceController)
+
+import EntityComparisonExplorerController from "./admin/ecosystems/load_sources/entites/entity_comparison_explorer_controller"
+application.register("entity-comparison-explorer", EntityComparisonExplorerController)
+
+import EntityComparisonInteractionController from "./admin/ecosystems/load_sources/entites/entity_comparison_interaction_controller"
+application.register("entity-comparison-interaction", EntityComparisonInteractionController)
+
+import EntityComparisonEngagementController from "./admin/ecosystems/load_sources/entites/entity_comparison_engagement_controller"
+application.register("entity-comparison-engagement", EntityComparisonEngagementController)
+
+import EntityComparisonPremiumController from "./admin/ecosystems/load_sources/entites/entity_comparison_premium_controller"
+application.register("entity-comparison-premium", EntityComparisonPremiumController)
+
+import EntityComparisonGamificationController from "./admin/ecosystems/load_sources/entites/entity_comparison_gamification_controller"
+application.register("entity-comparison-gamification", EntityComparisonGamificationController)
+
+import EntityComparisonIntelligenceController from "./admin/ecosystems/load_sources/entites/entity_comparison_intelligence_controller"
+application.register("entity-comparison-intelligence", EntityComparisonIntelligenceController)
+
+import EntityComparisonIntelligenceBridgeController from "./admin/ecosystems/load_sources/entites/entity_comparison_intelligence_bridge_controller"
+application.register("entity-comparison-intelligence-bridge", EntityComparisonIntelligenceBridgeController)
+
+// import ComparisonIntelligenceEngineController from "./admin/ecosystems/load_sources/entites/comparison_intelligence_engine_controller"
+// application.register("comparison-intelligence-engine", ComparisonIntelligenceEngineController)
+
+import ComparisonIntelligenceBridgeController from "./admin/ecosystems/load_sources/entites/comparison_intelligence_bridge_controller"
+application.register("comparison-intelligence-bridge", ComparisonIntelligenceBridgeController)
+
+import ComparisonIntelligenceScoreController from "./admin/ecosystems/load_sources/entites/comparison_intelligence_score_controller"
+application.register("comparison-intelligence-score", ComparisonIntelligenceScoreController)
+
+import EntityEvolutionTimelineController from "./admin/ecosystems/load_sources/entites/entity_evolution_timeline_controller"
+application.register("entity-evolution-timeline", EntityEvolutionTimelineController)
+
+import EntityComparisonInsightsController from "./admin/ecosystems/load_sources/entites/entity_comparison_insights_controller"
+application.register("entity-comparison-insights", EntityComparisonInsightsController)
+
+import EntityDiffIntelligenceBridgeController from "./admin/ecosystems/load_sources/entites/entity_diff_intelligence_bridge_controller"
+application.register("entity-diff-intelligence-bridge", EntityDiffIntelligenceBridgeController)
+
+import EntityEcosystemAnalyticsController from "./admin/ecosystems/load_sources/entites/entity_ecosystem_analytics_controller"
+application.register("entity-ecosystem-analytics", EntityEcosystemAnalyticsController)
+
+import EntityEcosystemGraphController from "./admin/ecosystems/load_sources/entites/entity_ecosystem_graph_controller"
+application.register("entity-ecosystem-graph", EntityEcosystemGraphController)
+
+import EntityEcosystemMissionsController from "./admin/ecosystems/load_sources/entites/entity_ecosystem_missions_controller"
+application.register("entity-ecosystem-missions", EntityEcosystemMissionsController)
+
+import EntityRelationshipIntelligenceController from "./admin/ecosystems/load_sources/entites/entity_relationship_intelligence_controller"
+application.register("entity-relationship-intelligence", EntityRelationshipIntelligenceController)
+
+import EntityEcosystemRelationshipGraphController from "./admin/ecosystems/load_sources/entites/entity_ecosystem_relationship_graph_controller"
+application.register("entity-ecosystem-relationship-graph", EntityEcosystemRelationshipGraphController)
+
+import CrossEntityIntelligenceController from "./admin/ecosystems/load_sources/entites/cross_entity_intelligence_controller"
+application.register("cross-entity-intelligence", CrossEntityIntelligenceController)
+
+import EvolutionTimelineController from "./admin/ecosystems/load_sources/entites/evolution_timeline_controller"
+application.register("evolution-timeline", EvolutionTimelineController)
+
+import VersionEvolutionController from "./admin/ecosystems/load_sources/entites/version_evolution_controller"
+application.register("version-evolution", VersionEvolutionController)
+
+import EntityCrossIntelligenceController from "./admin/ecosystems/load_sources/entites/entity_cross_intelligence_controller"
+application.register("entity-cross-intelligence", EntityCrossIntelligenceController)
+
+import EntityIntelligenceController from "./admin/ecosystems/load_sources/entites/entity_intelligence_controller"
+application.register("entity-intelligence", EntityIntelligenceController)
+
+
+import RelationshipsEntityIntelligenceController from "./admin/ecosystems/load_sources/entites/relationships_entity_intelligence_controller"
+application.register("relationships-entity-intelligence", RelationshipsEntityIntelligenceController)
+
+
+
+
+
+
+import "./admin/ecosystems/load_sources/entites/page_autoload_javascript/entity_comparison";
+import "./admin/ecosystems/load_sources/entites/page_autoload_javascript/comparison";
