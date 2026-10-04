@@ -1,0 +1,282 @@
+<%
+  summary =
+    local_assigns.fetch(
+      :summary,
+      {}
+    )
+
+  total =
+    summary[:total] ||
+      summary["total"] ||
+      0
+
+  changes =
+    summary[:changes] ||
+      summary["changes"] ||
+      summary[:changed] ||
+      summary["changed"] ||
+      0
+
+  movements =
+    summary[:movements] ||
+      summary["movements"] ||
+      summary[:moved] ||
+      summary["moved"] ||
+      0
+
+  additions =
+    summary[:additions] ||
+      summary["additions"] ||
+      summary[:added] ||
+      summary["added"] ||
+      0
+
+  removals =
+    summary[:removals] ||
+      summary["removals"] ||
+      summary[:removed] ||
+      summary["removed"] ||
+      0
+
+  warnings =
+    summary[:warnings] ||
+      summary["warnings"] ||
+      0
+%>
+
+<div
+  data-controller="admin--ecosystems--load-sources--entites--entity-comparison-gamification"
+  data-admin--ecosystems--load-sources--entites--entity-comparison-gamification-total-value="<%= total %>"
+  data-admin--ecosystems--load-sources--entites--entity-comparison-gamification-changes-value="<%= changes %>"
+  data-admin--ecosystems--load-sources--entites--entity-comparison-gamification-movements-value="<%= movements %>"
+  data-admin--ecosystems--load-sources--entites--entity-comparison-gamification-additions-value="<%= additions %>"
+  data-admin--ecosystems--load-sources--entites--entity-comparison-gamification-removals-value="<%= removals %>"
+  data-admin--ecosystems--load-sources--entites--entity-comparison-gamification-warnings-value="<%= warnings %>"
+  class="
+    mt-6
+    overflow-hidden
+    rounded-[30px]
+    border-2 border-violet-100
+    bg-gradient-to-r
+    from-violet-50/80
+    via-white
+    to-orange-50/70
+    p-5
+    shadow-lg
+    shadow-violet-100/30
+  "
+>
+  <div
+    class="
+      flex
+      flex-col
+      gap-5
+      lg:flex-row
+      lg:items-center
+      lg:justify-between
+    "
+  >
+    <div class="flex items-start gap-4">
+      <div
+        class="
+          flex
+          h-12
+          w-12
+          shrink-0
+          items-center
+          justify-center
+          rounded-2xl
+          border
+          border-violet-200
+          bg-violet-100
+          text-xl
+          shadow-sm
+        "
+      >
+        🏆
+      </div>
+
+      <div>
+        <div
+          class="
+            flex
+            flex-wrap
+            items-center
+            gap-2
+          "
+        >
+          <span
+            data-admin--ecosystems--load-sources--entites--entity-comparison-gamification-target="level"
+            class="
+              rounded-full
+              border
+              border-violet-200
+              bg-violet-100
+              px-3
+              py-1
+              text-[10px]
+              font-black
+              tracking-widest
+              text-violet-700
+            "
+          >
+            LEVEL 1
+          </span>
+
+          <span
+            data-admin--ecosystems--load-sources--entites--entity-comparison-gamification-target="xp"
+            class="
+              rounded-full
+              border
+              border-orange-200
+              bg-orange-50
+              px-3
+              py-1
+              text-[10px]
+              font-black
+              text-orange-600
+            "
+          >
+            0 XP
+          </span>
+        </div>
+
+        <div
+          class="
+            mt-2
+            text-sm
+            font-black
+            text-slate-700
+          "
+        >
+          Comparison Explorer
+        </div>
+
+        <p
+          data-admin--ecosystems--load-sources--entites--entity-comparison-gamification-target="message"
+          class="
+            mt-1
+            text-xs
+            leading-5
+            text-slate-400
+          "
+        >
+          Begin your comparison journey.
+        </p>
+      </div>
+    </div>
+
+    <div class="min-w-0 lg:w-[420px]">
+      <div
+        class="
+          mb-2
+          flex
+          items-center
+          justify-between
+        "
+      >
+        <span
+          class="
+            text-[9px]
+            font-black
+            uppercase
+            tracking-[0.2em]
+            text-slate-400
+          "
+        >
+          Discovery progress
+        </span>
+
+        <span
+          data-admin--ecosystems--load-sources--entites--entity-comparison-gamification-target="streak"
+          class="
+            text-[10px]
+            font-black
+            text-violet-500
+          "
+        >
+          1 discovery step
+        </span>
+      </div>
+
+      <div
+        class="
+          h-3
+          overflow-hidden
+          rounded-full
+          border
+          border-violet-100
+          bg-white
+        "
+        role="progressbar"
+        aria-label="Comparison discovery progress"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="0"
+      >
+        <div
+          data-admin--ecosystems--load-sources--entites--entity-comparison-gamification-target="progress"
+          class="
+            h-full
+            w-0
+            rounded-full
+            bg-gradient-to-r
+            from-violet-400
+            via-fuchsia-400
+            to-orange-400
+            shadow-sm
+            transition-all
+            duration-700
+          "
+        ></div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    data-admin--ecosystems--load-sources--entites--entity-comparison-gamification-target="achievement"
+    class="
+      mt-5
+      hidden
+      rounded-2xl
+      border
+      border-amber-200
+      bg-gradient-to-r
+      from-amber-50
+      to-orange-50
+      px-4
+      py-3
+    "
+  >
+    <div class="flex items-start gap-3">
+      <div class="text-lg">
+        ✨
+      </div>
+
+      <div>
+        <div
+          data-admin--ecosystems--load-sources--entites--entity-comparison-gamification-target="achievementTitle"
+          class="
+            text-xs
+            font-black
+            text-amber-700
+          "
+        >
+          First comparison
+        </div>
+
+        <div
+          data-admin--ecosystems--load-sources--entites--entity-comparison-gamification-target="achievementDescription"
+          class="
+            mt-1
+            text-[11px]
+            leading-5
+            text-amber-600
+          "
+        >
+          Start exploring differences between versions.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

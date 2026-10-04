@@ -1,0 +1,1791 @@
+<div
+  class="max-w-6xl mx-auto my-10 px-4"
+  data-controller="diff-intelligence-configuration"
+>
+
+  <!-- ========================================================= -->
+  <!-- HEADER -->
+  <!-- ========================================================= -->
+
+  <div
+    class="
+      overflow-hidden
+      rounded-[38px]
+      border-2 border-orange-100
+      bg-gradient-to-b
+      from-white
+      via-orange-50/20
+      to-slate-50/50
+      shadow-md
+      shadow-orange-100/40
+    "
+  >
+
+    <div class="p-8">
+
+      <!-- ======================================================= -->
+      <!-- TITLE -->
+      <!-- ======================================================= -->
+
+      <div
+        class="
+          flex flex-col gap-5
+          lg:flex-row
+          lg:items-center
+          lg:justify-between
+          mb-8
+          pb-6
+          border-b-2 border-orange-100
+        "
+      >
+
+        <div class="flex items-start gap-4">
+
+          <div
+            class="
+              flex
+              h-12 w-12
+              shrink-0
+              items-center justify-center
+              rounded-2xl
+              border border-orange-200/70
+              bg-orange-100
+              text-xl
+              shadow-sm
+            "
+          >
+            🧠
+          </div>
+
+          <div>
+
+            <div
+              class="
+                text-[11px]
+                font-black
+                uppercase
+                tracking-[0.18em]
+                text-orange-500
+              "
+            >
+              Diff Intelligence
+            </div>
+
+            <h1
+              class="
+                mt-1
+                text-2xl
+                font-black
+                tracking-tight
+                text-slate-800
+              "
+            >
+              Identity Configuration
+            </h1>
+
+            <p
+              class="
+                mt-2
+                max-w-2xl
+                text-sm
+                leading-6
+                font-medium
+                text-slate-400
+              "
+            >
+              Teach the semantic comparison engine how to recognize
+              objects inside arrays without relying on their position.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <!-- Status -->
+
+        <div
+          class="
+            inline-flex
+            w-fit
+            items-center
+            gap-2
+            rounded-full
+            border
+            border-emerald-200
+            bg-emerald-50
+            px-4 py-2
+            text-xs
+            font-black
+            text-emerald-700
+            shadow-sm
+          "
+        >
+
+          <span
+            class="
+              h-2 w-2
+              rounded-full
+              bg-emerald-400
+              shadow-[0_0_8px_rgba(52,211,153,0.7)]
+            "
+          ></span>
+
+          Read-only comparison
+
+        </div>
+
+      </div>
+
+
+      <!-- ======================================================= -->
+      <!-- FLASH -->
+      <!-- ======================================================= -->
+
+      <% if flash[:notice].present? %>
+
+        <div
+          class="
+            mb-6
+            rounded-2xl
+            border-2 border-emerald-100
+            bg-emerald-50
+            px-5 py-4
+            text-sm
+            font-bold
+            text-emerald-700
+          "
+        >
+          <div class="flex items-center gap-3">
+
+            <span class="text-lg">✨</span>
+
+            <span>
+              <%= flash[:notice] %>
+            </span>
+
+          </div>
+        </div>
+
+      <% end %>
+
+
+      <% if flash[:alert].present? %>
+
+        <div
+          class="
+            mb-6
+            rounded-2xl
+            border-2 border-red-100
+            bg-red-50
+            px-5 py-4
+            text-sm
+            font-bold
+            text-red-700
+          "
+        >
+          <div class="flex items-center gap-3">
+
+            <span class="text-lg">⚠️</span>
+
+            <span>
+              <%= flash[:alert] %>
+            </span>
+
+          </div>
+        </div>
+
+      <% end %>
+
+
+      <!-- ======================================================= -->
+      <!-- CONFIGURATION EXPLANATION -->
+      <!-- ======================================================= -->
+
+      <div
+        class="
+          mb-8
+          rounded-[28px]
+          border-2 border-orange-100
+          bg-gradient-to-r
+          from-orange-50/80
+          via-white
+          to-sky-50/50
+          p-6
+          shadow-sm
+        "
+      >
+
+        <div class="flex items-start gap-4">
+
+          <div
+            class="
+              flex
+              h-11 w-11
+              shrink-0
+              items-center justify-center
+              rounded-2xl
+              border border-orange-200
+              bg-orange-100
+              text-lg
+            "
+          >
+            🎯
+          </div>
+
+          <div>
+
+            <div
+              class="
+                text-sm
+                font-black
+                text-slate-700
+              "
+            >
+              Teach the engine object identity
+            </div>
+
+            <p
+              class="
+                mt-2
+                max-w-4xl
+                text-xs
+                leading-6
+                font-medium
+                text-slate-400
+              "
+            >
+              Configure the field that uniquely identifies each object
+              inside an array. Once configured, the comparison engine can
+              match objects across versions even when their array positions
+              change.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <!-- Example -->
+
+        <div
+          class="
+            mt-5
+            grid
+            gap-3
+            md:grid-cols-3
+          "
+        >
+
+          <div
+            class="
+              rounded-2xl
+              border border-sky-100
+              bg-sky-50/70
+              p-4
+            "
+          >
+
+            <div
+              class="
+                text-[9px]
+                font-black
+                uppercase
+                tracking-widest
+                text-sky-500
+              "
+            >
+              Array
+            </div>
+
+            <div
+              class="
+                mt-2
+                font-mono
+                text-xs
+                font-bold
+                text-slate-700
+              "
+            >
+              metadata.sources
+            </div>
+
+          </div>
+
+
+          <div
+            class="
+              flex
+              items-center
+              justify-center
+              text-slate-300
+            "
+          >
+            →
+
+          </div>
+
+
+          <div
+            class="
+              rounded-2xl
+              border border-emerald-100
+              bg-emerald-50/70
+              p-4
+            "
+          >
+
+            <div
+              class="
+                text-[9px]
+                font-black
+                uppercase
+                tracking-widest
+                text-emerald-500
+              "
+            >
+              Identity field
+            </div>
+
+            <div
+              class="
+                mt-2
+                font-mono
+                text-xs
+                font-black
+                text-slate-700
+              "
+            >
+              uuid
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ======================================================= -->
+      <!-- CONFIGURATION CARD -->
+      <!-- ======================================================= -->
+
+      <div
+        class="
+          rounded-[30px]
+          border-2 border-slate-100
+          bg-white
+          shadow-sm
+          overflow-hidden
+        "
+      >
+
+        <!-- Card header -->
+
+        <div
+          class="
+            flex
+            flex-col
+            gap-4
+            border-b
+            border-slate-100
+            bg-slate-50/70
+            px-6 py-5
+            sm:flex-row
+            sm:items-center
+            sm:justify-between
+          "
+        >
+
+          <div>
+
+            <div
+              class="
+                flex
+                items-center
+                gap-3
+              "
+            >
+
+              <span
+                class="
+                  flex
+                  h-9 w-9
+                  items-center
+                  justify-center
+                  rounded-xl
+                  bg-violet-100
+                  text-violet-600
+                "
+              >
+                🔑
+              </span>
+
+              <div>
+
+                <div
+                  class="
+                    text-sm
+                    font-black
+                    text-slate-700
+                  "
+                >
+                  Array identity rules
+                </div>
+
+                <div
+                  class="
+                    mt-0.5
+                    text-[11px]
+                    font-medium
+                    text-slate-400
+                  "
+                >
+                  Configure identity for each semantic array.
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div
+            data-diff-intelligence-target="count"
+            class="
+              rounded-full
+              border border-orange-100
+              bg-orange-50
+              px-3 py-1.5
+              text-[10px]
+              font-black
+              text-orange-600
+            "
+          >
+            0 identity rules
+          </div>
+
+        </div>
+
+
+        <!-- Rows -->
+
+        <div class="p-6">
+
+          <div
+            class="
+              hidden
+              md:grid
+              md:grid-cols-[1fr_260px_56px]
+              gap-4
+              px-4 pb-3
+            "
+          >
+
+            <div
+              class="
+                text-[9px]
+                font-black
+                uppercase
+                tracking-widest
+                text-slate-400
+              "
+            >
+              Array path
+            </div>
+
+            <div
+              class="
+                text-[9px]
+                font-black
+                uppercase
+                tracking-widest
+                text-slate-400
+              "
+            >
+              Identity field
+            </div>
+
+            <div></div>
+
+          </div>
+
+
+          <div
+            data-diff-intelligence-target="rows"
+            class="space-y-3"
+          >
+
+            <% @array_identities.each_with_index do |rule, index| %>
+
+              <div
+                data-diff-intelligence-target="row"
+                class="
+                  group
+                  grid
+                  gap-3
+                  md:grid-cols-[1fr_260px_56px]
+                  rounded-2xl
+                  border-2 border-slate-100
+                  bg-slate-50/40
+                  p-4
+                  transition-all
+                  duration-200
+                  hover:border-orange-100
+                  hover:bg-orange-50/20
+                "
+              >
+
+                <!-- Path -->
+
+                <div>
+
+                  <label
+                    class="
+                      mb-2
+                      block
+                      text-[9px]
+                      font-black
+                      uppercase
+                      tracking-widest
+                      text-slate-400
+                      md:hidden
+                    "
+                  >
+                    Array path
+                  </label>
+
+                  <div class="relative">
+
+                    <span
+                      class="
+                        pointer-events-none
+                        absolute
+                        left-3
+                        top-1/2
+                        -translate-y-1/2
+                        text-slate-300
+                      "
+                    >
+                      /
+                    </span>
+
+                    <input
+                      data-role="path-input"
+                      type="text"
+                      name="diff_intelligence[array_identities][<%= index %>][path]"
+                      value="<%= rule[:path] %>"
+                      placeholder="metadata.sources"
+                      autocomplete="off"
+                      class="
+                        w-full
+                        rounded-xl
+                        border-2 border-slate-100
+                        bg-white
+                        py-3
+                        pl-8 pr-4
+                        font-mono
+                        text-sm
+                        font-bold
+                        text-slate-700
+                        outline-none
+                        transition
+                        focus:border-orange-300
+                        focus:ring-4
+                        focus:ring-orange-100
+                      "
+                    >
+
+                  </div>
+
+                </div>
+
+
+                <!-- Identity -->
+
+                <div>
+
+                  <label
+                    class="
+                      mb-2
+                      block
+                      text-[9px]
+                      font-black
+                      uppercase
+                      tracking-widest
+                      text-slate-400
+                      md:hidden
+                    "
+                  >
+                    Identity field
+                  </label>
+
+                  <div class="relative">
+
+                    <span
+                      class="
+                        pointer-events-none
+                        absolute
+                        left-3
+                        top-1/2
+                        -translate-y-1/2
+                        text-emerald-400
+                      "
+                    >
+                      #
+                    </span>
+
+                    <input
+                      type="text"
+                      name="diff_intelligence[array_identities][<%= index %>][identity]"
+                      value="<%= rule[:identity] %>"
+                      placeholder="uuid"
+                      autocomplete="off"
+                      class="
+                        w-full
+                        rounded-xl
+                        border-2 border-slate-100
+                        bg-white
+                        py-3
+                        pl-8 pr-4
+                        font-mono
+                        text-sm
+                        font-black
+                        text-slate-700
+                        outline-none
+                        transition
+                        focus:border-emerald-300
+                        focus:ring-4
+                        focus:ring-emerald-100
+                      "
+                    >
+
+                  </div>
+
+                </div>
+
+
+                <!-- Remove -->
+
+                <div class="flex items-end justify-end">
+
+                  <button
+                    type="button"
+                    data-action="click->diff-intelligence-configuration#removeRow"
+                    class="
+                      flex
+                      h-11 w-11
+                      items-center
+                      justify-center
+                      rounded-xl
+                      border-2 border-red-100
+                      bg-red-50
+                      text-red-500
+                      transition-all
+                      duration-200
+                      hover:-translate-y-0.5
+                      hover:border-red-200
+                      hover:bg-red-100
+                      hover:shadow-md
+                    "
+                    aria-label="Remove identity rule"
+                  >
+                    ×
+                  </button>
+
+                </div>
+
+              </div>
+
+            <% end %>
+
+          </div>
+
+
+          <!-- Empty -->
+
+          <div
+            data-diff-intelligence-target="emptyState"
+            class="
+              hidden
+              rounded-2xl
+              border-2
+              border-dashed
+              border-slate-200
+              bg-slate-50/60
+              px-6 py-10
+              text-center
+            "
+          >
+
+            <div class="text-3xl">
+              🧭
+            </div>
+
+            <div
+              class="
+                mt-3
+                text-sm
+                font-black
+                text-slate-700
+              "
+            >
+              No identity rules configured
+            </div>
+
+            <p
+              class="
+                mt-1
+                text-xs
+                font-medium
+                text-slate-400
+              "
+            >
+              Add an identity rule to teach the comparison engine
+              how to match objects.
+            </p>
+
+          </div>
+
+
+          <!-- Add button -->
+
+          <div class="mt-5">
+
+            <button
+              type="button"
+              data-action="click->diff-intelligence-configuration#addRow"
+              class="
+                group
+                inline-flex
+                items-center
+                gap-2
+                rounded-2xl
+                border-2 border-orange-200
+                bg-orange-50
+                px-5 py-3
+                text-xs
+                font-black
+                text-orange-600
+                transition-all
+                duration-200
+                hover:-translate-y-0.5
+                hover:border-orange-300
+                hover:bg-orange-100
+                hover:shadow-md
+                hover:shadow-orange-100
+              "
+            >
+
+              <span
+                class="
+                  text-base
+                  transition-transform
+                  duration-200
+                  group-hover:rotate-90
+                "
+              >
+                +
+              </span>
+
+              Add identity rule
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ======================================================= -->
+      <!-- GAMIFICATION / INTELLIGENCE PROGRESS -->
+      <!-- ======================================================= -->
+
+      <div
+        class="
+          mt-8
+          rounded-[30px]
+          border-2 border-violet-100
+          bg-gradient-to-r
+          from-violet-50/70
+          via-white
+          to-orange-50/50
+          p-6
+          shadow-sm
+        "
+      >
+
+        <div
+          class="
+            flex
+            flex-col
+            gap-5
+            md:flex-row
+            md:items-center
+            md:justify-between
+          "
+        >
+
+          <div class="flex items-start gap-4">
+
+            <div
+              class="
+                flex
+                h-11 w-11
+                shrink-0
+                items-center
+                justify-center
+                rounded-2xl
+                border border-violet-200
+                bg-violet-100
+                text-lg
+              "
+            >
+              🏆
+            </div>
+
+            <div>
+
+              <div
+                class="
+                  text-sm
+                  font-black
+                  text-slate-700
+                "
+              >
+                Identity Intelligence
+              </div>
+
+              <p
+                class="
+                  mt-1
+                  text-xs
+                  leading-6
+                  font-medium
+                  text-slate-400
+                "
+              >
+                Every identity rule gives the semantic engine more
+                context for understanding how your data evolves.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div
+            class="
+              shrink-0
+              rounded-2xl
+              border-2 border-violet-100
+              bg-white
+              px-5 py-3
+              text-center
+              shadow-sm
+            "
+          >
+
+            <div
+              class="
+                text-[9px]
+                font-black
+                uppercase
+                tracking-widest
+                text-violet-400
+              "
+            >
+              Intelligence layer
+            </div>
+
+            <div
+              class="
+                mt-1
+                text-lg
+                font-black
+                text-violet-600
+              "
+            >
+              Configurable
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="mt-6">
+
+          <div
+            class="
+              mb-2
+              flex
+              items-center
+              justify-between
+            "
+          >
+
+            <span
+              class="
+                text-[9px]
+                font-black
+                uppercase
+                tracking-widest
+                text-slate-400
+              "
+            >
+              Semantic capability
+            </span>
+
+            <span
+              class="
+                text-[10px]
+                font-black
+                text-violet-500
+              "
+            >
+              Identity-aware
+            </span>
+
+          </div>
+
+          <div
+            class="
+              h-2.5
+              overflow-hidden
+              rounded-full
+              border
+              border-violet-100
+              bg-white
+            "
+          >
+
+            <div
+              class="
+                h-full
+                w-[72%]
+                rounded-full
+                bg-gradient-to-r
+                from-orange-400
+                via-violet-400
+                to-emerald-400
+                shadow-sm
+              "
+            ></div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ======================================================= -->
+      <!-- READ ONLY BOUNDARY -->
+      <!-- ======================================================= -->
+
+      <div
+        class="
+          mt-8
+          rounded-[28px]
+          border-2 border-slate-100
+          bg-slate-50/70
+          p-6
+        "
+      >
+
+        <div class="flex items-start gap-4">
+
+          <div
+            class="
+              flex
+              h-10 w-10
+              shrink-0
+              items-center
+              justify-center
+              rounded-xl
+              bg-slate-200
+              text-slate-600
+            "
+          >
+            🔒
+          </div>
+
+          <div>
+
+            <div
+              class="
+                text-sm
+                font-black
+                text-slate-700
+              "
+            >
+              Comparison safety boundary
+            </div>
+
+            <p
+              class="
+                mt-2
+                text-xs
+                leading-6
+                font-medium
+                text-slate-400
+              "
+            >
+              These settings only describe how versions should be
+              compared. Saving a rule does not modify, restore,
+              publish, rollback or release any entity version.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ======================================================= -->
+      <!-- ACTIONS -->
+      <!-- ======================================================= -->
+
+      <form
+        action="<%= admin_entity_template_diff_intelligence_configuration_path(@entity_template) %>"
+        method="post"
+        data-action="submit->diff-intelligence-configuration#handleSubmit"
+      >
+
+        <input
+          type="hidden"
+          name="_method"
+          value="patch"
+        >
+
+        <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+
+
+        <div
+          class="
+      rounded-[30px]
+      border-2 border-slate-100
+      bg-white
+      shadow-sm
+      overflow-hidden
+    "
+        >
+
+          <div
+            class="
+        flex
+        flex-col
+        gap-4
+        border-b
+        border-slate-100
+        bg-slate-50/70
+        px-6 py-5
+        sm:flex-row
+        sm:items-center
+        sm:justify-between
+      "
+          >
+
+            <div>
+
+              <div
+                class="
+            flex
+            items-center
+            gap-3
+          "
+              >
+
+          <span
+            class="
+              flex
+              h-9 w-9
+              items-center
+              justify-center
+              rounded-xl
+              bg-violet-100
+              text-violet-600
+            "
+          >
+            🔑
+          </span>
+
+                <div>
+
+                  <div
+                    class="
+                text-sm
+                font-black
+                text-slate-700
+              "
+                  >
+                    Array identity rules
+                  </div>
+
+                  <div
+                    class="
+                mt-0.5
+                text-[11px]
+                font-medium
+                text-slate-400
+              "
+                  >
+                    Configure identity for each semantic array.
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            <div
+              data-diff-intelligence-configuration-target="count"
+              class="
+          rounded-full
+          border border-orange-100
+          bg-orange-50
+          px-3 py-1.5
+          text-[10px]
+          font-black
+          text-orange-600
+        "
+            >
+              0 identity rules
+            </div>
+
+          </div>
+
+
+          <div class="p-6">
+
+            <div
+              class="
+          hidden
+          md:grid
+          md:grid-cols-[1fr_260px_56px]
+          gap-4
+          px-4 pb-3
+        "
+            >
+
+              <div
+                class="
+            text-[9px]
+            font-black
+            uppercase
+            tracking-widest
+            text-slate-400
+          "
+              >
+                Array path
+              </div>
+
+              <div
+                class="
+            text-[9px]
+            font-black
+            uppercase
+            tracking-widest
+            text-slate-400
+          "
+              >
+                Identity field
+              </div>
+
+              <div></div>
+
+            </div>
+
+
+            <div
+              data-diff-intelligence-target="rows"
+              class="space-y-3"
+            >
+
+              <% @array_identities.each_with_index do |rule, index| %>
+
+                <div
+                  data-diff-intelligence-target="row"
+                  class="
+              grid
+              gap-3
+              md:grid-cols-[1fr_260px_56px]
+              rounded-2xl
+              border-2 border-slate-100
+              bg-slate-50/40
+              p-4
+              transition-all
+              duration-200
+              hover:border-orange-100
+              hover:bg-orange-50/20
+            "
+                >
+
+                  <div>
+
+                    <label
+                      class="
+                  mb-2
+                  block
+                  text-[9px]
+                  font-black
+                  uppercase
+                  tracking-widest
+                  text-slate-400
+                  md:hidden
+                "
+                    >
+                      Array path
+                    </label>
+
+                    <div class="relative">
+
+                <span
+                  class="
+                    pointer-events-none
+                    absolute
+                    left-3
+                    top-1/2
+                    -translate-y-1/2
+                    text-slate-300
+                  "
+                >
+                  /
+                </span>
+
+                      <input
+                        data-role="path-input"
+                        type="text"
+                        name="diff_intelligence[array_identities][<%= index %>][path]"
+                        value="<%= rule[:path] %>"
+                        placeholder="metadata.sources"
+                        autocomplete="off"
+                        class="
+                    w-full
+                    rounded-xl
+                    border-2 border-slate-100
+                    bg-white
+                    py-3
+                    pl-8 pr-4
+                    font-mono
+                    text-sm
+                    font-bold
+                    text-slate-700
+                    outline-none
+                    transition
+                    focus:border-orange-300
+                    focus:ring-4
+                    focus:ring-orange-100
+                  "
+                      >
+
+                    </div>
+
+                  </div>
+
+
+                  <div>
+
+                    <label
+                      class="
+                  mb-2
+                  block
+                  text-[9px]
+                  font-black
+                  uppercase
+                  tracking-widest
+                  text-slate-400
+                  md:hidden
+                "
+                    >
+                      Identity field
+                    </label>
+
+                    <div class="relative">
+
+                <span
+                  class="
+                    pointer-events-none
+                    absolute
+                    left-3
+                    top-1/2
+                    -translate-y-1/2
+                    text-emerald-400
+                  "
+                >
+                  #
+                </span>
+
+                      <input
+                        type="text"
+                        name="diff_intelligence[array_identities][<%= index %>][identity]"
+                        value="<%= rule[:identity] %>"
+                        placeholder="uuid"
+                        autocomplete="off"
+                        class="
+                    w-full
+                    rounded-xl
+                    border-2 border-slate-100
+                    bg-white
+                    py-3
+                    pl-8 pr-4
+                    font-mono
+                    text-sm
+                    font-black
+                    text-slate-700
+                    outline-none
+                    transition
+                    focus:border-emerald-300
+                    focus:ring-4
+                    focus:ring-emerald-100
+                  "
+                      >
+
+                    </div>
+
+                  </div>
+
+
+                  <div class="flex items-end justify-end">
+
+                    <button
+                      type="button"
+                      data-action="click->diff-intelligence-configuration#removeRow"
+                      class="
+                  flex
+                  h-11 w-11
+                  items-center
+                  justify-center
+                  rounded-xl
+                  border-2 border-red-100
+                  bg-red-50
+                  text-red-500
+                  transition-all
+                  duration-200
+                  hover:-translate-y-0.5
+                  hover:border-red-200
+                  hover:bg-red-100
+                  hover:shadow-md
+                "
+                    >
+                      ×
+                    </button>
+
+                  </div>
+
+                </div>
+
+              <% end %>
+
+            </div>
+
+
+            <div
+              data-diff-intelligence-target="emptyState"
+              class="
+          hidden
+          rounded-2xl
+          border-2
+          border-dashed
+          border-slate-200
+          bg-slate-50/60
+          px-6 py-10
+          text-center
+        "
+            >
+
+              <div class="text-3xl">
+                🧭
+              </div>
+
+              <div
+                class="
+            mt-3
+            text-sm
+            font-black
+            text-slate-700
+          "
+              >
+                No identity rules configured
+              </div>
+
+              <p
+                class="
+            mt-1
+            text-xs
+            font-medium
+            text-slate-400
+          "
+              >
+                Add an identity rule to teach the comparison engine
+                how to match objects.
+              </p>
+
+            </div>
+
+
+            <button
+              type="button"
+              data-action="click->diff-intelligence-configuration#addRow"
+              class="
+          mt-5
+          group
+          inline-flex
+          items-center
+          gap-2
+          rounded-2xl
+          border-2 border-orange-200
+          bg-orange-50
+          px-5 py-3
+          text-xs
+          font-black
+          text-orange-600
+          transition-all
+          duration-200
+          hover:-translate-y-0.5
+          hover:border-orange-300
+          hover:bg-orange-100
+          hover:shadow-md
+        "
+            >
+
+        <span
+          class="
+            text-base
+            transition-transform
+            duration-200
+            group-hover:rotate-90
+          "
+        >
+          +
+        </span>
+
+              Add identity rule
+
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- ========================================================= -->
+        <!-- SAVE -->
+        <!-- ========================================================= -->
+
+        <div
+          class="
+      mt-8
+      rounded-[28px]
+      border-2 border-orange-100
+      bg-gradient-to-r
+      from-orange-50/70
+      via-white
+      to-emerald-50/50
+      p-6
+    "
+        >
+
+          <div
+            class="
+        flex
+        flex-col
+        gap-5
+        md:flex-row
+        md:items-center
+        md:justify-between
+      "
+          >
+
+            <div>
+
+              <div
+                class="
+            text-sm
+            font-black
+            text-slate-700
+          "
+              >
+                Ready to apply?
+              </div>
+
+              <p
+                class="
+            mt-1
+            text-xs
+            leading-5
+            font-medium
+            text-slate-400
+          "
+              >
+                Save these identity rules for this entity template.
+              </p>
+
+            </div>
+
+
+            <button
+              type="submit"
+              data-diff-intelligence-target="submitButton"
+              class="
+          group
+          inline-flex
+          shrink-0
+          items-center
+          justify-center
+          gap-3
+          rounded-2xl
+          border-2 border-orange-300
+          bg-gradient-to-r
+          from-orange-400
+          to-amber-400
+          px-6 py-3.5
+          text-sm
+          font-black
+          text-white
+          shadow-md
+          shadow-orange-200/60
+          transition-all
+          duration-300
+          hover:-translate-y-1
+          hover:from-orange-500
+          hover:to-amber-500
+          hover:shadow-lg
+          disabled:cursor-wait
+        "
+            >
+
+        <span
+          data-diff-intelligence-target="spinner"
+          class="hidden"
+        >
+          <span
+            class="
+              inline-block
+              h-4 w-4
+              animate-spin
+              rounded-full
+              border-2
+              border-white/40
+              border-t-white
+            "
+          ></span>
+        </span>
+
+              <span>✨</span>
+
+              <span data-diff-intelligence-target="submitLabel">
+          Save identity configuration
+        </span>
+
+              <span
+                class="
+            transition-transform
+            duration-300
+            group-hover:translate-x-1
+          "
+              >
+          →
+        </span>
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- TEMPLATE FOR NEW ROWS -->
+  <!-- ========================================================= -->
+
+  <template
+    data-diff-intelligence-configuration-target="template"
+  >
+
+    <div
+      data-diff-intelligence-target="row"
+      class="
+        group
+        grid
+        gap-3
+        md:grid-cols-[1fr_260px_56px]
+        rounded-2xl
+        border-2 border-slate-100
+        bg-slate-50/40
+        p-4
+        transition-all
+        duration-200
+        hover:border-orange-100
+        hover:bg-orange-50/20
+      "
+    >
+
+      <div>
+
+        <label
+          class="
+            mb-2
+            block
+            text-[9px]
+            font-black
+            uppercase
+            tracking-widest
+            text-slate-400
+            md:hidden
+          "
+        >
+          Array path
+        </label>
+
+        <div class="relative">
+
+          <span
+            class="
+              pointer-events-none
+              absolute
+              left-3
+              top-1/2
+              -translate-y-1/2
+              text-slate-300
+            "
+          >
+            /
+          </span>
+
+          <input
+            data-role="path-input"
+            type="text"
+            name="diff_intelligence[array_identities][NEW_RECORD][path]"
+            placeholder="metadata.sources"
+            autocomplete="off"
+            class="
+              w-full
+              rounded-xl
+              border-2 border-slate-100
+              bg-white
+              py-3
+              pl-8 pr-4
+              font-mono
+              text-sm
+              font-bold
+              text-slate-700
+              outline-none
+              transition
+              focus:border-orange-300
+              focus:ring-4
+              focus:ring-orange-100
+            "
+          >
+
+        </div>
+
+      </div>
+
+
+      <div>
+
+        <label
+          class="
+            mb-2
+            block
+            text-[9px]
+            font-black
+            uppercase
+            tracking-widest
+            text-slate-400
+            md:hidden
+          "
+        >
+          Identity field
+        </label>
+
+        <div class="relative">
+
+          <span
+            class="
+              pointer-events-none
+              absolute
+              left-3
+              top-1/2
+              -translate-y-1/2
+              text-emerald-400
+            "
+          >
+            #
+          </span>
+
+          <input
+            type="text"
+            name="diff_intelligence[array_identities][NEW_RECORD][identity]"
+            placeholder="uuid"
+            autocomplete="off"
+            class="
+              w-full
+              rounded-xl
+              border-2 border-slate-100
+              bg-white
+              py-3
+              pl-8 pr-4
+              font-mono
+              text-sm
+              font-black
+              text-slate-700
+              outline-none
+              transition
+              focus:border-emerald-300
+              focus:ring-4
+              focus:ring-emerald-100
+            "
+          >
+
+        </div>
+
+      </div>
+
+
+      <div class="flex items-end justify-end">
+
+        <button
+          type="button"
+          data-action="click->diff-intelligence-configuration#removeRow"
+          class="
+            flex
+            h-11 w-11
+            items-center
+            justify-center
+            rounded-xl
+            border-2 border-red-100
+            bg-red-50
+            text-red-500
+            transition-all
+            duration-200
+            hover:-translate-y-0.5
+            hover:border-red-200
+            hover:bg-red-100
+            hover:shadow-md
+          "
+          aria-label="Remove identity rule"
+        >
+          ×
+        </button>
+
+      </div>
+
+    </div>
+
+  </template>
+
+</div>

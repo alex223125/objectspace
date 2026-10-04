@@ -1,0 +1,104 @@
+<% nodes = intelligence[:nodes] %>
+<% edges = intelligence[:edges] %>
+
+<div class="relative min-h-[360px] overflow-hidden rounded-2xl border border-slate-800 bg-slate-950">
+
+  <div
+    class="pointer-events-none absolute inset-0 opacity-30"
+    style="
+    background-image:
+      linear-gradient(rgba(139,92,246,.10) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(139,92,246,.10) 1px, transparent 1px);
+      background-size: 28px 28px;
+    ">
+  </div>
+
+  <% center = nodes.first %>
+  <% satellites = nodes.drop(1).first(8) %>
+
+  <% if center.present? %>
+
+    <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+
+      <div
+        class="flex h-24 w-24 items-center justify-center rounded-full border-2 border-violet-400/70 bg-violet-500/20 p-3 text-center shadow-[0_0_45px_rgba(139,92,246,.25)]">
+
+        <span class="line-clamp-3 text-[9px] font-black uppercase tracking-wider text-white">
+          <%= center[:name] %>
+        </span>
+
+      </div>
+
+    </div>
+
+    <% satellites.each_with_index do |node, index| %>
+
+      <% positions = [
+        ["8%", "15%"],
+        ["38%", "5%"],
+        ["72%", "10%"],
+        ["82%", "38%"],
+        ["72%", "72%"],
+        ["38%", "80%"],
+        ["8%", "70%"],
+        ["3%", "40%"]
+      ] %>
+
+      <% left, top = positions[index] %>
+
+      <div
+        class="absolute -translate-x-1/2 -translate-y-1/2"
+        style="left: <%= left %>; top: <%= top %>;">
+
+        <div
+          class="flex h-16 w-16 items-center justify-center rounded-full border border-sky-400/40 bg-sky-500/10 p-2 text-center shadow-lg">
+
+          <span class="line-clamp-3 text-[7px] font-black uppercase tracking-wider text-sky-200">
+            <%= node[:name] %>
+          </span>
+
+        </div>
+
+      </div>
+
+    <% end %>
+
+    <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+
+      <span
+        class="rounded-full border border-violet-400/20 bg-violet-500/10 px-2 py-1 text-[8px] font-black uppercase tracking-wider text-violet-300">
+        <%= nodes.length %> nodes
+      </span>
+
+      <span
+        class="rounded-full border border-sky-400/20 bg-sky-500/10 px-2 py-1 text-[8px] font-black uppercase tracking-wider text-sky-300">
+        <%= edges.length %> edges
+      </span>
+
+    </div>
+
+  <% else %>
+
+    <div class="flex min-h-[360px] items-center justify-center">
+
+      <div class="text-center">
+
+        <div class="text-3xl">
+          ◈
+        </div>
+
+        <div class="mt-2 text-xs font-black text-slate-300">
+          Relationship graph empty
+        </div>
+
+        <div class="mt-1 text-[10px] text-slate-500">
+          Discover relationships to populate the network.
+        </div>
+
+      </div>
+
+    </div>
+
+  <% end %>
+
+</div>

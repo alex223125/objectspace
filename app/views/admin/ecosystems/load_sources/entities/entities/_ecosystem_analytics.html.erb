@@ -1,0 +1,505 @@
+<%
+  analytics_entities =
+    if defined?(@ecosystem_analytics_entities)
+      @ecosystem_analytics_entities
+    else
+      []
+    end
+%>
+
+<section
+  class="
+    mt-10
+    overflow-hidden
+    rounded-[36px]
+    border-2
+    border-indigo-100
+    bg-gradient-to-b
+    from-white
+    via-indigo-50/20
+    to-slate-50/60
+    shadow-lg
+    shadow-indigo-100/30
+  "
+  data-controller="entity-ecosystem-analytics"
+  data-entity-ecosystem-analytics-entities-value="<%= ERB::Util.html_escape(analytics_entities.to_json) %>">
+
+  <div
+    class="
+      border-b
+      border-indigo-100
+      bg-white/80
+      px-6
+      py-6
+    ">
+
+    <div
+      class="
+        flex
+        flex-col
+        gap-5
+        lg:flex-row
+        lg:items-center
+        lg:justify-between
+      ">
+
+      <div
+        class="
+          flex
+          items-start
+          gap-4
+        ">
+
+        <div
+          class="
+            flex
+            h-12
+            w-12
+            shrink-0
+            items-center
+            justify-center
+            rounded-2xl
+            border
+            border-indigo-200
+            bg-indigo-50
+            text-xl
+            shadow-sm
+          ">
+
+          🌐
+
+        </div>
+
+        <div>
+
+          <div
+            class="
+              text-[10px]
+              font-black
+              uppercase
+              tracking-[0.2em]
+              text-indigo-500
+            ">
+
+            Ecosystem intelligence
+
+          </div>
+
+          <h2
+            class="
+              mt-1
+              text-xl
+              font-black
+              tracking-tight
+              text-slate-800
+            ">
+
+            Cross-entity analytics
+
+          </h2>
+
+          <p
+            class="
+              mt-1
+              max-w-2xl
+              text-xs
+              leading-5
+              text-slate-400
+            ">
+
+            Discover where activity, structural change
+            and review signals concentrate across the ecosystem.
+
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div
+        class="
+          flex
+          items-center
+          gap-2
+          rounded-full
+          border
+          border-emerald-200
+          bg-emerald-50
+          px-3.5
+          py-2
+          text-[9px]
+          font-black
+          uppercase
+          tracking-wider
+          text-emerald-600
+        ">
+
+        <span
+          class="
+            h-2
+            w-2
+            rounded-full
+            bg-emerald-400
+            shadow-[0_0_8px_rgba(52,211,153,0.7)]
+          ">
+        </span>
+
+        Ecosystem live
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- Metrics -->
+
+  <div
+    class="
+      grid
+      grid-cols-2
+      gap-px
+      bg-slate-100
+      md:grid-cols-4
+    ">
+
+    <div class="bg-white p-5">
+
+      <div
+        class="
+          text-[9px]
+          font-black
+          uppercase
+          tracking-widest
+          text-slate-400
+        ">
+
+        Entities
+
+      </div>
+
+      <div
+        class="
+          mt-2
+          text-2xl
+          font-black
+          text-indigo-600
+        "
+        data-entity-ecosystem-analytics-target="total">
+
+        0
+
+      </div>
+
+    </div>
+
+
+    <div class="bg-white p-5">
+
+      <div
+        class="
+          text-[9px]
+          font-black
+          uppercase
+          tracking-widest
+          text-slate-400
+        ">
+
+        Active
+
+      </div>
+
+      <div
+        class="
+          mt-2
+          text-2xl
+          font-black
+          text-emerald-600
+        "
+        data-entity-ecosystem-analytics-target="active">
+
+        0
+
+      </div>
+
+    </div>
+
+
+    <div class="bg-white p-5">
+
+      <div
+        class="
+          text-[9px]
+          font-black
+          uppercase
+          tracking-widest
+          text-slate-400
+        ">
+
+        Changes
+
+      </div>
+
+      <div
+        class="
+          mt-2
+          text-2xl
+          font-black
+          text-violet-600
+        "
+        data-entity-ecosystem-analytics-target="changes">
+
+        0
+
+      </div>
+
+    </div>
+
+
+    <div class="bg-white p-5">
+
+      <div
+        class="
+          text-[9px]
+          font-black
+          uppercase
+          tracking-widest
+          text-slate-400
+        ">
+
+        Avg activity
+
+      </div>
+
+      <div
+        class="
+          mt-2
+          text-2xl
+          font-black
+          text-orange-500
+        "
+        data-entity-ecosystem-analytics-target="density">
+
+        0
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- Controls -->
+
+  <div
+    class="
+      flex
+      flex-col
+      gap-3
+      border-b
+      border-slate-100
+      bg-white/70
+      p-5
+      md:flex-row
+    ">
+
+    <div class="relative flex-1">
+
+      <input
+        type="search"
+        placeholder="Search entities..."
+        data-entity-ecosystem-analytics-target="search"
+        data-action="input->entity-ecosystem-analytics#search"
+        class="
+          w-full
+          rounded-2xl
+          border
+          border-slate-200
+          bg-white
+          px-4
+          py-3
+          text-xs
+          font-medium
+          text-slate-700
+          outline-none
+          transition
+          placeholder:text-slate-300
+          focus:border-violet-300
+          focus:ring-4
+          focus:ring-violet-50
+        ">
+
+    </div>
+
+
+    <select
+      data-entity-ecosystem-analytics-target="filter"
+      data-action="change->entity-ecosystem-analytics#filter"
+      class="
+        rounded-2xl
+        border
+        border-slate-200
+        bg-white
+        px-4
+        py-3
+        text-xs
+        font-bold
+        text-slate-600
+        outline-none
+        focus:border-violet-300
+      ">
+
+      <option value="all">
+        All activity
+      </option>
+
+      <option value="active">
+        Active entities
+      </option>
+
+      <option value="warnings">
+        Review warnings
+      </option>
+
+      <option value="additions">
+        Additions
+      </option>
+
+      <option value="removals">
+        Removals
+      </option>
+
+      <option value="movement">
+        Structural movement
+      </option>
+
+    </select>
+
+
+    <select
+      data-entity-ecosystem-analytics-target="sort"
+      data-action="change->entity-ecosystem-analytics#sort"
+      class="
+        rounded-2xl
+        border
+        border-slate-200
+        bg-white
+        px-4
+        py-3
+        text-xs
+        font-bold
+        text-slate-600
+        outline-none
+        focus:border-violet-300
+      ">
+
+      <option value="activity">
+        Sort by activity
+      </option>
+
+      <option value="risk">
+        Sort by review signal
+      </option>
+
+      <option value="name">
+        Sort alphabetically
+      </option>
+
+    </select>
+
+  </div>
+
+
+  <!-- Insights -->
+
+  <div class="p-6">
+
+    <div
+      class="
+        mb-4
+        flex
+        items-center
+        justify-between
+      ">
+
+      <div>
+
+        <div
+          class="
+            text-[9px]
+            font-black
+            uppercase
+            tracking-[0.18em]
+            text-slate-400
+          ">
+
+          Ecosystem signals
+
+        </div>
+
+        <div
+          class="
+            mt-1
+            text-sm
+            font-black
+            text-slate-700
+          ">
+
+          Where should attention go?
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div
+      class="
+        grid
+        gap-3
+        md:grid-cols-2
+        xl:grid-cols-4
+      "
+      data-entity-ecosystem-analytics-target="insights">
+
+    </div>
+
+  </div>
+
+
+  <!-- Entity ranking -->
+
+  <div class="px-6 pb-7">
+
+    <div
+      class="
+        mb-4
+        text-[9px]
+        font-black
+        uppercase
+        tracking-[0.18em]
+        text-slate-400
+      ">
+
+      Entity activity
+
+    </div>
+
+
+    <div
+      class="
+        grid
+        gap-3
+        md:grid-cols-2
+        xl:grid-cols-3
+      "
+      data-entity-ecosystem-analytics-target="entityList">
+
+    </div>
+
+  </div>
+
+</section>

@@ -1,0 +1,605 @@
+<%
+  gamification = local_assigns.fetch(:gamification)
+  summary = gamification.fetch(:summary)
+  signals = gamification.fetch(:signals)
+  badges = gamification.fetch(:badges)
+  progress = gamification.fetch(:progress)
+%>
+
+<div
+  data-controller="diff-intelligence"
+  data-diff-intelligence-progress-value="<%= progress.fetch(:score) %>"
+  data-diff-intelligence-auto-animate-value="true"
+  class="relative my-8 overflow-hidden
+         rounded-[32px]
+         border-2 border-orange-100
+         bg-gradient-to-b
+         from-white
+         via-orange-50/20
+         to-slate-50/70
+         shadow-md shadow-orange-100/40">
+
+  <!-- Ambient decoration -->
+
+  <div
+    class="pointer-events-none absolute
+           -right-20 -top-20
+           h-48 w-48
+           rounded-full
+           bg-orange-200/20
+           blur-3xl">
+  </div>
+
+  <div
+    class="pointer-events-none absolute
+           -left-20 bottom-0
+           h-40 w-40
+           rounded-full
+           bg-emerald-200/20
+           blur-3xl">
+  </div>
+
+
+  <!-- Header -->
+
+  <div
+    class="relative flex flex-col gap-5
+           border-b-2 border-orange-100
+           px-6 py-6
+           md:flex-row
+           md:items-center
+           md:justify-between">
+
+    <div class="flex items-center gap-4">
+
+      <div
+        class="flex h-12 w-12 shrink-0
+               items-center justify-center
+               rounded-2xl
+               border border-orange-200
+               bg-orange-100
+               text-xl
+               shadow-sm">
+
+        🧠
+
+      </div>
+
+      <div>
+
+        <div
+          class="text-[11px]
+                 font-black
+                 uppercase
+                 tracking-[0.18em]
+                 text-orange-500">
+
+          Diff Intelligence
+
+        </div>
+
+        <h3
+          class="mt-1
+                 text-lg
+                 font-black
+                 text-slate-800">
+
+          Semantic comparison signals
+
+        </h3>
+
+        <p
+          class="mt-1
+                 text-xs
+                 font-medium
+                 text-slate-400">
+
+          Semantic facts are translated into visual intelligence.
+
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- Status -->
+
+    <div
+      class="w-fit
+             rounded-full
+             border border-emerald-200
+             bg-emerald-50
+             px-4 py-2
+             text-[10px]
+             font-black
+             uppercase
+             tracking-widest
+             text-emerald-600">
+
+      ✓ Read-only analysis
+
+    </div>
+
+  </div>
+
+
+  <!-- Main -->
+
+  <div class="relative grid gap-6 p-6 lg:grid-cols-3">
+
+
+    <!-- ====================================================== -->
+    <!-- SEMANTIC PROGRESS -->
+    <!-- ====================================================== -->
+
+    <div
+      class="rounded-[26px]
+             border-2 border-orange-100
+             bg-white/80
+             p-5
+             shadow-sm">
+
+      <div class="flex items-start justify-between">
+
+        <div>
+
+          <div
+            class="text-[10px]
+                   font-black
+                   uppercase
+                   tracking-widest
+                   text-slate-400">
+
+            Semantic stability
+
+          </div>
+
+          <div
+            class="mt-2
+                   text-3xl
+                   font-black
+                   text-slate-800">
+
+            <span data-diff-intelligence-target="progressValue">
+              0%
+            </span>
+
+          </div>
+
+        </div>
+
+        <div
+          class="flex h-10 w-10
+                 items-center justify-center
+                 rounded-xl
+                 bg-violet-50
+                 text-violet-600">
+
+          ✨
+
+        </div>
+
+      </div>
+
+
+      <div
+        class="mt-5
+               h-3
+               overflow-hidden
+               rounded-full
+               border border-orange-100
+               bg-orange-50">
+
+        <div
+          data-diff-intelligence-target="progressBar"
+          class="h-full
+                 w-0
+                 rounded-full
+                 bg-gradient-to-r
+                 from-orange-400
+                 via-amber-400
+                 via-violet-400
+                 to-emerald-400
+                 shadow-sm
+                 transition-all
+                 duration-1000
+                 ease-out">
+        </div>
+
+      </div>
+
+
+      <div
+        class="mt-4
+               rounded-2xl
+               bg-slate-50
+               px-4 py-3">
+
+        <div
+          class="text-xs
+                 font-black
+                 text-slate-700">
+
+          <%= progress.fetch(:label) %>
+
+        </div>
+
+        <div
+          class="mt-1
+                 text-[11px]
+                 leading-5
+                 text-slate-400">
+
+          <%= progress.fetch(:description) %>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ====================================================== -->
+    <!-- CHANGE SUMMARY -->
+    <!-- ====================================================== -->
+
+    <div
+      class="rounded-[26px]
+             border-2 border-sky-100
+             bg-white/80
+             p-5
+             shadow-sm">
+
+      <div
+        class="text-[10px]
+               font-black
+               uppercase
+               tracking-widest
+               text-slate-400">
+
+        Change signals
+
+      </div>
+
+      <div
+        class="mt-4
+               grid grid-cols-2 gap-3">
+
+        <div class="rounded-2xl bg-emerald-50 p-3">
+
+          <div class="text-xl font-black text-emerald-600">
+            <%= summary.fetch(:added) %>
+          </div>
+
+          <div class="mt-1 text-[10px] font-bold text-emerald-500">
+            Added
+          </div>
+
+        </div>
+
+        <div class="rounded-2xl bg-orange-50 p-3">
+
+          <div class="text-xl font-black text-orange-600">
+            <%= summary.fetch(:removed) %>
+          </div>
+
+          <div class="mt-1 text-[10px] font-bold text-orange-500">
+            Removed
+          </div>
+
+        </div>
+
+        <div class="rounded-2xl bg-violet-50 p-3">
+
+          <div class="text-xl font-black text-violet-600">
+            <%= summary.fetch(:changed) %>
+          </div>
+
+          <div class="mt-1 text-[10px] font-bold text-violet-500">
+            Changed
+          </div>
+
+        </div>
+
+        <div class="rounded-2xl bg-sky-50 p-3">
+
+          <div class="text-xl font-black text-sky-600">
+            <%= summary.fetch(:moved) %>
+          </div>
+
+          <div class="mt-1 text-[10px] font-bold text-sky-500">
+            Moved
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ====================================================== -->
+    <!-- BADGES -->
+    <!-- ====================================================== -->
+
+    <div
+      class="rounded-[26px]
+             border-2 border-violet-100
+             bg-white/80
+             p-5
+             shadow-sm">
+
+      <div
+        class="text-[10px]
+               font-black
+               uppercase
+               tracking-widest
+               text-slate-400">
+
+        Intelligence achievements
+
+      </div>
+
+      <div
+        data-diff-intelligence-target="badgeList"
+        class="mt-4 space-y-3">
+
+        <% badges.each do |badge| %>
+
+          <button
+            type="button"
+            data-diff-intelligence-badge
+            data-action="click->diff-intelligence#showBadge"
+            data-badge-title="<%= badge.fetch(:name) %>"
+            data-badge-message="<%= badge.fetch(:description) %>"
+            class="group
+                   flex w-full
+                   items-center gap-3
+                   rounded-2xl
+                   border border-violet-100
+                   bg-violet-50/60
+                   p-3
+                   text-left
+                   transition
+                   duration-200
+                   hover:-translate-y-0.5
+                   hover:border-violet-200
+                   hover:bg-violet-50">
+
+            <div
+              class="flex h-10 w-10 shrink-0
+                     items-center justify-center
+                     rounded-xl
+                     bg-white
+                     text-lg
+                     shadow-sm">
+
+              <%= badge.fetch(:icon) %>
+
+            </div>
+
+            <div class="min-w-0">
+
+              <div
+                class="truncate
+                       text-xs
+                       font-black
+                       text-slate-700">
+
+                <%= badge.fetch(:name) %>
+
+              </div>
+
+              <div
+                class="mt-0.5
+                       text-[9px]
+                       font-bold
+                       uppercase
+                       tracking-wider
+                       text-violet-500">
+
+                <%= badge.fetch(:rarity) %>
+
+              </div>
+
+            </div>
+
+            <div
+              class="ml-auto
+                     text-slate-300
+                     transition
+                     group-hover:text-violet-400">
+
+              →
+
+            </div>
+
+          </button>
+
+        <% end %>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ====================================================== -->
+  <!-- SIGNALS -->
+  <!-- ====================================================== -->
+
+  <div
+    class="relative
+           border-t-2 border-orange-100
+           px-6 py-6">
+
+    <div
+      class="mb-4
+             flex items-center justify-between">
+
+      <div>
+
+        <div
+          class="text-[10px]
+                 font-black
+                 uppercase
+                 tracking-widest
+                 text-slate-400">
+
+          Live semantic signals
+
+        </div>
+
+        <div
+          class="mt-1
+                 text-xs
+                 font-medium
+                 text-slate-400">
+
+          Generated from the comparison engine.
+
+        </div>
+
+      </div>
+
+      <div
+        class="rounded-full
+               border border-orange-100
+               bg-orange-50
+               px-3 py-1
+               text-[9px]
+               font-black
+               uppercase
+               tracking-wider
+               text-orange-500">
+
+        <%= signals.length %> signals
+
+      </div>
+
+    </div>
+
+
+    <div
+      data-diff-intelligence-target="signalList"
+      class="grid gap-3 md:grid-cols-2">
+
+      <% signals.each do |signal| %>
+
+        <button
+          type="button"
+          data-diff-intelligence-signal
+          data-action="click->diff-intelligence#showSignal"
+          data-signal-title="<%= signal.fetch(:title) %>"
+          data-signal-message="<%= signal.fetch(:description) %>"
+          class="group
+                 flex items-start gap-3
+                 rounded-2xl
+                 border border-slate-100
+                 bg-white
+                 p-4
+                 text-left
+                 shadow-sm
+                 transition
+                 duration-200
+                 hover:-translate-y-0.5
+                 hover:border-orange-200
+                 hover:shadow-md">
+
+          <div
+            class="flex h-10 w-10 shrink-0
+                   items-center justify-center
+                   rounded-xl
+                   bg-<%= signal.fetch(:color) %>-50
+                   text-lg">
+
+            <%= signal.fetch(:icon) %>
+
+          </div>
+
+          <div class="min-w-0">
+
+            <div
+              class="text-xs
+                     font-black
+                     text-slate-700">
+
+              <%= signal.fetch(:title) %>
+
+            </div>
+
+            <div
+              class="mt-1
+                     text-[11px]
+                     leading-5
+                     text-slate-400">
+
+              <%= signal.fetch(:description) %>
+
+            </div>
+
+          </div>
+
+        </button>
+
+      <% end %>
+
+    </div>
+
+  </div>
+
+
+  <!-- Toast -->
+
+  <div
+    data-diff-intelligence-target="toast"
+    class="pointer-events-none
+           fixed
+           bottom-6
+           right-6
+           z-50
+           w-[min(360px,calc(100vw-2rem))]
+           translate-y-3
+           rounded-2xl
+           border-2 border-orange-100
+           bg-white
+           p-4
+           opacity-0
+           shadow-xl
+           shadow-orange-200/30
+           transition-all
+           duration-300">
+
+    <div class="flex items-start gap-3">
+
+      <div
+        class="flex h-10 w-10 shrink-0
+               items-center justify-center
+               rounded-xl
+               bg-orange-100">
+
+        ✨
+
+      </div>
+
+      <div>
+
+        <div
+          data-diff-intelligence-target="toastTitle"
+          class="text-xs font-black text-slate-700">
+        </div>
+
+        <div
+          data-diff-intelligence-target="toastMessage"
+          class="mt-1 text-[11px] leading-5 text-slate-400">
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

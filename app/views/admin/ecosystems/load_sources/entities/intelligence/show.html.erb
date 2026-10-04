@@ -1,0 +1,361 @@
+<div
+  data-controller="entity-cross-intelligence"
+  class="space-y-5">
+
+  <%# ============================================================
+      HEADER
+  ============================================================= %>
+
+  <div
+    class="relative overflow-hidden rounded-[28px] border border-slate-800 bg-slate-950 shadow-xl">
+
+    <div
+      class="pointer-events-none absolute inset-0 opacity-20"
+      style="
+      background-image:
+        linear-gradient(rgba(99,102,241,.18) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(99,102,241,.18) 1px, transparent 1px);
+        background-size: 24px 24px;
+      ">
+    </div>
+
+    <div class="relative p-5 sm:p-7">
+
+      <div
+        class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+
+        <div class="flex items-start gap-4">
+
+          <div
+            class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-violet-400/30 bg-violet-500/10 text-2xl">
+            🧠
+          </div>
+
+          <div>
+
+            <div
+              class="text-[10px] font-black uppercase tracking-[0.25em] text-violet-400">
+              Cross-Entity Intelligence
+            </div>
+
+            <h1 class="mt-1 text-2xl font-black tracking-tight text-white">
+              <%= @entity.name %>
+            </h1>
+
+            <p class="mt-1 font-mono text-[10px] text-slate-500">
+              <%= @entity.slug %>
+              · ENTITY #<%= @entity.id %>
+            </p>
+
+          </div>
+
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+
+          <%= link_to(
+                "← ENTITY",
+                admin_ecosystems_load_sources_entity_path(@entity),
+                class: "rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-300 hover:bg-slate-800"
+              ) %>
+
+          <%= button_to(
+                "DISCOVER RELATIONSHIPS",
+                admin_ecosystems_load_sources_entities_intelligence_discover_path(
+                  entity_id: @entity.id
+                ),
+                method: :post,
+                class: "rounded-xl bg-violet-600 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-violet-500/20 hover:bg-violet-500"
+              ) %>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <%# ============================================================
+      SUMMARY METRICS
+  ============================================================= %>
+
+  <div class="grid grid-cols-2 gap-3 lg:grid-cols-5">
+
+    <%= render(
+          "metric",
+          label: "RELATIONSHIPS",
+          value: @intelligence[:relationship_count],
+          color: "violet"
+        ) %>
+
+    <%= render(
+          "metric",
+          label: "STRONG",
+          value: @intelligence[:strong_relationship_count],
+          color: "sky"
+        ) %>
+
+    <%= render(
+          "metric",
+          label: "CONFIDENT",
+          value: @intelligence[:high_confidence_count],
+          color: "emerald"
+        ) %>
+
+    <%= render(
+          "metric",
+          label: "AVG STRENGTH",
+          value: "#{@intelligence[:average_strength]}%",
+          color: "amber"
+        ) %>
+
+    <%= render(
+          "metric",
+          label: "AVG CONFIDENCE",
+          value: "#{@intelligence[:average_confidence]}%",
+          color: "indigo"
+        ) %>
+
+  </div>
+
+
+  <%# ============================================================
+      INTELLIGENCE SIGNALS
+  ============================================================= %>
+
+  <% if @intelligence[:attention_signals].any? %>
+
+    <div class="grid gap-3 md:grid-cols-2">
+
+      <% @intelligence[:attention_signals].each do |signal| %>
+
+        <div
+          data-entity-cross-intelligence-target="signal"
+          class="rounded-2xl border border-indigo-200 bg-indigo-50/70 p-4 dark:border-indigo-900 dark:bg-indigo-950/30">
+
+          <div class="flex items-start gap-3">
+
+            <div
+              class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-500">
+              ✦
+            </div>
+
+            <div>
+
+              <div
+                class="text-[10px] font-black uppercase tracking-widest text-indigo-500 dark:text-indigo-400">
+                <%= signal[:level] %>
+              </div>
+
+              <div class="mt-1 text-sm font-black text-gray-800 dark:text-white">
+                <%= signal[:title] %>
+              </div>
+
+              <p class="mt-1 text-xs leading-relaxed text-gray-500 dark:text-gray-400">
+                <%= signal[:message] %>
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      <% end %>
+
+    </div>
+
+  <% end %>
+
+
+  <%# ============================================================
+      GRAPH
+  ============================================================= %>
+
+  <div
+    class="overflow-hidden rounded-[28px] border border-gray-200 bg-slate-950 shadow-sm dark:border-gray-800">
+
+    <div
+      class="flex items-center justify-between border-b border-slate-800 px-5 py-4">
+
+      <div>
+
+        <div
+          class="text-[10px] font-black uppercase tracking-[0.2em] text-violet-400">
+          Ecosystem Graph
+        </div>
+
+        <div class="mt-1 text-xs text-slate-500">
+          Persisted relationship intelligence
+        </div>
+
+      </div>
+
+      <div
+        class="rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-slate-400">
+        <%= @graph[:nodes].length %> nodes
+      </div>
+
+    </div>
+
+    <div
+      data-entity-cross-intelligence-target="graph"
+      class="min-h-[360px] p-3 sm:p-5">
+    </div>
+
+    <script
+      type="application/json"
+      data-entity-cross-intelligence-graph>
+      <%= raw @graph.to_json %>
+    </script>
+
+  </div>
+
+
+  <%# ============================================================
+      RELATIONSHIP LIST
+  ============================================================= %>
+
+  <div
+    class="overflow-hidden rounded-[28px] border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+
+    <div
+      class="flex flex-col gap-3 border-b border-gray-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800">
+
+      <div>
+
+        <div
+          class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">
+          Related Entities
+        </div>
+
+        <div class="mt-1 text-xs text-gray-400">
+          Connections discovered by the intelligence engine.
+        </div>
+
+      </div>
+
+      <input
+        type="search"
+        placeholder="Filter relationships..."
+        data-entity-cross-intelligence-target="search"
+        data-action="input->entity-cross-intelligence#filterRelationships"
+        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs outline-none focus:border-violet-400 sm:w-64 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-200">
+
+    </div>
+
+
+    <% if @relationships.any? %>
+
+      <div class="divide-y divide-gray-100 dark:divide-gray-800">
+
+        <% @relationships.each do |relationship| %>
+
+          <% other = relationship.other_entity(@entity) %>
+
+          <% next unless other %>
+
+          <div
+            data-entity-cross-intelligence-target="relationship"
+            class="group flex flex-col gap-3 px-5 py-4 transition hover:bg-violet-50/40 sm:flex-row sm:items-center sm:justify-between dark:hover:bg-violet-950/10">
+
+            <div class="flex min-w-0 items-center gap-3">
+
+              <div
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-violet-200 bg-violet-50 text-sm dark:border-violet-900 dark:bg-violet-950/30">
+                ◈
+              </div>
+
+              <div class="min-w-0">
+
+                <%= link_to(
+                      other.name,
+                      admin_ecosystems_load_sources_entity_path(other),
+                      class: "truncate text-sm font-black text-gray-800 hover:text-violet-600 dark:text-white dark:hover:text-violet-400"
+                    ) %>
+
+                <div class="mt-1 flex flex-wrap gap-2">
+
+                  <span
+                    class="rounded-full border border-violet-200 bg-violet-50 px-2 py-0.5 text-[8px] font-black uppercase tracking-wider text-violet-600 dark:border-violet-900 dark:bg-violet-950/30 dark:text-violet-400">
+                    <%= relationship.relationship_type.to_s.humanize %>
+                  </span>
+
+                  <span
+                    class="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[8px] font-black uppercase tracking-wider text-slate-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-400">
+                    <%= relationship.status.to_s.humanize %>
+                  </span>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div class="flex shrink-0 items-center gap-5">
+
+              <div>
+
+                <div class="text-right text-[8px] font-black uppercase tracking-widest text-gray-400">
+                  Strength
+                </div>
+
+                <div class="mt-1 text-right text-sm font-black text-gray-800 dark:text-white">
+                  <%= relationship.strength.to_i %>%
+                </div>
+
+              </div>
+
+              <div class="w-24">
+
+                <div class="h-1.5 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+
+                  <div
+                    class="h-full rounded-full bg-gradient-to-r from-amber-400 via-sky-400 to-violet-500"
+                    style="width: <%= relationship.strength.to_i.clamp(0, 100) %>%">
+                  </div>
+
+                </div>
+
+                <div class="mt-1 text-right text-[8px] text-gray-400">
+                  <%= relationship.confidence.to_f.round %>% confidence
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        <% end %>
+
+      </div>
+
+    <% else %>
+
+      <div class="px-6 py-16 text-center">
+
+        <div
+          class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-dashed border-violet-300 bg-violet-50 text-xl dark:border-violet-800 dark:bg-violet-950/30">
+          ◎
+        </div>
+
+        <h3 class="mt-4 text-sm font-black text-gray-800 dark:text-white">
+          Intelligence graph is empty
+        </h3>
+
+        <p class="mx-auto mt-1 max-w-md text-xs leading-relaxed text-gray-400">
+          Run relationship discovery to calculate structural,
+          conceptual, template, scope, and temporal connections.
+        </p>
+
+      </div>
+
+    <% end %>
+
+  </div>
+
+</div>

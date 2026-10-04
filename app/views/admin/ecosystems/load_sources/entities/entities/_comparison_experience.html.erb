@@ -1,0 +1,522 @@
+<div
+  data-controller="admin--ecosystems--load-sources--entities--entity-comparison-experience"
+  data-admin--ecosystems--load-sources--entities--entity-comparison-experience-storage-key-value="entity-comparison-<%= @entity.id %>-<%= @old_version.id %>-<%= @new_version.id %>"
+  class="mb-8"
+>
+
+  <section
+    class="
+      relative overflow-hidden
+      rounded-[32px]
+      border border-orange-100
+      bg-gradient-to-br
+      from-white
+      via-orange-50/40
+      to-violet-50/40
+      p-5 sm:p-6
+      shadow-[0_18px_50px_rgba(249,115,22,0.08)]
+    "
+    aria-label="Comparison exploration progress"
+  >
+
+    <!-- Decorative glow -->
+
+    <div
+      class="
+        pointer-events-none
+        absolute -right-20 -top-20
+        h-48 w-48
+        rounded-full
+        bg-orange-200/20
+        blur-3xl
+      "
+      aria-hidden="true"
+    ></div>
+
+    <div
+      class="
+        pointer-events-none
+        absolute -bottom-24 -left-16
+        h-48 w-48
+        rounded-full
+        bg-violet-200/20
+        blur-3xl
+      "
+      aria-hidden="true"
+    ></div>
+
+
+    <!-- Header -->
+
+    <div
+      class="
+        relative
+        flex flex-col gap-4
+        lg:flex-row
+        lg:items-center
+        lg:justify-between
+      "
+    >
+
+      <div class="flex items-center gap-3">
+
+        <div
+          class="
+            flex h-11 w-11 shrink-0
+            items-center justify-center
+            rounded-2xl
+            border border-orange-200
+            bg-orange-100
+            text-xl
+            shadow-sm
+          "
+        >
+          ✨
+        </div>
+
+        <div>
+
+          <div
+            class="
+              text-[10px]
+              font-black
+              uppercase
+              tracking-[0.18em]
+              text-orange-500
+            "
+          >
+            Discovery Mode
+          </div>
+
+          <h2
+            class="
+              mt-1
+              text-base sm:text-lg
+              font-black
+              tracking-tight
+              text-slate-800
+            "
+          >
+            Explore this comparison
+          </h2>
+
+          <p
+            class="
+              mt-1
+              text-xs
+              leading-5
+              text-slate-400
+            "
+          >
+            Inspect changes to unlock discoveries,
+            progress and comparison insights.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <!-- XP -->
+
+      <div
+        class="
+          flex w-fit
+          items-center gap-3
+          rounded-2xl
+          border border-amber-200
+          bg-white/80
+          px-4 py-2.5
+          shadow-sm
+          backdrop-blur
+        "
+      >
+
+        <div
+          class="
+            flex h-9 w-9
+            items-center justify-center
+            rounded-xl
+            bg-amber-100
+            text-sm
+          "
+        >
+          ⚡
+        </div>
+
+        <div>
+
+          <div
+            class="
+              text-[9px]
+              font-black
+              uppercase
+              tracking-widest
+              text-slate-400
+            "
+          >
+            Discovery XP
+          </div>
+
+          <div
+            class="
+              mt-0.5
+              text-sm
+              font-black
+              text-amber-600
+            "
+            data-admin--ecosystems--load-sources--entities--entity-comparison-experience-target="xp"
+          >
+            0
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- Progress -->
+
+    <div class="relative mt-7">
+
+      <div
+        class="
+          mb-2
+          flex items-center
+          justify-between gap-4
+        "
+      >
+
+        <span
+          class="
+            text-[10px]
+            font-black
+            uppercase
+            tracking-widest
+            text-slate-400
+          "
+        >
+          Exploration progress
+        </span>
+
+        <span
+          class="
+            text-[10px]
+            font-black
+            text-orange-500
+          "
+          data-admin--ecosystems--load-sources--entities--entity-comparison-experience-target="progressLabel"
+        >
+          0% explored
+        </span>
+
+      </div>
+
+
+      <div
+        class="
+          h-3
+          overflow-hidden
+          rounded-full
+          border border-orange-100
+          bg-white
+          shadow-inner
+        "
+        role="progressbar"
+        aria-label="Comparison exploration progress"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="0"
+      >
+
+        <div
+          class="
+            h-full
+            w-0
+            rounded-full
+            bg-gradient-to-r
+            from-orange-400
+            via-amber-400
+            via-sky-400
+            to-violet-500
+            shadow-[0_0_14px_rgba(249,115,22,0.35)]
+            transition-all
+            duration-700
+            ease-out
+          "
+          data-admin--ecosystems--load-sources--entities--entity-comparison-experience-target="progress"
+        ></div>
+
+      </div>
+
+    </div>
+
+
+    <!-- Mission cards -->
+
+    <div
+      class="
+        mt-6
+        grid grid-cols-1
+        gap-3
+        sm:grid-cols-3
+      "
+    >
+
+      <div
+        class="
+          rounded-2xl
+          border border-orange-100
+          bg-white/75
+          p-4
+          backdrop-blur
+        "
+      >
+
+        <div
+          class="
+            text-[9px]
+            font-black
+            uppercase
+            tracking-widest
+            text-slate-400
+          "
+        >
+          Current mission
+        </div>
+
+        <div
+          class="
+            mt-2
+            text-sm
+            font-black
+            text-slate-700
+          "
+          data-admin--ecosystems--load-sources--entities--entity-comparison-experience-target="mission"
+        >
+          Begin your comparison journey
+        </div>
+
+        <div
+          class="
+            mt-1
+            text-[10px]
+            font-medium
+            text-slate-400
+          "
+          data-admin--ecosystems--load-sources--entities--entity-comparison-experience-target="missionLabel"
+        >
+          0 discoveries explored
+        </div>
+
+      </div>
+
+
+      <div
+        class="
+          rounded-2xl
+          border border-sky-100
+          bg-white/75
+          p-4
+          backdrop-blur
+        "
+      >
+
+        <div
+          class="
+            text-[9px]
+            font-black
+            uppercase
+            tracking-widest
+            text-slate-400
+          "
+        >
+          Change taxonomy
+        </div>
+
+        <div
+          class="
+            mt-2
+            text-sm
+            font-black
+            text-sky-700
+          "
+          data-admin--ecosystems--load-sources--entities--entity-comparison-experience-target="category"
+        >
+          0 change types discovered
+        </div>
+
+        <div
+          class="
+            mt-1
+            text-[10px]
+            font-medium
+            text-slate-400
+          "
+        >
+          <span
+            data-admin--ecosystems--load-sources--entities--entity-comparison-experience-target="categoryCount"
+          >
+            0
+          </span>
+          taxonomy categories
+        </div>
+
+      </div>
+
+
+      <div
+        class="
+          rounded-2xl
+          border border-emerald-100
+          bg-white/75
+          p-4
+          backdrop-blur
+        "
+      >
+
+        <div
+          class="
+            text-[9px]
+            font-black
+            uppercase
+            tracking-widest
+            text-slate-400
+          "
+        >
+          Session
+        </div>
+
+        <div
+          class="
+            mt-2
+            flex items-center gap-2
+            text-sm
+            font-black
+            text-emerald-700
+          "
+        >
+
+          <span
+            class="
+              h-2.5 w-2.5
+              rounded-full
+              bg-emerald-400
+              shadow-[0_0_8px_rgba(52,211,153,0.7)]
+            "
+          ></span>
+
+          <span
+            data-admin--ecosystems--load-sources--entities--entity-comparison-experience-target="status"
+          >
+            Ready
+          </span>
+
+        </div>
+
+        <div
+          class="
+            mt-1
+            text-[10px]
+            font-medium
+            text-slate-400
+          "
+        >
+          Click a discovery to explore it.
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- Keyboard hint -->
+
+    <div
+      class="
+        mt-5
+        flex flex-col gap-2
+        sm:flex-row
+        sm:items-center
+        sm:justify-between
+      "
+    >
+
+      <div
+        class="
+          text-[10px]
+          font-medium
+          text-slate-400
+        "
+      >
+        Tip: press
+        <kbd
+          class="
+            mx-1 rounded-md
+            border border-slate-200
+            bg-white px-1.5 py-0.5
+            font-mono font-bold
+            text-slate-500
+            shadow-sm
+          "
+        >?</kbd>
+        for comparison shortcuts.
+      </div>
+
+      <div
+        class="
+          text-[10px]
+          font-bold
+          text-slate-400
+        "
+      >
+        <span class="text-orange-500">1</span>
+        Changes
+        <span class="mx-1">·</span>
+
+        <span class="text-sky-500">2</span>
+        Movements
+        <span class="mx-1">·</span>
+
+        <span class="text-emerald-500">3–5</span>
+        More
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- Toast -->
+
+  <div
+    hidden
+    role="status"
+    aria-live="polite"
+    data-admin--ecosystems--load-sources--entities--entity-comparison-experience-target="toast"
+    class="
+      fixed
+      bottom-6
+      left-1/2
+      z-50
+      -translate-x-1/2
+      rounded-2xl
+      border border-orange-200
+      bg-slate-900
+      px-5 py-3
+      text-xs
+      font-black
+      text-white
+      shadow-2xl
+    "
+  >
+
+    <span
+      data-admin--ecosystems--load-sources--entities--entity-comparison-experience-target="toastMessage"
+    ></span>
+
+  </div>
+
+</div>

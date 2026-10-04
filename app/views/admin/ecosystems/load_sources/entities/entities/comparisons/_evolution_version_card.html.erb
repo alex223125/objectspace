@@ -1,0 +1,72 @@
+<%
+  color = evolution_status_color(version.status)
+%>
+
+<article
+  class="evolution-detail-card"
+  data-version-id="<%= version.id %>">
+
+  <div class="flex items-start justify-between gap-4">
+
+    <div>
+
+      <div
+        class="text-[9px] font-black uppercase tracking-[0.18em] text-slate-400">
+
+        Evolution snapshot
+
+      </div>
+
+      <h3
+        class="mt-1 text-base font-black text-slate-800">
+
+        <%= version.label %>
+
+      </h3>
+
+    </div>
+
+
+    <span
+      class="evolution-status evolution-status-<%= color %>">
+
+      <%= evolution_status_label(version.status) %>
+
+    </span>
+
+  </div>
+
+
+  <div class="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">
+
+    <div class="evolution-detail-stat">
+      <span>Activity</span>
+      <strong><%= version.activity_score %>%</strong>
+    </div>
+
+    <div class="evolution-detail-stat">
+      <span>Evolution</span>
+      <strong><%= version.evolution_score %>%</strong>
+    </div>
+
+    <div class="evolution-detail-stat">
+      <span>Risk</span>
+      <strong><%= version.risk_score %>%</strong>
+    </div>
+
+    <div class="evolution-detail-stat">
+      <span>Changes</span>
+      <strong><%= version.changes_count %></strong>
+    </div>
+
+  </div>
+
+
+  <p
+    class="mt-5 text-xs leading-6 text-slate-400">
+
+    <%= version.summary %>
+
+  </p>
+
+</article>

@@ -1,0 +1,172 @@
+<%# frozen_string_literal: true %>
+
+<article
+  class="entity-diff-fact entity-diff-fact--<%= fact.type.to_s.dasherize %>"
+  data-diff-fact-type="<%= fact.type %>"
+>
+
+  <header class="entity-diff-fact__header">
+
+    <div class="entity-diff-fact__type">
+      <%= fact.type.to_s.humanize %>
+    </div>
+
+    <% if fact.identity.present? %>
+
+      <div class="entity-diff-fact__identity">
+        Identity:
+        <strong>
+          <%= fact.identity %>
+        </strong>
+      </div>
+
+    <% end %>
+
+  </header>
+
+
+  <div class="entity-diff-fact__path">
+
+    <span class="entity-diff-fact__path-label">
+      Path
+    </span>
+
+    <code>
+      <%= fact.path.join(".") %>
+    </code>
+
+  </div>
+
+
+  <% if fact.semantic_movement? %>
+
+    <div class="entity-diff-fact__movement">
+
+      <div>
+        <span>
+          Old index
+        </span>
+
+        <strong>
+          <%= fact.old_index %>
+        </strong>
+      </div>
+
+      <div>
+        <span>
+          New index
+        </span>
+
+        <strong>
+          <%= fact.new_index %>
+        </strong>
+      </div>
+
+    </div>
+
+  <% end %>
+
+
+  <% if fact.content_change? %>
+
+    <div class="entity-diff-fact__values">
+
+      <div class="entity-diff-fact__value entity-diff-fact__value--old">
+
+        <div class="entity-diff-fact__value-label">
+          Old value
+        </div>
+
+        <pre><%= format_diff_value(fact.old_value) %></pre>
+
+      </div>
+
+
+      <div class="entity-diff-fact__value entity-diff-fact__value--new">
+
+        <div class="entity-diff-fact__value-label">
+          New value
+        </div>
+
+        <pre><%= format_diff_value(fact.new_value) %></pre>
+
+      </div>
+
+    </div>
+
+  <% end %>
+
+
+  <% if fact.removed_entity? %>
+
+    <div class="entity-diff-fact__values">
+
+      <div class="entity-diff-fact__value entity-diff-fact__value--removed">
+
+        <div class="entity-diff-fact__value-label">
+          Removed value
+        </div>
+
+        <pre><%= format_diff_value(fact.old_value) %></pre>
+
+      </div>
+
+    </div>
+
+  <% end %>
+
+
+  <% if fact.added_entity? %>
+
+    <div class="entity-diff-fact__values">
+
+      <div class="entity-diff-fact__value entity-diff-fact__value--added">
+
+        <div class="entity-diff-fact__value-label">
+          Added value
+        </div>
+
+        <pre><%= format_diff_value(fact.new_value) %></pre>
+
+      </div>
+
+    </div>
+
+  <% end %>
+
+
+  <% if fact.identity_warning? %>
+
+    <div class="entity-diff-fact__warning">
+
+      <div class="entity-diff-fact__warning-title">
+        Identity warning
+      </div>
+
+      <% if fact.metadata.present? %>
+
+        <dl>
+
+          <% fact.metadata
+                 .sort_by { |key, _value| key.to_s }
+                 .each do |key, value| %>
+
+            <dt>
+              <%= key.to_s.humanize %>
+            </dt>
+
+            <dd>
+              <%= format_diff_value(value) %>
+            </dd>
+
+          <% end %>
+
+        </dl>
+
+      <% end %>
+
+    </div>
+
+  <% end %>
+
+</article>

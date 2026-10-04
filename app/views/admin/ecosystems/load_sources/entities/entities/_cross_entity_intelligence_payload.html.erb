@@ -1,0 +1,12 @@
+<%
+  intelligence =
+    Ecosystems::LoadSources::Entity::CrossEntityIntelligence.new(
+      entities: entities
+    ).call
+%>
+
+<script
+  type="application/json"
+  data-cross-entity-intelligence-payload>
+  <%= raw intelligence.to_json %>
+</script>

@@ -1,219 +1,338 @@
-<div class="entity-history-page">
+<%# frozen_string_literal: true %>
 
-  <div class="entity-history-header">
+<div
+  class="entity-version-history"
+  data-controller="entity-version-history"
+>
+  <% versions =
+       if defined?(@versions) && @versions.present?
+         @versions.to_a
+       else
+         []
+       end
+  %>
+
+  <% newest_version = versions.first %>
+  <% previous_version = versions.second %>
+  <% oldest_version = versions.last %>
+
+  <header class="entity-version-history__header">
     <div>
-
-      <div class="entity-history-breadcrumb">
-
-        <%= link_to(
-              "← Back to Entity",
-              admin_ecosystems_load_sources_entity_path(@entity)
-            ) %>
-
-      </div>
-
-      <h1>Version History</h1>
+      <h1>
+        Version history
+      </h1>
 
       <p>
-        <strong><%= @entity.name %></strong>
+        Review entity versions and select two versions to compare.
       </p>
-
-      <p>
-        Browse the immutable content versions stored for this entity.
-      </p>
-
     </div>
 
-
-    <% if @versions.size >= 2 %>
-
-      <div class="entity-history-header-actions">
-
-        <%= link_to(
-              "Compare Versions",
-              compare_admin_ecosystems_load_sources_entity_path(@entity)
-            ) %>
-
-      </div>
-
-    <% end %>
-  </div>
-
-  <% if @versions.empty? %>
-    <div class="entity-history-empty">
-
-      <h2>No versions yet</h2>
-
-      <p>
-        This entity does not have any stored versions yet.
-      </p>
-
+    <div class="entity-version-history__actions">
       <%= link_to(
-            "Back to Entity",
-            admin_ecosystems_load_sources_entity_path(@entity)
+            "Back to entity",
+            admin_ecosystems_load_sources_entity_path(@entity),
+            class: "entity-comparison__button"
           ) %>
-
     </div>
-  <% else %>
+  </header>
 
-    <div class="entity-history-list">
+  <% if versions.present? %>
 
-      <% @versions.each do |version| %>
+    <!-- ========================================================
+         QUICK COMPARISON ACTIONS
+         ======================================================== -->
 
-        <div class="entity-history-item">
+    <section
+      class="entity-version-history__quick-actions"
+      aria-label="Quick comparisons"
+    >
+      <div>
+        <strong>
+          Quick comparison
+        </strong>
 
-          <div class="entity-history-item-main">
+        <p>
+          Start with a commonly useful version comparison.
+        </p>
+      </div>
 
-            <div class="entity-history-version">
+      <div class="entity-version-history__quick-actions-buttons">
 
-              <h2>
-                Version <%= version.version_number %>
-              </h2>
+        <% if previous_version && newest_version %>
 
-              <% if version.id == @entity.current_version_id %>
+          <%= link_to(
+                "Compare previous / current",
+                compare_admin_ecosystems_load_sources_entity_path(
+                  @entity,
+                  from_version: previous_version.id,
+                  to_version: newest_version.id
+                ),
+                class: "entity-comparison__button"
+              ) %>
 
-            <span class="entity-history-current">
-              Current Version
-            </span>
+        <% end %>
 
-              <% end %>
+        <% if oldest_version &&
+          newest_version &&
+          oldest_version.id.to_s != newest_version.id.to_s %>
 
-            </div>
+          <%= link_to(
+                "Compare oldest / newest",
+                compare_admin_ecosystems_load_sources_entity_path(
+                  @entity,
+                  from_version: oldest_version.id,
+                  to_version: newest_version.id
+                ),
+                class: "entity-comparison__button"
+              ) %>
 
+        <% end %>
 
-            <div class="entity-history-details">
+      </div>
+    </section>
 
-              <div class="entity-history-detail">
+    <!-- ========================================================
+         MANUAL SELECTION
+         ======================================================== -->
 
-                <strong>Status</strong>
+    <form
+      method="get"
+      action="<%= compare_admin_ecosystems_load_sources_entity_path(@entity) %>"
+      data-entity-version-history-target="form"
+      data-action="submit->entity-version-history#submit"
+    >
 
-                <span>
-              <%= version.status.to_s.humanize %>
-            </span>
+      <section
+        class="entity-version-history__selection"
+        aria-label="Select versions to compare"
+      >
+        <div class="entity-version-history__toolbar">
 
-              </div>
+          <div>
+            <strong>
+              Select versions
+            </strong>
 
-
-              <% if version.reason.present? %>
-
-                <div class="entity-history-detail">
-
-                  <strong>Reason</strong>
-
-                  <span>
-                <%= version.reason %>
-              </span>
-
-                </div>
-
-              <% end %>
-
-
-              <div class="entity-history-detail">
-
-                <strong>Created</strong>
-
-                <span>
-              <%= version.created_at&.strftime("%Y-%m-%d %H:%M:%S") %>
-            </span>
-
-              </div>
-
-
-              <% if version.published_at.present? %>
-
-                <div class="entity-history-detail">
-
-                  <strong>Published</strong>
-
-                  <span>
-                <%= version.published_at.strftime("%Y-%m-%d %H:%M:%S") %>
-              </span>
-
-                </div>
-
-              <% end %>
-
-
-              <% if version.created_by_id.present? %>
-
-                <div class="entity-history-detail">
-
-                  <strong>Created By</strong>
-
-                  <span>
-                <%= version.created_by_type.presence || "User" %>
-                    #<%= version.created_by_id %>
-              </span>
-
-                </div>
-
-              <% end %>
-
-            </div>
-
-
-            <% if version.checksum.present? %>
-
-              <div class="entity-history-checksum">
-
-                <strong>Checksum:</strong>
-
-                <code>
-                  <%= version.checksum %>
-                </code>
-
-              </div>
-
-            <% end %>
-
+            <p>
+              Select one version as the old version and another
+              as the new version.
+            </p>
           </div>
 
-
-          <div class="entity-history-actions">
-
-            <%= link_to(
-                  "View Version",
-                  version_admin_ecosystems_load_sources_entity_path(
-                    @entity,
-                    version_id: version.id
-                  )
-                ) %>
-
-            <% if @versions.size >= 2 %>
-
-              <%= link_to(
-                    "Compare",
-                    compare_admin_ecosystems_load_sources_entity_path(
-                      @entity,
-                      version_a: version.id,
-                      version_b: (
-                        @versions.find do |other_version|
-                          other_version.id != version.id
-                        end&.id
-                      )
-                    )
-                  ) %>
-
-            <% end %>
-
-          </div>
-
+          <button
+            type="submit"
+            class="entity-comparison__button"
+            data-entity-version-history-target="compareButton"
+            disabled
+          >
+            Compare selected versions
+          </button>
         </div>
 
-      <% end %>
+        <div
+          class="entity-version-history__error"
+          data-entity-version-history-target="error"
+          role="alert"
+          aria-live="assertive"
+          hidden
+        >
+          Please select two different versions.
+        </div>
 
+        <!-- ======================================================
+             TABLE
+             ====================================================== -->
+
+        <div class="entity-version-history__table-wrapper">
+          <table class="entity-version-history__table">
+            <thead>
+            <tr>
+              <th scope="col">
+                Version
+              </th>
+
+              <th scope="col">
+                Created
+              </th>
+
+              <th scope="col">
+                Status
+              </th>
+
+              <th scope="col">
+                Old
+              </th>
+
+              <th scope="col">
+                New
+              </th>
+
+              <th scope="col">
+                View
+              </th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            <% versions.each do |version| %>
+
+              <% is_newest =
+                   newest_version &&
+                     version.id.to_s == newest_version.id.to_s
+              %>
+
+              <% is_previous =
+                   previous_version &&
+                     version.id.to_s == previous_version.id.to_s
+              %>
+
+              <% is_oldest =
+                   oldest_version &&
+                     version.id.to_s == oldest_version.id.to_s
+              %>
+
+              <tr
+                data-entity-version-history-row
+                data-version-id="<%= version.id %>"
+                class="<%= "entity-version-history__row--newest" if is_newest %>"
+              >
+
+                <!-- VERSION -->
+
+                <td>
+                  <strong>
+                    <%= comparison_version_label(version) %>
+                  </strong>
+
+                  <% if is_newest %>
+
+                      <span class="entity-version-history__marker">
+                        Current / newest
+                      </span>
+
+                  <% elsif is_previous %>
+
+                      <span class="entity-version-history__marker">
+                        Previous
+                      </span>
+
+                  <% elsif is_oldest %>
+
+                      <span class="entity-version-history__marker">
+                        Oldest
+                      </span>
+
+                  <% end %>
+                </td>
+
+                <!-- CREATED -->
+
+                <td>
+                  <% if version.respond_to?(:created_at) &&
+                    version.created_at.present? %>
+
+                    <%= version.created_at %>
+
+                  <% else %>
+
+                    —
+
+                  <% end %>
+                </td>
+
+                <!-- STATUS -->
+
+                <td>
+                  <% if version.respond_to?(:status) &&
+                    version.status.present? %>
+
+                    <%= version.status %>
+
+                  <% else %>
+
+                    —
+
+                  <% end %>
+                </td>
+
+                <!-- OLD -->
+
+                <td>
+                  <input
+                    type="radio"
+                    name="history_old_version"
+                    value="<%= version.id %>"
+                    aria-label="Select <%= comparison_version_label(version) %> as old version"
+                    data-entity-version-history-target="oldVersion"
+                    data-action="change->entity-version-history#oldVersionChanged"
+                    <%= "checked" if is_previous && previous_version.present? %>
+                  >
+                </td>
+
+                <!-- NEW -->
+
+                <td>
+                  <input
+                    type="radio"
+                    name="history_new_version"
+                    value="<%= version.id %>"
+                    aria-label="Select <%= comparison_version_label(version) %> as new version"
+                    data-entity-version-history-target="newVersion"
+                    data-action="change->entity-version-history#newVersionChanged"
+                    <%= "checked" if is_newest %>
+                  >
+                </td>
+
+                <!-- VIEW -->
+
+                <td>
+                  <%= link_to(
+                        "View",
+                        version_admin_ecosystems_load_sources_entity_path(
+                          @entity,
+                          version.id
+                        ),
+                        class: "entity-comparison__button"
+                      ) %>
+                </td>
+
+              </tr>
+
+            <% end %>
+
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ======================================================
+             SUBMISSION VALUES
+             ====================================================== -->
+
+        <input
+          type="hidden"
+          name="from_version"
+          value=""
+          data-entity-version-history-target="fromVersion"
+        >
+
+        <input
+          type="hidden"
+          name="to_version"
+          value=""
+          data-entity-version-history-target="toVersion"
+        >
+
+      </section>
+
+    </form>
+
+  <% else %>
+
+    <div class="entity-comparison__empty">
+      This entity has no versions yet.
     </div>
 
   <% end %>
-
-  <div class="entity-history-footer">
-
-    <%= link_to(
-          "← Back to Entity",
-          admin_ecosystems_load_sources_entity_path(@entity)
-        ) %>
-
-  </div>
 
 </div>

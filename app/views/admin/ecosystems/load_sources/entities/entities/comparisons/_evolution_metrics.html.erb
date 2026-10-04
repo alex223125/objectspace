@@ -1,0 +1,98 @@
+<div class="grid grid-cols-2 gap-3 md:grid-cols-4">
+
+  <!-- VERSIONS -->
+
+  <div class="evolution-metric-card">
+
+    <div class="evolution-metric-icon bg-sky-50 text-sky-600">
+      ◉
+    </div>
+
+    <div class="min-w-0">
+
+      <div class="evolution-metric-label">
+        Versions
+      </div>
+
+      <div class="evolution-metric-value">
+        <%= timeline[:total_versions] %>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- CHANGES -->
+
+  <div class="evolution-metric-card">
+
+    <div class="evolution-metric-icon bg-orange-50 text-orange-600">
+      ↗
+    </div>
+
+    <div class="min-w-0">
+
+      <div class="evolution-metric-label">
+        Total change
+      </div>
+
+      <div class="evolution-metric-value">
+        <%= timeline[:total_changes] %>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ACTIVITY -->
+
+  <div class="evolution-metric-card">
+
+    <div class="evolution-metric-icon bg-violet-50 text-violet-600">
+      ✦
+    </div>
+
+    <div class="min-w-0">
+
+      <div class="evolution-metric-label">
+        Peak activity
+      </div>
+
+      <div class="evolution-metric-value">
+
+        <%= timeline[:peak_activity] %>%
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- EVOLUTION -->
+
+  <div class="evolution-metric-card">
+
+    <div class="evolution-metric-icon bg-emerald-50 text-emerald-600">
+      🧬
+    </div>
+
+    <div class="min-w-0">
+
+      <div class="evolution-metric-label">
+        Evolution
+      </div>
+
+      <div class="evolution-metric-value">
+
+        <%= timeline[:evolution_score] %>%
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

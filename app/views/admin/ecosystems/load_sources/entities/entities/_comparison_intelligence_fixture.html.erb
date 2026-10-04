@@ -1,0 +1,105 @@
+<%# ============================================================
+    DEVELOPMENT FIXTURE
+
+    This partial is optional.
+
+    It gives the intelligence controller standardized change
+    elements so you can visually test the intelligence layer
+    before wiring every production diff card.
+
+    Remove this partial from production once the real diff cards
+    expose the same attributes.
+   ============================================================ %>
+
+
+<div class="hidden" data-comparison-intelligence-fixture>
+
+  <article
+    data-diff-item
+    data-change-type="changed"
+    data-path="identity.name">
+
+    <span data-path-label>identity.name</span>
+
+    <button
+      type="button"
+      data-comparison-review-button
+      aria-pressed="false">
+      Review
+    </button>
+
+  </article>
+
+
+  <article
+    data-diff-item
+    data-change-type="added"
+    data-path="methods.validation">
+
+    <span data-path-label>methods.validation</span>
+
+    <button
+      type="button"
+      data-comparison-review-button
+      aria-pressed="false">
+      Review
+    </button>
+
+  </article>
+
+
+  <article
+    data-diff-item
+    data-change-type="removed"
+    data-path="architecture.legacy">
+
+    <span data-path-label>architecture.legacy</span>
+
+    <button
+      type="button"
+      data-comparison-review-button
+      aria-pressed="false">
+      Review
+    </button>
+
+  </article>
+
+
+  <article
+    data-diff-item
+    data-change-type="moved"
+    data-path="methods.pipeline"
+    data-moved="true">
+
+    <span data-path-label>methods.pipeline</span>
+
+    <button
+      type="button"
+      data-comparison-review-button
+      aria-pressed="false">
+      Review
+    </button>
+
+  </article>
+
+
+  <article
+    data-diff-item
+    data-change-type="changed"
+    data-path="identity.entity_id"
+    data-warning="true">
+
+    <span data-path-label>identity.entity_id</span>
+
+    <span>Identity warning</span>
+
+    <button
+      type="button"
+      data-comparison-review-button
+      aria-pressed="false">
+      Review
+    </button>
+
+  </article>
+
+</div>

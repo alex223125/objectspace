@@ -1,0 +1,66 @@
+<div
+  data-entity-comparison-explorer-target="empty"
+  hidden
+  class="my-8 rounded-[30px]
+         border-2 border-dashed
+         border-orange-200
+         bg-gradient-to-br
+         from-orange-50/60
+         via-white
+         to-amber-50/40
+         p-10 text-center"
+>
+
+  <div
+    class="mx-auto flex h-16 w-16
+           items-center justify-center
+           rounded-[24px]
+           border-2 border-orange-200
+           bg-orange-100
+           text-2xl
+           shadow-sm"
+  >
+    🧭
+  </div>
+
+  <h3
+    class="mt-5 text-sm
+           font-black
+           uppercase tracking-widest
+           text-slate-700"
+  >
+    Nothing found
+  </h3>
+
+  <p
+    class="mx-auto mt-2
+           max-w-md
+           text-xs leading-6
+           font-medium
+           text-slate-400"
+  >
+    Your current exploration filters do not match
+    any comparison facts. Try another search,
+    change the category, or reset the explorer.
+  </p>
+
+  <button
+    type="button"
+    data-action="click->entity-comparison-explorer#reset"
+    class="mt-5 rounded-2xl
+           border-2 border-orange-200
+           bg-orange-50
+           px-5 py-2.5
+           text-xs font-black
+           text-orange-600
+           transition
+           hover:-translate-y-0.5
+           hover:bg-orange-100
+           focus-visible:outline-none
+           focus-visible:ring-4
+           focus-visible:ring-orange-100"
+  >
+    Reset exploration
+  </button>
+
+</div>

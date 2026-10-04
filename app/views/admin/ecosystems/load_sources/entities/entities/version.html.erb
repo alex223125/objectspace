@@ -1,144 +1,450 @@
-<div class="entity-version-page">
+<%# frozen_string_literal: true %>
 
-  <div class="entity-version-header">
+<div
+  class="entity-comparison"
+  data-controller="entity-comparison"
+  data-entity-comparison
+>
+  <% payload =
+       if defined?(@diff_payload) && @diff_payload.present?
+         @diff_payload
+       else
+         {}
+       end
+  %>
 
+  <% summary =
+       payload[:summary] ||
+         payload["summary"] ||
+         {}
+  %>
+
+  <% facts =
+       payload[:facts] ||
+         payload["facts"] ||
+         []
+  %>
+
+  <!-- ==========================================================
+       HEADER
+       ========================================================== -->
+
+  <header class="entity-comparison__header">
     <div>
-      <div class="entity-version-breadcrumb">
-        <%= link_to(
-              "← Back to Entity",
-              admin_ecosystems_load_sources_entity_path(@entity)
-            ) %>
-      </div>
-
       <h1>
-        Version <%= @version.version_number %>
+        Entity comparison
       </h1>
 
       <p>
-        <strong><%= @entity.name %></strong>
+        Compare the semantic differences between
+        two entity versions.
       </p>
     </div>
 
-    <div class="entity-version-status">
-  <span>
-    <%= @version.status.to_s.humanize %>
-  </span>
-    </div>
-
-  </div>
-
-  <div class="entity-version-meta">
-
-    <div class="entity-version-meta-item">
-      <strong>Version</strong>
+    <div class="entity-comparison__versions">
+      <span>
+        <strong>Old:</strong>
+        <%= comparison_version_label(@old_version) %>
+      </span>
 
       <span>
-    v<%= @version.version_number %>
-  </span>
+        <strong>New:</strong>
+        <%= comparison_version_label(@new_version) %>
+      </span>
     </div>
+  </header>
 
+  <!-- ==========================================================
+       VERSION SELECTOR
+       ========================================================== -->
 
-    <div class="entity-version-meta-item">
-      <strong>Status</strong>
+  <section
+    class="entity-comparison__version-selector"
+    aria-label="Select versions to compare"
+    data-controller="entity-comparison-versions"
+  >
+    <%= form_with(
+          url: compare_admin_ecosystems_load_sources_entity_path(@entity),
+          method: :get,
+          local: true,
+          class: "entity-comparison__version-form"
+        ) do %>
 
-      <span>
-    <%= @version.status.to_s.humanize %>
-  </span>
-    </div>
+      <div
+        class="entity-comparison__version-field"
+        data-version-selector-field
+      >
+        <label
+          for="entity-comparison-from-version"
+          class="entity-comparison__label"
+        >
+          Old version
+        </label>
 
+        <select
+          id="entity-comparison-from-version"
+          name="from_version"
+          class="entity-comparison__select"
+          data-entity-comparison-versions-target="from"
+          data-action="change->entity-comparison-versions#change"
+          aria-invalid="false"
+        >
+          <option value="">
+            Select old version
+          </option>
 
-    <% if @version.reason.present? %>
-      <div class="entity-version-meta-item">
-        <strong>Reason</strong>
-
-        <span>
-      <%= @version.reason %>
-    </span>
+          <% @versions.each do |version| %>
+            <option
+              value="<%= version.id %>"
+              <%= "selected" if @old_version &&
+                @old_version.id.to_s == version.id.to_s %>
+            >
+              <%= comparison_version_label(version) %>
+            </option>
+          <% end %>
+        </select>
       </div>
+
+      <div
+        class="entity-comparison__version-field"
+        data-version-selector-field
+      >
+        <label
+          for="entity-comparison-to-version"
+          class="entity-comparison__label"
+        >
+          New version
+        </label>
+
+        <select
+          id="entity-comparison-to-version"
+          name="to_version"
+          class="entity-comparison__select"
+          data-entity-comparison-versions-target="to"
+          data-action="change->entity-comparison-versions#change"
+          aria-invalid="false"
+        >
+          <option value="">
+            Select new version
+          </option>
+
+          <% @versions.reverse_each do |version| %>
+            <option
+              value="<%= version.id %>"
+              <%= "selected" if @new_version &&
+                @new_version.id.to_s == version.id.to_s %>
+            >
+              <%= comparison_version_label(version) %>
+            </option>
+          <% end %>
+        </select>
+      </div>
+
+      <button
+        type="submit"
+        class="entity-comparison__button entity-comparison__button--primary"
+        data-entity-comparison-versions-target="submit"
+      >
+        Compare versions
+      </button>
+
     <% end %>
 
+    <% if @old_version && @new_version &&
+      @old_version.id.to_s == @new_version.id.to_s %>
 
-    <div class="entity-version-meta-item">
-      <strong>Created</strong>
-
-      <span>
-    <%= @version.created_at&.strftime("%Y-%m-%d %H:%M:%S") %>
-  </span>
-    </div>
-
-
-    <% if @version.published_at.present? %>
-      <div class="entity-version-meta-item">
-        <strong>Published</strong>
-
-        <span>
-      <%= @version.published_at.strftime("%Y-%m-%d %H:%M:%S") %>
-    </span>
-      </div>
-    <% end %>
-
-
-    <% if @version.created_by_id.present? %>
-      <div class="entity-version-meta-item">
-        <strong>Created By</strong>
-
-        <span>
-      <%= @version.created_by_type.presence || "User" %>
-          #<%= @version.created_by_id %>
-    </span>
-      </div>
-    <% end %>
-
-
-    <% if @version.checksum.present? %>
-      <div class="entity-version-meta-item">
-        <strong>Checksum</strong>
-
-        <code>
-          <%= @version.checksum %>
-        </code>
-      </div>
-    <% end %>
-
-
-  </div>
-
-  <div class="entity-version-content">
-
-
-    <div class="entity-version-content-header">
-      <h2>Snapshot</h2>
-
-      <p>
-        This is the immutable content snapshot stored for this version.
+      <p
+        class="entity-comparison__version-error"
+        role="alert"
+      >
+        Please select two different versions to compare.
       </p>
+
+    <% end %>
+  </section>
+
+  <!-- ==========================================================
+       SUMMARY
+       ========================================================== -->
+
+  <section
+    class="entity-comparison__summary"
+    aria-label="Comparison summary"
+  >
+    <div class="entity-comparison__summary-card">
+      <span>Total</span>
+
+      <strong>
+        <%= summary[:total].to_i %>
+      </strong>
     </div>
 
+    <div class="entity-comparison__summary-card">
+      <span>Changes</span>
 
-    <div class="entity-version-snapshot">
+      <strong>
+        <%= summary[:changed].to_i %>
+      </strong>
+    </div>
 
-      <pre><%= JSON.pretty_generate(@version.snapshot || {}) %></pre>
+    <div class="entity-comparison__summary-card">
+      <span>Movements</span>
+
+      <strong>
+        <%= summary[:moved].to_i %>
+      </strong>
+    </div>
+
+    <div class="entity-comparison__summary-card">
+      <span>Additions</span>
+
+      <strong>
+        <%= summary[:added].to_i %>
+      </strong>
+    </div>
+
+    <div class="entity-comparison__summary-card">
+      <span>Removals</span>
+
+      <strong>
+        <%= summary[:removed].to_i %>
+      </strong>
+    </div>
+
+    <div class="entity-comparison__summary-card">
+      <span>Warnings</span>
+
+      <strong>
+        <%= summary[:warnings].to_i %>
+      </strong>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       TOOLBAR
+       ========================================================== -->
+
+  <section
+    class="entity-comparison__toolbar"
+    aria-label="Comparison filters"
+  >
+    <div class="entity-comparison__toolbar-field">
+      <label
+        for="entity-comparison-search"
+        class="entity-comparison__label"
+      >
+        Search
+      </label>
+
+      <input
+        id="entity-comparison-search"
+        type="search"
+        class="entity-comparison__search"
+        placeholder="Search paths and values..."
+        aria-label="Search comparison"
+        autocomplete="off"
+        data-entity-comparison-target="search"
+        data-comparison-search
+        data-action="input->entity-comparison#search"
+      >
+    </div>
+
+    <div class="entity-comparison__toolbar-field">
+      <label
+        for="entity-comparison-type-filter"
+        class="entity-comparison__label"
+      >
+        Type
+      </label>
+
+      <select
+        id="entity-comparison-type-filter"
+        class="entity-comparison__select"
+        aria-label="Filter comparison type"
+        data-entity-comparison-target="typeFilter"
+        data-comparison-type-filter
+        data-action="change->entity-comparison#filter"
+      >
+        <option value="all">
+          All changes
+        </option>
+
+        <option value="content_change">
+          Changes
+        </option>
+
+        <option value="semantic_movement">
+          Movements
+        </option>
+
+        <option value="added_entity">
+          Additions
+        </option>
+
+        <option value="removed_entity">
+          Removals
+        </option>
+
+        <option value="identity_warning">
+          Identity warnings
+        </option>
+      </select>
+    </div>
+
+    <button
+      type="button"
+      class="entity-comparison__button"
+      data-entity-comparison-target="reset"
+      data-comparison-reset
+      data-action="click->entity-comparison#reset"
+    >
+      Reset
+    </button>
+
+    <div
+      class="entity-comparison__counter"
+      aria-live="polite"
+      aria-atomic="true"
+    >
+      Showing
+      <strong
+        data-entity-comparison-target="visibleCount"
+        data-comparison-visible-count
+      >
+        0
+      </strong>
+      changes
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       RESULTS
+       ========================================================== -->
+
+  <section
+    class="entity-comparison__results"
+    aria-label="Comparison results"
+  >
+    <div
+      class="entity-comparison__rows"
+      data-comparison-rows
+    >
+
+      <% facts.each do |fact| %>
+
+        <% fact_type =
+             fact[:type] ||
+               fact["type"]
+        %>
+
+        <% fact_path =
+             fact[:path] ||
+               fact["path"] ||
+               []
+        %>
+
+        <% identity =
+             fact[:identity] ||
+               fact["identity"]
+        %>
+
+        <% old_value =
+             if fact.respond_to?(:key?) && fact.key?(:old_value)
+               fact[:old_value]
+             else
+               fact["old_value"]
+             end
+        %>
+
+        <% new_value =
+             if fact.respond_to?(:key?) && fact.key?(:new_value)
+               fact[:new_value]
+             else
+               fact["new_value"]
+             end
+        %>
+
+        <article
+          class="entity-comparison__row <%= comparison_change_class(fact_type) %>"
+          data-entity-comparison-target="row"
+          data-comparison-row
+          data-change-type="<%= fact_type %>"
+          data-comparison-path="<%= comparison_path(fact_path) %>"
+          data-comparison-identity="<%= identity %>"
+          data-old-value="<%= comparison_value(old_value) %>"
+          data-new-value="<%= comparison_value(new_value) %>"
+        >
+
+          <div class="entity-comparison__path">
+            <code>
+              <%= comparison_path(fact_path) %>
+            </code>
+          </div>
+
+          <div class="entity-comparison__badge">
+            <%= comparison_change_label(fact_type) %>
+          </div>
+
+          <% if identity.present? %>
+            <div class="entity-comparison__identity">
+              <span>
+                Identity
+              </span>
+
+              <code>
+                <%= identity %>
+              </code>
+            </div>
+          <% end %>
+
+          <div class="entity-comparison__value">
+            <div class="entity-comparison__value-label">
+              Old
+            </div>
+
+            <pre><%= comparison_value(old_value) %></pre>
+          </div>
+
+          <div class="entity-comparison__value">
+            <div class="entity-comparison__value-label">
+              New
+            </div>
+
+            <pre><%= comparison_value(new_value) %></pre>
+          </div>
+
+        </article>
+
+      <% end %>
 
     </div>
 
+    <!-- ========================================================
+         FILTER EMPTY STATE
+         ======================================================== -->
 
-  </div>
+    <div
+      class="entity-comparison__empty"
+      data-entity-comparison-target="empty"
+      data-comparison-empty
+      hidden
+    >
+      No comparison results match the current search or filter.
+    </div>
 
-  <div class="entity-version-footer">
+    <!-- ========================================================
+         NO FACTS STATE
+         ======================================================== -->
 
+    <% if facts.empty? %>
 
-    <%= link_to(
-          "Back to Version History",
-          history_admin_ecosystems_load_sources_entity_path(@entity)
-        ) %>
+      <div
+        class="entity-comparison__empty entity-comparison__empty--initial"
+        data-comparison-no-facts
+      >
+        There are no comparison facts to display.
+      </div>
 
-    <span>·</span>
-
-    <%= link_to(
-          "Back to Entity",
-          admin_ecosystems_load_sources_entity_path(@entity)
-        ) %>
-
-  </div>
-
+    <% end %>
+  </section>
 </div>

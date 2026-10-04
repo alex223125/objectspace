@@ -1,0 +1,46 @@
+<% payload =
+     local_assigns.fetch(
+       :payload,
+       @diff_payload
+     ) %>
+
+<div
+  data-controller="entity-diff"
+  data-entity-diff-payload-value="<%= json_escape(payload.to_json) %>"
+>
+  <div data-entity-diff-target="summary">
+    <span data-role="total">
+      <%= payload.dig(:summary, :total) || 0 %>
+    </span>
+
+    <span data-role="changes">
+      <%= payload.dig(:summary, :changes) || 0 %>
+    </span>
+
+    <span data-role="movements">
+      <%= payload.dig(:summary, :movements) || 0 %>
+    </span>
+
+    <span data-role="additions">
+      <%= payload.dig(:summary, :additions) || 0 %>
+    </span>
+
+    <span data-role="removals">
+      <%= payload.dig(:summary, :removals) || 0 %>
+    </span>
+
+    <span data-role="warnings">
+      <%= payload.dig(:summary, :warnings) || 0 %>
+    </span>
+  </div>
+
+  <div data-entity-diff-target="changes"></div>
+
+  <div data-entity-diff-target="movements"></div>
+
+  <div data-entity-diff-target="additions"></div>
+
+  <div data-entity-diff-target="removals"></div>
+
+  <div data-entity-diff-target="warnings"></div>
+</div>

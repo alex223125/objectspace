@@ -1,0 +1,256 @@
+<%
+  timeline =
+    ComparisonIntelligence::EvolutionTimeline
+      .new(versions)
+      .call
+
+  evolution_versions = timeline[:versions]
+%>
+
+<section
+  class="evolution-observatory"
+  data-controller="evolution-timeline"
+  data-evolution-timeline-selected-value="<%= timeline[:current_version]&.id %>"
+  data-compare-url="<%= local_assigns[:compare_url] %>">
+
+  <div class="evolution-observatory__shell">
+
+    <!-- HEADER -->
+
+    <div class="evolution-observatory__header">
+
+      <div class="flex items-start gap-4">
+
+        <div class="evolution-observatory__icon">
+          🧬
+        </div>
+
+        <div>
+
+          <div class="flex flex-wrap items-center gap-2">
+
+            <h2
+              class="text-lg font-black tracking-tight text-slate-800">
+
+              Evolution Observatory
+
+            </h2>
+
+            <span class="evolution-badge">
+              PREMIUM INTELLIGENCE
+            </span>
+
+          </div>
+
+          <p
+            class="mt-1 max-w-2xl text-xs leading-6 text-slate-400">
+
+            Follow how this entity changed over time,
+            identify structural turning points,
+            and investigate the versions that matter most.
+
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="flex items-center gap-2">
+
+        <span class="evolution-live-dot"></span>
+
+        <span
+          class="text-[10px] font-black uppercase tracking-widest text-emerald-600">
+
+          Evolution tracked
+
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <!-- METRICS -->
+
+    <%= render(
+          "comparisons/evolution_metrics",
+          timeline: timeline
+        ) %>
+
+
+    <!-- OBSERVATORY -->
+
+    <div class="mt-8">
+
+      <%= render(
+            "comparisons/evolution_timeline",
+            timeline: timeline
+          ) %>
+
+    </div>
+
+
+    <!-- SELECTED VERSION -->
+
+    <div class="mt-7">
+
+      <div
+        class="evolution-selection-panel">
+
+        <div>
+
+          <div
+            class="text-[9px] font-black uppercase tracking-[0.18em] text-slate-400">
+
+            Selected version
+
+          </div>
+
+          <div
+            class="mt-1 text-sm font-black text-slate-700"
+            data-evolution-timeline-target="selectedLabel">
+
+            <%= timeline[:current_version]&.label || "No version selected" %>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="hidden md:flex items-center gap-5">
+
+          <div>
+
+            <div class="evolution-mini-label">
+              Previous
+            </div>
+
+            <div
+              class="evolution-mini-value"
+              data-evolution-timeline-target="previousLabel">
+
+              Beginning
+
+            </div>
+
+          </div>
+
+
+          <div class="evolution-direction">
+            →
+          </div>
+
+
+          <div>
+
+            <div class="evolution-mini-label">
+              Next
+            </div>
+
+            <div
+              class="evolution-mini-value"
+              data-evolution-timeline-target="nextLabel">
+
+              Latest
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="flex items-center gap-2">
+
+          <button
+            type="button"
+            data-action="click->evolution-timeline#previous"
+            class="evolution-control">
+
+            ←
+
+          </button>
+
+
+          <button
+            type="button"
+            data-action="click->evolution-timeline#next"
+            class="evolution-control">
+
+            →
+
+          </button>
+
+
+          <% if local_assigns[:compare_url].present? %>
+
+            <button
+              type="button"
+              data-action="click->evolution-timeline#compareSelected"
+              class="evolution-primary-button">
+
+              Compare selected
+
+              <span>↗</span>
+
+            </button>
+
+          <% end %>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- FOOTER -->
+
+    <div
+      class="mt-5 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+
+      <div
+        class="text-[10px] font-semibold text-slate-400">
+
+        <span class="font-black text-slate-500">
+          <%= evolution_versions.length %>
+        </span>
+
+        versions tracked
+
+        <span class="mx-1">·</span>
+
+        <span class="font-black text-slate-500">
+          <%= timeline[:total_changes] %>
+        </span>
+
+        structural changes
+
+      </div>
+
+
+      <div
+        class="text-[10px] font-bold text-slate-400">
+
+        Keyboard:
+
+        <span class="rounded-md border border-slate-200 bg-white px-1.5 py-0.5">
+          ←
+        </span>
+
+        <span class="rounded-md border border-slate-200 bg-white px-1.5 py-0.5">
+          →
+        </span>
+
+        to navigate
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>

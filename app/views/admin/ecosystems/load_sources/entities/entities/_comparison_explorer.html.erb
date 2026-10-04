@@ -1,0 +1,265 @@
+<%
+  explorer_storage_key =
+    "entity-comparison-explorer-#{@entity.respond_to?(:id) ? @entity.id : 'default'}"
+%>
+
+<section
+  data-controller="admin--ecosystems--load-sources--entities--entity-comparison-explorer"
+  data-admin--ecosystems--load-sources--entities--entity-comparison-explorer-storage-key-value="<%= explorer_storage_key %>"
+  class="relative mb-8 overflow-hidden rounded-[34px] border border-orange-100 bg-gradient-to-br from-white via-orange-50/30 to-violet-50/30 p-5 shadow-xl shadow-orange-100/30 sm:p-7"
+>
+
+  <!-- Decorative glow -->
+  <div
+    class="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-orange-300/20 blur-3xl"
+  ></div>
+
+  <div
+    class="pointer-events-none absolute -bottom-28 -left-20 h-64 w-64 rounded-full bg-violet-300/15 blur-3xl"
+  ></div>
+
+  <div class="relative">
+
+    <!-- Header -->
+    <div
+      class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between"
+    >
+
+      <div class="flex items-start gap-4">
+
+        <div
+          class="flex h-12 w-12 shrink-0 items-center justify-center rounded-[18px] border border-orange-200 bg-gradient-to-br from-orange-100 to-amber-100 text-xl shadow-sm"
+        >
+          🧭
+        </div>
+
+        <div>
+
+          <div
+            class="flex flex-wrap items-center gap-2"
+          >
+
+            <h3
+              class="text-sm font-black uppercase tracking-[0.16em] text-slate-800"
+            >
+              Comparison Explorer
+            </h3>
+
+            <span
+              class="rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-orange-600"
+              data-admin--ecosystems--load-sources--entities--entity-comparison-explorer-target="badge"
+            >
+              Explorer
+            </span>
+
+          </div>
+
+          <p
+            class="mt-1 max-w-2xl text-xs font-medium leading-5 text-slate-400"
+          >
+            Explore meaningful differences, discover structural movements,
+            and build your own collection of important changes.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <!-- XP / streak -->
+      <div
+        class="flex flex-wrap items-center gap-2"
+      >
+
+        <div
+          class="rounded-2xl border border-violet-200 bg-violet-50 px-3.5 py-2 text-center shadow-sm"
+        >
+          <div
+            class="text-[9px] font-black uppercase tracking-widest text-violet-400"
+          >
+            Experience
+          </div>
+
+          <div
+            class="mt-0.5 text-sm font-black text-violet-700"
+            data-admin--ecosystems--load-sources--entities--entity-comparison-explorer-target="xp"
+          >
+            0 XP
+          </div>
+        </div>
+
+
+        <div
+          class="rounded-2xl border border-orange-200 bg-orange-50 px-3.5 py-2 text-center shadow-sm"
+        >
+          <div
+            class="text-[9px] font-black uppercase tracking-widest text-orange-400"
+          >
+            Momentum
+          </div>
+
+          <div
+            class="mt-0.5 text-sm font-black text-orange-700"
+            data-admin--ecosystems--load-sources--entities--entity-comparison-explorer-target="streak"
+          >
+            0 discovery streak
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- Progress -->
+    <div
+      class="mt-6 rounded-[24px] border border-slate-100 bg-white/80 p-4 shadow-sm backdrop-blur"
+    >
+
+      <div
+        class="mb-2 flex items-center justify-between gap-4"
+      >
+
+        <span
+          class="text-[9px] font-black uppercase tracking-[0.18em] text-slate-400"
+        >
+          Exploration progress
+        </span>
+
+        <span
+          class="text-[10px] font-black text-orange-500"
+          data-admin--ecosystems--load-sources--entities--entity-comparison-explorer-target="progressLabel"
+        >
+          0% explored
+        </span>
+
+      </div>
+
+      <div
+        class="h-2.5 overflow-hidden rounded-full bg-slate-100"
+      >
+
+        <div
+          class="h-full w-0 rounded-full bg-gradient-to-r from-orange-400 via-amber-400 via-violet-400 to-emerald-400 shadow-sm shadow-orange-200 transition-all duration-700 ease-out"
+          data-admin--ecosystems--load-sources--entities--entity-comparison-explorer-target="progress"
+        ></div>
+
+      </div>
+
+      <div
+        class="mt-3 text-[10px] font-medium text-slate-400"
+        data-admin--ecosystems--load-sources--entities--entity-comparison-explorer-target="milestone"
+      >
+        Make your first discovery to begin.
+      </div>
+
+    </div>
+
+
+    <!-- Stats -->
+    <div
+      class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4"
+    >
+
+      <div
+        class="rounded-2xl border border-slate-100 bg-white/80 p-3 shadow-sm"
+      >
+        <div
+          class="text-[9px] font-black uppercase tracking-widest text-slate-400"
+        >
+          Visible
+        </div>
+
+        <div
+          class="mt-1 text-lg font-black text-slate-700"
+          data-admin--ecosystems--load-sources--entities--entity-comparison-explorer-target="visibleCount"
+        >
+          0
+        </div>
+      </div>
+
+
+      <div
+        class="rounded-2xl border border-amber-100 bg-amber-50/70 p-3 shadow-sm"
+      >
+        <div
+          class="text-[9px] font-black uppercase tracking-widest text-amber-500"
+        >
+          Pinned
+        </div>
+
+        <div
+          class="mt-1 text-lg font-black text-amber-700"
+          data-admin--ecosystems--load-sources--entities--entity-comparison-explorer-target="bookmarkCount"
+        >
+          0
+        </div>
+      </div>
+
+
+      <div
+        class="rounded-2xl border border-violet-100 bg-violet-50/70 p-3 shadow-sm"
+      >
+        <div
+          class="text-[9px] font-black uppercase tracking-widest text-violet-500"
+        >
+          Collection
+        </div>
+
+        <div
+          class="mt-1 text-xs font-black text-violet-700"
+          data-admin--ecosystems--load-sources--entities--entity-comparison-explorer-target="bookmarkedFacts"
+        >
+          No pinned discoveries
+        </div>
+      </div>
+
+
+      <div
+        class="flex items-center justify-center rounded-2xl border border-slate-100 bg-white/80 p-3 shadow-sm"
+      >
+
+        <button
+          type="button"
+          data-action="click->admin--ecosystems--load-sources--entities--entity-comparison-explorer#resetExplorer"
+          class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-500 transition hover:border-orange-200 hover:bg-orange-50 hover:text-orange-600"
+        >
+          Reset progress
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- Empty -->
+    <div
+      hidden
+      data-admin--ecosystems--load-sources--entities--entity-comparison-explorer-target="empty"
+      class="mt-5 rounded-2xl border border-dashed border-slate-200 bg-white/70 p-6 text-center"
+    >
+      <div class="text-2xl">🔎</div>
+
+      <div
+        class="mt-2 text-sm font-black text-slate-700"
+      >
+        No discoveries match your current view.
+      </div>
+
+      <p
+        class="mt-1 text-xs font-medium text-slate-400"
+      >
+        Adjust your filters to continue exploring.
+      </p>
+    </div>
+
+
+    <!-- Toast -->
+    <div
+      class="pointer-events-none fixed bottom-6 right-6 z-50 translate-y-3 rounded-2xl border border-slate-200 bg-slate-900 px-4 py-3 text-xs font-black text-white opacity-0 shadow-2xl transition-all duration-300"
+      data-admin--ecosystems--load-sources--entities--entity-comparison-explorer-target="toast"
+      aria-live="polite"
+    ></div>
+
+  </div>
+</section>

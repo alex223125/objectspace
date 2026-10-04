@@ -1,0 +1,347 @@
+<div
+  class="mb-6 overflow-hidden rounded-[30px]
+         border-2 border-orange-100
+         bg-gradient-to-br
+         from-white via-orange-50/30 to-slate-50
+         shadow-lg shadow-orange-100/30"
+>
+
+  <!-- ========================================================= -->
+  <!-- TOP BAR -->
+  <!-- ========================================================= -->
+
+  <div
+    class="flex flex-col gap-5
+           border-b border-orange-100
+           p-5 lg:flex-row
+           lg:items-center
+           lg:justify-between"
+  >
+
+    <div class="flex items-center gap-4">
+
+      <div
+        class="flex h-12 w-12 shrink-0
+               items-center justify-center
+               rounded-2xl
+               border border-orange-200
+               bg-orange-100
+               text-xl
+               shadow-sm"
+      >
+        🧭
+      </div>
+
+      <div>
+
+        <div
+          class="flex flex-wrap items-center gap-2"
+        >
+
+          <h3
+            class="text-sm font-black
+                   uppercase tracking-widest
+                   text-slate-800"
+          >
+            Comparison Explorer
+          </h3>
+
+          <span
+            class="rounded-full
+                   border border-emerald-200
+                   bg-emerald-50
+                   px-2.5 py-1
+                   text-[9px]
+                   font-black uppercase
+                   tracking-widest
+                   text-emerald-600"
+          >
+            Live
+          </span>
+
+        </div>
+
+        <p
+          class="mt-1 text-xs
+                 font-medium text-slate-400"
+        >
+          Explore the evolution of this entity
+          across versions.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- XP -->
+
+    <div
+      class="flex items-center gap-3"
+    >
+
+      <div
+        class="rounded-2xl
+               border border-amber-200
+               bg-gradient-to-r
+               from-amber-50 to-orange-50
+               px-4 py-2.5
+               shadow-sm"
+      >
+
+        <div
+          class="text-[8px]
+                 font-black uppercase
+                 tracking-[0.2em]
+                 text-amber-500"
+        >
+          Explorer progress
+        </div>
+
+        <div
+          data-entity-comparison-explorer-target="xp"
+          class="mt-0.5 text-sm
+                 font-black text-orange-600"
+        >
+          0 XP
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- SEARCH -->
+  <!-- ========================================================= -->
+
+  <div class="p-5">
+
+    <div
+      class="flex flex-col gap-3
+             lg:flex-row"
+    >
+
+      <div class="relative flex-1">
+
+        <span
+          class="pointer-events-none
+                 absolute left-4 top-1/2
+                 -translate-y-1/2
+                 text-slate-400"
+        >
+          ⌕
+        </span>
+
+        <input
+          type="search"
+          data-entity-comparison-explorer-target="search"
+          data-action="input->entity-comparison-explorer#searchChanged"
+          placeholder="Search paths, identities, values, changes..."
+          autocomplete="off"
+          class="w-full rounded-2xl
+                 border-2 border-slate-100
+                 bg-white
+                 py-3.5 pl-11 pr-20
+                 text-sm font-semibold
+                 text-slate-700
+                 outline-none
+                 transition
+                 placeholder:text-slate-300
+                 hover:border-orange-200
+                 focus:border-orange-400
+                 focus:ring-4
+                 focus:ring-orange-100"
+          />
+
+        <kbd
+          class="absolute right-3 top-1/2
+                 -translate-y-1/2
+                 rounded-lg
+                 border border-slate-200
+                 bg-slate-50
+                 px-2 py-1
+                 text-[9px]
+                 font-black text-slate-400"
+        >
+          /
+        </kbd>
+
+      </div>
+
+
+      <select
+        data-entity-comparison-explorer-target="typeFilter"
+        data-action="change->entity-comparison-explorer#typeFilterChanged"
+        class="rounded-2xl
+               border-2 border-slate-100
+               bg-white
+               px-4 py-3.5
+               text-sm font-bold
+               text-slate-600
+               outline-none
+               transition
+               hover:border-orange-200
+               focus:border-orange-400
+               focus:ring-4
+               focus:ring-orange-100"
+      >
+        <option value="all">All changes</option>
+        <option value="content_change">Content changes</option>
+        <option value="semantic_movement">Movements</option>
+        <option value="added_entity">Additions</option>
+        <option value="removed_entity">Removals</option>
+        <option value="identity_warning">Warnings</option>
+      </select>
+
+
+      <button
+        type="button"
+        data-action="click->entity-comparison-explorer#reset"
+        class="rounded-2xl
+               border-2 border-orange-200
+               bg-gradient-to-r
+               from-orange-400 to-amber-400
+               px-5 py-3.5
+               text-xs font-black
+               text-white
+               shadow-md
+               shadow-orange-200/50
+               transition
+               hover:-translate-y-0.5
+               hover:from-orange-500
+               hover:to-amber-500
+               focus-visible:outline-none
+               focus-visible:ring-4
+               focus-visible:ring-orange-200"
+      >
+        Reset
+      </button>
+
+    </div>
+
+
+    <!-- ======================================================= -->
+    <!-- FILTER CHIPS -->
+    <!-- ======================================================= -->
+
+    <div
+      class="mt-4 flex flex-wrap gap-2"
+    >
+
+      <% [
+           ["all", "Everything", "1"],
+           ["content_change", "Changes", "2"],
+           ["semantic_movement", "Moved", "3"],
+           ["added_entity", "Added", "4"],
+           ["removed_entity", "Removed", "5"]
+         ].each do |filter, label, shortcut| %>
+
+        <button
+          type="button"
+          data-filter="<%= filter %>"
+          data-entity-comparison-explorer-target="filterChip"
+          data-action="click->entity-comparison-explorer#chooseFilter"
+          aria-pressed="<%= filter == "all" ? "true" : "false" %>"
+          class="
+            rounded-full
+            border-2 border-slate-100
+            bg-white
+            px-3.5 py-1.5
+            text-[10px]
+            font-black
+            text-slate-500
+            shadow-sm
+            transition
+            hover:-translate-y-0.5
+            hover:border-orange-200
+            hover:text-orange-600
+            focus-visible:outline-none
+            focus-visible:ring-4
+            focus-visible:ring-orange-100
+          "
+        >
+          <%= label %>
+
+          <span
+            class="ml-1 text-[8px]
+                   opacity-50"
+          >
+            <%= shortcut %>
+          </span>
+
+        </button>
+
+      <% end %>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- PROGRESS -->
+  <!-- ========================================================= -->
+
+  <div class="px-5 pb-5">
+
+    <div
+      class="rounded-2xl
+             border border-orange-100
+             bg-white/80
+             p-4"
+    >
+
+      <div
+        class="mb-2 flex items-center
+               justify-between"
+      >
+
+        <span
+          class="text-[9px]
+                 font-black uppercase
+                 tracking-[0.18em]
+                 text-slate-400"
+        >
+          Exploration progress
+        </span>
+
+        <span
+          data-entity-comparison-explorer-target="progressLabel"
+          class="text-[10px]
+                 font-black
+                 text-orange-500"
+        >
+          0% explored
+        </span>
+
+      </div>
+
+      <div
+        class="h-2 overflow-hidden
+               rounded-full
+               bg-slate-100"
+      >
+
+        <div
+          data-entity-comparison-explorer-target="progress"
+          class="h-full w-0
+                 rounded-full
+                 bg-gradient-to-r
+                 from-orange-400
+                 via-amber-400
+                 to-emerald-400
+                 shadow-sm
+                 transition-all duration-500
+                 motion-reduce:transition-none"
+        ></div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

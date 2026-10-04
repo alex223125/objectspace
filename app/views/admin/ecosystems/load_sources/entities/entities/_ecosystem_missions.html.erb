@@ -1,0 +1,684 @@
+<%
+  ecosystem_missions =
+    [
+      {
+        id: "discover-three",
+        name: "Discover the ecosystem",
+        description: "Explore three ecosystem objectives and begin building your knowledge path.",
+        icon: "🧭",
+        xp: 50
+      },
+      {
+        id: "inspect-relationships",
+        name: "Map the connections",
+        description: "Inspect relationships between methods, algorithms, problems and technologies.",
+        icon: "🕸️",
+        xp: 75
+      },
+      {
+        id: "find-evolution",
+        name: "Follow the evolution",
+        description: "Trace how an idea changes across versions and identify a meaningful structural transition.",
+        icon: "🔄",
+        xp: 100
+      },
+      {
+        id: "ecosystem-investigator",
+        name: "Become an investigator",
+        description: "Complete multiple ecosystem investigations and build your exploration streak.",
+        icon: "🔎",
+        xp: 150
+      }
+    ]
+%>
+
+<%
+  ecosystem_achievements =
+    [
+      {
+        id: "first-explorer",
+        name: "First Explorer",
+        description: "Complete your first ecosystem mission.",
+        icon: "🌱",
+        missionThreshold: 1
+      },
+      {
+        id: "connection-hunter",
+        name: "Connection Hunter",
+        description: "Complete two ecosystem missions.",
+        icon: "🕸️",
+        missionThreshold: 2
+      },
+      {
+        id: "knowledge-scout",
+        name: "Knowledge Scout",
+        description: "Reach 150 XP.",
+        icon: "🧭",
+        xpThreshold: 150
+      },
+      {
+        id: "ecosystem-builder",
+        name: "Ecosystem Builder",
+        description: "Complete four ecosystem missions.",
+        icon: "🌍",
+        missionThreshold: 4
+      },
+      {
+        id: "intelligence-master",
+        name: "Intelligence Master",
+        description: "Reach 300 XP.",
+        icon: "✨",
+        xpThreshold: 300
+      }
+    ]
+%>
+
+<section
+  class="
+    mt-10
+    overflow-hidden
+    rounded-[38px]
+    border-2
+    border-orange-100
+    bg-gradient-to-b
+    from-white
+    via-orange-50/20
+    to-slate-50/50
+    shadow-md
+    shadow-orange-100/40
+  "
+  data-controller="entity-ecosystem-missions"
+  data-entity-ecosystem-missions-missions-value="<%= ERB::Util.html_escape(ecosystem_missions.to_json) %>"
+  data-entity-ecosystem-missions-achievements-value="<%= ERB::Util.html_escape(ecosystem_achievements.to_json) %>"
+>
+
+  <!-- Header -->
+
+  <div
+    class="
+      border-b-2
+      border-orange-100
+      bg-white/80
+      px-6
+      py-6
+      md:px-8
+    "
+  >
+
+    <div
+      class="
+        flex
+        flex-col
+        gap-5
+        lg:flex-row
+        lg:items-center
+        lg:justify-between
+      "
+    >
+
+      <div
+        class="
+          flex
+          items-start
+          gap-4
+        "
+      >
+
+        <div
+          class="
+            flex
+            h-12
+            w-12
+            shrink-0
+            items-center
+            justify-center
+            rounded-2xl
+            border
+            border-orange-200
+            bg-orange-100
+            text-xl
+            shadow-sm
+          "
+        >
+          🧭
+        </div>
+
+        <div>
+
+          <div
+            class="
+              text-[10px]
+              font-black
+              uppercase
+              tracking-[0.2em]
+              text-orange-500
+            "
+          >
+            Ecosystem missions
+          </div>
+
+          <h2
+            class="
+              mt-1
+              text-xl
+              font-black
+              tracking-tight
+              text-slate-800
+            "
+          >
+            Explore. Discover. Level up.
+          </h2>
+
+          <p
+            class="
+              mt-1
+              max-w-2xl
+              text-xs
+              leading-5
+              text-slate-400
+            "
+          >
+            Turn ecosystem exploration into a guided
+            knowledge journey with missions, XP and
+            achievements.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div
+        class="
+          flex
+          items-center
+          gap-2
+          rounded-full
+          border
+          border-orange-200
+          bg-orange-50
+          px-3.5
+          py-2
+          text-[9px]
+          font-black
+          uppercase
+          tracking-wider
+          text-orange-600
+        "
+      >
+
+        <span
+          class="
+            h-2
+            w-2
+            rounded-full
+            bg-orange-400
+            shadow-[0_0_8px_rgba(251,146,60,0.7)]
+          "
+        ></span>
+
+        Knowledge journey active
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Player progress -->
+
+  <div
+    class="
+      grid
+      grid-cols-1
+      gap-px
+      bg-orange-100
+      md:grid-cols-3
+    "
+  >
+
+    <div class="bg-white p-6">
+
+      <div
+        class="
+          text-[9px]
+          font-black
+          uppercase
+          tracking-widest
+          text-slate-400
+        "
+      >
+        Explorer level
+      </div>
+
+      <div class="mt-2 flex items-end gap-2">
+
+        <span
+          class="
+            text-3xl
+            font-black
+            text-orange-500
+          "
+          data-entity-ecosystem-missions-target="level"
+        >
+          1
+        </span>
+
+        <span
+          class="
+            pb-1
+            text-[10px]
+            font-black
+            uppercase
+            tracking-wider
+            text-slate-300
+          "
+        >
+          Level
+        </span>
+
+      </div>
+
+    </div>
+
+    <div class="bg-white p-6">
+
+      <div
+        class="
+          flex
+          items-center
+          justify-between
+        "
+      >
+
+        <div
+          class="
+            text-[9px]
+            font-black
+            uppercase
+            tracking-widest
+            text-slate-400
+          "
+        >
+          Knowledge XP
+        </div>
+
+        <div
+          class="
+            text-[10px]
+            font-black
+            text-orange-500
+          "
+        >
+          <span
+            data-entity-ecosystem-missions-target="xp"
+          >
+            0
+          </span>
+          XP
+        </div>
+
+      </div>
+
+      <div
+        class="
+          mt-4
+          h-2.5
+          overflow-hidden
+          rounded-full
+          border
+          border-orange-100
+          bg-orange-50
+        "
+      >
+
+        <div
+          class="
+            h-full
+            w-0
+            rounded-full
+            bg-gradient-to-r
+            from-orange-400
+            via-amber-400
+            to-emerald-400
+            shadow-sm
+            transition-all
+            duration-700
+          "
+          data-entity-ecosystem-missions-target="xpProgress"
+          role="progressbar"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="0"
+        ></div>
+
+      </div>
+
+    </div>
+
+    <div class="bg-white p-6">
+
+      <div
+        class="
+          text-[9px]
+          font-black
+          uppercase
+          tracking-widest
+          text-slate-400
+        "
+      >
+        Exploration streak
+      </div>
+
+      <div class="mt-2 flex items-end gap-2">
+
+        <span
+          class="
+            text-3xl
+            font-black
+            text-amber-500
+          "
+          data-entity-ecosystem-missions-target="streak"
+        >
+          0
+        </span>
+
+        <span
+          class="
+            pb-1
+            text-[10px]
+            font-black
+            uppercase
+            tracking-wider
+            text-slate-300
+          "
+        >
+          days 🔥
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Completion toast -->
+
+  <div
+    class="
+      hidden
+      border-b
+      border-emerald-100
+      bg-emerald-50
+      px-6
+      py-3
+      text-center
+      text-xs
+      font-black
+      text-emerald-600
+    "
+    data-entity-ecosystem-missions-target="completionNotice"
+    role="status"
+    aria-live="polite"
+  ></div>
+
+  <!-- Missions -->
+
+  <div class="p-6 md:p-8">
+
+    <div
+      class="
+        mb-5
+        flex
+        flex-col
+        gap-2
+        md:flex-row
+        md:items-end
+        md:justify-between
+      "
+    >
+
+      <div>
+
+        <div
+          class="
+            text-[9px]
+            font-black
+            uppercase
+            tracking-[0.18em]
+            text-orange-400
+          "
+        >
+          Current objectives
+        </div>
+
+        <div
+          class="
+            mt-1
+            text-lg
+            font-black
+            text-slate-700
+          "
+        >
+          Choose your next investigation
+        </div>
+
+      </div>
+
+      <div
+        class="
+          text-[10px]
+          font-bold
+          text-slate-400
+        "
+      >
+        Every completed mission earns knowledge XP.
+      </div>
+
+    </div>
+
+    <div
+      class="
+        grid
+        gap-4
+        md:grid-cols-2
+      "
+      data-entity-ecosystem-missions-target="missionList"
+    ></div>
+
+  </div>
+
+  <!-- Achievement section -->
+
+  <div
+    class="
+      border-t-2
+      border-orange-100
+      bg-white/70
+      p-6
+      md:p-8
+    "
+  >
+
+    <div
+      class="
+        mb-5
+        flex
+        items-center
+        justify-between
+      "
+    >
+
+      <div>
+
+        <div
+          class="
+            text-[9px]
+            font-black
+            uppercase
+            tracking-[0.18em]
+            text-slate-400
+          "
+        >
+          Achievement collection
+        </div>
+
+        <div
+          class="
+            mt-1
+            text-lg
+            font-black
+            text-slate-700
+          "
+        >
+          Milestones worth discovering
+        </div>
+
+      </div>
+
+      <div
+        class="
+          hidden
+          rounded-full
+          bg-amber-50
+          px-3
+          py-1.5
+          text-[9px]
+          font-black
+          uppercase
+          tracking-wider
+          text-amber-600
+          md:block
+        "
+      >
+        Collect them all
+      </div>
+
+    </div>
+
+    <div
+      class="
+        grid
+        grid-cols-2
+        gap-3
+        md:grid-cols-3
+        lg:grid-cols-5
+      "
+      data-entity-ecosystem-missions-target="achievementList"
+    ></div>
+
+  </div>
+
+  <!-- Journey footer -->
+
+  <div class="p-6 md:p-8">
+
+    <div
+      class="
+        rounded-[28px]
+        border-2
+        border-orange-100
+        bg-gradient-to-r
+        from-orange-50/80
+        via-white
+        to-emerald-50/60
+        p-6
+        shadow-sm
+      "
+    >
+
+      <div
+        class="
+          flex
+          flex-col
+          gap-5
+          md:flex-row
+          md:items-center
+          md:justify-between
+        "
+      >
+
+        <div
+          class="
+            flex
+            items-start
+            gap-4
+          "
+        >
+
+          <div
+            class="
+              flex
+              h-11
+              w-11
+              shrink-0
+              items-center
+              justify-center
+              rounded-2xl
+              border
+              border-orange-200
+              bg-orange-100
+              text-lg
+            "
+          >
+            🌱
+          </div>
+
+          <div>
+
+            <div
+              class="
+                text-sm
+                font-black
+                text-slate-700
+              "
+            >
+              Your knowledge journey is just beginning
+            </div>
+
+            <p
+              class="
+                mt-1
+                max-w-2xl
+                text-xs
+                leading-6
+                text-slate-400
+              "
+            >
+              Explore connections, investigate evolution,
+              compare competing approaches and gradually
+              build mastery across the ecosystem.
+            </p>
+
+          </div>
+
+        </div>
+
+        <div
+          class="
+            shrink-0
+            rounded-2xl
+            border-2
+            border-orange-200
+            bg-gradient-to-r
+            from-orange-400
+            to-amber-400
+            px-5
+            py-3
+            text-center
+            text-xs
+            font-black
+            text-white
+            shadow-md
+            shadow-orange-200/60
+          "
+        >
+          Keep exploring →
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>

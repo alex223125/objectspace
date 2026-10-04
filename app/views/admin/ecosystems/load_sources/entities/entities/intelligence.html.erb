@@ -1,0 +1,514 @@
+<%# ================================================================
+    CROSS-ENTITY INTELLIGENCE
+    STEP 9 — ECOSYSTEM INTELLIGENCE
+================================================================ %>
+
+<div
+  data-controller="entity-cross-intelligence"
+  class="space-y-5">
+
+  <% metrics = @intelligence[:metrics] %>
+
+  <%# ============================================================
+      MISSION HEADER
+  ============================================================= %>
+
+  <div class="relative overflow-hidden rounded-[28px] border border-slate-800 bg-slate-950 shadow-2xl">
+
+    <div
+      class="pointer-events-none absolute inset-0 opacity-20"
+      style="
+      background-image:
+        linear-gradient(rgba(99,102,241,.18) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(99,102,241,.18) 1px, transparent 1px);
+        background-size: 24px 24px;
+      ">
+    </div>
+
+    <div class="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-violet-500/10 blur-3xl"></div>
+
+    <div class="relative p-6 lg:p-8">
+
+      <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+
+        <div class="flex items-start gap-4">
+
+          <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-violet-400/30 bg-violet-500/10 text-2xl">
+            🧠
+          </div>
+
+          <div>
+
+            <div class="text-[10px] font-black uppercase tracking-[0.28em] text-violet-400">
+              Mission 09 // Ecosystem Intelligence
+            </div>
+
+            <h1 class="mt-1 text-2xl font-black tracking-tight text-white sm:text-3xl">
+              Cross-Entity Intelligence
+            </h1>
+
+            <p class="mt-2 max-w-3xl text-sm leading-relaxed text-slate-400">
+              Discover structural relationships, ecosystem hotspots,
+              quality pressure, review opportunities, and entity evolution
+              across the living registry.
+            </p>
+
+          </div>
+
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+
+          <%= link_to(
+                admin_ecosystems_load_sources_entities_path,
+                class: "rounded-xl border border-slate-700 bg-slate-900 px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-slate-300 transition hover:border-indigo-400 hover:text-white"
+              ) do %>
+            ENTITY REGISTRY
+          <% end %>
+
+          <%= link_to(
+                entities_intelligence_path(format: :json),
+                class: "rounded-xl bg-violet-500 px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-violet-500/20 transition hover:bg-violet-400"
+              ) do %>
+            JSON DATA
+          <% end %>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <%# ============================================================
+      ECOSYSTEM METRICS
+  ============================================================= %>
+
+  <div class="grid grid-cols-2 gap-3 lg:grid-cols-5">
+
+    <% [
+         [
+           "ENTITIES",
+           metrics[:total_entities],
+           "🧬",
+           "indigo"
+         ],
+         [
+           "PUBLISHED",
+           metrics[:published],
+           "✓",
+           "emerald"
+         ],
+         [
+           "IN REVIEW",
+           metrics[:review],
+           "◌",
+           "amber"
+         ],
+         [
+           "LOW HEALTH",
+           metrics[:low_health],
+           "!",
+           "orange"
+         ],
+         [
+           "COMPLETE",
+           metrics[:complete],
+           "◆",
+           "violet"
+         ]
+       ].each do |label, value, icon, color| %>
+
+      <div class="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+
+        <div class="flex items-center justify-between">
+
+          <span class="text-[9px] font-black uppercase tracking-[0.18em] text-gray-400">
+            <%= label %>
+          </span>
+
+          <span class="text-sm text-<%= color %>-500">
+            <%= icon %>
+          </span>
+
+        </div>
+
+        <div class="mt-2 text-2xl font-black text-gray-900 dark:text-white">
+          <%= number_with_delimiter(value) %>
+        </div>
+
+      </div>
+
+    <% end %>
+
+  </div>
+
+
+  <%# ============================================================
+      SIGNALS
+  ============================================================= %>
+
+  <section>
+
+    <div class="mb-3 flex items-center justify-between">
+
+      <div>
+
+        <div class="text-[10px] font-black uppercase tracking-[0.2em] text-violet-500">
+          Intelligence Signals
+        </div>
+
+        <div class="mt-1 text-xs text-gray-400">
+          Machine-derived ecosystem observations.
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="grid gap-3 lg:grid-cols-2">
+
+      <% @intelligence[:signals].each do |signal| %>
+
+        <% signal_classes =
+             case signal[:severity].to_s
+             when "positive"
+               "border-emerald-200 bg-emerald-50 dark:border-emerald-900 dark:bg-emerald-950/20"
+             when "warning"
+               "border-orange-200 bg-orange-50 dark:border-orange-900 dark:bg-orange-950/20"
+             else
+               "border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/20"
+             end
+        %>
+
+        <div class="rounded-2xl border p-4 <%= signal_classes %>">
+
+          <div class="flex items-start gap-3">
+
+            <div class="text-lg">
+              <%= signal[:severity].to_s == "positive" ? "✓" : "!" %>
+            </div>
+
+            <div>
+
+              <div class="text-sm font-black text-gray-800 dark:text-gray-100">
+                <%= signal[:title] %>
+              </div>
+
+              <p class="mt-1 text-xs leading-relaxed text-gray-500 dark:text-gray-400">
+                <%= signal[:message] %>
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      <% end %>
+
+    </div>
+
+  </section>
+
+
+  <%# ============================================================
+      RELATIONSHIP GRAPH
+  ============================================================= %>
+
+  <section
+    class="overflow-hidden rounded-[28px] border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+
+    <div class="border-b border-gray-200 px-5 py-4 dark:border-gray-800">
+
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+
+        <div>
+
+          <div class="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500">
+            Ecosystem Relationship Graph
+          </div>
+
+          <div class="mt-1 text-xs text-gray-400">
+            Relationship strength is inferred from shared structure,
+            metadata references, and conceptual similarity.
+          </div>
+
+        </div>
+
+        <div class="text-[9px] font-black uppercase tracking-widest text-gray-400">
+          <%= @intelligence[:relationships].length %> signals
+        </div>
+
+      </div>
+
+    </div>
+
+    <div
+      data-entity-cross-intelligence-target="graph"
+      class="min-h-[520px] bg-slate-950">
+    </div>
+
+  </section>
+
+
+  <%# ============================================================
+      HOTSPOTS
+  ============================================================= %>
+
+  <section>
+
+    <div class="mb-3">
+
+      <div class="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500">
+        Structural Hotspots
+      </div>
+
+      <div class="mt-1 text-xs text-gray-400">
+        Highly connected entities deserve disproportionate editorial attention.
+      </div>
+
+    </div>
+
+    <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+
+      <% @intelligence[:hotspots].first(8).each do |hotspot| %>
+
+        <div class="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+
+          <div class="flex items-center justify-between">
+
+            <span class="text-[9px] font-black uppercase tracking-widest text-gray-400">
+              HOTSPOT
+            </span>
+
+            <span class="rounded-full bg-orange-50 px-2 py-1 text-[9px] font-black text-orange-600 dark:bg-orange-950/30 dark:text-orange-400">
+              <%= hotspot[:hotspot_score] %>
+            </span>
+
+          </div>
+
+          <div class="mt-3 truncate text-sm font-black text-gray-800 dark:text-white">
+            <%= hotspot[:name] %>
+          </div>
+
+          <div class="mt-1 font-mono text-[9px] text-gray-400">
+            <%= hotspot[:slug] %>
+          </div>
+
+          <div class="mt-4 flex items-center justify-between text-[9px] font-bold text-gray-400">
+
+            <span>
+              <%= hotspot[:connections] %> connections
+            </span>
+
+            <span>
+              health <%= hotspot[:health_score] %>
+            </span>
+
+          </div>
+
+          <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+
+            <div
+              class="h-full rounded-full bg-gradient-to-r from-orange-500 to-amber-400"
+              style="width: <%= hotspot[:hotspot_score] %>%">
+            </div>
+
+          </div>
+
+        </div>
+
+      <% end %>
+
+    </div>
+
+  </section>
+
+
+  <%# ============================================================
+      REVIEW MISSIONS
+  ============================================================= %>
+
+  <section>
+
+    <div class="mb-3">
+
+      <div class="text-[10px] font-black uppercase tracking-[0.2em] text-amber-500">
+        Review Missions
+      </div>
+
+      <div class="mt-1 text-xs text-gray-400">
+        Highest-value opportunities for editorial intervention.
+      </div>
+
+    </div>
+
+    <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+
+      <% @intelligence[:review_opportunities].each do |opportunity| %>
+
+        <div class="border-b border-gray-100 p-4 last:border-0 dark:border-gray-800">
+
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+            <div>
+
+              <div class="text-sm font-black text-gray-800 dark:text-white">
+                <%= opportunity[:name] %>
+              </div>
+
+              <div class="mt-1 font-mono text-[9px] text-gray-400">
+                <%= opportunity[:slug] %>
+              </div>
+
+            </div>
+
+            <div class="flex items-center gap-2">
+
+              <span class="rounded-full bg-amber-50 px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-amber-600 dark:bg-amber-950/30 dark:text-amber-400">
+                Priority <%= opportunity[:priority] %>
+              </span>
+
+            </div>
+
+          </div>
+
+          <div class="mt-3 flex flex-wrap gap-2">
+
+            <% opportunity[:reasons].each do |reason| %>
+
+              <span class="rounded-lg border border-gray-200 bg-gray-50 px-2 py-1 text-[9px] font-bold text-gray-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-400">
+                <%= reason[:label] %>
+              </span>
+
+            <% end %>
+
+          </div>
+
+        </div>
+
+      <% end %>
+
+      <% if @intelligence[:review_opportunities].empty? %>
+
+        <div class="p-8 text-center">
+
+          <div class="text-2xl">
+            ✓
+          </div>
+
+          <div class="mt-2 text-sm font-black text-gray-700 dark:text-gray-200">
+            No major review opportunities detected.
+          </div>
+
+        </div>
+
+      <% end %>
+
+    </div>
+
+  </section>
+
+
+  <%# ============================================================
+      EVOLUTION
+  ============================================================= %>
+
+  <section class="grid gap-4 lg:grid-cols-2">
+
+    <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
+
+      <div class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500">
+        Emerging Entities
+      </div>
+
+      <div class="mt-1 text-xs text-gray-400">
+        Recently created or activated members of the ecosystem.
+      </div>
+
+      <div class="mt-4 space-y-2">
+
+        <% @intelligence[:emerging].each do |entity| %>
+
+          <div class="flex items-center justify-between rounded-xl bg-emerald-50 px-3 py-2 dark:bg-emerald-950/20">
+
+            <div class="min-w-0">
+
+              <div class="truncate text-xs font-black text-gray-800 dark:text-gray-100">
+                <%= entity[:name] %>
+              </div>
+
+              <div class="font-mono text-[8px] text-gray-400">
+                <%= entity[:slug] %>
+              </div>
+
+            </div>
+
+            <span class="ml-3 shrink-0 text-[9px] font-black text-emerald-600 dark:text-emerald-400">
+              <%= entity[:health_score] %>
+            </span>
+
+          </div>
+
+        <% end %>
+
+      </div>
+
+    </div>
+
+
+    <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
+
+      <div class="text-[10px] font-black uppercase tracking-[0.2em] text-red-500">
+        Declining Entities
+      </div>
+
+      <div class="mt-1 text-xs text-gray-400">
+        Entities showing lifecycle or activity risk.
+      </div>
+
+      <div class="mt-4 space-y-2">
+
+        <% @intelligence[:declining].each do |entity| %>
+
+          <div class="flex items-center justify-between rounded-xl bg-red-50 px-3 py-2 dark:bg-red-950/20">
+
+            <div class="min-w-0">
+
+              <div class="truncate text-xs font-black text-gray-800 dark:text-gray-100">
+                <%= entity[:name] %>
+              </div>
+
+              <div class="font-mono text-[8px] text-gray-400">
+                <%= entity[:signal] %>
+              </div>
+
+            </div>
+
+            <span class="ml-3 shrink-0 text-[9px] font-black text-red-600 dark:text-red-400">
+              <%= entity[:health_score] %>
+            </span>
+
+          </div>
+
+        <% end %>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <%# ============================================================
+      RAW DATA
+  ============================================================= %>
+
+  <script
+    type="application/json"
+    data-entity-cross-intelligence-target="payload"><%= raw @intelligence.to_json %></script>
+
+</div>

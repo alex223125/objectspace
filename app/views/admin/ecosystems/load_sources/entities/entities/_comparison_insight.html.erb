@@ -1,0 +1,51 @@
+<%# frozen_string_literal: true %>
+
+<%
+  insight_hash =
+    if insight.respond_to?(:to_h)
+      insight.to_h
+    else
+      {}
+    end
+
+  insight_hash =
+    insight_hash.respond_to?(:to_h) ?
+      insight_hash.to_h :
+      {}
+%>
+
+<div class="entity-diff-insight-card">
+
+  <% if insight_hash.empty? %>
+
+    <p>
+      No comparison insight available.
+    </p>
+
+  <% else %>
+
+    <dl class="entity-diff-insight-list">
+
+      <% insight_hash
+           .sort_by { |key, _value| key.to_s }
+           .each do |key, value| %>
+
+        <div class="entity-diff-insight-item">
+
+          <dt>
+            <%= key.to_s.humanize %>
+          </dt>
+
+          <dd>
+            <%= format_diff_value(value) %>
+          </dd>
+
+        </div>
+
+      <% end %>
+
+    </dl>
+
+  <% end %>
+
+</div>

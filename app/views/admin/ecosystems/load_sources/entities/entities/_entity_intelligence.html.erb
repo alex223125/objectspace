@@ -1,0 +1,61 @@
+<div
+  data-controller="entity-intelligence"
+  data-entity-intelligence-intelligence-url-value="<%= admin_ecosystems_load_sources_entity_intelligence_path(entity_id: entity.id) %>"
+  data-entity-intelligence-relationships-url-value="<%= discover_admin_ecosystems_load_sources_entity_relationships_path(entity_id: entity.id) %>"
+  class="space-y-4">
+
+  <div class="rounded-2xl border border-indigo-200 bg-indigo-50/50 p-4 dark:border-indigo-900/50 dark:bg-indigo-950/20">
+
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+      <div>
+        <div class="text-[9px] font-black uppercase tracking-[0.18em] text-indigo-500 dark:text-indigo-400">
+          Ecosystem Intelligence
+        </div>
+
+        <div class="mt-1 text-sm font-black text-gray-800 dark:text-white">
+          Cross-entity relationship intelligence
+        </div>
+
+        <div
+          data-entity-intelligence-target="status"
+          class="mt-1 text-[10px] text-gray-400">
+          Loading…
+        </div>
+      </div>
+
+      <button
+        type="button"
+        data-entity-intelligence-target="discoverButton"
+        data-action="click->entity-intelligence#discover"
+        class="rounded-xl bg-indigo-600 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50">
+        Discover relationships
+      </button>
+
+    </div>
+
+  </div>
+
+  <div>
+    <div class="mb-2 text-[9px] font-black uppercase tracking-[0.18em] text-gray-400">
+      Intelligence Signals
+    </div>
+
+    <div
+      data-entity-intelligence-target="signals"
+      class="space-y-2">
+    </div>
+  </div>
+
+  <div>
+    <div class="mb-2 text-[9px] font-black uppercase tracking-[0.18em] text-gray-400">
+      Related Entities
+    </div>
+
+    <div
+      data-entity-intelligence-target="relationships"
+      class="grid gap-3 md:grid-cols-2">
+    </div>
+  </div>
+
+</div>

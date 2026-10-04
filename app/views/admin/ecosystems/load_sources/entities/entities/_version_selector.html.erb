@@ -1,0 +1,181 @@
+<%# frozen_string_literal: true %>
+
+<section
+  class="entity-comparison__version-selector"
+  aria-label="Select versions to compare"
+>
+  <div class="entity-comparison__version-selector-header">
+    <div>
+      <h2>
+        Compare versions
+      </h2>
+
+      <p>
+        Select the earlier version and the newer version
+        you want to compare.
+      </p>
+    </div>
+  </div>
+
+  <% if defined?(@comparison_error) && @comparison_error.present? %>
+    <div
+      class="entity-comparison__selection-error"
+      role="alert"
+      data-version-selection-error
+    >
+      <%= @comparison_error %>
+    </div>
+  <% end %>
+
+  <% if @versions.blank? %>
+
+    <div class="entity-comparison__empty">
+      There are no entity versions available for comparison.
+    </div>
+
+  <% elsif @versions.length < 2 %>
+
+    <div
+      class="entity-comparison__empty"
+      role="status"
+    >
+      At least two entity versions are required for comparison.
+    </div>
+
+  <% else %>
+
+    <%= form_with(
+          url: request.path,
+          method: :get,
+          local: true,
+          data: {
+            "version-selection-form": true,
+            action: "submit->entity-version-compare#submitVersionSelection"
+          }
+        ) do %>
+
+      <div class="entity-comparison__version-selector-fields">
+
+        <!-- ======================================================
+             OLD VERSION
+             ====================================================== -->
+
+        <div class="entity-comparison__toolbar-field">
+
+          <label
+            for="entity-comparison-old-version"
+            class="entity-comparison__label"
+          >
+            Old version
+          </label>
+
+          <select
+            id="entity-comparison-old-version"
+            name="from_version"
+            class="entity-comparison__select"
+            data-version-old-select
+            data-action="change->entity-version-compare#versionChanged"
+            aria-describedby="entity-comparison-version-help"
+            required
+          >
+
+            <% @versions.each do |version| %>
+
+              <option
+                value="<%= version.id %>"
+                <%= "selected" if version.id.to_s == @old_version&.id.to_s %>
+              >
+                <%= comparison_version_label(version) %>
+              </option>
+
+            <% end %>
+
+          </select>
+
+        </div>
+
+        <!-- ======================================================
+             NEW VERSION
+             ====================================================== -->
+
+        <div class="entity-comparison__toolbar-field">
+
+          <label
+            for="entity-comparison-new-version"
+            class="entity-comparison__label"
+          >
+            New version
+          </label>
+
+          <select
+            id="entity-comparison-new-version"
+            name="to_version"
+            class="entity-comparison__select"
+            data-version-new-select
+            data-action="change->entity-version-compare#versionChanged"
+            aria-describedby="entity-comparison-version-help"
+            required
+          >
+
+            <% @versions.each do |version| %>
+
+              <option
+                value="<%= version.id %>"
+                <%= "selected" if version.id.to_s == @new_version&.id.to_s %>
+              >
+                <%= comparison_version_label(version) %>
+              </option>
+
+            <% end %>
+
+          </select>
+
+        </div>
+
+        <!-- ======================================================
+             ACTIONS
+             ====================================================== -->
+
+        <div class="entity-comparison__version-selector-actions">
+
+          <button
+            type="submit"
+            class="entity-comparison__button entity-comparison__button--primary"
+            data-version-submit
+          >
+            Compare versions
+          </button>
+
+          <button
+            type="button"
+            class="entity-comparison__button"
+            data-action="click->entity-version-compare#resetVersionSelection"
+          >
+            Reset versions
+          </button>
+
+        </div>
+
+      </div>
+
+      <p
+        id="entity-comparison-version-help"
+        class="entity-comparison__help"
+      >
+        Select two different versions. The comparison runs from
+        the old version to the new version.
+      </p>
+
+      <div
+        class="entity-comparison__selection-error"
+        data-version-selection-client-error
+        role="alert"
+        hidden
+      >
+        Old version and new version must be different.
+      </div>
+
+    <% end %>
+
+  <% end %>
+</section>

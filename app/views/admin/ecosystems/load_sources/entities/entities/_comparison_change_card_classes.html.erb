@@ -1,0 +1,108 @@
+<%
+  change_type = local_assigns.fetch(:change_type, "changed")
+
+  classes = {
+    "changed" => {
+      wrapper: "border-orange-200 bg-orange-50/30",
+      badge: "bg-orange-100 text-orange-700 border-orange-200",
+      accent: "bg-orange-400"
+    },
+
+    "moved" => {
+      wrapper: "border-violet-200 bg-violet-50/30",
+      badge: "bg-violet-100 text-violet-700 border-violet-200",
+      accent: "bg-violet-400"
+    },
+
+    "added" => {
+      wrapper: "border-emerald-200 bg-emerald-50/30",
+      badge: "bg-emerald-100 text-emerald-700 border-emerald-200",
+      accent: "bg-emerald-400"
+    },
+
+    "removed" => {
+      wrapper: "border-rose-200 bg-rose-50/30",
+      badge: "bg-rose-100 text-rose-700 border-rose-200",
+      accent: "bg-rose-400"
+    },
+
+    "identity" => {
+      wrapper: "border-amber-200 bg-amber-50/30",
+      badge: "bg-amber-100 text-amber-700 border-amber-200",
+      accent: "bg-amber-400"
+    }
+  }
+
+  style = classes.fetch(
+    change_type,
+    classes["changed"]
+  )
+%>
+
+<div
+  data-comparison-change
+  data-comparison-change-type="<%= change_type %>"
+  class="
+    group relative overflow-hidden
+    rounded-[24px]
+    border-2
+    <%= style[:wrapper] %>
+    bg-white/80
+    p-5
+    shadow-sm
+    transition-all duration-300
+    hover:-translate-y-0.5
+    hover:shadow-lg
+  ">
+
+  <div
+    class="
+      absolute left-0 top-0 bottom-0
+      w-1
+      <%= style[:accent] %>
+    ">
+  </div>
+
+  <div
+    class="flex items-center
+           justify-between gap-3">
+
+    <span
+      class="
+        rounded-full
+        border
+        px-3 py-1
+        text-[9px]
+        font-black
+        uppercase
+        tracking-widest
+        <%= style[:badge] %>
+      ">
+
+      <%= change_type %>
+
+    </span>
+
+    <% if local_assigns[:path].present? %>
+
+      <span
+        data-comparison-path
+        class="truncate text-[10px]
+               font-mono
+               text-slate-400">
+
+        <%= path %>
+
+      </span>
+
+    <% end %>
+
+  </div>
+
+  <div class="mt-4">
+
+    <%= yield if block_given? %>
+
+  </div>
+
+</div>

@@ -1,0 +1,59 @@
+<div
+  class="group relative overflow-hidden rounded-[28px]
+         border border-orange-100
+         bg-gradient-to-br
+         from-white
+         via-orange-50/20
+         to-violet-50/20
+         p-5
+         shadow-sm
+         transition-all duration-300
+         hover:-translate-y-1
+         hover:shadow-lg hover:shadow-orange-100/40">
+
+  <div
+    class="absolute -right-8 -top-8 h-24 w-24 rounded-full
+           bg-orange-100/40 blur-2xl
+           transition-all duration-500
+           group-hover:bg-violet-100/50">
+  </div>
+
+  <div class="relative flex items-start gap-4">
+
+    <div
+      class="flex h-11 w-11 shrink-0 items-center justify-center
+             rounded-2xl
+             bg-orange-100
+             text-lg
+             shadow-sm">
+
+      🧠
+
+    </div>
+
+    <div class="min-w-0">
+
+      <div
+        class="text-[9px] font-black uppercase
+               tracking-[0.18em] text-orange-500">
+
+        Comparison insight
+
+      </div>
+
+      <h4 class="mt-1 text-sm font-black text-slate-800">
+        <%= local_assigns.fetch(:title, "Structural evolution detected") %>
+      </h4>
+
+      <p class="mt-2 text-[11px] leading-5 text-slate-400">
+        <%= local_assigns.fetch(
+              :description,
+              "The current version contains meaningful structural changes that deserve review."
+            ) %>
+      </p>
+
+    </div>
+
+  </div>
+
+</div>

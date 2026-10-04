@@ -1,0 +1,102 @@
+<%
+  comparison_entity =
+    if defined?(@entity) && @entity.present?
+      @entity
+    else
+      nil
+    end
+%>
+
+<% if comparison_entity %>
+
+  <%
+    comparison_intelligence =
+      ::Ecosystems::LoadSources::Entity::EntityIntelligence
+        .new(comparison_entity)
+        .call
+  %>
+
+  <div class="mt-6 rounded-[28px] border border-indigo-200 bg-gradient-to-br from-indigo-50 via-white to-violet-50 p-5 shadow-sm dark:border-indigo-900/50 dark:from-indigo-950/30 dark:via-gray-900 dark:to-violet-950/20">
+
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
+      <div>
+
+        <div class="text-[10px] font-black uppercase tracking-[.22em] text-indigo-500 dark:text-indigo-400">
+          Cross-Entity Intelligence
+        </div>
+
+        <h3 class="mt-1 text-lg font-black text-gray-900 dark:text-white">
+          Ecosystem context detected
+        </h3>
+
+        <p class="mt-1 max-w-2xl text-xs leading-relaxed text-gray-500 dark:text-gray-400">
+          This comparison can be interpreted alongside the entity's
+          structural relationships, health signals, and evolution history.
+        </p>
+
+      </div>
+
+      <%= link_to(
+            "OPEN INTELLIGENCE",
+            intelligence_admin_ecosystems_load_sources_entity_path(comparison_entity),
+            class: "inline-flex shrink-0 items-center justify-center rounded-xl bg-indigo-600 px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-white transition hover:bg-indigo-500"
+          ) %>
+
+    </div>
+
+    <div class="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">
+
+      <div class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/60">
+
+        <div class="text-[9px] font-black uppercase text-gray-400">
+          Health
+        </div>
+
+        <div class="mt-1 text-xl font-black text-gray-900 dark:text-white">
+          <%= comparison_intelligence[:entity][:health][:score] %>%
+        </div>
+
+      </div>
+
+      <div class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/60">
+
+        <div class="text-[9px] font-black uppercase text-gray-400">
+          Relationships
+        </div>
+
+        <div class="mt-1 text-xl font-black text-indigo-600 dark:text-indigo-400">
+          <%= comparison_intelligence[:relationships][:count] %>
+        </div>
+
+      </div>
+
+      <div class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/60">
+
+        <div class="text-[9px] font-black uppercase text-gray-400">
+          Signals
+        </div>
+
+        <div class="mt-1 text-xl font-black text-amber-500">
+          <%= comparison_intelligence[:signals].length %>
+        </div>
+
+      </div>
+
+      <div class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/60">
+
+        <div class="text-[9px] font-black uppercase text-gray-400">
+          Versions
+        </div>
+
+        <div class="mt-1 text-xl font-black text-violet-600 dark:text-violet-400">
+          <%= comparison_intelligence[:evolution][:version_count] %>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+<% end %>

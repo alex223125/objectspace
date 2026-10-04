@@ -1,0 +1,228 @@
+<%
+  totals = intelligence[:totals]
+  signals = intelligence[:signals]
+  strongest = intelligence[:strongest_relationships]
+  isolated = intelligence[:isolated_entities]
+  hotspots = intelligence[:hotspots]
+%>
+
+<section
+  class="rounded-[30px] border border-indigo-200/70 bg-gradient-to-br from-indigo-50 via-white to-violet-50 p-5 shadow-sm dark:border-indigo-900/50 dark:from-indigo-950/30 dark:via-gray-950 dark:to-violet-950/20">
+
+  <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+
+    <div>
+
+      <div class="text-[9px] font-black uppercase tracking-[0.25em] text-indigo-500">
+        Cross-Entity Intelligence
+      </div>
+
+      <h2 class="mt-1 text-xl font-black tracking-tight text-gray-900 dark:text-white">
+        Ecosystem Network
+      </h2>
+
+      <p class="mt-1 max-w-2xl text-xs leading-relaxed text-gray-500 dark:text-gray-400">
+        Structural intelligence generated from relationships between entities.
+      </p>
+
+    </div>
+
+    <div class="rounded-2xl border border-indigo-200 bg-white/80 px-4 py-3 dark:border-indigo-900 dark:bg-gray-900/70">
+
+      <div class="text-[9px] font-black uppercase tracking-wider text-gray-400">
+        Network State
+      </div>
+
+      <div class="mt-1 text-sm font-black text-indigo-600 dark:text-indigo-400">
+        <%= totals[:relationships] %> relationships
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-5">
+
+    <% [
+         ["Entities", totals[:entities], "indigo"],
+         ["Relationships", totals[:relationships], "violet"],
+         ["Confirmed", totals[:confirmed], "emerald"],
+         ["Suggested", totals[:suggested], "amber"],
+         ["High Confidence", totals[:high_confidence], "sky"]
+       ].each do |label, value, color| %>
+
+      <div class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-900/70">
+
+        <div class="text-[9px] font-black uppercase tracking-wider text-gray-400">
+          <%= label %>
+        </div>
+
+        <div class="mt-2 text-2xl font-black text-<%= color %>-600 dark:text-<%= color %>-400">
+          <%= number_with_delimiter(value) %>
+        </div>
+
+      </div>
+
+    <% end %>
+
+  </div>
+
+  <% if signals.any? %>
+
+    <div class="mt-5 grid gap-2 lg:grid-cols-3">
+
+      <% signals.each do |signal| %>
+
+        <div class="rounded-2xl border border-gray-200 bg-white/70 p-4 dark:border-gray-800 dark:bg-gray-900/60">
+
+          <div class="text-xs font-black text-gray-800 dark:text-gray-100">
+            <%= signal[:title] %>
+          </div>
+
+          <p class="mt-1 text-[10px] leading-relaxed text-gray-500 dark:text-gray-400">
+            <%= signal[:message] %>
+          </p>
+
+        </div>
+
+      <% end %>
+
+    </div>
+
+  <% end %>
+
+  <div class="mt-5 grid gap-5 lg:grid-cols-3">
+
+    <div class="lg:col-span-2">
+
+      <div class="mb-3 text-[9px] font-black uppercase tracking-[0.18em] text-gray-400">
+        Strongest Network Connections
+      </div>
+
+      <% if strongest.any? %>
+
+        <div class="space-y-2">
+
+          <% strongest.each do |relationship| %>
+
+            <div class="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white/70 p-3 dark:border-gray-800 dark:bg-gray-900/60">
+
+              <div class="min-w-0 flex-1">
+
+                <div class="flex flex-col gap-1 sm:flex-row sm:items-center">
+
+                  <span class="truncate text-xs font-black text-gray-800 dark:text-gray-100">
+                    <%= relationship[:source][:name] %>
+                  </span>
+
+                  <span class="hidden text-gray-300 sm:block">
+                    →
+                  </span>
+
+                  <span class="truncate text-xs font-black text-gray-800 dark:text-gray-100">
+                    <%= relationship[:target][:name] %>
+                  </span>
+
+                </div>
+
+                <div class="mt-1 text-[9px] text-gray-400">
+                  <%= relationship[:kind].to_s.humanize %>
+                </div>
+
+              </div>
+
+              <div class="shrink-0 text-right">
+
+                <div class="text-sm font-black text-violet-600 dark:text-violet-400">
+                  <%= relationship[:confidence_percent] %>%
+                </div>
+
+                <div class="text-[8px] font-black uppercase text-gray-400">
+                  confidence
+                </div>
+
+              </div>
+
+            </div>
+
+          <% end %>
+
+        </div>
+
+      <% else %>
+
+        <div class="rounded-2xl border border-dashed border-gray-300 p-8 text-center dark:border-gray-700">
+
+          <div class="text-sm font-black text-gray-700 dark:text-gray-200">
+            Network not populated
+          </div>
+
+          <div class="mt-1 text-xs text-gray-400">
+            Run the relationship discovery task.
+          </div>
+
+        </div>
+
+      <% end %>
+
+    </div>
+
+    <div>
+
+      <div class="mb-3 text-[9px] font-black uppercase tracking-[0.18em] text-gray-400">
+        Structural Hotspots
+      </div>
+
+      <div class="space-y-2">
+
+        <% hotspots.each do |hotspot| %>
+
+          <div class="rounded-2xl border border-gray-200 bg-white/70 p-3 dark:border-gray-800 dark:bg-gray-900/60">
+
+            <div class="flex items-center justify-between">
+
+              <span class="text-xs font-black text-gray-700 dark:text-gray-200">
+                <%= hotspot[:kind].to_s.humanize %>
+              </span>
+
+              <span class="text-xs font-black text-indigo-600 dark:text-indigo-400">
+                <%= hotspot[:count] %>
+              </span>
+
+            </div>
+
+            <div class="mt-1 text-[9px] text-gray-400">
+              relationship cluster
+            </div>
+
+          </div>
+
+        <% end %>
+
+      </div>
+
+      <% if isolated.any? %>
+
+        <div class="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/50 dark:bg-amber-950/20">
+
+          <div class="text-[9px] font-black uppercase tracking-wider text-amber-600">
+            Review Opportunity
+          </div>
+
+          <div class="mt-1 text-xs font-black text-amber-800 dark:text-amber-300">
+            <%= isolated.length %> isolated entities
+          </div>
+
+          <div class="mt-1 text-[10px] leading-relaxed text-amber-700/70 dark:text-amber-400/70">
+            These entities currently have no discovered ecosystem relationships.
+          </div>
+
+        </div>
+
+      <% end %>
+
+    </div>
+
+  </div>
+
+</section>

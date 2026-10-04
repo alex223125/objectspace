@@ -608,15 +608,23 @@ REGISTRY
 
               </td>
 
-              <td class="px-4 py-4 text-right">
+              <div class="flex items-center justify-end gap-1">
 
                 <%= link_to(
                       "VIEW",
                       admin_ecosystems_load_sources_entity_path(entity),
-                      class: "rounded-lg px-2 py-1 text-[9px] font-black text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950"
+                      class:
+                        "rounded-lg px-2 py-1 text-[9px] font-black text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950"
                     ) %>
 
-              </td>
+                <%= link_to(
+                      "LINKS",
+                      admin_ecosystems_load_sources_entity_relationships_path(entity),
+                      class:
+                        "rounded-lg px-2 py-1 text-[9px] font-black text-violet-600 hover:bg-violet-50 dark:text-violet-400 dark:hover:bg-violet-950"
+                    ) %>
+
+              </div>
 
             </tr>
 
@@ -784,3 +792,90 @@ FIELD MANUAL FOOTER
     </div>
 
   </div> </div>
+
+
+<%= render "ecosystem_analytics" %>
+<%= render "ecosystem_relationship_graph" %>
+
+
+<% if @entities.present? %>
+
+  <div class="rounded-[28px] border border-violet-200 bg-violet-50/50 p-5 dark:border-violet-900/60 dark:bg-violet-950/20">
+
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
+      <div>
+
+        <div class="text-[10px] font-black uppercase tracking-[0.2em] text-violet-500 dark:text-violet-400">
+          Cross-Entity Intelligence
+        </div>
+
+        <div class="mt-1 text-sm font-black text-gray-800 dark:text-white">
+          Explore the relationship network
+        </div>
+
+        <p class="mt-1 max-w-2xl text-xs leading-relaxed text-gray-500 dark:text-gray-400">
+          Discover structural relationships between entities using
+          shared types, templates, scopes, concepts and temporal signals.
+        </p>
+
+      </div>
+
+      <% first_entity = @entities.first %>
+
+      <%= link_to(
+            "OPEN INTELLIGENCE",
+            admin_ecosystems_load_sources_entities_intelligence_path(
+              entity_id: first_entity.id
+            ),
+            class: "inline-flex shrink-0 items-center justify-center rounded-xl bg-violet-600 px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-violet-500/20 transition hover:bg-violet-500"
+          ) %>
+
+    </div>
+
+  </div>
+
+<% end %>
+
+
+
+
+
+<%= render "ecosystem_analytics" %>
+
+<%= render(
+      "ecosystem_relationship_graph",
+      graph_entities: @entities
+    ) %>
+
+<%= render "relationship_graph_mount" %>
+
+
+<%= render(
+      "cross_entity_intelligence",
+      entities: @entities
+    ) %>
+
+<%= render(
+      "cross_entity_intelligence_payload",
+      entities: @entities
+    ) %>
+
+<%= render(
+      "cross_entity_graph_preview",
+      entities: @entities
+    ) %>
+
+
+<%
+  ecosystem_intelligence =
+    Ecosystems::LoadSources::Entity::
+        EcosystemIntelligence
+      .new
+      .call
+%>
+
+<%= render(
+      "ecosystem_intelligence",
+      intelligence: ecosystem_intelligence
+    ) %>

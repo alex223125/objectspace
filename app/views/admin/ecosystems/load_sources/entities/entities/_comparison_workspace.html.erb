@@ -1,0 +1,509 @@
+<div
+  data-controller="admin--ecosystems--load-sources--entities--entity-comparison-workspace"
+  data-entity-comparison
+  class="comparison-workspace max-w-7xl mx-auto my-10 px-4 sm:px-6 lg:px-8"
+>
+
+  <!-- HERO -->
+
+  <div
+    class="
+      overflow-hidden
+      rounded-[34px]
+      border-2 border-orange-100
+      bg-gradient-to-br
+      from-white
+      via-orange-50/40
+      to-emerald-50/40
+      shadow-xl shadow-orange-100/30
+    "
+  >
+
+    <div class="p-6 sm:p-8 lg:p-10">
+
+      <div
+        class="
+          flex flex-col gap-6
+          lg:flex-row
+          lg:items-start
+          lg:justify-between
+        "
+      >
+
+        <div class="flex items-start gap-4">
+
+          <div
+            class="
+              flex h-14 w-14 shrink-0
+              items-center justify-center
+              rounded-[20px]
+              border-2 border-orange-200
+              bg-orange-100
+              text-2xl
+              shadow-sm
+            "
+          >
+            🔬
+          </div>
+
+          <div>
+
+            <div
+              class="
+                mb-1
+                text-[10px]
+                font-black
+                uppercase
+                tracking-[0.2em]
+                text-orange-500
+              "
+            >
+              Intelligence workspace
+            </div>
+
+            <h1
+              class="
+                text-2xl
+                font-black
+                tracking-tight
+                text-slate-800
+                sm:text-3xl
+              "
+            >
+              Entity Evolution Lab
+            </h1>
+
+            <p
+              class="
+                mt-2
+                max-w-2xl
+                text-sm
+                leading-6
+                text-slate-500
+              "
+            >
+              Explore how knowledge changes between versions,
+              discover structural movement, and identify important
+              signals across the ecosystem.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="
+            flex items-center gap-3
+            rounded-2xl
+            border border-emerald-200
+            bg-emerald-50
+            px-4 py-3
+          "
+        >
+
+          <span
+            class="
+              h-2.5 w-2.5
+              rounded-full
+              bg-emerald-400
+              shadow-[0_0_12px_rgba(52,211,153,.7)]
+            "
+          ></span>
+
+          <span
+            class="
+              text-xs
+              font-black
+              text-emerald-700
+            "
+          >
+            Live comparison
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- PROGRESS -->
+
+      <div class="mt-8">
+
+        <div class="mb-2 flex items-center justify-between">
+
+          <span
+            class="
+              text-[10px]
+              font-black
+              uppercase
+              tracking-widest
+              text-slate-400
+            "
+          >
+            Exploration progress
+          </span>
+
+          <span
+            data-admin--ecosystems--load-sources--entities--entity-comparison-workspace-target="progressLabel"
+            class="
+              text-[10px]
+              font-black
+              text-orange-500
+            "
+          >
+            0% of comparison visible
+          </span>
+
+        </div>
+
+        <div
+          class="
+            h-3
+            overflow-hidden
+            rounded-full
+            border border-orange-100
+            bg-white
+          "
+        >
+
+          <div
+            data-admin--ecosystems--load-sources--entities--entity-comparison-workspace-target="progress"
+            class="
+              h-full
+              w-0
+              rounded-full
+              bg-gradient-to-r
+              from-orange-400
+              via-amber-400
+              via-sky-400
+              to-emerald-400
+              shadow-sm
+              transition-all
+              duration-500
+            "
+          ></div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- TOOLBAR -->
+
+    <div
+      class="
+        border-t border-orange-100
+        bg-white/70
+        p-4
+        sm:p-5
+      "
+    >
+
+      <div
+        class="
+          grid
+          gap-3
+          md:grid-cols-[1fr_220px_auto_auto]
+        "
+      >
+
+        <label class="relative">
+
+          <span class="sr-only">
+            Search comparison
+          </span>
+
+          <span
+            class="
+              pointer-events-none
+              absolute left-4 top-1/2
+              -translate-y-1/2
+              text-slate-400
+            "
+          >
+            ⌕
+          </span>
+
+          <input
+            data-admin--ecosystems--load-sources--entities--entity-comparison-workspace-target="search"
+            data-action="input->admin--ecosystems--load-sources--entities--entity-comparison-workspace#searchChanged"
+            type="search"
+            placeholder="Search paths, identities or values..."
+            class="
+              h-12 w-full
+              rounded-2xl
+              border-2 border-slate-100
+              bg-white
+              pl-11 pr-4
+              text-sm font-medium
+              text-slate-700
+              outline-none
+              transition
+              placeholder:text-slate-400
+              focus:border-orange-300
+              focus:ring-4
+              focus:ring-orange-100
+            "
+          >
+
+        </label>
+
+
+        <select
+          data-admin--ecosystems--load-sources--entities--entity-comparison-workspace-target="typeFilter"
+          data-action="change->admin--ecosystems--load-sources--entities--entity-comparison-workspace#typeChanged"
+          class="
+            h-12
+            rounded-2xl
+            border-2 border-slate-100
+            bg-white
+            px-4
+            text-sm
+            font-bold
+            text-slate-600
+            outline-none
+            focus:border-orange-300
+            focus:ring-4
+            focus:ring-orange-100
+          "
+        >
+          <option value="all">All signals</option>
+          <option value="content_change">Changed</option>
+          <option value="semantic_movement">Moved</option>
+          <option value="added_entity">Added</option>
+          <option value="removed_entity">Removed</option>
+          <option value="identity_warning">Warnings</option>
+        </select>
+
+
+        <button
+          type="button"
+          data-action="click->admin--ecosystems--load-sources--entities--entity-comparison-workspace#toggleFocusMode"
+          class="
+            h-12
+            rounded-2xl
+            border-2 border-violet-200
+            bg-violet-50
+            px-5
+            text-xs
+            font-black
+            text-violet-700
+            transition
+            hover:-translate-y-0.5
+            hover:bg-violet-100
+          "
+        >
+          <span
+            data-admin--ecosystems--load-sources--entities--entity-comparison-workspace-target="focusLabel"
+          >
+            Focus mode
+          </span>
+        </button>
+
+
+        <button
+          type="button"
+          data-action="click->admin--ecosystems--load-sources--entities--entity-comparison-workspace#reset"
+          class="
+            h-12
+            rounded-2xl
+            border-2 border-orange-200
+            bg-orange-50
+            px-5
+            text-xs
+            font-black
+            text-orange-700
+            transition
+            hover:-translate-y-0.5
+            hover:bg-orange-100
+          "
+        >
+          Reset
+        </button>
+
+      </div>
+
+
+      <div class="mt-4 flex flex-wrap items-center gap-4">
+
+        <div class="text-xs font-bold text-slate-400">
+          Showing
+          <strong
+            data-admin--ecosystems--load-sources--entities--entity-comparison-workspace-target="visibleCount"
+            class="text-slate-700"
+          >0</strong>
+          /
+          <strong
+            data-admin--ecosystems--load-sources--entities--entity-comparison-workspace-target="totalCount"
+            class="text-slate-700"
+          >0</strong>
+          signals
+        </div>
+
+        <div
+          class="
+            flex items-center gap-2
+            rounded-full
+            bg-orange-50
+            px-3 py-1.5
+            text-[10px]
+            font-black
+            uppercase
+            tracking-wider
+            text-orange-600
+          "
+        >
+          🧭 Exploration XP
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ACHIEVEMENT -->
+
+  <div
+    data-admin--ecosystems--load-sources--entities--entity-comparison-workspace-target="achievement"
+    data-unlocked=""
+    hidden
+    class="
+      mt-5
+      rounded-[26px]
+      border-2 border-amber-200
+      bg-gradient-to-r
+      from-amber-50
+      via-orange-50
+      to-yellow-50
+      p-5
+      shadow-lg shadow-amber-100/40
+    "
+  >
+
+    <div class="flex items-start gap-4">
+
+      <div
+        class="
+          flex h-12 w-12 shrink-0
+          items-center justify-center
+          rounded-2xl
+          bg-amber-100
+          text-xl
+        "
+      >
+        🏆
+      </div>
+
+      <div>
+
+        <div
+          class="
+            text-[10px]
+            font-black
+            uppercase
+            tracking-widest
+            text-amber-600
+          "
+        >
+          Achievement unlocked
+        </div>
+
+        <div
+          data-admin--ecosystems--load-sources--entities--entity-comparison-workspace-target="achievementTitle"
+          class="
+            mt-1
+            text-lg
+            font-black
+            text-slate-800
+          "
+        ></div>
+
+        <p
+          data-admin--ecosystems--load-sources--entities--entity-comparison-workspace-target="achievementText"
+          class="
+            mt-1
+            text-xs
+            leading-5
+            text-slate-500
+          "
+        ></p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ACTIVITY -->
+
+  <div
+    class="
+      mt-5
+      rounded-[26px]
+      border-2 border-slate-100
+      bg-white
+      p-5
+      shadow-sm
+    "
+  >
+
+    <div class="flex items-center justify-between">
+
+      <div>
+
+        <div
+          class="
+            text-[10px]
+            font-black
+            uppercase
+            tracking-widest
+            text-slate-400
+          "
+        >
+          Recent exploration
+        </div>
+
+        <div
+          class="
+            mt-1
+            text-sm
+            font-black
+            text-slate-700
+          "
+        >
+          Workspace activity
+        </div>
+
+      </div>
+
+      <span
+        data-admin--ecosystems--load-sources--entities--entity-comparison-workspace-target="activityCount"
+        class="
+          rounded-full
+          bg-slate-100
+          px-3 py-1
+          text-[10px]
+          font-black
+          text-slate-500
+        "
+      >
+        0
+      </span>
+
+    </div>
+
+    <div
+      data-admin--ecosystems--load-sources--entities--entity-comparison-workspace-target="activity"
+      class="mt-4 space-y-2"
+    >
+    </div>
+
+  </div>
+
+</div>

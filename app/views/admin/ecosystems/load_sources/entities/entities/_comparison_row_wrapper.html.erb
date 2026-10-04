@@ -1,0 +1,15 @@
+<div
+  data-comparison-row
+  data-change-type="<%= fact[:type] || fact["type"] %>"
+  data-comparison-path="<%= Array(fact[:path] || fact["path"]).join(" › ") %>"
+  data-comparison-identity="<%= fact[:identity] || fact["identity"] %>"
+  data-old-value="<%= fact[:old_value].to_json rescue fact["old_value"] %>"
+  data-new-value="<%= fact[:new_value].to_json rescue fact["new_value"] %>"
+  class="
+    entity-comparison-row
+    transition-all
+    duration-200
+  "
+>
+  <%= yield %>
+</div>

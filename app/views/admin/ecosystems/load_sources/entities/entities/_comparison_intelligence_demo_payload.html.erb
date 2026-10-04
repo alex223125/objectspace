@@ -1,0 +1,75 @@
+<script
+  type="application/json"
+  data-entity-comparison-intelligence-demo-payload>
+
+  {
+    "changes": [
+      {
+        "id": "title",
+        "type": "changed",
+        "path": "identity.title",
+        "label": "Entity title",
+        "severity": "medium"
+      },
+      {
+        "id": "category",
+        "type": "changed",
+        "path": "identity.category",
+        "label": "Entity category",
+        "severity": "high"
+      },
+      {
+        "id": "method",
+        "type": "added",
+        "path": "methods.primary",
+        "label": "Primary method",
+        "severity": "low"
+      },
+      {
+        "id": "method-secondary",
+        "type": "added",
+        "path": "methods.secondary",
+        "label": "Secondary method",
+        "severity": "low"
+      },
+      {
+        "id": "deprecated",
+        "type": "removed",
+        "path": "methods.deprecated",
+        "label": "Deprecated method",
+        "severity": "medium"
+      },
+      {
+        "id": "architecture",
+        "type": "moved",
+        "path": "architecture.layers",
+        "label": "Architecture layer",
+        "severity": "medium"
+      },
+      {
+        "id": "architecture-2",
+        "type": "moved",
+        "path": "architecture.layers",
+        "label": "Architecture dependency",
+        "severity": "medium"
+      },
+      {
+        "id": "warning-1",
+        "type": "changed",
+        "path": "identity.entity_type",
+        "label": "Entity identity",
+        "severity": "high"
+      }
+    ],
+
+    "warnings": [
+      {
+        "id": "identity-warning",
+        "path": "identity.entity_type",
+        "label": "Entity identity requires verification",
+        "severity": "high"
+      }
+    ]
+  }
+
+</script>

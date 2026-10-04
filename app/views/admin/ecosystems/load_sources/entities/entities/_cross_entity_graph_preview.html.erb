@@ -1,0 +1,106 @@
+<%
+  intelligence =
+    Ecosystems::LoadSources::Entity::CrossEntityIntelligence.new(
+      entities: entities
+    ).call
+
+  relationships = intelligence[:relationships].first(12)
+
+  nodes =
+    relationships
+      .flat_map do |relationship|
+      [
+        [
+          relationship[:source_id],
+          relationship[:source_name]
+        ],
+        [
+          relationship[:target_id],
+          relationship[:target_name]
+        ]
+      ]
+    end
+      .uniq
+      .first(20)
+%>
+
+<section class="rounded-[28px] border border-sky-200 bg-slate-950 p-5 shadow-xl dark:border-sky-900/50">
+
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+    <div>
+
+      <div class="text-[9px] font-black uppercase tracking-[0.2em] text-sky-400">
+        Ecosystem Topology
+      </div>
+
+      <h3 class="mt-1 text-sm font-black text-white">
+        Relationship Network Preview
+      </h3>
+
+      <p class="mt-1 text-[10px] text-slate-400">
+        Current deterministic relationship signals.
+      </p>
+
+    </div>
+
+    <span class="rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1.5 text-[8px] font-black uppercase tracking-widest text-sky-400">
+      GRAPH FOUNDATION
+    </span>
+
+  </div>
+
+  <% if relationships.any? %>
+
+    <div class="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+
+      <% nodes.each do |id, name| %>
+
+        <%= link_to(
+              admin_ecosystems_load_sources_entity_path(id),
+              class: "group rounded-xl border border-slate-800 bg-slate-900/80 p-3 transition hover:border-sky-500/50 hover:bg-slate-900"
+            ) do %>
+
+          <div class="flex items-center gap-3">
+
+            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sky-500/10 text-sm text-sky-400">
+              ◉
+            </div>
+
+            <div class="min-w-0">
+
+              <div class="truncate text-[10px] font-black text-slate-200 group-hover:text-sky-300">
+                <%= name %>
+              </div>
+
+              <div class="mt-0.5 font-mono text-[8px] text-slate-500">
+                NODE #<%= id %>
+              </div>
+
+            </div>
+
+          </div>
+
+        <% end %>
+
+      <% end %>
+
+    </div>
+
+  <% else %>
+
+    <div class="mt-5 rounded-2xl border border-dashed border-slate-800 p-8 text-center">
+
+      <div class="text-2xl text-slate-600">
+        ◌
+      </div>
+
+      <div class="mt-2 text-[10px] font-black uppercase tracking-widest text-slate-500">
+        Graph awaiting stronger relationships
+      </div>
+
+    </div>
+
+  <% end %>
+
+</section>

@@ -1,0 +1,464 @@
+<div
+  class="max-w-6xl mx-auto my-10 p-8
+         bg-gradient-to-b from-white via-orange-50/20 to-slate-50/50
+         border-2 border-orange-100
+         rounded-[38px]
+         shadow-md shadow-orange-100/40">
+
+  <!-- ========================================================= -->
+  <!-- HEADER -->
+  <!-- ========================================================= -->
+
+  <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between mb-10">
+
+    <div class="flex items-center gap-4">
+
+      <div
+        class="w-12 h-12 rounded-2xl
+               bg-orange-100
+               border border-orange-200
+               flex items-center justify-center
+               text-xl
+               shadow-sm">
+
+        🧠
+
+      </div>
+
+      <div>
+
+        <h1 class="text-xl font-black text-slate-800">
+          Diff Intelligence
+        </h1>
+
+        <p class="mt-1 text-sm text-slate-400">
+          Semantic facts → intelligence signals → progression
+        </p>
+
+      </div>
+
+    </div>
+
+    <div
+      class="px-4 py-2 rounded-full
+             bg-emerald-50
+             border border-emerald-200
+             text-emerald-600
+             text-xs font-black">
+
+      ● ENGINE ONLINE
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- GAMIFICATION SCORE -->
+  <!-- ========================================================= -->
+
+  <div
+    class="rounded-[28px]
+           bg-gradient-to-r
+           from-orange-400
+           via-amber-400
+           to-emerald-400
+           p-[2px]
+           shadow-lg shadow-orange-200/50">
+
+    <div
+      class="rounded-[26px]
+             bg-white
+             px-6 py-6">
+
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+
+        <div>
+
+          <div
+            class="text-[10px]
+                   uppercase
+                   tracking-[0.2em]
+                   font-black
+                   text-slate-400">
+
+            Semantic Progress
+
+          </div>
+
+          <div class="mt-2 flex items-baseline gap-2">
+
+            <span
+              class="text-4xl
+                     font-black
+                     text-slate-800">
+
+              <%= @insight.total_points %>
+
+            </span>
+
+            <span
+              class="text-sm
+                     font-black
+                     text-orange-500">
+
+              XP
+
+            </span>
+
+          </div>
+
+          <p class="mt-1 text-xs text-slate-400">
+            Generated from semantic comparison facts.
+          </p>
+
+        </div>
+
+
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+
+          <% @insight.counts.each do |status, count| %>
+
+            <div
+              class="min-w-[82px]
+                     rounded-2xl
+                     bg-slate-50
+                     border border-slate-100
+                     px-3 py-3
+                     text-center">
+
+              <div
+                class="text-lg
+                       font-black
+                       text-slate-700">
+
+                <%= count %>
+
+              </div>
+
+              <div
+                class="mt-1
+                       text-[9px]
+                       uppercase
+                       tracking-wider
+                       font-black
+                       text-slate-400">
+
+                <%= status %>
+
+              </div>
+
+            </div>
+
+          <% end %>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- SEMANTIC SIGNALS -->
+  <!-- ========================================================= -->
+
+  <div class="mt-8">
+
+    <div class="flex items-center justify-between mb-4">
+
+      <div>
+
+        <h2 class="text-sm font-black text-slate-700">
+          Semantic Signals
+        </h2>
+
+        <p class="text-xs text-slate-400 mt-1">
+          Gamification consumes facts; it does not modify the comparison engine.
+        </p>
+
+      </div>
+
+      <span
+        class="rounded-full
+               bg-orange-50
+               border border-orange-100
+               px-3 py-1
+               text-[10px]
+               font-black
+               text-orange-600">
+
+        <%= @insight.signals.size %> SIGNALS
+
+      </span>
+
+    </div>
+
+
+    <div class="grid gap-4">
+
+      <% @insight.signals.each do |signal| %>
+
+        <% color =
+             case signal.severity
+             when "positive"
+               "emerald"
+             when "warning"
+               "amber"
+             else
+               "sky"
+             end
+        %>
+
+        <div
+          class="group
+                 rounded-[24px]
+                 border border-<%= color %>-100
+                 bg-gradient-to-r
+                 from-white
+                 to-<%= color %>-50/30
+                 p-5
+                 transition-all duration-300
+                 hover:-translate-y-0.5
+                 hover:shadow-md">
+
+          <div class="flex items-start gap-4">
+
+            <div
+              class="h-11 w-11
+                     shrink-0
+                     rounded-2xl
+                     bg-<%= color %>-50
+                     border border-<%= color %>-100
+                     flex items-center justify-center
+                     text-lg">
+
+              <%=
+                case signal.type
+                when "change"
+                  "✏️"
+                when "movement"
+                  "↔️"
+                when "addition"
+                  "✨"
+                when "removal"
+                  "🗑️"
+                when "identity"
+                  "🧬"
+                when "stability"
+                  "🛡️"
+                else
+                  "🔎"
+                end
+              %>
+
+            </div>
+
+
+            <div class="flex-1 min-w-0">
+
+              <div class="flex flex-wrap items-center gap-2">
+
+                <h3 class="text-sm font-black text-slate-700">
+                  <%= signal.title %>
+                </h3>
+
+                <span
+                  class="rounded-full
+                         bg-<%= color %>-50
+                         border border-<%= color %>-100
+                         px-2 py-0.5
+                         text-[9px]
+                         font-black
+                         uppercase
+                         tracking-wider
+                         text-<%= color %>-600">
+
+                  <%= signal.type %>
+
+                </span>
+
+              </div>
+
+              <p class="mt-1 text-xs leading-5 text-slate-400">
+                <%= signal.description %>
+              </p>
+
+            </div>
+
+
+            <div class="text-right shrink-0">
+
+              <div
+                class="text-sm
+                       font-black
+                       text-orange-500">
+
+                +<%= signal.points %>
+
+              </div>
+
+              <div
+                class="text-[9px]
+                       uppercase
+                       tracking-wider
+                       font-black
+                       text-slate-300">
+
+                XP
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      <% end %>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- ARCHITECTURE -->
+  <!-- ========================================================= -->
+
+  <div
+    class="mt-10
+           rounded-[28px]
+           border-2 border-orange-100
+           bg-gradient-to-r
+           from-orange-50/60
+           via-white
+           to-emerald-50/40
+           p-6">
+
+    <div class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+      Architecture
+    </div>
+
+    <div
+      class="mt-5
+             grid grid-cols-1
+             md:grid-cols-4
+             gap-3
+             items-center">
+
+      <div class="rounded-2xl bg-slate-50 border border-slate-100 p-4 text-center">
+
+        <div class="text-xl">
+          🧠
+        </div>
+
+        <div class="mt-2 text-xs font-black text-slate-700">
+          Diff Engine
+        </div>
+
+        <div class="mt-1 text-[10px] text-slate-400">
+          Semantic comparison
+        </div>
+
+      </div>
+
+
+      <div class="hidden md:block text-center text-orange-300 text-xl">
+        →
+      </div>
+
+
+      <div class="rounded-2xl bg-orange-50 border border-orange-100 p-4 text-center">
+
+        <div class="text-xl">
+          📊
+        </div>
+
+        <div class="mt-2 text-xs font-black text-orange-700">
+          Semantic Facts
+        </div>
+
+        <div class="mt-1 text-[10px] text-orange-400">
+          Stable contract
+        </div>
+
+      </div>
+
+
+      <div class="hidden md:block text-center text-emerald-300 text-xl">
+        →
+      </div>
+
+
+      <div class="rounded-2xl bg-emerald-50 border border-emerald-100 p-4 text-center">
+
+        <div class="text-xl">
+          🏆
+        </div>
+
+        <div class="mt-2 text-xs font-black text-emerald-700">
+          Gamification
+        </div>
+
+        <div class="mt-1 text-[10px] text-emerald-400">
+          Signals & progression
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- SAFETY BOUNDARY -->
+  <!-- ========================================================= -->
+
+  <div
+    class="mt-8
+           rounded-[24px]
+           border border-slate-100
+           bg-slate-50/70
+           p-5">
+
+    <div class="text-xs font-black text-slate-600">
+      Read-only comparison boundary
+    </div>
+
+    <div class="mt-3 flex flex-wrap gap-2">
+
+      <% [
+           "Restore",
+           "Rollback",
+           "Release management",
+           "Comments",
+           "Publishing mutation",
+           "Editing from diff",
+           "New version model",
+           "Database migration"
+         ].each do |item| %>
+
+        <span
+          class="rounded-full
+                 bg-white
+                 border border-slate-200
+                 px-3 py-1
+                 text-[10px]
+                 font-bold
+                 text-slate-400">
+
+          ❌ <%= item %>
+
+        </span>
+
+      <% end %>
+
+    </div>
+
+  </div>
+
+</div>

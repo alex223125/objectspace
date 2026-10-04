@@ -1,0 +1,172 @@
+<section
+  class="
+    relative
+    my-8
+    space-y-5
+  "
+>
+
+  <!-- ======================================================== -->
+  <!-- SECTION HEADER -->
+  <!-- ======================================================== -->
+
+  <div
+    class="
+      flex
+      flex-col
+      gap-4
+      md:flex-row
+      md:items-end
+      md:justify-between
+    "
+  >
+
+    <div>
+
+      <div
+        class="
+          flex
+          items-center
+          gap-2
+        "
+      >
+
+        <span
+          class="
+            flex
+            h-9
+            w-9
+            items-center
+            justify-center
+            rounded-xl
+            border
+            border-violet-200
+            bg-violet-100
+            text-violet-600
+          "
+        >
+          🧠
+        </span>
+
+        <span
+          class="
+            text-sm
+            font-black
+            uppercase
+            tracking-[0.16em]
+            text-slate-700
+          "
+        >
+          Intelligence Layer
+        </span>
+
+        <span
+          class="
+            rounded-full
+            border
+            border-violet-200
+            bg-violet-50
+            px-2.5
+            py-1
+            text-[9px]
+            font-black
+            uppercase
+            tracking-widest
+            text-violet-600
+          "
+        >
+          Premium
+        </span>
+
+      </div>
+
+      <p
+        class="
+          mt-2
+          max-w-2xl
+          text-xs
+          leading-5
+          text-slate-400
+        "
+      >
+        Move from raw version history to an understandable
+        visual model of how the knowledge changed.
+      </p>
+
+    </div>
+
+
+    <div
+      class="
+        rounded-2xl
+        border
+        border-orange-100
+        bg-orange-50/60
+        px-4
+        py-3
+      "
+    >
+
+      <div
+        class="
+          text-[8px]
+          font-black
+          uppercase
+          tracking-widest
+          text-orange-500
+        "
+      >
+        Intelligence status
+      </div>
+
+      <div
+        class="
+          mt-1
+          flex
+          items-center
+          gap-2
+          text-xs
+          font-black
+          text-slate-700
+        "
+      >
+
+        <span
+          class="
+            h-2
+            w-2
+            rounded-full
+            bg-emerald-400
+            shadow-[0_0_8px_rgba(52,211,153,0.7)]
+          "
+        ></span>
+
+        Evolution tracking active
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ======================================================== -->
+  <!-- SUMMARY -->
+  <!-- ======================================================== -->
+
+  <%= render(
+        "comparisons/intelligence_evolution_summary",
+        comparison: comparison
+      ) %>
+
+
+  <!-- ======================================================== -->
+  <!-- TIMELINE -->
+  <!-- ======================================================== -->
+
+  <%= render(
+        "comparisons/evolution_timeline",
+        comparison: comparison
+      ) %>
+
+</section>

@@ -1,0 +1,29 @@
+<%= link_to(
+      admin_ecosystems_load_sources_entities_intelligence_path(
+        entity_id: entity.id
+      ),
+      class: "group flex items-center gap-3 rounded-2xl border border-violet-200 bg-violet-50/60 p-4 transition hover:border-violet-400 hover:bg-violet-50 dark:border-violet-900/60 dark:bg-violet-950/20 dark:hover:border-violet-700"
+    ) do %>
+
+  <div
+    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-500/10 text-violet-500">
+    🧠
+  </div>
+
+  <div class="min-w-0 flex-1">
+
+    <div class="text-[9px] font-black uppercase tracking-[0.18em] text-violet-500 dark:text-violet-400">
+      Cross-Entity Intelligence
+    </div>
+
+    <div class="mt-1 text-xs font-black text-gray-800 dark:text-white">
+      Explore relationships, shared concepts and ecosystem signals
+    </div>
+
+  </div>
+
+  <div class="text-violet-500 transition group-hover:translate-x-1">
+    →
+  </div>
+
+<% end %>

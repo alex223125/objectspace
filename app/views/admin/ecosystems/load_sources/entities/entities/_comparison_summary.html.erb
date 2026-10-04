@@ -1,0 +1,419 @@
+<%
+  summary = @diff_payload[:summary] || {}
+
+  total =
+    summary[:total] ||
+      summary["total"] ||
+      0
+
+  changes =
+    summary[:changes] ||
+      summary[:changed] ||
+      0
+
+  movements =
+    summary[:movements] ||
+      summary[:moved] ||
+      0
+
+  additions =
+    summary[:additions] ||
+      summary[:added] ||
+      0
+
+  removals =
+    summary[:removals] ||
+      summary[:removed] ||
+      0
+
+  warnings =
+    summary[:warnings] ||
+      0
+%>
+
+<div
+  class="
+    grid
+    grid-cols-2
+    gap-3
+    sm:grid-cols-3
+    xl:grid-cols-6
+  "
+>
+  <div
+    class="
+      group
+      rounded-[24px]
+      border
+      border-orange-100
+      bg-gradient-to-br
+      from-orange-50
+      via-white
+      to-amber-50
+      p-4
+      shadow-sm
+      shadow-orange-100/30
+      transition-all
+      duration-300
+      hover:-translate-y-1
+      hover:shadow-lg
+      hover:shadow-orange-100/50
+    "
+  >
+    <div
+      class="
+        flex
+        h-9
+        w-9
+        items-center
+        justify-center
+        rounded-xl
+        bg-orange-100
+        text-sm
+        font-black
+        text-orange-600
+      "
+    >
+      ✦
+    </div>
+
+    <div
+      class="
+        mt-3
+        text-2xl
+        font-black
+        text-orange-700
+      "
+    >
+      <%= total %>
+    </div>
+
+    <div
+      class="
+        mt-1
+        text-[9px]
+        font-black
+        uppercase
+        tracking-[0.16em]
+        text-slate-400
+      "
+    >
+      Total
+    </div>
+  </div>
+
+
+  <div
+    class="
+      group
+      rounded-[24px]
+      border
+      border-sky-100
+      bg-gradient-to-br
+      from-sky-50
+      via-white
+      to-cyan-50
+      p-4
+      shadow-sm
+      shadow-sky-100/30
+      transition-all
+      duration-300
+      hover:-translate-y-1
+      hover:shadow-lg
+      hover:shadow-sky-100/50
+    "
+  >
+    <div
+      class="
+        flex
+        h-9
+        w-9
+        items-center
+        justify-center
+        rounded-xl
+        bg-sky-100
+        text-sm
+        font-black
+        text-sky-600
+      "
+    >
+      ↗
+    </div>
+
+    <div
+      class="
+        mt-3
+        text-2xl
+        font-black
+        text-sky-700
+      "
+    >
+      <%= changes %>
+    </div>
+
+    <div
+      class="
+        mt-1
+        text-[9px]
+        font-black
+        uppercase
+        tracking-[0.16em]
+        text-slate-400
+      "
+    >
+      Changes
+    </div>
+  </div>
+
+
+  <div
+    class="
+      group
+      rounded-[24px]
+      border
+      border-violet-100
+      bg-gradient-to-br
+      from-violet-50
+      via-white
+      to-purple-50
+      p-4
+      shadow-sm
+      shadow-violet-100/30
+      transition-all
+      duration-300
+      hover:-translate-y-1
+      hover:shadow-lg
+      hover:shadow-violet-100/50
+    "
+  >
+    <div
+      class="
+        flex
+        h-9
+        w-9
+        items-center
+        justify-center
+        rounded-xl
+        bg-violet-100
+        text-sm
+        font-black
+        text-violet-600
+      "
+    >
+      ↔
+    </div>
+
+    <div
+      class="
+        mt-3
+        text-2xl
+        font-black
+        text-violet-700
+      "
+    >
+      <%= movements %>
+    </div>
+
+    <div
+      class="
+        mt-1
+        text-[9px]
+        font-black
+        uppercase
+        tracking-[0.16em]
+        text-slate-400
+      "
+    >
+      Moved
+    </div>
+  </div>
+
+
+  <div
+    class="
+      group
+      rounded-[24px]
+      border
+      border-emerald-100
+      bg-gradient-to-br
+      from-emerald-50
+      via-white
+      to-teal-50
+      p-4
+      shadow-sm
+      shadow-emerald-100/30
+      transition-all
+      duration-300
+      hover:-translate-y-1
+      hover:shadow-lg
+      hover:shadow-emerald-100/50
+    "
+  >
+    <div
+      class="
+        flex
+        h-9
+        w-9
+        items-center
+        justify-center
+        rounded-xl
+        bg-emerald-100
+        text-sm
+        font-black
+        text-emerald-600
+      "
+    >
+      +
+    </div>
+
+    <div
+      class="
+        mt-3
+        text-2xl
+        font-black
+        text-emerald-700
+      "
+    >
+      <%= additions %>
+    </div>
+
+    <div
+      class="
+        mt-1
+        text-[9px]
+        font-black
+        uppercase
+        tracking-[0.16em]
+        text-slate-400
+      "
+    >
+      Added
+    </div>
+  </div>
+
+
+  <div
+    class="
+      group
+      rounded-[24px]
+      border
+      border-rose-100
+      bg-gradient-to-br
+      from-rose-50
+      via-white
+      to-pink-50
+      p-4
+      shadow-sm
+      shadow-rose-100/30
+      transition-all
+      duration-300
+      hover:-translate-y-1
+      hover:shadow-lg
+      hover:shadow-rose-100/50
+    "
+  >
+    <div
+      class="
+        flex
+        h-9
+        w-9
+        items-center
+        justify-center
+        rounded-xl
+        bg-rose-100
+        text-sm
+        font-black
+        text-rose-600
+      "
+    >
+      −
+    </div>
+
+    <div
+      class="
+        mt-3
+        text-2xl
+        font-black
+        text-rose-700
+      "
+    >
+      <%= removals %>
+    </div>
+
+    <div
+      class="
+        mt-1
+        text-[9px]
+        font-black
+        uppercase
+        tracking-[0.16em]
+        text-slate-400
+      "
+    >
+      Removed
+    </div>
+  </div>
+
+
+  <div
+    class="
+      group
+      rounded-[24px]
+      border
+      border-amber-100
+      bg-gradient-to-br
+      from-amber-50
+      via-white
+      to-yellow-50
+      p-4
+      shadow-sm
+      shadow-amber-100/30
+      transition-all
+      duration-300
+      hover:-translate-y-1
+      hover:shadow-lg
+      hover:shadow-amber-100/50
+    "
+  >
+    <div
+      class="
+        flex
+        h-9
+        w-9
+        items-center
+        justify-center
+        rounded-xl
+        bg-amber-100
+        text-sm
+        font-black
+        text-amber-600
+      "
+    >
+      !
+    </div>
+
+    <div
+      class="
+        mt-3
+        text-2xl
+        font-black
+        text-amber-700
+      "
+    >
+      <%= warnings %>
+    </div>
+
+    <div
+      class="
+        mt-1
+        text-[9px]
+        font-black
+        uppercase
+        tracking-[0.16em]
+        text-slate-400
+      "
+    >
+      Warnings
+    </div>
+  </div>
+</div>

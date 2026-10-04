@@ -1,0 +1,335 @@
+<%
+  type =
+    fact[:type] ||
+      fact["type"] ||
+      "content_change"
+
+  path =
+    fact[:path] ||
+      fact["path"] ||
+      []
+
+  identity =
+    fact[:identity] ||
+      fact["identity"]
+
+  old_value =
+    fact[:old_value] ||
+      fact["old_value"]
+
+  new_value =
+    fact[:new_value] ||
+      fact["new_value"]
+
+  type_label =
+    case type.to_s
+    when "content_change"
+      "Changed"
+    when "semantic_movement"
+      "Moved"
+    when "added_entity"
+      "Added"
+    when "removed_entity"
+      "Removed"
+    when "identity_warning"
+      "Warning"
+    else
+      type.to_s.humanize
+    end
+
+  badge_classes =
+    case type.to_s
+    when "content_change"
+      "bg-sky-50 text-sky-700 border-sky-200"
+    when "semantic_movement"
+      "bg-violet-50 text-violet-700 border-violet-200"
+    when "added_entity"
+      "bg-emerald-50 text-emerald-700 border-emerald-200"
+    when "removed_entity"
+      "bg-rose-50 text-rose-700 border-rose-200"
+    when "identity_warning"
+      "bg-amber-50 text-amber-700 border-amber-200"
+    else
+      "bg-slate-50 text-slate-700 border-slate-200"
+    end
+%>
+
+<article
+  data-comparison-row
+  data-change-type="<%= type %>"
+  data-comparison-path="<%= Array(path).join(" › ") %>"
+  data-comparison-identity="<%= identity %>"
+  data-comparison-old-value="<%= old_value.is_a?(Hash) ? old_value.to_json : old_value %>"
+  data-comparison-new-value="<%= new_value.is_a?(Hash) ? new_value.to_json : new_value %>"
+  data-action="click->admin--ecosystems--load-sources--entities--entity-comparison-workspace#inspectRow"
+  class="
+    group
+    relative
+    overflow-hidden
+    rounded-[24px]
+    border-2 border-slate-100
+    bg-white
+    p-5
+    shadow-sm
+    transition
+    hover:border-orange-200
+    hover:shadow-lg
+    hover:shadow-orange-100/40
+  "
+>
+
+  <div
+    class="
+      absolute inset-y-0 left-0
+      w-1
+      bg-gradient-to-b
+      from-orange-400
+      via-amber-400
+      to-emerald-400
+      opacity-60
+    "
+  ></div>
+
+
+  <div
+    class="
+      flex flex-col gap-4
+      lg:flex-row
+      lg:items-start
+      lg:justify-between
+    "
+  >
+
+    <div class="min-w-0">
+
+      <div class="flex flex-wrap items-center gap-2">
+
+        <span
+          class="
+            rounded-full
+            border
+            px-3 py-1
+            text-[10px]
+            font-black
+            uppercase
+            tracking-wider
+            <%= badge_classes %>
+          "
+        >
+          <%= type_label %>
+        </span>
+
+        <% if identity.present? %>
+
+          <span
+            class="
+              rounded-full
+              border border-slate-200
+              bg-slate-50
+              px-3 py-1
+              text-[10px]
+              font-bold
+              text-slate-500
+            "
+          >
+            ID:
+            <%= identity %>
+          </span>
+
+        <% end %>
+
+      </div>
+
+
+      <div
+        class="
+          mt-3
+          break-words
+          text-sm
+          font-black
+          text-slate-700
+        "
+      >
+        <%= Array(path).join(" › ") .presence || "Root" %>
+      </div>
+
+    </div>
+
+
+    <button
+      type="button"
+      class="
+        shrink-0
+        rounded-xl
+        border border-slate-200
+        bg-white
+        px-3 py-2
+        text-[10px]
+        font-black
+        text-slate-500
+        opacity-70
+        transition
+        group-hover:opacity-100
+        hover:border-orange-200
+        hover:bg-orange-50
+        hover:text-orange-700
+      "
+      aria-label="Inspect comparison signal"
+    >
+      Inspect →
+    </button>
+
+  </div>
+
+
+  <% if type.to_s == "semantic_movement" %>
+
+    <div
+      class="
+        mt-5
+        flex items-center
+        gap-3
+        rounded-2xl
+        bg-violet-50
+        px-4 py-3
+        text-xs
+        font-black
+        text-violet-700
+      "
+    >
+      <span>Position changed</span>
+      <span class="text-violet-400">→</span>
+      <span>Semantic movement detected</span>
+    </div>
+
+  <% elsif type.to_s == "identity_warning" %>
+
+    <div
+      class="
+        mt-5
+        rounded-2xl
+        border border-amber-100
+        bg-amber-50/70
+        p-4
+      "
+    >
+
+      <div
+        class="
+          text-[10px]
+          font-black
+          uppercase
+          tracking-widest
+          text-amber-600
+        "
+      >
+        Review required
+      </div>
+
+      <div
+        class="
+          mt-1
+          text-xs
+          leading-5
+          text-amber-800
+        "
+      >
+        This signal requires identity interpretation before
+        it should be treated as a definitive structural change.
+      </div>
+
+    </div>
+
+  <% else %>
+
+    <div
+      class="
+        mt-5
+        grid
+        gap-3
+        lg:grid-cols-2
+      "
+    >
+
+      <div
+        class="
+          overflow-hidden
+          rounded-2xl
+          border border-rose-100
+          bg-rose-50/50
+        "
+      >
+
+        <div
+          class="
+            border-b border-rose-100
+            px-4 py-2
+            text-[9px]
+            font-black
+            uppercase
+            tracking-widest
+            text-rose-500
+          "
+        >
+          Previous
+        </div>
+
+        <pre
+          class="
+            max-h-52
+            overflow-auto
+            whitespace-pre-wrap
+            break-words
+            p-4
+            text-[11px]
+            leading-5
+            text-slate-600
+          "
+        ><%= old_value.nil? ? "—" : old_value.is_a?(Hash) || old_value.is_a?(Array) ? JSON.pretty_generate(old_value) : old_value %></pre>
+
+      </div>
+
+
+      <div
+        class="
+          overflow-hidden
+          rounded-2xl
+          border border-emerald-100
+          bg-emerald-50/50
+        "
+      >
+
+        <div
+          class="
+            border-b border-emerald-100
+            px-4 py-2
+            text-[9px]
+            font-black
+            uppercase
+            tracking-widest
+            text-emerald-600
+          "
+        >
+          Current
+        </div>
+
+        <pre
+          class="
+            max-h-52
+            overflow-auto
+            whitespace-pre-wrap
+            break-words
+            p-4
+            text-[11px]
+            leading-5
+            text-slate-600
+          "
+        ><%= new_value.nil? ? "—" : new_value.is_a?(Hash) || new_value.is_a?(Array) ? JSON.pretty_generate(new_value) : new_value %></pre>
+
+      </div>
+
+    </div>
+
+  <% end %>
+
+</article>

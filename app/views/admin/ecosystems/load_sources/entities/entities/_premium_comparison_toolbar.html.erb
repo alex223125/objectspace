@@ -1,0 +1,592 @@
+<div
+  class="
+    entity-comparison-premium
+    mb-8
+    overflow-hidden
+    rounded-[30px]
+    border-2 border-orange-100
+    bg-gradient-to-br
+    from-white
+    via-orange-50/30
+    to-violet-50/20
+    shadow-lg shadow-orange-100/30
+  "
+  data-controller="admin--ecosystems--load-sources--entities--entity-comparison-premium"
+  data-entity-comparison
+>
+  <!-- ========================================================= -->
+  <!-- COMMAND HEADER -->
+  <!-- ========================================================= -->
+
+  <div
+    class="
+      flex flex-col gap-5
+      border-b border-orange-100
+      p-6
+      lg:flex-row
+      lg:items-center
+      lg:justify-between
+    "
+  >
+
+    <div class="flex items-start gap-4">
+
+      <div
+        class="
+          flex h-12 w-12 shrink-0
+          items-center justify-center
+          rounded-2xl
+          border border-orange-200
+          bg-orange-100
+          text-xl
+          shadow-sm
+          shadow-orange-100
+          comparison-xp-pulse
+        "
+      >
+        🧠
+      </div>
+
+      <div>
+
+        <div class="flex flex-wrap items-center gap-2">
+
+          <h2
+            class="
+              text-base
+              font-black
+              tracking-tight
+              text-slate-800
+            "
+          >
+            Comparison Intelligence
+          </h2>
+
+          <span
+            class="
+              rounded-full
+              border border-orange-200
+              bg-orange-50
+              px-2.5 py-1
+              text-[9px]
+              font-black
+              uppercase
+              tracking-widest
+              text-orange-600
+            "
+          >
+            PRO
+          </span>
+
+        </div>
+
+        <p
+          class="
+            mt-1
+            max-w-2xl
+            text-xs
+            leading-5
+            text-slate-400
+          "
+        >
+          Explore structural changes, semantic movements,
+          additions, removals and identity signals.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- COMMAND ACTIONS -->
+
+    <div class="flex flex-wrap items-center gap-2">
+
+      <button
+        type="button"
+        data-action="click->admin--ecosystems--load-sources--entities--entity-comparison-premium#share"
+        data-comparison-share
+        class="
+          comparison-command-button
+          inline-flex items-center gap-2
+          rounded-xl
+          border border-slate-200
+          bg-white
+          px-3.5 py-2.5
+          text-xs
+          font-black
+          text-slate-600
+          shadow-sm
+          hover:border-orange-200
+          hover:text-orange-600
+        "
+      >
+        <span>↗</span>
+        Share
+      </button>
+
+      <button
+        type="button"
+        data-action="click->admin--ecosystems--load-sources--entities--entity-comparison-premium#reset"
+        class="
+          comparison-command-button
+          inline-flex items-center gap-2
+          rounded-xl
+          border border-orange-200
+          bg-orange-50
+          px-3.5 py-2.5
+          text-xs
+          font-black
+          text-orange-600
+          shadow-sm
+          hover:bg-orange-100
+        "
+      >
+        Reset
+        <span class="comparison-key">R</span>
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- EXPLORATION STATUS -->
+  <!-- ========================================================= -->
+
+  <div class="px-6 pt-5">
+
+    <div
+      class="
+        flex flex-col gap-3
+        rounded-2xl
+        border border-orange-100
+        bg-white/80
+        p-4
+        md:flex-row
+        md:items-center
+        md:justify-between
+      "
+    >
+
+      <div class="flex items-center gap-3">
+
+        <span
+          class="
+            flex h-8 w-8
+            items-center justify-center
+            rounded-xl
+            bg-emerald-50
+            text-sm
+          "
+        >
+          ✨
+        </span>
+
+        <div>
+
+          <div
+            class="
+              text-[10px]
+              font-black
+              uppercase
+              tracking-widest
+              text-slate-400
+            "
+          >
+            Exploration status
+          </div>
+
+          <div
+            class="
+              mt-0.5
+              text-xs
+              font-bold
+              text-slate-600
+            "
+            data-admin--ecosystems--load-sources--entities--entity-comparison-premium-target="command"
+          >
+            Ready to explore
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div
+        class="
+          text-[10px]
+          font-black
+          text-orange-500
+        "
+        data-admin--ecosystems--load-sources--entities--entity-comparison-premium-target="activity"
+      >
+        New exploration
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- SEARCH -->
+  <!-- ========================================================= -->
+
+  <div class="px-6 pt-5">
+
+    <div class="relative">
+
+      <span
+        class="
+          pointer-events-none
+          absolute left-4 top-1/2
+          -translate-y-1/2
+          text-slate-400
+        "
+      >
+        ⌕
+      </span>
+
+      <input
+        type="search"
+        autocomplete="off"
+        placeholder="Search paths, identities, old values or new values..."
+        data-comparison-search
+        data-admin--ecosystems--load-sources--entities--entity-comparison-premium-target="search"
+        data-action="
+          input->admin--ecosystems--load-sources--entities--entity-comparison-premium#searchChanged
+        "
+        class="
+          w-full
+          rounded-2xl
+          border-2 border-slate-100
+          bg-white
+          py-3.5
+          pl-11 pr-20
+          text-sm
+          font-medium
+          text-slate-700
+          outline-none
+          transition
+          placeholder:text-slate-300
+          focus:border-orange-300
+          focus:ring-4
+          focus:ring-orange-100
+        "
+        />
+
+      <div
+        class="
+          pointer-events-none
+          absolute right-4 top-1/2
+          flex -translate-y-1/2
+          items-center gap-1.5
+        "
+      >
+        <span class="comparison-key">/</span>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- FILTER CHIPS -->
+  <!-- ========================================================= -->
+
+  <div class="px-6 pt-4">
+
+    <div class="flex flex-wrap gap-2">
+
+      <button
+        type="button"
+        data-comparison-chip
+        data-filter="all"
+        data-admin--ecosystems--load-sources--entities--entity-comparison-premium-target="chip"
+        data-action="
+          click->admin--ecosystems--load-sources--entities--entity-comparison-premium#filterChanged
+        "
+        class="
+          rounded-full
+          border border-slate-200
+          bg-white
+          px-3.5 py-1.5
+          text-[10px]
+          font-black
+          text-slate-500
+          hover:border-orange-200
+          hover:text-orange-600
+        "
+      >
+        All
+      </button>
+
+      <button
+        type="button"
+        data-comparison-chip
+        data-filter="content_change"
+        data-admin--ecosystems--load-sources--entities--entity-comparison-premium-target="chip"
+        data-action="
+          click->admin--ecosystems--load-sources--entities--entity-comparison-premium#filterChanged
+        "
+        class="
+          rounded-full
+          border border-sky-200
+          bg-sky-50
+          px-3.5 py-1.5
+          text-[10px]
+          font-black
+          text-sky-600
+        "
+      >
+        Changes
+      </button>
+
+      <button
+        type="button"
+        data-comparison-chip
+        data-filter="semantic_movement"
+        data-admin--ecosystems--load-sources--entities--entity-comparison-premium-target="chip"
+        data-action="
+          click->admin--ecosystems--load-sources--entities--entity-comparison-premium#filterChanged
+        "
+        class="
+          rounded-full
+          border border-violet-200
+          bg-violet-50
+          px-3.5 py-1.5
+          text-[10px]
+          font-black
+          text-violet-600
+        "
+      >
+        Movements
+      </button>
+
+      <button
+        type="button"
+        data-comparison-chip
+        data-filter="added_entity"
+        data-admin--ecosystems--load-sources--entities--entity-comparison-premium-target="chip"
+        data-action="
+          click->admin--ecosystems--load-sources--entities--entity-comparison-premium#filterChanged
+        "
+        class="
+          rounded-full
+          border border-emerald-200
+          bg-emerald-50
+          px-3.5 py-1.5
+          text-[10px]
+          font-black
+          text-emerald-600
+        "
+      >
+        Additions
+      </button>
+
+      <button
+        type="button"
+        data-comparison-chip
+        data-filter="removed_entity"
+        data-admin--ecosystems--load-sources--entities--entity-comparison-premium-target="chip"
+        data-action="
+          click->admin--ecosystems--load-sources--entities--entity-comparison-premium#filterChanged
+        "
+        class="
+          rounded-full
+          border border-rose-200
+          bg-rose-50
+          px-3.5 py-1.5
+          text-[10px]
+          font-black
+          text-rose-600
+        "
+      >
+        Removals
+      </button>
+
+      <button
+        type="button"
+        data-comparison-chip
+        data-filter="identity_warning"
+        data-admin--ecosystems--load-sources--entities--entity-comparison-premium-target="chip"
+        data-action="
+          click->admin--ecosystems--load-sources--entities--entity-comparison-premium#filterChanged
+        "
+        class="
+          rounded-full
+          border border-amber-200
+          bg-amber-50
+          px-3.5 py-1.5
+          text-[10px]
+          font-black
+          text-amber-600
+        "
+      >
+        Warnings
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- PROGRESS -->
+  <!-- ========================================================= -->
+
+  <div class="px-6 pb-6 pt-5">
+
+    <div
+      class="
+        flex items-center justify-between
+        gap-4
+        text-[10px]
+        font-black
+      "
+    >
+
+      <div class="text-slate-400">
+        Comparison exploration
+      </div>
+
+      <div
+        class="text-orange-500"
+        data-admin--ecosystems--load-sources--entities--entity-comparison-premium-target="progressLabel"
+      >
+        100% of comparison visible
+      </div>
+
+    </div>
+
+    <div
+      class="
+        comparison-progress-bar
+        mt-2
+        h-2.5
+        overflow-hidden
+        rounded-full
+        border border-orange-100
+        bg-orange-50
+      "
+    >
+      <div
+        class="
+          h-full
+          rounded-full
+          bg-gradient-to-r
+          from-orange-400
+          via-amber-400
+          to-emerald-400
+          shadow-sm
+          transition-all
+          duration-500
+        "
+        style="width: 100%"
+        data-admin--ecosystems--load-sources--entities--entity-comparison-premium-target="progress"
+      ></div>
+    </div>
+
+    <div
+      class="
+        mt-3
+        flex flex-wrap
+        items-center
+        justify-between
+        gap-2
+      "
+    >
+
+      <div
+        class="
+          text-[11px]
+          font-medium
+          text-slate-400
+        "
+        data-admin--ecosystems--load-sources--entities--entity-comparison-premium-target="resultSummary"
+      >
+        Exploring comparison facts.
+      </div>
+
+      <div
+        class="
+          rounded-full
+          bg-slate-100
+          px-3 py-1
+          text-[10px]
+          font-black
+          text-slate-500
+        "
+      >
+        <span
+          data-admin--ecosystems--load-sources--entities--entity-comparison-premium-target="visibleCount"
+        >
+          0
+        </span>
+
+        /
+
+        <span
+          data-admin--ecosystems--load-sources--entities--entity-comparison-premium-target="totalCount"
+        >
+          0
+        </span>
+
+        facts
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- EMPTY -->
+  <!-- ========================================================= -->
+
+  <div
+    hidden
+    data-comparison-empty
+    data-admin--ecosystems--load-sources--entities--entity-comparison-premium-target="empty"
+    class="
+      mx-6 mb-6
+      rounded-2xl
+      border border-dashed border-orange-200
+      bg-orange-50/40
+      p-8
+      text-center
+    "
+  >
+
+    <div class="text-2xl">🔎</div>
+
+    <div
+      class="
+        mt-2
+        text-sm
+        font-black
+        text-slate-700
+      "
+    >
+      No comparison facts found
+    </div>
+
+    <p
+      class="
+        mx-auto mt-1
+        max-w-md
+        text-xs
+        leading-5
+        text-slate-400
+      "
+    >
+      Try another search term or reset the comparison filters.
+    </p>
+
+  </div>
+
+</div>

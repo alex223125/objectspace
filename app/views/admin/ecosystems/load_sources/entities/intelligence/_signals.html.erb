@@ -1,0 +1,90 @@
+<div>
+
+  <div class="mb-3 flex items-center justify-between">
+
+    <div>
+      <div class="text-[10px] font-black uppercase tracking-[.2em] text-gray-400">
+        Intelligence Signals
+      </div>
+
+      <div class="mt-1 text-xs text-gray-500">
+        Automatically derived observations from the entity ecosystem.
+      </div>
+    </div>
+
+  </div>
+
+  <% if signals.any? %>
+
+    <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+
+      <% signals.each do |signal| %>
+
+        <% colors =
+             case signal[:severity].to_sym
+             when :critical
+               {
+                 border: "border-red-200 dark:border-red-900/50",
+                 bg: "bg-red-50 dark:bg-red-950/20",
+                 icon: "bg-red-500",
+                 title: "text-red-700 dark:text-red-300"
+               }
+             when :warning
+               {
+                 border: "border-amber-200 dark:border-amber-900/50",
+                 bg: "bg-amber-50 dark:bg-amber-950/20",
+                 icon: "bg-amber-500",
+                 title: "text-amber-700 dark:text-amber-300"
+               }
+             when :positive
+               {
+                 border: "border-emerald-200 dark:border-emerald-900/50",
+                 bg: "bg-emerald-50 dark:bg-emerald-950/20",
+                 icon: "bg-emerald-500",
+                 title: "text-emerald-700 dark:text-emerald-300"
+               }
+             else
+               {
+                 border: "border-indigo-200 dark:border-indigo-900/50",
+                 bg: "bg-indigo-50 dark:bg-indigo-950/20",
+                 icon: "bg-indigo-500",
+                 title: "text-indigo-700 dark:text-indigo-300"
+               }
+             end
+        %>
+
+        <div class="rounded-2xl border <%= colors[:border] %> <%= colors[:bg] %> p-4">
+
+          <div class="flex items-start gap-3">
+
+            <span class="mt-1 h-2.5 w-2.5 shrink-0 rounded-full <%= colors[:icon] %>"></span>
+
+            <div>
+
+              <div class="text-xs font-black <%= colors[:title] %>">
+                <%= signal[:title] %>
+              </div>
+
+              <p class="mt-1 text-[11px] leading-relaxed text-gray-500 dark:text-gray-400">
+                <%= signal[:description] %>
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      <% end %>
+
+    </div>
+
+  <% else %>
+
+    <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-sm text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/20 dark:text-emerald-300">
+      No immediate intelligence signals detected.
+    </div>
+
+  <% end %>
+
+</div>

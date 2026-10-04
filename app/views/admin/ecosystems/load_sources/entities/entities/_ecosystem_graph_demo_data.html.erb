@@ -1,0 +1,45 @@
+<%
+  demo_graph = [
+    {
+      id: 1,
+      name: "Global Problems",
+      type: "Problem",
+      description: "Emerging problems and ecosystem signals.",
+      connections: [2]
+    },
+    {
+      id: 2,
+      name: "Methods",
+      type: "Method",
+      description: "Approaches created to address ecosystem problems.",
+      connections: [1, 3]
+    },
+    {
+      id: 3,
+      name: "Algorithms",
+      type: "Algorithm",
+      description: "Structured repeatable approaches derived from methods.",
+      connections: [2, 4]
+    },
+    {
+      id: 4,
+      name: "Architecture",
+      type: "Architecture",
+      description: "Technology and implementation structures.",
+      connections: [3, 5]
+    },
+    {
+      id: 5,
+      name: "Versions",
+      type: "Version",
+      description: "Historical evolution of the ecosystem.",
+      connections: [4]
+    }
+  ]
+%>
+
+<div
+  data-controller="entity-ecosystem-relationship-graph"
+  data-entity-ecosystem-relationship-graph-graph-value="<%= ERB::Util.html_escape(demo_graph.to_json) %>"
+>
+</div>

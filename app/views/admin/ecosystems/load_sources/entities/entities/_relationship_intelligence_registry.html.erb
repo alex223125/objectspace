@@ -1,0 +1,38 @@
+<div
+  class="rounded-3xl border border-indigo-200 bg-gradient-to-br from-indigo-50 via-white to-violet-50 p-5 shadow-sm dark:border-indigo-900/60 dark:from-indigo-950/40 dark:via-gray-900 dark:to-violet-950/30">
+
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
+    <div>
+
+      <div class="text-[9px] font-black uppercase tracking-[0.22em] text-indigo-500 dark:text-indigo-400">
+        Ecosystem Intelligence
+      </div>
+
+      <h2 class="mt-1 text-lg font-black text-gray-900 dark:text-white">
+        Relationship Discovery
+      </h2>
+
+      <p class="mt-1 max-w-2xl text-xs leading-relaxed text-gray-500 dark:text-gray-400">
+        Discover structural and conceptual connections between entities.
+        Relationships remain explainable and begin as reviewable suggestions.
+      </p>
+
+    </div>
+
+    <div
+      class="rounded-2xl border border-indigo-200 bg-white px-4 py-3 text-center dark:border-indigo-800 dark:bg-gray-950">
+
+      <div class="text-[9px] font-black uppercase tracking-widest text-gray-400">
+        Indexed entities
+      </div>
+
+      <div class="mt-1 text-xl font-black text-indigo-600 dark:text-indigo-400">
+        <%= number_with_delimiter(entities.length) %>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
