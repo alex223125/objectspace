@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 class CreateEntityChangeRequests < ActiveRecord::Migration[7.0]
+  TABLE_NAME = :ecosystems_load_sources_entity_change_requests
+
   def change
-    create_table :ecosystems_load_sources_entity_change_requests do |t|
+    create_table TABLE_NAME do |t|
       t.bigint :entity_id, null: false
       t.bigint :entity_version_id
 
@@ -19,58 +21,58 @@ class CreateEntityChangeRequests < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_index \
-      :ecosystems_load_sources_entity_change_requests,
-      :entity_id
+    # Indexes: explicitly named to avoid PostgreSQL's
+    # 63-character identifier limit.
 
-    add_index \
-      :ecosystems_load_sources_entity_change_requests,
-      :entity_version_id
+    add_index TABLE_NAME,
+              :entity_id,
+              name: "idx_change_requests_entity_id"
 
-    add_index \
-      :ecosystems_load_sources_entity_change_requests,
-      :requested_by_id
+    add_index TABLE_NAME,
+              :entity_version_id,
+              name: "idx_change_requests_version_id"
 
-    add_index \
-      :ecosystems_load_sources_entity_change_requests,
-      :assigned_to_id
+    add_index TABLE_NAME,
+              :requested_by_id,
+              name: "idx_change_requests_requested_by"
 
-    add_index \
-      :ecosystems_load_sources_entity_change_requests,
-      :resolved_by_id
+    add_index TABLE_NAME,
+              :assigned_to_id,
+              name: "idx_change_requests_assigned_to"
 
-    add_index \
-      :ecosystems_load_sources_entity_change_requests,
-      :status
+    add_index TABLE_NAME,
+              :resolved_by_id,
+              name: "idx_change_requests_resolved_by"
 
-    add_foreign_key \
-      :ecosystems_load_sources_entity_change_requests,
-      :ecosystems_load_sources_entities,
-      column: :entity_id,
-      on_delete: :restrict
+    add_index TABLE_NAME,
+              :status,
+              name: "idx_change_requests_status"
 
-    add_foreign_key \
-      :ecosystems_load_sources_entity_change_requests,
-      :ecosystems_load_sources_entity_versions,
-      column: :entity_version_id,
-      on_delete: :restrict
+    # Foreign keys
 
-    add_foreign_key \
-      :ecosystems_load_sources_entity_change_requests,
-      :users,
-      column: :requested_by_id,
-      on_delete: :restrict
+    add_foreign_key TABLE_NAME,
+                    :ecosystems_load_sources_entities,
+                    column: :entity_id,
+                    on_delete: :restrict
 
-    add_foreign_key \
-      :ecosystems_load_sources_entity_change_requests,
-      :users,
-      column: :assigned_to_id,
-      on_delete: :nullify
+    add_foreign_key TABLE_NAME,
+                    :ecosystems_load_sources_entity_versions,
+                    column: :entity_version_id,
+                    on_delete: :restrict
 
-    add_foreign_key \
-      :ecosystems_load_sources_entity_change_requests,
-      :users,
-      column: :resolved_by_id,
-      on_delete: :nullify
+    add_foreign_key TABLE_NAME,
+                    :users,
+                    column: :requested_by_id,
+                    on_delete: :restrict
+
+    add_foreign_key TABLE_NAME,
+                    :users,
+                    column: :assigned_to_id,
+                    on_delete: :nullify
+
+    add_foreign_key TABLE_NAME,
+                    :users,
+                    column: :resolved_by_id,
+                    on_delete: :nullify
   end
 end

@@ -15,44 +15,42 @@ class CreateEntityEditorialComments < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_index \
-      :ecosystems_load_sources_entity_editorial_comments,
-      :entity_id
+    # Indexes with explicit names to stay within PostgreSQL's 63-character limit.
+    add_index :ecosystems_load_sources_entity_editorial_comments,
+              :entity_id,
+              name: "idx_editorial_comments_entity_id"
 
-    add_index \
-      :ecosystems_load_sources_entity_editorial_comments,
-      :entity_version_id
+    add_index :ecosystems_load_sources_entity_editorial_comments,
+              :entity_version_id,
+              name: "idx_editorial_comments_version_id"
 
-    add_index \
-      :ecosystems_load_sources_entity_editorial_comments,
-      :user_id
+    add_index :ecosystems_load_sources_entity_editorial_comments,
+              :user_id,
+              name: "idx_editorial_comments_user_id"
 
-    add_index \
-      :ecosystems_load_sources_entity_editorial_comments,
-      :resolved_by_id
+    add_index :ecosystems_load_sources_entity_editorial_comments,
+              :resolved_by_id,
+              name: "idx_editorial_comments_resolved_by_id"
 
-    add_foreign_key \
-      :ecosystems_load_sources_entity_editorial_comments,
-      :ecosystems_load_sources_entities,
-      column: :entity_id,
-      on_delete: :restrict
+    # Foreign keys
+    add_foreign_key :ecosystems_load_sources_entity_editorial_comments,
+                    :ecosystems_load_sources_entities,
+                    column: :entity_id,
+                    on_delete: :restrict
 
-    add_foreign_key \
-      :ecosystems_load_sources_entity_editorial_comments,
-      :ecosystems_load_sources_entity_versions,
-      column: :entity_version_id,
-      on_delete: :restrict
+    add_foreign_key :ecosystems_load_sources_entity_editorial_comments,
+                    :ecosystems_load_sources_entity_versions,
+                    column: :entity_version_id,
+                    on_delete: :restrict
 
-    add_foreign_key \
-      :ecosystems_load_sources_entity_editorial_comments,
-      :users,
-      column: :user_id,
-      on_delete: :restrict
+    add_foreign_key :ecosystems_load_sources_entity_editorial_comments,
+                    :users,
+                    column: :user_id,
+                    on_delete: :restrict
 
-    add_foreign_key \
-      :ecosystems_load_sources_entity_editorial_comments,
-      :users,
-      column: :resolved_by_id,
-      on_delete: :nullify
+    add_foreign_key :ecosystems_load_sources_entity_editorial_comments,
+                    :users,
+                    column: :resolved_by_id,
+                    on_delete: :nullify
   end
 end
