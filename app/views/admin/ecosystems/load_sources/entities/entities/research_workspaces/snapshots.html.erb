@@ -1,0 +1,72 @@
+<div class="mx-auto max-w-6xl px-6 py-10">
+
+  <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+
+    <div>
+      <div class="text-xs font-bold uppercase tracking-[0.2em] text-purple-400">
+        Research history
+      </div>
+
+      <h1 class="mt-2 text-3xl font-black text-white">
+        Investigation checkpoints
+      </h1>
+
+      <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+        Saved research states provide a point-in-time record of the investigation,
+        including items, annotations, evidence, confidence, and verification.
+      </p>
+    </div>
+
+    <%= link_to "Back to investigation",
+                admin_research_workspace_path(@workspace),
+                class: "rounded-2xl bg-white/5 px-5 py-3 text-sm font-bold text-slate-400 hover:bg-white/10 hover:text-white" %>
+
+  </div>
+
+  <div class="mt-8">
+
+    <% if @snapshots.empty? %>
+
+      <div class="rounded-3xl border border-white/10 bg-white/[0.03] p-10 text-center">
+
+        <div class="text-4xl">◆</div>
+
+        <h2 class="mt-4 text-xl font-black text-white">
+          No checkpoints yet
+        </h2>
+
+        <p class="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-500">
+          Create a checkpoint whenever you want to preserve the current
+          research state.
+        </p>
+
+        <div class="mt-6">
+
+          <%= button_to "Create first checkpoint",
+                        save_checkpoint_admin_research_workspace_path(@workspace),
+                        method: :post,
+                        class: "rounded-2xl bg-purple-500 px-5 py-3 text-sm font-black text-white hover:bg-purple-400" %>
+
+        </div>
+
+      </div>
+
+    <% else %>
+
+      <div class="space-y-4">
+
+        <% @snapshots.each_with_index do |snapshot, index| %>
+
+          <%= render "snapshot_card",
+                     snapshot: snapshot,
+                     index: index %>
+
+        <% end %>
+
+      </div>
+
+    <% end %>
+
+  </div>
+
+</div>

@@ -1,0 +1,114 @@
+<div class="mx-auto max-w-5xl px-6 py-10">
+
+  <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+
+    <div>
+      <div class="text-xs font-bold uppercase tracking-[0.2em] text-sky-400">
+        Audit trail
+      </div>
+
+      <h1 class="mt-2 text-3xl font-black text-white">
+        Research history
+      </h1>
+
+      <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+        A chronological record of the major lifecycle actions and saved research
+        checkpoints for this investigation.
+      </p>
+    </div>
+
+    <%= link_to "Back to investigation",
+                admin_research_workspace_path(@workspace),
+                class: "rounded-2xl bg-white/5 px-5 py-3 text-sm font-bold text-slate-400 hover:bg-white/10 hover:text-white" %>
+
+  </div>
+
+  <div class="mt-10">
+
+    <% if @history.empty? %>
+
+      <div class="rounded-3xl border border-white/10 bg-white/[0.03] p-10 text-center">
+
+        <div class="text-4xl">◌</div>
+
+        <h2 class="mt-4 text-xl font-black text-white">
+          No activity recorded yet
+        </h2>
+
+        <p class="mt-2 text-sm text-slate-500">
+          Investigation activity will appear here as you work.
+        </p>
+
+      </div>
+
+    <% else %>
+
+      <div class="relative">
+
+        <div class="absolute bottom-0 left-5 top-0 w-px bg-white/10"></div>
+
+        <div class="space-y-6">
+
+          <% @history.each do |event| %>
+
+            <div class="relative flex gap-5">
+
+              <div class="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-[#0b0d10] text-sm text-slate-300">
+                <%= investigation_event_icon(event["event"]) %>
+              </div>
+
+              <div class="min-w-0 flex-1 rounded-3xl border border-white/10 bg-white/[0.03] p-5">
+
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+
+                  <h2 class="font-bold text-white">
+                    <%= investigation_event_label(event["event"]) %>
+                  </h2>
+
+                  <time class="text-xs text-slate-600">
+                    <%= investigation_time(event["occurred_at"]) %>
+                  </time>
+
+                </div>
+
+                <% details = event["details"] || {} %>
+
+                <% if details.present? %>
+
+                  <div class="mt-3 flex flex-wrap gap-3 text-xs text-slate-600">
+
+                    <% details.each do |key, value| %>
+
+                      <% next if value.blank? %>
+
+                      <span class="rounded-full bg-black/20 px-3 py-1.5">
+                        <span class="text-slate-700">
+                          <%= key.to_s.humanize %>:
+                        </span>
+
+                        <strong class="text-slate-400">
+                          <%= value %>
+                        </strong>
+                      </span>
+
+                    <% end %>
+
+                  </div>
+
+                <% end %>
+
+              </div>
+
+            </div>
+
+          <% end %>
+
+        </div>
+
+      </div>
+
+    <% end %>
+
+  </div>
+
+</div>

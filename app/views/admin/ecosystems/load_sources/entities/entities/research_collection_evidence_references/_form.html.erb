@@ -1,0 +1,96 @@
+<%= form_with model: [
+  :admin,
+  collection,
+  evidence_reference
+],
+              class: "space-y-5" do |form| %>
+
+  <% if evidence_reference.errors.any? %>
+    <div class="rounded-2xl border border-rose-500/20 bg-rose-500/5 p-4 text-sm text-rose-200">
+      <% evidence_reference.errors.full_messages.each do |message| %>
+        <div><%= message %></div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :title,
+                   class: "text-xs font-bold uppercase tracking-wider text-slate-400" %>
+
+    <%= form.text_field :title,
+                        required: true,
+                        class: "mt-2 w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white" %>
+  </div>
+
+  <div>
+    <%= form.label :source_type,
+                   class: "text-xs font-bold uppercase tracking-wider text-slate-400" %>
+
+    <%= form.select :source_type,
+                    %w[web paper book report dataset interview document internal other],
+                    { include_blank: true },
+                    class: "mt-2 w-full rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white" %>
+  </div>
+
+  <div>
+    <%= form.label :research_workspace_id,
+                   "Related investigation",
+                   class: "text-xs font-bold uppercase tracking-wider text-slate-400" %>
+
+    <%= form.collection_select(
+          :research_workspace_id,
+          collection.research_workspaces.order(:title),
+          :id,
+          :title,
+          { include_blank: "Collection-level evidence" },
+          class: "mt-2 w-full rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white"
+        ) %>
+  </div>
+
+  <div>
+    <%= form.label :source_url,
+                   class: "text-xs font-bold uppercase tracking-wider text-slate-400" %>
+
+    <%= form.url_field :source_url,
+                       placeholder: "https://...",
+                       class: "mt-2 w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white" %>
+  </div>
+
+  <div>
+    <%= form.label :external_identifier,
+                   class: "text-xs font-bold uppercase tracking-wider text-slate-400" %>
+
+    <%= form.text_field :external_identifier,
+                        class: "mt-2 w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white" %>
+  </div>
+
+  <div>
+    <%= form.label :confidence,
+                   "Confidence (0–100)",
+                   class: "text-xs font-bold uppercase tracking-wider text-slate-400" %>
+
+    <%= form.number_field :confidence,
+                          min: 0,
+                          max: 100,
+                          value: evidence_reference.confidence || 0,
+                          class: "mt-2 w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white" %>
+  </div>
+
+  <div>
+    <%= form.label :description,
+                   class: "text-xs font-bold uppercase tracking-wider text-slate-400" %>
+
+    <%= form.text_area :description,
+                       rows: 5,
+                       class: "mt-2 w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white" %>
+  </div>
+
+  <div class="flex gap-3">
+    <%= form.submit "Save evidence",
+                    class: "rounded-xl bg-orange-500 px-5 py-3 text-xs font-black text-white" %>
+
+    <%= link_to "Cancel",
+                admin_research_collection_path(collection),
+                class: "rounded-xl bg-white/5 px-5 py-3 text-xs font-bold text-slate-400" %>
+  </div>
+<% end %>

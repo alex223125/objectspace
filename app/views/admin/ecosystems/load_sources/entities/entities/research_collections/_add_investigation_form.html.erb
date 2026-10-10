@@ -1,0 +1,16 @@
+<%= form_with url: add_investigation_admin_research_collection_path(collection),
+              method: :post,
+              class: "flex flex-col gap-3 sm:flex-row" do |form| %>
+
+  <%= form.collection_select(
+        :research_workspace_id,
+        ResearchWorkspace.order(updated_at: :desc),
+        :id,
+        :title,
+        { include_blank: "Select investigation" },
+        class: "min-w-0 flex-1 rounded-xl border border-white/10 bg-slate-950 px-3 py-2.5 text-xs text-white"
+      ) %>
+
+  <%= form.submit "Add investigation",
+                  class: "rounded-xl bg-orange-500 px-4 py-2.5 text-xs font-black text-white" %>
+<% end %>

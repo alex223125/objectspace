@@ -1,0 +1,48 @@
+<div class="row g-3">
+  <div class="col-md-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="text-muted small">Open questions</div>
+        <div class="fs-2 fw-bold">
+          <%= @intelligence[:questions][:open] %>
+        </div>
+        <div class="small text-muted">
+          <%= @intelligence[:questions][:resolution_percentage] %>% resolved
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="text-muted small">Objective progress</div>
+        <div class="fs-2 fw-bold">
+          <%= @intelligence[:objectives][:progress] %>%
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="text-muted small">Milestone progress</div>
+        <div class="fs-2 fw-bold">
+          <%= @intelligence[:milestones][:progress] %>%
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="text-muted small">High-confidence findings</div>
+        <div class="fs-2 fw-bold">
+          <%= @intelligence[:findings][:high_confidence] %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

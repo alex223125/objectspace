@@ -1,0 +1,43 @@
+<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+
+  <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+    <div class="text-xs font-bold uppercase tracking-wider text-slate-600">
+      Annotations
+    </div>
+
+    <div class="mt-2 text-2xl font-black">
+      <%= workspace.research_annotations.count %>
+    </div>
+  </div>
+
+  <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+    <div class="text-xs font-bold uppercase tracking-wider text-slate-600">
+      Evidence
+    </div>
+
+    <div class="mt-2 text-2xl font-black">
+      <%= workspace.research_evidences.count %>
+    </div>
+  </div>
+
+  <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+    <div class="text-xs font-bold uppercase tracking-wider text-slate-600">
+      Verified
+    </div>
+
+    <div class="mt-2 text-2xl font-black text-emerald-300">
+      <%= workspace.research_evidences.verified.count %>
+    </div>
+  </div>
+
+  <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+    <div class="text-xs font-bold uppercase tracking-wider text-slate-600">
+      Research-ready
+    </div>
+
+    <div class="mt-2 text-2xl font-black text-orange-300">
+      <%= workspace.items.count(&:research_ready?) %>
+    </div>
+  </div>
+
+</div>

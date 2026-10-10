@@ -1,0 +1,110 @@
+<div class="mx-auto max-w-6xl px-6 py-10">
+  <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <div class="text-xs font-bold uppercase tracking-[0.2em] text-purple-400">
+        Historical checkpoint
+      </div>
+
+      <h1 class="mt-2 text-3xl font-black text-white">
+        <%= @snapshot.name %>
+      </h1>
+
+      <p class="mt-2 text-sm text-slate-500">
+        <%= @snapshot.created_at.strftime("%Y-%m-%d %H:%M:%S") %>
+      </p>
+    </div>
+
+    <%= link_to "Back to history",
+                admin_research_investigation_path(@workspace),
+                class: "rounded-2xl bg-white/5 px-5 py-3 text-sm font-bold text-slate-400 hover:bg-white/10 hover:text-white" %>
+  </div>
+
+  <div class="mt-8 grid gap-4 sm:grid-cols-5">
+    <div class="rounded-2xl bg-white/[0.03] p-4">
+      <div class="text-xl font-black text-white">
+        <%= @snapshot.item_count %>
+      </div>
+      <div class="text-[10px] uppercase tracking-wider text-slate-600">
+        Items
+      </div>
+    </div>
+
+    <div class="rounded-2xl bg-white/[0.03] p-4">
+      <div class="text-xl font-black text-white">
+        <%= @snapshot.annotation_count %>
+      </div>
+      <div class="text-[10px] uppercase tracking-wider text-slate-600">
+        Annotations
+      </div>
+    </div>
+
+    <div class="rounded-2xl bg-white/[0.03] p-4">
+      <div class="text-xl font-black text-white">
+        <%= @snapshot.evidence_count %>
+      </div>
+      <div class="text-[10px] uppercase tracking-wider text-slate-600">
+        Evidence
+      </div>
+    </div>
+
+    <div class="rounded-2xl bg-white/[0.03] p-4">
+      <div class="text-xl font-black text-emerald-300">
+        <%= @snapshot.verified_evidence_count %>
+      </div>
+      <div class="text-[10px] uppercase tracking-wider text-slate-600">
+        Verified
+      </div>
+    </div>
+
+    <div class="rounded-2xl bg-white/[0.03] p-4">
+      <div class="text-xl font-black text-orange-300">
+        <%= @snapshot.research_strength %>%
+      </div>
+      <div class="text-[10px] uppercase tracking-wider text-slate-600">
+        Strength
+      </div>
+    </div>
+  </div>
+
+  <% if @snapshot.description.present? %>
+    <div class="mt-8 rounded-3xl border border-white/10 bg-white/[0.03] p-5">
+      <div class="text-xs font-bold uppercase tracking-wider text-slate-600">
+        Checkpoint note
+      </div>
+
+      <p class="mt-2 text-sm leading-6 text-slate-400">
+        <%= @snapshot.description %>
+      </p>
+    </div>
+  <% end %>
+
+  <div class="mt-8">
+    <h2 class="text-xl font-black text-white">
+      Captured research state
+    </h2>
+
+    <div class="mt-5 space-y-4">
+      <% @snapshot.item_states.each do |item| %>
+        <div class="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
+          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+            <%= item["kind"] %>
+          </div>
+
+          <h3 class="mt-1 font-black text-white">
+            <%= item["title"] %>
+          </h3>
+
+          <div class="mt-3 flex flex-wrap gap-4 text-xs text-slate-600">
+            <span>
+              <%= Array(item["annotations"]).length %> annotations
+            </span>
+
+            <span>
+              <%= Array(item["evidences"]).length %> evidence
+            </span>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

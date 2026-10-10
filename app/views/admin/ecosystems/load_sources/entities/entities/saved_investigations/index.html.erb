@@ -1,0 +1,83 @@
+<%= render "admin/research_collections/dashboard_summary" %>
+
+<%= render "navigation" %>
+
+<%= render "collection_link" %>
+
+<!-- existing saved investigations UI continues here -->
+
+<div class="mx-auto max-w-7xl px-6 py-10">
+  <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+    <div>
+      <div class="text-xs font-bold uppercase tracking-[0.2em] text-orange-400">
+        Research archive
+      </div>
+
+      <h1 class="mt-2 text-3xl font-black text-white">
+        Saved investigations
+      </h1>
+
+      <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+        Resume active research, inspect completed investigations, and preserve
+        a historical record of your research decisions.
+      </p>
+    </div>
+
+    <%= link_to "Research workspaces",
+                admin_research_workspaces_path,
+                class: "rounded-2xl bg-white/5 px-5 py-3 text-sm font-bold text-slate-300 hover:bg-white/10 hover:text-white" %>
+  </div>
+
+  <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <%= render "stat",
+               label: "Total",
+               value: @stats[:total],
+               color: "text-white" %>
+
+    <%= render "stat",
+               label: "In progress",
+               value: @stats[:active],
+               color: "text-sky-300" %>
+
+    <%= render "stat",
+               label: "Completed",
+               value: @stats[:completed],
+               color: "text-emerald-300" %>
+
+    <%= render "stat",
+               label: "Archived",
+               value: @stats[:archived],
+               color: "text-slate-400" %>
+  </div>
+
+  <div class="mt-8 flex flex-wrap gap-2">
+    <%= link_to "All",
+                admin_saved_investigations_path,
+                class: "rounded-xl bg-white/5 px-4 py-2 text-xs font-bold text-slate-400 hover:bg-white/10 hover:text-white" %>
+
+    <%= link_to "Active",
+                admin_saved_investigations_path(status: "active"),
+                class: "rounded-xl bg-sky-500/10 px-4 py-2 text-xs font-bold text-sky-300 hover:bg-sky-500/20" %>
+
+    <%= link_to "Completed",
+                admin_saved_investigations_path(status: "completed"),
+                class: "rounded-xl bg-emerald-500/10 px-4 py-2 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20" %>
+
+    <%= link_to "Archived",
+                admin_saved_investigations_path(status: "archived"),
+                class: "rounded-xl bg-white/5 px-4 py-2 text-xs font-bold text-slate-500 hover:bg-white/10 hover:text-white" %>
+  </div>
+
+  <div class="mt-8">
+    <% if @workspaces.any? %>
+      <div class="grid gap-5 lg:grid-cols-2">
+        <% @workspaces.each do |workspace| %>
+          <%= render "workspace_card",
+                     workspace: workspace %>
+        <% end %>
+      </div>
+    <% else %>
+      <%= render "empty" %>
+    <% end %>
+  </div>
+</div>

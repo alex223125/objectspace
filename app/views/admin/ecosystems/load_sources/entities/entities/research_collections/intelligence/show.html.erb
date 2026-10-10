@@ -1,0 +1,84 @@
+<div class="research-collection-intelligence">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1>
+        <%= @collection.name %>
+      </h1>
+
+      <p class="text-muted mb-0">
+        Collection Intelligence
+      </p>
+    </div>
+
+    <div class="d-flex gap-2">
+
+      <%= link_to "Snapshots",
+                  admin_research_collection_snapshots_path(@collection),
+                  class: "btn btn-outline-secondary" %>
+
+      <%= button_to "Refresh intelligence",
+                    refresh_intelligence_admin_research_collection_path(
+                      @collection
+                    ),
+                    method: :post,
+                    class: "btn btn-primary",
+                    form_class: "d-inline" %>
+
+
+      <%= link_to "Checkpoints",
+                  admin_research_collection_snapshots_path(@collection),
+                  class: "btn btn-outline-secondary" %>
+
+    </div>
+  </div>
+
+  <%= render "summary_cards" %>
+
+  <div class="row g-4 mt-1">
+
+    <div class="col-lg-6">
+      <%= render "questions" %>
+    </div>
+
+    <div class="col-lg-6">
+      <%= render "objectives" %>
+    </div>
+
+    <div class="col-lg-6">
+      <%= render "milestones" %>
+    </div>
+
+    <div class="col-lg-6">
+      <%= render "findings" %>
+    </div>
+
+    <div class="col-lg-6">
+      <%= render "signals" %>
+    </div>
+
+    <div class="col-lg-6">
+      <%= render "relationships" %>
+    </div>
+
+    <div class="col-lg-6">
+      <%= render "evidence_inventory" %>
+    </div>
+
+    <div class="col-lg-6">
+      <%= render "synthesis_notes" %>
+    </div>
+
+    <div class="col-lg-6">
+      <%= render "coverage" %>
+    </div>
+
+    <div class="col-lg-6">
+      <%= render "workspace_intelligence" %>
+    </div>
+
+
+
+  </div>
+
+</div>

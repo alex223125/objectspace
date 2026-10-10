@@ -1,0 +1,59 @@
+<div class="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <div class="text-xs font-bold uppercase tracking-[0.2em] text-slate-600">
+        Investigation lifecycle
+      </div>
+
+      <div class="mt-2 flex flex-wrap items-center gap-3">
+        <h2 class="text-lg font-black text-white">
+          <%= workspace.lifecycle_label %>
+        </h2>
+
+        <span class="rounded-full bg-white/5 px-3 py-1 text-xs font-bold uppercase tracking-wider text-slate-500">
+          <%= workspace.status %>
+        </span>
+      </div>
+
+      <% if workspace.last_opened_at.present? %>
+        <p class="mt-2 text-xs text-slate-600">
+          Last opened
+          <%= time_ago_in_words(workspace.last_opened_at) %> ago
+        </p>
+      <% end %>
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+      <% if workspace.active? %>
+        <%= button_to "Complete investigation",
+                      complete_item_admin_research_workspace_path(workspace),
+                      method: :patch,
+                      class: "rounded-xl bg-emerald-500/10 px-4 py-2 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20" %>
+      <% elsif workspace.completed? %>
+        <%= button_to "Reopen investigation",
+                      reopen_item_admin_research_workspace_path(workspace),
+                      method: :patch,
+                      class: "rounded-xl bg-orange-500/10 px-4 py-2 text-xs font-bold text-orange-300 hover:bg-orange-500/20" %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="mt-5">
+    <div class="mb-2 flex justify-between text-xs">
+      <span class="text-slate-500">
+        Investigation progress
+      </span>
+
+      <strong class="text-slate-300">
+        <%= workspace.progress %>%
+      </strong>
+    </div>
+
+    <div class="h-2 overflow-hidden rounded-full bg-white/5">
+      <div
+        class="h-full rounded-full bg-orange-500"
+        style="width: <%= workspace.progress %>%">
+      </div>
+    </div>
+  </div>
+</div>

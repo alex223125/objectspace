@@ -1,0 +1,89 @@
+<div class="rounded-2xl border border-white/10 bg-black/10 p-4">
+
+  <div class="flex items-start gap-3">
+
+    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-400/10">
+      <%= evidence_icon(evidence.evidence_type) %>
+    </div>
+
+    <div class="min-w-0 flex-1">
+
+      <div class="flex flex-wrap items-center gap-2">
+
+        <h4 class="font-semibold text-slate-300">
+          <%= evidence.title %>
+        </h4>
+
+        <span class="rounded-full bg-white/5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-600">
+          <%= evidence.evidence_type.humanize %>
+        </span>
+
+        <span class="rounded-full bg-emerald-400/10 px-2 py-1 text-[10px] font-bold text-emerald-300">
+          <%= evidence.confidence %>%
+        </span>
+
+      </div>
+
+      <% if evidence.source_name.present? %>
+        <div class="mt-1 text-xs text-slate-600">
+          <%= evidence.source_name %>
+        </div>
+      <% end %>
+
+      <% if evidence.source_url.present? %>
+        <%= link_to evidence.source_url,
+                    evidence.source_url,
+                    target: "_blank",
+                    rel: "noopener noreferrer",
+                    class: "mt-2 block truncate text-xs text-cyan-400 hover:text-cyan-300" %>
+      <% end %>
+
+      <% if evidence.excerpt.present? %>
+        <div class="mt-3 border-l-2 border-emerald-400/20 pl-3 text-xs leading-5 text-slate-500">
+          <%= evidence.excerpt %>
+        </div>
+      <% end %>
+
+      <% if evidence.notes.present? %>
+        <div class="mt-3 text-xs leading-5 text-slate-600">
+          <%= evidence.notes %>
+        </div>
+      <% end %>
+
+      <div class="mt-3 flex flex-wrap gap-3 text-[10px] text-slate-600">
+
+        <% if evidence.published_on.present? %>
+          <span>
+            Published <%= evidence.published_on.strftime("%b %d, %Y") %>
+          </span>
+        <% end %>
+
+        <% if evidence.accessed_on.present? %>
+          <span>
+            Accessed <%= evidence.accessed_on.strftime("%b %d, %Y") %>
+          </span>
+        <% end %>
+
+      </div>
+
+    </div>
+
+    <div class="shrink-0">
+
+      <%= button_to "×",
+                    admin_research_workspace_item_evidence_path(
+                      workspace,
+                      evidence.research_workspace_item,
+                      evidence
+                    ),
+                    method: :delete,
+                    data: {
+                      turbo_confirm: "Remove this evidence?"
+                    },
+                    class: "rounded-lg px-2 py-1 text-slate-600 hover:bg-rose-500/10 hover:text-rose-300" %>
+
+    </div>
+
+  </div>
+
+</div>

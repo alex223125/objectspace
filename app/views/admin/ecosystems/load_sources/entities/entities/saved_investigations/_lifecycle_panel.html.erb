@@ -1,0 +1,81 @@
+<div class="mt-8 rounded-3xl border border-white/10 bg-white/[0.03] p-6">
+  <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+    <div>
+      <div class="text-xs font-bold uppercase tracking-[0.2em] text-slate-600">
+        Investigation lifecycle
+      </div>
+
+      <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+        Save checkpoints while researching, complete investigations when the
+        research is ready, archive old work, or reopen an archived investigation.
+      </p>
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+      <% if workspace.active? %>
+        <%= button_to "Mark completed",
+                      complete_admin_saved_investigation_path(workspace),
+                      method: :patch,
+                      data: {
+                        turbo_confirm: "Mark this investigation as completed?"
+                      },
+                      class: "rounded-xl bg-emerald-500/10 px-4 py-2.5 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20" %>
+
+        <%= button_to "Archive",
+                      archive_admin_saved_investigation_path(workspace),
+                      method: :patch,
+                      data: {
+                        turbo_confirm: "Archive this investigation?"
+                      },
+                      class: "rounded-xl bg-white/5 px-4 py-2.5 text-xs font-bold text-slate-400 hover:bg-white/10 hover:text-white" %>
+      <% elsif workspace.completed? %>
+        <%= button_to "Resume",
+                      resume_admin_saved_investigation_path(workspace),
+                      method: :patch,
+                      class: "rounded-xl bg-sky-500/10 px-4 py-2.5 text-xs font-bold text-sky-300 hover:bg-sky-500/20" %>
+
+        <%= button_to "Archive",
+                      archive_admin_saved_investigation_path(workspace),
+                      method: :patch,
+                      class: "rounded-xl bg-white/5 px-4 py-2.5 text-xs font-bold text-slate-400 hover:bg-white/10 hover:text-white" %>
+      <% elsif workspace.archived? %>
+        <%= button_to "Reopen",
+                      reopen_admin_saved_investigation_path(workspace),
+                      method: :patch,
+                      class: "rounded-xl bg-sky-500/10 px-4 py-2.5 text-xs font-bold text-sky-300 hover:bg-sky-500/20" %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="mt-6 grid gap-3 sm:grid-cols-3">
+    <div class="rounded-2xl bg-black/20 p-4">
+      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+        Saved
+      </div>
+
+      <div class="mt-2 text-sm font-bold text-slate-300">
+        <%= workspace.saved_at&.strftime("%Y-%m-%d %H:%M") || "Not yet" %>
+      </div>
+    </div>
+
+    <div class="rounded-2xl bg-black/20 p-4">
+      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+        Last resumed
+      </div>
+
+      <div class="mt-2 text-sm font-bold text-slate-300">
+        <%= workspace.last_resumed_at&.strftime("%Y-%m-%d %H:%M") || "Not yet" %>
+      </div>
+    </div>
+
+    <div class="rounded-2xl bg-black/20 p-4">
+      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+        Last checkpoint
+      </div>
+
+      <div class="mt-2 text-sm font-bold text-slate-300">
+        <%= workspace.last_snapshot_at&.strftime("%Y-%m-%d %H:%M") || "None" %>
+      </div>
+    </div>
+  </div>
+</div>

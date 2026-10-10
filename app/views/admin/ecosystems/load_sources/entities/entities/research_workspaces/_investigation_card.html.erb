@@ -1,0 +1,97 @@
+<div class="group rounded-3xl border border-white/10 bg-white/[0.03] p-5 transition hover:border-orange-500/20 hover:bg-white/[0.045]">
+  <div class="flex items-start justify-between gap-4">
+    <div class="min-w-0">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider <%= lifecycle_badge_class(workspace.status) %>">
+          <span class="h-1.5 w-1.5 rounded-full <%= lifecycle_dot_class(workspace.status) %>"></span>
+          <%= workspace.lifecycle_label %>
+        </span>
+
+        <% if workspace.latest_snapshot.present? %>
+          <span class="rounded-full bg-sky-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-sky-300">
+            Snapshot saved
+          </span>
+        <% end %>
+      </div>
+
+      <h3 class="mt-3 truncate text-lg font-black text-white">
+        <%= workspace.title %>
+      </h3>
+
+      <p class="mt-1 text-xs text-slate-600">
+        <%= workspace.slug %>
+      </p>
+    </div>
+
+    <div class="text-2xl">
+      <%= workspace.lifecycle_icon %>
+    </div>
+  </div>
+
+  <div class="mt-5">
+    <div class="mb-2 flex items-center justify-between text-xs">
+      <span class="text-slate-600">
+        Research progress
+      </span>
+
+      <strong class="text-slate-300">
+        <%= workspace.progress %>%
+      </strong>
+    </div>
+
+    <div class="h-1.5 overflow-hidden rounded-full bg-white/5">
+      <div
+        class="h-full rounded-full <%= workspace.completed? ? "bg-emerald-500" : "bg-orange-500" %>"
+        style="width: <%= workspace.progress %>%">
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-5 grid grid-cols-3 gap-2">
+    <div class="rounded-xl bg-black/20 p-3 text-center">
+      <div class="text-lg font-black text-white">
+        <%= workspace.items.count %>
+      </div>
+
+      <div class="text-[9px] font-bold uppercase tracking-wider text-slate-700">
+        Items
+      </div>
+    </div>
+
+    <div class="rounded-xl bg-black/20 p-3 text-center">
+      <div class="text-lg font-black text-white">
+        <%= workspace.annotation_count %>
+      </div>
+
+      <div class="text-[9px] font-bold uppercase tracking-wider text-slate-700">
+        Notes
+      </div>
+    </div>
+
+    <div class="rounded-xl bg-black/20 p-3 text-center">
+      <div class="text-lg font-black text-white">
+        <%= workspace.evidence_count %>
+      </div>
+
+      <div class="text-[9px] font-bold uppercase tracking-wider text-slate-700">
+        Evidence
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-5 flex items-center justify-between gap-3">
+    <div class="text-[11px] text-slate-700">
+      <% if workspace.last_opened_at.present? %>
+        Opened <%= time_ago_in_words(workspace.last_opened_at) %> ago
+      <% else %>
+        Not opened yet
+      <% end %>
+    </div>
+
+    <%= link_to(
+          workspace.archived? ? "Restore" : "Resume",
+          admin_research_workspace_path(workspace),
+          class: "rounded-xl bg-orange-500/10 px-3 py-2 text-xs font-bold text-orange-300 hover:bg-orange-500/20"
+        ) %>
+  </div>
+</div>

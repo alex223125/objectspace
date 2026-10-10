@@ -1,0 +1,62 @@
+
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1><%= @snapshot.label %></h1>
+      <p class="text-muted mb-0">
+        Checkpoint #<%= @snapshot.sequence %>
+        · <%= l(@snapshot.captured_at, format: :long) %>
+      </p>
+    </div>
+
+    <%= link_to "All checkpoints",
+                admin_research_collection_snapshots_path(@collection),
+                class: "btn btn-outline-secondary" %>
+  </div>
+
+  <% if @snapshot_integrity_valid %>
+    <div class="alert alert-success">
+      Snapshot checksum verified.
+    </div>
+  <% else %>
+    <div class="alert alert-danger">
+      Snapshot checksum mismatch. Do not rely on this checkpoint
+      until its integrity has been investigated.
+    </div>
+  <% end %>
+
+  <% if @snapshot.description.present? %>
+    <p><%= @snapshot.description %></p>
+  <% end %>
+
+  <div class="card mb-4">
+    <div class="card-header">Compare against another checkpoint</div>
+    <div class="card-body">
+      <%= form_with url: compare_admin_research_collection_snapshot_path(
+        @collection, @snapshot
+      ), method: :get, local: true do |form| %>
+        <div class="mb-3">
+          <%= form.label :before_id, "Compare with" %>
+          <%= form.collection_select :before_id,
+                                     @collection.snapshots.where.not(
+                                       id: @snapshot.id
+                                     ).ordered,
+                                     :id,
+                                     :label,
+                                     { prompt: "Choose an earlier or later checkpoint" },
+                                     class: "form-select",
+                                     required: true %>
+        </div>
+        <%= form.submit "Compare checkpoints",
+                        class: "btn btn-primary" %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">Captured payload</div>
+    <div class="card-body">
+      <pre class="small text-wrap"><%= JSON.pretty_generate(@snapshot.payload) %></pre>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,35 @@
+<div class="rounded-2xl border border-purple-500/10 bg-purple-500/[0.03] p-4">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <div class="text-xs font-black uppercase tracking-wider text-purple-300">
+        Research history
+      </div>
+
+      <p class="mt-1 text-xs leading-5 text-slate-600">
+        Save a durable checkpoint before a major research decision.
+      </p>
+    </div>
+
+    <%= button_to "＋ Save checkpoint",
+                  snapshot_admin_research_investigation_path(workspace),
+                  method: :post,
+                  class: "rounded-xl bg-purple-500/10 px-4 py-2.5 text-xs font-black text-purple-300 hover:bg-purple-500/20" %>
+  </div>
+
+  <% if workspace.latest_snapshot %>
+    <div class="mt-3 text-[11px] text-slate-600">
+      Last checkpoint:
+      <strong class="text-slate-500">
+        <%= workspace.latest_snapshot.name %>
+      </strong>
+      ·
+      <%= workspace.latest_snapshot.created_at.strftime("%Y-%m-%d %H:%M") %>
+    </div>
+  <% end %>
+
+  <div class="mt-3">
+    <%= link_to "View investigation history",
+                admin_research_investigation_path(workspace),
+                class: "text-xs font-bold text-purple-400 hover:text-purple-300" %>
+  </div>
+</div>

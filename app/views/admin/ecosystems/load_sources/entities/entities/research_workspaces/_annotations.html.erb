@@ -1,0 +1,156 @@
+<div class="space-y-3">
+
+  <% annotations = item.annotations.ordered %>
+
+  <% if annotations.empty? %>
+
+    <div class="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-5 text-sm text-slate-600">
+      No expert annotations yet.
+    </div>
+
+  <% else %>
+
+    <% annotations.each do |annotation| %>
+
+      <div class="rounded-3xl border border-white/10 bg-black/10 p-5">
+
+        <div class="flex items-start gap-4">
+
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-purple-400/10 text-lg">
+            <%= annotation_icon(annotation.kind) %>
+          </div>
+
+          <div class="min-w-0 flex-1">
+
+            <div class="flex flex-wrap items-center gap-2">
+
+              <h4 class="font-bold text-white">
+                <%= annotation.title %>
+              </h4>
+
+              <span class="rounded-full bg-white/5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                <%= annotation.kind_label %>
+              </span>
+
+              <span class="rounded-full bg-white/5 px-2 py-1 text-[10px] font-bold text-slate-400">
+                <%= annotation.status_label %>
+              </span>
+
+            </div>
+
+            <p class="mt-3 whitespace-pre-line text-sm leading-6 text-slate-400">
+              <%= annotation.body %>
+            </p>
+
+            <div class="mt-4 flex flex-wrap items-center gap-4 text-xs">
+
+              <% if annotation.author_name.present? %>
+                <span class="text-slate-500">
+                  By
+                  <span class="font-semibold text-slate-300">
+                    <%= annotation.author_name %>
+                  </span>
+                </span>
+              <% end %>
+
+              <span class="<%= confidence_color(annotation.confidence) %> font-semibold">
+                <%= annotation.confidence %>% confidence
+              </span>
+
+              <span class="text-slate-600">
+                <%= time_ago_in_words(annotation.created_at) %> ago
+              </span>
+
+            </div>
+
+            <div class="mt-3 h-1 overflow-hidden rounded-full bg-white/5">
+              <div
+                class="h-full rounded-full <%= confidence_bar_color(annotation.confidence) %>"
+                style="width: <%= annotation.confidence %>%">
+              </div>
+            </div>
+
+            <% if annotation.evidences.any? %>
+
+              <div class="mt-5 border-t border-white/5 pt-4">
+
+                <div class="mb-3 text-[10px] font-bold uppercase tracking-wider text-slate-600">
+                  Supporting evidence
+                </div>
+
+                <div class="space-y-2">
+
+                  <% annotation.evidences.ordered.each do |evidence| %>
+
+                    <div class="rounded-2xl bg-white/[0.03] p-3">
+
+                      <div class="flex items-start gap-3">
+
+                        <span class="text-base">
+                          <%= evidence_icon(evidence.evidence_type) %>
+                        </span>
+
+                        <div class="min-w-0 flex-1">
+
+                          <div class="font-semibold text-slate-300">
+                            <%= evidence.title %>
+                          </div>
+
+                          <% if evidence.source_name.present? %>
+                            <div class="mt-1 text-xs text-slate-600">
+                              <%= evidence.source_name %>
+                            </div>
+                          <% end %>
+
+                          <% if evidence.source_url.present? %>
+                            <%= link_to evidence.source_url,
+                                        evidence.source_url,
+                                        target: "_blank",
+                                        rel: "noopener noreferrer",
+                                        class: "mt-2 block truncate text-xs text-blue-400 hover:text-blue-300" %>
+                          <% end %>
+
+                        </div>
+
+                        <% if evidence.verified? %>
+                          <span class="rounded-full bg-emerald-400/10 px-2 py-1 text-[10px] font-bold text-emerald-300">
+                            Verified
+                          </span>
+                        <% end %>
+
+                      </div>
+
+                    </div>
+
+                  <% end %>
+
+                </div>
+
+              </div>
+
+            <% end %>
+
+          </div>
+
+          <div class="shrink-0">
+
+            <%= button_to "Delete",
+                          delete_annotation_admin_research_workspace_path(
+                            workspace,
+                            item_id: item.id,
+                            annotation_id: annotation.id
+                          ),
+                          method: :delete,
+                          class: "rounded-xl bg-white/5 px-3 py-2 text-xs font-bold text-slate-600 transition hover:bg-red-500/10 hover:text-red-300" %>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    <% end %>
+
+  <% end %>
+
+</div>

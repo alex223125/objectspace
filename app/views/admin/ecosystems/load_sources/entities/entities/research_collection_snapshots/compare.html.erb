@@ -1,0 +1,50 @@
+
+<div class="container-fluid">
+  <h1>Checkpoint comparison</h1>
+
+  <p class="text-muted">
+    <%= @before_snapshot.label %>
+    → <%= @snapshot.label %>
+  </p>
+
+  <% if @diff[:collection].empty? && @diff[:records].values.all? {
+    |records| records.values.all?(&:empty?)
+  } %>
+    <div class="alert alert-info">
+      No differences were found in the compared collection fields
+      and record lists.
+    </div>
+  <% end %>
+
+  <% @diff[:records].each do |record_type, changes| %>
+    <div class="card mb-3">
+      <div class="card-header">
+        <strong><%= record_type.to_s.humanize %></strong>
+      </div>
+      <div class="card-body">
+        <% %i[added removed changed].each do |change_type| %>
+          <% items = changes[change_type] || [] %>
+          <h6><%= change_type.to_s.humanize %> (<%= items.length %>)</h6>
+
+          <% if items.any? %>
+            <ul>
+              <% items.each do |item| %>
+                <li>
+                  <% if change_type == :changed %>
+                    Record <%= item[:id] %>:
+                    <%= item[:changes].to_json %>
+                  <% else %>
+                    <%= item["title"] || item["question"] ||
+                          item["label"] || item.to_json %>
+                  <% end %>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <p class="text-muted">None</p>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

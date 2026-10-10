@@ -1,0 +1,20 @@
+<div class="rounded-3xl border border-dashed border-white/10 bg-white/[0.02] px-6 py-16 text-center">
+  <div class="text-4xl">
+    🔎
+  </div>
+
+  <h2 class="mt-4 text-xl font-black text-white">
+    No saved investigations
+  </h2>
+
+  <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-600">
+    Start a research workspace and save your first investigation checkpoint.
+    Saved investigations will appear here automatically.
+  </p>
+
+  <div class="mt-6">
+    <%= link_to "Open research workspaces",
+                admin_research_workspaces_path,
+                class: "rounded-2xl bg-orange-500 px-5 py-3 text-sm font-bold text-white hover:bg-orange-400" %>
+  </div>
+</div>

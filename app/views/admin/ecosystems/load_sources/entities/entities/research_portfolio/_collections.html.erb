@@ -1,0 +1,54 @@
+<table class="table table-hover mb-0">
+  <thead>
+  <tr>
+    <th>Collection</th>
+    <th>Health</th>
+    <th>Questions</th>
+    <th>Findings</th>
+    <th>Workspaces</th>
+    <th></th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <% collections.each do |row| %>
+    <tr>
+      <td>
+        <strong>
+          <%= row[:name] || "Collection ##{row[:id]}" %>
+        </strong>
+
+        <% if row[:status].present? %>
+          <div class="small text-muted">
+            <%= row[:status] %>
+          </div>
+        <% end %>
+      </td>
+
+      <td>
+          <span class="badge bg-<%= row[:health][:score] >= 75 ? "success" : row[:health][:score] >= 40 ? "warning" : "danger" %>">
+            <%= row[:health][:score] %>%
+          </span>
+      </td>
+
+      <td>
+        <%= row[:questions] %>
+      </td>
+
+      <td>
+        <%= row[:findings] %>
+      </td>
+
+      <td>
+        <%= row[:workspaces] %>
+      </td>
+
+      <td>
+        <%= link_to "Intelligence",
+                    admin_research_collection_intelligence_path(row[:id]),
+                    class: "btn btn-sm btn-outline-primary" %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>

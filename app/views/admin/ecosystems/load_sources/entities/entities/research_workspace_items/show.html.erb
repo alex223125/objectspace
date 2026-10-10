@@ -1,0 +1,188 @@
+<div class="min-h-screen bg-slate-950 text-white">
+  <div class="mx-auto max-w-7xl px-6 py-10">
+
+    <div class="mb-8">
+      <%= link_to "← Back to workspace",
+                  admin_research_workspace_path(@workspace),
+                  class: "text-sm font-semibold text-slate-500 transition hover:text-white" %>
+
+      <div class="mt-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div>
+          <div class="text-xs font-bold uppercase tracking-[0.25em] text-orange-400">
+            Research Workspace
+          </div>
+
+          <h1 class="mt-2 text-3xl font-black tracking-tight">
+            <%= @item.title %>
+          </h1>
+
+          <div class="mt-2 flex flex-wrap gap-2">
+            <span class="rounded-full bg-white/5 px-3 py-1 text-xs font-bold uppercase tracking-wider text-slate-400">
+              <%= @item.kind %>
+            </span>
+
+            <span class="rounded-full bg-white/5 px-3 py-1 text-xs font-bold text-slate-400">
+              <%= @item.annotation_count %> annotations
+            </span>
+
+            <span class="rounded-full bg-white/5 px-3 py-1 text-xs font-bold text-slate-400">
+              <%= @item.evidence_count %> evidence
+            </span>
+
+            <span class="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-300">
+              <%= @item.verified_evidence_count %> verified
+            </span>
+          </div>
+        </div>
+
+        <% if @item.research_ready? %>
+          <div class="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm font-bold text-emerald-300">
+            ✓ Research-ready
+          </div>
+        <% else %>
+          <div class="rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm font-bold text-amber-300">
+            Needs supporting evidence
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <% if @item.body.present? %>
+      <div class="mb-8 rounded-3xl border border-white/10 bg-white/[0.03] p-6">
+        <div class="text-xs font-bold uppercase tracking-wider text-slate-500">
+          Workspace context
+        </div>
+
+        <p class="mt-3 whitespace-pre-line text-sm leading-7 text-slate-300">
+          <%= @item.body %>
+        </p>
+      </div>
+    <% end %>
+
+    <div class="grid gap-8 lg:grid-cols-2">
+
+      <section>
+        <div class="mb-4">
+          <div class="text-xs font-bold uppercase tracking-[0.2em] text-orange-400">
+            Expert annotations
+          </div>
+
+          <h2 class="mt-1 text-xl font-black">
+            Interpretation & review
+          </h2>
+        </div>
+
+        <div class="space-y-4">
+          <% if @annotations.any? %>
+
+            <% @annotations.each do |annotation| %>
+              <%= render "admin/research_workspace_items/annotation",
+                         annotation: annotation,
+                         workspace: @workspace,
+                         item: @item %>
+            <% end %>
+
+          <% else %>
+
+            <div class="rounded-3xl border border-dashed border-white/10 bg-white/[0.02] p-8 text-center">
+              <div class="text-3xl">🧠</div>
+
+              <div class="mt-3 font-bold">
+                No expert annotations yet
+              </div>
+
+              <p class="mt-2 text-sm text-slate-500">
+                Add an interpretation, hypothesis, warning,
+                correction, or expert note.
+              </p>
+            </div>
+
+          <% end %>
+        </div>
+
+        <div class="mt-6">
+          <%= render "admin/research_workspace_items/annotation_form",
+                     annotation: @annotation,
+                     workspace: @workspace,
+                     item: @item %>
+        </div>
+      </section>
+
+      <section>
+        <div class="mb-4">
+          <div class="text-xs font-bold uppercase tracking-[0.2em] text-cyan-400">
+            Evidence & provenance
+          </div>
+
+          <h2 class="mt-1 text-xl font-black">
+            Supporting sources
+          </h2>
+        </div>
+
+        <div class="space-y-4">
+          <% if @evidences.any? %>
+
+            <% @evidences.each do |evidence| %>
+              <%= render "admin/research_workspace_items/evidence",
+                         evidence: evidence,
+                         workspace: @workspace,
+                         item: @item %>
+            <% end %>
+
+          <% else %>
+
+            <div class="rounded-3xl border border-dashed border-white/10 bg-white/[0.02] p-8 text-center">
+              <div class="text-3xl">🔎</div>
+
+              <div class="mt-3 font-bold">
+                No evidence recorded yet
+              </div>
+
+              <p class="mt-2 text-sm text-slate-500">
+                Add sources, papers, reports, datasets,
+                interviews, observations, or other provenance.
+              </p>
+            </div>
+
+          <% end %>
+        </div>
+
+        <div class="mt-6">
+          <%= render "admin/research_workspace_items/evidence_form",
+                     evidence: @evidence,
+                     annotations: @annotations,
+                     workspace: @workspace,
+                     item: @item %>
+        </div>
+      </section>
+
+    </div>
+
+    <div class="mt-10 rounded-3xl border border-white/10 bg-black/20 p-6">
+      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+
+        <div>
+          <div class="text-xs font-bold uppercase tracking-wider text-slate-500">
+            Provenance API
+          </div>
+
+          <p class="mt-1 text-sm text-slate-500">
+            Machine-readable annotations and evidence for this item.
+          </p>
+        </div>
+
+        <%= link_to "View JSON provenance",
+                    provenance_admin_research_workspace_item_path(
+                      @workspace,
+                      @item,
+                      format: :json
+                    ),
+                    target: "_blank",
+                    rel: "noopener",
+                    class: "rounded-2xl bg-white/5 px-4 py-3 text-sm font-bold text-slate-300 transition hover:bg-white/10 hover:text-white" %>
+
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,104 @@
+<section
+  class="relative mt-8 overflow-hidden rounded-[32px] border border-orange-400/15 bg-slate-950/90 shadow-2xl shadow-orange-950/10"
+  data-controller="ecosystem-discovery"
+  data-ecosystem-discovery-url-value="<%= admin_ecosystem_discovery_path(entity_id: local_assigns[:entity]&.id || @entity&.id) %>"
+>
+  <div class="absolute inset-0 bg-gradient-to-br from-orange-500/[0.06] via-transparent to-violet-500/[0.05] pointer-events-none"></div>
+
+  <div class="relative p-6 md:p-8">
+
+    <div class="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+      <div>
+        <div class="flex items-center gap-3">
+          <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-orange-500/10 text-xl ring-1 ring-orange-400/20">
+            🧭
+          </span>
+
+          <div>
+            <div class="text-[11px] font-bold uppercase tracking-[0.24em] text-orange-300/80">
+              Step 12
+            </div>
+
+            <h2 class="mt-1 text-xl font-black tracking-tight text-white md:text-2xl">
+              Discovery Engine
+            </h2>
+          </div>
+        </div>
+
+        <p class="mt-3 max-w-2xl text-sm leading-6 text-white/55">
+          Discover the most valuable entities to explore next based on relationship
+          strength, activity, novelty, and ecosystem connectivity.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1.5 text-xs font-bold text-emerald-300">
+          <span class="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,.8)]"></span>
+          LIVE DISCOVERY
+        </span>
+      </div>
+    </div>
+
+    <div class="mt-7 grid grid-cols-2 gap-3 md:grid-cols-4">
+      <div class="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+        <div class="text-[10px] font-bold uppercase tracking-widest text-white/35">
+          Discoveries
+        </div>
+
+        <div
+          class="mt-2 text-2xl font-black text-white"
+          data-ecosystem-discovery-target="count"
+        >
+          —
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+        <div class="text-[10px] font-bold uppercase tracking-widest text-white/35">
+          High Value
+        </div>
+
+        <div
+          class="mt-2 text-2xl font-black text-violet-300"
+          data-ecosystem-discovery-target="highValue"
+        >
+          —
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+        <div class="text-[10px] font-bold uppercase tracking-widest text-white/35">
+          Active
+        </div>
+
+        <div
+          class="mt-2 text-2xl font-black text-emerald-300"
+          data-ecosystem-discovery-target="active"
+        >
+          —
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+        <div class="text-[10px] font-bold uppercase tracking-widest text-white/35">
+          New
+        </div>
+
+        <div
+          class="mt-2 text-2xl font-black text-orange-300"
+          data-ecosystem-discovery-target="newDiscoveries"
+        >
+          —
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="mt-7"
+      data-ecosystem-discovery-target="results"
+    >
+      <%= render "discovery_skeleton" %>
+    </div>
+
+  </div>
+</section>

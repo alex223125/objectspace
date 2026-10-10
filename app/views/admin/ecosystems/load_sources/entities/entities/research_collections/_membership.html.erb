@@ -1,0 +1,62 @@
+<% workspace = membership.research_workspace %>
+
+<div class="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+  <div class="flex items-start gap-4">
+    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/5 text-sm font-black text-slate-400">
+      <%= membership.pinned? ? "★" : "○" %>
+    </div>
+
+    <div class="min-w-0 flex-1">
+      <div class="flex flex-wrap items-center gap-2">
+        <%= link_to workspace.title,
+                    admin_research_workspace_path(workspace),
+                    class: "text-sm font-black text-white hover:text-orange-300" %>
+
+        <% if membership.pinned? %>
+          <span class="rounded-full bg-orange-500/10 px-2 py-1 text-[10px] font-black text-orange-300">
+            PINNED
+          </span>
+        <% end %>
+
+        <span class="<%= collection_workspace_status_color(workspace.status) %> text-[10px] font-black uppercase tracking-[0.12em]">
+          <%= workspace.status %>
+        </span>
+      </div>
+
+      <% if membership.notes.present? %>
+        <p class="mt-2 text-xs leading-5 text-slate-500">
+          <%= membership.notes %>
+        </p>
+      <% end %>
+
+      <div class="mt-4 flex flex-wrap gap-2">
+        <% if membership.pinned? %>
+          <%= button_to "Unpin",
+                        unpin_admin_research_collection_membership_path(
+                          collection,
+                          membership
+                        ),
+                        method: :patch,
+                        class: "rounded-lg bg-white/5 px-3 py-1.5 text-[10px] font-bold text-slate-400 hover:bg-white/10 hover:text-white" %>
+        <% else %>
+          <%= button_to "Pin",
+                        pin_admin_research_collection_membership_path(
+                          collection,
+                          membership
+                        ),
+                        method: :patch,
+                        class: "rounded-lg bg-orange-500/10 px-3 py-1.5 text-[10px] font-bold text-orange-300 hover:bg-orange-500/20" %>
+        <% end %>
+
+        <%= button_to "Remove",
+                      admin_research_collection_membership_path(
+                        collection,
+                        membership,
+                        research_workspace_id: workspace.id
+                      ),
+                      method: :delete,
+                      class: "rounded-lg bg-white/5 px-3 py-1.5 text-[10px] font-bold text-slate-500 hover:bg-rose-500/10 hover:text-rose-300" %>
+      </div>
+    </div>
+  </div>
+</div>

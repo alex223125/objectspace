@@ -1,0 +1,65 @@
+
+<div class="card h-100">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <strong>Workspace-derived intelligence</strong>
+    <span class="badge bg-secondary">
+      <%= @workspace_intelligence[:workspace_count] %> workspaces
+    </span>
+  </div>
+
+  <div class="card-body">
+    <div class="row g-3 mb-3">
+      <div class="col-6">
+        <div class="text-muted small">Discovered evidence</div>
+        <div class="fs-3 fw-bold">
+          <%= @workspace_intelligence[:evidence_count] %>
+        </div>
+      </div>
+
+      <div class="col-6">
+        <div class="text-muted small">Workspace coverage</div>
+        <div class="fs-3 fw-bold">
+          <%= @workspace_intelligence[:coverage_percentage] %>%
+        </div>
+      </div>
+    </div>
+
+    <% if @workspace_intelligence[:workspaces].any? %>
+      <div class="list-group list-group-flush">
+        <% @workspace_intelligence[:workspaces].each do |workspace| %>
+          <div class="list-group-item px-0">
+            <div class="d-flex justify-content-between">
+              <strong><%= workspace[:name] %></strong>
+              <span class="small text-muted">
+                <%= workspace[:status].presence || "Status unknown" %>
+              </span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-muted mb-0">
+        No linked workspaces were discovered through the configured
+        membership associations. Verify the collection's workspace
+        relationship before interpreting this as missing research.
+      </p>
+    <% end %>
+
+    <hr>
+
+    <h6>Automated review signals</h6>
+
+    <% if @workspace_signals[:signals].any? %>
+      <% @workspace_signals[:signals].each do |signal| %>
+        <div class="alert alert-light border py-2">
+          <strong><%= signal[:severity].humanize %></strong>
+          <div><%= signal[:message] %></div>
+        </div>
+      <% end %>
+    <% else %>
+      <p class="text-muted mb-0">
+        No workspace coverage review signals were generated.
+      </p>
+    <% end %>
+  </div>
+</div>

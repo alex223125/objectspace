@@ -1,0 +1,157 @@
+<div class="rounded-2xl border border-white/10 bg-black/10 p-5">
+
+  <div class="mb-5">
+    <div class="text-xs font-black uppercase tracking-widest text-slate-500">
+      Add evidence
+    </div>
+  </div>
+
+  <%= form_with url: add_evidence_admin_research_workspace_path(workspace),
+                method: :post,
+                local: true,
+                class: "space-y-4" do |form| %>
+
+    <%= hidden_field_tag :item_id, item.id %>
+
+    <div>
+
+      <%= label_tag "evidence_title",
+                    "Title",
+                    class: "text-xs font-bold text-slate-500" %>
+
+      <%= text_field_tag "evidence[title]",
+                         nil,
+                         required: true,
+                         placeholder: "Evidence title",
+                         class: "mt-2 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-700" %>
+
+    </div>
+
+    <div class="grid gap-4 md:grid-cols-2">
+
+      <div>
+
+        <%= label_tag "evidence_evidence_type",
+                      "Evidence type",
+                      class: "text-xs font-bold text-slate-500" %>
+
+        <%= select_tag "evidence[evidence_type]",
+                       options_for_select([
+                                            ["Source", "source"],
+                                            ["Document", "document"],
+                                            ["Dataset", "dataset"],
+                                            ["Publication", "publication"],
+                                            ["Interview", "interview"],
+                                            ["Observation", "observation"],
+                                            ["Internal note", "internal_note"],
+                                            ["Other", "other"]
+                                          ]),
+                       class: "mt-2 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-sm text-white" %>
+
+      </div>
+
+      <div>
+
+        <%= label_tag "evidence_source_name",
+                      "Source",
+                      class: "text-xs font-bold text-slate-500" %>
+
+        <%= text_field_tag "evidence[source_name]",
+                           nil,
+                           class: "mt-2 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-sm text-white" %>
+
+      </div>
+
+    </div>
+
+    <div>
+
+      <%= label_tag "evidence_source_url",
+                    "Source URL",
+                    class: "text-xs font-bold text-slate-500" %>
+
+      <%= url_field_tag "evidence[source_url]",
+                        nil,
+                        placeholder: "https://...",
+                        class: "mt-2 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-700" %>
+
+    </div>
+
+    <div>
+
+      <%= label_tag "evidence_summary",
+                    "Summary",
+                    class: "text-xs font-bold text-slate-500" %>
+
+      <%= text_area_tag "evidence[summary]",
+                        nil,
+                        rows: 3,
+                        class: "mt-2 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none" %>
+
+    </div>
+
+    <div>
+
+      <%= label_tag "evidence_quote",
+                    "Important quote",
+                    class: "text-xs font-bold text-slate-500" %>
+
+      <%= text_area_tag "evidence[quote]",
+                        nil,
+                        rows: 3,
+                        class: "mt-2 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none" %>
+
+    </div>
+
+    <div class="grid gap-4 md:grid-cols-3">
+
+      <div>
+
+        <%= label_tag "evidence_confidence",
+                      "Confidence",
+                      class: "text-xs font-bold text-slate-500" %>
+
+        <%= number_field_tag "evidence[confidence]",
+                             50,
+                             min: 0,
+                             max: 100,
+                             class: "mt-2 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-sm text-white" %>
+
+      </div>
+
+      <div>
+
+        <%= label_tag "evidence_published_at",
+                      "Published",
+                      class: "text-xs font-bold text-slate-500" %>
+
+        <%= date_field_tag "evidence[published_at]",
+                           nil,
+                           class: "mt-2 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-sm text-white" %>
+
+      </div>
+
+      <div>
+
+        <%= label_tag "evidence_accessed_at",
+                      "Accessed",
+                      class: "text-xs font-bold text-slate-500" %>
+
+        <%= date_field_tag "evidence[accessed_at]",
+                           Date.current,
+                           class: "mt-2 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-sm text-white" %>
+
+      </div>
+
+    </div>
+
+    <div class="flex justify-end">
+
+      <%= submit_tag "Save evidence",
+                     class: "rounded-xl bg-orange-500 px-4 py-3 text-xs font-bold text-white" %>
+
+    </div>
+
+  <% end %>
+
+</div>

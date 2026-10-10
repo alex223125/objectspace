@@ -1,0 +1,78 @@
+<div class="mx-auto max-w-7xl px-6 py-10">
+
+  <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+    <div>
+      <div class="text-xs font-bold uppercase tracking-[0.2em] text-orange-400">
+        Research library
+      </div>
+
+      <h1 class="mt-2 text-4xl font-black tracking-tight text-white">
+        Saved investigations
+      </h1>
+
+      <p class="mt-3 max-w-3xl text-sm leading-6 text-slate-500">
+        Return to active investigations, completed research, and archived
+        investigation records without losing the underlying evidence or reasoning.
+      </p>
+    </div>
+
+    <%= link_to "Research workspaces",
+                admin_research_workspaces_path,
+                class: "rounded-2xl bg-white/5 px-5 py-3 text-sm font-bold text-slate-300 hover:bg-white/10 hover:text-white" %>
+  </div>
+
+  <div class="mt-8 grid gap-3 sm:grid-cols-4">
+
+    <% [
+         ["all", "All", @investigation_counts[:all], "text-white"],
+         ["active", "In progress", @investigation_counts[:active], "text-emerald-300"],
+         ["completed", "Completed", @investigation_counts[:completed], "text-sky-300"],
+         ["archived", "Archived", @investigation_counts[:archived], "text-slate-400"]
+       ].each do |key, label, count, color| %>
+
+      <%= link_to saved_admin_research_workspaces_path(filter: key),
+                  class: "rounded-3xl border p-5 transition #{params[:filter].to_s == key || (key == 'all' && params[:filter].blank?) ? 'border-orange-500/30 bg-orange-500/5' : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.05]'}" do %>
+
+        <div class="text-xs font-bold uppercase tracking-wider text-slate-600">
+          <%= label %>
+        </div>
+
+        <div class="mt-2 text-3xl font-black <%= color %>">
+          <%= count %>
+        </div>
+
+      <% end %>
+
+    <% end %>
+
+  </div>
+
+  <div class="mt-8 space-y-4">
+
+    <% if @investigations.empty? %>
+
+      <div class="rounded-3xl border border-white/10 bg-white/[0.03] p-10 text-center">
+        <div class="text-4xl">◎</div>
+
+        <h2 class="mt-4 text-xl font-black text-white">
+          No saved investigations yet
+        </h2>
+
+        <p class="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-500">
+          Start an investigation from an existing research workspace and it will
+          appear here automatically.
+        </p>
+      </div>
+
+    <% else %>
+
+      <% @investigations.each do |workspace| %>
+        <%= render "investigation_card",
+                   workspace: workspace %>
+      <% end %>
+
+    <% end %>
+
+  </div>
+
+</div>

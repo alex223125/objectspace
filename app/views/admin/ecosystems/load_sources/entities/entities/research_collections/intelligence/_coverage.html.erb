@@ -1,0 +1,52 @@
+<div class="card h-100">
+  <div class="card-header">
+    <strong>Evidence coverage</strong>
+  </div>
+
+  <div class="card-body">
+    <div class="display-5 fw-bold">
+      <%= @evidence_coverage[:coverage_percentage] %>%
+    </div>
+
+    <p class="text-muted">
+      <%= @evidence_coverage[:evidence_references] %>
+      evidence references across
+      <%= @evidence_coverage[:workspaces] %>
+      investigations.
+    </p>
+
+    <h6>Unresolved questions</h6>
+
+    <% if @unresolved_questions.any? %>
+      <ul class="mb-3">
+        <% @unresolved_questions.each do |question| %>
+          <li>
+            <%= question.question %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="text-success">
+        No unresolved research questions.
+      </p>
+    <% end %>
+
+    <h6>Contradictions</h6>
+
+    <% if @contradictions.any? %>
+      <ul>
+        <% @contradictions.each do |contradiction| %>
+          <li>
+            <strong><%= contradiction.title %></strong>
+            —
+            <%= contradiction.content %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="text-success">
+        No recorded contradictions.
+      </p>
+    <% end %>
+  </div>
+</div>

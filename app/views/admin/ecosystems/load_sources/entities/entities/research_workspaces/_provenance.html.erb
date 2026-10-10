@@ -1,0 +1,97 @@
+<div
+  class="mt-6 space-y-5"
+  data-controller="research-provenance">
+
+  <div class="flex items-center justify-between">
+
+    <div>
+
+      <h4 class="font-bold text-slate-200">
+        Expert annotations & provenance
+      </h4>
+
+      <p class="mt-1 text-xs text-slate-600">
+        Explain the reasoning and preserve the evidence behind this research.
+      </p>
+
+    </div>
+
+    <div class="flex gap-2">
+
+      <button
+        type="button"
+        data-action="research-provenance#showAnnotations"
+        class="rounded-xl bg-orange-500/10 px-3 py-2 text-xs font-bold text-orange-300 hover:bg-orange-500/20">
+        Annotations
+      </button>
+
+      <button
+        type="button"
+        data-action="research-provenance#showEvidence"
+        class="rounded-xl bg-emerald-500/10 px-3 py-2 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20">
+        Evidence
+      </button>
+
+    </div>
+
+  </div>
+
+  <div
+    data-research-provenance-target="annotations"
+    class="space-y-3">
+
+    <% if item.research_workspace_annotations.any? %>
+
+      <% item.research_workspace_annotations.recent.each do |annotation| %>
+
+        <%= render "admin/research_workspaces/annotation",
+                   annotation: annotation,
+                   workspace: workspace,
+                   item: item %>
+
+      <% end %>
+
+    <% else %>
+
+      <div class="rounded-2xl bg-white/[0.02] p-4 text-sm text-slate-600">
+        No expert annotations yet.
+      </div>
+
+    <% end %>
+
+    <%= render "admin/research_workspaces/annotation_form",
+               workspace: workspace,
+               item: item %>
+
+  </div>
+
+  <div
+    data-research-provenance-target="evidence"
+    class="hidden space-y-3">
+
+    <% if item.research_workspace_evidences.any? %>
+
+      <% item.research_workspace_evidences.recent.each do |evidence| %>
+
+        <%= render "admin/research_workspaces/evidence",
+                   evidence: evidence,
+                   workspace: workspace,
+                   item: item %>
+
+      <% end %>
+
+    <% else %>
+
+      <div class="rounded-2xl bg-white/[0.02] p-4 text-sm text-slate-600">
+        No evidence has been attached yet.
+      </div>
+
+    <% end %>
+
+    <%= render "admin/research_workspaces/evidence_form",
+               workspace: workspace,
+               item: item %>
+
+  </div>
+
+</div>

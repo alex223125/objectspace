@@ -1,0 +1,265 @@
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+
+  <div>
+    <div class="text-xs font-bold uppercase tracking-[0.2em] text-orange-400">
+      Research intelligence
+    </div>
+
+    <h2 class="mt-2 text-xl font-black text-white">
+      Expert annotations & evidence
+    </h2>
+  </div>
+
+  <%= link_to(
+        "Research history",
+        admin_research_workspace_snapshots_path(workspace),
+        class: "rounded-xl bg-white/5 px-4 py-2 text-xs font-bold text-slate-400 hover:bg-white/10 hover:text-white"
+      ) %>
+
+</div>
+
+
+
+
+<div class="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
+
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+
+    <div>
+
+      <div class="text-xs font-bold uppercase tracking-[0.2em] text-orange-400">
+        Research intelligence
+      </div>
+
+      <h2 class="mt-2 text-xl font-black text-white">
+        Expert annotations & evidence
+      </h2>
+
+      <p class="mt-1 text-sm text-slate-500">
+        Build an auditable research record around the entities and relationships
+        in this investigation.
+      </p>
+
+    </div>
+
+    <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
+
+      <div class="rounded-2xl bg-black/20 px-4 py-3 text-center">
+        <div class="text-xl font-black text-white">
+          <%= workspace.annotation_count %>
+        </div>
+
+        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+          Notes
+        </div>
+      </div>
+
+      <div class="rounded-2xl bg-black/20 px-4 py-3 text-center">
+        <div class="text-xl font-black text-white">
+          <%= workspace.evidence_count %>
+        </div>
+
+        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+          Evidence
+        </div>
+      </div>
+
+      <div class="rounded-2xl bg-black/20 px-4 py-3 text-center">
+        <div class="text-xl font-black text-emerald-300">
+          <%= workspace.verified_evidence_count %>
+        </div>
+
+        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+          Verified
+        </div>
+      </div>
+
+      <div class="rounded-2xl bg-black/20 px-4 py-3 text-center">
+        <div class="text-xl font-black text-orange-300">
+          <%= workspace.research_strength %>%
+        </div>
+
+        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+          Strength
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="mt-6 grid gap-3 sm:grid-cols-2">
+
+    <div>
+
+      <div class="mb-2 flex justify-between text-xs">
+        <span class="text-slate-500">
+          Annotation coverage
+        </span>
+
+        <strong class="text-slate-300">
+          <%= workspace.annotation_coverage %>%
+        </strong>
+      </div>
+
+      <div class="h-2 overflow-hidden rounded-full bg-white/5">
+        <div
+          class="h-full rounded-full bg-orange-500"
+          style="width: <%= workspace.annotation_coverage %>%">
+        </div>
+      </div>
+
+    </div>
+
+    <div>
+
+      <div class="mb-2 flex justify-between text-xs">
+        <span class="text-slate-500">
+          Evidence coverage
+        </span>
+
+        <strong class="text-slate-300">
+          <%= workspace.evidence_coverage %>%
+        </strong>
+      </div>
+
+      <div class="h-2 overflow-hidden rounded-full bg-white/5">
+        <div
+          class="h-full rounded-full bg-emerald-500"
+          style="width: <%= workspace.evidence_coverage %>%">
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="mt-8 space-y-6">
+
+    <% workspace.items.includes(
+      :target,
+      :annotations,
+      :evidences
+    ).each do |item| %>
+
+      <div class="rounded-3xl border border-white/5 bg-black/10 p-5">
+
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+
+          <div>
+
+            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+              <%= item.kind %>
+            </div>
+
+            <h3 class="mt-1 font-bold text-white">
+              <%= item.title %>
+            </h3>
+
+            <% if item.target_present? %>
+              <div class="mt-1 text-xs text-slate-600">
+                Target:
+                <span class="text-slate-400">
+                  <%= item.target_label %>
+                </span>
+              </div>
+            <% end %>
+
+            <div class="mt-2 flex flex-wrap gap-3 text-xs">
+
+              <span class="text-slate-600">
+                <%= item.annotation_count %> annotations
+              </span>
+
+              <span class="text-slate-600">
+                <%= item.evidence_count %> evidence
+              </span>
+
+              <span class="<%= confidence_color(item.research_strength) %>">
+                <%= item.research_strength %>% strength
+              </span>
+
+            </div>
+
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+
+            <%= link_to "＋ Annotation",
+                        new_admin_research_workspace_item_annotation_path(
+                          workspace,
+                          item
+                        ),
+                        class: "rounded-xl bg-orange-500/10 px-3 py-2 text-xs font-bold text-orange-300 hover:bg-orange-500/20" %>
+
+            <%= link_to "＋ Evidence",
+                        new_admin_research_workspace_item_evidence_path(
+                          workspace,
+                          item
+                        ),
+                        class: "rounded-xl bg-emerald-500/10 px-3 py-2 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20" %>
+
+          </div>
+
+        </div>
+
+        <% if item.annotations.any? %>
+
+          <div class="mt-5 space-y-3">
+
+            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+              Annotations
+            </div>
+
+            <% item.annotations.ordered.each do |annotation| %>
+
+              <%= render "annotation",
+                         annotation: annotation,
+                         workspace: workspace %>
+
+            <% end %>
+
+          </div>
+
+        <% end %>
+
+        <% standalone_evidence = item.evidences.where(
+          research_annotation_id: nil
+        ) %>
+
+        <% if standalone_evidence.any? %>
+
+          <div class="mt-5 space-y-3">
+
+            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+              Evidence
+            </div>
+
+            <% standalone_evidence.each do |evidence| %>
+
+              <%= render "evidence",
+                         evidence: evidence,
+                         workspace: workspace %>
+
+            <% end %>
+
+          </div>
+
+        <% end %>
+
+        <% if item.annotations.empty? && item.evidences.empty? %>
+
+          <div class="mt-5 rounded-2xl bg-white/[0.02] p-4 text-sm text-slate-600">
+            This item has no research record yet.
+            Add an annotation or evidence to begin.
+          </div>
+
+        <% end %>
+
+      </div>
+
+    <% end %>
+
+  </div>
+
+</div>

@@ -1,0 +1,64 @@
+<div class="card h-100">
+  <div class="card-header d-flex justify-content-between">
+    <strong>Research questions</strong>
+
+    <span class="badge bg-secondary">
+      <%= @intelligence[:questions][:total] %>
+    </span>
+  </div>
+
+  <div class="card-body">
+    <%= form_with model: [
+      :admin,
+      @collection,
+      ResearchCollectionQuestion.new
+    ],
+                  local: true do |form| %>
+
+      <div class="mb-2">
+        <%= form.text_field :question,
+                            class: "form-control",
+                            placeholder: "Add a research question..." %>
+      </div>
+
+      <%= form.submit "Add question",
+                      class: "btn btn-sm btn-primary" %>
+    <% end %>
+
+    <hr>
+
+    <% @collection.questions.ordered.each do |question| %>
+      <div class="border-bottom py-2">
+        <div class="d-flex justify-content-between">
+          <span>
+            <%= question.question %>
+          </span>
+
+          <span class="badge bg-<%= question.status == "resolved" ? "success" : "warning" %>">
+            <%= question.status %>
+          </span>
+        </div>
+
+        <div class="mt-2">
+          <% if question.status == "resolved" %>
+            <%= button_to "Reopen",
+                          reopen_admin_research_collection_question_path(
+                            @collection,
+                            question
+                          ),
+                          method: :patch,
+                          class: "btn btn-sm btn-outline-secondary" %>
+          <% else %>
+            <%= button_to "Resolve",
+                          resolve_admin_research_collection_question_path(
+                            @collection,
+                            question
+                          ),
+                          method: :patch,
+                          class: "btn btn-sm btn-outline-success" %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,108 @@
+<div class="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+
+  <div class="mb-4">
+    <div class="text-sm font-bold text-white">
+      Add expert annotation
+    </div>
+
+    <div class="mt-1 text-xs leading-5 text-slate-500">
+      Capture an explanation, hypothesis, reviewer note, warning, or conclusion.
+    </div>
+  </div>
+
+  <%= form_with model: ResearchWorkspaceAnnotation.new,
+                url: admin_research_workspace_item_annotations_path(
+                  workspace,
+                  item
+                ),
+                local: true,
+                class: "space-y-4" do |form| %>
+
+    <div class="grid gap-4 md:grid-cols-2">
+
+      <div>
+        <%= form.label :annotation_type,
+                       "Type",
+                       class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+        <%= form.select :annotation_type,
+                        ResearchWorkspaceAnnotation::ANNOTATION_TYPES.map {
+                          |value| [value.humanize, value]
+                        },
+                        {},
+                        class: "w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-white" %>
+      </div>
+
+      <div>
+        <%= form.label :confidence,
+                       "Confidence",
+                       class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+        <%= form.select :confidence,
+                        ResearchWorkspaceAnnotation::CONFIDENCE_LEVELS.map {
+                          |value| [value.humanize, value]
+                        },
+                        {},
+                        class: "w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-white" %>
+      </div>
+
+    </div>
+
+    <div>
+      <%= form.label :title,
+                     "Title",
+                     class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+      <%= form.text_field :title,
+                          placeholder: "What is the key observation?",
+                          class: "w-full rounded-xl border border-white/10 bg-black/20 px-3 py-3 text-sm text-white placeholder:text-slate-700" %>
+    </div>
+
+    <div>
+      <%= form.label :body,
+                     "Annotation",
+                     class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+      <%= form.text_area :body,
+                         rows: 5,
+                         placeholder: "Explain what you observed, why it matters, or what should be investigated next...",
+                         class: "w-full rounded-xl border border-white/10 bg-black/20 px-3 py-3 text-sm leading-6 text-white placeholder:text-slate-700" %>
+    </div>
+
+    <div class="grid gap-4 md:grid-cols-2">
+
+      <div>
+        <%= form.label :author_name,
+                       "Reviewer / Expert",
+                       class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+        <%= form.text_field :author_name,
+                            placeholder: "Optional",
+                            class: "w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-white placeholder:text-slate-700" %>
+      </div>
+
+      <div>
+        <%= form.label :author_role,
+                       "Role",
+                       class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+        <%= form.text_field :author_role,
+                            placeholder: "Researcher, analyst, reviewer...",
+                            class: "w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-white placeholder:text-slate-700" %>
+      </div>
+
+    </div>
+
+    <label class="flex items-center gap-3 text-sm text-slate-400">
+      <%= form.check_box :important,
+                         class: "rounded border-white/20 bg-black/20" %>
+
+      Mark this annotation as important
+    </label>
+
+    <%= form.submit "Add annotation",
+                    class: "rounded-xl bg-orange-500 px-4 py-3 text-xs font-bold text-white transition hover:bg-orange-400" %>
+
+  <% end %>
+
+</div>

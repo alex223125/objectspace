@@ -1,0 +1,186 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+      <h1><%= @collection.name %></h1>
+      <p class="text-muted mb-0">
+        Collection Intelligence
+      </p>
+    </div>
+
+    <%= button_to(
+          "Create checkpoint",
+          snapshot_admin_research_collection_intelligence_path(@collection),
+          method: :post,
+          params: {
+            label: "Manual checkpoint",
+            reason: "Created from collection intelligence"
+          },
+          class: "btn btn-primary"
+        ) %>
+  </div>
+
+  <% health = @intelligence[:health] %>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card h-100">
+        <div class="card-body">
+          <div class="text-muted">Health</div>
+          <div class="display-6">
+            <%= health[:score] %>%
+          </div>
+          <div>
+            <%= health[:label].humanize %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card h-100">
+        <div class="card-body">
+          <div class="text-muted">Objectives</div>
+          <div class="display-6">
+            <%= @intelligence[:objectives][:completion_percent] %>%
+          </div>
+          <div>
+            <%= @intelligence[:objectives][:completed] %>
+            /
+            <%= @intelligence[:objectives][:total] %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card h-100">
+        <div class="card-body">
+          <div class="text-muted">Questions</div>
+          <div class="display-6">
+            <%= @intelligence[:questions][:unresolved] %>
+          </div>
+          <div>unresolved</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card h-100">
+        <div class="card-body">
+          <div class="text-muted">Contradictions</div>
+          <div class="display-6">
+            <%= @intelligence[:contradictions].length %>
+          </div>
+          <div>detected</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-header">
+          Unresolved Questions
+        </div>
+
+        <div class="card-body">
+          <% if @intelligence[:unresolved_questions].any? %>
+            <ul class="list-group list-group-flush">
+              <% @intelligence[:unresolved_questions].each do |question| %>
+                <li class="list-group-item px-0">
+                  <div class="fw-semibold">
+                    <%= question[:question] %>
+                  </div>
+
+                  <small class="text-muted">
+                    <%= question[:findings_count] %>
+                    findings
+                  </small>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <p class="text-muted mb-0">
+              No unresolved research questions.
+            </p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-header">
+          Contradictions
+        </div>
+
+        <div class="card-body">
+          <% if @intelligence[:contradictions].any? %>
+            <% @intelligence[:contradictions].each do |contradiction| %>
+              <div class="border rounded p-3 mb-3">
+                <div class="fw-semibold mb-2">
+                  <%= contradiction[:claim_key] %>
+                </div>
+
+                <% contradiction[:findings].each do |finding| %>
+                  <div class="mb-2">
+                    <strong>
+                      <%= finding[:title] %>
+                    </strong>
+
+                    <div class="small text-muted">
+                      <%= finding[:stance].humanize %>
+                      ·
+                      <%= finding[:confidence].humanize %>
+                    </div>
+
+                    <div>
+                      <%= finding[:claim] %>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          <% else %>
+            <p class="text-muted mb-0">
+              No contradictions detected.
+            </p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          Evidence Coverage
+        </div>
+
+        <div class="card-body">
+          <div class="progress mb-2" style="height: 22px;">
+            <div
+              class="progress-bar"
+              role="progressbar"
+              style="width: <%= @intelligence[:evidence_coverage][:coverage_percent] %>%;">
+              <%= @intelligence[:evidence_coverage][:coverage_percent] %>%
+            </div>
+          </div>
+
+          <small class="text-muted">
+            <%= @intelligence[:evidence_coverage][:evidence_reference_count] %>
+            evidence references across
+            <%= @intelligence[:evidence_coverage][:workspace_count] %>
+            workspaces.
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%= link_to(
+      "Collection Intelligence",
+      admin_research_collection_intelligence_path(@collection),
+      class: "btn btn-outline-primary"
+    ) %>

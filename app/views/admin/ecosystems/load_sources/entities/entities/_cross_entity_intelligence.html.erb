@@ -1,370 +1,150 @@
 <%
-  intelligence =
-    Ecosystems::LoadSources::Entity::CrossEntityIntelligence.new(
-      entities: entities
-    ).call
+  intelligence_service =
+    Ecosystems::LoadSources::Entity::CrossEntityIntelligence.new(entities)
 
-  metrics = intelligence[:metrics]
-  relationships = intelligence[:relationships]
-  signals = intelligence[:signals]
-  clusters = intelligence[:clusters]
+  dashboard = intelligence_service.dashboard
+
+  metrics = dashboard[:metrics] || {}
+  relationships = dashboard[:relationships] || []
+  signals = dashboard[:signals] || []
+  clusters = dashboard[:clusters] || []
 %>
 
-<section
-  data-controller="cross-entity-intelligence"
-  class="overflow-hidden rounded-[28px] border border-violet-200 bg-white shadow-sm dark:border-violet-900/50 dark:bg-gray-900">
-
-  <!-- ==========================================================
-       HEADER
-  =========================================================== -->
-
-  <div class="relative overflow-hidden border-b border-violet-100 bg-gradient-to-br from-violet-50 via-white to-sky-50 px-5 py-5 dark:border-violet-900/50 dark:from-violet-950/40 dark:via-gray-900 dark:to-sky-950/30">
-
-    <div class="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-violet-500/10 blur-3xl"></div>
-
-    <div class="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-
-      <div class="flex items-start gap-4">
-
-        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-violet-300/50 bg-violet-500/10 text-xl dark:border-violet-700">
-          🧠
+<section class="overflow-hidden rounded-[28px] border border-violet-200 bg-white shadow-sm dark:border-violet-900/50 dark:bg-gray-900">
+  <div class="border-b border-violet-100 bg-gradient-to-br from-violet-50 via-white to-sky-50 px-5 py-5 dark:border-violet-900/50 dark:from-violet-950/40 dark:via-gray-900 dark:to-sky-950/30">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <div>
+        <div class="text-[9px] font-black uppercase tracking-[0.25em] text-violet-500 dark:text-violet-400">
+          Step 9 // Ecosystem Intelligence
         </div>
 
-        <div>
+        <h2 class="mt-1 text-lg font-black tracking-tight text-gray-900 dark:text-white">
+          Cross-Entity Intelligence
+        </h2>
 
-          <div class="text-[9px] font-black uppercase tracking-[0.25em] text-violet-500 dark:text-violet-400">
-            Step 9 // Ecosystem Intelligence
-          </div>
-
-          <h2 class="mt-1 text-lg font-black tracking-tight text-gray-900 dark:text-white">
-            Cross-Entity Intelligence
-          </h2>
-
-          <p class="mt-1 max-w-2xl text-xs leading-relaxed text-gray-500 dark:text-gray-400">
-            Structural relationships and review signals discovered across the entity registry.
-          </p>
-
-        </div>
-
+        <p class="mt-1 max-w-2xl text-xs leading-relaxed text-gray-500 dark:text-gray-400">
+          Structural relationships and review signals discovered across the entity registry.
+        </p>
       </div>
 
-      <div class="flex items-center gap-2">
-
-        <span class="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-400">
-          LIVE ANALYSIS
-        </span>
-
-        <span class="rounded-full border border-gray-200 bg-white px-3 py-1.5 text-[9px] font-black uppercase tracking-widest text-gray-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-400">
-          <%= intelligence[:comparison_entity_count] %> scanned
-        </span>
-
-      </div>
-
+      <span class="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-400">
+        LIVE ANALYSIS
+      </span>
     </div>
-
   </div>
 
-  <!-- ==========================================================
-       METRICS
-  =========================================================== -->
-
   <div class="grid grid-cols-2 border-b border-gray-100 dark:border-gray-800 lg:grid-cols-4">
-
     <div class="border-r border-gray-100 p-4 dark:border-gray-800">
-      <div class="text-[9px] font-black uppercase tracking-widest text-gray-400">
-        Relationships
-      </div>
+      <div class="text-[9px] font-black uppercase tracking-widest text-gray-400">Entities</div>
       <div class="mt-1 text-2xl font-black text-gray-900 dark:text-white">
-        <%= number_with_delimiter(metrics[:relationships]) %>
-      </div>
-    </div>
-
-    <div class="border-b border-gray-100 p-4 dark:border-gray-800 lg:border-b-0 lg:border-r">
-      <div class="text-[9px] font-black uppercase tracking-widest text-gray-400">
-        Strong Links
-      </div>
-      <div class="mt-1 text-2xl font-black text-emerald-600">
-        <%= number_with_delimiter(metrics[:strong_relationships]) %>
+        <%= number_with_delimiter(metrics[:entities] || 0) %>
       </div>
     </div>
 
     <div class="border-r border-gray-100 p-4 dark:border-gray-800">
-      <div class="text-[9px] font-black uppercase tracking-widest text-gray-400">
-        Attention
+      <div class="text-[9px] font-black uppercase tracking-widest text-gray-400">Relationships</div>
+      <div class="mt-1 text-2xl font-black text-violet-600">
+        <%= number_with_delimiter(metrics[:relationships] || 0) %>
       </div>
-      <div class="mt-1 text-2xl font-black text-amber-600">
-        <%= number_with_delimiter(metrics[:attention_signals]) %>
+    </div>
+
+    <div class="border-r border-gray-100 p-4 dark:border-gray-800">
+      <div class="text-[9px] font-black uppercase tracking-widest text-gray-400">Confirmed</div>
+      <div class="mt-1 text-2xl font-black text-emerald-600">
+        <%= number_with_delimiter(metrics[:confirmed_relationships] || 0) %>
       </div>
     </div>
 
     <div class="p-4">
-      <div class="text-[9px] font-black uppercase tracking-widest text-gray-400">
-        Clusters
-      </div>
-      <div class="mt-1 text-2xl font-black text-violet-600">
-        <%= number_with_delimiter(metrics[:clusters]) %>
+      <div class="text-[9px] font-black uppercase tracking-widest text-gray-400">Review Queue</div>
+      <div class="mt-1 text-2xl font-black text-amber-600">
+        <%= number_with_delimiter(metrics[:review_queue] || 0) %>
       </div>
     </div>
-
   </div>
 
-  <!-- ==========================================================
-       CONTENT
-  =========================================================== -->
+  <div class="grid gap-5 p-5 xl:grid-cols-2">
+    <div>
+      <h3 class="mb-3 text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
+        Relationship Hotspots
+      </h3>
 
-  <div class="grid gap-5 p-5 xl:grid-cols-3">
+      <% hotspots = dashboard[:hotspots] || [] %>
 
-    <!-- RELATIONSHIPS -->
+      <% if hotspots.any? %>
+        <div class="space-y-2">
+          <% hotspots.each do |item| %>
+            <% entity = item[:entity] %>
+            <% next unless entity %>
 
-    <div class="xl:col-span-2">
+            <div class="flex items-center justify-between gap-3 rounded-xl border border-gray-100 bg-gray-50 p-3 dark:border-gray-800 dark:bg-gray-950">
+              <%= link_to(
+                    entity.name,
+                    admin_ecosystems_load_sources_entity_path(entity),
+                    class: "truncate text-xs font-bold text-gray-800 hover:text-violet-600 dark:text-gray-100"
+                  ) %>
 
-      <div class="mb-3 flex items-center justify-between">
-
-        <div>
-          <div class="text-[9px] font-black uppercase tracking-[0.18em] text-gray-400">
-            Relationship Discovery
-          </div>
-
-          <div class="mt-0.5 text-xs font-bold text-gray-700 dark:text-gray-300">
-            Highest-confidence connections
-          </div>
-        </div>
-
-        <button
-          type="button"
-          data-action="click->cross-entity-intelligence#toggleRelationships"
-          class="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-[9px] font-black uppercase tracking-widest text-gray-500 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-400">
-          Toggle
-        </button>
-
-      </div>
-
-      <div
-        data-cross-entity-intelligence-target="relationships"
-        class="space-y-2">
-
-        <% if relationships.any? %>
-
-          <% relationships.first(12).each do |relationship| %>
-
-            <div class="rounded-2xl border border-gray-100 bg-gray-50/70 p-3 transition hover:border-violet-200 hover:bg-violet-50/40 dark:border-gray-800 dark:bg-gray-950/50 dark:hover:border-violet-900">
-
-              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-
-                <div class="min-w-0">
-
-                  <div class="flex flex-wrap items-center gap-2">
-
-                    <%= link_to(
-                          relationship[:source_name],
-                          admin_ecosystems_load_sources_entity_path(
-                            relationship[:source_id]
-                          ),
-                          class: "truncate text-xs font-black text-gray-800 hover:text-violet-600 dark:text-gray-100 dark:hover:text-violet-400"
-                        ) %>
-
-                    <span class="text-gray-300">
-                      ↔
-                    </span>
-
-                    <%= link_to(
-                          relationship[:target_name],
-                          admin_ecosystems_load_sources_entity_path(
-                            relationship[:target_id]
-                          ),
-                          class: "truncate text-xs font-black text-gray-800 hover:text-violet-600 dark:text-gray-100 dark:hover:text-violet-400"
-                        ) %>
-
-                  </div>
-
-                  <div class="mt-1 flex flex-wrap gap-1.5">
-
-                    <% relationship[:reasons].first(4).each do |reason| %>
-
-                      <span class="rounded-md border border-gray-200 bg-white px-2 py-0.5 text-[8px] font-bold uppercase tracking-wide text-gray-400 dark:border-gray-700 dark:bg-gray-900">
-                        <%= reason %>
-                      </span>
-
-                    <% end %>
-
-                  </div>
-
-                </div>
-
-                <div class="flex shrink-0 items-center gap-2">
-
-                  <span class="<%= cross_entity_intelligence_strength_class(relationship[:strength]) %> rounded-full border px-2.5 py-1 text-[8px] font-black uppercase tracking-wider">
-                    <%= relationship[:strength] %>
-                  </span>
-
-                  <span class="font-mono text-[10px] font-black text-gray-500">
-                    <%= relationship[:score] %>
-                  </span>
-
-                </div>
-
-              </div>
-
+              <span class="shrink-0 rounded-full bg-violet-100 px-2.5 py-1 text-[9px] font-black text-violet-700 dark:bg-violet-950 dark:text-violet-300">
+                <%= item[:relationship_count] %> links
+              </span>
             </div>
-
           <% end %>
-
-        <% else %>
-
-          <div class="rounded-2xl border border-dashed border-gray-200 px-5 py-10 text-center dark:border-gray-700">
-
-            <div class="text-xl">
-              ◌
-            </div>
-
-            <div class="mt-2 text-xs font-black text-gray-700 dark:text-gray-300">
-              No strong relationships detected
-            </div>
-
-            <div class="mt-1 text-[10px] text-gray-400">
-              The intelligence engine needs more shared structure or vocabulary.
-            </div>
-
-          </div>
-
-        <% end %>
-
-      </div>
-
+        </div>
+      <% else %>
+        <div class="rounded-xl border border-dashed border-gray-200 p-5 text-center text-xs text-gray-500 dark:border-gray-700">
+          No relationship hotspots found yet.
+        </div>
+      <% end %>
     </div>
-
-    <!-- SIGNALS -->
 
     <div>
+      <h3 class="mb-3 text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
+        Review Opportunities
+      </h3>
 
-      <div class="mb-3">
+      <% opportunities = dashboard[:review_opportunities] || [] %>
 
-        <div class="text-[9px] font-black uppercase tracking-[0.18em] text-gray-400">
-          Intelligence Signals
-        </div>
+      <% if opportunities.any? %>
+        <div class="space-y-2">
+          <% opportunities.each do |entity| %>
+            <div class="rounded-xl border border-amber-100 bg-amber-50/50 p-3 dark:border-amber-900/50 dark:bg-amber-950/20">
+              <%= link_to(
+                    entity.name,
+                    admin_ecosystems_load_sources_entity_path(entity),
+                    class: "text-xs font-bold text-gray-800 hover:text-amber-600 dark:text-gray-100"
+                  ) %>
 
-        <div class="mt-0.5 text-xs font-bold text-gray-700 dark:text-gray-300">
-          Review opportunities
-        </div>
-
-      </div>
-
-      <div class="space-y-2">
-
-        <% if signals.any? %>
-
-          <% signals.first(8).each do |signal| %>
-
-            <div class="<%= cross_entity_signal_class(signal[:severity]) %> rounded-2xl border p-3">
-
-              <div class="flex gap-3">
-
-                <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white/70 text-xs font-black dark:bg-gray-950/50">
-                  <%= cross_entity_signal_icon(signal[:severity]) %>
-                </div>
-
-                <div class="min-w-0">
-
-                  <div class="text-[10px] font-black text-gray-800 dark:text-gray-100">
-                    <%= signal[:title] %>
-                  </div>
-
-                  <div class="mt-0.5 truncate text-[9px] font-bold text-gray-500 dark:text-gray-400">
-                    <%= signal[:entity_name] %>
-                  </div>
-
-                  <div class="mt-1 text-[9px] leading-relaxed text-gray-500 dark:text-gray-400">
-                    <%= signal[:message] %>
-                  </div>
-
-                </div>
-
+              <div class="mt-1 text-[10px] text-gray-500 dark:text-gray-400">
+                Health score: <%= entity.health_score %>
               </div>
-
             </div>
-
           <% end %>
-
-        <% else %>
-
-          <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-center dark:border-emerald-900/50 dark:bg-emerald-950/20">
-
-            <div class="text-lg">
-              ✓
-            </div>
-
-            <div class="mt-1 text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
-              No attention signals
-            </div>
-
-          </div>
-
-        <% end %>
-
-      </div>
-
+        </div>
+      <% else %>
+        <div class="rounded-xl border border-dashed border-gray-200 p-5 text-center text-xs text-gray-500 dark:border-gray-700">
+          No review opportunities identified.
+        </div>
+      <% end %>
     </div>
-
   </div>
 
-  <!-- ==========================================================
-       CLUSTERS
-  =========================================================== -->
+  <% isolated = dashboard[:isolated] || [] %>
 
-  <% if clusters.any? %>
-
+  <% if isolated.any? %>
     <div class="border-t border-gray-100 p-5 dark:border-gray-800">
+      <h3 class="mb-3 text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
+        Isolated Entities
+      </h3>
 
-      <div class="mb-3">
-
-        <div class="text-[9px] font-black uppercase tracking-[0.18em] text-gray-400">
-          Structural Clusters
-        </div>
-
-        <div class="mt-0.5 text-xs font-bold text-gray-700 dark:text-gray-300">
-          Groups sharing type, template, and scope
-        </div>
-
-      </div>
-
-      <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-
-        <% clusters.each do |cluster| %>
-
-          <div class="rounded-2xl border border-violet-100 bg-violet-50/50 p-4 dark:border-violet-900/50 dark:bg-violet-950/20">
-
-            <div class="flex items-center justify-between gap-3">
-
-              <div class="truncate text-[10px] font-black text-violet-700 dark:text-violet-300">
-                <%= cluster[:label] %>
-              </div>
-
-              <span class="rounded-full bg-violet-100 px-2 py-1 text-[8px] font-black text-violet-600 dark:bg-violet-900/50 dark:text-violet-300">
-                <%= cluster[:size] %>
-              </span>
-
-            </div>
-
-            <div class="mt-2 flex flex-wrap gap-1">
-
-              <% cluster[:entity_names].first(6).each do |name| %>
-
-                <span class="rounded-md bg-white px-2 py-1 text-[8px] font-bold text-gray-500 dark:bg-gray-900 dark:text-gray-400">
-                  <%= name %>
-                </span>
-
-              <% end %>
-
-            </div>
-
-          </div>
-
+      <div class="flex flex-wrap gap-2">
+        <% isolated.first(25).each do |entity| %>
+          <%= link_to(
+                entity.name,
+                admin_ecosystems_load_sources_entity_path(entity),
+                class: "rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-[10px] font-bold text-gray-600 hover:border-violet-300 hover:text-violet-600 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-300"
+              ) %>
         <% end %>
-
       </div>
-
     </div>
-
   <% end %>
-
 </section>

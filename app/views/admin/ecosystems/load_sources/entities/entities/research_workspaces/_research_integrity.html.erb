@@ -1,0 +1,161 @@
+<div class="mt-8 border-t border-white/10 pt-8">
+
+  <div class="mb-6">
+
+    <div class="text-xs font-bold uppercase tracking-[0.25em] text-cyan-400">
+      Research integrity
+    </div>
+
+    <h2 class="mt-2 text-2xl font-black text-white">
+      Annotations & evidence
+    </h2>
+
+    <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">
+      Capture expert reasoning and preserve the evidence behind each important research item.
+    </p>
+
+  </div>
+
+  <% workspace.items.order(position: :asc, created_at: :asc).each do |item| %>
+
+    <div class="mb-8 overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.02]">
+
+      <div class="border-b border-white/10 bg-white/[0.02] p-5">
+
+        <div class="flex flex-wrap items-center gap-3">
+
+          <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 text-lg">
+            <%= recommendation_icon(item.kind) %>
+          </div>
+
+          <div class="min-w-0 flex-1">
+
+            <div class="font-black text-white">
+              <%= item.title %>
+            </div>
+
+            <div class="mt-1 text-xs text-slate-600">
+              <%= item.kind.humanize %>
+            </div>
+
+          </div>
+
+          <div class="flex flex-wrap gap-2 text-xs">
+
+            <span class="rounded-full bg-orange-400/10 px-3 py-1 font-bold text-orange-300">
+              <%= item.research_annotations.count %>
+              annotations
+            </span>
+
+            <span class="rounded-full bg-cyan-400/10 px-3 py-1 font-bold text-cyan-300">
+              <%= item.research_evidences.count %>
+              evidence
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="grid gap-6 p-5 xl:grid-cols-2">
+
+        <div class="space-y-4">
+
+          <div class="flex items-center justify-between">
+
+            <div>
+              <h3 class="font-black text-white">
+                Expert annotations
+              </h3>
+
+              <p class="mt-1 text-xs text-slate-600">
+                Interpretations, hypotheses and reviewer notes.
+              </p>
+            </div>
+
+          </div>
+
+          <% annotations = item.research_annotations.recent %>
+
+          <% if annotations.any? %>
+
+            <div class="space-y-3">
+
+              <% annotations.each do |annotation| %>
+
+                <%= render "admin/research_workspaces/annotation",
+                           annotation: annotation,
+                           workspace: workspace,
+                           item: item %>
+
+              <% end %>
+
+            </div>
+
+          <% else %>
+
+            <div class="rounded-2xl bg-white/[0.03] p-4 text-sm text-slate-600">
+              No expert annotations yet.
+            </div>
+
+          <% end %>
+
+          <%= render "admin/research_workspaces/annotation_form",
+                     workspace: workspace,
+                     item: item %>
+
+        </div>
+
+        <div class="space-y-4">
+
+          <div>
+
+            <h3 class="font-black text-white">
+              Evidence & provenance
+            </h3>
+
+            <p class="mt-1 text-xs text-slate-600">
+              Sources supporting this research item.
+            </p>
+
+          </div>
+
+          <% evidences = item.research_evidences.recent %>
+
+          <% if evidences.any? %>
+
+            <div class="space-y-3">
+
+              <% evidences.each do |evidence| %>
+
+                <%= render "admin/research_workspaces/evidence",
+                           evidence: evidence,
+                           workspace: workspace,
+                           item: item %>
+
+              <% end %>
+
+            </div>
+
+          <% else %>
+
+            <div class="rounded-2xl bg-white/[0.03] p-4 text-sm text-slate-600">
+              No evidence records yet.
+            </div>
+
+          <% end %>
+
+          <%= render "admin/research_workspaces/evidence_form",
+                     workspace: workspace,
+                     item: item %>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  <% end %>
+
+</div>

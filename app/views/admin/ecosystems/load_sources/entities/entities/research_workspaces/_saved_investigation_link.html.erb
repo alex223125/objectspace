@@ -1,0 +1,33 @@
+<div class="mb-6 rounded-3xl border border-white/10 bg-white/[0.03] p-5">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <div class="text-xs font-bold uppercase tracking-[0.2em] text-orange-400">
+        Saved investigation
+      </div>
+
+      <h2 class="mt-2 font-black text-white">
+        <%= workspace.lifecycle_label %>
+      </h2>
+
+      <p class="mt-1 text-sm text-slate-600">
+        <%= workspace.snapshot_count %>
+        historical checkpoints
+      </p>
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+      <%= link_to "Open history",
+                  admin_saved_investigation_path(workspace),
+                  class: "rounded-xl bg-white/5 px-4 py-2.5 text-xs font-bold text-slate-400 hover:bg-white/10 hover:text-white" %>
+
+      <%= link_to "Collections",
+                  admin_research_collections_path,
+                  class: "rounded-xl bg-white/5 px-4 py-2.5 text-xs font-bold text-slate-400 hover:bg-white/10 hover:text-white" %>
+
+      <%= button_to "Save checkpoint",
+                    snapshot_admin_saved_investigation_path(workspace),
+                    method: :post,
+                    class: "rounded-xl bg-orange-500/10 px-4 py-2.5 text-xs font-bold text-orange-300 hover:bg-orange-500/20" %>
+    </div>
+  </div>
+</div>

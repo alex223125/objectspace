@@ -1,0 +1,120 @@
+<div class="rounded-3xl border border-white/10 bg-black/20 p-6">
+
+  <div class="mb-5">
+    <div class="font-black">
+      Add expert annotation
+    </div>
+
+    <p class="mt-1 text-xs leading-5 text-slate-600">
+      Capture interpretation, uncertainty, expert reasoning,
+      warnings, hypotheses, or conclusions.
+    </p>
+  </div>
+
+  <%= form_with model: annotation,
+                url: admin_research_workspace_item_annotations_path(
+                  workspace,
+                  item
+                ),
+                local: true do |form| %>
+
+    <div class="space-y-4">
+
+      <div>
+        <%= form.label :kind,
+                       class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+        <%= form.select :kind,
+                        ResearchAnnotation::KINDS.map {
+                          |value| [value.humanize, value]
+                        },
+                        {},
+                        class: "w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white focus:border-orange-400 focus:outline-none" %>
+      </div>
+
+      <div>
+        <%= form.label :title,
+                       class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+        <%= form.text_field :title,
+                            placeholder: "What is the key expert observation?",
+                            class: "w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white placeholder:text-slate-700 focus:border-orange-400 focus:outline-none" %>
+      </div>
+
+      <div>
+        <%= form.label :body,
+                       class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+        <%= form.text_area :body,
+                           rows: 6,
+                           placeholder: "Explain the interpretation, reasoning, caveat, or conclusion...",
+                           class: "w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm leading-6 text-white placeholder:text-slate-700 focus:border-orange-400 focus:outline-none" %>
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-2">
+
+        <div>
+          <%= form.label :confidence,
+                         class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+          <%= form.select :confidence,
+                          ResearchAnnotation::CONFIDENCES.map {
+                            |value| [value.humanize, value]
+                          },
+                          {},
+                          class: "w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white focus:border-orange-400 focus:outline-none" %>
+        </div>
+
+        <div>
+          <%= form.label :status,
+                         class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+          <%= form.select :status,
+                          ResearchAnnotation::STATUSES.map {
+                            |value| [value.humanize, value]
+                          },
+                          {},
+                          class: "w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white focus:border-orange-400 focus:outline-none" %>
+        </div>
+
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-2">
+
+        <div>
+          <%= form.label :reviewer_name,
+                         class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+          <%= form.text_field :reviewer_name,
+                              placeholder: "Reviewer / expert name",
+                              class: "w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white placeholder:text-slate-700 focus:border-orange-400 focus:outline-none" %>
+        </div>
+
+        <div>
+          <%= form.label :reviewed_at,
+                         class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+          <%= form.datetime_local_field :reviewed_at,
+                                        class: "w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white focus:border-orange-400 focus:outline-none" %>
+        </div>
+
+      </div>
+
+      <div>
+        <%= form.label :reviewer_note,
+                       class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+        <%= form.text_area :reviewer_note,
+                           rows: 3,
+                           placeholder: "Optional review note...",
+                           class: "w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white placeholder:text-slate-700 focus:border-orange-400 focus:outline-none" %>
+      </div>
+
+      <%= form.submit "Add annotation",
+                      class: "w-full rounded-2xl bg-orange-500 px-5 py-3 text-sm font-black text-white transition hover:bg-orange-400" %>
+
+    </div>
+
+  <% end %>
+
+</div>

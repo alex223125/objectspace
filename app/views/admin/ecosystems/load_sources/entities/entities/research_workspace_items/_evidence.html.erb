@@ -1,0 +1,134 @@
+<div class="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
+
+  <div class="flex items-start justify-between gap-4">
+
+    <div class="min-w-0">
+
+      <div class="flex flex-wrap items-center gap-2">
+
+        <span class="rounded-full bg-cyan-400/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-cyan-300">
+          <%= evidence.evidence_type.humanize %>
+        </span>
+
+        <span class="rounded-full bg-white/5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+          <%= evidence.source_type.humanize %>
+        </span>
+
+        <% if evidence.verified? %>
+          <span class="rounded-full bg-emerald-400/10 px-2 py-1 text-[10px] font-bold text-emerald-300">
+            Verified
+          </span>
+        <% else %>
+          <span class="rounded-full bg-amber-400/10 px-2 py-1 text-[10px] font-bold text-amber-300">
+            <%= evidence.verification_status.humanize %>
+          </span>
+        <% end %>
+
+      </div>
+
+      <h3 class="mt-3 font-black">
+        <%= evidence.title %>
+      </h3>
+
+    </div>
+
+    <%= button_to "Delete",
+                  admin_research_workspace_item_evidence_path(
+                    workspace,
+                    item,
+                    evidence
+                  ),
+                  method: :delete,
+                  data: {
+                    turbo_confirm: "Delete this evidence?"
+                  },
+                  class: "shrink-0 text-xs font-bold text-slate-600 transition hover:text-red-400" %>
+
+  </div>
+
+  <% if evidence.source_title.present? %>
+    <div class="mt-3 text-sm font-semibold text-slate-300">
+      <%= evidence.source_title %>
+    </div>
+  <% end %>
+
+  <% if evidence.source_url.present? %>
+    <div class="mt-2 truncate">
+      <%= link_to evidence.source_url,
+                  evidence.source_url,
+                  target: "_blank",
+                  rel: "noopener noreferrer",
+                  class: "text-xs font-semibold text-cyan-400 hover:text-cyan-300" %>
+    </div>
+  <% end %>
+
+  <% if evidence.description.present? %>
+    <p class="mt-3 text-sm leading-6 text-slate-500">
+      <%= evidence.description %>
+    </p>
+  <% end %>
+
+  <% if evidence.excerpt.present? %>
+    <blockquote class="mt-4 rounded-2xl border-l-2 border-cyan-400/40 bg-black/20 px-4 py-3 text-sm italic leading-6 text-slate-400">
+      “<%= evidence.excerpt %>”
+    </blockquote>
+  <% end %>
+
+  <div class="mt-4 flex flex-wrap gap-3 text-[11px] text-slate-600">
+
+    <% if evidence.locator.present? %>
+      <span>
+        Locator:
+        <strong class="text-slate-400">
+          <%= evidence.locator %>
+        </strong>
+      </span>
+    <% end %>
+
+    <% if evidence.published_on.present? %>
+      <span>
+        Published:
+        <strong class="text-slate-400">
+          <%= l(evidence.published_on, format: :long) %>
+        </strong>
+      </span>
+    <% end %>
+
+    <% if evidence.accessed_on.present? %>
+      <span>
+        Accessed:
+        <strong class="text-slate-400">
+          <%= l(evidence.accessed_on, format: :long) %>
+        </strong>
+      </span>
+    <% end %>
+
+    <span>
+      Confidence:
+      <strong class="text-slate-400">
+        <%= evidence.confidence.humanize %>
+      </strong>
+    </span>
+
+  </div>
+
+  <% if evidence.verification_note.present? %>
+    <div class="mt-4 rounded-2xl bg-emerald-400/5 p-3 text-xs leading-5 text-slate-500">
+      <span class="font-bold text-emerald-300">
+        Verification:
+      </span>
+
+      <%= evidence.verification_note %>
+    </div>
+  <% end %>
+
+  <% if evidence.research_annotation.present? %>
+    <div class="mt-4 border-t border-white/5 pt-3 text-xs text-slate-600">
+      Supports annotation:
+      <span class="font-semibold text-slate-400">
+        <%= evidence.research_annotation.title %>
+      </span>
+    </div>
+  <% end %>
+
+</div>

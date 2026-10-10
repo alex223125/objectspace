@@ -1,0 +1,17 @@
+<div class="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
+  <div class="mb-8">
+    <%= link_to "← Research collections",
+                admin_research_collections_path,
+                class: "text-xs font-bold text-slate-500 hover:text-white" %>
+
+    <h1 class="mt-4 text-3xl font-black text-white">
+      New research collection
+    </h1>
+
+    <p class="mt-2 text-sm text-slate-400">
+      Create a reusable portfolio for related investigations.
+    </p>
+  </div>
+
+  <%= render "form", collection: @collection %>
+</div>

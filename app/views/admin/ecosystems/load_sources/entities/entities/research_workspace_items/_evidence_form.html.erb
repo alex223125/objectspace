@@ -1,0 +1,189 @@
+<div class="rounded-3xl border border-white/10 bg-black/20 p-6">
+
+  <div class="mb-5">
+    <div class="font-black">
+      Add evidence
+    </div>
+
+    <p class="mt-1 text-xs leading-5 text-slate-600">
+      Record exactly where a claim, interpretation,
+      or observation comes from.
+    </p>
+  </div>
+
+  <%= form_with model: evidence,
+                url: admin_research_workspace_item_evidences_path(
+                  workspace,
+                  item
+                ),
+                local: true do |form| %>
+
+    <div class="space-y-4">
+
+      <div>
+        <%= form.label :title,
+                       class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+        <%= form.text_field :title,
+                            placeholder: "Evidence title",
+                            class: "w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white placeholder:text-slate-700 focus:border-cyan-400 focus:outline-none" %>
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-2">
+
+        <div>
+          <%= form.label :evidence_type,
+                         class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+          <%= form.select :evidence_type,
+                          ResearchEvidence::EVIDENCE_TYPES.map {
+                            |value| [value.humanize, value]
+                          },
+                          {},
+                          class: "w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white focus:border-cyan-400 focus:outline-none" %>
+        </div>
+
+        <div>
+          <%= form.label :source_type,
+                         class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+          <%= form.select :source_type,
+                          ResearchEvidence::SOURCE_TYPES.map {
+                            |value| [value.humanize, value]
+                          },
+                          {},
+                          class: "w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white focus:border-cyan-400 focus:outline-none" %>
+        </div>
+
+      </div>
+
+      <div>
+        <%= form.label :source_title,
+                       class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+        <%= form.text_field :source_title,
+                            placeholder: "Source / publication / organization",
+                            class: "w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white placeholder:text-slate-700 focus:border-cyan-400 focus:outline-none" %>
+      </div>
+
+      <div>
+        <%= form.label :source_url,
+                       class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+        <%= form.url_field :source_url,
+                           placeholder: "https://example.com/source",
+                           class: "w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white placeholder:text-slate-700 focus:border-cyan-400 focus:outline-none" %>
+      </div>
+
+      <div>
+        <%= form.label :description,
+                       class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+        <%= form.text_area :description,
+                           rows: 3,
+                           placeholder: "Why does this source matter?",
+                           class: "w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white placeholder:text-slate-700 focus:border-cyan-400 focus:outline-none" %>
+      </div>
+
+      <div>
+        <%= form.label :excerpt,
+                       class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+        <%= form.text_area :excerpt,
+                           rows: 4,
+                           placeholder: "Relevant quote, observation, or extracted evidence...",
+                           class: "w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm leading-6 text-white placeholder:text-slate-700 focus:border-cyan-400 focus:outline-none" %>
+      </div>
+
+      <div>
+        <%= form.label :locator,
+                       class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+        <%= form.text_field :locator,
+                            placeholder: "Page 14, section 3.2, timestamp 12:42, etc.",
+                            class: "w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white placeholder:text-slate-700 focus:border-cyan-400 focus:outline-none" %>
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-2">
+
+        <div>
+          <%= form.label :published_on,
+                         class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+          <%= form.date_field :published_on,
+                              class: "w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white focus:border-cyan-400 focus:outline-none" %>
+        </div>
+
+        <div>
+          <%= form.label :accessed_on,
+                         class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+          <%= form.date_field :accessed_on,
+                              class: "w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white focus:border-cyan-400 focus:outline-none" %>
+        </div>
+
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-2">
+
+        <div>
+          <%= form.label :confidence,
+                         class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+          <%= form.select :confidence,
+                          ResearchEvidence::CONFIDENCES.map {
+                            |value| [value.humanize, value]
+                          },
+                          {},
+                          class: "w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white focus:border-cyan-400 focus:outline-none" %>
+        </div>
+
+        <div>
+          <%= form.label :verification_status,
+                         class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+          <%= form.select :verification_status,
+                          ResearchEvidence::VERIFICATION_STATUSES.map {
+                            |value| [value.humanize, value]
+                          },
+                          {},
+                          class: "w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white focus:border-cyan-400 focus:outline-none" %>
+        </div>
+
+      </div>
+
+      <% if annotations.any? %>
+        <div>
+          <%= form.label :research_annotation_id,
+                         "Supports annotation",
+                         class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+          <%= select_tag "research_evidence[research_annotation_id]",
+                         options_from_collection_for_select(
+                           annotations,
+                           :id,
+                           :title
+                         ),
+                         include_blank: "Not linked to a specific annotation",
+                         class: "w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white focus:border-cyan-400 focus:outline-none" %>
+        </div>
+      <% end %>
+
+      <div>
+        <%= form.label :verification_note,
+                       class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+        <%= form.text_area :verification_note,
+                           rows: 3,
+                           placeholder: "How was this evidence checked?",
+                           class: "w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white placeholder:text-slate-700 focus:border-cyan-400 focus:outline-none" %>
+      </div>
+
+      <%= form.submit "Add evidence",
+                      class: "w-full rounded-2xl bg-cyan-500 px-5 py-3 text-sm font-black text-slate-950 transition hover:bg-cyan-400" %>
+
+    </div>
+
+  <% end %>
+
+</div>

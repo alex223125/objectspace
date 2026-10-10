@@ -1,0 +1,29 @@
+<section class="research-collection-findings">
+  <h2>Synthesis findings</h2>
+
+  <% findings.each do |finding| %>
+    <article>
+      <h3>
+        <%= finding.title %>
+      </h3>
+
+      <p>
+        <%= finding.body %>
+      </p>
+
+      <small>
+        <%= finding.confidence %> confidence
+      </small>
+
+      <% if finding.contradiction? %>
+        <strong>
+          Potential contradiction
+        </strong>
+      <% end %>
+    </article>
+  <% end %>
+
+  <% if findings.empty? %>
+    <p>No synthesis findings have been created.</p>
+  <% end %>
+</section>

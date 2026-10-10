@@ -1,0 +1,28 @@
+<section class="research-collection-objectives">
+  <h2>Objectives</h2>
+
+  <% objectives.each do |objective| %>
+    <article>
+      <strong>
+        <%= objective.title %>
+      </strong>
+
+      <p>
+        <%= objective.description %>
+      </p>
+
+      <progress
+        value="<%= objective.progress %>"
+        max="100">
+      </progress>
+
+      <span>
+        <%= objective.progress %>%
+      </span>
+    </article>
+  <% end %>
+
+  <% if objectives.empty? %>
+    <p>No objectives have been defined.</p>
+  <% end %>
+</section>

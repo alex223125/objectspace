@@ -1,27 +1,16 @@
 <%
+  entities =
+    local_assigns[:entities] ||
+      @entities ||
+      ::Ecosystems::LoadSources::Entity::Entity.all
+
   intelligence =
-    Ecosystems::LoadSources::Entity::CrossEntityIntelligence.new(
-      entities: entities
+    ::Ecosystems::LoadSources::Entity::CrossEntityIntelligence.new(
+      entities
     ).call
 
-  relationships = intelligence[:relationships].first(12)
-
-  nodes =
-    relationships
-      .flat_map do |relationship|
-      [
-        [
-          relationship[:source_id],
-          relationship[:source_name]
-        ],
-        [
-          relationship[:target_id],
-          relationship[:target_name]
-        ]
-      ]
-    end
-      .uniq
-      .first(20)
+  relationships =
+    intelligence[:relationships].to_a.first(12)
 %>
 
 <section class="rounded-[28px] border border-sky-200 bg-slate-950 p-5 shadow-xl dark:border-sky-900/50">

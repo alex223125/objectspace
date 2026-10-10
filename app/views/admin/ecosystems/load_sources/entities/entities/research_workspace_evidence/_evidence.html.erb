@@ -1,0 +1,109 @@
+<div class="rounded-2xl border border-white/10 bg-black/10 p-4">
+
+  <div class="flex items-start gap-3">
+
+    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-300">
+      🔎
+    </div>
+
+    <div class="min-w-0 flex-1">
+
+      <div class="flex flex-wrap items-center gap-2">
+
+        <span class="text-[10px] font-bold uppercase tracking-wider text-cyan-300">
+          <%= evidence.evidence_type.humanize %>
+        </span>
+
+        <span class="rounded-full bg-white/5 px-2 py-1 text-[10px] font-bold text-slate-500">
+          <%= evidence.confidence_label %> confidence
+        </span>
+
+        <% if evidence.primary_source? %>
+          <span class="rounded-full bg-purple-400/10 px-2 py-1 text-[10px] font-bold text-purple-300">
+            Primary
+          </span>
+        <% end %>
+
+        <span class="rounded-full px-2 py-1 text-[10px] font-bold
+          <%= case evidence.verification_status
+              when "verified"
+                "bg-emerald-400/10 text-emerald-300"
+              when "reviewed"
+                "bg-cyan-400/10 text-cyan-300"
+              when "disputed"
+                "bg-red-400/10 text-red-300"
+              else
+                "bg-white/5 text-slate-500"
+              end %>">
+
+          <%= evidence.verification_label %>
+
+        </span>
+
+      </div>
+
+      <h5 class="mt-2 font-bold text-white">
+        <%= evidence.title %>
+      </h5>
+
+      <% if evidence.source_name.present? || evidence.publisher.present? %>
+        <div class="mt-1 text-xs text-slate-500">
+
+          <% if evidence.source_name.present? %>
+            <%= evidence.source_name %>
+          <% end %>
+
+          <% if evidence.source_name.present? && evidence.publisher.present? %>
+            ·
+          <% end %>
+
+          <% if evidence.publisher.present? %>
+            <%= evidence.publisher %>
+          <% end %>
+
+        </div>
+      <% end %>
+
+      <% if evidence.excerpt.present? %>
+        <div class="mt-3 rounded-xl border-l-2 border-cyan-500/40 bg-white/[0.02] p-3 text-sm italic leading-6 text-slate-400">
+          <%= evidence.excerpt %>
+        </div>
+      <% end %>
+
+      <% if evidence.description.present? %>
+        <p class="mt-3 whitespace-pre-line text-sm leading-6 text-slate-500">
+          <%= evidence.description %>
+        </p>
+      <% end %>
+
+      <% if evidence.source_url.present? %>
+        <div class="mt-3">
+
+          <%= link_to evidence.source_url,
+                      evidence.source_url,
+                      target: "_blank",
+                      rel: "noopener noreferrer",
+                      class: "break-all text-xs font-semibold text-cyan-400 hover:text-cyan-300" %>
+
+        </div>
+      <% end %>
+
+    </div>
+
+    <%= button_to "×",
+                  admin_research_workspace_item_evidence_path(
+                    workspace,
+                    item,
+                    evidence
+                  ),
+                  method: :delete,
+                  class: "shrink-0 text-lg text-slate-600 transition hover:text-red-400",
+                  form: {
+                    data: {
+                      turbo_confirm: "Remove this evidence record?"
+                    }
+                  } %>
+
+  </div>
+
+</div>

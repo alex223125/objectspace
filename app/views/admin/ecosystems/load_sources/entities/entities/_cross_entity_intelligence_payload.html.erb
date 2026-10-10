@@ -1,12 +1,50 @@
 <%
-  intelligence =
-    Ecosystems::LoadSources::Entity::CrossEntityIntelligence.new(
-      entities: entities
-    ).call
+  intelligence_service =
+    Ecosystems::LoadSources::Entity::CrossEntityIntelligence.new(entities)
+
+  dashboard = intelligence_service.dashboard
+
+  payload = {
+    metrics: dashboard[:metrics] || {},
+    hotspots: (dashboard[:hotspots] || []).map do |item|
+      entity = item[:entity]
+
+      {
+        entity_id: entity&.id,
+        entity_name: entity&.name,
+        relationship_count: item[:relationship_count]
+      }
+    end,
+    isolated: (dashboard[:isolated] || []).map do |entity|
+      {
+        id: entity.id,
+        name: entity.name
+      }
+    end,
+    review_opportunities: (dashboard[:review_opportunities] || []).map do |entity|
+      {
+        id: entity.id,
+        name: entity.name,
+        health_score: entity.health_score
+      }
+    end,
+    stale_entities: (dashboard[:stale_entities] || []).map do |entity|
+      {
+        id: entity.id,
+        name: entity.name,
+        updated_at: entity.updated_at
+      }
+    end,
+    recent_activity: (dashboard[:recent_activity] || []).map do |entity|
+      {
+        id: entity.id,
+        name: entity.name,
+        updated_at: entity.updated_at
+      }
+    end
+  }
 %>
 
-<script
-  type="application/json"
-  data-cross-entity-intelligence-payload>
-  <%= raw intelligence.to_json %>
+<script type="application/json" id="cross-entity-intelligence-payload">
+  <%= raw(json_escape(payload.to_json)) %>
 </script>

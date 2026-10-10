@@ -1,0 +1,62 @@
+<div class="card h-100">
+  <div class="card-header d-flex justify-content-between">
+    <strong>Findings</strong>
+
+    <span class="badge bg-primary">
+      <%= @intelligence[:findings][:total] %>
+    </span>
+  </div>
+
+  <div class="card-body">
+    <%= form_with model: [
+      :admin,
+      @collection,
+      ResearchCollectionFinding.new
+    ],
+                  local: true do |form| %>
+
+      <div class="mb-2">
+        <%= form.text_field :title,
+                            class: "form-control",
+                            placeholder: "Finding title..." %>
+      </div>
+
+      <div class="mb-2">
+        <%= form.text_area :statement,
+                           rows: 3,
+                           class: "form-control",
+                           placeholder: "Finding..." %>
+      </div>
+
+      <div class="mb-2">
+        <%= form.select :confidence,
+                        ResearchCollectionFinding::CONFIDENCE_LEVELS.map {
+                          |value| [value.humanize, value]
+                        },
+                        {},
+                        class: "form-select" %>
+      </div>
+
+      <%= form.submit "Add finding",
+                      class: "btn btn-sm btn-primary" %>
+    <% end %>
+
+    <hr>
+
+    <% @collection.findings.active.ordered.each do |finding| %>
+      <div class="border-bottom py-3">
+        <div class="d-flex justify-content-between">
+          <strong><%= finding.title %></strong>
+
+          <span class="badge bg-info">
+            <%= finding.confidence %>
+          </span>
+        </div>
+
+        <p class="mb-0 mt-2">
+          <%= finding.statement %>
+        </p>
+      </div>
+    <% end %>
+  </div>
+</div>

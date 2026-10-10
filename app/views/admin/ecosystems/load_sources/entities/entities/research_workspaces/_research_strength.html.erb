@@ -1,0 +1,64 @@
+<div class="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+
+  <div class="flex items-center justify-between gap-4">
+
+    <div>
+      <div class="text-sm font-bold text-white">
+        Research strength
+      </div>
+
+      <div class="mt-1 text-xs text-slate-500">
+        Based on investigation progress, annotations, and verified evidence.
+      </div>
+    </div>
+
+    <div class="text-2xl font-black text-orange-400">
+      <%= workspace.research_strength %>%
+    </div>
+
+  </div>
+
+  <div class="mt-4 h-2 overflow-hidden rounded-full bg-white/5">
+
+    <div
+      class="h-full rounded-full bg-gradient-to-r from-orange-500 to-cyan-400 transition-all"
+      style="width: <%= workspace.research_strength %>%">
+    </div>
+
+  </div>
+
+  <div class="mt-4 grid grid-cols-3 gap-3">
+
+    <div class="rounded-xl bg-white/[0.03] p-3">
+      <div class="text-lg font-black text-white">
+        <%= workspace.annotation_count %>
+      </div>
+
+      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+        Annotations
+      </div>
+    </div>
+
+    <div class="rounded-xl bg-white/[0.03] p-3">
+      <div class="text-lg font-black text-white">
+        <%= workspace.evidence_count %>
+      </div>
+
+      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+        Evidence
+      </div>
+    </div>
+
+    <div class="rounded-xl bg-white/[0.03] p-3">
+      <div class="text-lg font-black text-white">
+        <%= workspace.verified_evidence_count %>
+      </div>
+
+      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+        Verified
+      </div>
+    </div>
+
+  </div>
+
+</div>

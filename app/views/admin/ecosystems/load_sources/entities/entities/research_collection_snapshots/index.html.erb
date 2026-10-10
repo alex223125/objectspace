@@ -1,0 +1,72 @@
+
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1>Collection checkpoints</h1>
+      <p class="text-muted mb-0"><%= @collection.name %></p>
+    </div>
+
+    <%= link_to "Collection intelligence",
+                admin_research_collection_intelligence_path(@collection),
+                class: "btn btn-outline-secondary" %>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5>Capture a checkpoint</h5>
+
+      <%= form_with scope: :research_collection_snapshot,
+                    url: admin_research_collection_snapshots_path(@collection),
+                    method: :post,
+                    local: true do |form| %>
+        <div class="mb-3">
+          <%= form.label :label %>
+          <%= form.text_field :label,
+                              required: true,
+                              class: "form-control",
+                              placeholder: "Before review, Q4 baseline..." %>
+        </div>
+
+        <div class="mb-3">
+          <%= form.label :description %>
+          <%= form.text_area :description,
+                             rows: 2,
+                             class: "form-control" %>
+        </div>
+
+        <%= form.submit "Capture checkpoint",
+                        class: "btn btn-primary" %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">Checkpoint history</div>
+    <div class="list-group list-group-flush">
+      <% @snapshots.each do |snapshot| %>
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <strong>
+              #<%= snapshot.sequence %> — <%= snapshot.label %>
+            </strong>
+            <div class="small text-muted">
+              <%= l(snapshot.captured_at, format: :long) %>
+            </div>
+          </div>
+
+          <%= link_to "Inspect",
+                      admin_research_collection_snapshot_path(
+                        @collection, snapshot
+                      ),
+                      class: "btn btn-sm btn-outline-primary" %>
+        </div>
+      <% end %>
+
+      <% if @snapshots.empty? %>
+        <div class="list-group-item text-muted">
+          No checkpoints have been captured.
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

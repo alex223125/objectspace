@@ -1,0 +1,172 @@
+<div class="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
+  <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+    <div>
+      <div class="text-xs font-bold uppercase tracking-[0.2em] text-orange-400">
+        Investigation lifecycle
+      </div>
+
+      <h2 class="mt-2 text-xl font-black text-white">
+        Saved investigation
+      </h2>
+
+      <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+        This investigation is persistent. You can leave it, return later,
+        resume the work, create snapshots, complete it, or archive it.
+      </p>
+    </div>
+
+    <div class="flex shrink-0 items-center gap-2">
+      <span class="inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-bold <%= lifecycle_badge_class(workspace.status) %>">
+        <span class="h-2 w-2 rounded-full <%= lifecycle_dot_class(workspace.status) %>"></span>
+        <%= workspace.lifecycle_label %>
+      </span>
+    </div>
+  </div>
+
+  <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="rounded-2xl bg-black/20 p-4">
+      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+        Progress
+      </div>
+
+      <div class="mt-2 text-2xl font-black text-white">
+        <%= workspace.progress %>%
+      </div>
+
+      <div class="mt-3 h-1.5 overflow-hidden rounded-full bg-white/5">
+        <div
+          class="h-full rounded-full bg-orange-500"
+          style="width: <%= workspace.progress %>%">
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-2xl bg-black/20 p-4">
+      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+        Items
+      </div>
+
+      <div class="mt-2 text-2xl font-black text-white">
+        <%= workspace.items.count %>
+      </div>
+
+      <div class="mt-1 text-xs text-slate-600">
+        <%= workspace.completed_items_count %> completed
+      </div>
+    </div>
+
+    <div class="rounded-2xl bg-black/20 p-4">
+      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+        Research record
+      </div>
+
+      <div class="mt-2 text-2xl font-black text-white">
+        <%= workspace.annotation_count + workspace.evidence_count %>
+      </div>
+
+      <div class="mt-1 text-xs text-slate-600">
+        annotations + evidence
+      </div>
+    </div>
+
+    <div class="rounded-2xl bg-black/20 p-4">
+      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+        Last opened
+      </div>
+
+      <div class="mt-2 text-sm font-bold text-white">
+        <% if workspace.last_opened_at.present? %>
+          <%= time_ago_in_words(workspace.last_opened_at) %> ago
+        <% else %>
+          Never
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-6 flex flex-wrap gap-2">
+    <% if workspace.archived? %>
+      <%= button_to "Resume investigation",
+                    resume_admin_research_workspace_path(workspace),
+                    method: :patch,
+                    class: "rounded-xl bg-orange-500 px-4 py-2.5 text-xs font-bold text-white hover:bg-orange-400" %>
+
+      <%= button_to "Restore",
+                    restore_admin_research_workspace_path(workspace),
+                    method: :patch,
+                    class: "rounded-xl bg-white/5 px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/10 hover:text-white" %>
+    <% elsif workspace.completed? %>
+      <%= button_to "Reopen investigation",
+                    reopen_admin_research_workspace_path(workspace),
+                    method: :patch,
+                    class: "rounded-xl bg-orange-500 px-4 py-2.5 text-xs font-bold text-white hover:bg-orange-400" %>
+
+      <%= button_to "Archive",
+                    archive_admin_research_workspace_path(workspace),
+                    method: :patch,
+                    data: {
+                      turbo_confirm: "Archive this completed investigation?"
+                    },
+                    class: "rounded-xl bg-white/5 px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/10 hover:text-white" %>
+    <% else %>
+      <%= button_to "Save snapshot",
+                    snapshot_admin_research_workspace_path(workspace),
+                    method: :post,
+                    class: "rounded-xl bg-sky-500/10 px-4 py-2.5 text-xs font-bold text-sky-300 hover:bg-sky-500/20" %>
+
+      <%= button_to "Mark completed",
+                    complete_admin_research_workspace_path(workspace),
+                    method: :patch,
+                    data: {
+                      turbo_confirm: "Mark this investigation as completed?"
+                    },
+                    class: "rounded-xl bg-emerald-500/10 px-4 py-2.5 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20" %>
+
+      <%= button_to "Archive",
+                    archive_admin_research_workspace_path(workspace),
+                    method: :patch,
+                    data: {
+                      turbo_confirm: "Archive this investigation?"
+                    },
+                    class: "rounded-xl bg-white/5 px-4 py-2.5 text-xs font-bold text-slate-400 hover:bg-white/10 hover:text-white" %>
+    <% end %>
+  </div>
+
+  <% if workspace.latest_snapshot.present? %>
+    <div class="mt-6 rounded-2xl border border-sky-500/10 bg-sky-500/[0.03] p-4">
+      <div class="flex items-start gap-3">
+        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sky-500/10 text-sky-300">
+          ◈
+        </div>
+
+        <div class="min-w-0">
+          <div class="text-xs font-bold uppercase tracking-wider text-sky-300">
+            Latest snapshot
+          </div>
+
+          <div class="mt-1 font-bold text-white">
+            <%= workspace.latest_snapshot["label"] %>
+          </div>
+
+          <div class="mt-2 flex flex-wrap gap-3 text-xs text-slate-600">
+            <span>
+              <%= workspace.latest_snapshot["item_count"] %> items
+            </span>
+
+            <span>
+              <%= workspace.latest_snapshot["annotation_count"] %> annotations
+            </span>
+
+            <span>
+              <%= workspace.latest_snapshot["evidence_count"] %> evidence
+            </span>
+
+            <span>
+              <%= workspace.latest_snapshot["progress"] %>% progress
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

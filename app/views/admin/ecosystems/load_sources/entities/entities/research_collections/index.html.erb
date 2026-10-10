@@ -1,0 +1,109 @@
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+  <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <div class="text-xs font-black uppercase tracking-[0.22em] text-orange-400">
+        Research system
+      </div>
+
+      <h1 class="mt-2 text-3xl font-black tracking-tight text-white">
+        Research collections
+      </h1>
+
+      <p class="mt-2 max-w-2xl text-sm text-slate-400">
+        Group related saved investigations into reusable research portfolios.
+      </p>
+    </div>
+
+    <%= link_to "New collection",
+                new_admin_research_collection_path,
+                class: "rounded-2xl bg-orange-500 px-5 py-3 text-sm font-black text-white hover:bg-orange-400" %>
+  </div>
+
+  <% if @collections.any? %>
+    <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+      <% @collections.each do |collection| %>
+        <article class="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="text-xs font-bold uppercase tracking-[0.18em] <%= collection_status_color(collection.status) %>">
+                <%= collection_status_icon(collection.status) %>
+                <%= collection.status %>
+              </div>
+
+              <h2 class="mt-2 text-xl font-black text-white">
+                <%= collection.name %>
+              </h2>
+            </div>
+
+            <div class="rounded-xl bg-white/5 px-3 py-2 text-xs font-bold text-slate-400">
+              <%= collection.workspace_count %>
+              investigations
+            </div>
+          </div>
+
+          <% if collection.description.present? %>
+            <p class="mt-4 text-sm leading-6 text-slate-400">
+              <%= truncate(collection.description, length: 180) %>
+            </p>
+          <% end %>
+
+          <div class="mt-5">
+            <div class="mb-2 flex items-center justify-between text-xs">
+              <span class="font-bold text-slate-500">
+                Progress
+              </span>
+
+              <span class="font-black text-white">
+                <%= collection.progress_percentage %>%
+              </span>
+            </div>
+
+            <div class="h-2 overflow-hidden rounded-full bg-white/10">
+              <div
+                class="h-full <%= collection_progress_color(collection.progress_percentage) %>"
+                style="width: <%= collection.progress_percentage %>%">
+              </div>
+            </div>
+          </div>
+
+          <% if collection.tags.any? %>
+            <div class="mt-5 flex flex-wrap gap-2">
+              <% collection.tags.ordered.each do |tag| %>
+                <span class="rounded-full bg-white/5 px-2.5 py-1 text-[11px] font-bold text-slate-400">
+                  #<%= tag.name %>
+                </span>
+              <% end %>
+            </div>
+          <% end %>
+
+          <div class="mt-6 flex gap-2">
+            <%= link_to "Open",
+                        admin_research_collection_path(collection),
+                        class: "flex-1 rounded-xl bg-white/10 px-4 py-2.5 text-center text-xs font-black text-white hover:bg-white/15" %>
+
+            <%= link_to "Edit",
+                        edit_admin_research_collection_path(collection),
+                        class: "rounded-xl bg-white/5 px-4 py-2.5 text-xs font-bold text-slate-400 hover:bg-white/10 hover:text-white" %>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="rounded-3xl border border-dashed border-white/10 bg-white/[0.02] p-12 text-center">
+      <div class="text-4xl">🗂️</div>
+
+      <h2 class="mt-4 text-xl font-black text-white">
+        No research collections yet
+      </h2>
+
+      <p class="mx-auto mt-2 max-w-lg text-sm text-slate-500">
+        Create a collection to group saved investigations around a research program,
+        project, question, or deliverable.
+      </p>
+
+      <%= link_to "Create first collection",
+                  new_admin_research_collection_path,
+                  class: "mt-6 inline-flex rounded-xl bg-orange-500 px-5 py-3 text-xs font-black text-white" %>
+    </div>
+  <% end %>
+</div>

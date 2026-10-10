@@ -1,0 +1,72 @@
+<div class="grid grid-cols-2 gap-3 md:grid-cols-4">
+
+  <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-600">
+      Progress
+    </div>
+
+    <div class="mt-2 text-2xl font-black text-white">
+      <%= summary[:progress] %>%
+    </div>
+  </div>
+
+  <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-600">
+      Items
+    </div>
+
+    <div class="mt-2 text-2xl font-black text-white">
+      <%= summary[:items] %>
+    </div>
+
+    <div class="mt-1 text-xs text-slate-600">
+      <%= summary[:completed_items] %> completed
+    </div>
+  </div>
+
+  <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-600">
+      Evidence
+    </div>
+
+    <div class="mt-2 text-2xl font-black text-white">
+      <%= summary[:evidence] %>
+    </div>
+
+    <div class="mt-1 text-xs text-slate-600">
+      <%= summary[:verified_evidence] %> verified
+    </div>
+  </div>
+
+  <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-600">
+      Research strength
+    </div>
+
+    <div class="mt-2 text-2xl font-black <%= research_strength_class(summary[:research_strength]) %>">
+      <%= summary[:research_strength] %>
+    </div>
+  </div>
+
+</div>
+
+<div class="mt-4 rounded-2xl border border-white/10 bg-black/10 p-4">
+
+  <div class="flex items-center justify-between">
+    <span class="text-xs font-bold text-slate-500">
+      Evidence coverage
+    </span>
+
+    <span class="text-xs font-black text-white">
+      <%= summary[:evidence_coverage] %>%
+    </span>
+  </div>
+
+  <div class="mt-3 h-2 overflow-hidden rounded-full bg-white/5">
+    <div
+      class="h-full rounded-full bg-orange-500 transition-all"
+      style="width: <%= summary[:evidence_coverage] %>%">
+    </div>
+  </div>
+
+</div>

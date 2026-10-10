@@ -1,0 +1,107 @@
+
+<div class="card h-100">
+  <div class="card-header d-flex justify-content-between">
+    <strong>Cross-investigation relationships</strong>
+    <span class="badge bg-secondary">
+      <%= @collection.investigation_relationships.count %>
+    </span>
+  </div>
+
+  <div class="card-body">
+    <%= form_with model: [
+      :admin,
+      @collection,
+      ResearchCollectionRelationship.new
+    ], local: true do |form| %>
+
+      <% workspace_options =
+           @workspace_intelligence[:workspaces].map do |workspace|
+             [workspace[:name], workspace[:id]]
+           end %>
+
+      <div class="mb-2">
+        <%= form.label :source_workspace_id, "Source investigation" %>
+        <%= form.select :source_workspace_id,
+                        workspace_options,
+                        { include_blank: "Select source" },
+                        class: "form-select",
+                        required: true %>
+      </div>
+
+      <div class="mb-2">
+        <%= form.label :target_workspace_id, "Target investigation" %>
+        <%= form.select :target_workspace_id,
+                        workspace_options,
+                        { include_blank: "Select target" },
+                        class: "form-select",
+                        required: true %>
+      </div>
+
+      <div class="mb-2">
+        <%= form.select :relationship_type,
+                        ResearchCollectionRelationship::TYPES.map {
+                          |type| [type.humanize, type]
+                        },
+                        {},
+                        class: "form-select" %>
+      </div>
+
+      <div class="mb-2">
+        <%= form.text_field :label,
+                            class: "form-control",
+                            placeholder: "Relationship label (optional)" %>
+      </div>
+
+      <div class="mb-2">
+        <%= form.text_area :description,
+                           rows: 2,
+                           class: "form-control",
+                           placeholder: "Explain the relationship..." %>
+      </div>
+
+      <%= form.submit "Add relationship",
+                      class: "btn btn-sm btn-primary",
+                      disabled: workspace_options.length < 2 %>
+    <% end %>
+
+    <hr>
+
+    <% @collection.investigation_relationships
+                  .includes(:source_workspace, :target_workspace)
+                  .ordered.each do |relationship| %>
+      <div class="border-bottom py-3">
+        <div>
+          <strong>
+            <%= relationship.source_workspace.name %>
+          </strong>
+          <span class="text-muted">
+            <%= relationship.relationship_type.humanize.downcase %>
+          </span>
+          <strong>
+            <%= relationship.target_workspace.name %>
+          </strong>
+        </div>
+
+        <% if relationship.description.present? %>
+          <p class="small text-muted mt-2 mb-1">
+            <%= relationship.description %>
+          </p>
+        <% end %>
+
+        <span class="badge bg-secondary">
+          <%= relationship.status %>
+        </span>
+
+        <%= button_to "Remove",
+                      admin_research_collection_relationship_path(
+                        @collection, relationship
+                      ),
+                      method: :delete,
+                      class: "btn btn-sm btn-outline-danger mt-2",
+                      form: { data: {
+                        turbo_confirm: "Remove this relationship?"
+                      } } %>
+      </div>
+    <% end %>
+  </div>
+</div>

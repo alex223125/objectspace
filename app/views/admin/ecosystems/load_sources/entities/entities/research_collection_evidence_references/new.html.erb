@@ -1,0 +1,19 @@
+<div class="mx-auto max-w-3xl px-6 py-8">
+  <%= link_to "← Collection",
+              admin_research_collection_path(@collection),
+              class: "text-xs font-bold text-slate-500 hover:text-white" %>
+
+  <h1 class="mt-5 text-3xl font-black text-white">
+    Add evidence reference
+  </h1>
+
+  <p class="mt-2 text-sm text-slate-400">
+    Capture evidence that is useful across multiple investigations.
+  </p>
+
+  <div class="mt-8 rounded-3xl border border-white/10 bg-white/[0.03] p-6">
+    <%= render "form",
+               collection: @collection,
+               evidence_reference: @evidence_reference %>
+  </div>
+</div>

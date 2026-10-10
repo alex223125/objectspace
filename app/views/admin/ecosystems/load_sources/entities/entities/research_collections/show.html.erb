@@ -1,0 +1,400 @@
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+  <div class="mb-8 flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+    <div>
+      <%= link_to "← Research collections",
+                  admin_research_collections_path,
+                  class: "text-xs font-bold text-slate-500 hover:text-white" %>
+
+      <div class="mt-4 flex items-center gap-3">
+        <span class="<%= collection_status_color(@collection.status) %> text-xs font-black uppercase tracking-[0.18em]">
+          <%= collection_status_icon(@collection.status) %>
+          <%= @collection.status %>
+        </span>
+      </div>
+
+      <h1 class="mt-2 text-3xl font-black tracking-tight text-white">
+        <%= @collection.name %>
+      </h1>
+
+      <% if @collection.description.present? %>
+        <p class="mt-3 max-w-3xl text-sm leading-6 text-slate-400">
+          <%= @collection.description %>
+        </p>
+      <% end %>
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+      <%= link_to "Edit",
+                  edit_admin_research_collection_path(@collection),
+                  class: "rounded-xl bg-white/5 px-4 py-2.5 text-xs font-bold text-slate-400 hover:bg-white/10 hover:text-white" %>
+
+      <% if @collection.active? %>
+        <%= button_to "Complete",
+                      complete_admin_research_collection_path(@collection),
+                      method: :patch,
+                      class: "rounded-xl bg-emerald-500/10 px-4 py-2.5 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20" %>
+
+        <%= button_to "Archive",
+                      archive_admin_research_collection_path(@collection),
+                      method: :patch,
+                      class: "rounded-xl bg-white/5 px-4 py-2.5 text-xs font-bold text-slate-400 hover:bg-white/10" %>
+      <% else %>
+        <%= button_to "Reopen",
+                      reopen_admin_research_collection_path(@collection),
+                      method: :patch,
+                      class: "rounded-xl bg-sky-500/10 px-4 py-2.5 text-xs font-bold text-sky-300 hover:bg-sky-500/20" %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+    <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+      <div class="text-xs font-bold uppercase tracking-[0.15em] text-slate-500">
+        Investigations
+      </div>
+      <div class="mt-2 text-2xl font-black text-white">
+        <%= @dashboard[:workspace_count] %>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+      <div class="text-xs font-bold uppercase tracking-[0.15em] text-slate-500">
+        Pinned
+      </div>
+      <div class="mt-2 text-2xl font-black text-white">
+        <%= @dashboard[:pinned_workspace_count] %>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+      <div class="text-xs font-bold uppercase tracking-[0.15em] text-slate-500">
+        Completed
+      </div>
+      <div class="mt-2 text-2xl font-black text-white">
+        <%= @dashboard[:completed_workspace_count] %>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+      <div class="text-xs font-bold uppercase tracking-[0.15em] text-slate-500">
+        Evidence
+      </div>
+      <div class="mt-2 text-2xl font-black text-white">
+        <%= @dashboard[:evidence_count] %>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+      <div class="text-xs font-bold uppercase tracking-[0.15em] text-slate-500">
+        Progress
+      </div>
+      <div class="mt-2 text-2xl font-black text-white">
+        <%= @dashboard[:progress_percentage] %>%
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+    <section class="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="text-xs font-black uppercase tracking-[0.18em] text-orange-400">
+            Collection portfolio
+          </div>
+
+          <h2 class="mt-2 text-xl font-black text-white">
+            Saved investigations
+          </h2>
+        </div>
+
+        <span class="rounded-xl bg-white/5 px-3 py-2 text-xs font-bold text-slate-400">
+          <%= @memberships.size %> linked
+        </span>
+      </div>
+
+      <div class="mt-6 space-y-3">
+        <% if @memberships.any? %>
+          <% @memberships.each do |membership| %>
+            <%= render "membership",
+                       collection: @collection,
+                       membership: membership %>
+          <% end %>
+        <% else %>
+          <div class="rounded-2xl border border-dashed border-white/10 p-8 text-center">
+            <div class="text-3xl">🔬</div>
+
+            <div class="mt-3 text-sm font-black text-white">
+              No investigations yet
+            </div>
+
+            <div class="mt-1 text-xs text-slate-500">
+              Add a saved investigation from the panel on the right.
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </section>
+
+    <aside class="space-y-6">
+      <section class="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
+        <div class="text-xs font-black uppercase tracking-[0.18em] text-orange-400">
+          Add investigation
+        </div>
+
+        <h2 class="mt-2 text-lg font-black text-white">
+          Saved workspaces
+        </h2>
+
+        <div class="mt-5 space-y-2">
+          <% if @available_workspaces.any? %>
+            <% @available_workspaces.each do |workspace| %>
+              <%= form_with url: admin_research_collection_memberships_path(@collection),
+                            method: :post,
+                            class: "rounded-2xl border border-white/10 bg-white/[0.02] p-3" do |form| %>
+
+                <%= hidden_field_tag :research_workspace_id,
+                                     workspace.id %>
+
+                <div class="flex items-start justify-between gap-3">
+                  <div class="min-w-0">
+                    <div class="truncate text-sm font-black text-white">
+                      <%= workspace.title %>
+                    </div>
+
+                    <div class="mt-1 text-[11px] text-slate-500">
+                      <%= workspace.status.to_s.humanize %>
+                    </div>
+                  </div>
+
+                  <%= form.submit "Add",
+                                  class: "rounded-lg bg-orange-500/10 px-3 py-1.5 text-[11px] font-black text-orange-300 hover:bg-orange-500/20" %>
+                </div>
+              <% end %>
+            <% end %>
+          <% else %>
+            <div class="rounded-2xl bg-white/[0.02] p-4 text-xs text-slate-500">
+              All available saved investigations are already in this collection.
+            </div>
+          <% end %>
+        </div>
+      </section>
+
+      <section class="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
+        <div class="text-xs font-black uppercase tracking-[0.18em] text-orange-400">
+          Tags
+        </div>
+
+        <%= form_with url: admin_research_collection_tags_path(@collection),
+                      method: :post,
+                      class: "mt-4 flex gap-2" do |form| %>
+
+          <%= form.text_field :name,
+                              name: "research_collection_tag[name]",
+                              placeholder: "add tag",
+                              class: "min-w-0 flex-1 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white outline-none focus:border-orange-500" %>
+
+          <%= form.submit "Add",
+                          class: "rounded-xl bg-white/10 px-3 py-2 text-xs font-black text-white" %>
+        <% end %>
+
+        <div class="mt-4 flex flex-wrap gap-2">
+          <% @collection.tags.ordered.each do |tag| %>
+            <div class="flex items-center gap-1 rounded-full bg-white/5 px-3 py-1.5">
+              <span class="text-[11px] font-bold text-slate-300">
+                #<%= tag.name %>
+              </span>
+
+              <%= button_to "×",
+                            admin_research_collection_tag_path(@collection, tag),
+                            method: :delete,
+                            class: "text-xs text-slate-600 hover:text-rose-300" %>
+            </div>
+          <% end %>
+        </div>
+      </section>
+
+      <section class="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
+        <div class="text-xs font-black uppercase tracking-[0.18em] text-orange-400">
+          Cross-investigation evidence
+        </div>
+
+        <p class="mt-2 text-xs leading-5 text-slate-500">
+          Link an existing evidence record to this collection so it can be
+          referenced across multiple investigations.
+        </p>
+
+        <%= form_with url: admin_research_collection_evidence_references_path(@collection),
+                      method: :post,
+                      class: "mt-4 space-y-3" do |form| %>
+
+          <%= form.text_field :source_type,
+                              name: "research_collection_evidence_reference[source_type]",
+                              placeholder: "Evidence",
+                              class: "w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white outline-none focus:border-orange-500" %>
+
+          <%= form.number_field :source_id,
+                                name: "research_collection_evidence_reference[source_id]",
+                                placeholder: "Evidence ID",
+                                class: "w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white outline-none focus:border-orange-500" %>
+
+          <%= form.text_field :label,
+                              name: "research_collection_evidence_reference[label]",
+                              placeholder: "Optional label",
+                              class: "w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white outline-none focus:border-orange-500" %>
+
+          <%= form.submit "Link evidence",
+                          class: "w-full rounded-xl bg-orange-500/10 px-4 py-2.5 text-xs font-black text-orange-300 hover:bg-orange-500/20" %>
+        <% end %>
+
+        <div class="mt-5 space-y-2">
+          <% @evidence_references.each do |reference| %>
+            <div class="rounded-xl bg-white/[0.03] p-3">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-xs font-black text-white">
+                    <%= reference.display_label %>
+                  </div>
+
+                  <div class="mt-1 text-[10px] text-slate-600">
+                    <%= reference.source_type %> #<%= reference.source_id %>
+                  </div>
+                </div>
+
+                <%= button_to "Remove",
+                              admin_research_collection_evidence_reference_path(@collection, reference),
+                              method: :delete,
+                              class: "text-[10px] font-bold text-slate-600 hover:text-rose-300" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </section>
+    </aside>
+  </div>
+</div>
+
+
+<div class="d-flex gap-2 flex-wrap">
+  <%= link_to(
+        "Collection Intelligence",
+        admin_research_collection_intelligence_path(@collection),
+        class: "btn btn-outline-primary"
+      ) %>
+
+  <%= link_to(
+        "Back to Collections",
+        admin_research_collections_path,
+        class: "btn btn-outline-secondary"
+      ) %>
+</div>
+
+
+
+<section class="mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4 mb-0">Objectives</h2>
+  </div>
+
+  <% if @collection.objectives.ordered.any? %>
+    <div class="list-group">
+      <% @collection.objectives.ordered.each do |objective| %>
+        <div class="list-group-item">
+          <div class="d-flex justify-content-between">
+            <strong><%= objective.title %></strong>
+
+            <span class="badge bg-secondary">
+              <%= objective.status.humanize %>
+            </span>
+          </div>
+
+          <% if objective.description.present? %>
+            <div class="small text-muted mt-1">
+              <%= objective.description %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-muted">
+      No objectives have been defined yet.
+    </p>
+  <% end %>
+</section>
+
+
+
+<section class="mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4 mb-0">Objectives</h2>
+  </div>
+
+  <% if @collection.objectives.ordered.any? %>
+    <div class="list-group">
+      <% @collection.objectives.ordered.each do |objective| %>
+        <div class="list-group-item">
+          <div class="d-flex justify-content-between">
+            <strong><%= objective.title %></strong>
+
+            <span class="badge bg-secondary">
+              <%= objective.status.humanize %>
+            </span>
+          </div>
+
+          <% if objective.description.present? %>
+            <div class="small text-muted mt-1">
+              <%= objective.description %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-muted">
+      No objectives have been defined yet.
+    </p>
+  <% end %>
+</section>
+
+
+
+<section class="mt-4">
+  <h2 class="h4 mb-3">Milestones</h2>
+
+  <% if @collection.milestones.ordered.any? %>
+    <div class="list-group">
+      <% @collection.milestones.ordered.each do |milestone| %>
+        <div class="list-group-item">
+          <div class="d-flex justify-content-between">
+            <strong><%= milestone.title %></strong>
+
+            <span class="badge bg-secondary">
+              <%= milestone.status.humanize %>
+            </span>
+          </div>
+
+          <% if milestone.target_date.present? %>
+            <div class="small text-muted mt-1">
+              Target:
+              <%= milestone.target_date %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-muted">
+      No milestones have been defined.
+    </p>
+  <% end %>
+</section>
+
+
+<%= link_to "Collection Intelligence",
+            admin_research_collection_intelligence_path(@collection),
+            class: "btn btn-outline-primary" %>
+
+
+<%= link_to "Checkpoints",
+            admin_research_collection_snapshots_path(@collection),
+            class: "btn btn-outline-secondary" %>

@@ -1,17 +1,27 @@
 <%# ============================================================================
 ENTITY — SHOW
 
-Path:
-app/views/admin/ecosystems/load_sources/entities/entities/show.html.erb
+Path: app/views/admin/ecosystems/load_sources/entities/entities/show.html.erb
 
 Purpose:
 Administrative detail view for an Entity.
+
+This view includes:
+* Entity identity and metadata
+* Entity lifecycle actions
+* Template/version lineage
+* Persisted entity fields
+* Field search/filter/pagination
+* Intelligence sections
+* Relationship intelligence
+* Investigation/workspace entry point
+* Recommendation list hook for Stimulus
 ============================================================================ %>
 
 <%
-  # ============================================================================
+  # ==========================================================================
   # SAFE DEFAULTS
-  # ============================================================================
+  # ==========================================================================
 
   entity = @entity
 
@@ -92,9 +102,9 @@ Administrative detail view for an Entity.
   published_at =
     entity.published_at if entity.respond_to?(:published_at)
 
-  # ============================================================================
+  # ==========================================================================
   # STATUS PRESENTATION
-  # ============================================================================
+  # ==========================================================================
 
   status_badge =
     case normalized_status
@@ -136,44 +146,33 @@ Administrative detail view for an Entity.
       }
     end
 
-  # ============================================================================
+  # ==========================================================================
   # ENTITY PAYLOAD
-  #
-  # Do NOT use entity.attributes directly as displayed entity data.
-  # ActiveRecord's attributes contains database columns.
-  # ============================================================================
+  # ==========================================================================
 
   entity_payload = {}
 
   if entity.respond_to?(:data)
     candidate = entity.data
     candidate = candidate.to_h if candidate.respond_to?(:to_h)
-
     entity_payload = candidate if candidate.is_a?(Hash)
   end
 
   if entity_payload.blank? && entity.respond_to?(:attributes_data)
     candidate = entity.attributes_data
     candidate = candidate.to_h if candidate.respond_to?(:to_h)
-
     entity_payload = candidate if candidate.is_a?(Hash)
   end
-
-  # ============================================================================
-  # FALLBACK PAYLOAD RESOLUTION
-  # ============================================================================
 
   if entity_payload.blank? && entity.respond_to?(:entity_attributes)
     candidate = entity.entity_attributes
     candidate = candidate.to_h if candidate.respond_to?(:to_h)
-
     entity_payload = candidate if candidate.is_a?(Hash)
   end
 
   if entity_payload.blank? && entity.respond_to?(:fields)
     candidate = entity.fields
     candidate = candidate.to_h if candidate.respond_to?(:to_h)
-
     entity_payload = candidate if candidate.is_a?(Hash)
   end
 
@@ -185,21 +184,20 @@ Administrative detail view for an Entity.
     normalized_entity_payload[key.to_s] = value
   end
 
-  # ============================================================================
+  # ==========================================================================
   # TEMPLATE FIELDS
-  # ============================================================================
+  # ==========================================================================
 
   template_fields = []
 
   if template_version.present? &&
     template_version.respond_to?(:entity_template_fields)
-
     template_fields = template_version.entity_template_fields.to_a
   end
 
-  # ============================================================================
+  # ==========================================================================
   # FIELD HELPERS
-  # ============================================================================
+  # ==========================================================================
 
   field_name_for =
     lambda do |field|
@@ -250,9 +248,9 @@ Administrative detail view for an Entity.
       end
     end
 
-  # ============================================================================
+  # ==========================================================================
   # VALUE RESOLUTION
-  # ============================================================================
+  # ==========================================================================
 
   value_for_field =
     lambda do |field|
@@ -298,9 +296,9 @@ Administrative detail view for an Entity.
       [found, value]
     end
 
-  # ============================================================================
+  # ==========================================================================
   # RESOLVED ENTITY DATA
-  # ============================================================================
+  # ==========================================================================
 
   resolved_fields = []
 
@@ -321,9 +319,9 @@ Administrative detail view for an Entity.
     }
   end
 
-  # ============================================================================
+  # ==========================================================================
   # EXTRA PAYLOAD VALUES
-  # ============================================================================
+  # ==========================================================================
 
   defined_field_keys =
     resolved_fields.map { |item| item[:key].to_s }
@@ -331,17 +329,12 @@ Administrative detail view for an Entity.
   extra_payload =
     normalized_entity_payload.reject do |key, _value|
       key.to_s.in?(defined_field_keys) ||
-        key.to_s.in?(%w[
-        id
-        created_at
-        updated_at
-        deleted_at
-      ])
+        key.to_s.in?(%w[id created_at updated_at deleted_at])
     end
 
-  # ============================================================================
+  # ==========================================================================
   # DISPLAY COUNTS
-  # ============================================================================
+  # ==========================================================================
 
   field_count =
     if template_fields.present?
@@ -362,9 +355,9 @@ Administrative detail view for an Entity.
       entity.sections.size
     end
 
-  # ============================================================================
+  # ==========================================================================
   # URLS
-  # ============================================================================
+  # ==========================================================================
 
   entities_path =
     admin_ecosystems_load_sources_entities_path
@@ -410,20 +403,34 @@ Administrative detail view for an Entity.
         nil
       end
     end
+
+  intelligence_path =
+    intelligence_admin_ecosystems_load_sources_entity_path(@entity)
+
+  relationships_path =
+    admin_ecosystems_load_sources_entity_relationships_path(@entity)
+
+  history_path =
+    history_admin_ecosystems_load_sources_entity_path(@entity)
+
+  research_workspaces_path =
+    admin_research_workspaces_path
 %>
+
+
+<%= render "lifecycle_panel",
+           workspace: @workspace %>
 
 <div class="mx-auto w-full max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8">
 
-  <%# =========================================================================
+  <%# ==========================================================================
   HEADER
-  ========================================================================= %>
+  ========================================================================== %>
 
   <div class="mb-8">
-
     <div class="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
 
       <div class="min-w-0">
-
         <div class="flex items-center gap-4">
 
           <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-violet-100 text-2xl shadow-sm dark:bg-violet-900/40">
@@ -431,7 +438,6 @@ Administrative detail view for an Entity.
           </div>
 
           <div class="min-w-0">
-
             <div class="mb-1 text-[11px] font-black uppercase tracking-[0.2em] text-violet-500">
               Entity Registry
             </div>
@@ -446,9 +452,7 @@ Administrative detail view for an Entity.
               Inspect the entity record, structural definition, version lineage
               and persisted attributes.
             </p>
-
           </div>
-
         </div>
 
         <div class="mt-4 flex flex-wrap items-center gap-2 text-xs text-gray-400">
@@ -465,7 +469,6 @@ Administrative detail view for an Entity.
             <%= entity_name %>
           </span>
         </div>
-
       </div>
 
       <%# HEADER ACTIONS %>
@@ -484,41 +487,17 @@ Administrative detail view for an Entity.
           Edit Entity
         <% end %>
 
-        <%= link_to(
-              "History",
-              history_admin_ecosystems_load_sources_entity_path(@entity)
-            ) %>
-
-        <% if @entity.current_version %>
-
-          <p>
-            Current version:
-            <strong>
-              Version <%= @entity.current_version.version_number %>
-            </strong>
-          </p>
-
-        <% end %>
-
-        <p>
-          Versions:
-          <strong>
-            <%= @entity.versions.count %>
-          </strong>
-        </p>
-
-
-
+        <%= link_to "History",
+                    history_path,
+                    class: "inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-700 shadow-sm hover:border-violet-200 hover:text-violet-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300" %>
 
       </div>
-
     </div>
-
   </div>
 
-  <%# =========================================================================
+  <%# ==========================================================================
   ENTITY IDENTITY PANEL
-  ========================================================================= %>
+  ========================================================================== %>
 
   <div class="mb-8 overflow-hidden rounded-2xl border-2 border-violet-100 bg-gradient-to-br from-violet-50 via-white to-indigo-50 shadow-sm dark:border-violet-900/40 dark:from-violet-950/30 dark:via-gray-900 dark:to-indigo-950/30">
 
@@ -541,54 +520,47 @@ Administrative detail view for an Entity.
             </div>
 
             <% if entity_identifier.present? %>
-
               <div class="mt-2 inline-flex max-w-full items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 font-mono text-xs text-gray-500 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
                 <span class="text-violet-500">#</span>
-
                 <span class="truncate">
                   <%= entity_identifier %>
                 </span>
               </div>
-
             <% end %>
 
             <% if entity_description.present? %>
-
               <p class="mt-4 max-w-3xl text-sm leading-6 text-gray-500 dark:text-gray-400">
                 <%= entity_description %>
               </p>
-
             <% end %>
 
           </div>
 
           <div class="shrink-0">
-
             <span class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold <%= status_badge[:classes] %>">
               <span><%= status_badge[:icon] %></span>
               <%= status_badge[:label] %>
             </span>
-
           </div>
 
         </div>
 
-        <%# ACTION TOOLBAR %>
+        <%# ==========================================================================
+        ACTION TOOLBAR
+        ========================================================================== %>
 
         <div class="mt-7 rounded-2xl border border-gray-200 bg-white/80 p-4 shadow-sm backdrop-blur dark:border-gray-700 dark:bg-gray-900/50">
 
           <div class="mb-3 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
 
             <div>
-
               <div class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">
                 Entity Actions
               </div>
 
               <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                Manage lifecycle, create a copy, or inspect differences.
+                Manage lifecycle, create a copy, inspect differences, or start an investigation.
               </div>
-
             </div>
 
             <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400">
@@ -600,44 +572,36 @@ Administrative detail view for an Entity.
           <div class="flex flex-wrap gap-2">
 
             <% unless normalized_status == "published" %>
-
               <%= link_to publish_entity_path,
                           method: :post,
                           class: "inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-700" do %>
                 <span>✓</span>
                 Publish
               <% end %>
-
             <% end %>
 
             <% unless normalized_status == "archived" %>
-
               <%= link_to archive_entity_path,
                           class: "inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-bold text-gray-700 shadow-sm transition hover:border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700" do %>
                 <span>◌</span>
                 Archive
               <% end %>
-
             <% end %>
 
             <% if normalized_status == "archived" %>
-
               <%= link_to restore_entity_path,
                           class: "inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-indigo-700" do %>
                 <span>↺</span>
                 Restore
               <% end %>
-
             <% end %>
 
             <% unless normalized_status == "deprecated" %>
-
               <%= link_to deprecate_entity_path,
                           class: "inline-flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-xs font-bold text-rose-700 shadow-sm transition hover:bg-rose-100 dark:border-rose-900/40 dark:bg-rose-950/20 dark:text-rose-400" do %>
                 <span>!</span>
                 Deprecate
               <% end %>
-
             <% end %>
 
             <%= link_to clone_entity_path,
@@ -652,11 +616,20 @@ Administrative detail view for an Entity.
               Compare
             <% end %>
 
-          </div>
+            <%# Investigation entry point %>
 
+            <%= link_to research_workspaces_path,
+                        class: "inline-flex items-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-orange-600" do %>
+              <span>🧭</span>
+              Start investigation
+            <% end %>
+
+          </div>
         </div>
 
-        <%# IDENTITY METRICS %>
+        <%# ==========================================================================
+        IDENTITY METRICS
+        ========================================================================== %>
 
         <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
 
@@ -713,26 +686,25 @@ Administrative detail view for an Entity.
           </div>
 
         </div>
-
       </div>
-
     </div>
-
   </div>
 
-  <%# =========================================================================
+  <%# ==========================================================================
   MAIN CONTENT
-  ========================================================================= %>
+  ========================================================================== %>
 
   <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
 
-    <%# =========================================================================
+    <%# ==========================================================================
     LEFT / PRIMARY CONTENT
-    ========================================================================= %>
+    ========================================================================== %>
 
     <div class="space-y-6 xl:col-span-2">
 
-      <%# STRUCTURAL DEFINITION / ENTITY DATA %>
+      <%# ==========================================================================
+      STRUCTURAL DEFINITION / ENTITY DATA
+      ========================================================================== %>
 
       <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-800">
 
@@ -741,7 +713,6 @@ Administrative detail view for an Entity.
           <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
 
             <div>
-
               <div class="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400">
                 Structural Definition
               </div>
@@ -757,15 +728,12 @@ Administrative detail view for an Entity.
                   v<%= version_number %>
                 <% end %>.
               </p>
-
             </div>
 
             <% if template_fields.present? %>
-
               <div class="flex w-full flex-col gap-2 sm:flex-row lg:w-auto">
 
                 <div class="relative">
-
                   <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-400">
                     ⌕
                   </span>
@@ -775,9 +743,7 @@ Administrative detail view for an Entity.
                     type="search"
                     placeholder="Search fields..."
                     autocomplete="off"
-                    class="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-xs font-semibold text-gray-700 outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-100 sm:w-52 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:focus:ring-violet-900/30"
-                  >
-
+                    class="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-xs font-semibold text-gray-700 outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-100 sm:w-52 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:focus:ring-violet-900/30">
                 </div>
 
                 <select
@@ -805,13 +771,11 @@ Administrative detail view for an Entity.
                 </select>
 
               </div>
-
             <% end %>
 
           </div>
 
           <% if template_fields.present? %>
-
             <div class="mt-4 flex flex-wrap items-center justify-between gap-2">
 
               <div
@@ -825,7 +789,6 @@ Administrative detail view for an Entity.
               </div>
 
             </div>
-
           <% end %>
 
         </div>
@@ -917,11 +880,9 @@ Administrative detail view for an Entity.
                     </div>
 
                     <div class="mt-2">
-
                       <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-[9px] font-black uppercase tracking-wider text-gray-500 dark:bg-gray-900 dark:text-gray-400">
                         <%= type.humanize %>
                       </span>
-
                     </div>
 
                   </div>
@@ -988,15 +949,12 @@ Administrative detail view for an Entity.
                           </div>
 
                         </div>
-
                       </div>
 
                     <% end %>
 
                   </div>
-
                 </div>
-
               </div>
 
             <% end %>
@@ -1045,7 +1003,6 @@ Administrative detail view for an Entity.
                     </div>
 
                   </div>
-
                 </div>
 
                 <div class="space-y-3">
@@ -1083,15 +1040,12 @@ Administrative detail view for an Entity.
                           <% end %>
 
                         </div>
-
                       </div>
-
                     </div>
 
                   <% end %>
 
                 </div>
-
               </div>
 
             <% end %>
@@ -1133,18 +1087,15 @@ Administrative detail view for an Entity.
                 </button>
 
               </div>
-
             </div>
-
           </div>
 
         <% end %>
-
       </div>
 
-      <%# =========================================================================
+      <%# ==========================================================================
       VERSION LINEAGE
-      ========================================================================= %>
+      ========================================================================== %>
 
       <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-800">
 
@@ -1219,7 +1170,6 @@ Administrative detail view for an Entity.
                   <% end %>
 
                 </div>
-
               </div>
 
               <%# VERSION %>
@@ -1271,7 +1221,6 @@ Administrative detail view for an Entity.
                   <% end %>
 
                 </div>
-
               </div>
 
               <%# ENTITY %>
@@ -1297,22 +1246,54 @@ Administrative detail view for an Entity.
                   </div>
 
                 </div>
-
               </div>
 
             </div>
+          </div>
+        </div>
+      </div>
 
+      <%# ==========================================================================
+      RECOMMENDATIONS
+      ========================================================================== %>
+
+      <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-800">
+
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+
+          <div>
+
+            <div class="text-[11px] font-black uppercase tracking-[0.2em] text-orange-500">
+              Intelligence
+            </div>
+
+            <h2 class="mt-1 text-xl font-black text-gray-900 dark:text-white">
+              Recommendations
+            </h2>
+
+            <p class="mt-1 text-xs text-gray-400">
+              Suggested next actions and related investigations for this entity.
+            </p>
+
+          </div>
+        </div>
+
+        <div
+          class="mt-5 space-y-3"
+          data-recommendation-list>
+
+          <div class="rounded-xl border border-dashed border-gray-200 bg-gray-50 p-5 text-sm text-gray-500 dark:border-gray-700 dark:bg-gray-900/40 dark:text-gray-400">
+            Recommendations will appear here.
           </div>
 
         </div>
-
       </div>
 
     </div>
 
-    <%# =========================================================================
+    <%# ==========================================================================
     RIGHT / METADATA
-    ========================================================================= %>
+    ========================================================================== %>
 
     <div class="space-y-6">
 
@@ -1327,6 +1308,7 @@ Administrative detail view for an Entity.
         <div class="mt-5 space-y-4">
 
           <div>
+
             <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400">
               Entity ID
             </div>
@@ -1334,6 +1316,7 @@ Administrative detail view for an Entity.
             <div class="mt-1 font-mono text-sm font-bold text-gray-700 dark:text-gray-300">
               #<%= entity_id %>
             </div>
+
           </div>
 
           <% if entity_identifier.present? %>
@@ -1359,12 +1342,10 @@ Administrative detail view for an Entity.
             </div>
 
             <div class="mt-2">
-
               <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold <%= status_badge[:classes] %>">
                 <span><%= status_badge[:icon] %></span>
                 <%= status_badge[:label] %>
               </span>
-
             </div>
 
           </div>
@@ -1430,7 +1411,6 @@ Administrative detail view for an Entity.
           <% end %>
 
         </div>
-
       </div>
 
       <%# QUICK ACTIONS %>
@@ -1445,53 +1425,59 @@ Administrative detail view for an Entity.
 
           <%= link_to edit_entity_path,
                       class: "flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-xs font-bold text-gray-700 transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700 dark:border-gray-700 dark:bg-gray-900/50 dark:text-gray-300 dark:hover:bg-violet-900/20" do %>
-
             <span class="flex items-center gap-2">
               <span>✎</span>
               Edit entity
             </span>
-
             <span>→</span>
-
           <% end %>
 
           <%= link_to clone_entity_path,
                       class: "flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-xs font-bold text-gray-700 transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700 dark:border-gray-700 dark:bg-gray-900/50 dark:text-gray-300 dark:hover:bg-violet-900/20" do %>
-
             <span class="flex items-center gap-2">
               <span>⧉</span>
               Clone entity
             </span>
-
             <span>→</span>
-
           <% end %>
 
           <%= link_to compare_entity_path,
                       class: "flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-xs font-bold text-gray-700 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700 dark:border-gray-700 dark:bg-gray-900/50 dark:text-gray-300 dark:hover:bg-indigo-900/20" do %>
-
             <span class="flex items-center gap-2">
               <span>⇄</span>
               Compare entity
             </span>
-
             <span>→</span>
+          <% end %>
 
+          <%= link_to intelligence_path,
+                      class: "flex items-center justify-between rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-xs font-bold text-indigo-700 transition hover:bg-indigo-100 dark:border-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-300" do %>
+            <span class="flex items-center gap-2">
+              <span>◉</span>
+              Intelligence
+            </span>
+            <span>→</span>
+          <% end %>
+
+          <%= link_to relationships_path,
+                      class: "flex items-center justify-between rounded-xl border border-violet-200 bg-violet-50 px-4 py-3 text-xs font-bold text-violet-700 transition hover:bg-violet-100 dark:border-violet-800 dark:bg-violet-900/20 dark:text-violet-300" do %>
+            <span class="flex items-center gap-2">
+              <span>◎</span>
+              Ecosystem intelligence
+            </span>
+            <span>→</span>
+          <% end %>
+
+          <%= link_to research_workspaces_path,
+                      class: "flex items-center justify-between rounded-xl bg-orange-500 px-4 py-3 text-xs font-bold text-white transition hover:bg-orange-600" do %>
+            <span class="flex items-center gap-2">
+              <span>🧭</span>
+              Start investigation
+            </span>
+            <span>→</span>
           <% end %>
 
         </div>
-
-      </div>
-
-      <div class="entity-actions">
-
-        <%= link_to(
-              "History",
-              history_admin_ecosystems_load_sources_entity_path(@entity)
-            ) %>
-
-        <%# existing actions remain here %>
-
       </div>
 
       <%# TIMELINE %>
@@ -1521,7 +1507,6 @@ Administrative detail view for an Entity.
                 </div>
 
               </div>
-
             </div>
 
           <% end %>
@@ -1545,7 +1530,6 @@ Administrative detail view for an Entity.
                 </div>
 
               </div>
-
             </div>
 
           <% end %>
@@ -1567,13 +1551,11 @@ Administrative detail view for an Entity.
                 </div>
 
               </div>
-
             </div>
 
           <% end %>
 
         </div>
-
       </div>
 
       <%# SYSTEM STATUS %>
@@ -1598,18 +1580,15 @@ Administrative detail view for an Entity.
             </p>
 
           </div>
-
         </div>
-
       </div>
 
     </div>
-
   </div>
 
-  <%# =========================================================================
+  <%# ==========================================================================
   FOOTER
-  ========================================================================= %>
+  ========================================================================== %>
 
   <div class="mt-8 flex flex-col gap-3 border-t border-gray-100 pt-5 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800">
 
@@ -1624,52 +1603,56 @@ Administrative detail view for an Entity.
       Entity record operational
 
     </div>
-
   </div>
 
 </div>
 
-
-<%= link_to(
-      "INTELLIGENCE",
-      intelligence_admin_ecosystems_load_sources_entity_path(@entity),
-      class: "inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-indigo-500/20 transition hover:bg-indigo-500"
-    ) %>
-
+<%# ============================================================================
+ENTITY INTELLIGENCE
+============================================================================ %>
 
 <%= render(
       "entity_intelligence",
       entity: @entity
     ) %>
 
-<%=
-  render(
-    "admin/ecosystems/load_sources/entities/relationship_intelligence",
-    entity: @entity,
-    intelligence:
-      Ecosystems::LoadSources::Entity::
-          RelationshipIntelligence
-        .new(@entity)
-        .call
-  )
-%>
+<%# ============================================================================
+RELATIONSHIP INTELLIGENCE
+============================================================================ %>
 
-<%= link_to(
-      "ECOSYSTEM INTELLIGENCE",
-      admin_ecosystems_load_sources_entity_relationships_path(@entity),
-      class: "inline-flex items-center gap-2 rounded-xl border border-violet-200 bg-violet-50 px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-violet-600 transition hover:bg-violet-100 dark:border-violet-900 dark:bg-violet-950/30 dark:text-violet-400"
+<%= render(
+      "admin/ecosystems/load_sources/entities/relationship_intelligence",
+      entity: @entity,
+      intelligence:
+        Ecosystems::LoadSources::Entity::
+            RelationshipIntelligence
+          .new(@entity)
+          .call
     ) %>
 
+<%# ============================================================================
+RELATIONSHIP SUMMARY
+============================================================================ %>
 
 <%= render(
       "relationship_summary",
       entity: @entity
     ) %>
+
+<%= render "snapshot_history",
+           workspace: @workspace,
+           snapshots: @latest_snapshots %>
+
+
+
+<%= link_to "Research Portfolio",
+            admin_research_portfolio_path,
+            class: "nav-link" %>
+
 <%# ============================================================================
 CLIENT-SIDE FIELD SEARCH / FILTER / PAGINATION
 
-This intentionally operates only on the already-rendered template fields.
-No existing server-side functionality is removed.
+This operates only on already-rendered template fields.
 ============================================================================ %>
 
 <% if template_fields.present? %>
@@ -1714,7 +1697,6 @@ No existing server-side functionality is removed.
               if (!rows.length) return;
 
               const pageSize = 10;
-
               let currentPage = 1;
               let filteredRows = rows.slice();
 
@@ -1753,7 +1735,11 @@ No existing server-side functionality is removed.
                       !valueState ||
                       normalize(row.dataset.fieldValueState) === valueState;
 
-                  return searchMatches && typeMatches && valueMatches;
+                  return (
+                      searchMatches &&
+                      typeMatches &&
+                      valueMatches
+                  );
               };
 
               const createPageButton = (page) => {
@@ -1802,7 +1788,11 @@ No existing server-side functionality is removed.
                   const pages = [];
 
                   if (totalPages <= 7) {
-                      for (let page = 1; page <= totalPages; page += 1) {
+                      for (
+                          let page = 1;
+                          page <= totalPages;
+                          page += 1
+                      ) {
                           pages.push(page);
                       }
                   } else {
@@ -1826,7 +1816,11 @@ No existing server-side functionality is removed.
                       const end =
                           Math.min(totalPages - 1, currentPage + 1);
 
-                      for (let page = start; page <= end; page += 1) {
+                      for (
+                          let page = start;
+                          page <= end;
+                          page += 1
+                      ) {
                           pages.push(page);
                       }
 
@@ -1870,7 +1864,10 @@ No existing server-side functionality is removed.
                       filteredRows.length;
 
                   const totalPages =
-                      Math.max(1, Math.ceil(total / pageSize));
+                      Math.max(
+                          1,
+                          Math.ceil(total / pageSize)
+                      );
 
                   if (currentPage > totalPages) {
                       currentPage = totalPages;
@@ -1924,40 +1921,57 @@ No existing server-side functionality is removed.
                   renderPagination(totalPages);
               };
 
-              searchInput?.addEventListener("input", () => {
-                  currentPage = 1;
-                  render();
-              });
-
-              typeFilter?.addEventListener("change", () => {
-                  currentPage = 1;
-                  render();
-              });
-
-              valueFilter?.addEventListener("change", () => {
-                  currentPage = 1;
-                  render();
-              });
-
-              previousButton?.addEventListener("click", () => {
-                  if (currentPage > 1) {
-                      currentPage -= 1;
+              searchInput?.addEventListener(
+                  "input",
+                  () => {
+                      currentPage = 1;
                       render();
                   }
-              });
+              );
 
-              nextButton?.addEventListener("click", () => {
-                  const totalPages =
-                      Math.max(
-                          1,
-                          Math.ceil(filteredRows.length / pageSize)
-                      );
-
-                  if (currentPage < totalPages) {
-                      currentPage += 1;
+              typeFilter?.addEventListener(
+                  "change",
+                  () => {
+                      currentPage = 1;
                       render();
                   }
-              });
+              );
+
+              valueFilter?.addEventListener(
+                  "change",
+                  () => {
+                      currentPage = 1;
+                      render();
+                  }
+              );
+
+              previousButton?.addEventListener(
+                  "click",
+                  () => {
+                      if (currentPage > 1) {
+                          currentPage -= 1;
+                          render();
+                      }
+                  }
+              );
+
+              nextButton?.addEventListener(
+                  "click",
+                  () => {
+                      const totalPages =
+                          Math.max(
+                              1,
+                              Math.ceil(
+                                  filteredRows.length / pageSize
+                              )
+                          );
+
+                      if (currentPage < totalPages) {
+                          currentPage += 1;
+                          render();
+                      }
+                  }
+              );
 
               render();
           };
@@ -1974,4 +1988,3 @@ No existing server-side functionality is removed.
   </script>
 
 <% end %>
-

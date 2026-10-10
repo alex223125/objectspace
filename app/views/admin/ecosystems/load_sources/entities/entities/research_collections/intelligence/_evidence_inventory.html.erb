@@ -1,0 +1,54 @@
+<div class="card h-100">
+  <div class="card-header">
+    <strong>Evidence inventory</strong>
+  </div>
+
+  <div class="card-body">
+
+    <div class="row text-center mb-3">
+
+      <div class="col-4">
+        <div class="fs-3 fw-bold">
+          <%= @evidence_inventory[:total_workspaces] %>
+        </div>
+        <div class="small text-muted">
+          Workspaces
+        </div>
+      </div>
+
+      <div class="col-4">
+        <div class="fs-3 fw-bold">
+          <%= @evidence_inventory[:total_evidence] %>
+        </div>
+        <div class="small text-muted">
+          Evidence
+        </div>
+      </div>
+
+      <div class="col-4">
+        <div class="fs-3 fw-bold">
+          <%= @evidence_inventory[:workspaces_with_evidence] %>
+        </div>
+        <div class="small text-muted">
+          Covered
+        </div>
+      </div>
+
+    </div>
+
+    <% @evidence_inventory[:records].each do |record| %>
+      <div class="border-bottom py-2">
+        <div class="d-flex justify-content-between">
+          <span>
+            <%= record[:workspace_name] %>
+          </span>
+
+          <strong>
+            <%= record[:evidence_count] %>
+          </strong>
+        </div>
+      </div>
+    <% end %>
+
+  </div>
+</div>

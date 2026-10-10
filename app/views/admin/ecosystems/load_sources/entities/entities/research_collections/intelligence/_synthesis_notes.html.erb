@@ -1,0 +1,58 @@
+<div class="card h-100">
+  <div class="card-header">
+    <strong>Synthesis</strong>
+  </div>
+
+  <div class="card-body">
+    <%= form_with model: [
+      :admin,
+      @collection,
+      ResearchCollectionSynthesisNote.new
+    ],
+                  local: true do |form| %>
+
+      <div class="mb-2">
+        <%= form.text_field :title,
+                            class: "form-control",
+                            placeholder: "Note title..." %>
+      </div>
+
+      <div class="mb-2">
+        <%= form.text_area :content,
+                           rows: 4,
+                           class: "form-control",
+                           placeholder: "Synthesis..." %>
+      </div>
+
+      <div class="mb-2">
+        <%= form.select :note_type,
+                        ResearchCollectionSynthesisNote::NOTE_TYPES.map {
+                          |value| [value.humanize, value]
+                        },
+                        {},
+                        class: "form-select" %>
+      </div>
+
+      <%= form.submit "Add note",
+                      class: "btn btn-sm btn-primary" %>
+    <% end %>
+
+    <hr>
+
+    <% @collection.synthesis_notes.ordered.each do |note| %>
+      <div class="border-bottom py-2">
+        <div class="d-flex justify-content-between">
+          <strong><%= note.title %></strong>
+
+          <span class="badge bg-secondary">
+            <%= note.note_type %>
+          </span>
+        </div>
+
+        <p class="mt-2 mb-0">
+          <%= note.content %>
+        </p>
+      </div>
+    <% end %>
+  </div>
+</div>

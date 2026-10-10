@@ -1,0 +1,123 @@
+
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1>Research Portfolio</h1>
+      <p class="text-muted mb-0">
+        Collection-level research status and unresolved work.
+      </p>
+    </div>
+
+    <%= link_to "All collections",
+                admin_research_collections_path,
+                class: "btn btn-outline-secondary" %>
+  </div>
+
+  <%= form_with url: admin_research_portfolio_path,
+                method: :get, local: true,
+                class: "row g-2 mb-4" do |form| %>
+    <div class="col-md-6">
+      <%= form.search_field :q,
+                            value: params[:q],
+                            class: "form-control",
+                            placeholder: "Search collection names..." %>
+    </div>
+
+    <div class="col-md-3">
+      <%= form.submit "Filter portfolio",
+                      class: "btn btn-primary" %>
+    </div>
+  <% end %>
+
+  <div class="row g-3 mb-4">
+    <% [
+         ["Collections", :total_collections],
+         ["Research questions", :total_questions],
+         ["Unresolved questions", :unresolved_questions],
+         ["Active objectives", :active_objectives],
+         ["Incomplete milestones", :incomplete_milestones],
+         ["Active findings", :active_findings],
+         ["High-confidence findings", :high_confidence_findings],
+         ["Recorded contradictions", :contradictions],
+         ["Saved checkpoints", :snapshots]
+       ].each do |label, key| %>
+      <div class="col-sm-6 col-xl-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <div class="small text-muted"><%= label %></div>
+            <div class="fs-2 fw-bold">
+              <%= @portfolio[key] %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="card">
+    <div class="card-header d-flex justify-content-between">
+      <strong>Collections requiring attention</strong>
+      <span class="badge bg-secondary">
+        <%= @collections.count %>
+      </span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+        <tr>
+          <th>Collection</th>
+          <th>Status</th>
+          <th>Priority</th>
+          <th>Open questions</th>
+          <th>Objectives</th>
+          <th>Last updated</th>
+          <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <% @collections.each do |collection| %>
+          <tr>
+            <td>
+              <strong><%= collection.name %></strong>
+              <% if collection.research_question.present? %>
+                <div class="small text-muted">
+                  <%= truncate(collection.research_question, length: 100) %>
+                </div>
+              <% end %>
+            </td>
+            <td><%= collection.try(:status).presence || "—" %></td>
+            <td><%= collection.try(:priority) || 0 %></td>
+            <td>
+              <%= collection.questions.open_questions.count %>
+            </td>
+            <td>
+              <%= collection.objectives.active.count %>
+            </td>
+            <td>
+              <%= l(collection.updated_at, format: :short) %>
+            </td>
+            <td class="text-nowrap">
+              <%= link_to "Intelligence",
+                          admin_research_collection_intelligence_path(collection),
+                          class: "btn btn-sm btn-outline-primary" %>
+
+              <%= link_to "Checkpoints",
+                          admin_research_collection_snapshots_path(collection),
+                          class: "btn btn-sm btn-outline-secondary" %>
+            </td>
+          </tr>
+        <% end %>
+
+        <% if @collections.empty? %>
+          <tr>
+            <td colspan="7" class="text-center text-muted py-4">
+              No collections match your search.
+            </td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

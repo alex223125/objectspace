@@ -1,0 +1,47 @@
+<div class="card">
+  <div class="card-body p-0">
+
+    <table class="table mb-0">
+      <thead>
+      <tr>
+        <th>Metric</th>
+        <th><%= @left.name %></th>
+        <th><%= @right.name %></th>
+        <th>Delta</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <% {
+           "Questions" => @comparison[:questions],
+           "Objectives" => @comparison[:objectives],
+           "Milestones" => @comparison[:milestones],
+           "Findings" => @comparison[:findings],
+           "Evidence" => @comparison[:evidence],
+           "Relationships" => @comparison[:relationships]
+         }.each do |label, values| %>
+
+        <tr>
+          <td>
+            <strong><%= label %></strong>
+          </td>
+
+          <td>
+            <%= values[:left] %>
+          </td>
+
+          <td>
+            <%= values[:right] %>
+          </td>
+
+          <td>
+            <%= values[:delta] > 0 ? "+" : "" %><%= values[:delta] %>
+          </td>
+        </tr>
+
+      <% end %>
+      </tbody>
+    </table>
+
+  </div>
+</div>

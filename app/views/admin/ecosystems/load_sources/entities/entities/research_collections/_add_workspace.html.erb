@@ -1,0 +1,60 @@
+<div class="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
+  <div class="text-xs font-bold uppercase tracking-[0.2em] text-orange-400">
+    Add investigation
+  </div>
+
+  <h2 class="mt-2 font-black text-white">
+    Add saved investigation
+  </h2>
+
+  <% if workspaces.any? %>
+    <%= form_with url: admin_research_collection_memberships_path(collection),
+                  method: :post,
+                  class: "mt-5 space-y-4" do |form| %>
+
+      <div>
+        <label class="text-xs font-bold uppercase tracking-wider text-slate-500">
+          Investigation
+        </label>
+
+        <%= select_tag :research_workspace_id,
+                       options_from_collection_for_select(
+                         workspaces,
+                         :id,
+                         :title
+                       ),
+                       class: "mt-2 w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white" %>
+      </div>
+
+      <div>
+        <label class="text-xs font-bold uppercase tracking-wider text-slate-500">
+          Note
+        </label>
+
+        <%= text_area_tag :note,
+                          nil,
+                          rows: 3,
+                          placeholder: "Why does this investigation belong here?",
+                          class: "mt-2 w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white" %>
+      </div>
+
+      <label class="flex items-center gap-3">
+        <%= check_box_tag :pinned,
+                          "1",
+                          false,
+                          class: "h-4 w-4 rounded border-white/20 bg-slate-950 text-orange-500" %>
+
+        <span class="text-xs font-bold text-slate-400">
+          Pin this investigation
+        </span>
+      </label>
+
+      <%= form.submit "Add investigation",
+                      class: "w-full rounded-xl bg-orange-500 px-4 py-3 text-xs font-black text-white hover:bg-orange-400" %>
+    <% end %>
+  <% else %>
+    <div class="mt-5 rounded-2xl bg-black/10 p-4 text-sm text-slate-500">
+      All available investigations are already in this collection.
+    </div>
+  <% end %>
+</div>

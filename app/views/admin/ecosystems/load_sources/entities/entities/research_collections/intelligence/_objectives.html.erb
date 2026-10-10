@@ -1,0 +1,67 @@
+<div class="card h-100">
+  <div class="card-header">
+    <strong>Objectives</strong>
+  </div>
+
+  <div class="card-body">
+    <%= form_with model: [
+      :admin,
+      @collection,
+      ResearchCollectionObjective.new
+    ],
+                  local: true do |form| %>
+
+      <div class="mb-2">
+        <%= form.text_field :title,
+                            class: "form-control",
+                            placeholder: "Objective title..." %>
+      </div>
+
+      <div class="mb-2">
+        <%= form.text_area :description,
+                           rows: 2,
+                           class: "form-control",
+                           placeholder: "Description..." %>
+      </div>
+
+      <%= form.submit "Add objective",
+                      class: "btn btn-sm btn-primary" %>
+    <% end %>
+
+    <hr>
+
+    <% @collection.objectives.ordered.each do |objective| %>
+      <div class="mb-3">
+        <div class="d-flex justify-content-between">
+          <strong><%= objective.title %></strong>
+
+          <span>
+            <%= objective.progress %>%
+          </span>
+        </div>
+
+        <div class="progress mt-2">
+          <div class="progress-bar"
+               style="width: <%= objective.progress %>%">
+          </div>
+        </div>
+
+        <% if objective.description.present? %>
+          <div class="small text-muted mt-1">
+            <%= objective.description %>
+          </div>
+        <% end %>
+
+        <% unless objective.status == "completed" %>
+          <%= button_to "Complete",
+                        complete_admin_research_collection_objective_path(
+                          @collection,
+                          objective
+                        ),
+                        method: :patch,
+                        class: "btn btn-sm btn-outline-success mt-2" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

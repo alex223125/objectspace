@@ -1,0 +1,97 @@
+<article class="<%= collection_color_classes(collection.color) %> rounded-3xl border p-6">
+
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="<%= collection_status_color(collection.status) %> text-xs">
+          <%= collection_status_icon(collection.status) %>
+        </span>
+
+        <span class="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">
+          <%= collection.lifecycle_label %>
+        </span>
+      </div>
+
+      <h2 class="mt-3 text-xl font-black text-white">
+        <%= collection.title %>
+      </h2>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <% if collection.pinned? %>
+        <span class="text-orange-300" title="Pinned">
+          ★
+        </span>
+      <% end %>
+
+      <%= link_to "Open",
+                  admin_research_collection_path(collection),
+                  class: "rounded-lg bg-white/5 px-3 py-2 text-[11px] font-bold text-slate-400 hover:bg-white/10 hover:text-white" %>
+    </div>
+  </div>
+
+  <% if collection.description.present? %>
+    <p class="mt-4 line-clamp-3 text-sm leading-6 text-slate-500">
+      <%= collection.description %>
+    </p>
+  <% end %>
+
+  <div class="mt-6">
+    <div class="mb-2 flex items-center justify-between">
+      <span class="text-[10px] font-black uppercase tracking-[0.16em] text-slate-600">
+        Progress
+      </span>
+
+      <span class="<%= collection_progress_text_color(collection.completion_percentage) %> text-xs font-black">
+        <%= collection.completion_percentage %>%
+      </span>
+    </div>
+
+    <div class="h-2 overflow-hidden rounded-full bg-white/5">
+      <div class="<%= collection_progress_color(collection.completion_percentage) %> h-full rounded-full"
+           style="width: <%= collection.completion_percentage %>%"></div>
+    </div>
+  </div>
+
+  <div class="mt-6 grid grid-cols-3 gap-2">
+    <div class="rounded-xl bg-black/10 p-3">
+      <div class="text-lg font-black text-white">
+        <%= collection.investigations_count %>
+      </div>
+
+      <div class="text-[9px] font-bold uppercase tracking-wider text-slate-600">
+        Total
+      </div>
+    </div>
+
+    <div class="rounded-xl bg-black/10 p-3">
+      <div class="text-lg font-black text-sky-300">
+        <%= collection.active_investigations_count %>
+      </div>
+
+      <div class="text-[9px] font-bold uppercase tracking-wider text-slate-600">
+        Active
+      </div>
+    </div>
+
+    <div class="rounded-xl bg-black/10 p-3">
+      <div class="text-lg font-black text-emerald-300">
+        <%= collection.completed_investigations_count %>
+      </div>
+
+      <div class="text-[9px] font-bold uppercase tracking-wider text-slate-600">
+        Done
+      </div>
+    </div>
+  </div>
+
+  <% if collection.tags.any? %>
+    <div class="mt-5 flex flex-wrap gap-2">
+      <% collection.tags.each do |tag| %>
+        <span class="rounded-full bg-white/5 px-2.5 py-1 text-[10px] font-bold text-slate-400">
+          #<%= tag.name %>
+        </span>
+      <% end %>
+    </div>
+  <% end %>
+</article>

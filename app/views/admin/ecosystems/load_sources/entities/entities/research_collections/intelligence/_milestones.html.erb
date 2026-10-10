@@ -1,0 +1,59 @@
+<div class="card h-100">
+  <div class="card-header">
+    <strong>Milestones</strong>
+  </div>
+
+  <div class="card-body">
+    <%= form_with model: [
+      :admin,
+      @collection,
+      ResearchCollectionMilestone.new
+    ],
+                  local: true do |form| %>
+
+      <div class="mb-2">
+        <%= form.text_field :title,
+                            class: "form-control",
+                            placeholder: "Milestone..." %>
+      </div>
+
+      <div class="mb-2">
+        <%= form.date_field :target_date,
+                            class: "form-control" %>
+      </div>
+
+      <%= form.submit "Add milestone",
+                      class: "btn btn-sm btn-primary" %>
+    <% end %>
+
+    <hr>
+
+    <% @collection.milestones.ordered.each do |milestone| %>
+      <div class="border-bottom py-2">
+        <strong><%= milestone.title %></strong>
+
+        <% if milestone.target_date.present? %>
+          <div class="small text-muted">
+            Target: <%= milestone.target_date %>
+          </div>
+        <% end %>
+
+        <div class="mt-2">
+          <span class="badge bg-secondary">
+            <%= milestone.status %>
+          </span>
+        </div>
+
+        <% unless milestone.status == "completed" %>
+          <%= button_to "Complete",
+                        complete_admin_research_collection_milestone_path(
+                          @collection,
+                          milestone
+                        ),
+                        method: :patch,
+                        class: "btn btn-sm btn-outline-success mt-2" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

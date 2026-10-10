@@ -1,0 +1,11 @@
+<div class="mt-8 grid gap-6 lg:grid-cols-2">
+
+  <%= render "admin/research_workspaces/annotation_form",
+             workspace: item.research_workspace,
+             item: item %>
+
+  <%= render "admin/research_workspaces/evidence_form",
+             workspace: item.research_workspace,
+             item: item %>
+
+</div>

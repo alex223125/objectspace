@@ -1,0 +1,152 @@
+<div class="rounded-2xl border border-white/10 bg-black/20 p-5">
+
+  <div class="mb-4">
+    <h4 class="font-bold text-white">
+      Add evidence
+    </h4>
+
+    <p class="mt-1 text-xs leading-5 text-slate-500">
+      Attach a source, paper, report, dataset, observation,
+      or other provenance record.
+    </p>
+  </div>
+
+  <%= form_with model: ResearchEvidence.new,
+                url: admin_research_workspace_item_evidences_path(
+                  workspace,
+                  item
+                ),
+                local: true do |form| %>
+
+    <div class="space-y-4">
+
+      <div>
+        <%= form.label :evidence_type,
+                       "Evidence type",
+                       class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+        <%= form.select :evidence_type,
+                        [
+                          ["Source", "source"],
+                          ["Article", "article"],
+                          ["Paper", "paper"],
+                          ["Report", "report"],
+                          ["Dataset", "dataset"],
+                          ["Interview", "interview"],
+                          ["Documentation", "documentation"],
+                          ["Observation", "observation"],
+                          ["Internal note", "internal_note"]
+                        ],
+                        {},
+                        class: "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white" %>
+      </div>
+
+      <div>
+        <%= form.label :title,
+                       class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+        <%= form.text_field :title,
+                            placeholder: "Evidence title",
+                            class: "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-700" %>
+      </div>
+
+      <div>
+        <%= form.label :source_name,
+                       "Source",
+                       class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+        <%= form.text_field :source_name,
+                            placeholder: "Publisher, organization, researcher...",
+                            class: "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-700" %>
+      </div>
+
+      <div>
+        <%= form.label :source_url,
+                       "Source URL",
+                       class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+        <%= form.url_field :source_url,
+                           placeholder: "https://...",
+                           class: "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-700" %>
+      </div>
+
+      <% if item.research_annotations.active.any? %>
+        <div>
+          <%= form.label :research_annotation_id,
+                         "Attach to annotation",
+                         class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+          <%= form.collection_select :research_annotation_id,
+                                     item.research_annotations.active.recent,
+                                     :id,
+                                     :title,
+                                     { include_blank: "Evidence for item generally" },
+                                     class: "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white" %>
+        </div>
+      <% end %>
+
+      <div>
+        <%= form.label :excerpt,
+                       "Excerpt",
+                       class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+        <%= form.text_area :excerpt,
+                           rows: 4,
+                           placeholder: "Relevant passage or supporting observation...",
+                           class: "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-700" %>
+      </div>
+
+      <div class="grid gap-4 md:grid-cols-2">
+
+        <div>
+          <%= form.label :published_on,
+                         "Published",
+                         class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+          <%= form.date_field :published_on,
+                              class: "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white" %>
+        </div>
+
+        <div>
+          <%= form.label :accessed_on,
+                         "Accessed",
+                         class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+          <%= form.date_field :accessed_on,
+                              value: Date.current,
+                              class: "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white" %>
+        </div>
+
+      </div>
+
+      <div>
+        <%= form.label :confidence,
+                       "Evidence confidence",
+                       class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+        <%= form.range_field :confidence,
+                             min: 0,
+                             max: 100,
+                             value: 80,
+                             class: "w-full accent-emerald-400" %>
+      </div>
+
+      <div>
+        <%= form.label :notes,
+                       "Research notes",
+                       class: "mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+        <%= form.text_area :notes,
+                           rows: 3,
+                           placeholder: "Why does this evidence matter?",
+                           class: "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-700" %>
+      </div>
+
+      <%= form.submit "Add evidence",
+                      class: "w-full rounded-xl bg-emerald-500 px-4 py-3 text-sm font-bold text-white transition hover:bg-emerald-400" %>
+
+    </div>
+
+  <% end %>
+
+</div>

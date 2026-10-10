@@ -1,0 +1,130 @@
+<div class="mx-auto max-w-7xl px-6 py-10">
+  <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <div class="text-xs font-bold uppercase tracking-[0.2em] text-orange-400">
+        Research workspace
+      </div>
+
+      <h1 class="mt-2 text-3xl font-black text-white">
+        Saved investigations
+      </h1>
+
+      <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+        Resume ongoing investigations, review completed research,
+        and return to saved research records.
+      </p>
+    </div>
+  </div>
+
+  <div class="mt-8 grid gap-3 sm:grid-cols-3">
+    <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+      <div class="text-xs font-bold uppercase tracking-wider text-slate-600">
+        Active
+      </div>
+
+      <div class="mt-2 text-3xl font-black text-orange-300">
+        <%= @active_workspaces.size %>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+      <div class="text-xs font-bold uppercase tracking-wider text-slate-600">
+        Completed
+      </div>
+
+      <div class="mt-2 text-3xl font-black text-emerald-300">
+        <%= @completed_workspaces.size %>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+      <div class="text-xs font-bold uppercase tracking-wider text-slate-600">
+        Archived
+      </div>
+
+      <div class="mt-2 text-3xl font-black text-slate-400">
+        <%= @archived_workspaces.size %>
+      </div>
+    </div>
+  </div>
+
+  <% if @active_workspaces.any? %>
+    <section class="mt-10">
+      <div class="mb-4">
+        <div class="text-xs font-bold uppercase tracking-[0.2em] text-orange-400">
+          Continue working
+        </div>
+
+        <h2 class="mt-1 text-xl font-black text-white">
+          Active investigations
+        </h2>
+      </div>
+
+      <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <% @active_workspaces.each do |workspace| %>
+          <%= render "investigation_card",
+                     workspace: workspace %>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <% if @completed_workspaces.any? %>
+    <section class="mt-12">
+      <div class="mb-4">
+        <div class="text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">
+          Finished research
+        </div>
+
+        <h2 class="mt-1 text-xl font-black text-white">
+          Completed investigations
+        </h2>
+      </div>
+
+      <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <% @completed_workspaces.each do |workspace| %>
+          <%= render "investigation_card",
+                     workspace: workspace %>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <% if @archived_workspaces.any? %>
+    <section class="mt-12">
+      <div class="mb-4">
+        <div class="text-xs font-bold uppercase tracking-[0.2em] text-slate-600">
+          Archived
+        </div>
+
+        <h2 class="mt-1 text-xl font-black text-white">
+          Archived investigations
+        </h2>
+      </div>
+
+      <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <% @archived_workspaces.each do |workspace| %>
+          <%= render "investigation_card",
+                     workspace: workspace %>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <% if @workspaces.empty? %>
+    <div class="mt-10 rounded-3xl border border-dashed border-white/10 bg-white/[0.02] p-10 text-center">
+      <div class="text-4xl">
+        🔬
+      </div>
+
+      <h2 class="mt-4 text-xl font-black text-white">
+        No saved investigations yet
+      </h2>
+
+      <p class="mx-auto mt-2 max-w-lg text-sm leading-6 text-slate-600">
+        Start an investigation from an entity or another supported research
+        entry point to create your first saved investigation.
+      </p>
+    </div>
+  <% end %>
+</div>

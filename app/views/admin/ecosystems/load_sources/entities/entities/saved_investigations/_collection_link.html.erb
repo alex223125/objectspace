@@ -1,0 +1,27 @@
+<div class="mb-6 rounded-3xl border border-white/10 bg-white/[0.03] p-5">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <div class="text-xs font-black uppercase tracking-[0.18em] text-orange-400">
+        Research portfolios
+      </div>
+
+      <h2 class="mt-2 font-black text-white">
+        Organize investigations into collections
+      </h2>
+
+      <p class="mt-1 text-sm text-slate-500">
+        Group related saved investigations, track progress, and connect shared evidence.
+      </p>
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+      <%= link_to "Collections",
+                  admin_research_collections_path,
+                  class: "rounded-xl bg-white/5 px-4 py-2.5 text-xs font-bold text-slate-400 hover:bg-white/10 hover:text-white" %>
+
+      <%= link_to "New collection",
+                  new_admin_research_collection_path,
+                  class: "rounded-xl bg-orange-500/10 px-4 py-2.5 text-xs font-bold text-orange-300 hover:bg-orange-500/20" %>
+    </div>
+  </div>
+</div>

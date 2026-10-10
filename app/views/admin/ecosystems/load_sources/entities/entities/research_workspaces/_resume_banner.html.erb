@@ -1,0 +1,41 @@
+<% latest = @active_workspaces.first %>
+
+<% if latest.present? %>
+  <div class="rounded-3xl border border-orange-500/10 bg-orange-500/[0.03] p-6">
+    <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+      <div class="min-w-0">
+        <div class="text-xs font-bold uppercase tracking-[0.2em] text-orange-400">
+          Continue research
+        </div>
+
+        <h2 class="mt-2 truncate text-xl font-black text-white">
+          <%= latest.title %>
+        </h2>
+
+        <div class="mt-2 flex flex-wrap gap-3 text-xs text-slate-600">
+          <span>
+            <%= latest.progress %>% complete
+          </span>
+
+          <span>
+            <%= latest.annotation_count %> annotations
+          </span>
+
+          <span>
+            <%= latest.evidence_count %> evidence
+          </span>
+
+          <% if latest.last_opened_at.present? %>
+            <span>
+              Last opened <%= time_ago_in_words(latest.last_opened_at) %> ago
+            </span>
+          <% end %>
+        </div>
+      </div>
+
+      <%= link_to "Resume investigation",
+                  admin_research_workspace_path(latest),
+                  class: "shrink-0 rounded-xl bg-orange-500 px-5 py-3 text-xs font-bold text-white hover:bg-orange-400" %>
+    </div>
+  </div>
+<% end %>

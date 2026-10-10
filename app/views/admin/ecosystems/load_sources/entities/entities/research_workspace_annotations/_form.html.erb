@@ -1,0 +1,177 @@
+<%= form_with model: @evidence,
+              url: @evidence.persisted? ?
+                     admin_research_workspace_item_evidence_path(
+                       @workspace,
+                       @item,
+                       @evidence
+                     ) :
+                     admin_research_workspace_item_evidences_path(
+                       @workspace,
+                       @item
+                     ),
+              method: @evidence.persisted? ? :patch : :post,
+              class: "space-y-5" do |form| %>
+
+  <% if @evidence.errors.any? %>
+    <div class="rounded-2xl border border-rose-500/20 bg-rose-500/10 p-4">
+      <div class="font-bold text-rose-300">
+        Please correct the following:
+      </div>
+
+      <ul class="mt-2 space-y-1 text-sm text-rose-200">
+        <% @evidence.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :title,
+                   "Evidence title",
+                   class: "text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+    <%= form.text_field :title,
+                        required: true,
+                        class: "mt-2 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white placeholder:text-slate-600",
+                        placeholder: "What does this evidence establish?" %>
+  </div>
+
+  <div class="grid gap-4 sm:grid-cols-2">
+
+    <div>
+      <%= form.label :source_type,
+                     class: "text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+      <%= form.select :source_type,
+                      [
+                        ["Web source", "web"],
+                        ["Paper", "paper"],
+                        ["Book", "book"],
+                        ["Report", "report"],
+                        ["Dataset", "dataset"],
+                        ["Interview", "interview"],
+                        ["Document", "document"],
+                        ["Internal", "internal"],
+                        ["Other", "other"]
+                      ],
+                      {},
+                      class: "mt-2 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white" %>
+    </div>
+
+    <div>
+      <%= form.label :confidence,
+                     "Confidence",
+                     class: "text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+      <%= form.number_field :confidence,
+                            min: 0,
+                            max: 100,
+                            class: "mt-2 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white" %>
+    </div>
+
+  </div>
+
+  <div>
+    <%= form.label :source_url,
+                   "Source URL",
+                   class: "text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+    <%= form.url_field :source_url,
+                       class: "mt-2 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white placeholder:text-slate-600",
+                       placeholder: "https://..." %>
+  </div>
+
+  <div class="grid gap-4 sm:grid-cols-2">
+
+    <div>
+      <%= form.label :publisher,
+                     class: "text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+      <%= form.text_field :publisher,
+                          class: "mt-2 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white" %>
+    </div>
+
+    <div>
+      <%= form.label :author,
+                     class: "text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+      <%= form.text_field :author,
+                          class: "mt-2 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white" %>
+    </div>
+
+  </div>
+
+  <div class="grid gap-4 sm:grid-cols-2">
+
+    <div>
+      <%= form.label :published_on,
+                     "Published",
+                     class: "text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+      <%= form.date_field :published_on,
+                          class: "mt-2 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white" %>
+    </div>
+
+    <div>
+      <%= form.label :accessed_on,
+                     "Accessed",
+                     class: "text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+      <%= form.date_field :accessed_on,
+                          class: "mt-2 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white" %>
+    </div>
+
+  </div>
+
+  <div>
+    <%= form.label :excerpt,
+                   "Excerpt",
+                   class: "text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+    <%= form.text_area :excerpt,
+                       rows: 5,
+                       class: "mt-2 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm leading-6 text-white placeholder:text-slate-600",
+                       placeholder: "Important quote or extracted passage..." %>
+  </div>
+
+  <div>
+    <%= form.label :notes,
+                   "Research notes",
+                   class: "text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+    <%= form.text_area :notes,
+                       rows: 4,
+                       class: "mt-2 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm leading-6 text-white placeholder:text-slate-600",
+                       placeholder: "Why is this source relevant?" %>
+  </div>
+
+  <% if @item.annotations.exists? %>
+    <div>
+      <%= form.label :research_annotation_id,
+                     "Supports annotation",
+                     class: "text-xs font-bold uppercase tracking-wider text-slate-500" %>
+
+      <%= form.collection_select :research_annotation_id,
+                                 @item.annotations.ordered,
+                                 :id,
+                                 :title,
+                                 { include_blank: "No specific annotation" },
+                                 class: "mt-2 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white" %>
+    </div>
+  <% end %>
+
+  <div class="flex flex-wrap gap-3">
+
+    <%= form.submit(
+          @evidence.persisted? ? "Save evidence" : "Add evidence",
+          class: "rounded-2xl bg-orange-500 px-5 py-3 text-sm font-bold text-white transition hover:bg-orange-400"
+        ) %>
+
+    <%= link_to "Cancel",
+                admin_research_workspace_path(@workspace),
+                class: "rounded-2xl bg-white/5 px-5 py-3 text-sm font-bold text-slate-400 hover:bg-white/10 hover:text-white" %>
+
+  </div>
+
+<% end %>

@@ -1,0 +1,15 @@
+<nav class="nav nav-tabs mb-4">
+
+  <%= link_to "Overview",
+              admin_research_collection_path(@collection),
+              class: "nav-link" %>
+
+  <%= link_to "Intelligence",
+              admin_research_collection_intelligence_path(@collection),
+              class: "nav-link" %>
+
+  <%= link_to "Checkpoints",
+              admin_research_collection_snapshots_path(@collection),
+              class: "nav-link" %>
+
+</nav>

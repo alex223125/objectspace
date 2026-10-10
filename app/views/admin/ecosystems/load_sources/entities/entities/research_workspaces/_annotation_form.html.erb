@@ -1,0 +1,103 @@
+<div class="rounded-2xl border border-white/10 bg-black/10 p-5">
+
+  <div class="mb-5">
+    <div class="text-xs font-black uppercase tracking-widest text-slate-500">
+      Add expert annotation
+    </div>
+  </div>
+
+  <%= form_with url: add_annotation_admin_research_workspace_path(workspace),
+                method: :post,
+                local: true,
+                class: "space-y-4" do |form| %>
+
+    <%= hidden_field_tag :item_id, item.id %>
+
+    <div>
+
+      <%= label_tag "annotation_title",
+                    "Title",
+                    class: "text-xs font-bold text-slate-500" %>
+
+      <%= text_field_tag "annotation[title]",
+                         nil,
+                         required: true,
+                         placeholder: "What is the important observation?",
+                         class: "mt-2 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-700" %>
+
+    </div>
+
+    <div>
+
+      <%= label_tag "annotation_body",
+                    "Annotation",
+                    class: "text-xs font-bold text-slate-500" %>
+
+      <%= text_area_tag "annotation[body]",
+                        nil,
+                        required: true,
+                        rows: 4,
+                        placeholder: "Explain the observation, interpretation, hypothesis, or expert note...",
+                        class: "mt-2 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-700" %>
+
+    </div>
+
+    <div class="grid gap-4 md:grid-cols-3">
+
+      <div>
+
+        <%= label_tag "annotation_kind",
+                      "Type",
+                      class: "text-xs font-bold text-slate-500" %>
+
+        <%= select_tag "annotation[kind]",
+                       options_for_select([
+                                            ["Expert note", "expert_note"],
+                                            ["Interpretation", "interpretation"],
+                                            ["Hypothesis", "hypothesis"],
+                                            ["Warning", "warning"],
+                                            ["Conclusion", "conclusion"],
+                                            ["Reviewer note", "reviewer_note"]
+                                          ]),
+                       class: "mt-2 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-sm text-white" %>
+
+      </div>
+
+      <div>
+
+        <%= label_tag "annotation_confidence",
+                      "Confidence",
+                      class: "text-xs font-bold text-slate-500" %>
+
+        <%= number_field_tag "annotation[confidence]",
+                             50,
+                             min: 0,
+                             max: 100,
+                             class: "mt-2 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-sm text-white" %>
+
+      </div>
+
+      <div>
+
+        <%= label_tag "annotation_author_name",
+                      "Author",
+                      class: "text-xs font-bold text-slate-500" %>
+
+        <%= text_field_tag "annotation[author_name]",
+                           nil,
+                           class: "mt-2 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-sm text-white" %>
+
+      </div>
+
+    </div>
+
+    <div class="flex justify-end">
+
+      <%= submit_tag "Save annotation",
+                     class: "rounded-xl bg-orange-500 px-4 py-3 text-xs font-bold text-white" %>
+
+    </div>
+
+  <% end %>
+
+</div>

@@ -1,0 +1,23 @@
+<section class="research-collection-questions">
+  <h2>Research questions</h2>
+
+  <% questions.each do |question| %>
+    <article>
+      <strong>
+        <%= question.question %>
+      </strong>
+
+      <span>
+        <%= question.priority %>
+      </span>
+
+      <span>
+        <%= question.status %>
+      </span>
+    </article>
+  <% end %>
+
+  <% if questions.empty? %>
+    <p>No research questions have been added.</p>
+  <% end %>
+</section>

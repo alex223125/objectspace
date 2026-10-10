@@ -1,0 +1,21 @@
+<div class="rounded-3xl border border-orange-500/10 bg-orange-500/[0.03] p-5">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <div class="text-xs font-bold uppercase tracking-[0.2em] text-orange-400">
+        Research portfolios
+      </div>
+
+      <h2 class="mt-2 font-black text-white">
+        Organize saved investigations
+      </h2>
+
+      <p class="mt-1 text-sm text-slate-500">
+        Group investigations by research question, project, topic, or publication.
+      </p>
+    </div>
+
+    <%= link_to "Open collections",
+                admin_research_collections_path,
+                class: "rounded-xl bg-orange-500/10 px-4 py-2.5 text-xs font-black text-orange-300 hover:bg-orange-500/20" %>
+  </div>
+</div>

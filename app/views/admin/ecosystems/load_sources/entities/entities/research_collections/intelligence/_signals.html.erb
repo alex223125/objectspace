@@ -1,0 +1,54 @@
+<div class="card h-100">
+  <div class="card-header d-flex justify-content-between">
+    <strong>Workspace signals</strong>
+
+    <span class="badge bg-secondary">
+      <%= @signals.length %>
+    </span>
+  </div>
+
+  <div class="card-body">
+    <% if @signals.any? %>
+
+      <% @signals.each do |signal| %>
+        <div class="border-bottom py-3">
+
+          <div class="d-flex justify-content-between">
+            <strong>
+              <%= signal.title %>
+            </strong>
+
+            <span class="badge bg-info">
+              <%= signal.confidence %>
+            </span>
+          </div>
+
+          <div class="small text-muted mb-2">
+            <%= signal.signal_type %>
+          </div>
+
+          <p class="mb-1">
+            <%= signal.statement %>
+          </p>
+
+          <% if signal.research_workspace.present? %>
+            <div class="small text-muted">
+              Workspace:
+              <%= signal.research_workspace.try(:name) ||
+                    signal.research_workspace.try(:title) ||
+                    "##{signal.research_workspace.id}" %>
+            </div>
+          <% end %>
+
+        </div>
+      <% end %>
+
+    <% else %>
+
+      <p class="text-muted mb-0">
+        No workspace-derived signals yet.
+      </p>
+
+    <% end %>
+  </div>
+</div>

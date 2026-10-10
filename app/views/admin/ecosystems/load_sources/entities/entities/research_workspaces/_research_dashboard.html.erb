@@ -1,0 +1,67 @@
+<div class="grid gap-4 md:grid-cols-4">
+
+  <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+
+    <div class="text-xs font-bold uppercase tracking-wider text-slate-600">
+      Items
+    </div>
+
+    <div class="mt-2 text-3xl font-black text-white">
+      <%= workspace.items.count %>
+    </div>
+
+    <div class="mt-1 text-xs text-slate-600">
+      Investigation nodes
+    </div>
+
+  </div>
+
+  <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+
+    <div class="text-xs font-bold uppercase tracking-wider text-slate-600">
+      Annotations
+    </div>
+
+    <div class="mt-2 text-3xl font-black text-orange-300">
+      <%= workspace.annotation_count %>
+    </div>
+
+    <div class="mt-1 text-xs text-slate-600">
+      Expert observations
+    </div>
+
+  </div>
+
+  <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+
+    <div class="text-xs font-bold uppercase tracking-wider text-slate-600">
+      Evidence
+    </div>
+
+    <div class="mt-2 text-3xl font-black text-cyan-300">
+      <%= workspace.evidence_count %>
+    </div>
+
+    <div class="mt-1 text-xs text-slate-600">
+      Research records
+    </div>
+
+  </div>
+
+  <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+
+    <div class="text-xs font-bold uppercase tracking-wider text-slate-600">
+      Verified
+    </div>
+
+    <div class="mt-2 text-3xl font-black text-emerald-300">
+      <%= workspace.verified_evidence_count %>
+    </div>
+
+    <div class="mt-1 text-xs text-slate-600">
+      Verified sources
+    </div>
+
+  </div>
+
+</div>

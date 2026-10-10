@@ -1,0 +1,180 @@
+<div class="mx-auto max-w-5xl px-6 py-10">
+
+  <div class="flex flex-wrap items-center justify-between gap-4">
+
+    <%= link_to "← Evidence",
+                admin_research_workspace_evidences_path(@workspace),
+                class: "text-sm font-bold text-slate-500 hover:text-white" %>
+
+    <div class="flex gap-2">
+
+      <%= link_to "Edit",
+                  edit_admin_research_workspace_evidence_path(
+                    @workspace,
+                    @evidence
+                  ),
+                  class: "rounded-xl bg-white/5 px-4 py-2 text-xs font-bold text-slate-300" %>
+
+      <% if @evidence.verified? %>
+
+        <%= button_to "Mark unverified",
+                      unverify_admin_research_workspace_evidence_path(
+                        @workspace,
+                        @evidence
+                      ),
+                      method: :patch,
+                      class: "rounded-xl bg-amber-500/10 px-4 py-2 text-xs font-bold text-amber-300" %>
+
+      <% else %>
+
+        <%= button_to "Verify evidence",
+                      verify_admin_research_workspace_evidence_path(
+                        @workspace,
+                        @evidence
+                      ),
+                      method: :patch,
+                      class: "rounded-xl bg-emerald-500/10 px-4 py-2 text-xs font-bold text-emerald-300" %>
+
+      <% end %>
+
+    </div>
+
+  </div>
+
+  <article class="mt-6 rounded-3xl border border-white/10 bg-white/[0.03] p-8">
+
+    <div class="flex items-start gap-5">
+
+      <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-blue-500/10 text-2xl">
+        <%= @evidence.source_icon %>
+      </div>
+
+      <div class="min-w-0">
+
+        <div class="text-xs font-bold uppercase tracking-widest text-blue-400">
+          <%= @evidence.source_type_label %>
+        </div>
+
+        <h1 class="mt-2 text-3xl font-black text-white">
+          <%= @evidence.title %>
+        </h1>
+
+        <div class="mt-3 flex flex-wrap gap-2">
+
+          <span class="rounded-full bg-white/5 px-3 py-1 text-xs font-bold text-slate-400">
+            <%= @evidence.confidence %>% confidence
+          </span>
+
+          <% if @evidence.verified? %>
+
+            <span class="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-300">
+              Verified
+            </span>
+
+          <% else %>
+
+            <span class="rounded-full bg-amber-500/10 px-3 py-1 text-xs font-bold text-amber-300">
+              Unverified
+            </span>
+
+          <% end %>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <% if @evidence.source_url.present? %>
+
+      <div class="mt-8">
+
+        <div class="text-xs font-bold uppercase tracking-widest text-slate-600">
+          Source
+        </div>
+
+        <%= link_to @evidence.source_url,
+                    @evidence.source_url,
+                    target: "_blank",
+                    rel: "noopener noreferrer",
+                    class: "mt-2 block break-all text-sm text-orange-300 hover:text-orange-200" %>
+
+      </div>
+
+    <% end %>
+
+    <div class="mt-8 grid gap-5 md:grid-cols-2">
+
+      <div class="rounded-2xl bg-black/20 p-5">
+
+        <div class="text-xs font-bold uppercase tracking-widest text-slate-600">
+          Publisher
+        </div>
+
+        <div class="mt-2 text-sm text-slate-300">
+          <%= @evidence.publisher.presence || "Not specified" %>
+        </div>
+
+      </div>
+
+      <div class="rounded-2xl bg-black/20 p-5">
+
+        <div class="text-xs font-bold uppercase tracking-widest text-slate-600">
+          Author
+        </div>
+
+        <div class="mt-2 text-sm text-slate-300">
+          <%= @evidence.author.presence || "Not specified" %>
+        </div>
+
+      </div>
+
+    </div>
+
+    <% if @evidence.excerpt.present? %>
+
+      <div class="mt-8">
+
+        <div class="text-xs font-bold uppercase tracking-widest text-slate-600">
+          Excerpt
+        </div>
+
+        <blockquote class="mt-3 border-l-2 border-blue-400/40 pl-5 text-base italic leading-8 text-slate-300">
+          <%= @evidence.excerpt %>
+        </blockquote>
+
+      </div>
+
+    <% end %>
+
+    <% if @evidence.notes.present? %>
+
+      <div class="mt-8">
+
+        <div class="text-xs font-bold uppercase tracking-widest text-slate-600">
+          Research notes
+        </div>
+
+        <div class="mt-3 whitespace-pre-line text-sm leading-7 text-slate-400">
+          <%= @evidence.notes %>
+        </div>
+
+      </div>
+
+    <% end %>
+
+    <div class="mt-8 rounded-2xl bg-black/20 p-5">
+
+      <div class="text-xs font-bold uppercase tracking-widest text-slate-600">
+        Workspace item
+      </div>
+
+      <div class="mt-2 font-bold text-white">
+        <%= @evidence.research_workspace_item.title %>
+      </div>
+
+    </div>
+
+  </article>
+
+</div>
