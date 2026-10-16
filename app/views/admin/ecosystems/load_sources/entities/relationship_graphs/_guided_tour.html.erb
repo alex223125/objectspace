@@ -1,0 +1,53 @@
+
+<section class="rounded-[26px] border border-cyan-100 bg-gradient-to-br from-cyan-50/60 to-white p-5 shadow-sm sm:p-7"
+         data-controller="guided-tour"
+         data-guided-tour-target="panel"
+         aria-labelledby="guided-tour-heading">
+
+  <p class="text-[10px] font-black uppercase tracking-[0.18em] text-cyan-700">Interactive onboarding</p>
+  <h2 id="guided-tour-heading" class="mt-1 text-lg font-black text-slate-900">Guided graph tour</h2>
+  <p class="mt-2 text-sm leading-6 text-slate-500">
+    Follow a short sequence to learn the main parts of the workspace.
+  </p>
+
+  <div class="mt-5 rounded-2xl border border-cyan-100 bg-white p-5">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <span class="rounded-full bg-cyan-50 px-3 py-1.5 text-xs font-black text-cyan-800"
+            data-guided-tour-target="stepLabel">
+        Step 1 of 5
+      </span>
+
+      <button type="button"
+              class="rounded-lg border border-slate-200 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50"
+              data-action="click->guided-tour#close">
+        End tour
+      </button>
+    </div>
+
+    <h3 class="mt-4 text-lg font-black text-slate-900" data-guided-tour-target="title">
+      Start with the overview
+    </h3>
+    <p class="mt-2 text-sm leading-7 text-slate-600" data-guided-tour-target="description">
+      The overview summarizes the metrics returned by your services. A missing value means the service did not provide it.
+    </p>
+
+    <div class="mt-5 h-2 overflow-hidden rounded-full bg-slate-100">
+      <div class="h-full w-1/5 rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400 transition-all"
+           data-guided-tour-target="progress"></div>
+    </div>
+
+    <div class="mt-5 flex flex-wrap justify-between gap-3">
+      <button type="button"
+              class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50"
+              data-action="click->guided-tour#previous">
+        ← Previous
+      </button>
+
+      <button type="button"
+              class="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-bold text-white hover:bg-slate-700"
+              data-action="click->guided-tour#next">
+        Next →
+      </button>
+    </div>
+  </div>
+</section>

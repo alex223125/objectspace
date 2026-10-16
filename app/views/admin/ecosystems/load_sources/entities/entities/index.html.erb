@@ -387,11 +387,15 @@ FIELD MANUAL FOOTER
 
   </div> </div>
 
-
+<br>
+<br>
 <%= render "ecosystem_discovery" %>
+<br>
+<br>
 
 <%= render "start_investigation" %>
-
+<br>
+<br>
 
 <% if @entities.present? %>
 
@@ -433,33 +437,34 @@ FIELD MANUAL FOOTER
 <% end %>
 
 
-
+<br>
 <%= render "ecosystem_analytics" %>
-
+<br>
 
 <%= render(
       "ecosystem_relationship_graph",
       graph_entities: @entities
     ) %>
-
-<%= render "relationship_graph_mount" %>
-
+<br>
 
 <%= render(
       "cross_entity_intelligence",
       entities: @entities
     ) %>
 
+<br>
+
 <%= render(
       "cross_entity_intelligence_payload",
       entities: @entities
     ) %>
+<br>
 
 <%= render(
       "cross_entity_graph_preview",
       entities: @entities
     ) %>
-
+<br>
 
 <%
   intelligence_service =
@@ -530,6 +535,7 @@ FIELD MANUAL FOOTER
   }
 %>
 
+<br>
 <%= render(
       "ecosystem_intelligence",
       intelligence: ecosystem_intelligence

@@ -1,0 +1,91 @@
+<div class="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
+
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+
+    <div>
+      <div class="text-xs font-bold uppercase tracking-[0.2em] text-slate-600">
+        Saved states
+      </div>
+
+      <h2 class="mt-2 text-lg font-black text-white">
+        Investigation snapshots
+      </h2>
+
+      <p class="mt-1 text-sm text-slate-600">
+        Lightweight checkpoints of the investigation's research state.
+      </p>
+    </div>
+
+    <%= button_to(
+          "＋ Snapshot",
+          admin_ecosystems_load_sources_entity_research_workspace_snapshots_path(
+            entity_id: params[:entity_id],
+            research_workspace_id: workspace.id
+          ),
+          method: :post,
+          class: "rounded-xl bg-sky-500/10 px-3 py-2 text-xs font-bold text-sky-300 hover:bg-sky-500/20"
+        ) %>
+
+  </div>
+
+  <% snapshots = workspace.snapshots %>
+
+  <% if snapshots.blank? %>
+
+    <div class="mt-6 rounded-2xl bg-black/20 p-5 text-sm text-slate-600">
+      No snapshots have been saved yet.
+    </div>
+
+  <% else %>
+
+    <div class="mt-6 space-y-3">
+
+      <% snapshots.first(10).each do |snapshot| %>
+
+        <div class="rounded-2xl border border-white/5 bg-black/10 p-4">
+
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+            <div>
+              <div class="font-bold text-white">
+                <%= snapshot["label"].presence || "Investigation snapshot" %>
+              </div>
+
+              <div class="mt-1 text-xs text-slate-600">
+                <% if snapshot["created_at"].present? %>
+                  <%= Time.iso8601(snapshot["created_at"]).strftime("%Y-%m-%d %H:%M") %>
+                <% else %>
+                  Unknown time
+                <% end %>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-3 text-xs text-slate-600">
+              <span>
+                <%= snapshot["item_count"] || 0 %> items
+              </span>
+
+              <span>
+                <%= snapshot["annotation_count"] || 0 %> annotations
+              </span>
+
+              <span>
+                <%= snapshot["evidence_count"] || 0 %> evidence
+              </span>
+
+              <span>
+                <%= snapshot["progress"] || 0 %>% complete
+              </span>
+            </div>
+
+          </div>
+
+        </div>
+
+      <% end %>
+
+    </div>
+
+  <% end %>
+
+</div>

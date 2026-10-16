@@ -1,0 +1,85 @@
+<%# New research investigation %>
+
+<div class="mx-auto max-w-4xl py-8">
+  <div class="rounded-3xl border border-orange-200 bg-white p-6 shadow-xl sm:p-10">
+
+    <div class="mb-8 flex items-start gap-4">
+      <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-orange-100 text-3xl">
+        🔬
+      </div>
+
+      <div>
+        <p class="text-sm font-bold uppercase tracking-widest text-orange-600">
+          Research intelligence
+        </p>
+
+        <h1 class="mt-2 text-3xl font-black text-slate-900">
+          New investigation
+        </h1>
+
+        <p class="mt-2 text-slate-600">
+          Create a workspace to collect research questions, evidence,
+          interpretations, and review notes for entity #<%= params[:entity_id] %>.
+        </p>
+      </div>
+    </div>
+
+    <% if @workspace.errors.any? %>
+      <div class="mb-6 rounded-xl border border-red-300 bg-red-50 p-4 text-red-800">
+        <h2 class="font-bold">
+          Please correct the following errors:
+        </h2>
+
+        <ul class="mt-2 list-inside list-disc">
+          <% @workspace.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%= form_with model: @workspace,
+                  scope: :research_workspace,
+                  url: admin_ecosystems_load_sources_entity_research_investigations_path(
+                    entity_id: params[:entity_id]
+                  ),
+                  method: :post,
+                  local: true,
+                  class: "space-y-6" do |form| %>
+
+      <div>
+        <%= form.label :title, "Investigation title",
+                       class: "mb-2 block text-sm font-bold text-slate-800" %>
+
+        <%= form.text_field :title,
+                            required: true,
+                            maxlength: 200,
+                            placeholder: "e.g. Investigate an emerging technology",
+                            class: "block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200" %>
+      </div>
+
+      <div>
+        <%= form.label :summary, "Research question and objective",
+                       class: "mb-2 block text-sm font-bold text-slate-800" %>
+
+        <%= form.text_area :summary,
+                           rows: 6,
+                           placeholder: "What are you investigating? What is known, what remains uncertain, and what should the investigation establish?",
+                           class: "block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200" %>
+      </div>
+
+      <div class="flex flex-wrap gap-3 border-t border-slate-200 pt-6">
+        <%= form.submit "Create investigation",
+                        class: "cursor-pointer rounded-xl bg-orange-600 px-6 py-3 font-bold text-white shadow transition hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-400" %>
+
+        <%= link_to "Cancel",
+                    admin_ecosystems_load_sources_entity_research_investigations_path(
+                      entity_id: params[:entity_id]
+                    ),
+                    class: "rounded-xl border border-slate-300 px-6 py-3 font-bold text-slate-700 hover:bg-slate-50" %>
+      </div>
+
+    <% end %>
+
+  </div>
+</div>

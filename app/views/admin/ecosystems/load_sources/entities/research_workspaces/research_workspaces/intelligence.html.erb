@@ -1,0 +1,29 @@
+<%# Research intelligence dashboard %>
+
+<section class="rw-intelligence" aria-labelledby="rw-intelligence-title"> <header class="rw-intelligence__header"> <p class="rw-intelligence__eyebrow">RESEARCH ANALYTICS</p> <h1 id="rw-intelligence-title">Research intelligence</h1> <p>Evidence coverage, investigation progress, and recommended next steps.</p> </header>
+
+  <% report = @intelligence_report || {} %>
+  <% metrics = report[] || report["metrics"] || {} %>
+  <% recommendations = report[] || report["recommendations"] || [] %>
+
+  <div class="rw-intelligence__metrics"> <% metrics.each do |name, value| %> <article class="rw-intelligence__metric"> <span><%= name.to_s.humanize %></span> <strong><%= value %></strong> </article> <% end %> </div>
+
+  <section aria-labelledby="rw-recommendations-title"> <h2 id="rw-recommendations-title">Recommended next steps</h2>
+
+    <% if recommendations.any? %>
+      <ul class="rw-intelligence__recommendations">
+        <% recommendations.each do |item| %>
+          <li>
+            <h3><%= item[:title] || item["title"] %></h3>
+            <p><%= item[:description] || item["description"] %></p>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p role="status">
+        No recommendations are available. Add research items and evidence to
+        improve the investigation report.
+      </p>
+    <% end %>
+
+  </section> </section>

@@ -1,0 +1,783 @@
+
+<%# app/views/admin/ecosystems/load_sources/entities/research_collections/research_collections/show.html.erb %>
+
+<% entity_id = params[:entity_id] %>
+<% collection_id = @collection.id %>
+
+<% collection_path =
+     admin_ecosystems_load_sources_entity_research_collections_path(
+       entity_id: entity_id
+     ) %>
+
+<% collection_member_path =
+     admin_ecosystems_load_sources_entity_research_collection_path(
+       entity_id: entity_id,
+       id: collection_id
+     ) %>
+
+<% panel = "rounded-[28px] border-2 border-orange-100 bg-white/90 p-6 shadow-sm shadow-orange-100/40 sm:p-7" %>
+<% heading = "text-xl font-black tracking-tight text-slate-800 sm:text-2xl" %>
+<% body_text = "text-base leading-7 text-slate-600" %>
+<% muted_text = "text-sm leading-6 text-slate-500" %>
+<% field_class = "w-full rounded-xl border-2 border-orange-100 bg-white px-4 py-3 text-base text-slate-800 placeholder:text-slate-400 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100" %>
+<% button_class = "inline-flex items-center justify-center rounded-xl border-2 border-orange-200 bg-white px-5 py-3 text-sm font-bold text-orange-700 transition hover:-translate-y-0.5 hover:bg-orange-50 focus:outline-none focus:ring-4 focus:ring-orange-100" %>
+
+<% dashboard = @dashboard || {} %>
+<% progress = [[dashboard.fetch(:progress_percentage, 0).to_i, 0].max, 100].min %>
+<% memberships = @memberships || [] %>
+<% available_workspaces = @available_workspaces || [] %>
+<% objectives = @collection.objectives.ordered.to_a %>
+<% milestones = @collection.milestones.ordered.to_a %>
+<% tags = @collection.tags.ordered.to_a %>
+
+<div class="mx-auto my-6 max-w-7xl px-4 py-6 sm:px-6 lg:my-10 lg:px-8">
+
+  <%# Collection header %>
+
+  <header class="overflow-hidden rounded-[34px] border-2 border-orange-100 bg-gradient-to-br from-white via-orange-50/40 to-amber-50/60 p-6 shadow-md shadow-orange-100/40 sm:p-9">
+
+    <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+
+      <div class="min-w-0 flex-1">
+
+        <%= link_to "← All research collections",
+                    collection_path,
+                    class: "inline-flex items-center gap-2 rounded-lg text-base font-bold text-orange-700 transition hover:text-orange-900 hover:underline" %>
+
+        <div class="mt-6 flex items-start gap-4">
+
+          <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-[22px] border-2 border-orange-200 bg-orange-100 text-2xl shadow-sm shadow-orange-100">
+            🔬
+          </div>
+
+          <div class="min-w-0 flex-1">
+
+            <div class="flex flex-wrap items-center gap-3">
+
+              <span class="<%= collection_status_color(@collection.status) %> inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-black uppercase tracking-wide">
+                <%= collection_status_icon(@collection.status) %>
+                <%= @collection.status.to_s.humanize %>
+              </span>
+
+              <span class="text-sm font-semibold text-slate-400">
+                Research collection #<%= collection_id %>
+              </span>
+
+            </div>
+
+            <h1 class="mt-4 break-words text-3xl font-black leading-tight tracking-tight text-slate-800 sm:text-4xl lg:text-5xl">
+              <%= @collection.title %>
+            </h1>
+
+            <% if @collection.description.present? %>
+              <p class="mt-4 max-w-4xl text-base leading-8 text-slate-600 sm:text-lg">
+                <%= @collection.description %>
+              </p>
+            <% else %>
+              <p class="mt-3 text-base leading-7 text-slate-500">
+                A central workspace for organizing investigations, objectives, milestones and shared evidence.
+              </p>
+            <% end %>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="flex shrink-0 flex-wrap gap-3 lg:max-w-xs lg:justify-end">
+
+        <%= link_to "Edit collection",
+                    edit_admin_ecosystems_load_sources_entity_research_collection_path(
+                      entity_id: entity_id,
+                      id: collection_id
+                    ),
+                    class: button_class %>
+
+        <% if @collection.status.to_s == "active" %>
+
+          <%= button_to "✓ Complete",
+                        complete_admin_ecosystems_load_sources_entity_research_collection_path(
+                          entity_id: entity_id,
+                          id: collection_id
+                        ),
+                        method: :patch,
+                        class: "inline-flex items-center justify-center rounded-xl border-2 border-emerald-200 bg-emerald-50 px-5 py-3 text-sm font-bold text-emerald-700 transition hover:bg-emerald-100" %>
+
+          <%= button_to "Archive",
+                        archive_admin_ecosystems_load_sources_entity_research_collection_path(
+                          entity_id: entity_id,
+                          id: collection_id
+                        ),
+                        method: :patch,
+                        class: "inline-flex items-center justify-center rounded-xl border-2 border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-600 transition hover:bg-slate-50" %>
+
+        <% else %>
+
+          <%= button_to "↻ Reopen",
+                        reopen_admin_ecosystems_load_sources_entity_research_collection_path(
+                          entity_id: entity_id,
+                          id: collection_id
+                        ),
+                        method: :patch,
+                        class: "inline-flex items-center justify-center rounded-xl border-2 border-sky-200 bg-sky-50 px-5 py-3 text-sm font-bold text-sky-700 transition hover:bg-sky-100" %>
+
+        <% end %>
+
+      </div>
+
+    </div>
+
+    <%# Research ecosystem %>
+
+    <div class="mt-8 rounded-[24px] border-2 border-orange-100 bg-white/80 p-5 sm:p-6">
+
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+
+        <div>
+          <div class="text-base font-black text-slate-800">
+            Research ecosystem
+          </div>
+          <p class="mt-1 text-sm leading-6 text-slate-500">
+            Investigations, objectives, evidence and discoveries in one place.
+          </p>
+        </div>
+
+        <span class="w-fit rounded-full border border-orange-200 bg-orange-50 px-4 py-2 text-sm font-bold text-orange-700">
+          ✨ Continuously evolving
+        </span>
+
+      </div>
+
+      <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+
+        <% [
+             ["01", "Investigate", "Explore saved workspaces", "orange"],
+             ["02", "Organize", "Define research objectives", "sky"],
+             ["03", "Connect", "Share evidence and findings", "violet"],
+             ["04", "Improve", "Track progress and milestones", "emerald"]
+           ].each do |number, title, description, color| %>
+
+          <div class="rounded-2xl border-2 border-<%= color %>-100 bg-<%= color %>-50/60 p-4">
+
+            <div class="flex items-center gap-3">
+
+              <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-<%= color %>-200 bg-white text-sm font-black text-<%= color %>-700 shadow-sm">
+                <%= number %>
+              </span>
+
+              <h2 class="text-base font-black text-slate-800">
+                <%= title %>
+              </h2>
+
+            </div>
+
+            <p class="mt-3 text-sm leading-6 text-slate-600">
+              <%= description %>
+            </p>
+
+          </div>
+
+        <% end %>
+
+      </div>
+
+    </div>
+
+  </header>
+
+  <%# Collection metrics %>
+
+  <section aria-label="Collection metrics" class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+
+    <% [
+         ["Investigations", dashboard.fetch(:workspace_count, 0), "🔬", "orange"],
+         ["Pinned", dashboard.fetch(:pinned_workspace_count, 0), "📌", "sky"],
+         ["Completed", dashboard.fetch(:completed_workspace_count, 0), "✓", "emerald"],
+         ["Evidence", dashboard.fetch(:evidence_count, 0), "📚", "violet"],
+         ["Progress", "#{progress}%", "↗", "amber"]
+       ].each do |label, value, icon, color| %>
+
+      <div class="rounded-[24px] border-2 border-orange-100 bg-white p-5 shadow-sm shadow-orange-100/30 transition hover:-translate-y-1 hover:shadow-md">
+
+        <div class="flex items-center justify-between gap-3">
+
+          <span class="text-sm font-bold text-slate-500">
+            <%= label %>
+          </span>
+
+          <span class="flex h-11 w-11 items-center justify-center rounded-2xl border border-<%= color %>-100 bg-<%= color %>-50 text-xl text-<%= color %>-700">
+            <%= icon %>
+          </span>
+
+        </div>
+
+        <div class="mt-4 break-words text-3xl font-black tracking-tight text-slate-800 sm:text-4xl">
+          <%= value %>
+        </div>
+
+        <% if label == "Progress" %>
+          <div class="mt-4 h-2.5 overflow-hidden rounded-full border border-orange-100 bg-orange-50">
+            <div class="h-full rounded-full bg-gradient-to-r from-orange-400 via-amber-400 to-emerald-400"
+                 style="width: <%= progress %>%;">
+            </div>
+          </div>
+        <% end %>
+
+      </div>
+
+    <% end %>
+
+  </section>
+
+  <%# Main content %>
+
+  <div class="mt-8 grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_390px]">
+
+    <main class="min-w-0 space-y-6">
+
+      <%# Saved investigations %>
+
+      <section class="<%= panel %>">
+
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+          <div>
+            <div class="text-sm font-black uppercase tracking-widest text-orange-600">
+              Collection portfolio
+            </div>
+            <h2 class="<%= heading %> mt-2">
+              Saved investigations
+            </h2>
+            <p class="<%= muted_text %> mt-2">
+              Investigations linked to this collection.
+            </p>
+          </div>
+
+          <span class="w-fit rounded-full border-2 border-orange-100 bg-orange-50 px-4 py-2 text-sm font-bold text-orange-700">
+            <%= memberships.size %> linked
+          </span>
+
+        </div>
+
+        <div class="mt-6 space-y-4">
+
+          <% if memberships.any? %>
+
+            <% memberships.each do |membership| %>
+              <%= render "membership",
+                         collection: @collection,
+                         membership: membership %>
+            <% end %>
+
+          <% else %>
+
+            <div class="rounded-[24px] border-2 border-dashed border-orange-200 bg-orange-50/40 px-5 py-10 text-center">
+
+              <div class="text-4xl">🔬</div>
+
+              <h3 class="mt-4 text-lg font-black text-slate-800">
+                No investigations yet
+              </h3>
+
+              <p class="mx-auto mt-2 max-w-md text-base leading-7 text-slate-600">
+                Add an existing saved investigation using the panel on the right.
+              </p>
+
+            </div>
+
+          <% end %>
+
+        </div>
+
+      </section>
+
+      <%# Objectives %>
+
+      <section class="<%= panel %>">
+
+        <div class="flex items-center gap-4">
+
+          <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-sky-100 bg-sky-50 text-xl">
+            🎯
+          </div>
+
+          <div>
+            <h2 class="<%= heading %>">Objectives</h2>
+            <p class="<%= muted_text %> mt-1">
+              Research goals and their current status.
+            </p>
+          </div>
+
+        </div>
+
+        <% if objectives.any? %>
+
+          <div class="mt-6 space-y-4">
+
+            <% objectives.each do |objective| %>
+
+              <article class="rounded-2xl border-2 border-sky-100 bg-sky-50/30 p-5">
+
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+
+                  <h3 class="text-lg font-black leading-7 text-slate-800">
+                    <%= objective.title %>
+                  </h3>
+
+                  <span class="w-fit shrink-0 rounded-full border border-sky-200 bg-white px-3 py-1.5 text-sm font-bold text-sky-700">
+                    <%= objective.status.to_s.humanize %>
+                  </span>
+
+                </div>
+
+                <% if objective.description.present? %>
+                  <p class="mt-3 text-base leading-7 text-slate-600">
+                    <%= objective.description %>
+                  </p>
+                <% end %>
+
+              </article>
+
+            <% end %>
+
+          </div>
+
+        <% else %>
+
+          <p class="<%= body_text %> mt-6 rounded-2xl bg-slate-50 p-5">
+            No objectives have been defined yet.
+          </p>
+
+        <% end %>
+
+      </section>
+
+      <%# Milestones %>
+
+      <section class="<%= panel %>">
+
+        <div class="flex items-center gap-4">
+
+          <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-emerald-100 bg-emerald-50 text-xl">
+            🏁
+          </div>
+
+          <div>
+            <h2 class="<%= heading %>">Milestones</h2>
+            <p class="<%= muted_text %> mt-1">
+              Important checkpoints and target dates.
+            </p>
+          </div>
+
+        </div>
+
+        <% if milestones.any? %>
+
+          <div class="mt-6 space-y-4">
+
+            <% milestones.each do |milestone| %>
+
+              <article class="rounded-2xl border-2 border-emerald-100 bg-emerald-50/30 p-5">
+
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+
+                  <h3 class="text-lg font-black leading-7 text-slate-800">
+                    <%= milestone.title %>
+                  </h3>
+
+                  <span class="w-fit shrink-0 rounded-full border border-emerald-200 bg-white px-3 py-1.5 text-sm font-bold text-emerald-700">
+                    <%= milestone.status.to_s.humanize %>
+                  </span>
+
+                </div>
+
+                <% if milestone.target_date.present? %>
+                  <div class="mt-4 inline-flex items-center gap-2 rounded-xl border border-emerald-100 bg-white px-4 py-2 text-sm font-semibold text-slate-600">
+                    <span>📅</span>
+                    <span>Target date: <%= milestone.target_date %></span>
+                  </div>
+                <% end %>
+
+              </article>
+
+            <% end %>
+
+          </div>
+
+        <% else %>
+
+          <p class="<%= body_text %> mt-6 rounded-2xl bg-slate-50 p-5">
+            No milestones have been defined.
+          </p>
+
+        <% end %>
+
+      </section>
+
+    </main>
+
+    <%# Right sidebar %>
+
+    <aside class="min-w-0 space-y-6">
+
+      <%# Add investigation %>
+
+      <section class="<%= panel %>">
+
+        <div class="flex items-center gap-3">
+
+          <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-orange-100 bg-orange-50 text-xl">
+            ➕
+          </div>
+
+          <div>
+            <h2 class="text-xl font-black text-slate-800">
+              Add investigation
+            </h2>
+            <p class="mt-1 text-sm text-slate-500">
+              Select a saved workspace.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="mt-6 space-y-3">
+
+          <% if available_workspaces.any? %>
+
+            <% available_workspaces.each do |workspace| %>
+
+              <%= form_with(
+                    url: admin_ecosystems_load_sources_entity_research_collection_memberships_path(
+                      entity_id: entity_id,
+                      research_collection_id: collection_id
+                    ),
+                    method: :post,
+                    class: "rounded-2xl border-2 border-orange-100 bg-orange-50/30 p-4 transition hover:border-orange-200 hover:bg-orange-50/70"
+                  ) do |form| %>
+
+                <%= hidden_field_tag :research_workspace_id, workspace.id %>
+
+                <div class="min-w-0">
+
+                  <h3 class="break-words text-base font-black leading-6 text-slate-800">
+                    <%= workspace.title %>
+                  </h3>
+
+                  <p class="mt-2 text-sm font-semibold text-slate-500">
+                    <%= workspace.status.to_s.humanize %>
+                  </p>
+
+                </div>
+
+                <%= form.submit "＋ Add investigation",
+                                class: "mt-4 w-full cursor-pointer rounded-xl border-2 border-orange-200 bg-white px-4 py-3 text-sm font-black text-orange-700 transition hover:bg-orange-100" %>
+
+              <% end %>
+
+            <% end %>
+
+          <% else %>
+
+            <div class="rounded-2xl border-2 border-dashed border-orange-200 bg-orange-50/30 p-5">
+
+              <div class="text-2xl">✓</div>
+
+              <p class="mt-3 text-base font-bold leading-7 text-slate-700">
+                All available saved investigations are already in this collection.
+              </p>
+
+            </div>
+
+          <% end %>
+
+        </div>
+
+      </section>
+
+      <%# Collection tags %>
+
+      <section class="<%= panel %>">
+
+        <div class="flex items-center gap-3">
+
+          <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-amber-100 bg-amber-50 text-xl">
+            🏷️
+          </div>
+
+          <div>
+            <h2 class="text-xl font-black text-slate-800">
+              Collection tags
+            </h2>
+            <p class="mt-1 text-sm text-slate-500">
+              Organize and classify research.
+            </p>
+          </div>
+
+        </div>
+
+        <%= form_with(
+              url: add_tag_admin_ecosystems_load_sources_entity_research_collection_path(
+                entity_id: entity_id,
+                id: collection_id
+              ),
+              method: :post,
+              class: "mt-5 flex flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row"
+            ) do |form| %>
+
+          <%= form.text_field :name,
+                              name: "name",
+                              placeholder: "Enter a tag name",
+                              class: field_class %>
+
+          <%= form.submit "Add tag",
+                          class: "shrink-0 cursor-pointer rounded-xl border-2 border-orange-300 bg-gradient-to-r from-orange-400 to-amber-400 px-5 py-3 text-base font-black text-white shadow-sm transition hover:from-orange-500 hover:to-amber-500" %>
+
+        <% end %>
+
+        <div class="mt-5 flex flex-wrap gap-2">
+
+          <% if tags.any? %>
+
+            <% tags.each do |tag| %>
+
+              <div class="inline-flex items-center gap-2 rounded-full border-2 border-orange-100 bg-orange-50 px-4 py-2">
+
+                <span class="text-sm font-bold text-orange-800">
+                  #<%= tag.name %>
+                </span>
+
+                <%= button_to "×",
+                              remove_tag_admin_ecosystems_load_sources_entity_research_collection_path(
+                                entity_id: entity_id,
+                                id: collection_id
+                              ),
+                              method: :delete,
+                              params: { tag_id: tag.id },
+                              form: { class: "inline-flex" },
+                              class: "flex h-7 w-7 items-center justify-center rounded-full text-lg font-bold text-slate-500 transition hover:bg-rose-100 hover:text-rose-700",
+                              title: "Remove #{tag.name}" %>
+
+              </div>
+
+            <% end %>
+
+          <% else %>
+
+            <p class="text-base leading-7 text-slate-500">
+              No tags yet. Add a tag to organize this collection.
+            </p>
+
+          <% end %>
+
+        </div>
+
+      </section>
+
+      <%# Shared evidence %>
+
+      <section class="<%= panel %>">
+
+        <div class="flex items-center gap-3">
+
+          <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-violet-100 bg-violet-50 text-xl">
+            📚
+          </div>
+
+          <div>
+            <h2 class="text-xl font-black text-slate-800">
+              Shared evidence
+            </h2>
+            <p class="mt-1 text-sm text-slate-500">
+              Cross-investigation references
+            </p>
+          </div>
+
+        </div>
+
+        <p class="mt-4 text-base leading-7 text-slate-600">
+          Evidence can be managed through the existing research workspace evidence pages. The collection-specific evidence-reference routes are not registered in the current application routes.
+        </p>
+
+        <div class="mt-5 rounded-2xl border-2 border-violet-100 bg-violet-50/30 p-4">
+
+          <div class="text-sm font-bold text-slate-500">
+            Evidence records
+          </div>
+
+          <div class="mt-2 text-3xl font-black text-slate-800">
+            <%= dashboard.fetch(:evidence_count, 0) %>
+          </div>
+
+          <p class="mt-2 text-sm leading-6 text-slate-600">
+            This count comes from the collection dashboard. It does not necessarily represent a count of collection-specific evidence references.
+          </p>
+
+        </div>
+
+        <div class="mt-5">
+
+          <%= link_to "Open collection intelligence →",
+                      admin_ecosystems_load_sources_entity_research_collection_intelligence_path(
+                        entity_id: entity_id,
+                        research_collection_id: collection_id
+                      ),
+                      class: "inline-flex w-full items-center justify-center rounded-xl border-2 border-violet-200 bg-violet-50 px-4 py-3 text-sm font-bold text-violet-800 transition hover:bg-violet-100" %>
+
+        </div>
+
+      </section>
+
+      <%# Collection tools %>
+
+      <section class="<%= panel %>">
+
+        <div class="flex items-center gap-3">
+
+          <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-emerald-100 bg-emerald-50 text-xl">
+            ⚙️
+          </div>
+
+          <div>
+            <h2 class="text-xl font-black text-slate-800">
+              Collection tools
+            </h2>
+            <p class="mt-1 text-sm text-slate-500">
+              Analyze and preserve progress.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="mt-5 space-y-3">
+
+          <%= link_to admin_ecosystems_load_sources_entity_research_collection_intelligence_path(
+                        entity_id: entity_id,
+                        research_collection_id: collection_id
+                      ),
+                      class: "group flex items-center gap-4 rounded-2xl border-2 border-orange-100 bg-orange-50/40 p-4 transition hover:-translate-y-0.5 hover:border-orange-200 hover:bg-orange-50" do %>
+
+            <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-orange-100 bg-white text-xl">
+              🧠
+            </span>
+
+            <span class="min-w-0 flex-1">
+              <span class="block text-base font-black text-slate-800">
+                Collection intelligence
+              </span>
+              <span class="mt-1 block text-sm leading-6 text-slate-500">
+                Explore connections and insights.
+              </span>
+            </span>
+
+            <span class="text-xl font-bold text-orange-500 transition group-hover:translate-x-1">
+              →
+            </span>
+
+          <% end %>
+
+          <%= link_to admin_ecosystems_load_sources_entity_research_collection_snapshots_path(
+                        entity_id: entity_id,
+                        research_collection_id: collection_id
+                      ),
+                      class: "group flex items-center gap-4 rounded-2xl border-2 border-sky-100 bg-sky-50/40 p-4 transition hover:-translate-y-0.5 hover:border-sky-200 hover:bg-sky-50" do %>
+
+            <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-sky-100 bg-white text-xl">
+              📸
+            </span>
+
+            <span class="min-w-0 flex-1">
+              <span class="block text-base font-black text-slate-800">
+                Checkpoints
+              </span>
+              <span class="mt-1 block text-sm leading-6 text-slate-500">
+                Review saved collection snapshots.
+              </span>
+            </span>
+
+            <span class="text-xl font-bold text-sky-500 transition group-hover:translate-x-1">
+              →
+            </span>
+
+          <% end %>
+
+        </div>
+
+      </section>
+
+    </aside>
+
+  </div>
+
+  <%# Ecosystem improvement loop %>
+
+  <section class="mt-8 rounded-[30px] border-2 border-orange-100 bg-gradient-to-r from-orange-50 via-white to-emerald-50/60 p-6 shadow-sm sm:p-8">
+
+    <div class="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+
+      <div class="flex items-start gap-4">
+
+        <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border-2 border-orange-200 bg-orange-100 text-2xl shadow-sm">
+          🔄
+        </div>
+
+        <div>
+
+          <h2 class="text-xl font-black text-slate-800 sm:text-2xl">
+            Ecosystem improvement loop
+          </h2>
+
+          <p class="mt-3 max-w-3xl text-base leading-8 text-slate-600">
+            Investigations reveal problems. Objectives guide research.
+            Evidence connects discoveries across workspaces. Milestones
+            measure progress, while collection intelligence helps identify
+            connections and opportunities for improvement.
+          </p>
+
+        </div>
+
+      </div>
+
+      <%= link_to admin_ecosystems_load_sources_entity_research_collection_intelligence_path(
+                    entity_id: entity_id,
+                    research_collection_id: collection_id
+                  ),
+                  class: "inline-flex shrink-0 items-center justify-center gap-3 rounded-2xl border-2 border-orange-300 bg-gradient-to-r from-orange-400 to-amber-400 px-6 py-4 text-base font-black text-white shadow-md shadow-orange-200/50 transition hover:-translate-y-1 hover:from-orange-500 hover:to-amber-500" do %>
+
+        <span>Explore intelligence</span>
+        <span class="text-xl">→</span>
+
+      <% end %>
+
+    </div>
+
+    <div class="mt-7 border-t-2 border-orange-100 pt-5">
+
+      <div class="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+
+        <span class="text-sm font-black uppercase tracking-widest text-slate-500">
+          Collection progress
+        </span>
+
+        <span class="text-base font-black text-orange-700">
+          <%= progress %>% complete
+        </span>
+
+      </div>
+
+      <div class="h-4 overflow-hidden rounded-full border-2 border-orange-100 bg-white">
+
+        <div class="h-full rounded-full bg-gradient-to-r from-orange-400 via-amber-400 via-sky-400 to-emerald-400 transition-all duration-700"
+             style="width: <%= progress %>%;">
+        </div>
+
+      </div>
+
+      <p class="mt-3 text-sm leading-6 text-slate-500">
+        Keep investigations connected, document evidence and complete milestones to move research forward.
+      </p>
+
+    </div>
+
+  </section>
+
+</div>

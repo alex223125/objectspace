@@ -1,0 +1,174 @@
+
+<% report = local_assigns.fetch(:report) %>
+<% items = report[:items] || [] %>
+
+<section class="my-6 rounded-[30px] border-2 border-orange-100
+                bg-gradient-to-b from-white via-orange-50/20
+                to-slate-50/50 p-6 shadow-md shadow-orange-100/30"
+         aria-labelledby="provenance-heading">
+
+  <div class="flex flex-col gap-3 sm:flex-row
+              sm:items-center sm:justify-between">
+
+    <div>
+      <h3 id="provenance-heading"
+          class="text-sm font-black uppercase
+                 tracking-wider text-slate-700">
+        Research provenance
+      </h3>
+      <p class="mt-1 text-xs text-slate-400">
+        Trace investigation items to annotations and evidence
+      </p>
+    </div>
+
+    <span class="w-fit rounded-full border border-orange-200
+                 bg-orange-50 px-3 py-1 text-[10px]
+                 font-black text-orange-700">
+      <%= items.size %> research items
+    </span>
+  </div>
+
+  <% if items.empty? %>
+    <%= render(
+          "admin/ecosystems/load_sources/entities/research_workspaces/empty_state",
+          heading: "No provenance records yet",
+          description: "Add research items to start building a traceable investigation."
+        ) %>
+  <% else %>
+    <div class="mt-6 space-y-4">
+      <% items.each do |item| %>
+        <article class="rounded-[24px] border border-orange-100
+                        bg-white/80 p-5">
+
+          <div class="flex items-start gap-3">
+            <div class="flex h-10 w-10 shrink-0 items-center
+                        justify-center rounded-xl bg-orange-50
+                        text-sm font-black text-orange-600">
+              <%= item[:id] %>
+            </div>
+
+            <div class="min-w-0 flex-1">
+              <h4 class="break-words text-sm font-black
+                         text-slate-700">
+                <%= item[:title].presence || "Untitled research item" %>
+              </h4>
+
+              <p class="mt-1 text-[10px] font-bold uppercase
+                        tracking-wider text-slate-400">
+                <%= item[:kind].presence || "Research item" %>
+                ·
+                <%= item[:status].presence || "Status unavailable" %>
+              </p>
+
+              <% if item.dig(:target, :type).present? &&
+                item.dig(:target, :id).present? %>
+                <p class="mt-2 text-xs text-slate-500">
+                  Target:
+                  <%= item.dig(:target, :type) %>
+                  #<%= item.dig(:target, :id) %>
+                </p>
+              <% end %>
+            </div>
+          </div>
+
+          <div class="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+
+            <div class="rounded-2xl border border-sky-100
+                        bg-sky-50/40 p-4">
+              <h5 class="text-[10px] font-black uppercase
+                         tracking-wider text-sky-700">
+                Annotations · <%= item[:annotations].size %>
+              </h5>
+
+              <% if item[:annotations].empty? %>
+                <p class="mt-3 text-xs text-slate-400">
+                  No linked annotations.
+                </p>
+              <% else %>
+                <ul class="mt-3 space-y-3">
+                  <% item[:annotations].each do |annotation| %>
+                    <li class="border-l-2 border-sky-200 pl-3">
+                      <p class="text-xs font-bold text-slate-700">
+                        <%= annotation[:title].presence ||
+                              annotation[:type].to_s.humanize.presence ||
+                              "Annotation ##{annotation[:id]}" %>
+                      </p>
+
+                      <p class="mt-1 text-[10px] text-slate-400">
+                        <%= annotation[:status].presence || "Status unavailable" %>
+                        <% if annotation[:confidence].present? %>
+                          · Confidence: <%= annotation[:confidence] %>
+                        <% end %>
+                      </p>
+                    </li>
+                  <% end %>
+                </ul>
+              <% end %>
+            </div>
+
+            <div class="rounded-2xl border border-emerald-100
+                        bg-emerald-50/40 p-4">
+              <h5 class="text-[10px] font-black uppercase
+                         tracking-wider text-emerald-700">
+                Evidence · <%= item[:evidence].size %>
+              </h5>
+
+              <% if item[:evidence].empty? %>
+                <p class="mt-3 text-xs text-slate-400">
+                  No linked evidence.
+                </p>
+              <% else %>
+                <ul class="mt-3 space-y-3">
+                  <% item[:evidence].each do |record| %>
+                    <li class="border-l-2 border-emerald-200 pl-3">
+                      <p class="text-xs font-bold text-slate-700">
+                        <%= record[:title].presence ||
+                              "Evidence ##{record[:id]}" %>
+                      </p>
+
+                      <p class="mt-1 text-[10px] text-slate-500">
+                        <%= record[:source_name].presence ||
+                              "Source not identified" %>
+                      </p>
+
+                      <% if record[:source_url].present? %>
+                        <p class="mt-2">
+                          <%= link_to "Open source",
+                                      record[:source_url],
+                                      target: "_blank",
+                                      rel: "noopener noreferrer",
+                                      class: "text-[10px] font-bold
+                                        text-emerald-700 underline
+                                        underline-offset-2" %>
+                        </p>
+                      <% end %>
+
+                      <div class="mt-2 flex flex-wrap gap-2">
+                        <span class="rounded-full border
+                                     border-emerald-200 bg-white
+                                     px-2 py-1 text-[9px]
+                                     font-bold text-emerald-700">
+                          <%= record[:verified] ? "Verified" : "Not verified" %>
+                        </span>
+
+                        <% if record[:confidence].present? %>
+                          <span class="rounded-full border
+                                       border-slate-200 bg-white
+                                       px-2 py-1 text-[9px]
+                                       font-bold text-slate-600">
+                            Confidence: <%= record[:confidence] %>
+                          </span>
+                        <% end %>
+                      </div>
+                    </li>
+                  <% end %>
+                </ul>
+              <% end %>
+            </div>
+
+          </div>
+        </article>
+      <% end %>
+    </div>
+  <% end %>
+</section>

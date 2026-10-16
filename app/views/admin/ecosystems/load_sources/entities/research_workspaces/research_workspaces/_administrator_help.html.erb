@@ -1,0 +1,107 @@
+
+<section class="rounded-[30px] border-2 border-orange-100
+                bg-gradient-to-br from-orange-50/60 via-white to-slate-50
+                p-6 shadow-sm sm:p-8">
+
+  <div class="flex items-start gap-4">
+    <div class="flex h-12 w-12 shrink-0 items-center justify-center
+                rounded-2xl border border-orange-200 bg-orange-100 text-2xl">
+      💡
+    </div>
+
+    <div>
+      <h2 class="text-2xl font-black text-slate-800">
+        Research workspace: administrator reference
+      </h2>
+
+      <p class="mt-3 text-base leading-7 text-slate-600">
+        A workspace groups the information collected during an investigation.
+        The purpose is to keep the research question, supporting material,
+        observations, and workflow decisions together so the work can be
+        reviewed later.
+      </p>
+    </div>
+  </div>
+
+  <div class="mt-7 space-y-4">
+
+    <details class="group rounded-2xl border border-orange-100 bg-white p-5">
+      <summary class="cursor-pointer list-none text-lg font-black text-slate-800">
+        <span class="flex items-center justify-between gap-4">
+          What belongs in a research item?
+          <span class="text-orange-600 transition-transform group-open:rotate-180">⌄</span>
+        </span>
+      </summary>
+
+      <p class="mt-4 text-base leading-7 text-slate-600">
+        Research items can represent entities, questions, notes, sources, or
+        other supported work units. Give each item a descriptive title and
+        enough context that another administrator can understand why it exists.
+        Keep factual observations separate from assumptions and conclusions.
+      </p>
+    </details>
+
+    <details class="group rounded-2xl border border-orange-100 bg-white p-5">
+      <summary class="cursor-pointer list-none text-lg font-black text-slate-800">
+        <span class="flex items-center justify-between gap-4">
+          How should evidence be evaluated?
+          <span class="text-orange-600 transition-transform group-open:rotate-180">⌄</span>
+        </span>
+      </summary>
+
+      <p class="mt-4 text-base leading-7 text-slate-600">
+        Record the original source, its publication date when available,
+        the date it was accessed, and the claim it supports. Check whether
+        the source directly supports that claim. Seek independent corroboration
+        for important conclusions, and document contradictory evidence rather
+        than silently discarding it.
+      </p>
+    </details>
+
+    <details class="group rounded-2xl border border-orange-100 bg-white p-5">
+      <summary class="cursor-pointer list-none text-lg font-black text-slate-800">
+        <span class="flex items-center justify-between gap-4">
+          What does a snapshot preserve?
+          <span class="text-orange-600 transition-transform group-open:rotate-180">⌄</span>
+        </span>
+      </summary>
+
+      <p class="mt-4 text-base leading-7 text-slate-600">
+        A snapshot is a recorded representation of a workspace at a particular
+        point in time. Snapshot restoration can replace current research state,
+        depending on the application's restore service. Review the snapshot and
+        confirm the intended workspace before restoring it.
+      </p>
+    </details>
+
+    <details class="group rounded-2xl border border-orange-100 bg-white p-5">
+      <summary class="cursor-pointer list-none text-lg font-black text-slate-800">
+        <span class="flex items-center justify-between gap-4">
+          How should completed investigations be handled?
+          <span class="text-orange-600 transition-transform group-open:rotate-180">⌄</span>
+        </span>
+      </summary>
+
+      <p class="mt-4 text-base leading-7 text-slate-600">
+        Completion is a workflow decision, not a guarantee that every finding
+        is correct. Document unresolved questions and limitations. If new
+        evidence changes the conclusion, reopen the investigation using its
+        supported lifecycle action and record the reason for further work.
+      </p>
+    </details>
+
+  </div>
+
+  <div class="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
+    <h3 class="text-lg font-black text-amber-900">
+      Important operational rule
+    </h3>
+
+    <p class="mt-2 text-base leading-7 text-amber-900">
+      Prefer the application's existing lifecycle methods and snapshot
+      services over direct database updates. They may record timestamps,
+      lifecycle events, and snapshots in addition to changing status.
+    </p>
+  </div>
+
+</section>

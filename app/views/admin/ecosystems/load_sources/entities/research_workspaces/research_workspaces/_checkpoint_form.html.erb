@@ -1,0 +1,17 @@
+<%= form_with url: snapshot_admin_ecosystems_load_sources_entity_research_investigation_path(
+  entity_id: params[:entity_id],
+  id: workspace.slug
+),
+              method: :post,
+              local: true,
+              class: "flex flex-col gap-3 sm:flex-row" do |form| %>
+
+  <%= form.text_field :label,
+                      name: "label",
+                      placeholder: "Checkpoint label",
+                      class: "min-w-0 flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-orange-400 focus:outline-none" %>
+
+  <%= form.submit "Save checkpoint",
+                  class: "rounded-xl bg-orange-500 px-4 py-3 text-sm font-bold text-white transition hover:bg-orange-400" %>
+
+<% end %>

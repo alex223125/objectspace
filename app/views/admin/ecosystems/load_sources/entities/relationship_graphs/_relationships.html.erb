@@ -1,0 +1,37 @@
+
+<%
+  relationships = local_assigns[:relationships] || []
+  relationships = [] unless relationships.is_a?(Array)
+%>
+
+<section class="rounded-[26px] border border-slate-200 bg-white p-5 shadow-sm"
+         aria-labelledby="entity-relationships-heading">
+
+  <h2 id="entity-relationships-heading" class="text-lg font-black text-slate-900">Entity relationships</h2>
+  <p class="mt-2 text-sm leading-6 text-slate-500">
+    Connections associated with the selected entity, if supplied by the caller.
+  </p>
+
+  <% if relationships.any? %>
+    <ul class="mt-4 space-y-3">
+      <% relationships.each do |raw_relationship| %>
+        <%
+          relationship = raw_relationship.respond_to?(:to_h) ? raw_relationship.to_h : {}
+          name = relationship[:entity_name] || relationship["entity_name"] ||
+            relationship[:name] || relationship["name"] || "Unnamed entity"
+          kind = relationship[:relationship_kind] || relationship["relationship_kind"] || "Relationship"
+          state = relationship[:state] || relationship["state"] || "Not provided"
+        %>
+        <li class="rounded-xl border border-slate-100 p-4">
+          <p class="text-sm font-bold text-slate-800"><%= name %></p>
+          <p class="mt-1 text-xs text-slate-500"><%= kind.to_s.humanize %></p>
+          <span class="mt-2 inline-flex rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-[10px] font-bold text-slate-600"><%= state.to_s.humanize %></span>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="mt-4 rounded-xl border border-dashed border-slate-200 p-4 text-sm text-slate-500">
+      No relationships were supplied for this entity.
+    </p>
+  <% end %>
+</section>

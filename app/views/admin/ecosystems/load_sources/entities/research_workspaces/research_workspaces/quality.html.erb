@@ -1,0 +1,140 @@
+
+<div class="max-w-6xl mx-auto my-8 p-6 md:p-8
+            bg-gradient-to-b from-white via-orange-50/20 to-slate-50/50
+            border-2 border-orange-100 rounded-[32px]
+            shadow-md shadow-orange-100/40">
+
+  <header class="flex flex-col gap-4 sm:flex-row
+                 sm:items-center sm:justify-between
+                 mb-8 pb-5 border-b-2 border-orange-100">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 rounded-2xl bg-orange-100
+                  border border-orange-200 flex items-center
+                  justify-center text-xl">
+        🔬
+      </div>
+
+      <div>
+        <h1 class="text-lg font-black tracking-wide text-slate-700">
+          Research Integrity
+        </h1>
+        <p class="mt-1 text-xs text-slate-400">
+          Evidence verification, source provenance, and annotation quality
+        </p>
+      </div>
+    </div>
+
+    <%= link_to "← Back to investigation",
+                admin_ecosystems_load_sources_entity_research_workspace_path(
+                  entity_id: params[:entity_id],
+                  id: @workspace.id
+                ),
+                class: "inline-flex w-fit items-center rounded-2xl
+                  border-2 border-orange-200 bg-white px-4 py-2
+                  text-xs font-bold text-orange-700
+                  hover:bg-orange-50" %>
+  </header>
+
+  <% evidence = @integrity_report.fetch(:evidence) %>
+  <% annotations = @integrity_report.fetch(:annotations) %>
+  <% quality = @integrity_report.fetch(:quality) %>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+    <% [
+         ["Evidence records", evidence[:total], "bg-orange-50", "text-orange-700"],
+         ["Verified", evidence[:verified], "bg-emerald-50", "text-emerald-700"],
+         ["Disputed", evidence[:disputed], "bg-rose-50", "text-rose-700"],
+         ["Annotations", annotations[:total], "bg-sky-50", "text-sky-700"]
+       ].each do |label, value, background, foreground| %>
+      <section class="rounded-[24px] border border-orange-100
+                      bg-white/90 p-5 shadow-sm">
+        <p class="text-[10px] uppercase tracking-widest
+                  font-black text-slate-400"><%= label %></p>
+        <p class="mt-3 text-3xl font-black <%= foreground %>">
+          <%= value %>
+        </p>
+      </section>
+    <% end %>
+  </div>
+
+  <section class="mt-6 rounded-[28px] border-2 border-orange-100
+                  bg-gradient-to-r from-orange-50/70 via-white
+                  to-emerald-50/50 p-6">
+    <div class="flex flex-col gap-2 sm:flex-row
+                sm:items-center sm:justify-between">
+      <div>
+        <h2 class="text-sm font-black text-slate-700">
+          Research integrity score
+        </h2>
+        <p class="mt-1 text-xs leading-5 text-slate-400">
+          A heuristic based on verification, source provenance, and active
+          annotations. It is not a guarantee of factual accuracy.
+        </p>
+      </div>
+
+      <p class="text-3xl font-black text-orange-600">
+        <%= quality[:research_strength] %><span class="text-base">/100</span>
+      </p>
+    </div>
+
+    <div class="mt-5 h-3 overflow-hidden rounded-full
+                border border-orange-100 bg-white">
+      <div class="h-full rounded-full
+                  bg-gradient-to-r from-orange-400 via-amber-400
+                  to-emerald-400 transition-all"
+           role="progressbar"
+           aria-label="Research integrity score"
+           aria-valuemin="0"
+           aria-valuemax="100"
+           aria-valuenow="<%= quality[:research_strength] %>"
+           style="width: <%= quality[:research_strength] %>%">
+      </div>
+    </div>
+  </section>
+
+  <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+    <% [
+         ["Evidence verification", quality[:evidence_verification_percent]],
+         ["Provenance completeness", quality[:provenance_completeness_percent]]
+       ].each do |label, percentage| %>
+      <section class="rounded-[24px] border border-orange-100
+                      bg-white p-5">
+        <div class="flex items-center justify-between gap-3">
+          <h2 class="text-xs font-black text-slate-600"><%= label %></h2>
+          <span class="text-sm font-black text-orange-600">
+            <%= percentage %>%
+          </span>
+        </div>
+
+        <div class="mt-3 h-2 rounded-full bg-slate-100 overflow-hidden">
+          <div class="h-full rounded-full bg-orange-400"
+               style="width: <%= percentage %>%"></div>
+        </div>
+      </section>
+    <% end %>
+  </div>
+
+  <section class="mt-6 rounded-[24px] border border-orange-100
+                  bg-white p-5">
+    <h2 class="text-sm font-black text-slate-700">
+      Items requiring attention
+    </h2>
+
+    <ul class="mt-4 space-y-3 text-xs text-slate-600">
+      <% [
+           ["Unverified evidence", evidence[:unverified]],
+           ["Evidence without source details", evidence[:missing_provenance]],
+           ["Unresolved annotations", annotations[:unresolved]]
+         ].each do |label, count| %>
+        <li class="flex items-center justify-between gap-3
+                   rounded-2xl bg-slate-50 px-4 py-3">
+          <span><%= label %></span>
+          <span class="rounded-full bg-orange-100 px-3 py-1
+                       font-black text-orange-700">
+            <%= count %>
+          </span>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+</div>

@@ -1,514 +1,1163 @@
-<%# ================================================================
-    CROSS-ENTITY INTELLIGENCE
-    STEP 9 — ECOSYSTEM INTELLIGENCE
-================================================================ %>
+<%
+  payload = (@intelligence || {}).to_h.with_indifferent_access
 
-<div
-  data-controller="entity-cross-intelligence"
-  class="space-y-5">
+  metrics = (payload[:metrics] || {}).to_h.with_indifferent_access
+  graph = (payload[:graph] || {}).to_h.with_indifferent_access
+  graph_stats = (graph[:stats] || {}).to_h.with_indifferent_access
 
-  <% metrics = @intelligence[:metrics] %>
+  nodes = Array(graph[:nodes])
+  edges = Array(graph[:edges])
+  relationships = Array(payload[:relationships])
+  signals = Array(payload[:signals])
+  hotspots = Array(payload[:hotspots])
+  review_opportunities = Array(payload[:review_opportunities])
+  emerging = Array(payload[:emerging])
+  declining = Array(payload[:declining])
 
-  <%# ============================================================
-      MISSION HEADER
-  ============================================================= %>
+  total_entities =
+    if metrics.key?(:total_entities)
+      metrics[:total_entities].to_i
+    else
+      nodes.size
+    end
 
-  <div class="relative overflow-hidden rounded-[28px] border border-slate-800 bg-slate-950 shadow-2xl">
+  published = metrics[:published].to_i
+  in_review = metrics[:review].to_i
+  low_health = metrics[:low_health].to_i
+  complete = metrics[:complete].to_i
+
+  relationship_count = edges.any? ? edges.size : relationships.size
+
+  graph_without_edges = nodes.any? && edges.empty?
+
+  no_findings =
+    signals.empty? &&
+      hotspots.empty? &&
+      review_opportunities.empty? &&
+      emerging.empty? &&
+      declining.empty?
+
+  diagnostics = []
+
+  if graph_without_edges
+    diagnostics << {
+      severity: "warning",
+      title: "Graph has nodes but no edges",
+      message: "The graph contains #{nodes.size} nodes and no edges. " \
+        "The visualization cannot show connections until the " \
+        "relationship service supplies graph edges."
+    }
+  end
+
+  if no_findings
+    diagnostics << {
+      severity: "warning",
+      title: "Intelligence collections are empty",
+      message: "The payload contains no signals, hotspots, review " \
+        "opportunities, emerging entities, or declining entities. " \
+        "Check the intelligence service and its query results."
+    }
+  end
+
+  if total_entities.positive? && nodes.empty?
+    diagnostics << {
+      severity: "warning",
+      title: "Entities are missing from the graph",
+      message: "#{total_entities} entities were reported by the registry " \
+        "metric, but the graph returned no nodes."
+    }
+  end
+
+  pretty_payload = JSON.pretty_generate(payload)
+%>
+
+<main class="min-h-[calc(100vh-160px)] bg-slate-50/60">
+  <div class="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8">
 
     <div
-      class="pointer-events-none absolute inset-0 opacity-20"
-      style="
-      background-image:
-        linear-gradient(rgba(99,102,241,.18) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(99,102,241,.18) 1px, transparent 1px);
-        background-size: 24px 24px;
-      ">
-    </div>
+      data-controller="entity-cross-intelligence"
+      class="mx-auto my-4 max-w-7xl space-y-8 rounded-[32px] border-2 border-orange-100 bg-gradient-to-b from-white via-orange-50/20 to-slate-50/60 p-4 text-base leading-7 text-slate-700 shadow-lg shadow-orange-100/40 sm:my-6 sm:space-y-10 sm:p-6 lg:p-8"
+    >
 
-    <div class="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-violet-500/10 blur-3xl"></div>
+      <%# ========================================================== %>
+      <%# HEADER                                                      %>
+      <%# ========================================================== %>
 
-    <div class="relative p-6 lg:p-8">
+      <header class="relative isolate overflow-hidden rounded-[28px] border-2 border-orange-100 bg-gradient-to-br from-white via-orange-50/50 to-amber-50/60 shadow-sm">
+        <div aria-hidden="true" class="pointer-events-none absolute -right-16 -top-20 -z-10 h-64 w-64 rounded-full bg-orange-200/30 blur-3xl"></div>
+        <div aria-hidden="true" class="pointer-events-none absolute -bottom-24 left-1/3 -z-10 h-56 w-56 rounded-full bg-emerald-100/40 blur-3xl"></div>
 
-      <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+        <div class="relative p-5 sm:p-7 lg:p-9">
+          <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div class="flex min-w-0 items-start gap-4 sm:gap-5">
+              <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-[22px] border-2 border-orange-200 bg-orange-100/80 text-3xl shadow-md shadow-orange-100/60 sm:h-16 sm:w-16">
+                🧠
+              </div>
 
+              <div class="min-w-0">
+                <div class="flex flex-wrap items-center gap-2">
+                  <p class="text-xs font-black uppercase tracking-[0.18em] text-orange-700 sm:text-sm">
+                    Mission 09
+                  </p>
+                  <span aria-hidden="true" class="text-orange-300">/</span>
+                  <p class="text-xs font-bold uppercase tracking-wider text-slate-500 sm:text-sm">
+                    Ecosystem Intelligence
+                  </p>
+                </div>
+
+                <h1 class="mt-3 text-2xl font-black leading-tight tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
+                  Cross-Entity Intelligence
+                </h1>
+
+                <p class="mt-3 max-w-3xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
+                  Discover structural relationships, identify ecosystem hotspots,
+                  prioritize review opportunities, and understand how entities
+                  evolve throughout your registry.
+                </p>
+
+                <div class="mt-5 flex flex-wrap items-center gap-2">
+                  <span class="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-3 py-1.5 text-sm font-bold text-orange-800">
+                    <span aria-hidden="true" class="h-2 w-2 rounded-full bg-orange-400"></span>
+                    Relationship intelligence
+                  </span>
+
+                  <span class="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-sm font-bold text-emerald-800">
+                    <span aria-hidden="true" class="h-2 w-2 rounded-full bg-emerald-400"></span>
+                    Ecosystem monitoring
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex shrink-0 flex-wrap gap-3 lg:justify-end">
+              <%= link_to(
+                    "← Entity registry",
+                    "/admin/ecosystems/load_sources/entities",
+                    class: "inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border-2 border-orange-200 bg-white px-5 py-3 text-sm font-extrabold text-slate-700 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-orange-400 hover:bg-orange-50 hover:text-orange-800 focus:outline-none focus:ring-4 focus:ring-orange-200"
+                  ) %>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <%# ========================================================== %>
+      <%# EXISTING SUMMARY CARDS                                      %>
+      <%# ========================================================== %>
+
+      <section aria-labelledby="intelligence-metrics-heading">
+        <div class="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="h-6 w-1.5 rounded-full bg-orange-400"></span>
+              <h2 id="intelligence-metrics-heading" class="text-xl font-black tracking-tight text-slate-900 sm:text-2xl">
+                Registry overview
+              </h2>
+            </div>
+
+            <p class="mt-2 text-base leading-7 text-slate-600">
+              A snapshot of the current state of your entity ecosystem.
+            </p>
+          </div>
+
+          <span class="text-sm font-semibold text-slate-500">
+            Five key indicators
+          </span>
+        </div>
+
+        <%= render(
+              "admin/ecosystems/load_sources/entities/entities/summary_cards",
+              total_entities: total_entities,
+              published: published,
+              in_review: in_review,
+              low_health: low_health,
+              complete: complete,
+              relationship_count: relationship_count,
+              nodes_count: nodes.size,
+              edges_count: edges.size
+            ) %>
+      </section>
+
+      <%# ========================================================== %>
+      <%# ECOSYSTEM AT A GLANCE                                       %>
+      <%# ========================================================== %>
+
+      <section aria-labelledby="ecosystem-status-heading" class="rounded-[28px] border-2 border-orange-100 bg-gradient-to-r from-orange-50/80 via-white to-emerald-50/50 p-5 shadow-sm sm:p-7">
         <div class="flex items-start gap-4">
-
-          <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-violet-400/30 bg-violet-500/10 text-2xl">
-            🧠
+          <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-orange-100 text-xl shadow-sm">
+            📊
           </div>
 
           <div>
+            <h2 id="ecosystem-status-heading" class="text-xl font-black tracking-tight text-slate-900 sm:text-2xl">
+              Ecosystem at a glance
+            </h2>
 
-            <div class="text-[10px] font-black uppercase tracking-[0.28em] text-violet-400">
-              Mission 09 // Ecosystem Intelligence
-            </div>
-
-            <h1 class="mt-1 text-2xl font-black tracking-tight text-white sm:text-3xl">
-              Cross-Entity Intelligence
-            </h1>
-
-            <p class="mt-2 max-w-3xl text-sm leading-relaxed text-slate-400">
-              Discover structural relationships, ecosystem hotspots,
-              quality pressure, review opportunities, and entity evolution
-              across the living registry.
+            <p class="mt-1 text-base leading-7 text-slate-600">
+              Quickly identify publication progress, review workload, health risks,
+              and completed workflows.
             </p>
-
           </div>
-
         </div>
 
-        <div class="flex flex-wrap gap-2">
+        <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <% [
+               {
+                 label: "Published entities",
+                 value: published,
+                 description: "Available in the published registry",
+                 icon: "✓",
+                 border: "border-emerald-100",
+                 icon_bg: "bg-emerald-100",
+                 icon_text: "text-emerald-700",
+                 value_text: "text-emerald-700"
+               },
+               {
+                 label: "Awaiting review",
+                 value: in_review,
+                 description: "Requiring editorial attention",
+                 icon: "◷",
+                 border: "border-amber-100",
+                 icon_bg: "bg-amber-100",
+                 icon_text: "text-amber-800",
+                 value_text: "text-amber-700"
+               },
+               {
+                 label: "Low-health entities",
+                 value: low_health,
+                 description: "Potentially needing intervention",
+                 icon: "!",
+                 border: "border-rose-100",
+                 icon_bg: "bg-rose-100",
+                 icon_text: "text-rose-700",
+                 value_text: "text-rose-700"
+               },
+               {
+                 label: "Completed workflows",
+                 value: complete,
+                 description: "Workflows marked complete",
+                 icon: "◆",
+                 border: "border-violet-100",
+                 icon_bg: "bg-violet-100",
+                 icon_text: "text-violet-700",
+                 value_text: "text-violet-700"
+               }
+             ].each do |item| %>
+            <article class="rounded-2xl border-2 <%= item[:border] %> bg-white p-5 shadow-sm">
+              <div class="flex items-center justify-between gap-3">
+                <p class="text-sm font-bold text-slate-600 sm:text-base">
+                  <%= item[:label] %>
+                </p>
 
-          <%= link_to(
-                admin_ecosystems_load_sources_entities_path,
-                class: "rounded-xl border border-slate-700 bg-slate-900 px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-slate-300 transition hover:border-indigo-400 hover:text-white"
-              ) do %>
-            ENTITY REGISTRY
-          <% end %>
-
-          <%= link_to(
-                entities_intelligence_path(format: :json),
-                class: "rounded-xl bg-violet-500 px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-violet-500/20 transition hover:bg-violet-400"
-              ) do %>
-            JSON DATA
-          <% end %>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <%# ============================================================
-      ECOSYSTEM METRICS
-  ============================================================= %>
-
-  <div class="grid grid-cols-2 gap-3 lg:grid-cols-5">
-
-    <% [
-         [
-           "ENTITIES",
-           metrics[:total_entities],
-           "🧬",
-           "indigo"
-         ],
-         [
-           "PUBLISHED",
-           metrics[:published],
-           "✓",
-           "emerald"
-         ],
-         [
-           "IN REVIEW",
-           metrics[:review],
-           "◌",
-           "amber"
-         ],
-         [
-           "LOW HEALTH",
-           metrics[:low_health],
-           "!",
-           "orange"
-         ],
-         [
-           "COMPLETE",
-           metrics[:complete],
-           "◆",
-           "violet"
-         ]
-       ].each do |label, value, icon, color| %>
-
-      <div class="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-
-        <div class="flex items-center justify-between">
-
-          <span class="text-[9px] font-black uppercase tracking-[0.18em] text-gray-400">
-            <%= label %>
-          </span>
-
-          <span class="text-sm text-<%= color %>-500">
-            <%= icon %>
-          </span>
-
-        </div>
-
-        <div class="mt-2 text-2xl font-black text-gray-900 dark:text-white">
-          <%= number_with_delimiter(value) %>
-        </div>
-
-      </div>
-
-    <% end %>
-
-  </div>
-
-
-  <%# ============================================================
-      SIGNALS
-  ============================================================= %>
-
-  <section>
-
-    <div class="mb-3 flex items-center justify-between">
-
-      <div>
-
-        <div class="text-[10px] font-black uppercase tracking-[0.2em] text-violet-500">
-          Intelligence Signals
-        </div>
-
-        <div class="mt-1 text-xs text-gray-400">
-          Machine-derived ecosystem observations.
-        </div>
-
-      </div>
-
-    </div>
-
-    <div class="grid gap-3 lg:grid-cols-2">
-
-      <% @intelligence[:signals].each do |signal| %>
-
-        <% signal_classes =
-             case signal[:severity].to_s
-             when "positive"
-               "border-emerald-200 bg-emerald-50 dark:border-emerald-900 dark:bg-emerald-950/20"
-             when "warning"
-               "border-orange-200 bg-orange-50 dark:border-orange-900 dark:bg-orange-950/20"
-             else
-               "border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/20"
-             end
-        %>
-
-        <div class="rounded-2xl border p-4 <%= signal_classes %>">
-
-          <div class="flex items-start gap-3">
-
-            <div class="text-lg">
-              <%= signal[:severity].to_s == "positive" ? "✓" : "!" %>
-            </div>
-
-            <div>
-
-              <div class="text-sm font-black text-gray-800 dark:text-gray-100">
-                <%= signal[:title] %>
+                <span class="flex h-9 w-9 items-center justify-center rounded-xl <%= item[:icon_bg] %> text-lg font-black <%= item[:icon_text] %>">
+                  <%= item[:icon] %>
+                </span>
               </div>
 
-              <p class="mt-1 text-xs leading-relaxed text-gray-500 dark:text-gray-400">
-                <%= signal[:message] %>
+              <p class="mt-3 text-3xl font-black tabular-nums <%= item[:value_text] %> sm:text-4xl">
+                <%= number_with_delimiter(item[:value]) %>
               </p>
 
-            </div>
+              <p class="mt-2 text-sm leading-6 text-slate-500">
+                <%= item[:description] %>
+              </p>
+            </article>
+          <% end %>
+        </div>
+      </section>
 
+      <%# ========================================================== %>
+      <%# DIAGNOSTICS                                                 %>
+      <%# ========================================================== %>
+
+      <% if diagnostics.any? %>
+        <section aria-labelledby="intelligence-alerts-heading" class="space-y-3">
+          <div class="flex items-center gap-2">
+            <span class="h-6 w-1.5 rounded-full bg-amber-500"></span>
+            <h2 id="intelligence-alerts-heading" class="text-xl font-black text-slate-900">
+              Data requiring inspection
+            </h2>
           </div>
 
-        </div>
+          <% diagnostics.each do |diagnostic| %>
+            <article class="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+              <div class="flex items-start gap-3">
+                <span aria-hidden="true" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-amber-100 font-black text-amber-800">
+                  !
+                </span>
 
+                <div>
+                  <h3 class="font-extrabold text-amber-950">
+                    <%= diagnostic[:title] %>
+                  </h3>
+
+                  <p class="mt-1 text-sm leading-6 text-amber-900">
+                    <%= diagnostic[:message] %>
+                  </p>
+                </div>
+              </div>
+            </article>
+          <% end %>
+        </section>
       <% end %>
 
-    </div>
+      <%# ========================================================== %>
+      <%# INTELLIGENCE SIGNALS                                        %>
+      <%# ========================================================== %>
 
-  </section>
-
-
-  <%# ============================================================
-      RELATIONSHIP GRAPH
-  ============================================================= %>
-
-  <section
-    class="overflow-hidden rounded-[28px] border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
-
-    <div class="border-b border-gray-200 px-5 py-4 dark:border-gray-800">
-
-      <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-
-        <div>
-
-          <div class="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500">
-            Ecosystem Relationship Graph
+      <section aria-labelledby="intelligence-signals-heading">
+        <div class="mb-5">
+          <div class="flex items-center gap-2">
+            <span class="h-6 w-1.5 rounded-full bg-amber-400"></span>
+            <h2 id="intelligence-signals-heading" class="text-xl font-black tracking-tight text-slate-900 sm:text-2xl">
+              Intelligence signals
+            </h2>
           </div>
 
-          <div class="mt-1 text-xs text-gray-400">
-            Relationship strength is inferred from shared structure,
-            metadata references, and conceptual similarity.
-          </div>
-
+          <p class="mt-2 text-base leading-7 text-slate-600">
+            Machine-derived observations about ecosystem activity, potential
+            problems, and positive developments.
+          </p>
         </div>
 
-        <div class="text-[9px] font-black uppercase tracking-widest text-gray-400">
-          <%= @intelligence[:relationships].length %> signals
-        </div>
+        <% if signals.any? %>
+          <div class="grid gap-4 md:grid-cols-2">
+            <% signals.each_with_index do |signal, index| %>
+              <% signal = signal.respond_to?(:to_h) ? signal.to_h.with_indifferent_access : { value: signal } %>
 
-      </div>
+              <article class="rounded-[24px] border-2 border-orange-100 bg-white p-5 shadow-sm">
+                <div class="flex items-start gap-3">
+                  <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-xl">
+                    ◉
+                  </span>
 
-    </div>
+                  <div class="min-w-0">
+                    <h3 class="font-extrabold text-slate-900">
+                      <%= signal[:title].presence || signal[:name].presence || "Intelligence signal #{index + 1}" %>
+                    </h3>
 
-    <div
-      data-entity-cross-intelligence-target="graph"
-      class="min-h-[520px] bg-slate-950">
-    </div>
+                    <% if signal[:severity].present? || signal[:type].present? %>
+                      <p class="mt-1 text-xs font-bold uppercase tracking-wide text-orange-700">
+                        <%= signal[:severity].presence || signal[:type] %>
+                      </p>
+                    <% end %>
+                  </div>
+                </div>
 
-  </section>
-
-
-  <%# ============================================================
-      HOTSPOTS
-  ============================================================= %>
-
-  <section>
-
-    <div class="mb-3">
-
-      <div class="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500">
-        Structural Hotspots
-      </div>
-
-      <div class="mt-1 text-xs text-gray-400">
-        Highly connected entities deserve disproportionate editorial attention.
-      </div>
-
-    </div>
-
-    <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-
-      <% @intelligence[:hotspots].first(8).each do |hotspot| %>
-
-        <div class="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-
-          <div class="flex items-center justify-between">
-
-            <span class="text-[9px] font-black uppercase tracking-widest text-gray-400">
-              HOTSPOT
-            </span>
-
-            <span class="rounded-full bg-orange-50 px-2 py-1 text-[9px] font-black text-orange-600 dark:bg-orange-950/30 dark:text-orange-400">
-              <%= hotspot[:hotspot_score] %>
-            </span>
-
+                <p class="mt-3 text-sm leading-6 text-slate-600">
+                  <%= signal[:message].presence || signal[:description].presence || signal[:summary].presence || signal[:value].presence || "No description was provided for this signal." %>
+                </p>
+              </article>
+            <% end %>
           </div>
+        <% else %>
+          <div class="rounded-[24px] border-2 border-dashed border-orange-200 bg-gradient-to-br from-orange-50/60 to-white p-6 sm:p-8">
+            <div class="flex items-start gap-4">
+              <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-orange-100 text-2xl">
+                ◉
+              </span>
 
-          <div class="mt-3 truncate text-sm font-black text-gray-800 dark:text-white">
-            <%= hotspot[:name] %>
+              <div>
+                <h3 class="text-lg font-extrabold text-slate-900">
+                  No intelligence signals available
+                </h3>
+
+                <p class="mt-2 text-base leading-7 text-slate-600">
+                  The current payload does not contain any signals. This does not
+                  necessarily mean the ecosystem has no issues or opportunities.
+                </p>
+              </div>
+            </div>
           </div>
+        <% end %>
+      </section>
 
-          <div class="mt-1 font-mono text-[9px] text-gray-400">
-            <%= hotspot[:slug] %>
-          </div>
+      <%# ========================================================== %>
+      <%# RELATIONSHIP GRAPH                                          %>
+      <%# Keep the Stimulus graph target and payload contract intact.  %>
+      <%# ========================================================== %>
 
-          <div class="mt-4 flex items-center justify-between text-[9px] font-bold text-gray-400">
+      <section aria-labelledby="relationship-graph-heading" class="overflow-hidden rounded-[28px] border-2 border-orange-100 bg-white shadow-md shadow-orange-100/30">
+        <div class="border-b-2 border-orange-100 bg-gradient-to-r from-orange-50/80 via-white to-amber-50/50 px-5 py-6 sm:px-7">
+          <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex items-start gap-4">
+              <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-orange-100 text-xl shadow-sm">
+                🌐
+              </div>
 
-            <span>
-              <%= hotspot[:connections] %> connections
-            </span>
+              <div>
+                <h2 id="relationship-graph-heading" class="text-xl font-black tracking-tight text-slate-900 sm:text-2xl">
+                  Ecosystem relationship graph
+                </h2>
 
-            <span>
-              health <%= hotspot[:health_score] %>
-            </span>
-
-          </div>
-
-          <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
-
-            <div
-              class="h-full rounded-full bg-gradient-to-r from-orange-500 to-amber-400"
-              style="width: <%= hotspot[:hotspot_score] %>%">
+                <p class="mt-2 max-w-3xl text-base leading-7 text-slate-600">
+                  Explore the relationships connecting entities across your ecosystem.
+                </p>
+              </div>
             </div>
 
+            <span class="inline-flex w-fit shrink-0 items-center gap-2 rounded-full border border-orange-200 bg-white px-4 py-2 text-sm font-bold text-orange-800 shadow-sm">
+              <span aria-hidden="true" class="h-2 w-2 rounded-full bg-orange-400"></span>
+              <%= number_with_delimiter(relationship_count) %> relationships
+            </span>
           </div>
-
         </div>
 
-      <% end %>
+        <div
+          data-entity-cross-intelligence-target="graph"
+          class="relative min-h-[340px] overflow-hidden bg-slate-950"
+          aria-label="Entity relationship graph"
+        >
+          <div class="flex min-h-[340px] items-center justify-center px-6 py-10 text-center">
+            <div class="max-w-md">
+              <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-[24px] border border-slate-700 bg-slate-900 text-3xl text-orange-300">
+                ◎
+              </div>
 
-    </div>
+              <h3 class="mt-5 text-lg font-extrabold text-white">
+                <% if nodes.empty? %>
+                  No relationship data available
+                <% elsif edges.empty? %>
+                  Graph nodes have no edges
+                <% else %>
+                  Graph data loaded
+                <% end %>
+              </h3>
 
-  </section>
+              <p class="mt-2 text-base leading-7 text-slate-400">
+                <% if nodes.empty? %>
+                  The relationship service returned no graph nodes. Inspect the entity registry and graph service output.
+                <% elsif edges.empty? %>
+                  The service returned <%= nodes.size %> nodes but no edges. The entity explorer remains available below.
+                <% else %>
+                  The service returned <%= nodes.size %> nodes and <%= edges.size %> edges. The existing Stimulus controller manages graph visualization.
+                <% end %>
+              </p>
+            </div>
+          </div>
+        </div>
 
+        <div class="border-t border-orange-100 bg-orange-50/40 px-5 py-4 sm:px-7">
+          <p class="text-sm leading-6 text-slate-600 sm:text-base">
+            Graph visualization is managed by the existing
+            <span class="font-bold text-slate-800">entity-cross-intelligence</span>
+            Stimulus controller. The entity explorer remains available when
+            graph visualization is unavailable.
+          </p>
+        </div>
+      </section>
 
-  <%# ============================================================
-      REVIEW MISSIONS
-  ============================================================= %>
+      <%# ========================================================== %>
+      <%# EXISTING ENTITY EXPLORER                                    %>
+      <%# ========================================================== %>
 
-  <section>
+      <%= render(
+            "admin/ecosystems/load_sources/entities/entities/entity_table",
+            nodes: nodes,
+            total_entities: total_entities
+          ) %>
 
-    <div class="mb-3">
+      <%# ========================================================== %>
+      <%# EXISTING FINDINGS PARTIAL                                   %>
+      <%# ========================================================== %>
 
-      <div class="text-[10px] font-black uppercase tracking-[0.2em] text-amber-500">
-        Review Missions
-      </div>
+      <%= render(
+            "admin/ecosystems/load_sources/entities/entities/findings",
+            signals: signals,
+            hotspots: hotspots,
+            review_opportunities: review_opportunities,
+            emerging: emerging,
+            declining: declining
+          ) %>
 
-      <div class="mt-1 text-xs text-gray-400">
-        Highest-value opportunities for editorial intervention.
-      </div>
+      <%# ========================================================== %>
+      <%# STRUCTURAL HOTSPOTS                                         %>
+      <%# ========================================================== %>
 
-    </div>
+      <section aria-labelledby="hotspots-heading">
+        <div class="mb-5">
+          <div class="flex items-center gap-2">
+            <span class="h-6 w-1.5 rounded-full bg-orange-400"></span>
+            <h2 id="hotspots-heading" class="text-xl font-black tracking-tight text-slate-900 sm:text-2xl">
+              Structural hotspots
+            </h2>
+          </div>
 
-    <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+          <p class="mt-2 text-base leading-7 text-slate-600">
+            Highly connected entities that may influence the structure and
+            reliability of the ecosystem.
+          </p>
+        </div>
 
-      <% @intelligence[:review_opportunities].each do |opportunity| %>
+        <% if hotspots.any? %>
+          <div class="grid gap-4 md:grid-cols-2">
+            <% hotspots.each_with_index do |hotspot, index| %>
+              <% hotspot = hotspot.respond_to?(:to_h) ? hotspot.to_h.with_indifferent_access : { value: hotspot } %>
 
-        <div class="border-b border-gray-100 p-4 last:border-0 dark:border-gray-800">
+              <article class="rounded-[24px] border-2 border-orange-100 bg-white p-5 shadow-sm">
+                <div class="flex items-start justify-between gap-3">
+                  <h3 class="font-extrabold text-slate-900">
+                    <%= hotspot[:label].presence || hotspot[:name].presence || hotspot[:title].presence || "Structural hotspot #{index + 1}" %>
+                  </h3>
 
-          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <% if hotspot[:score].present? || hotspot[:degree].present? %>
+                    <span class="rounded-full bg-orange-50 px-3 py-1 text-xs font-bold text-orange-800">
+                      <%= hotspot[:score].presence || hotspot[:degree] %>
+                    </span>
+                  <% end %>
+                </div>
+
+                <% if hotspot[:description].present? || hotspot[:reason].present? %>
+                  <p class="mt-3 text-sm leading-6 text-slate-600">
+                    <%= hotspot[:description].presence || hotspot[:reason] %>
+                  </p>
+                <% end %>
+
+                <% if hotspot[:type].present? || hotspot[:status].present? %>
+                  <p class="mt-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    <%= [hotspot[:type], hotspot[:status]].compact_blank.join(" · ") %>
+                  </p>
+                <% end %>
+              </article>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="rounded-[24px] border-2 border-dashed border-orange-200 bg-white p-6 sm:p-8">
+            <div class="flex items-start gap-4">
+              <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-orange-100 text-xl">
+                ◉
+              </span>
+
+              <div>
+                <h3 class="text-lg font-extrabold text-slate-900">
+                  No structural hotspots reported
+                </h3>
+
+                <p class="mt-2 text-base leading-7 text-slate-600">
+                  The intelligence service did not include any hotspot records
+                  in the current payload.
+                </p>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </section>
+
+      <%# ========================================================== %>
+      <%# REVIEW MISSIONS                                              %>
+      <%# ========================================================== %>
+
+      <section aria-labelledby="review-missions-heading">
+        <div class="mb-5">
+          <div class="flex items-center gap-2">
+            <span class="h-6 w-1.5 rounded-full bg-amber-400"></span>
+            <h2 id="review-missions-heading" class="text-xl font-black tracking-tight text-slate-900 sm:text-2xl">
+              Review missions
+            </h2>
+          </div>
+
+          <p class="mt-2 text-base leading-7 text-slate-600">
+            Identify entities that may need editorial review, correction,
+            or additional investigation.
+          </p>
+        </div>
+
+        <div class="overflow-hidden rounded-[28px] border-2 border-orange-100 bg-white shadow-sm">
+          <div class="flex flex-col gap-2 border-b border-orange-100 bg-gradient-to-r from-amber-50/80 via-white to-orange-50/50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+            <h3 class="text-base font-extrabold text-slate-800">
+              Review queue
+            </h3>
+
+            <span class="inline-flex w-fit items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-sm font-bold text-amber-800">
+              <span aria-hidden="true" class="h-2 w-2 rounded-full bg-amber-400"></span>
+              <%= number_with_delimiter(review_opportunities.size) %> opportunities
+            </span>
+          </div>
+
+          <% if review_opportunities.any? %>
+            <div class="divide-y divide-orange-100">
+              <% review_opportunities.each_with_index do |opportunity, index| %>
+                <% opportunity = opportunity.respond_to?(:to_h) ? opportunity.to_h.with_indifferent_access : { value: opportunity } %>
+
+                <article class="p-5 sm:p-6">
+                  <div class="flex items-start gap-3">
+                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-100 font-black text-amber-800">
+                      <%= index + 1 %>
+                    </span>
+
+                    <div class="min-w-0 flex-1">
+                      <h4 class="font-extrabold text-slate-900">
+                        <%= opportunity[:title].presence || opportunity[:label].presence || opportunity[:name].presence || opportunity[:entity_name].presence || "Review opportunity #{index + 1}" %>
+                      </h4>
+
+                      <p class="mt-2 text-sm leading-6 text-slate-600">
+                        <%= opportunity[:description].presence || opportunity[:reason].presence || opportunity[:message].presence || opportunity[:value].presence || "Additional inspection may be required." %>
+                      </p>
+
+                      <% if opportunity[:priority].present? || opportunity[:severity].present? || opportunity[:status].present? %>
+                        <div class="mt-3 flex flex-wrap gap-2">
+                          <% [opportunity[:priority], opportunity[:severity], opportunity[:status]].compact_blank.each do |tag| %>
+                            <span class="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-bold text-amber-800">
+                              <%= tag %>
+                            </span>
+                          <% end %>
+                        </div>
+                      <% end %>
+                    </div>
+                  </div>
+                </article>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="p-8 text-center sm:p-10">
+              <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-emerald-200 bg-emerald-100 text-2xl font-black text-emerald-700">
+                ✓
+              </div>
+
+              <h3 class="mt-4 text-lg font-extrabold text-slate-900">
+                No review opportunities reported
+              </h3>
+
+              <p class="mx-auto mt-2 max-w-xl text-base leading-7 text-slate-600">
+                The intelligence service returned no review items. Individual
+                entity records may still require separate inspection.
+              </p>
+            </div>
+          <% end %>
+        </div>
+      </section>
+
+      <%# ========================================================== %>
+      <%# INTELLIGENCE DATA QUALITY                                    %>
+      <%# ========================================================== %>
+
+      <section aria-labelledby="intelligence-data-quality-heading" class="overflow-hidden rounded-[28px] border-2 border-slate-200 bg-white shadow-sm">
+        <div class="border-b border-slate-200 bg-slate-50 px-5 py-5 sm:px-7">
+          <h2 id="intelligence-data-quality-heading" class="text-xl font-black tracking-tight text-slate-900">
+            Intelligence data quality
+          </h2>
+
+          <p class="mt-2 text-sm leading-6 text-slate-600">
+            Actual records received by this page, independently of whether
+            the intelligence service successfully calculated its findings.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 p-4 sm:grid-cols-4 sm:p-6">
+          <% [
+               ["Signals", signals.size],
+               ["Relationships", relationship_count],
+               ["Graph nodes", nodes.size],
+               ["Graph edges", edges.size],
+               ["Hotspots", hotspots.size],
+               ["Review opportunities", review_opportunities.size],
+               ["Emerging entities", emerging.size],
+               ["Declining entities", declining.size]
+             ].each do |label, value| %>
+            <article class="rounded-2xl border border-slate-200 bg-white p-4">
+              <p class="text-sm font-semibold text-slate-500">
+                <%= label %>
+              </p>
+
+              <p class="mt-2 text-2xl font-black tabular-nums text-slate-900">
+                <%= number_with_delimiter(value) %>
+              </p>
+            </article>
+          <% end %>
+        </div>
+
+        <% if diagnostics.any? %>
+          <div class="space-y-3 px-4 pb-5 sm:px-6 sm:pb-6">
+            <h3 class="text-base font-extrabold text-slate-900">
+              Diagnostics requiring attention
+            </h3>
+
+            <% diagnostics.each do |diagnostic| %>
+              <article class="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+                <h4 class="font-extrabold text-amber-950">
+                  <%= diagnostic[:title] %>
+                </h4>
+
+                <p class="mt-1 text-sm leading-6 text-amber-900">
+                  <%= diagnostic[:message] %>
+                </p>
+              </article>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="px-4 pb-5 sm:px-6 sm:pb-6">
+            <p class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-600">
+              No issues were detected by the current page-level diagnostics.
+              This does not establish that the analysis is complete or that
+              the ecosystem is healthy.
+            </p>
+          </div>
+        <% end %>
+      </section>
+
+      <%# ========================================================== %>
+      <%# ENTITY EVOLUTION                                             %>
+      <%# ========================================================== %>
+
+      <section aria-labelledby="entity-evolution-heading">
+        <div class="mb-5">
+          <div class="flex items-center gap-2">
+            <span class="h-6 w-1.5 rounded-full bg-emerald-400"></span>
+            <h2 id="entity-evolution-heading" class="text-xl font-black tracking-tight text-slate-900 sm:text-2xl">
+              Entity evolution
+            </h2>
+          </div>
+
+          <p class="mt-2 text-base leading-7 text-slate-600">
+            Monitor newly emerging ecosystem members and entities that may
+            be experiencing declining health or activity.
+          </p>
+        </div>
+
+        <div class="grid gap-5 lg:grid-cols-2">
+
+          <%# Emerging entities %>
+          <section aria-labelledby="emerging-entities-heading" class="overflow-hidden rounded-[28px] border-2 border-emerald-100 bg-white shadow-sm">
+            <div class="border-b border-emerald-100 bg-gradient-to-r from-emerald-50/80 to-white p-5 sm:p-6">
+              <div class="flex items-start gap-4">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-emerald-200 bg-emerald-100 text-xl">
+                  ↗
+                </div>
+
+                <div>
+                  <h3 id="emerging-entities-heading" class="text-lg font-extrabold text-emerald-900 sm:text-xl">
+                    Emerging entities
+                  </h3>
+
+                  <p class="mt-2 text-base leading-7 text-slate-600">
+                    Recently created or activated ecosystem members.
+                  </p>
+                </div>
+              </div>
+
+              <div class="mt-4 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white px-3 py-1.5 text-sm font-bold text-emerald-800">
+                <span aria-hidden="true" class="h-2 w-2 rounded-full bg-emerald-400"></span>
+                <%= emerging.size %> emerging
+              </div>
+            </div>
+
+            <div class="space-y-3 p-4 sm:p-5">
+              <% if emerging.any? %>
+                <% emerging.each_with_index do |entity, index| %>
+                  <% entity = entity.respond_to?(:to_h) ? entity.to_h.with_indifferent_access : { value: entity } %>
+
+                  <article class="rounded-2xl border border-emerald-100 bg-emerald-50/40 p-4">
+                    <h4 class="font-bold text-slate-900">
+                      <%= entity[:label].presence || entity[:name].presence || entity[:title].presence || entity[:slug].presence || entity[:id].presence || "Emerging entity #{index + 1}" %>
+                    </h4>
+
+                    <% if entity[:description].present? || entity[:reason].present? %>
+                      <p class="mt-2 text-sm leading-6 text-slate-600">
+                        <%= entity[:description].presence || entity[:reason] %>
+                      </p>
+                    <% end %>
+
+                    <% if entity[:status].present? || entity[:type].present? %>
+                      <p class="mt-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        <%= [entity[:status], entity[:type]].compact_blank.join(" · ") %>
+                      </p>
+                    <% end %>
+                  </article>
+                <% end %>
+              <% else %>
+                <div class="rounded-2xl border border-dashed border-emerald-200 bg-emerald-50/40 p-6">
+                  <p class="text-base font-bold text-slate-800">
+                    No emerging entities reported
+                  </p>
+
+                  <p class="mt-2 text-sm leading-6 text-slate-600">
+                    New or activated entities will appear here when supplied
+                    by the intelligence service.
+                  </p>
+                </div>
+              <% end %>
+            </div>
+          </section>
+
+          <%# Declining entities %>
+          <section aria-labelledby="declining-entities-heading" class="overflow-hidden rounded-[28px] border-2 border-rose-100 bg-white shadow-sm">
+            <div class="border-b border-rose-100 bg-gradient-to-r from-rose-50/80 to-white p-5 sm:p-6">
+              <div class="flex items-start gap-4">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-rose-200 bg-rose-100 text-xl">
+                  ↘
+                </div>
+
+                <div>
+                  <h3 id="declining-entities-heading" class="text-lg font-extrabold text-rose-900 sm:text-xl">
+                    Declining entities
+                  </h3>
+
+                  <p class="mt-2 text-base leading-7 text-slate-600">
+                    Entities showing potential lifecycle or activity risks.
+                  </p>
+                </div>
+              </div>
+
+              <div class="mt-4 inline-flex items-center gap-2 rounded-full border border-rose-200 bg-white px-3 py-1.5 text-sm font-bold text-rose-800">
+                <span aria-hidden="true" class="h-2 w-2 rounded-full bg-rose-400"></span>
+                <%= declining.size %> declining
+              </div>
+            </div>
+
+            <div class="space-y-3 p-4 sm:p-5">
+              <% if declining.any? %>
+                <% declining.each_with_index do |entity, index| %>
+                  <% entity = entity.respond_to?(:to_h) ? entity.to_h.with_indifferent_access : { value: entity } %>
+
+                  <article class="rounded-2xl border border-rose-100 bg-rose-50/40 p-4">
+                    <h4 class="font-bold text-slate-900">
+                      <%= entity[:label].presence || entity[:name].presence || entity[:title].presence || entity[:slug].presence || entity[:id].presence || "Declining entity #{index + 1}" %>
+                    </h4>
+
+                    <% if entity[:description].present? || entity[:reason].present? %>
+                      <p class="mt-2 text-sm leading-6 text-slate-600">
+                        <%= entity[:description].presence || entity[:reason] %>
+                      </p>
+                    <% end %>
+
+                    <% if entity[:status].present? || entity[:type].present? %>
+                      <p class="mt-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        <%= [entity[:status], entity[:type]].compact_blank.join(" · ") %>
+                      </p>
+                    <% end %>
+                  </article>
+                <% end %>
+              <% else %>
+                <div class="rounded-2xl border border-dashed border-rose-200 bg-rose-50/40 p-6">
+                  <p class="text-base font-bold text-slate-800">
+                    No declining entities reported
+                  </p>
+
+                  <p class="mt-2 text-sm leading-6 text-slate-600">
+                    Entities with potential lifecycle or activity risks will
+                    appear here when supplied by the intelligence service.
+                  </p>
+                </div>
+              <% end %>
+            </div>
+          </section>
+
+        </div>
+      </section>
+
+      <%# ========================================================== %>
+      <%# ECOSYSTEM IMPROVEMENT LOOP                                   %>
+      <%# ========================================================== %>
+
+      <section aria-labelledby="ecosystem-improvement-heading" class="overflow-hidden rounded-[28px] border-2 border-orange-100 bg-gradient-to-r from-orange-50/80 via-white to-emerald-50/60 p-5 shadow-sm sm:p-7">
+        <div class="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+          <div class="flex items-start gap-4">
+            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-orange-100 text-2xl shadow-sm">
+              🔄
+            </div>
 
             <div>
+              <h2 id="ecosystem-improvement-heading" class="text-lg font-extrabold text-slate-900 sm:text-xl">
+                Ecosystem improvement loop
+              </h2>
 
-              <div class="text-sm font-black text-gray-800 dark:text-white">
-                <%= opportunity[:name] %>
-              </div>
-
-              <div class="mt-1 font-mono text-[9px] text-gray-400">
-                <%= opportunity[:slug] %>
-              </div>
-
+              <p class="mt-2 max-w-3xl text-base leading-7 text-slate-600">
+                Relationships reveal structural patterns. Intelligence signals
+                identify opportunities and risks. Review missions help maintain
+                quality, while entity evolution reveals how the ecosystem changes.
+              </p>
             </div>
-
-            <div class="flex items-center gap-2">
-
-              <span class="rounded-full bg-amber-50 px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-amber-600 dark:bg-amber-950/30 dark:text-amber-400">
-                Priority <%= opportunity[:priority] %>
-              </span>
-
-            </div>
-
           </div>
 
-          <div class="mt-3 flex flex-wrap gap-2">
-
-            <% opportunity[:reasons].each do |reason| %>
-
-              <span class="rounded-lg border border-gray-200 bg-gray-50 px-2 py-1 text-[9px] font-bold text-gray-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-400">
-                <%= reason[:label] %>
-              </span>
-
-            <% end %>
-
-          </div>
-
+          <span class="inline-flex w-fit shrink-0 items-center gap-2 rounded-full border border-orange-200 bg-white px-4 py-2 text-sm font-bold text-orange-800 shadow-sm">
+            <span aria-hidden="true">✨</span>
+            Continuous improvement
+          </span>
         </div>
 
-      <% end %>
+        <div class="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <% [
+               {
+                 number: "01",
+                 title: "Discover",
+                 description: "Detect relationships, structural hotspots, and new ecosystem signals.",
+                 border: "border-orange-200",
+                 icon_bg: "bg-orange-100",
+                 icon_text: "text-orange-700",
+                 title_text: "text-orange-800"
+               },
+               {
+                 number: "02",
+                 title: "Investigate",
+                 description: "Examine potential problems and prioritize entities needing review.",
+                 border: "border-amber-200",
+                 icon_bg: "bg-amber-100",
+                 icon_text: "text-amber-800",
+                 title_text: "text-amber-800"
+               },
+               {
+                 number: "03",
+                 title: "Improve",
+                 description: "Address review findings and improve entity quality and completeness.",
+                 border: "border-sky-200",
+                 icon_bg: "bg-sky-100",
+                 icon_text: "text-sky-700",
+                 title_text: "text-sky-800"
+               },
+               {
+                 number: "04",
+                 title: "Evolve",
+                 description: "Monitor changes and strengthen the ecosystem as new information emerges.",
+                 border: "border-emerald-200",
+                 icon_bg: "bg-emerald-100",
+                 icon_text: "text-emerald-700",
+                 title_text: "text-emerald-800"
+               }
+             ].each do |step| %>
+            <article class="rounded-2xl border <%= step[:border] %> bg-white/90 p-4">
+              <div class="flex h-10 w-10 items-center justify-center rounded-xl <%= step[:icon_bg] %> text-lg font-black <%= step[:icon_text] %>">
+                <%= step[:number] %>
+              </div>
 
-      <% if @intelligence[:review_opportunities].empty? %>
+              <h3 class="mt-4 text-base font-extrabold <%= step[:title_text] %>">
+                <%= step[:title] %>
+              </h3>
 
-        <div class="p-8 text-center">
-
-          <div class="text-2xl">
-            ✓
-          </div>
-
-          <div class="mt-2 text-sm font-black text-gray-700 dark:text-gray-200">
-            No major review opportunities detected.
-          </div>
-
+              <p class="mt-2 text-sm leading-6 text-slate-600">
+                <%= step[:description] %>
+              </p>
+            </article>
+          <% end %>
         </div>
 
-      <% end %>
-
-    </div>
-
-  </section>
-
-
-  <%# ============================================================
-      EVOLUTION
-  ============================================================= %>
-
-  <section class="grid gap-4 lg:grid-cols-2">
-
-    <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
-
-      <div class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500">
-        Emerging Entities
-      </div>
-
-      <div class="mt-1 text-xs text-gray-400">
-        Recently created or activated members of the ecosystem.
-      </div>
-
-      <div class="mt-4 space-y-2">
-
-        <% @intelligence[:emerging].each do |entity| %>
-
-          <div class="flex items-center justify-between rounded-xl bg-emerald-50 px-3 py-2 dark:bg-emerald-950/20">
-
-            <div class="min-w-0">
-
-              <div class="truncate text-xs font-black text-gray-800 dark:text-gray-100">
-                <%= entity[:name] %>
-              </div>
-
-              <div class="font-mono text-[8px] text-gray-400">
-                <%= entity[:slug] %>
-              </div>
-
-            </div>
-
-            <span class="ml-3 shrink-0 text-[9px] font-black text-emerald-600 dark:text-emerald-400">
-              <%= entity[:health_score] %>
+        <div class="mt-6 rounded-2xl border border-orange-100 bg-white/80 p-4 sm:p-5">
+          <div class="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <span class="text-sm font-black uppercase tracking-wider text-slate-600">
+              Intelligence coverage
             </span>
 
+            <span class="text-sm font-semibold text-slate-500">
+              6 intelligence areas represented
+            </span>
           </div>
 
-        <% end %>
+          <div class="h-2.5 overflow-hidden rounded-full border border-orange-100 bg-orange-50">
+            <div class="h-full w-full rounded-full bg-gradient-to-r from-orange-400 via-amber-400 via-sky-400 to-emerald-400"></div>
+          </div>
 
-      </div>
+          <p class="mt-3 text-sm leading-6 text-slate-500">
+            This indicator represents dashboard coverage, not a calculated
+            ecosystem health score or the completeness of the returned data.
+          </p>
+        </div>
+      </section>
 
-    </div>
+      <%# ========================================================== %>
+      <%# TECHNICAL DETAILS / JSON                                     %>
+      <%# ========================================================== %>
 
-
-    <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
-
-      <div class="text-[10px] font-black uppercase tracking-[0.2em] text-red-500">
-        Declining Entities
-      </div>
-
-      <div class="mt-1 text-xs text-gray-400">
-        Entities showing lifecycle or activity risk.
-      </div>
-
-      <div class="mt-4 space-y-2">
-
-        <% @intelligence[:declining].each do |entity| %>
-
-          <div class="flex items-center justify-between rounded-xl bg-red-50 px-3 py-2 dark:bg-red-950/20">
-
-            <div class="min-w-0">
-
-              <div class="truncate text-xs font-black text-gray-800 dark:text-gray-100">
-                <%= entity[:name] %>
+      <section class="overflow-hidden rounded-[24px] border-2 border-orange-200 bg-white shadow-sm" aria-labelledby="intelligence-technical-details-heading">
+        <details>
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-4 bg-orange-50 px-5 py-5 transition hover:bg-orange-100 sm:px-6">
+            <div class="flex min-w-0 items-center gap-4">
+              <div aria-hidden="true" class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border-2 border-orange-300 bg-orange-100 text-xl text-orange-900">
+                ⚙
               </div>
 
-              <div class="font-mono text-[8px] text-gray-400">
-                <%= entity[:signal] %>
-              </div>
+              <div class="min-w-0">
+                <h2 id="intelligence-technical-details-heading" class="text-base font-extrabold text-slate-900 sm:text-lg">
+                  Technical details
+                </h2>
 
+                <p class="mt-1 text-sm leading-6 text-slate-700">
+                  Inspect graph statistics and copy the normalized intelligence JSON payload.
+                </p>
+              </div>
             </div>
 
-            <span class="ml-3 shrink-0 text-[9px] font-black text-red-600 dark:text-red-400">
-              <%= entity[:health_score] %>
+            <span aria-hidden="true" class="shrink-0 text-xl font-bold text-orange-800">
+              +
             </span>
+          </summary>
 
+          <div class="border-t-2 border-orange-100 bg-white p-4 sm:p-6">
+            <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <% [
+                   ["Node count", graph_stats[:node_count]],
+                   ["Edge count", graph_stats[:edge_count]],
+                   ["Strong relationships", graph_stats[:strong_relationships]],
+                   ["Average confidence", graph_stats[:average_confidence]]
+                 ].each do |label, value| %>
+                <div class="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                  <p class="text-xs font-semibold text-slate-500">
+                    <%= label %>
+                  </p>
+
+                  <p class="mt-1 font-bold text-slate-900">
+                    <%= value.nil? ? "Not provided" : value %>
+                  </p>
+                </div>
+              <% end %>
+            </div>
+
+            <div class="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div class="min-w-0">
+                <h3 class="text-base font-extrabold text-slate-900">
+                  Intelligence payload
+                </h3>
+
+                <p class="mt-1 text-sm leading-6 text-slate-700">
+                  This is the same normalized payload supplied to the existing
+                  entity-cross-intelligence Stimulus controller.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                data-intelligence-copy-button
+                data-intelligence-json-copy-button
+                class="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl border-2 border-orange-300 bg-orange-50 px-4 py-2 text-sm font-extrabold text-orange-950 shadow-sm transition hover:border-orange-500 hover:bg-orange-100 focus:outline-none focus:ring-4 focus:ring-orange-200"
+              >
+                <span aria-hidden="true">▣</span>
+                Copy JSON
+              </button>
+            </div>
+
+            <div class="mt-4 overflow-hidden rounded-2xl border-2 border-slate-700 bg-slate-950 shadow-inner">
+              <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-700 bg-slate-900 px-4 py-3">
+                <span class="font-mono text-xs font-bold uppercase tracking-wider text-slate-200">
+                  JSON · Intelligence payload
+                </span>
+
+                <span class="text-xs font-semibold text-slate-300">
+                  Read-only
+                </span>
+              </div>
+
+              <pre
+                id="intelligence-json-payload"
+                tabindex="0"
+                aria-label="Normalized intelligence JSON payload"
+                class="m-0 max-h-[36rem] overflow-auto whitespace-pre-wrap break-words bg-slate-950 p-4 font-mono text-sm leading-6 text-white sm:p-5"
+                style="color:#ffffff;background-color:#020617;"
+              ><%= pretty_payload %></pre>
+            </div>
+
+            <p
+              data-intelligence-copy-status
+              data-intelligence-json-copy-status
+              class="mt-3 min-h-6 text-sm font-semibold text-slate-700"
+              role="status"
+              aria-live="polite"
+            >
+              The payload is displayed as readable, selectable text.
+            </p>
           </div>
+        </details>
+      </section>
 
-        <% end %>
+      <%# ========================================================== %>
+      <%# EXISTING STIMULUS PAYLOAD CONTRACT                            %>
+      <%# Keep this target available to the existing controller.       %>
+      <%# ========================================================== %>
 
-      </div>
+      <script
+        type="application/json"
+        data-entity-cross-intelligence-target="payload"
+      ><%= raw(json_escape(payload.to_json)) %></script>
+
+      <%# ========================================================== %>
+      <%# ABOUT THESE RESULTS                                          %>
+      <%# ========================================================== %>
+
+      <footer class="border-t-2 border-orange-100 pt-5">
+        <div class="flex items-start gap-3">
+          <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-orange-100 bg-orange-50 text-base">
+            ℹ
+          </span>
+
+          <div>
+            <p class="text-sm font-bold text-slate-700 sm:text-base">
+              About these intelligence results
+            </p>
+
+            <p class="mt-2 text-sm leading-6 text-slate-500 sm:text-base sm:leading-7">
+              Dashboard values are derived from the intelligence payload.
+              Empty sections indicate that records were not supplied for those
+              sections; they do not necessarily indicate an absence of ecosystem
+              relationships, problems, or review needs. The dashboard coverage
+              indicator describes the areas represented in the interface, not
+              a measured health score or proof that analysis completed.
+            </p>
+          </div>
+        </div>
+      </footer>
 
     </div>
+  </div>
+</main>
 
-  </section>
+<script>
+    (() => {
+        const initializeCopyButtons = () => {
+            document.querySelectorAll(
+                "[data-intelligence-json-copy-button], [data-intelligence-copy-button]"
+            ).forEach((button) => {
+                if (button.dataset.copyHandlerAttached === "true") return;
 
+                const section = button.closest("section") || document;
+                const payload = section.querySelector("#intelligence-json-payload") ||
+                    document.getElementById("intelligence-json-payload");
 
-  <%# ============================================================
-      RAW DATA
-  ============================================================= %>
+                const status = section.querySelector(
+                    "[data-intelligence-json-copy-status], [data-intelligence-copy-status]"
+                ) || document.querySelector(
+                    "[data-intelligence-json-copy-status], [data-intelligence-copy-status]"
+                );
 
-  <script
-    type="application/json"
-    data-entity-cross-intelligence-target="payload"><%= raw @intelligence.to_json %></script>
+                if (!payload || !status) return;
 
-</div>
+                button.dataset.copyHandlerAttached = "true";
+
+                button.addEventListener("click", async () => {
+                    const text = payload.textContent || "";
+
+                    try {
+                        if (navigator.clipboard && window.isSecureContext) {
+                            await navigator.clipboard.writeText(text);
+                        } else {
+                            const textarea = document.createElement("textarea");
+                            textarea.value = text;
+                            textarea.setAttribute("readonly", "");
+                            textarea.style.position = "fixed";
+                            textarea.style.left = "-9999px";
+                            textarea.style.top = "0";
+
+                            document.body.appendChild(textarea);
+                            textarea.select();
+
+                            const copied = document.execCommand("copy");
+                            textarea.remove();
+
+                            if (!copied) {
+                                throw new Error("Clipboard copy was unsuccessful.");
+                            }
+                        }
+
+                        status.textContent = "JSON copied to clipboard successfully.";
+                    } catch (_error) {
+                        status.textContent =
+                            "Automatic copying failed. Select the JSON text and copy it manually.";
+                    }
+                });
+            });
+        };
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", initializeCopyButtons, {
+                once: true
+            });
+        } else {
+            initializeCopyButtons();
+        }
+    })();
+</script>

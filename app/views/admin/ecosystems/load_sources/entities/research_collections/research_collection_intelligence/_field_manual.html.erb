@@ -1,0 +1,541 @@
+
+<%# ============================================================================
+RESEARCH COLLECTION INTELLIGENCE — FIELD MANUAL
+
+Purpose:
+Provide a beginner-friendly, encyclopedia-level explanation of the research
+intelligence model, including questions, objectives, findings, evidence,
+contradictions, synthesis, milestones, signals, and relationships.
+
+Usage:
+  <%= render "admin/ecosystems/load_sources/entities/research_collections/research_collection_intelligence/field_manual" %>
+
+Notes:
+- Presentation-only partial; it does not modify research data.
+- Uses Tailwind utility classes and semantic HTML.
+============================================================================ %>
+
+<section
+  aria-labelledby="research-field-manual-title"
+  class="relative mb-10 overflow-hidden rounded-[32px] border-2 border-violet-100 bg-gradient-to-b from-white via-violet-50/30 to-slate-50 shadow-md shadow-violet-100/40"
+>
+  <%# Decorative background %>
+  <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+    <div class="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-violet-200/30 blur-3xl"></div>
+    <div class="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-orange-200/25 blur-3xl"></div>
+    <div class="absolute right-20 top-20 h-24 w-24 rounded-full border-2 border-violet-100/70"></div>
+  </div>
+
+  <div class="relative z-10 p-5 sm:p-8 lg:p-10">
+
+    <%# Header labels %>
+    <div class="flex flex-wrap items-center gap-3">
+      <span class="inline-flex items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-4 py-2 text-[11px] font-black uppercase tracking-[0.18em] text-violet-700">
+        <span class="h-2 w-2 animate-pulse rounded-full bg-violet-500"></span>
+        Research field manual
+      </span>
+
+      <span class="rounded-full border border-orange-200 bg-orange-50 px-4 py-2 text-[11px] font-bold uppercase tracking-wider text-orange-700">
+        Knowledge protocol 01
+      </span>
+    </div>
+
+    <%# Hero %>
+    <div class="mt-7 grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-center">
+      <div class="lg:col-span-7">
+        <div class="text-[12px] font-black uppercase tracking-[0.22em] text-violet-500">
+          Research architecture
+        </div>
+
+        <h2 id="research-field-manual-title" class="mt-2 max-w-3xl text-3xl font-black leading-tight tracking-tight text-slate-900 sm:text-4xl">
+          How does research intelligence actually work?
+        </h2>
+
+        <p class="mt-5 max-w-2xl text-base leading-7 text-slate-600 sm:text-[17px]">
+          Research intelligence is the organized interpretation of a research
+          collection. It brings together questions, goals, observations,
+          findings, supporting material, and unresolved disagreements so that
+          a researcher can understand not only what has been recorded, but
+          also what remains uncertain and what deserves attention next.
+        </p>
+
+        <p class="mt-4 max-w-2xl text-sm leading-6 text-slate-500">
+          An individual record represents one piece of the investigation.
+          The collection provides the broader context in which those records
+          can be compared, connected, challenged, and synthesized.
+        </p>
+
+        <div class="mt-6 rounded-2xl border-2 border-amber-100 bg-gradient-to-r from-amber-50 via-white to-orange-50/60 p-5 shadow-sm">
+          <div class="flex items-start gap-4">
+            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-amber-200 bg-amber-100 text-xl">
+              💡
+            </div>
+
+            <div>
+              <div class="text-[12px] font-black uppercase tracking-wider text-amber-700">
+                Beginner rule
+              </div>
+
+              <p class="mt-2 text-sm leading-6 text-slate-600 sm:text-[15px]">
+                <strong class="text-slate-800">A recorded finding is a claim to evaluate, not automatically a proven fact.</strong>
+                Always ask what supports it, how strong that support is,
+                whether credible sources disagree, and what limitations remain.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <%# Visual concept card %>
+      <div class="relative lg:col-span-5">
+        <div class="mx-auto max-w-sm rounded-[28px] border-2 border-indigo-100 bg-white p-6 shadow-lg shadow-indigo-100/60 transition duration-300 hover:-translate-y-1">
+          <div class="flex h-20 w-20 items-center justify-center rounded-[24px] border-2 border-indigo-200 bg-gradient-to-br from-indigo-500 to-violet-500 text-4xl shadow-lg shadow-indigo-200/70">
+            🧠
+          </div>
+
+          <div class="mt-6 text-[11px] font-black uppercase tracking-[0.2em] text-indigo-500">
+            Research collection
+          </div>
+
+          <h3 class="mt-1 text-xl font-black text-slate-900">
+            A connected knowledge system
+          </h3>
+
+          <p class="mt-2 text-sm leading-6 text-slate-500">
+            Multiple records become more useful when their meaning,
+            evidence, status, and relationships can be examined together.
+          </p>
+
+          <div class="mt-6 space-y-3">
+            <% [
+                 ["Questions", "Identify uncertainty", "border-orange-100 bg-orange-50 text-orange-700"],
+                 ["Findings", "Describe emerging results", "border-violet-100 bg-violet-50 text-violet-700"],
+                 ["Evidence", "Support or challenge claims", "border-emerald-100 bg-emerald-50 text-emerald-700"],
+                 ["Synthesis", "Explain the overall picture", "border-sky-100 bg-sky-50 text-sky-700"]
+               ].each do |label, description, classes| %>
+              <div class="rounded-xl border p-3 <%= classes %>">
+                <div class="text-xs font-black"><%= label %></div>
+                <div class="mt-1 text-xs leading-5 opacity-80"><%= description %></div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%# Architecture map %>
+    <div class="mt-12">
+      <div class="text-[12px] font-black uppercase tracking-[0.2em] text-slate-400">
+        System map
+      </div>
+
+      <h3 class="mt-2 text-xl font-black text-slate-800">
+        From an unknown to a defensible conclusion
+      </h3>
+
+      <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">
+        This is a conceptual workflow, not a guarantee that every investigation
+        follows a strictly linear sequence. Research commonly returns to earlier
+        stages when new evidence changes the questions or assumptions.
+      </p>
+
+      <div class="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <% [
+             {
+               icon: "❓",
+               title: "1. Question",
+               description: "Define what is unknown, disputed, or in need of explanation.",
+               example: "What causes the observed change?",
+               classes: "border-orange-100 bg-orange-50/70 text-orange-700"
+             },
+             {
+               icon: "🎯",
+               title: "2. Objective",
+               description: "Turn the question into a practical investigative goal.",
+               example: "Compare possible explanations.",
+               classes: "border-sky-100 bg-sky-50/70 text-sky-700"
+             },
+             {
+               icon: "🔬",
+               title: "3. Finding",
+               description: "Record a result or claim derived from the investigation.",
+               example: "Several sources report a similar pattern.",
+               classes: "border-violet-100 bg-violet-50/70 text-violet-700"
+             },
+             {
+               icon: "📚",
+               title: "4. Evidence",
+               description: "Evaluate the material that supports or challenges the claim.",
+               example: "Check source quality and methodology.",
+               classes: "border-emerald-100 bg-emerald-50/70 text-emerald-700"
+             }
+           ].each do |stage| %>
+          <article class="rounded-2xl border-2 p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md <%= stage[:classes] %>">
+            <div class="text-2xl"><%= stage[:icon] %></div>
+            <h4 class="mt-4 text-sm font-black"><%= stage[:title] %></h4>
+            <p class="mt-2 text-sm leading-6 text-slate-600"><%= stage[:description] %></p>
+            <div class="mt-4 rounded-xl border border-white/80 bg-white/80 p-3">
+              <div class="text-[10px] font-black uppercase tracking-wider text-slate-400">Example</div>
+              <p class="mt-1 text-xs leading-5 text-slate-600"><%= stage[:example] %></p>
+            </div>
+          </article>
+        <% end %>
+      </div>
+
+      <div class="mt-4 rounded-2xl border-2 border-indigo-100 bg-indigo-50/60 p-5">
+        <div class="flex items-start gap-3">
+          <span class="text-2xl">🔄</span>
+          <div>
+            <h4 class="text-sm font-black text-indigo-800">5. Synthesize, challenge, and revise</h4>
+            <p class="mt-2 text-sm leading-6 text-slate-600">
+              Compare findings across the collection, identify contradictions,
+              document limitations, and determine whether the original question
+              has been answered. If important gaps remain, refine the objectives
+              or gather additional evidence and repeat the cycle.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%# Encyclopedia glossary %>
+    <div class="mt-12">
+      <div class="text-[12px] font-black uppercase tracking-[0.2em] text-slate-400">
+        Encyclopedia glossary
+      </div>
+
+      <h3 class="mt-2 text-xl font-black text-slate-800">
+        Understand every research component
+      </h3>
+
+      <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">
+        Each component answers a different question. Keeping these roles distinct
+        prevents progress indicators from being confused with evidence quality
+        or conclusions from being confused with raw observations.
+      </p>
+
+      <div class="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+        <% [
+             {
+               icon: "❓",
+               title: "Research questions",
+               question: "What do we need to know?",
+               explanation: "Questions define the uncertainty that motivates the investigation. An unresolved question is not necessarily a failure; it may identify an important knowledge gap, a missing source, or a question that cannot yet be answered confidently.",
+               example: "Which factors are associated with the observed outcome?",
+               classes: "border-orange-100 bg-orange-50/30"
+             },
+             {
+               icon: "🎯",
+               title: "Objectives",
+               question: "What work will address the question?",
+               explanation: "Objectives translate broad questions into actionable goals. Useful objectives are specific enough to guide research activities and assess whether a task has been completed. Completing an objective does not automatically mean the hypothesis was confirmed.",
+               example: "Compare the methods and results of three independent studies.",
+               classes: "border-sky-100 bg-sky-50/30"
+             },
+             {
+               icon: "🔬",
+               title: "Findings",
+               question: "What did the investigation discover?",
+               explanation: "A finding is a recorded research result, observation, or claim. Its interpretation depends on context, methodology, source quality, and the evidence attached to it. Findings can be preliminary, contested, or later revised.",
+               example: "Two studies observed a similar association.",
+               classes: "border-violet-100 bg-violet-50/30"
+             },
+             {
+               icon: "📚",
+               title: "Evidence",
+               question: "What supports or challenges a claim?",
+               explanation: "Evidence is the source material used to assess a finding. It may include documents, measurements, datasets, experiments, interviews, or other records. Evidence should be relevant to the claim and evaluated for reliability, provenance, limitations, and potential bias.",
+               example: "A dataset and its documented collection method.",
+               classes: "border-emerald-100 bg-emerald-50/30"
+             },
+             {
+               icon: "⚡",
+               title: "Contradictions",
+               question: "Where do claims appear to disagree?",
+               explanation: "A contradiction indicates a possible conflict between claims or findings. The disagreement may result from different definitions, samples, time periods, methods, assumptions, or genuine incompatibility. A detected contradiction is a prompt to investigate, not proof that either source is wrong.",
+               example: "Two studies report different effects under different conditions.",
+               classes: "border-rose-100 bg-rose-50/30"
+             },
+             {
+               icon: "📝",
+               title: "Research synthesis",
+               question: "What does the combined evidence suggest?",
+               explanation: "Synthesis integrates information from multiple findings into a coherent interpretation. It distinguishes direct observations from interpretations and conclusions, identifies recurring patterns, and records uncertainty instead of hiding disagreements.",
+               example: "The effect appears in one population but remains uncertain in another.",
+               classes: "border-amber-100 bg-amber-50/30"
+             },
+             {
+               icon: "🏁",
+               title: "Milestones",
+               question: "What deliverables have been completed?",
+               explanation: "Milestones track planned stages or deliverables. They are useful for project management, but a completed milestone measures recorded progress rather than the validity of the research result.",
+               example: "Complete source collection and document the methodology.",
+               classes: "border-fuchsia-100 bg-fuchsia-50/30"
+             },
+             {
+               icon: "🕸️",
+               title: "Relationships",
+               question: "How are research elements connected?",
+               explanation: "Relationships record meaningful connections among research records. Depending on the relationship type, a connection might indicate support, dependency, shared context, derivation, disagreement, or another domain-specific link.",
+               example: "A finding is supported by a particular evidence record.",
+               classes: "border-indigo-100 bg-indigo-50/30"
+             }
+           ].each do |item| %>
+          <article class="rounded-2xl border-2 p-5 shadow-sm <%= item[:classes] %>">
+            <div class="flex items-start gap-3">
+              <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white bg-white text-xl shadow-sm">
+                <%= item[:icon] %>
+              </div>
+              <div class="min-w-0">
+                <h4 class="text-sm font-black text-slate-800"><%= item[:title] %></h4>
+                <p class="mt-1 text-xs font-bold text-slate-500"><%= item[:question] %></p>
+              </div>
+            </div>
+
+            <p class="mt-4 text-sm leading-6 text-slate-600"><%= item[:explanation] %></p>
+
+            <div class="mt-4 rounded-xl border border-white bg-white/80 p-3">
+              <div class="text-[10px] font-black uppercase tracking-wider text-slate-400">Illustrative example</div>
+              <p class="mt-1 text-xs leading-5 text-slate-600"><%= item[:example] %></p>
+            </div>
+          </article>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Understanding confidence %>
+    <div class="mt-12 rounded-[26px] border-2 border-emerald-100 bg-gradient-to-r from-emerald-50/80 via-white to-sky-50/50 p-5 md:p-7">
+      <div class="flex items-start gap-4">
+        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-emerald-200 bg-emerald-100 text-xl">
+          ⚖️
+        </div>
+
+        <div>
+          <h3 class="text-lg font-black text-slate-800">
+            How to interpret confidence and evidence quality
+          </h3>
+
+          <p class="mt-2 text-sm leading-6 text-slate-600">
+            Confidence labels summarize an assessment of a finding. Their meaning
+            depends on how your application defines and assigns them. Unless the
+            underlying rules explicitly say otherwise, a high-confidence label
+            should not be treated as a statistical probability or a guarantee of truth.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-5 grid grid-cols-1 gap-3 md:grid-cols-3">
+        <div class="rounded-2xl border border-emerald-200 bg-white p-4">
+          <div class="text-xs font-black text-emerald-700">High confidence</div>
+          <p class="mt-2 text-xs leading-5 text-slate-500">
+            A strong assessment within the system's criteria. Still inspect the
+            underlying evidence, assumptions, and possible limitations.
+          </p>
+        </div>
+
+        <div class="rounded-2xl border border-amber-200 bg-white p-4">
+          <div class="text-xs font-black text-amber-700">Medium confidence</div>
+          <p class="mt-2 text-xs leading-5 text-slate-500">
+            Some support exists, but uncertainty, incomplete coverage, or
+            unresolved alternatives may remain.
+          </p>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 bg-white p-4">
+          <div class="text-xs font-black text-slate-700">Low confidence</div>
+          <p class="mt-2 text-xs leading-5 text-slate-500">
+            Treat the finding cautiously. Further verification or better
+            evidence may be needed before relying on it.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
+        <p class="text-xs leading-5 text-amber-900/80">
+          <strong>Remember:</strong> the number of evidence records is not the
+          same as the strength of evidence. Many records may repeat the same
+          original source, use weak methods, or fail to address the claim being
+          evaluated.
+        </p>
+      </div>
+    </div>
+
+    <%# Metric interpretation %>
+    <div class="mt-12">
+      <div class="text-[12px] font-black uppercase tracking-[0.2em] text-slate-400">
+        Metric interpretation
+      </div>
+
+      <h3 class="mt-2 text-xl font-black text-slate-800">
+        What the dashboard numbers do — and do not — tell you
+      </h3>
+
+      <div class="mt-5 overflow-hidden rounded-2xl border-2 border-slate-100 bg-white">
+        <div class="grid grid-cols-1 divide-y divide-slate-100 md:grid-cols-2 md:divide-x md:divide-y-0">
+          <div class="p-5">
+            <h4 class="text-sm font-black text-slate-800">Questions resolved</h4>
+            <p class="mt-2 text-sm leading-6 text-slate-500">
+              Indicates how many questions are recorded as resolved compared
+              with the total. Check whether the answer is documented and
+              supported before treating resolution as conclusive.
+            </p>
+          </div>
+
+          <div class="p-5">
+            <h4 class="text-sm font-black text-slate-800">Objective progress</h4>
+            <p class="mt-2 text-sm leading-6 text-slate-500">
+              Describes recorded objective completion. It does not directly
+              measure the originality, accuracy, or significance of the result.
+            </p>
+          </div>
+
+          <div class="border-t border-slate-100 p-5">
+            <h4 class="text-sm font-black text-slate-800">Finding confidence</h4>
+            <p class="mt-2 text-sm leading-6 text-slate-500">
+              Shows the current confidence categories assigned to findings.
+              Interpret them according to the application's assessment rules.
+            </p>
+          </div>
+
+          <div class="border-t border-slate-100 p-5">
+            <h4 class="text-sm font-black text-slate-800">Evidence coverage</h4>
+            <p class="mt-2 text-sm leading-6 text-slate-500">
+              Indicates how widely evidence is represented across workspaces.
+              Coverage alone does not establish that the evidence is sufficient
+              or relevant to every claim.
+            </p>
+          </div>
+
+          <div class="border-t border-slate-100 p-5">
+            <h4 class="text-sm font-black text-slate-800">Contradiction count</h4>
+            <p class="mt-2 text-sm leading-6 text-slate-500">
+              Shows the conflicts currently detected or recorded. More
+              contradictions may reflect more thorough investigation rather
+              than worse research.
+            </p>
+          </div>
+
+          <div class="border-t border-slate-100 p-5">
+            <h4 class="text-sm font-black text-slate-800">Relationship count</h4>
+            <p class="mt-2 text-sm leading-6 text-slate-500">
+              Shows recorded connections between research elements. A larger
+              network is useful only when its connections have meaningful,
+              interpretable semantics.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%# Practical examples %>
+    <div class="mt-12">
+      <div class="text-[12px] font-black uppercase tracking-[0.2em] text-slate-400">
+        Practical applications
+      </div>
+
+      <div class="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
+        <article class="rounded-2xl border-2 border-indigo-100 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+          <div class="text-2xl">📖</div>
+          <h4 class="mt-4 text-sm font-black text-slate-800">Encyclopedia building</h4>
+          <p class="mt-2 text-sm leading-6 text-slate-500">
+            Combine facts, source references, disagreements, and cross-links
+            to build entries that preserve context instead of presenting
+            isolated claims.
+          </p>
+          <div class="mt-4 text-[11px] font-black text-indigo-600">Connect knowledge</div>
+        </article>
+
+        <article class="rounded-2xl border-2 border-violet-100 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+          <div class="text-2xl">🧪</div>
+          <h4 class="mt-4 text-sm font-black text-slate-800">Scientific investigation</h4>
+          <p class="mt-2 text-sm leading-6 text-slate-500">
+            Track research questions, compare methods, record results, inspect
+            inconsistent outcomes, and make limitations visible in the final
+            synthesis.
+          </p>
+          <div class="mt-4 text-[11px] font-black text-violet-600">Evaluate claims</div>
+        </article>
+
+        <article class="rounded-2xl border-2 border-emerald-100 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+          <div class="text-2xl">🌐</div>
+          <h4 class="mt-4 text-sm font-black text-slate-800">Knowledge operations</h4>
+          <p class="mt-2 text-sm leading-6 text-slate-500">
+            Coordinate multiple workspaces, monitor evidence distribution,
+            identify missing connections, and determine which investigative
+            tasks need attention.
+          </p>
+          <div class="mt-4 text-[11px] font-black text-emerald-600">Improve coverage</div>
+        </article>
+      </div>
+    </div>
+
+    <%# Workflow and mission %>
+    <div class="mt-12 rounded-[26px] border-2 border-orange-100 bg-gradient-to-r from-orange-50/70 via-white to-emerald-50/50 p-5 md:p-7">
+      <div class="flex flex-col gap-5 sm:flex-row sm:items-start">
+        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-orange-100 text-xl">
+          🎯
+        </div>
+
+        <div class="min-w-0">
+          <div class="text-[12px] font-black uppercase tracking-[0.15em] text-orange-600">
+            Your research mission
+          </div>
+
+          <h3 class="mt-2 text-lg font-black text-slate-800">
+            Turn recorded information into a traceable explanation
+          </h3>
+
+          <p class="mt-3 text-sm leading-6 text-slate-600">
+            Start with the unresolved questions. Check which objectives address
+            them, inspect the findings produced, and follow each important claim
+            back to its evidence. Investigate contradictions, document
+            limitations, and use synthesis to explain what the combined
+            information supports — and what it cannot yet establish.
+          </p>
+
+          <ol class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <% [
+                 ["01", "Review open questions", "Identify the most important unknowns."],
+                 ["02", "Check objectives", "Confirm that work addresses the questions."],
+                 ["03", "Trace evidence", "Inspect sources and their limitations."],
+                 ["04", "Resolve conflicts", "Compare competing explanations fairly."],
+                 ["05", "Write synthesis", "Separate observations from conclusions."],
+                 ["06", "Refresh intelligence", "Recalculate the dashboard after updates."]
+               ].each do |number, title, description| %>
+              <li class="flex items-start gap-3 rounded-xl border border-white bg-white/80 p-3">
+                <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-orange-100 bg-orange-50 text-[10px] font-black text-orange-700">
+                  <%= number %>
+                </span>
+                <div>
+                  <div class="text-xs font-black text-slate-800"><%= title %></div>
+                  <p class="mt-1 text-xs leading-5 text-slate-500"><%= description %></p>
+                </div>
+              </li>
+            <% end %>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <%# Closing principle %>
+    <div class="mt-8 border-t-2 border-slate-100 pt-5">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div class="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400">
+          RESEARCH_PROTOCOL :: EVIDENCE :: SYNTHESIS
+        </div>
+
+        <div class="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-emerald-600">
+          <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+          Field manual available
+        </div>
+      </div>
+
+      <p class="mt-4 text-xs leading-5 text-slate-500">
+        The goal is not to eliminate all uncertainty. The goal is to make
+        uncertainty visible, explain the basis for each important claim,
+        preserve competing interpretations, and show how the research
+        supports its conclusions.
+      </p>
+    </div>
+  </div>
+</section>

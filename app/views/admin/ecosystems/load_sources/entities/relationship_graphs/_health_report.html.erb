@@ -1,0 +1,60 @@
+
+<%
+  diagnostics = local_assigns[:diagnostics] || {}
+
+  status = diagnostics[:health_status] || diagnostics["health_status"] ||
+    diagnostics[:status] || diagnostics["status"]
+
+  raw_checks = diagnostics[:health_checks] || diagnostics["health_checks"] ||
+    diagnostics[:checks] || diagnostics["checks"] || []
+
+  checks = raw_checks.is_a?(Array) ? raw_checks : []
+%>
+
+<section class="rounded-[26px] border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
+         aria-labelledby="health-report-heading">
+
+  <p class="text-[10px] font-black uppercase tracking-[0.18em] text-emerald-700">System integrity</p>
+  <h2 id="health-report-heading" class="mt-1 text-lg font-black text-slate-900">Graph health report</h2>
+  <p class="mt-2 text-sm leading-6 text-slate-500">
+    Review the health status and individual checks supplied by the diagnostics service.
+  </p>
+
+  <div class="mt-5 rounded-2xl border p-4 <%= status.to_s.downcase == 'healthy' ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50' %>">
+    <p class="text-xs font-bold text-slate-600">Reported status</p>
+    <p class="mt-1 text-lg font-black text-slate-900"><%= status.presence || "Unknown" %></p>
+    <% if status.blank? %>
+      <p class="mt-1 text-xs leading-5 text-slate-500">
+        No health status was provided. Unknown does not necessarily mean unhealthy.
+      </p>
+    <% end %>
+  </div>
+
+  <% if checks.any? %>
+    <ul class="mt-4 divide-y divide-slate-100 rounded-xl border border-slate-200">
+      <% checks.each do |raw_check| %>
+        <%
+          check = raw_check.respond_to?(:to_h) ? raw_check.to_h : {}
+          label = check[:name] || check["name"] || check[:label] || check["label"] || "Diagnostic check"
+          result = check[:status] || check["status"] || check[:result] || check["result"]
+          message = check[:message] || check["message"] || check[:description] || check["description"]
+        %>
+        <li class="p-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <span class="text-sm font-bold text-slate-800"><%= label %></span>
+            <span class="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-600">
+              <%= result.presence || "Not reported" %>
+            </span>
+          </div>
+          <% if message.present? %>
+            <p class="mt-2 text-xs leading-5 text-slate-500"><%= message %></p>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="mt-4 rounded-xl border border-dashed border-slate-200 p-4 text-xs leading-6 text-slate-500">
+      No individual health checks were supplied.
+    </p>
+  <% end %>
+</section>

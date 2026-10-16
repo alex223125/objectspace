@@ -1,0 +1,89 @@
+<%
+  entity_id = params[:entity_id].presence || @entity&.id || @collection&.try(:entity_id)
+
+  collections_path =
+    admin_ecosystems_load_sources_entity_research_collections_path(
+      entity_id: entity_id
+    )
+%>
+
+<div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+
+  <div class="my-6 overflow-hidden rounded-[38px] border-2 border-orange-100 bg-gradient-to-b from-white via-orange-50/20 to-slate-50/50 p-6 shadow-md shadow-orange-100/40 sm:p-8">
+
+    <%# Header %>
+    <div class="mb-8 flex flex-col gap-5 border-b-2 border-orange-100 pb-6 sm:flex-row sm:items-center sm:justify-between">
+
+      <div class="flex items-start gap-4">
+
+        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-orange-200/60 bg-orange-100/80 text-xl text-orange-600 shadow-sm shadow-orange-100">
+          📚
+        </div>
+
+        <div>
+          <div class="text-[10px] font-black uppercase tracking-[0.22em] text-orange-500">
+            Research system
+          </div>
+
+          <h1 class="mt-2 text-2xl font-black tracking-tight text-slate-800 sm:text-3xl">
+            New research collection
+          </h1>
+
+          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+            Create a reusable research portfolio to organize related investigations,
+            research questions, and project deliverables.
+          </p>
+        </div>
+
+      </div>
+
+      <%= link_to collections_path,
+                  class: "inline-flex w-fit shrink-0 items-center gap-2 rounded-2xl border-2 border-orange-200 bg-white px-4 py-3 text-xs font-black text-orange-600 shadow-sm transition hover:-translate-y-0.5 hover:border-orange-300 hover:bg-orange-50" do %>
+        <span aria-hidden="true">←</span>
+        <span>Research collections</span>
+      <% end %>
+
+    </div>
+
+    <%# Form section %>
+    <div class="rounded-[28px] border-2 border-orange-100 bg-white/80 p-5 shadow-sm shadow-orange-100/30 sm:p-8">
+
+      <div class="mb-7 flex items-start gap-3">
+
+        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-orange-200/60 bg-orange-50 text-lg">
+          ✨
+        </div>
+
+        <div>
+          <h2 class="text-sm font-black text-slate-700">
+            Collection details
+          </h2>
+
+          <p class="mt-1 text-xs leading-5 text-slate-400">
+            Define the purpose, status, and organization of your research collection.
+          </p>
+        </div>
+
+      </div>
+
+      <%= render "form", collection: @collection %>
+
+    </div>
+
+    <%# Footer %>
+    <div class="mt-6 flex flex-col gap-2 border-t border-orange-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
+
+      <p class="text-[11px] leading-5 text-slate-400">
+        Research collections help organize related investigations into reusable portfolios.
+      </p>
+
+      <div class="inline-flex w-fit items-center gap-2 rounded-full border border-orange-200/60 bg-orange-50 px-3 py-1.5 text-[10px] font-bold text-orange-600">
+        <span class="h-2 w-2 rounded-full bg-orange-400"></span>
+        Ready to create
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

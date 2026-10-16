@@ -1,0 +1,554 @@
+<div class="max-w-6xl mx-auto my-10 p-6 sm:p-8
+            bg-gradient-to-b from-white via-orange-50/20 to-slate-50/50
+            border-2 border-orange-100
+            rounded-[32px] sm:rounded-[38px]
+            shadow-md shadow-orange-100/40">
+
+  <!-- ========================================================= -->
+  <!-- HISTORY HEADER -->
+  <!-- ========================================================= -->
+
+  <div class="flex flex-col gap-5
+              lg:flex-row lg:items-center lg:justify-between
+              mb-8 pb-6 border-b-2 border-orange-100">
+
+    <div class="flex items-start gap-4">
+
+      <div class="w-12 h-12 shrink-0 rounded-2xl
+                  bg-orange-100/80 border border-orange-200/60
+                  flex items-center justify-center
+                  text-orange-600 text-xl
+                  shadow-sm shadow-orange-100">
+        🕘
+      </div>
+
+      <div>
+        <div class="text-[10px] font-black uppercase
+                    tracking-[0.2em] text-orange-500">
+          Investigation audit trail
+        </div>
+
+        <h1 class="mt-1 text-2xl sm:text-3xl font-black
+                   tracking-tight text-slate-800">
+          Research History
+        </h1>
+
+        <p class="mt-2 max-w-2xl text-xs sm:text-sm
+                  leading-6 text-slate-400">
+          Follow the evolution of your investigation through lifecycle
+          events, saved checkpoints and important research milestones.
+        </p>
+      </div>
+
+    </div>
+
+    <%= link_to admin_ecosystems_load_sources_entity_research_workspace_path(
+                  entity_id: params[:entity_id],
+                  id: @workspace.slug
+                ),
+                class: "group inline-flex w-fit shrink-0 items-center gap-2
+                rounded-2xl border-2 border-orange-200
+                bg-white px-5 py-3 text-sm font-black text-orange-600
+                shadow-sm shadow-orange-100/50
+                transition-all duration-300
+                hover:-translate-y-0.5 hover:bg-orange-50
+                hover:shadow-md" do %>
+      <span class="transition-transform duration-300
+                   group-hover:-translate-x-1">←</span>
+      Back to investigation
+    <% end %>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- HISTORY METRICS -->
+  <!-- ========================================================= -->
+
+  <% history_count = @history.respond_to?(:size) ? @history.size : 0 %>
+
+  <% snapshot_count =
+       if defined?(@snapshots) && @snapshots.respond_to?(:size)
+         @snapshots.size
+       else
+         0
+       end %>
+
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-10">
+
+    <div class="rounded-3xl border border-orange-100
+                bg-gradient-to-br from-orange-50 to-white p-5
+                shadow-sm shadow-orange-100/30">
+
+      <div class="flex items-center justify-between">
+        <span class="text-[10px] font-black uppercase
+                     tracking-widest text-orange-500">
+          Recorded events
+        </span>
+        <span class="text-xl">📋</span>
+      </div>
+
+      <div class="mt-3 text-3xl font-black text-slate-800">
+        <%= history_count %>
+      </div>
+
+      <p class="mt-1 text-[11px] text-slate-400">
+        Lifecycle activity records
+      </p>
+
+    </div>
+
+
+    <div class="rounded-3xl border border-sky-100
+                bg-gradient-to-br from-sky-50 to-white p-5
+                shadow-sm shadow-sky-100/30">
+
+      <div class="flex items-center justify-between">
+        <span class="text-[10px] font-black uppercase
+                     tracking-widest text-sky-600">
+          Checkpoints
+        </span>
+        <span class="text-xl">💾</span>
+      </div>
+
+      <div class="mt-3 text-3xl font-black text-slate-800">
+        <%= snapshot_count %>
+      </div>
+
+      <p class="mt-1 text-[11px] text-slate-400">
+        Saved research snapshots
+      </p>
+
+    </div>
+
+
+    <div class="rounded-3xl border border-emerald-100
+                bg-gradient-to-br from-emerald-50 to-white p-5
+                shadow-sm shadow-emerald-100/30">
+
+      <div class="flex items-center justify-between">
+        <span class="text-[10px] font-black uppercase
+                     tracking-widest text-emerald-600">
+          Investigation
+        </span>
+        <span class="text-xl">🔬</span>
+      </div>
+
+      <div class="mt-3 text-lg font-black capitalize
+                  text-slate-800 break-words">
+        <%= @workspace.status.to_s.humanize.presence || "Active" %>
+      </div>
+
+      <p class="mt-1 text-[11px] text-slate-400">
+        Current workspace status
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- TIMELINE HEADING -->
+  <!-- ========================================================= -->
+
+  <div class="flex flex-col gap-2 sm:flex-row
+              sm:items-end sm:justify-between mb-6">
+
+    <div>
+      <div class="text-[10px] font-black uppercase
+                  tracking-[0.2em] text-orange-500">
+        Chronological record
+      </div>
+
+      <h2 class="mt-1 text-xl font-black text-slate-800">
+        Investigation Timeline
+      </h2>
+
+      <p class="mt-1 text-xs leading-5 text-slate-400">
+        Major actions and changes recorded during your research.
+      </p>
+    </div>
+
+    <span class="w-fit rounded-full border border-orange-200/70
+                 bg-orange-50 px-3 py-1.5
+                 text-[10px] font-black text-orange-600">
+      <%= history_count %> events
+    </span>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- TIMELINE -->
+  <!-- ========================================================= -->
+
+  <% if @history.blank? %>
+
+    <div class="rounded-[28px] border-2 border-dashed
+                border-orange-200 bg-gradient-to-br
+                from-orange-50/70 via-white to-amber-50/40
+                px-6 py-12 sm:px-10 text-center">
+
+      <div class="mx-auto flex h-16 w-16 items-center
+                  justify-center rounded-[24px]
+                  border-2 border-orange-200 bg-orange-100/70
+                  text-3xl shadow-sm shadow-orange-100">
+        🕰️
+      </div>
+
+      <h3 class="mt-5 text-lg font-black text-slate-700">
+        No activity recorded yet
+      </h3>
+
+      <p class="mx-auto mt-2 max-w-md text-xs
+                leading-6 text-slate-400">
+        Your timeline will grow as you create investigations,
+        update research items, change lifecycle states and save checkpoints.
+      </p>
+
+      <%= link_to admin_ecosystems_load_sources_entity_research_workspace_path(
+                    entity_id: params[:entity_id],
+                    id: @workspace.slug
+                  ),
+                  class: "mt-6 inline-flex items-center gap-2
+                  rounded-2xl border-2 border-orange-200
+                  bg-gradient-to-r from-orange-400 to-amber-400
+                  px-5 py-3 text-xs font-black text-white
+                  shadow-md shadow-orange-200/50
+                  transition-all duration-300
+                  hover:-translate-y-0.5 hover:shadow-lg" do %>
+        Return to investigation
+        <span>→</span>
+      <% end %>
+
+    </div>
+
+  <% else %>
+
+    <div class="relative pl-1 sm:pl-2">
+
+      <!-- Timeline rail -->
+      <div class="absolute left-[23px] sm:left-[27px]
+                  top-7 bottom-7 w-1 rounded-full
+                  bg-gradient-to-b from-orange-200
+                  via-amber-200 to-emerald-200">
+      </div>
+
+      <div class="space-y-5">
+
+        <% @history.each_with_index do |event, index| %>
+
+          <% event_type = event["event"].to_s %>
+
+          <% node_style =
+               case event_type
+               when /creat|start|open/i
+                 "bg-orange-50 border-orange-300 text-orange-600 ring-orange-100"
+               when /complete|finish|restore/i
+                 "bg-emerald-50 border-emerald-300 text-emerald-600 ring-emerald-100"
+               when /pause|archive/i
+                 "bg-amber-50 border-amber-300 text-amber-600 ring-amber-100"
+               else
+                 "bg-sky-50 border-sky-300 text-sky-600 ring-sky-100"
+               end %>
+
+          <div class="relative flex items-start gap-4 sm:gap-5">
+
+            <!-- Timeline node -->
+            <div class="relative z-10 mt-4 flex h-11 w-11
+                        sm:h-14 sm:w-14 shrink-0 items-center
+                        justify-center rounded-[18px] sm:rounded-[22px]
+                        border-[3px] <%= node_style %>
+                        text-sm font-black ring-4
+                        shadow-md transition-all duration-300
+                        hover:scale-105">
+
+              <%= investigation_event_icon(event["event"]) %>
+
+            </div>
+
+
+            <!-- Event card -->
+            <div class="min-w-0 flex-1 overflow-hidden
+                        rounded-[24px] sm:rounded-[28px]
+                        border-2 border-orange-100
+                        bg-gradient-to-br from-white
+                        via-white to-orange-50/30
+                        p-4 sm:p-6
+                        shadow-sm shadow-orange-100/40
+                        transition-all duration-300
+                        hover:border-orange-200
+                        hover:shadow-md hover:shadow-orange-100/60">
+
+              <!-- Card header -->
+              <div class="flex flex-col gap-3
+                          sm:flex-row sm:items-start
+                          sm:justify-between">
+
+                <div class="min-w-0">
+
+                  <div class="flex flex-wrap items-center gap-2">
+
+                    <span class="rounded-full border
+                                 border-orange-200/70
+                                 bg-orange-50 px-2.5 py-1
+                                 text-[9px] font-black uppercase
+                                 tracking-wider text-orange-600">
+                      Event <%= format("%02d", index + 1) %>
+                    </span>
+
+                    <span class="rounded-full border
+                                 border-slate-200 bg-slate-50
+                                 px-2.5 py-1 text-[9px]
+                                 font-bold text-slate-500">
+                      <%= event_type.humanize.presence || "Activity" %>
+                    </span>
+
+                  </div>
+
+                  <h3 class="mt-3 text-base sm:text-lg
+                             font-black leading-6 text-slate-800">
+                    <%= investigation_event_label(event["event"]) %>
+                  </h3>
+
+                </div>
+
+                <time class="inline-flex w-fit shrink-0
+                             items-center gap-2 rounded-xl
+                             border border-slate-100
+                             bg-slate-50 px-3 py-2
+                             text-[10px] font-bold text-slate-500">
+                  <span>🗓️</span>
+                  <%= investigation_time(event["occurred_at"]) %>
+                </time>
+
+              </div>
+
+
+              <!-- Event details -->
+              <% details = event["details"] || {} %>
+
+              <% if details.present? %>
+
+                <div class="mt-5 border-t border-orange-100 pt-4">
+
+                  <div class="mb-3 text-[9px] font-black
+                              uppercase tracking-[0.18em]
+                              text-slate-400">
+                    Event details
+                  </div>
+
+                  <div class="grid grid-cols-1 gap-2
+                              sm:grid-cols-2 xl:grid-cols-3">
+
+                    <% details.each do |key, value| %>
+
+                      <% next if value.blank? %>
+
+                      <div class="min-w-0 rounded-2xl
+                                  border border-slate-100
+                                  bg-white/80 p-3">
+
+                        <div class="text-[9px] font-black
+                                    uppercase tracking-wider
+                                    text-slate-400">
+                          <%= key.to_s.humanize %>
+                        </div>
+
+                        <div class="mt-1 break-words text-xs
+                                    font-bold leading-5 text-slate-700">
+                          <%= value %>
+                        </div>
+
+                      </div>
+
+                    <% end %>
+
+                  </div>
+
+                </div>
+
+              <% end %>
+
+
+              <!-- Card footer -->
+              <div class="mt-5 flex items-center
+                          justify-between gap-3
+                          border-t border-orange-100 pt-3">
+
+                <span class="text-[9px] font-bold
+                             uppercase tracking-wider
+                             text-slate-400">
+                  Research activity
+                </span>
+
+                <span class="flex items-center gap-2
+                             text-[10px] font-black text-emerald-600">
+                  <span class="h-2 w-2 rounded-full
+                               bg-emerald-400"></span>
+                  Recorded
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        <% end %>
+
+      </div>
+
+    </div>
+
+  <% end %>
+
+
+  <!-- ========================================================= -->
+  <!-- SAVED CHECKPOINTS -->
+  <!-- ========================================================= -->
+
+  <div class="mt-12 rounded-[28px] border-2
+              border-orange-100 bg-gradient-to-r
+              from-orange-50/70 via-white to-amber-50/40
+              p-5 sm:p-7 shadow-sm">
+
+    <div class="flex flex-col gap-4
+                sm:flex-row sm:items-center sm:justify-between">
+
+      <div class="flex items-start gap-4">
+
+        <div class="flex h-12 w-12 shrink-0
+                    items-center justify-center
+                    rounded-2xl border border-orange-200
+                    bg-orange-100 text-xl shadow-sm">
+          💾
+        </div>
+
+        <div>
+          <h2 class="text-base font-black text-slate-800">
+            Saved checkpoints
+          </h2>
+
+          <p class="mt-1 max-w-2xl text-xs leading-6 text-slate-400">
+            Review saved versions of your research and use them as
+            reference points when tracking changes over time.
+          </p>
+        </div>
+
+      </div>
+
+      <%= link_to admin_ecosystems_load_sources_entity_research_workspace_path(
+                    entity_id: params[:entity_id],
+                    id: @workspace.slug
+                  ),
+                  class: "inline-flex w-fit shrink-0 items-center
+                  gap-2 rounded-2xl border-2 border-orange-200
+                  bg-white px-4 py-3 text-xs font-black
+                  text-orange-600 shadow-sm
+                  transition-all hover:bg-orange-50" do %>
+        Investigation
+        <span>→</span>
+      <% end %>
+
+    </div>
+
+
+    <% if defined?(@snapshots) && @snapshots.present? %>
+
+      <div class="mt-6 space-y-3">
+
+        <% @snapshots.each do |snapshot| %>
+
+          <div class="flex flex-col gap-3
+                      rounded-2xl border border-orange-100
+                      bg-white/80 p-4
+                      sm:flex-row sm:items-center
+                      sm:justify-between">
+
+            <div class="flex min-w-0 items-start gap-3">
+
+              <div class="flex h-10 w-10 shrink-0
+                          items-center justify-center
+                          rounded-xl border border-sky-100
+                          bg-sky-50 text-sky-600">
+                ◷
+              </div>
+
+              <div class="min-w-0">
+
+                <h3 class="break-words text-sm font-black
+                           text-slate-700">
+                  <%= snapshot.label.presence || "Research checkpoint" %>
+                </h3>
+
+                <p class="mt-1 text-[10px] text-slate-400">
+                  <%= snapshot.created_at.present? ?
+                        l(snapshot.created_at, format: :long) :
+                        "Date unavailable" %>
+                </p>
+
+              </div>
+
+            </div>
+
+            <span class="w-fit rounded-full border
+                         border-sky-200 bg-sky-50
+                         px-3 py-1.5 text-[9px]
+                         font-black uppercase tracking-wider
+                         text-sky-600">
+              <%= snapshot.kind.to_s.humanize.presence || "Saved" %>
+            </span>
+
+          </div>
+
+        <% end %>
+
+      </div>
+
+    <% else %>
+
+      <div class="mt-6 rounded-2xl border border-dashed
+                  border-orange-200 bg-white/60
+                  px-5 py-7 text-center">
+
+        <div class="text-2xl">📂</div>
+
+        <h3 class="mt-3 text-sm font-black text-slate-700">
+          No saved checkpoints available
+        </h3>
+
+        <p class="mt-1 text-xs leading-5 text-slate-400">
+          Save a checkpoint from the investigation page to preserve
+          the current research state.
+        </p>
+
+      </div>
+
+    <% end %>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- FOOTER -->
+  <!-- ========================================================= -->
+
+  <div class="mt-8 flex flex-col gap-2
+              sm:flex-row sm:items-center
+              sm:justify-between">
+
+    <p class="text-[10px] leading-5 text-slate-400">
+      Research history · Investigation audit trail
+    </p>
+
+    <p class="flex items-center gap-2 text-[10px]
+              font-bold text-orange-500">
+      <span class="h-2 w-2 rounded-full bg-orange-400"></span>
+      Research evolves through recorded activity
+    </p>
+
+  </div>
+
+</div>

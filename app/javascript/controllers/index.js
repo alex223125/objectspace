@@ -553,14 +553,131 @@ application.register("entity-cross-intelligence", EntityCrossIntelligenceControl
 import EntityIntelligenceController from "./admin/ecosystems/load_sources/entites/entity_intelligence_controller"
 application.register("entity-intelligence", EntityIntelligenceController)
 
-
 import RelationshipsEntityIntelligenceController from "./admin/ecosystems/load_sources/entites/relationships_entity_intelligence_controller"
 application.register("relationships-entity-intelligence", RelationshipsEntityIntelligenceController)
 
+import EcosystemRelationshipGraphController from "./admin/ecosystems/load_sources/entites/ecosystem_relationship_graph_controller"
+application.register("ecosystem-relationship-graph", EcosystemRelationshipGraphController)
+
+import RelationshipIntelligenceController from "./admin/ecosystems/load_sources/entites/relationship_intelligence_controller"
+application.register("relationship-intelligence", RelationshipIntelligenceController)
+
+import EcosystemDiscoveryController from "./admin/ecosystems/load_sources/entites/discovery/ecosystem_discovery_controller"
+application.register("ecosystem-discovery", EcosystemDiscoveryController)
+
+import DiscoveryController from "./admin/ecosystems/load_sources/entites/discivery_ecosystem/discovery_controller"
+application.register("discovery", DiscoveryController)
+
+import ResearchWorkspaceController from "./admin/ecosystems/load_sources/entites/research_workspaces/research_workspace_controller"
+application.register("research-workspace", ResearchWorkspaceController)
+
+import ResearchProvenanceController from "./admin/ecosystems/load_sources/entites/research_workspaces/research_provenance_controller"
+application.register("research-provenance", ResearchProvenanceController)
+
+import EntityHoverCardController from "./admin/ecosystems/load_sources/entites/entity_hover_card_controller"
+application.register("entity-hover-card", EntityHoverCardController)
+
+import EntityPreviewController from "./admin/ecosystems/load_sources/entites/entity_preview_controller"
+application.register("entity-preview", EntityPreviewController)
+
+import IntelligenceTableController from "./admin/ecosystems/load_sources/entites/intelligence_table_controller"
+application.register("intelligence-table", IntelligenceTableController)
+
+import IntelligenceCopyController from "./admin/ecosystems/load_sources/entites/intelligence_copy_controller"
+application.register("intelligence-copy", IntelligenceCopyController)
+
+import ResearchWorkspaceDashboardController from "./admin/ecosystems/load_sources/entites/research_workspaces/research_workspace_dashboard_controller"
+application.register("research-workspace-dashboard", ResearchWorkspaceDashboardController)
+
+import ResearchWorkspaceSearchController from "./admin/ecosystems/load_sources/entites/research_workspaces/research_workspace_search_controller"
+application.register("research-workspace-search", ResearchWorkspaceSearchController)
+
+import ResearchWorkspaceConfirmationController from "./admin/ecosystems/load_sources/entites/research_workspaces/research_workspace_confirmation_controller"
+application.register("research-workspace-confirmation", ResearchWorkspaceConfirmationController)
+
+import WorkspaceActionsController from "./admin/ecosystems/load_sources/entites/research_workspaces/workspace_actions_controller"
+application.register("workspace-actions", WorkspaceActionsController)
+
+import ResearchWorkspaceFiltersController from "./admin/ecosystems/load_sources/entites/research_workspaces/research_workspace_filters_controller"
+application.register("research-workspace-filters", ResearchWorkspaceFiltersController)
+
+import ConfirmActionController from "./admin/ecosystems/load_sources/entites/research_workspaces/confirm_action_controller"
+application.register("confirm-action", ConfirmActionController)
 
 
 
+// import RelationshipGraphController from "./admin/ecosystems/load_sources/entites/entities_relationships/relationship_graph_controller"
+// application.register("relationship-graph", RelationshipGraphController)
+
+// import GraphFiltersController from "./admin/ecosystems/load_sources/entites/entities_relationships/graph_filters_controller"
+// application.register("graph-filters", GraphFiltersController)
+
+// import EntityDossierController from "./admin/ecosystems/load_sources/entites/entities_relationships/entity_dossier_controller"
+// application.register("entity-dossier", EntityDossierController)
+//
+// import GuidedTourController from "./admin/ecosystems/load_sources/entites/entities_relationships/guided_tour_controller"
+// application.register("guided-tour", GuidedTourController)
+//
+// import GraphSearchController from "./admin/ecosystems/load_sources/entites/entities_relationships/graph_search_controller"
+// application.register("graph-search", GraphSearchController)
+//
+// import GraphManualController from "./admin/ecosystems/load_sources/entites/entities_relationships/graph_manual_controller"
+// application.register("graph-manual", GraphManualController)
+
+
+
+
+
+
+import RelationshipGraphController from "./admin/ecosystems/load_sources/entites/relationship_graph/relationship_graph_controller"
+application.register("relationship-graph", RelationshipGraphController)
+
+import GraphFiltersController from "./admin/ecosystems/load_sources/entites/relationship_graph/graph_filters_controller"
+application.register("graph-filters", GraphFiltersController)
+
+import EntityDossierController from "./admin/ecosystems/load_sources/entites/relationship_graph/entity_dossier_controller"
+application.register("entity-dossier", EntityDossierController)
+
+import GuidedTourController from "./admin/ecosystems/load_sources/entites/relationship_graph/guided_tour_controller"
+application.register("guided-tour", GuidedTourController)
+
+import GraphSearchController from "./admin/ecosystems/load_sources/entites/relationship_graph/graph_search_controller"
+application.register("graph-search", GraphSearchController)
+
+import GraphManualController from "./admin/ecosystems/load_sources/entites/relationship_graph/graph_manual_controller"
+application.register("graph-manual", GraphManualController)
+
+import GraphLayoutController from "./admin/ecosystems/load_sources/entites/relationship_graph/graph_layout_controller"
+application.register("graph-layout", GraphLayoutController)
+
+import GraphAccessibilityController from "./admin/ecosystems/load_sources/entites/relationship_graph/graph_accessibility_controller"
+application.register("graph-accessibility", GraphAccessibilityController)
+
+import GraphExportController from "./admin/ecosystems/load_sources/entites/relationship_graph/graph_export_controller"
+application.register("graph-export", GraphExportController)
+
+import GraphReviewController from "./admin/ecosystems/load_sources/entites/relationship_graph/graph_review_controller"
+application.register("graph-review", GraphReviewController)
+
+import GraphLiveUpdatesController from "./admin/ecosystems/load_sources/entites/relationship_graph/graph_live_updates_controller"
+application.register("graph-live-updates", GraphLiveUpdatesController)
+
+import GraphKeyboardController from "./admin/ecosystems/load_sources/entites/relationship_graph/graph_keyboard_controller"
+application.register("graph-keyboard", GraphKeyboardController)
+
+import GraphPresentationController from "./admin/ecosystems/load_sources/entites/relationship_graph/graph_presentation_controller"
+application.register("graph-presentation", GraphPresentationController)
+
+import GraphTooltipsController from "./admin/ecosystems/load_sources/entites/relationship_graph/graph_tooltips_controller"
+application.register("graph-tooltips", GraphTooltipsController)
+
+import GraphMetricsController from "./admin/ecosystems/load_sources/entites/relationship_graph/graph_metrics_controller"
+application.register("graph-metrics-controller", GraphMetricsController)
 
 
 import "./admin/ecosystems/load_sources/entites/page_autoload_javascript/entity_comparison";
 import "./admin/ecosystems/load_sources/entites/page_autoload_javascript/comparison";
+
+
+// http://127.0.0.1:3000/admin/ecosystems/load_sources/entities/5/research_investigations
+import "./admin/ecosystems/load_sources/entites/research_investigations/research_hints";

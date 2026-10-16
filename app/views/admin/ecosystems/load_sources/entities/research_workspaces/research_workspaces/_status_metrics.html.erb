@@ -1,0 +1,26 @@
+
+<section>
+  <div class="mb-4">
+    <h2 class="text-xl font-black text-slate-900 dark:text-white">Workspace overview</h2>
+    <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">
+      Saved investigations grouped by lifecycle status.
+    </p>
+  </div>
+
+  <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <% [
+         ["All saved", :all, "text-slate-900 dark:text-white"],
+         ["Active", :active, "text-emerald-600 dark:text-emerald-400"],
+         ["Completed", :completed, "text-sky-600 dark:text-sky-400"],
+         ["Archived", :archived, "text-slate-500 dark:text-slate-400"]
+       ].each do |label, key, color| %>
+
+      <%= render "admin/ecosystems/load_sources/entities/research_workspaces/research_workspaces/status_metric",
+                 label: label,
+                 count: counts.fetch(key, 0),
+                 color: color,
+                 filter: key.to_s %>
+
+    <% end %>
+  </div>
+</section>

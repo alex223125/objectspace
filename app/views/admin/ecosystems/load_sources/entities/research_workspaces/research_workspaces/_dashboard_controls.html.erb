@@ -1,0 +1,187 @@
+<div class="mx-auto my-6 rounded-[28px] border-2 border-orange-100
+            bg-gradient-to-b from-white via-orange-50/20 to-slate-50/50
+            p-5 shadow-md shadow-orange-100/30 sm:p-7">
+
+  <div class="mb-6 flex flex-col gap-4 sm:flex-row
+              sm:items-center sm:justify-between">
+    <div>
+      <p class="text-[10px] font-black uppercase tracking-[0.2em]
+                text-orange-500">
+        Research operations
+      </p>
+
+      <h2 class="mt-2 text-xl font-black text-slate-800">
+        Workspace intelligence
+      </h2>
+
+      <p class="mt-1 text-xs leading-5 text-slate-400">
+        Explore investigations, track progress and continue your research.
+      </p>
+    </div>
+
+    <span class="w-fit rounded-full border border-orange-200/70
+                 bg-orange-50 px-3.5 py-2 text-[10px]
+                 font-bold text-orange-700">
+      ✨ Live workspace data
+    </span>
+  </div>
+
+  <div class="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+
+    <div class="rounded-[22px] border border-orange-200/70
+                bg-orange-50/70 p-4 shadow-sm">
+      <p class="text-[10px] font-black uppercase tracking-wider
+                text-orange-600">
+        Active
+      </p>
+      <p class="mt-2 text-3xl font-black text-orange-700">
+        <%= number_with_delimiter(@active_count) %>
+      </p>
+      <p class="mt-1 text-[10px] text-slate-400">
+        In progress
+      </p>
+    </div>
+
+    <div class="rounded-[22px] border border-emerald-200/70
+                bg-emerald-50/70 p-4 shadow-sm">
+      <p class="text-[10px] font-black uppercase tracking-wider
+                text-emerald-700">
+        Completed
+      </p>
+      <p class="mt-2 text-3xl font-black text-emerald-700">
+        <%= number_with_delimiter(@completed_count) %>
+      </p>
+      <p class="mt-1 text-[10px] text-slate-400">
+        Finished work
+      </p>
+    </div>
+
+    <div class="rounded-[22px] border border-slate-200
+                bg-slate-50/80 p-4 shadow-sm">
+      <p class="text-[10px] font-black uppercase tracking-wider
+                text-slate-500">
+        Archived
+      </p>
+      <p class="mt-2 text-3xl font-black text-slate-700">
+        <%= number_with_delimiter(@archived_count) %>
+      </p>
+      <p class="mt-1 text-[10px] text-slate-400">
+        Preserved history
+      </p>
+    </div>
+
+    <div class="rounded-[22px] border border-sky-200/70
+                bg-sky-50/70 p-4 shadow-sm">
+      <p class="text-[10px] font-black uppercase tracking-wider
+                text-sky-700">
+        Collections
+      </p>
+      <p class="mt-2 text-3xl font-black text-sky-700">
+        <%= number_with_delimiter(@collection_count) %>
+      </p>
+      <p class="mt-1 text-[10px] text-slate-400">
+        Workspaces in collections
+      </p>
+    </div>
+
+  </div>
+
+  <%= form_with url: request.path, method: :get, local: true,
+                class: "grid grid-cols-1 gap-3 sm:grid-cols-12" do %>
+
+    <div class="sm:col-span-7">
+      <label for="workspace-search"
+             class="mb-1.5 block text-[10px] font-black
+                    uppercase tracking-wider text-slate-500">
+        Search workspaces
+      </label>
+
+      <input
+        id="workspace-search"
+        type="search"
+        name="q"
+        value="<%= @query %>"
+        placeholder="Search titles or slugs..."
+        class="w-full rounded-2xl border-2 border-orange-100
+               bg-white px-4 py-3 text-sm text-slate-700
+               outline-none transition
+               placeholder:text-slate-300
+               focus:border-orange-300 focus:ring-4
+               focus:ring-orange-100/60">
+    </div>
+
+    <div class="sm:col-span-3">
+      <label for="workspace-status"
+             class="mb-1.5 block text-[10px] font-black
+                    uppercase tracking-wider text-slate-500">
+        Lifecycle
+      </label>
+
+      <select
+        id="workspace-status"
+        name="status"
+        class="w-full rounded-2xl border-2 border-orange-100
+               bg-white px-3 py-3 text-sm text-slate-700
+               outline-none focus:border-orange-300
+               focus:ring-4 focus:ring-orange-100/60">
+
+        <option value="" <%= "selected" if @status.blank? %>>
+          All statuses
+        </option>
+
+        <option value="active"
+                <%= "selected" if @status == "active" %>>
+          Active
+        </option>
+
+        <option value="completed"
+                <%= "selected" if @status == "completed" %>>
+          Completed
+        </option>
+
+        <option value="archived"
+                <%= "selected" if @status == "archived" %>>
+          Archived
+        </option>
+      </select>
+    </div>
+
+    <div class="flex items-end gap-2 sm:col-span-2">
+      <button type="submit"
+              class="w-full rounded-2xl border-2 border-orange-300
+                     bg-gradient-to-r from-orange-400 to-amber-400
+                     px-4 py-3 text-sm font-black text-white
+                     shadow-md shadow-orange-200/50
+                     transition hover:-translate-y-0.5
+                     hover:from-orange-500 hover:to-amber-500
+                     focus:outline-none focus:ring-4
+                     focus:ring-orange-200">
+        Search
+      </button>
+    </div>
+
+  <% end %>
+
+  <div class="mt-4 flex flex-wrap items-center
+              justify-between gap-2 border-t border-orange-100 pt-4">
+
+    <p class="text-xs text-slate-400">
+      Showing
+      <span class="font-bold text-slate-700">
+        <%= @workspaces.size %>
+      </span>
+      of
+      <span class="font-bold text-slate-700">
+        <%= number_with_delimiter(@total_count) %>
+      </span>
+      matching workspaces
+    </p>
+
+    <%= link_to "Clear filters",
+                request.path,
+                class: "text-xs font-bold text-orange-600
+                  underline-offset-4 hover:underline" %>
+
+  </div>
+
+</div>

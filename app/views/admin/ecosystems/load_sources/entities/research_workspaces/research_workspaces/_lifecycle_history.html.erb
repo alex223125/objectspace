@@ -1,0 +1,104 @@
+<div class="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
+
+  <div>
+    <div class="text-xs font-bold uppercase tracking-[0.2em] text-slate-600">
+      Research history
+    </div>
+
+    <h2 class="mt-2 text-lg font-black text-white">
+      Lifecycle timeline
+    </h2>
+
+    <p class="mt-1 text-sm text-slate-500">
+      Key events recorded during this investigation.
+    </p>
+  </div>
+
+  <% events = [
+    {
+      label: "Workspace created",
+      time: workspace.created_at,
+      description: "Investigation workspace initialized."
+    },
+    {
+      label: "Last opened",
+      time: workspace.last_opened_at,
+      description: "Investigation workspace was last accessed."
+    },
+    {
+      label: "Research saved",
+      time: workspace.saved_at,
+      description: "Investigation changes were saved."
+    },
+    {
+      label: "Last resumed",
+      time: workspace.last_resumed_at,
+      description: "Investigation workspace was resumed."
+    },
+    {
+      label: "Completed",
+      time: workspace.completed_at,
+      description: "Investigation marked as completed."
+    },
+    {
+      label: "Archived",
+      time: workspace.archived_at,
+      description: "Investigation workspace archived."
+    },
+    {
+      label: "Snapshot created",
+      time: workspace.last_snapshot_at,
+      description: "A research snapshot was recorded."
+    }
+  ].select { |event| event[:time].present? }
+   .sort_by { |event| event[:time] }
+   .reverse %>
+
+  <% if events.any? %>
+
+    <div class="mt-6 space-y-4">
+
+      <% events.each do |event| %>
+
+        <div class="flex gap-4">
+
+          <div class="flex flex-col items-center">
+            <div class="mt-1 h-3 w-3 shrink-0 rounded-full bg-orange-400 ring-4 ring-orange-400/10"></div>
+            <div class="mt-2 w-px flex-1 bg-white/10"></div>
+          </div>
+
+          <div class="min-w-0 flex-1 pb-4">
+
+            <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+
+              <h3 class="text-sm font-bold text-white">
+                <%= event[:label] %>
+              </h3>
+
+              <time class="text-xs text-slate-600">
+                <%= event[:time].strftime("%Y-%m-%d %H:%M") %>
+              </time>
+
+            </div>
+
+            <p class="mt-1 text-sm text-slate-500">
+              <%= event[:description] %>
+            </p>
+
+          </div>
+
+        </div>
+
+      <% end %>
+
+    </div>
+
+  <% else %>
+
+    <div class="mt-6 rounded-2xl bg-black/20 p-5 text-sm text-slate-500">
+      No lifecycle events have been recorded yet.
+    </div>
+
+  <% end %>
+
+</div>

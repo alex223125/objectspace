@@ -1,228 +1,821 @@
 <%
-  totals = intelligence[:totals]
-  signals = intelligence[:signals]
-  strongest = intelligence[:strongest_relationships]
-  isolated = intelligence[:isolated_entities]
-  hotspots = intelligence[:hotspots]
+  # ============================================================
+  # ECOSYSTEM INTELLIGENCE DASHBOARD
+  # Rails ERB + Tailwind CSS
+  # ============================================================
+
+  # Safely normalize the supplied intelligence payload.
+  intelligence_data =
+    if defined?(intelligence) && intelligence.respond_to?(:[])
+      intelligence
+    else
+      {}
+    end
+
+  read_value = lambda do |record, key|
+    if record.nil?
+      nil
+    elsif record.is_a?(Hash)
+      record.key?(key) ? record[key] : record[key.to_s]
+    elsif record.respond_to?(key)
+      record.public_send(key)
+    end
+  end
+
+  totals = read_value.call(intelligence_data, :totals) || {}
+
+  signals = Array(read_value.call(intelligence_data, :signals))
+  strongest = Array(read_value.call(intelligence_data, :strongest_relationships))
+  isolated = Array(read_value.call(intelligence_data, :isolated_entities))
+  hotspots = Array(read_value.call(intelligence_data, :hotspots))
+
+  entity_count = [read_value.call(totals, :entities).to_i, 0].max
+  relationship_count = [read_value.call(totals, :relationships).to_i, 0].max
+  confirmed_count = [read_value.call(totals, :confirmed).to_i, 0].max
+  suggested_count = [read_value.call(totals, :suggested).to_i, 0].max
+  high_confidence_count = [read_value.call(totals, :high_confidence).to_i, 0].max
+
+  record_id = lambda do |record|
+    read_value.call(record, :id)
+  end
+
+  record_name = lambda do |record|
+    name = read_value.call(record, :name)
+    name = read_value.call(record, :title) if name.blank?
+
+    name.presence || begin
+                       id = record_id.call(record)
+                       id.present? ? "Entity ##{id}" : "Unnamed entity"
+                     end
+  end
+
+  record_description = lambda do |record|
+    description = read_value.call(record, :description)
+    description = read_value.call(record, :summary) if description.blank?
+    description = read_value.call(record, :content) if description.blank?
+    description.to_s
+  end
+
+  percentage = lambda do |numerator, denominator|
+    if denominator.to_f <= 0
+      0
+    else
+      ((numerator.to_f / denominator.to_f) * 100).round.clamp(0, 100)
+    end
+  end
+
+  # Keep isolated counts within the total entity inventory.
+  isolated_count = [isolated.length, entity_count].min
+  connected_count = [entity_count - isolated_count, 0].max
+
+  coverage_rate = percentage.call(connected_count, entity_count)
+  confirmed_rate = percentage.call(confirmed_count, relationship_count)
+  suggested_rate = percentage.call(suggested_count, relationship_count)
+  high_confidence_rate = percentage.call(high_confidence_count, relationship_count)
+
+  network_state =
+    if relationship_count.zero?
+      "Awaiting discovery"
+    elsif isolated_count.zero? && entity_count.positive?
+      "Fully connected coverage"
+    else
+      "Connections detected"
+    end
+
+  # Build a small, deduplicated entity preview.
+  entity_preview = isolated.dup
+
+  strongest.each do |relationship|
+    entity_preview << read_value.call(relationship, :source)
+    entity_preview << read_value.call(relationship, :target)
+  end
+
+  entity_preview = entity_preview.compact.uniq do |entity|
+    id = record_id.call(entity)
+    id.present? ? "id:#{id}" : "name:#{record_name.call(entity)}"
+  end.first(6)
+
+  relationship_preview = strongest.first(6)
+
+  relationship_kinds = hotspots.map do |hotspot|
+    read_value.call(hotspot, :kind).to_s
+  end.reject(&:blank?).uniq.length
+
+  metrics = [
+    {
+      label: "Entities",
+      value: entity_count,
+      note: "Available records",
+      icon: "◈",
+      accent: "text-orange-700",
+      icon_bg: "bg-orange-50",
+      card: "border-orange-100",
+      bar: "bg-orange-500",
+      rate: entity_count.positive? ? 100 : 0,
+      rate_note: "Record inventory",
+      show_rate: false
+    },
+    {
+      label: "Relationships",
+      value: relationship_count,
+      note: "Discovered connections",
+      icon: "↗",
+      accent: "text-indigo-700",
+      icon_bg: "bg-indigo-50",
+      card: "border-indigo-100",
+      bar: "bg-indigo-500",
+      rate: relationship_count.positive? ? 100 : 0,
+      rate_note: "Relationship inventory",
+      show_rate: false
+    },
+    {
+      label: "Confirmed",
+      value: confirmed_count,
+      note: "Verified links",
+      icon: "✓",
+      accent: "text-emerald-700",
+      icon_bg: "bg-emerald-50",
+      card: "border-emerald-100",
+      bar: "bg-emerald-500",
+      rate: confirmed_rate,
+      rate_note: "Of all relationships",
+      show_rate: true
+    },
+    {
+      label: "Suggested",
+      value: suggested_count,
+      note: "Awaiting evaluation",
+      icon: "◇",
+      accent: "text-amber-700",
+      icon_bg: "bg-amber-50",
+      card: "border-amber-100",
+      bar: "bg-amber-500",
+      rate: suggested_rate,
+      rate_note: "Of all relationships",
+      show_rate: true
+    },
+    {
+      label: "High confidence",
+      value: high_confidence_count,
+      note: "Confidence at least 80%",
+      icon: "★",
+      accent: "text-sky-700",
+      icon_bg: "bg-sky-50",
+      card: "border-sky-100",
+      bar: "bg-sky-500",
+      rate: high_confidence_rate,
+      rate_note: "Of all relationships",
+      show_rate: true
+    }
+  ]
 %>
 
 <section
-  class="rounded-[30px] border border-indigo-200/70 bg-gradient-to-br from-indigo-50 via-white to-violet-50 p-5 shadow-sm dark:border-indigo-900/50 dark:from-indigo-950/30 dark:via-gray-950 dark:to-violet-950/20">
+  aria-labelledby="ecosystem-heading"
+  class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
 
-  <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+  <%# HEADER %>
 
-    <div>
+  <header class="border-b border-slate-200 bg-gradient-to-r from-slate-50 via-white to-indigo-50/50 px-5 py-6 sm:px-7">
+    <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
 
-      <div class="text-[9px] font-black uppercase tracking-[0.25em] text-indigo-500">
-        Cross-Entity Intelligence
-      </div>
-
-      <h2 class="mt-1 text-xl font-black tracking-tight text-gray-900 dark:text-white">
-        Ecosystem Network
-      </h2>
-
-      <p class="mt-1 max-w-2xl text-xs leading-relaxed text-gray-500 dark:text-gray-400">
-        Structural intelligence generated from relationships between entities.
-      </p>
-
-    </div>
-
-    <div class="rounded-2xl border border-indigo-200 bg-white/80 px-4 py-3 dark:border-indigo-900 dark:bg-gray-900/70">
-
-      <div class="text-[9px] font-black uppercase tracking-wider text-gray-400">
-        Network State
-      </div>
-
-      <div class="mt-1 text-sm font-black text-indigo-600 dark:text-indigo-400">
-        <%= totals[:relationships] %> relationships
-      </div>
-
-    </div>
-
-  </div>
-
-  <div class="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-5">
-
-    <% [
-         ["Entities", totals[:entities], "indigo"],
-         ["Relationships", totals[:relationships], "violet"],
-         ["Confirmed", totals[:confirmed], "emerald"],
-         ["Suggested", totals[:suggested], "amber"],
-         ["High Confidence", totals[:high_confidence], "sky"]
-       ].each do |label, value, color| %>
-
-      <div class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-900/70">
-
-        <div class="text-[9px] font-black uppercase tracking-wider text-gray-400">
-          <%= label %>
+      <div class="flex min-w-0 items-start gap-4">
+        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-xl text-white shadow-sm">
+          🌐
         </div>
 
-        <div class="mt-2 text-2xl font-black text-<%= color %>-600 dark:text-<%= color %>-400">
-          <%= number_with_delimiter(value) %>
-        </div>
-
-      </div>
-
-    <% end %>
-
-  </div>
-
-  <% if signals.any? %>
-
-    <div class="mt-5 grid gap-2 lg:grid-cols-3">
-
-      <% signals.each do |signal| %>
-
-        <div class="rounded-2xl border border-gray-200 bg-white/70 p-4 dark:border-gray-800 dark:bg-gray-900/60">
-
-          <div class="text-xs font-black text-gray-800 dark:text-gray-100">
-            <%= signal[:title] %>
-          </div>
-
-          <p class="mt-1 text-[10px] leading-relaxed text-gray-500 dark:text-gray-400">
-            <%= signal[:message] %>
+        <div class="min-w-0">
+          <p class="text-xs font-bold uppercase tracking-[0.16em] text-indigo-600">
+            Cross-Entity Intelligence
           </p>
 
+          <h2 id="ecosystem-heading" class="mt-1 text-2xl font-bold tracking-tight text-slate-900">
+            Ecosystem Network
+          </h2>
+
+          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+            Monitor entity connectivity, relationship quality, structural
+            patterns, and the records behind your network.
+          </p>
         </div>
-
-      <% end %>
-
-    </div>
-
-  <% end %>
-
-  <div class="mt-5 grid gap-5 lg:grid-cols-3">
-
-    <div class="lg:col-span-2">
-
-      <div class="mb-3 text-[9px] font-black uppercase tracking-[0.18em] text-gray-400">
-        Strongest Network Connections
       </div>
 
-      <% if strongest.any? %>
+      <div class="flex items-center gap-3 self-start rounded-xl border border-slate-200 bg-white px-4 py-3 lg:self-center">
+        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg <%= relationship_count.positive? ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700' %>">
+          <span class="h-2.5 w-2.5 rounded-full <%= relationship_count.positive? ? 'bg-emerald-500' : 'bg-amber-500' %>"></span>
+        </span>
 
-        <div class="space-y-2">
+        <div>
+          <p class="text-xs font-medium text-slate-500">Network status</p>
+          <p class="mt-1 text-sm font-semibold text-slate-900"><%= network_state %></p>
+          <p class="mt-1 text-xs text-slate-500">
+            <%= number_with_delimiter(relationship_count) %> relationship records
+          </p>
+        </div>
+      </div>
+    </div>
 
-          <% strongest.each do |relationship| %>
+    <div class="mt-5 flex flex-wrap gap-2">
+      <span class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700">
+        <strong><%= number_with_delimiter(entity_count) %></strong> entities
+      </span>
 
-            <div class="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white/70 p-3 dark:border-gray-800 dark:bg-gray-900/60">
+      <span class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700">
+        <strong><%= number_with_delimiter(relationship_count) %></strong> relationships
+      </span>
 
-              <div class="min-w-0 flex-1">
+      <span class="rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-800">
+        <strong><%= number_with_delimiter(connected_count) %></strong> connected
+      </span>
 
-                <div class="flex flex-col gap-1 sm:flex-row sm:items-center">
+      <span class="rounded-lg border border-amber-100 bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-800">
+        <strong><%= number_with_delimiter(isolated_count) %></strong> isolated
+      </span>
+    </div>
+  </header>
 
-                  <span class="truncate text-xs font-black text-gray-800 dark:text-gray-100">
-                    <%= relationship[:source][:name] %>
+  <div class="space-y-8 p-4 sm:p-6 lg:p-7">
+
+    <%# OVERVIEW METRICS %>
+
+    <section aria-labelledby="metrics-heading">
+      <div class="mb-5">
+        <p class="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600">Overview</p>
+        <h3 id="metrics-heading" class="mt-1 text-lg font-bold text-slate-900">
+          Network at a glance
+        </h3>
+        <p class="mt-1 text-sm text-slate-500">
+          Summary of the records and relationship classifications reported by the service.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
+        <% metrics.each do |metric| %>
+          <article class="min-w-0 rounded-xl border <%= metric[:card] %> bg-white p-4 transition-shadow hover:shadow-sm">
+            <div class="flex items-center justify-between gap-3">
+              <p class="text-xs font-semibold text-slate-600"><%= metric[:label] %></p>
+
+              <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg <%= metric[:icon_bg] %> <%= metric[:accent] %>">
+                <span class="text-lg font-bold"><%= metric[:icon] %></span>
+              </span>
+            </div>
+
+            <p class="mt-4 text-3xl font-bold tracking-tight tabular-nums <%= metric[:accent] %>">
+              <%= number_with_delimiter(metric[:value]) %>
+            </p>
+
+            <p class="mt-1 min-h-5 text-xs text-slate-500"><%= metric[:note] %></p>
+
+            <div
+              class="mt-4 h-1.5 overflow-hidden rounded-full bg-slate-100"
+              role="progressbar"
+              aria-label="<%= metric[:label] %> proportion"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow="<%= metric[:rate] %>">
+              <div
+                class="h-full rounded-full <%= metric[:bar] %>"
+                style="width: <%= metric[:rate] %>%">
+              </div>
+            </div>
+
+            <p class="mt-2 text-xs text-slate-500">
+              <% if metric[:show_rate] %>
+                <strong class="text-slate-700"><%= metric[:rate] %>%</strong>
+              <% end %>
+              <%= metric[:rate_note] %>
+            </p>
+          </article>
+        <% end %>
+      </div>
+    </section>
+
+    <%# CONNECTIVITY %>
+
+    <section aria-labelledby="connectivity-heading">
+      <div class="mb-5">
+        <p class="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600">Structural overview</p>
+        <h3 id="connectivity-heading" class="mt-1 text-lg font-bold text-slate-900">
+          Connectivity and network health
+        </h3>
+        <p class="mt-1 text-sm text-slate-500">
+          Understand reported coverage, relationship confirmation, and structural findings.
+        </p>
+      </div>
+
+      <div class="grid gap-4 lg:grid-cols-3">
+
+        <%# NETWORK COVERAGE %>
+
+        <article class="rounded-xl border border-slate-200 bg-white p-5">
+          <div class="flex items-center justify-between gap-3">
+            <h4 class="text-sm font-semibold text-slate-800">Network coverage</h4>
+            <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50 text-lg text-indigo-700">◉</span>
+          </div>
+
+          <div class="mt-5 flex items-baseline gap-2">
+            <span class="text-4xl font-bold tracking-tight tabular-nums text-slate-900"><%= coverage_rate %>%</span>
+            <span class="text-xs text-slate-500">reported coverage</span>
+          </div>
+
+          <div
+            class="mt-4 h-2 overflow-hidden rounded-full bg-slate-100"
+            role="progressbar"
+            aria-label="Network coverage"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="<%= coverage_rate %>">
+            <div class="h-full rounded-full bg-indigo-500" style="width: <%= coverage_rate %>%"></div>
+          </div>
+
+          <div class="mt-4 grid grid-cols-2 gap-3">
+            <div class="rounded-lg bg-emerald-50 p-3">
+              <p class="text-xs text-emerald-700">Connected</p>
+              <p class="mt-1 text-xl font-bold tabular-nums text-emerald-800"><%= number_with_delimiter(connected_count) %></p>
+            </div>
+
+            <div class="rounded-lg bg-amber-50 p-3">
+              <p class="text-xs text-amber-700">Isolated</p>
+              <p class="mt-1 text-xl font-bold tabular-nums text-amber-800"><%= number_with_delimiter(isolated_count) %></p>
+            </div>
+          </div>
+
+          <p class="mt-4 text-xs leading-5 text-slate-500">
+            Calculated from the entity total and the supplied isolated-entity list.
+          </p>
+        </article>
+
+        <%# RELATIONSHIP HEALTH %>
+
+        <article class="rounded-xl border border-slate-200 bg-white p-5">
+          <div class="flex items-center justify-between gap-3">
+            <h4 class="text-sm font-semibold text-slate-800">Relationship health</h4>
+            <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 text-lg text-emerald-700">✓</span>
+          </div>
+
+          <div class="mt-5">
+            <p class="text-4xl font-bold tracking-tight tabular-nums text-slate-900"><%= confirmed_rate %>%</p>
+            <p class="mt-1 text-xs text-slate-500">Confirmation rate</p>
+          </div>
+
+          <div class="mt-5 space-y-4">
+            <div>
+              <div class="mb-2 flex items-center justify-between gap-3">
+                <span class="text-xs font-medium text-slate-600">Confirmed</span>
+                <span class="text-sm font-semibold tabular-nums text-emerald-700"><%= number_with_delimiter(confirmed_count) %></span>
+              </div>
+              <div class="h-2 overflow-hidden rounded-full bg-slate-100">
+                <div class="h-full rounded-full bg-emerald-500" style="width: <%= confirmed_rate %>%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="mb-2 flex items-center justify-between gap-3">
+                <span class="text-xs font-medium text-slate-600">Suggested</span>
+                <span class="text-sm font-semibold tabular-nums text-amber-700"><%= number_with_delimiter(suggested_count) %></span>
+              </div>
+              <div class="h-2 overflow-hidden rounded-full bg-slate-100">
+                <div class="h-full rounded-full bg-amber-500" style="width: <%= suggested_rate %>%"></div>
+              </div>
+            </div>
+          </div>
+
+          <p class="mt-4 text-xs leading-5 text-slate-500">
+            Suggested relationships may need review before confirmation.
+          </p>
+        </article>
+
+        <%# STRUCTURAL FINDINGS %>
+
+        <article class="rounded-xl border border-slate-200 bg-white p-5">
+          <div class="flex items-center justify-between gap-3">
+            <h4 class="text-sm font-semibold text-slate-800">Structural findings</h4>
+            <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-violet-50 text-lg text-violet-700">◇</span>
+          </div>
+
+          <div class="mt-5">
+            <p class="text-4xl font-bold tracking-tight tabular-nums text-slate-900"><%= number_with_delimiter(hotspots.length) %></p>
+            <p class="mt-1 text-xs text-slate-500">Reported structural hotspots</p>
+          </div>
+
+          <div class="mt-5 space-y-3">
+            <div class="flex items-center justify-between gap-3 rounded-lg border border-slate-100 px-3 py-3">
+              <span class="text-xs text-slate-600">Relationship types</span>
+              <span class="text-sm font-semibold tabular-nums text-slate-900"><%= relationship_kinds %></span>
+            </div>
+
+            <div class="flex items-center justify-between gap-3 rounded-lg border border-slate-100 px-3 py-3">
+              <span class="text-xs text-slate-600">High-confidence links</span>
+              <span class="text-sm font-semibold tabular-nums text-sky-700"><%= number_with_delimiter(high_confidence_count) %></span>
+            </div>
+          </div>
+
+          <p class="mt-4 text-xs leading-5 text-slate-500">
+            Hotspot figures reflect the groups returned by the intelligence service.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <%# INTELLIGENCE SIGNALS %>
+
+    <% if signals.any? %>
+      <section aria-labelledby="signals-heading">
+        <div class="mb-5">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-amber-600">Intelligence signals</p>
+          <h3 id="signals-heading" class="mt-1 text-lg font-bold text-slate-900">Findings and observations</h3>
+        </div>
+
+        <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <% signals.each do |signal| %>
+            <%
+              signal_title = read_value.call(signal, :title)
+              signal_message = read_value.call(signal, :message)
+            %>
+
+            <article class="rounded-xl border border-amber-200/80 bg-amber-50/40 p-4">
+              <div class="flex items-start gap-3">
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-amber-600 ring-1 ring-amber-100">✦</span>
+
+                <div class="min-w-0">
+                  <h4 class="break-words text-sm font-semibold text-slate-900">
+                    <%= signal_title.presence || "Intelligence signal" %>
+                  </h4>
+
+                  <p class="mt-2 break-words text-sm leading-6 text-slate-600">
+                    <%= signal_message.presence || "No additional details were supplied." %>
+                  </p>
+                </div>
+              </div>
+            </article>
+          <% end %>
+        </div>
+      </section>
+    <% end %>
+
+    <%# STRONGEST CONNECTIONS %>
+
+    <section aria-labelledby="connections-heading">
+      <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600">Relationship intelligence</p>
+          <h3 id="connections-heading" class="mt-1 text-lg font-bold text-slate-900">Strongest network connections</h3>
+          <p class="mt-1 text-sm text-slate-500">Source entities, target entities, confidence, and relationship status.</p>
+        </div>
+
+        <span class="w-fit rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-600">
+          Showing <%= relationship_preview.length %> of <%= number_with_delimiter(relationship_count) %>
+        </span>
+      </div>
+
+      <% if relationship_preview.any? %>
+        <div class="grid gap-4 xl:grid-cols-2">
+          <% relationship_preview.each do |relationship| %>
+            <%
+              source = read_value.call(relationship, :source)
+              target = read_value.call(relationship, :target)
+
+              kind = read_value.call(relationship, :kind)
+              kind = read_value.call(relationship, :relationship_kind) if kind.blank?
+
+              raw_confidence_percent = read_value.call(relationship, :confidence_percent)
+              raw_confidence = read_value.call(relationship, :confidence)
+
+              confidence =
+                if raw_confidence_percent.present?
+                  raw_confidence_percent.to_f
+                elsif raw_confidence.present?
+                  value = raw_confidence.to_f
+                  value <= 1 ? value * 100 : value
+                else
+                  0
+                end
+
+              confidence = confidence.clamp(0, 100)
+              confidence_display = confidence.round
+
+              state = read_value.call(relationship, :state)
+              state = read_value.call(relationship, :status) if state.blank?
+
+              source_id = record_id.call(source)
+              target_id = record_id.call(target)
+              relationship_id = record_id.call(relationship)
+
+              confirmed = state.to_s.downcase == "confirmed"
+            %>
+
+            <article class="min-w-0 rounded-xl border border-slate-200 bg-white p-4 transition-shadow hover:shadow-sm sm:p-5">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <span class="rounded-md bg-indigo-50 px-2.5 py-1.5 text-xs font-semibold text-indigo-700">
+                  <%= kind.to_s.humanize.presence || "Relationship" %>
+                </span>
+
+                <% if state.present? %>
+                  <span class="rounded-md px-2.5 py-1.5 text-xs font-medium <%= confirmed ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-800' %>">
+                    <%= state.to_s.humanize %>
                   </span>
+                <% end %>
+              </div>
 
-                  <span class="hidden text-gray-300 sm:block">
-                    →
-                  </span>
+              <div class="mt-4 grid grid-cols-[minmax(0,1fr)_24px_minmax(0,1fr)] items-center gap-2">
+                <div class="min-w-0 rounded-lg border border-sky-100 bg-sky-50/60 p-3">
+                  <p class="text-xs font-semibold text-sky-700">Source</p>
+                  <p class="mt-2 break-words text-sm font-semibold text-slate-900"><%= record_name.call(source) %></p>
 
-                  <span class="truncate text-xs font-black text-gray-800 dark:text-gray-100">
-                    <%= relationship[:target][:name] %>
-                  </span>
-
+                  <% if source_id.present? %>
+                    <p class="mt-1 break-all text-xs text-slate-500">ID: <%= source_id %></p>
+                  <% end %>
                 </div>
 
-                <div class="mt-1 text-[9px] text-gray-400">
-                  <%= relationship[:kind].to_s.humanize %>
+                <div class="flex justify-center text-xl text-slate-400" aria-label="Connects to">→</div>
+
+                <div class="min-w-0 rounded-lg border border-emerald-100 bg-emerald-50/60 p-3">
+                  <p class="text-xs font-semibold text-emerald-700">Target</p>
+                  <p class="mt-2 break-words text-sm font-semibold text-slate-900"><%= record_name.call(target) %></p>
+
+                  <% if target_id.present? %>
+                    <p class="mt-1 break-all text-xs text-slate-500">ID: <%= target_id %></p>
+                  <% end %>
+                </div>
+              </div>
+
+              <div class="mt-5 border-t border-slate-100 pt-4">
+                <div class="flex items-center justify-between gap-3">
+                  <span class="text-xs font-medium text-slate-600">Relationship confidence</span>
+                  <span class="text-sm font-bold tabular-nums <%= confidence >= 80 ? 'text-emerald-700' : 'text-indigo-700' %>">
+                    <%= confidence_display %>%
+                  </span>
                 </div>
 
+                <div
+                  class="mt-2 h-2 overflow-hidden rounded-full bg-slate-100"
+                  role="progressbar"
+                  aria-label="Relationship confidence"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow="<%= confidence_display %>">
+                  <div
+                    class="h-full rounded-full <%= confidence >= 80 ? 'bg-emerald-500' : 'bg-indigo-500' %>"
+                    style="width: <%= confidence %>%">
+                  </div>
+                </div>
+
+                <% if relationship_id.present? %>
+                  <p class="mt-3 break-all text-xs text-slate-500">Relationship ID: <%= relationship_id %></p>
+                <% end %>
+              </div>
+            </article>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="rounded-xl border border-dashed border-slate-300 bg-slate-50/70 px-5 py-10 text-center">
+          <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-white text-xl text-slate-400 ring-1 ring-slate-200">↗</div>
+
+          <h4 class="mt-4 text-base font-semibold text-slate-900">No relationship records to preview</h4>
+
+          <p class="mx-auto mt-2 max-w-lg text-sm leading-6 text-slate-600">
+            The intelligence service returned no strongest connections. When relationships are discovered,
+            this section can display their source entities, targets, types, confidence scores, and statuses.
+          </p>
+        </div>
+      <% end %>
+    </section>
+
+    <%# STRUCTURAL HOTSPOTS %>
+
+    <section aria-labelledby="hotspots-heading">
+      <div class="mb-5">
+        <p class="text-xs font-semibold uppercase tracking-[0.14em] text-violet-600">Structural analysis</p>
+        <h3 id="hotspots-heading" class="mt-1 text-lg font-bold text-slate-900">Relationship types and hotspots</h3>
+        <p class="mt-1 text-sm text-slate-500">Review relationship groups reported by the intelligence service.</p>
+      </div>
+
+      <% if hotspots.any? %>
+        <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          <% hotspots.each do |hotspot| %>
+            <%
+              hotspot_kind = read_value.call(hotspot, :kind).to_s.humanize
+              hotspot_count = [read_value.call(hotspot, :count).to_i, 0].max
+            %>
+
+            <article class="flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-4">
+              <div class="flex min-w-0 items-center gap-3">
+                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-violet-50 text-lg text-violet-700">◈</span>
+
+                <div class="min-w-0">
+                  <h4 class="break-words text-sm font-semibold text-slate-900">
+                    <%= hotspot_kind.presence || "Other relationship" %>
+                  </h4>
+                  <p class="mt-1 text-xs text-slate-500">Relationship group</p>
+                </div>
               </div>
 
               <div class="shrink-0 text-right">
+                <p class="text-2xl font-bold tabular-nums text-slate-900"><%= number_with_delimiter(hotspot_count) %></p>
+                <p class="text-xs text-slate-500">Records</p>
+              </div>
+            </article>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="rounded-xl border border-dashed border-slate-300 bg-slate-50/70 p-5">
+          <h4 class="text-sm font-semibold text-slate-900">No structural hotspots reported</h4>
+          <p class="mt-2 text-sm leading-6 text-slate-600">
+            No hotspot groups were supplied. Relationship distribution and cluster analysis
+            can be displayed when the service returns those results.
+          </p>
+        </div>
+      <% end %>
+    </section>
 
-                <div class="text-sm font-black text-violet-600 dark:text-violet-400">
-                  <%= relationship[:confidence_percent] %>%
+    <%# ENTITY DIRECTORY %>
+
+    <section aria-labelledby="entities-heading">
+      <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-orange-600">Entity directory</p>
+          <h3 id="entities-heading" class="mt-1 text-lg font-bold text-slate-900">Entity record preview</h3>
+          <p class="mt-1 text-sm text-slate-500">Inspect records from the isolation list and relationship endpoints.</p>
+        </div>
+
+        <span class="w-fit rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-600">
+          <%= entity_preview.length %> preview records
+        </span>
+      </div>
+
+      <% if entity_preview.any? %>
+        <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          <% entity_preview.each do |entity| %>
+            <%
+              name = record_name.call(entity)
+              id = record_id.call(entity)
+              description = record_description.call(entity)
+
+              entity_type = read_value.call(entity, :entity_type)
+              entity_type = read_value.call(entity, :kind) if entity_type.blank?
+              entity_type = read_value.call(entity, :type) if entity_type.blank?
+
+              isolated_entity = isolated.any? do |item|
+                item_id = record_id.call(item)
+
+                if id.present? && item_id.present?
+                  item_id.to_s == id.to_s
+                else
+                  record_name.call(item) == name
+                end
+              end
+            %>
+
+            <article class="min-w-0 rounded-xl border border-slate-200 bg-white p-4 transition-shadow hover:shadow-sm">
+              <div class="flex items-start gap-3">
+                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-xs font-bold text-orange-700">
+                  <%= id.present? ? truncate(id.to_s, length: 8) : "◈" %>
+                </span>
+
+                <div class="min-w-0 flex-1">
+                  <h4 class="break-words text-sm font-semibold text-slate-900"><%= name %></h4>
+
+                  <div class="mt-2 flex flex-wrap items-center gap-2">
+                    <% if id.present? %>
+                      <span class="break-all text-xs text-slate-500">ID: <%= id %></span>
+                    <% end %>
+
+                    <% if entity_type.present? %>
+                      <span class="rounded-md bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-700">
+                        <%= entity_type.to_s.humanize %>
+                      </span>
+                    <% end %>
+                  </div>
                 </div>
-
-                <div class="text-[8px] font-black uppercase text-gray-400">
-                  confidence
-                </div>
-
               </div>
 
-            </div>
+              <div class="mt-4 border-t border-slate-100 pt-3">
+                <p class="text-xs font-semibold text-slate-500">Description</p>
 
+                <p class="mt-2 break-words text-sm leading-6 text-slate-600">
+                  <%= description.present? ? truncate(description, length: 180) : "No description is available in the supplied intelligence data." %>
+                </p>
+              </div>
+
+              <% if isolated_entity %>
+                <div class="mt-3 flex items-center gap-2 rounded-lg bg-amber-50 px-3 py-2">
+                  <span class="h-2 w-2 shrink-0 rounded-full bg-amber-500"></span>
+                  <span class="text-xs font-medium text-amber-800">Reported as isolated</span>
+                </div>
+              <% end %>
+            </article>
           <% end %>
-
         </div>
-
       <% else %>
+        <div class="rounded-xl border border-dashed border-slate-300 bg-slate-50/70 px-5 py-10 text-center">
+          <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-white text-xl text-slate-400 ring-1 ring-slate-200">◈</div>
 
-        <div class="rounded-2xl border border-dashed border-gray-300 p-8 text-center dark:border-gray-700">
+          <h4 class="mt-4 text-base font-semibold text-slate-900">No entity records available for preview</h4>
 
-          <div class="text-sm font-black text-gray-700 dark:text-gray-200">
-            Network not populated
-          </div>
-
-          <div class="mt-1 text-xs text-gray-400">
-            Run the relationship discovery task.
-          </div>
-
+          <p class="mx-auto mt-2 max-w-lg text-sm leading-6 text-slate-600">
+            The supplied payload contains no isolated entities or usable source/target records.
+            The total entity count remains available above.
+          </p>
         </div>
-
       <% end %>
 
-    </div>
+      <% if entity_count > entity_preview.length %>
+        <div class="mt-3 flex flex-col gap-1 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <p class="text-xs leading-5 text-slate-600">
+            Previewing <strong class="text-slate-900"><%= entity_preview.length %></strong>
+            of <strong class="text-slate-900"><%= number_with_delimiter(entity_count) %></strong>
+            total entities.
+          </p>
+          <span class="text-xs font-semibold text-slate-500">Limited preview</span>
+        </div>
+      <% end %>
+    </section>
 
-    <div>
+    <%# RECOMMENDED NEXT ACTION %>
 
-      <div class="mb-3 text-[9px] font-black uppercase tracking-[0.18em] text-gray-400">
-        Structural Hotspots
-      </div>
+    <section aria-labelledby="next-action-heading">
+      <div class="overflow-hidden rounded-xl border border-indigo-200 bg-gradient-to-br from-indigo-50/70 via-white to-white">
 
-      <div class="space-y-2">
+        <div class="p-5 sm:p-6">
+          <div class="flex items-start gap-4">
+            <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-lg text-white">✦</span>
 
-        <% hotspots.each do |hotspot| %>
+            <div class="min-w-0 flex-1">
+              <p class="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600">Recommended next step</p>
 
-          <div class="rounded-2xl border border-gray-200 bg-white/70 p-3 dark:border-gray-800 dark:bg-gray-900/60">
+              <h3 id="next-action-heading" class="mt-2 text-lg font-bold text-slate-900">
+                <% if entity_count.zero? %>
+                  Populate your ecosystem
+                <% elsif relationship_count.zero? %>
+                  Discover relationships between entities
+                <% elsif suggested_count.positive? %>
+                  Review suggested relationships
+                <% elsif isolated_count.positive? %>
+                  Investigate isolated entities
+                <% else %>
+                  Explore your established network
+                <% end %>
+              </h3>
 
-            <div class="flex items-center justify-between">
+              <p class="mt-2 text-sm leading-6 text-slate-600">
+                <% if entity_count.zero? %>
+                  No entity records are available. Populate the ecosystem before running relationship discovery.
+                <% elsif relationship_count.zero? %>
+                  Your ecosystem contains
+                  <strong class="text-slate-900"><%= number_with_delimiter(entity_count) %> entities</strong>,
+                  but the service reports no relationships. Run relationship discovery and evaluate proposed connections.
+                <% elsif suggested_count.positive? %>
+                  There are
+                  <strong class="text-slate-900"><%= number_with_delimiter(suggested_count) %> suggested relationships</strong>
+                  awaiting evaluation. Review their source, target, type, and confidence before confirming valid links.
+                <% elsif isolated_count.positive? %>
+                  <strong class="text-slate-900"><%= number_with_delimiter(isolated_count) %> entities</strong>
+                  are reported as isolated. Investigate their missing connections and determine whether additional discovery is needed.
+                <% else %>
+                  The supplied metrics report relationships and no isolated entities. Review the strongest links,
+                  examine relationship types, and investigate high-confidence connections.
+                <% end %>
+              </p>
 
-              <span class="text-xs font-black text-gray-700 dark:text-gray-200">
-                <%= hotspot[:kind].to_s.humanize %>
-              </span>
+              <div class="mt-4 flex flex-wrap gap-2">
+                <span class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700">
+                  <strong><%= number_with_delimiter(entity_count) %></strong> entities
+                </span>
 
-              <span class="text-xs font-black text-indigo-600 dark:text-indigo-400">
-                <%= hotspot[:count] %>
-              </span>
+                <span class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700">
+                  <strong><%= number_with_delimiter(relationship_count) %></strong> relationships
+                </span>
 
+                <span class="rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-xs text-emerald-800">
+                  <strong><%= number_with_delimiter(confirmed_count) %></strong> confirmed
+                </span>
+
+                <span class="rounded-lg border border-amber-100 bg-amber-50 px-3 py-1.5 text-xs text-amber-800">
+                  <strong><%= number_with_delimiter(isolated_count) %></strong> isolated
+                </span>
+              </div>
             </div>
-
-            <div class="mt-1 text-[9px] text-gray-400">
-              relationship cluster
-            </div>
-
           </div>
-
-        <% end %>
-
-      </div>
-
-      <% if isolated.any? %>
-
-        <div class="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/50 dark:bg-amber-950/20">
-
-          <div class="text-[9px] font-black uppercase tracking-wider text-amber-600">
-            Review Opportunity
-          </div>
-
-          <div class="mt-1 text-xs font-black text-amber-800 dark:text-amber-300">
-            <%= isolated.length %> isolated entities
-          </div>
-
-          <div class="mt-1 text-[10px] leading-relaxed text-amber-700/70 dark:text-amber-400/70">
-            These entities currently have no discovered ecosystem relationships.
-          </div>
-
         </div>
 
-      <% end %>
+        <div class="border-t border-indigo-100 bg-white/70 px-5 py-3 sm:px-6">
+          <p class="text-xs leading-5 text-slate-500">
+            Recommendations are derived from the supplied metrics. This dashboard does not create or modify relationships.
+          </p>
+        </div>
+      </div>
+    </section>
 
-    </div>
+    <%# FOOTNOTE %>
+
+    <footer class="border-t border-slate-200 pt-4">
+      <p class="text-xs leading-5 text-slate-500">
+        All counts and previews use the supplied intelligence payload.
+        Coverage is calculated from the entity total and isolated-entity list.
+        Confidence scores reflect the supplied relationship values.
+        Missing hotspot data does not imply that structural patterns are absent.
+      </p>
+    </footer>
 
   </div>
-
 </section>

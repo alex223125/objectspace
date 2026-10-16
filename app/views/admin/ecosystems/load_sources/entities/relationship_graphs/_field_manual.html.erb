@@ -1,0 +1,187 @@
+
+<section id="graph-field-manual"
+         class="scroll-mt-8 rounded-[30px] border-2 border-orange-100 bg-gradient-to-b from-white via-orange-50/20 to-slate-50/60 p-5 shadow-sm sm:p-8"
+         aria-labelledby="field-manual-heading">
+
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div>
+      <p class="text-[10px] font-black uppercase tracking-[0.2em] text-orange-600">Administrator handbook · Edition 1</p>
+      <h2 id="field-manual-heading" class="mt-2 text-2xl font-black text-slate-900">Relationship Graph Field Manual</h2>
+      <p class="mt-3 max-w-3xl text-sm leading-7 text-slate-500">
+        Learn what the graph represents, where its information comes from, how filters affect the result, how to interpret diagnostics, and what to check when something goes wrong.
+      </p>
+    </div>
+
+    <button type="button"
+            class="shrink-0 rounded-xl border border-orange-200 bg-white px-4 py-2.5 text-xs font-black text-orange-700 hover:bg-orange-50"
+            data-action="click->graph-manual#toggleAll">
+      Expand / collapse chapters
+    </button>
+  </div>
+
+  <div class="mt-7 grid gap-3 sm:grid-cols-3">
+    <article class="rounded-2xl border border-orange-100 bg-white p-4">
+      <p class="text-xs font-black text-orange-700">01 · Understand</p>
+      <p class="mt-2 text-xs leading-6 text-slate-500">Learn the vocabulary of nodes, edges, states, evidence, and confidence.</p>
+    </article>
+    <article class="rounded-2xl border border-sky-100 bg-white p-4">
+      <p class="text-xs font-black text-sky-700">02 · Investigate</p>
+      <p class="mt-2 text-xs leading-6 text-slate-500">Learn how search, filters, graph scope, and service results affect what you see.</p>
+    </article>
+    <article class="rounded-2xl border border-emerald-100 bg-white p-4">
+      <p class="text-xs font-black text-emerald-700">03 · Verify</p>
+      <p class="mt-2 text-xs leading-6 text-slate-500">Use evidence and diagnostics before drawing conclusions or approving a connection.</p>
+    </article>
+  </div>
+
+  <div class="mt-7 space-y-3">
+    <details class="group rounded-2xl border border-slate-200 bg-white p-5" open>
+      <summary class="cursor-pointer list-none text-sm font-black text-slate-800">
+        <span class="mr-2 text-orange-500">01.</span> What is this page?
+        <span class="float-right text-orange-600 group-open:rotate-45">＋</span>
+      </summary>
+      <div class="mt-4 space-y-3 text-xs leading-7 text-slate-600">
+        <p>This page is an administrative inspection workspace for entities and their relationships. It combines graph data, summary metrics, diagnostics, relationship details, and documentation.</p>
+        <p>The page is a presentation layer. It does not prove that the data is correct simply because the page renders, and it must not be treated as the source of truth for persisted records.</p>
+        <p><strong class="text-slate-800">First rule:</strong> distinguish what the service returned from what the database contains and what the visualization can display.</p>
+      </div>
+    </details>
+
+    <details class="group rounded-2xl border border-slate-200 bg-white p-5">
+      <summary class="cursor-pointer list-none text-sm font-black text-slate-800">
+        <span class="mr-2 text-orange-500">02.</span> What are entities and nodes?
+        <span class="float-right text-orange-600 group-open:rotate-45">＋</span>
+      </summary>
+      <div class="mt-4 space-y-3 text-xs leading-7 text-slate-600">
+        <p>An entity is a record in your domain model. A node is the graph representation of that entity. One entity should normally map to one node for a given graph scope.</p>
+        <p>The identifier connects the graph representation to the underlying record. Names and descriptions help people recognize records but may not be unique.</p>
+        <p>When a node appears to be missing, check the entity query, service filters, serialization, and node identifier before assuming the record does not exist.</p>
+      </div>
+    </details>
+
+    <details class="group rounded-2xl border border-slate-200 bg-white p-5">
+      <summary class="cursor-pointer list-none text-sm font-black text-slate-800">
+        <span class="mr-2 text-orange-500">03.</span> What are edges and relationships?
+        <span class="float-right text-orange-600 group-open:rotate-45">＋</span>
+      </summary>
+      <div class="mt-4 space-y-3 text-xs leading-7 text-slate-600">
+        <p>An edge represents a relationship between a source entity and a target entity. The source and target identifiers determine which records the edge connects.</p>
+        <p>A relationship can have a type, lifecycle state, confidence value, and supporting evidence. Those attributes describe different aspects of the connection.</p>
+        <p>An edge that references an identifier missing from the current node list may reflect an incomplete response, a filtering mismatch, or inconsistent data. Investigate before assigning blame to the database.</p>
+      </div>
+    </details>
+
+    <details class="group rounded-2xl border border-slate-200 bg-white p-5">
+      <summary class="cursor-pointer list-none text-sm font-black text-slate-800">
+        <span class="mr-2 text-orange-500">04.</span> How is this graph generated?
+        <span class="float-right text-orange-600 group-open:rotate-45">＋</span>
+      </summary>
+      <div class="mt-4 space-y-3 text-xs leading-7 text-slate-600">
+        <ol class="list-decimal space-y-2 pl-5">
+          <li>The controller authorizes the request.</li>
+          <li>Request parameters are normalized into graph filters.</li>
+          <li>The graph service returns nodes and edges.</li>
+          <li>The metrics service calculates or retrieves summary measurements.</li>
+          <li>The diagnostics service provides data-quality and health information.</li>
+          <li>The candidate service supplies proposed connections, if any.</li>
+          <li>The Rails view renders the returned values into the workspace.</li>
+          <li>JavaScript controllers enhance interaction in the browser.</li>
+        </ol>
+        <p>This describes the controller's current orchestration. The exact queries, scoring rules, caching, and relationship-generation algorithms are defined by your services, not by the ERB template.</p>
+      </div>
+    </details>
+
+    <details class="group rounded-2xl border border-slate-200 bg-white p-5">
+      <summary class="cursor-pointer list-none text-sm font-black text-slate-800">
+        <span class="mr-2 text-orange-500">05.</span> How do filters change the result?
+        <span class="float-right text-orange-600 group-open:rotate-45">＋</span>
+      </summary>
+      <div class="mt-4 space-y-3 text-xs leading-7 text-slate-600">
+        <p>Search narrows the request according to the matching rules implemented by your graph service. State selects relationship lifecycle states, while relationship type narrows the requested kinds of connections.</p>
+        <p>The node limit bounds the size requested by the controller. A limit is not proof that every matching record is represented.</p>
+        <p>The current controller does not implement traversal depth. A depth control should only be added when the graph service accepts and applies a depth parameter.</p>
+      </div>
+    </details>
+
+    <details class="group rounded-2xl border border-slate-200 bg-white p-5">
+      <summary class="cursor-pointer list-none text-sm font-black text-slate-800">
+        <span class="mr-2 text-orange-500">06.</span> What do states mean?
+        <span class="float-right text-orange-600 group-open:rotate-45">＋</span>
+      </summary>
+      <div class="mt-4 space-y-3 text-xs leading-7 text-slate-600">
+        <p><strong class="text-slate-800">Suggested:</strong> a connection has been proposed but may require review.</p>
+        <p><strong class="text-slate-800">Confirmed:</strong> the application records the relationship as accepted under its domain rules.</p>
+        <p><strong class="text-slate-800">Rejected:</strong> a review or domain operation marked the relationship as rejected.</p>
+        <p><strong class="text-slate-800">Archived:</strong> the relationship is retained but may no longer be part of active workflows.</p>
+        <p>Use your model's actual state definitions as the authority. A label or color in the view cannot change the persisted state.</p>
+      </div>
+    </details>
+
+    <details class="group rounded-2xl border border-slate-200 bg-white p-5">
+      <summary class="cursor-pointer list-none text-sm font-black text-slate-800">
+        <span class="mr-2 text-orange-500">07.</span> Confidence and evidence
+        <span class="float-right text-orange-600 group-open:rotate-45">＋</span>
+      </summary>
+      <div class="mt-4 space-y-3 text-xs leading-7 text-slate-600">
+        <p>Confidence is an assessment supplied by your domain logic. Do not assume it is a probability unless the service explicitly defines it that way.</p>
+        <p>Evidence describes why a relationship exists or was proposed. Depending on your application, it may contain source references, observations, excerpts, or structured metadata.</p>
+        <p>High confidence without reliable evidence can still be misleading. Review the underlying evidence and its provenance before relying on a relationship.</p>
+      </div>
+    </details>
+
+    <details class="group rounded-2xl border border-slate-200 bg-white p-5">
+      <summary class="cursor-pointer list-none text-sm font-black text-slate-800">
+        <span class="mr-2 text-orange-500">08.</span> How to investigate an empty graph
+        <span class="float-right text-orange-600 group-open:rotate-45">＋</span>
+      </summary>
+      <div class="mt-4 space-y-3 text-xs leading-7 text-slate-600">
+        <ol class="list-decimal space-y-2 pl-5">
+          <li>Clear the query, state, and relationship type filters.</li>
+          <li>Check whether the graph service returned any nodes or edges.</li>
+          <li>Inspect the Rails logs if the request failed.</li>
+          <li>Compare entity identifiers against relationship source and target identifiers.</li>
+          <li>Check whether the service excludes particular relationship states.</li>
+          <li>Inspect the metrics and diagnostics separately.</li>
+        </ol>
+        <p>Zero returned nodes, zero returned edges, and a service exception are three different conditions. Do not treat them as interchangeable.</p>
+      </div>
+    </details>
+
+    <details class="group rounded-2xl border border-slate-200 bg-white p-5">
+      <summary class="cursor-pointer list-none text-sm font-black text-slate-800">
+        <span class="mr-2 text-orange-500">09.</span> Data safety and administrative responsibility
+        <span class="float-right text-orange-600 group-open:rotate-45">＋</span>
+      </summary>
+      <div class="mt-4 space-y-3 text-xs leading-7 text-slate-600">
+        <p>Inspect before modifying. A candidate is not an approved relationship. A displayed count is not a database audit. A visual connection is not evidence of correctness.</p>
+        <p>Before enabling review actions, verify the authorization policy, server-side state transitions, validation, audit trail, and any applicable transaction or concurrency safeguards.</p>
+        <p>Do not place private evidence or sensitive identifiers into client-visible debugging data unnecessarily.</p>
+      </div>
+    </details>
+
+    <details class="group rounded-2xl border border-slate-200 bg-white p-5">
+      <summary class="cursor-pointer list-none text-sm font-black text-slate-800">
+        <span class="mr-2 text-orange-500">10.</span> Administrator troubleshooting checklist
+        <span class="float-right text-orange-600 group-open:rotate-45">＋</span>
+      </summary>
+      <div class="mt-4 space-y-3 text-xs leading-7 text-slate-600">
+        <ul class="list-disc space-y-2 pl-5">
+          <li>Check Rails logs for the original service exception.</li>
+          <li>Confirm that each service returns the expected hash or array structure.</li>
+          <li>Confirm that the graph keys are `nodes` and `edges`.</li>
+          <li>Confirm that node IDs and edge endpoint IDs use compatible types.</li>
+          <li>Check browser developer tools for JavaScript and asset compilation errors.</li>
+          <li>Verify the shared layout receives the rendered `content` local.</li>
+          <li>Test authorization separately from rendering and data retrieval.</li>
+        </ul>
+      </div>
+    </details>
+  </div>
+
+  <div class="mt-7 rounded-2xl border border-orange-100 bg-gradient-to-r from-orange-50 to-emerald-50 p-5">
+    <h3 class="text-sm font-black text-slate-800">Recommended first session</h3>
+    <p class="mt-2 text-xs leading-7 text-slate-600">
+      Start with the overview metrics, clear all filters, inspect one entity and its relationships, open the evidence details, compare the result with diagnostics, and then review the field manual chapters about provenance and confidence.
+    </p>
+  </div>
+</section>

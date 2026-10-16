@@ -1,0 +1,858 @@
+<%# app/views/admin/ecosystems/load_sources/entities/research_workspaces/research_workspaces/new.html.erb %>
+
+<div class="min-h-screen bg-gradient-to-b from-white via-orange-50/20 to-slate-50/70 text-slate-700">
+
+  <div class="mx-auto max-w-6xl px-5 py-8 md:px-8 md:py-12">
+
+    <%# ========================================================= %>
+    <%# NAVIGATION                                                %>
+    <%# ========================================================= %>
+
+    <div class="flex flex-wrap items-center justify-between gap-4">
+
+      <%= link_to url_for(action: :index, only_path: true),
+                  class: "inline-flex items-center gap-2 rounded-xl border border-orange-100 bg-white px-4 py-2.5 text-xs font-bold text-slate-500 shadow-sm transition hover:border-orange-300 hover:text-orange-600" do %>
+        <span aria-hidden="true">←</span>
+        Back to workspaces
+      <% end %>
+
+      <div class="flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-3.5 py-2 text-[10px] font-black uppercase tracking-widest text-orange-600">
+        <span class="h-2 w-2 rounded-full bg-orange-400"></span>
+        Workspace creation
+      </div>
+
+    </div>
+
+
+    <%# ========================================================= %>
+    <%# PAGE HEADER                                                %>
+    <%# ========================================================= %>
+
+    <header class="mt-8 overflow-hidden rounded-[34px] border-2 border-orange-100 bg-gradient-to-br from-white via-orange-50/50 to-amber-50/50 p-6 shadow-md shadow-orange-100/40 md:p-10">
+
+      <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+
+        <div class="max-w-3xl">
+
+          <div class="flex items-center gap-3">
+
+            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-orange-100 text-2xl shadow-sm shadow-orange-100">
+              🧭
+            </div>
+
+            <div>
+              <div class="text-[10px] font-black uppercase tracking-[0.3em] text-orange-500">
+                Research intelligence
+              </div>
+
+              <div class="mt-1 text-xs font-medium text-slate-400">
+                Strategy · Discovery · Evidence · Knowledge
+              </div>
+            </div>
+
+          </div>
+
+          <h1 class="mt-7 text-3xl font-black tracking-tight text-slate-800 md:text-5xl">
+            Start a research workspace
+          </h1>
+
+          <p class="mt-4 max-w-2xl text-sm leading-7 text-slate-500 md:text-base">
+            Build a persistent investigation environment where ideas become
+            research questions, questions lead to evidence, and evidence
+            develops into structured knowledge.
+          </p>
+
+        </div>
+
+        <div class="w-full rounded-3xl border border-orange-100 bg-white/80 p-5 shadow-sm md:max-w-[230px]">
+
+          <div class="text-[10px] font-black uppercase tracking-widest text-slate-400">
+            Your mission
+          </div>
+
+          <div class="mt-3 text-lg font-black text-slate-700">
+            Explore. Verify. Connect.
+          </div>
+
+          <p class="mt-2 text-xs leading-6 text-slate-400">
+            Give your investigation a clear purpose and a place to grow.
+          </p>
+
+          <div class="mt-4 flex items-center gap-2 text-[10px] font-bold text-emerald-600">
+            <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+            Ready to begin
+          </div>
+
+        </div>
+
+      </div>
+
+    </header>
+
+
+    <%# ========================================================= %>
+    <%# ENCYCLOPEDIC EXPLANATION                                  %>
+    <%# ========================================================= %>
+
+    <section class="mt-8 rounded-[30px] border-2 border-orange-100 bg-white p-6 shadow-sm md:p-8">
+
+      <div class="flex items-start gap-4">
+
+        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-orange-50 text-xl">
+          📚
+        </div>
+
+        <div class="min-w-0 flex-1">
+
+          <div class="text-[10px] font-black uppercase tracking-[0.25em] text-orange-500">
+            Interface guide · 01
+          </div>
+
+          <h2 class="mt-2 text-xl font-black text-slate-800">
+            What is a research workspace?
+          </h2>
+
+          <p class="mt-3 text-sm leading-7 text-slate-500">
+            A research workspace is a dedicated environment for investigating
+            a subject over time. Instead of keeping discoveries in disconnected
+            notes, you can organize entities, questions, observations,
+            relationships, annotations, and supporting evidence around one
+            research objective.
+          </p>
+
+          <p class="mt-3 text-sm leading-7 text-slate-500">
+            Think of it as a combination of a research notebook, an investigation
+            map, and a knowledge-building process. Each workspace establishes
+            the context for a particular investigation, while its items record
+            what you discover, what remains uncertain, and what you should
+            investigate next.
+          </p>
+
+          <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+
+            <div class="rounded-2xl border border-orange-100 bg-orange-50/60 p-4">
+              <div class="text-xl">🎯</div>
+              <div class="mt-3 text-xs font-black text-orange-700">
+                Define the scope
+              </div>
+              <p class="mt-2 text-xs leading-5 text-slate-500">
+                Establish the topic, objective, and boundaries.
+              </p>
+            </div>
+
+            <div class="rounded-2xl border border-sky-100 bg-sky-50/60 p-4">
+              <div class="text-xl">🔎</div>
+              <div class="mt-3 text-xs font-black text-sky-700">
+                Investigate
+              </div>
+              <p class="mt-2 text-xs leading-5 text-slate-500">
+                Identify entities, questions, and missing information.
+              </p>
+            </div>
+
+            <div class="rounded-2xl border border-violet-100 bg-violet-50/60 p-4">
+              <div class="text-xl">🧩</div>
+              <div class="mt-3 text-xs font-black text-violet-700">
+                Connect findings
+              </div>
+              <p class="mt-2 text-xs leading-5 text-slate-500">
+                Record relationships, annotations, and supporting evidence.
+              </p>
+            </div>
+
+            <div class="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-4">
+              <div class="text-xl">🌱</div>
+              <div class="mt-3 text-xs font-black text-emerald-700">
+                Build knowledge
+              </div>
+              <p class="mt-2 text-xs leading-5 text-slate-500">
+                Refine conclusions and identify the next research steps.
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <%# ========================================================= %>
+    <%# RESEARCH STRATEGY                                         %>
+    <%# ========================================================= %>
+
+    <section class="mt-8 rounded-[32px] border-2 border-orange-100 bg-gradient-to-b from-white to-orange-50/30 p-6 shadow-sm md:p-8">
+
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+
+        <div>
+          <div class="text-[10px] font-black uppercase tracking-[0.25em] text-orange-500">
+            Investigation framework · 02
+          </div>
+
+          <h2 class="mt-2 text-xl font-black text-slate-800 md:text-2xl">
+            The research strategy
+          </h2>
+
+          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+            Use these stages as a practical guide. Your investigation can move
+            between stages as new discoveries change what you need to learn.
+          </p>
+        </div>
+
+        <span class="w-fit rounded-full border border-orange-200 bg-orange-50 px-3 py-1.5 text-[10px] font-bold text-orange-600">
+          A continuous learning cycle
+        </span>
+
+      </div>
+
+
+      <div class="relative mt-8">
+
+        <div class="absolute left-[12%] right-[12%] top-7 hidden h-1.5 rounded-full bg-orange-100 md:block"></div>
+
+        <div class="relative grid grid-cols-1 gap-7 md:grid-cols-4 md:gap-4">
+
+          <% [
+               {
+                 number: "01",
+                 icon: "🎯",
+                 title: "Frame",
+                 label: "Define the problem",
+                 description: "Specify the research topic, intended outcome, boundaries, and important unknowns.",
+                 color: "orange"
+               },
+               {
+                 number: "02",
+                 icon: "🔍",
+                 title: "Discover",
+                 label: "Explore the landscape",
+                 description: "Identify relevant entities, formulate questions, and locate information gaps.",
+                 color: "sky"
+               },
+               {
+                 number: "03",
+                 icon: "🧩",
+                 title: "Substantiate",
+                 label: "Build the evidence",
+                 description: "Collect observations, record sources, examine relationships, and challenge assumptions.",
+                 color: "violet"
+               },
+               {
+                 number: "04",
+                 icon: "🌱",
+                 title: "Synthesize",
+                 label: "Develop knowledge",
+                 description: "Summarize findings, track remaining uncertainties, and choose the next investigation.",
+                 color: "emerald"
+               }
+             ].each do |stage| %>
+
+            <% palette = {
+              "orange" => {
+                "border" => "border-orange-300",
+                "bg" => "bg-orange-50",
+                "text" => "text-orange-700",
+                "badge" => "bg-orange-100 text-orange-700 border-orange-200",
+                "ring" => "ring-orange-100"
+              },
+              "sky" => {
+                "border" => "border-sky-300",
+                "bg" => "bg-sky-50",
+                "text" => "text-sky-700",
+                "badge" => "bg-sky-100 text-sky-700 border-sky-200",
+                "ring" => "ring-sky-100"
+              },
+              "violet" => {
+                "border" => "border-violet-300",
+                "bg" => "bg-violet-50",
+                "text" => "text-violet-700",
+                "badge" => "bg-violet-100 text-violet-700 border-violet-200",
+                "ring" => "ring-violet-100"
+              },
+              "emerald" => {
+                "border" => "border-emerald-300",
+                "bg" => "bg-emerald-50",
+                "text" => "text-emerald-700",
+                "badge" => "bg-emerald-100 text-emerald-700 border-emerald-200",
+                "ring" => "ring-emerald-100"
+              }
+            }[stage[:color]] %>
+
+            <div class="group relative z-10 flex flex-col items-center rounded-3xl border border-slate-100 bg-white/80 p-5 text-center transition duration-300 hover:-translate-y-1 hover:shadow-lg">
+
+              <div class="flex h-14 w-14 items-center justify-center rounded-[22px] border-2 <%= palette["border"] %> <%= palette["bg"] %> text-2xl ring-4 <%= palette["ring"] %> transition group-hover:scale-105">
+                <%= stage[:icon] %>
+              </div>
+
+              <div class="mt-4 text-[10px] font-black uppercase tracking-widest <%= palette["text"] %>">
+                Stage <%= stage[:number] %>
+              </div>
+
+              <h3 class="mt-2 text-base font-black text-slate-800">
+                <%= stage[:title] %>
+              </h3>
+
+              <span class="mt-3 rounded-full border px-3 py-1 text-[9px] font-black uppercase tracking-wide <%= palette["badge"] %>">
+                <%= stage[:label] %>
+              </span>
+
+              <p class="mt-4 text-xs leading-6 text-slate-500">
+                <%= stage[:description] %>
+              </p>
+
+            </div>
+
+          <% end %>
+
+        </div>
+
+      </div>
+
+
+      <div class="mt-7 rounded-2xl border border-orange-100 bg-white p-5">
+
+        <div class="flex items-start gap-3">
+
+          <div class="text-xl">🔄</div>
+
+          <div>
+            <h3 class="text-sm font-black text-slate-700">
+              Why the process is iterative
+            </h3>
+
+            <p class="mt-2 text-xs leading-6 text-slate-500">
+              Research rarely follows a straight line. New evidence can reveal
+              a better question; a new question can expose a missing entity;
+              and an unexpected relationship can change your original hypothesis.
+              Revisit earlier stages whenever the evidence warrants it.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <%# ========================================================= %>
+    <%# INTERACTIVE HELP / GAME-STYLE TUTORIAL                     %>
+    <%# ========================================================= %>
+
+    <section class="mt-8 rounded-[30px] border-2 border-sky-100 bg-gradient-to-br from-white to-sky-50/40 p-6 shadow-sm md:p-8">
+
+      <div class="flex items-start gap-4">
+
+        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-sky-200 bg-sky-100 text-xl">
+          💡
+        </div>
+
+        <div class="min-w-0 flex-1">
+
+          <div class="text-[10px] font-black uppercase tracking-[0.25em] text-sky-600">
+            Field guide · 03
+          </div>
+
+          <h2 class="mt-2 text-xl font-black text-slate-800">
+            Learn the interface as you go
+          </h2>
+
+          <p class="mt-2 text-sm leading-6 text-slate-500">
+            Select any guide below to reveal practical advice, just like
+            contextual hints in a strategy game.
+          </p>
+
+          <div class="mt-5 grid gap-3 sm:grid-cols-2">
+
+            <details class="group rounded-2xl border border-sky-100 bg-white open:border-sky-300 open:shadow-sm">
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-3 p-4">
+                <span class="flex items-center gap-3">
+                  <span class="text-lg">🎯</span>
+                  <span class="text-xs font-black text-slate-700">Mission objective</span>
+                </span>
+                <span class="text-sky-500 transition group-open:rotate-180">⌄</span>
+              </summary>
+              <div class="px-4 pb-4 text-xs leading-6 text-slate-500">
+                Write a title that describes the investigation, not just the
+                broad subject. For example, use “Map the European AI safety
+                ecosystem” instead of simply “Artificial intelligence.”
+              </div>
+            </details>
+
+            <details class="group rounded-2xl border border-sky-100 bg-white open:border-sky-300 open:shadow-sm">
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-3 p-4">
+                <span class="flex items-center gap-3">
+                  <span class="text-lg">📝</span>
+                  <span class="text-xs font-black text-slate-700">Research brief</span>
+                </span>
+                <span class="text-sky-500 transition group-open:rotate-180">⌄</span>
+              </summary>
+              <div class="px-4 pb-4 text-xs leading-6 text-slate-500">
+                Use the summary to record the purpose, scope, time period,
+                intended outcome, and most important questions. It is a
+                compact orientation for anyone opening the workspace later.
+              </div>
+            </details>
+
+            <details class="group rounded-2xl border border-sky-100 bg-white open:border-sky-300 open:shadow-sm">
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-3 p-4">
+                <span class="flex items-center gap-3">
+                  <span class="text-lg">🚦</span>
+                  <span class="text-xs font-black text-slate-700">Workspace status</span>
+                </span>
+                <span class="text-sky-500 transition group-open:rotate-180">⌄</span>
+              </summary>
+              <div class="px-4 pb-4 text-xs leading-6 text-slate-500">
+                Active means the investigation is ongoing. Completed means
+                the work has reached its intended endpoint. Archived means
+                the workspace is being retained for reference rather than
+                treated as current work. Choose Active when starting.
+              </div>
+            </details>
+
+            <details class="group rounded-2xl border border-sky-100 bg-white open:border-sky-300 open:shadow-sm">
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-3 p-4">
+                <span class="flex items-center gap-3">
+                  <span class="text-lg">🔬</span>
+                  <span class="text-xs font-black text-slate-700">Evidence discipline</span>
+                </span>
+                <span class="text-sky-500 transition group-open:rotate-180">⌄</span>
+              </summary>
+              <div class="px-4 pb-4 text-xs leading-6 text-slate-500">
+                Keep observations distinct from interpretations. Where possible,
+                record the source, date, context, and confidence behind a
+                finding. An unresolved question is useful research progress,
+                not a failure.
+              </div>
+            </details>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <%# ========================================================= %>
+    <%# CREATION FORM                                              %>
+    <%# ========================================================= %>
+
+    <section id="workspace-creation-form" class="mt-8 rounded-[34px] border-2 border-orange-100 bg-white p-6 shadow-md shadow-orange-100/30 md:p-9">
+
+      <div class="flex items-start gap-4 border-b border-orange-100 pb-6">
+
+        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-orange-100 text-2xl">
+          ✍️
+        </div>
+
+        <div>
+          <div class="text-[10px] font-black uppercase tracking-[0.25em] text-orange-500">
+            Create your workspace · 04
+          </div>
+
+          <h2 class="mt-2 text-2xl font-black text-slate-800">
+            Define your investigation
+          </h2>
+
+          <p class="mt-2 text-sm leading-6 text-slate-500">
+            Start with the essentials. You can expand the investigation
+            with questions, entities, notes, relationships, and evidence later.
+          </p>
+        </div>
+
+      </div>
+
+
+      <%= form_with scope: :research_workspace,
+                    url: url_for(action: :create, only_path: true),
+                    method: :post,
+                    local: true,
+                    class: "mt-7 space-y-7" do |form| %>
+
+
+        <%# VALIDATION ERRORS %>
+
+        <% if @workspace && @workspace.errors.any? %>
+
+          <div role="alert" class="rounded-2xl border border-red-200 bg-red-50 p-5">
+
+            <div class="flex items-center gap-2 text-sm font-black text-red-700">
+              <span>⚠️</span>
+              <span>Please review the following issues</span>
+            </div>
+
+            <ul class="mt-3 list-inside list-disc space-y-2 text-xs leading-5 text-red-600">
+              <% @workspace.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+
+          </div>
+
+        <% end %>
+
+
+        <%# TITLE %>
+
+        <div>
+
+          <div class="flex flex-wrap items-center justify-between gap-2">
+
+            <%= form.label :title,
+                           "Investigation title",
+                           class: "text-xs font-black uppercase tracking-widest text-slate-700" %>
+
+            <span class="rounded-full border border-orange-100 bg-orange-50 px-2.5 py-1 text-[9px] font-bold text-orange-600">
+              Required
+            </span>
+
+          </div>
+
+          <p class="mt-2 text-xs leading-5 text-slate-400">
+            Give the investigation a specific, recognizable name.
+          </p>
+
+          <%= form.text_field :title,
+                              autofocus: true,
+                              required: true,
+                              maxlength: 255,
+                              placeholder: "e.g. Mapping the European AI safety ecosystem",
+                              class: "mt-3 w-full rounded-2xl border border-slate-200 bg-slate-50/60 px-4 py-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100" %>
+
+          <div class="mt-2 flex items-start gap-2 text-[10px] leading-5 text-slate-400">
+            <span>💡</span>
+            <span>
+              Tip: A good title describes what you intend to investigate or understand.
+            </span>
+          </div>
+
+        </div>
+
+
+        <%# SUMMARY %>
+
+        <div>
+
+          <div class="flex flex-wrap items-center justify-between gap-2">
+
+            <%= form.label :summary,
+                           "Research brief",
+                           class: "text-xs font-black uppercase tracking-widest text-slate-700" %>
+
+            <span class="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[9px] font-bold text-slate-500">
+              Optional
+            </span>
+
+          </div>
+
+          <p class="mt-2 text-xs leading-5 text-slate-400">
+            Explain why this investigation matters and what you hope to discover.
+          </p>
+
+          <%= form.text_area :summary,
+                             rows: 5,
+                             placeholder: "Purpose: What do you want to understand?\nScope: Which entities, technologies, events, or time periods matter?\nKey questions: What do you need to find out?\nExpected outcome: What would a useful result look like?",
+                             class: "mt-3 w-full resize-y rounded-2xl border border-slate-200 bg-slate-50/60 px-4 py-4 text-sm leading-6 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100" %>
+
+          <div class="mt-2 flex items-start gap-2 text-[10px] leading-5 text-slate-400">
+            <span>📖</span>
+            <span>
+              This brief helps future readers understand the context without
+              reconstructing your original intentions.
+            </span>
+          </div>
+
+        </div>
+
+
+        <%# STATUS %>
+
+        <div>
+
+          <%= form.label :status,
+                         "Initial workspace status",
+                         class: "text-xs font-black uppercase tracking-widest text-slate-700" %>
+
+          <p class="mt-2 text-xs leading-5 text-slate-400">
+            Select the current lifecycle state of this investigation.
+          </p>
+
+          <%= form.select :status,
+                          [
+                            ["🟢 Active — research in progress", "active"],
+                            ["🏁 Completed — investigation finished", "completed"],
+                            ["📦 Archived — retained for reference", "archived"]
+                          ],
+                          { selected: "active" },
+                          class: "mt-3 w-full rounded-2xl border border-slate-200 bg-slate-50/60 px-4 py-4 text-sm text-slate-700 outline-none transition focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100" %>
+
+          <div class="mt-3 rounded-2xl border border-emerald-100 bg-emerald-50/60 p-4">
+
+            <div class="flex items-start gap-3">
+
+              <span class="text-lg">🌱</span>
+
+              <div>
+                <div class="text-xs font-black text-emerald-700">
+                  Recommended: Active
+                </div>
+
+                <p class="mt-1 text-xs leading-5 text-slate-500">
+                  Most new investigations begin as active work and move to
+                  completed or archived when their lifecycle changes.
+                </p>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <%# OPTIONAL ENTITY CONTEXT %>
+
+        <% if params[:entity_id].present? %>
+          <%= hidden_field_tag :entity_id, params[:entity_id] %>
+        <% end %>
+
+
+        <%# FORM ACTIONS %>
+
+        <div class="flex flex-col gap-3 border-t border-orange-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
+
+          <p class="max-w-sm text-[10px] leading-5 text-slate-400">
+            Review the title and purpose before creating your workspace.
+            You can develop the research structure afterward.
+          </p>
+
+          <div class="flex flex-wrap gap-3">
+
+            <%= link_to "Cancel",
+                        url_for(action: :index, only_path: true),
+                        class: "inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 py-3 text-xs font-black text-slate-500 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700" %>
+
+            <%= form.submit "Create investigation →",
+                            class: "inline-flex cursor-pointer items-center justify-center rounded-2xl border border-orange-300 bg-gradient-to-r from-orange-400 to-amber-400 px-6 py-3 text-xs font-black text-white shadow-md shadow-orange-200/60 transition hover:-translate-y-0.5 hover:from-orange-500 hover:to-amber-500 hover:shadow-lg" %>
+
+          </div>
+
+        </div>
+
+      <% end %>
+
+    </section>
+
+
+    <%# ========================================================= %>
+    <%# WHAT HAPPENS NEXT                                          %>
+    <%# ========================================================= %>
+
+    <section class="mt-8 rounded-[30px] border-2 border-orange-100 bg-gradient-to-r from-orange-50/70 via-white to-emerald-50/50 p-6 shadow-sm md:p-8">
+
+      <div class="flex flex-col gap-5 md:flex-row md:items-start">
+
+        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-orange-100 text-2xl">
+          🚀
+        </div>
+
+        <div class="min-w-0 flex-1">
+
+          <h2 class="text-lg font-black text-slate-800">
+            What happens after creation?
+          </h2>
+
+          <p class="mt-2 text-sm leading-6 text-slate-500">
+            Your workspace becomes the starting point for a structured
+            investigation. Depending on the features available in your
+            application, you can use it to organize and develop the following:
+          </p>
+
+          <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+
+            <div class="rounded-2xl border border-orange-100 bg-white/80 p-4">
+              <div class="text-sm font-black text-slate-700">
+                01 · Research questions
+              </div>
+              <p class="mt-2 text-xs leading-5 text-slate-500">
+                Capture uncertainties, hypotheses, and questions requiring investigation.
+              </p>
+            </div>
+
+            <div class="rounded-2xl border border-sky-100 bg-white/80 p-4">
+              <div class="text-sm font-black text-slate-700">
+                02 · Entities and relationships
+              </div>
+              <p class="mt-2 text-xs leading-5 text-slate-500">
+                Organize relevant organizations, people, technologies, concepts, and connections.
+              </p>
+            </div>
+
+            <div class="rounded-2xl border border-violet-100 bg-white/80 p-4">
+              <div class="text-sm font-black text-slate-700">
+                03 · Notes and annotations
+              </div>
+              <p class="mt-2 text-xs leading-5 text-slate-500">
+                Record interpretations, observations, caveats, and emerging ideas.
+              </p>
+            </div>
+
+            <div class="rounded-2xl border border-emerald-100 bg-white/80 p-4">
+              <div class="text-sm font-black text-slate-700">
+                04 · Evidence
+              </div>
+              <p class="mt-2 text-xs leading-5 text-slate-500">
+                Collect and organize supporting material for your research findings.
+              </p>
+            </div>
+
+            <div class="rounded-2xl border border-amber-100 bg-white/80 p-4">
+              <div class="text-sm font-black text-slate-700">
+                05 · Progress and snapshots
+              </div>
+              <p class="mt-2 text-xs leading-5 text-slate-500">
+                Review progress and preserve investigation states where supported.
+              </p>
+            </div>
+
+            <div class="rounded-2xl border border-orange-100 bg-white/80 p-4">
+              <div class="text-sm font-black text-slate-700">
+                06 · Next steps
+              </div>
+              <p class="mt-2 text-xs leading-5 text-slate-500">
+                Identify gaps, refine questions, and decide what to investigate next.
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <%# ========================================================= %>
+    <%# FOOTER                                                     %>
+    <%# ========================================================= %>
+
+    <footer class="mt-8 flex flex-col gap-2 border-t border-orange-100 py-6 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
+
+      <p class="text-[10px] leading-5 text-slate-400">
+        Research Workspace · A structured environment for continuous discovery.
+      </p>
+
+      <%= link_to "Back to workspaces ↑",
+                  url_for(action: :index, only_path: true),
+                  class: "text-[10px] font-bold text-orange-600 transition hover:text-orange-700" %>
+
+    </footer>
+
+  </div>
+
+</div>
+
+
+
+
+<div class="mx-auto my-8 max-w-5xl px-4 sm:px-6">
+  <section class="rounded-[32px] border-2 border-orange-100 bg-gradient-to-b from-white via-orange-50/20 to-slate-50/50 p-6 shadow-md shadow-orange-100/40 sm:p-8">
+    <div class="flex items-start gap-4 border-b-2 border-orange-100 pb-6">
+      <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-orange-100 text-2xl">
+        🧪
+      </div>
+
+      <div>
+        <p class="text-sm font-bold uppercase tracking-widest text-orange-600">
+          Research workspace setup
+        </p>
+
+        <h1 class="mt-2 text-3xl font-black text-slate-800">
+          Create an investigation
+        </h1>
+
+        <p class="mt-3 text-base leading-7 text-slate-600">
+          Define the investigation before collecting evidence. A clear title
+          and research question make it easier for another administrator to
+          understand the purpose and evaluate the resulting findings.
+        </p>
+      </div>
+    </div>
+
+    <% if @workspace.errors.any? %>
+      <div role="alert" class="mt-6 rounded-2xl border-2 border-red-200 bg-red-50 p-5">
+        <h2 class="text-lg font-bold text-red-800">
+          Please correct the following issues
+        </h2>
+
+        <ul class="mt-3 list-disc space-y-1 pl-6 text-base leading-7 text-red-700">
+          <% @workspace.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%= form_with model: @workspace,
+                  url: admin_ecosystems_load_sources_entity_research_workspaces_path(entity_id: params[:entity_id]),
+                  local: true,
+                  class: "mt-7 space-y-6" do |form| %>
+
+      <div>
+        <%= form.label :title, "Investigation title", class: "mb-2 block text-base font-bold text-slate-800" %>
+
+        <%= form.text_field :title,
+                            required: true,
+                            autofocus: true,
+                            placeholder: "Example: Evaluate competing research approaches",
+                            class: "min-h-12 w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-base text-slate-800 focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-100" %>
+
+        <p class="mt-2 text-sm leading-6 text-slate-500">
+          Use a specific title that explains what the investigation is about.
+        </p>
+      </div>
+
+      <% if @workspace.respond_to?(:description) %>
+        <div>
+          <%= form.label :description, "Research question and purpose", class: "mb-2 block text-base font-bold text-slate-800" %>
+
+          <%= form.text_area :description,
+                             rows: 6,
+                             placeholder: "What are you investigating? What is already known? What evidence or decision would help resolve the question?",
+                             class: "w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-base leading-7 text-slate-800 focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-100" %>
+
+          <p class="mt-2 text-sm leading-6 text-slate-500">
+            Document the scope, assumptions, expected outcome, and any important
+            limitations. Do not enter information the workspace is not authorized
+            to store.
+          </p>
+        </div>
+      <% end %>
+
+      <div class="rounded-2xl border border-orange-100 bg-orange-50/60 p-5">
+        <h2 class="text-lg font-bold text-slate-800">What happens next?</h2>
+        <p class="mt-2 text-base leading-7 text-slate-600">
+          The controller creates a workspace with active status. After saving,
+          open the investigation to add items, evidence, annotations, and
+          supporting research details.
+        </p>
+      </div>
+
+      <div class="flex flex-col gap-3 border-t border-orange-100 pt-6 sm:flex-row">
+        <%= form.submit "Create investigation",
+                        class: "inline-flex min-h-12 cursor-pointer items-center justify-center rounded-xl border-2 border-orange-200 bg-gradient-to-r from-orange-400 to-amber-400 px-6 py-3 text-base font-bold text-white shadow-sm hover:from-orange-500 hover:to-amber-500" %>
+
+        <%= link_to "Cancel",
+                    admin_ecosystems_load_sources_entity_research_workspaces_path(entity_id: params[:entity_id]),
+                    class: "inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-slate-200 bg-white px-6 py-3 text-base font-bold text-slate-700 hover:bg-slate-50" %>
+      </div>
+    <% end %>
+  </section>
+</div>
+

@@ -1,0 +1,69 @@
+<% index_url = local_assigns.fetch(:index_url) %>
+<% selected_status = local_assigns.fetch(:status, @status) %>
+<% search_query = local_assigns.fetch(:query, @query) %>
+
+<section class="mb-6 rounded-[28px] border-2 border-orange-100
+                bg-gradient-to-r from-orange-50/60 via-white to-slate-50/70
+                p-5 shadow-sm"
+         aria-label="Filter research workspaces">
+
+  <%= form_with url: index_url,
+        method: :get,
+        local: true,
+        class: "grid grid-cols-1 items-end gap-4 md:grid-cols-12" do |form| %>
+
+    <div class="md:col-span-6">
+      <%= form.label :q, "Search investigations",
+            class: "mb-2 block text-[10px] font-black
+                    uppercase tracking-wider text-slate-500" %>
+
+      <%= form.search_field :q,
+            value: search_query,
+            placeholder: "Search title or slug...",
+            autocomplete: "off",
+            class: "w-full rounded-2xl border-2 border-orange-100
+                    bg-white px-4 py-3 text-sm text-slate-700
+                    outline-none placeholder:text-slate-300
+                    focus:border-orange-300 focus:ring-4
+                    focus:ring-orange-100/60" %>
+    </div>
+
+    <div class="md:col-span-3">
+      <%= form.label :status, "Lifecycle",
+            class: "mb-2 block text-[10px] font-black
+                    uppercase tracking-wider text-slate-500" %>
+
+      <%= form.select :status,
+            options_for_select([
+              ["All workspaces", ""],
+              ["Active", "active"],
+              ["Completed", "completed"],
+              ["Archived", "archived"]
+            ], selected_status),
+            {},
+            class: "w-full rounded-2xl border-2 border-orange-100
+                    bg-white px-3 py-3 text-sm text-slate-700
+                    focus:border-orange-300" %>
+    </div>
+
+    <div class="flex gap-2 md:col-span-3">
+
+      <%= form.submit "Apply filters",
+            class: "flex-1 rounded-2xl border-2 border-orange-200
+                    bg-gradient-to-r from-orange-400 to-amber-400
+                    px-4 py-3 text-xs font-black text-white
+                    shadow-sm transition hover:from-orange-500
+                    hover:to-amber-500 focus:outline-none
+                    focus:ring-4 focus:ring-orange-200" %>
+
+      <%= link_to "Reset",
+            index_url,
+            class: "rounded-2xl border border-slate-200
+                    bg-white px-4 py-3 text-xs font-bold
+                    text-slate-600 hover:bg-slate-50" %>
+
+    </div>
+
+  <% end %>
+
+</section>

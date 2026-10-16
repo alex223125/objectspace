@@ -1,0 +1,66 @@
+
+<%
+  diagnostics = local_assigns[:diagnostics] || {}
+  metrics = local_assigns[:metrics] || {}
+
+  read_value = lambda do |hash, *keys|
+    keys.each do |key|
+      value = hash[key]
+      value = hash[key.to_s] if value.nil?
+      return value unless value.nil?
+    end
+    nil
+  end
+
+  total = read_value.call(diagnostics, :total_entities, :entity_count)
+  total ||= read_value.call(metrics, :total_entities, :entity_count)
+
+  connected = read_value.call(diagnostics, :connected_entities, :connected_entity_count)
+  relationships = read_value.call(diagnostics, :total_relationships, :relationship_count)
+  coverage = read_value.call(diagnostics, :coverage_percent, :coverage_percentage)
+%>
+
+<section class="rounded-[26px] border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
+         aria-labelledby="coverage-report-heading">
+
+  <p class="text-[10px] font-black uppercase tracking-[0.18em] text-cyan-700">Coverage analysis</p>
+  <h2 id="coverage-report-heading" class="mt-1 text-lg font-black text-slate-900">Graph coverage report</h2>
+  <p class="mt-2 text-sm leading-6 text-slate-500">
+    Coverage describes the represented portion of a defined entity population. The reporting service must determine the population and the calculation.
+  </p>
+
+  <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    <% [
+         ["Total entities", total],
+         ["Connected entities", connected],
+         ["Total relationships", relationships],
+         ["Reported coverage", coverage.nil? ? nil : "#{coverage}%"]
+       ].each do |label, value| %>
+      <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+        <p class="text-xs font-bold text-slate-500"><%= label %></p>
+        <p class="mt-2 text-2xl font-black text-slate-900"><%= value.nil? ? "—" : value %></p>
+      </div>
+    <% end %>
+  </div>
+
+  <% if !coverage.nil? && coverage.to_s.match?(/\A-?\d+(\.\d+)?\z/) %>
+    <%
+      coverage_number = coverage.to_f
+      coverage_width = [[coverage_number, 0].max, 100].min
+    %>
+    <div class="mt-5">
+      <div class="mb-2 flex items-center justify-between text-xs">
+        <span class="font-bold text-slate-600">Reported coverage</span>
+        <span class="font-black text-cyan-700"><%= number_with_precision(coverage_number, precision: 1) %>%</span>
+      </div>
+      <div class="h-3 overflow-hidden rounded-full border border-cyan-100 bg-cyan-50">
+        <div class="h-full rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400"
+             style="width: <%= coverage_width %>%"></div>
+      </div>
+    </div>
+  <% else %>
+    <p class="mt-4 rounded-xl border border-dashed border-slate-200 p-4 text-xs leading-6 text-slate-500">
+      Coverage has not been reported. The page will not calculate a percentage from unrelated or potentially incompatible counts.
+    </p>
+  <% end %>
+</section>

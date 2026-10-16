@@ -1,0 +1,102 @@
+
+<% item_title = item.try(:title).presence || item.try(:name).presence || "Research item ##{item.id}" %>
+<% item_status = item.try(:status).to_s %>
+
+<article class="flex h-full flex-col rounded-[26px] border-2 border-orange-100 bg-white p-5 shadow-sm transition hover:shadow-md hover:shadow-orange-100/60">
+  <div class="flex items-start gap-3">
+    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-orange-50 text-xl">
+      📄
+    </div>
+
+    <div class="min-w-0 flex-1">
+      <h3 class="break-words text-lg font-black leading-7 text-slate-800">
+        <%= item_title %>
+      </h3>
+
+      <p class="mt-1 text-sm leading-6 text-slate-500">
+        Item reference: <%= item.id %>
+      </p>
+    </div>
+
+    <% if item_status.present? %>
+      <span class="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-sm font-bold text-slate-700">
+        <%= item_status.humanize %>
+      </span>
+    <% end %>
+  </div>
+
+  <% item_description = item.try(:description).presence || item.try(:content).presence %>
+
+  <div class="mt-4 rounded-xl border border-slate-100 bg-slate-50/70 p-4">
+    <h4 class="text-sm font-bold uppercase tracking-wide text-slate-500">
+      Item details
+    </h4>
+
+    <% if item_description.present? %>
+      <p class="mt-2 whitespace-pre-line break-words text-base leading-7 text-slate-700">
+        <%= item_description %>
+      </p>
+    <% else %>
+      <p class="mt-2 text-base leading-7 text-slate-500">
+        No description is available. Document what this item represents,
+        what is known, and what still needs to be established.
+      </p>
+    <% end %>
+  </div>
+
+  <div class="mt-4 grid grid-cols-2 gap-3">
+    <div class="rounded-xl border border-orange-100 bg-orange-50/60 p-3">
+      <p class="text-sm font-semibold text-slate-500">Annotations</p>
+      <p class="mt-1 text-2xl font-black text-slate-800">
+        <%= item.respond_to?(:annotations) ? item.annotations.size : "—" %>
+      </p>
+    </div>
+
+    <div class="rounded-xl border border-sky-100 bg-sky-50/60 p-3">
+      <p class="text-sm font-semibold text-slate-500">Evidence records</p>
+      <p class="mt-1 text-2xl font-black text-slate-800">
+        <%= item.respond_to?(:evidences) ? item.evidences.size : "—" %>
+      </p>
+    </div>
+  </div>
+
+  <div class="mt-auto flex flex-wrap gap-3 pt-5">
+    <%= link_to "Open item",
+                admin_ecosystems_load_sources_entity_research_workspace_item_path(
+                  entity_id: entity_id,
+                  research_workspace_id: workspace.id,
+                  id: item.id
+                ),
+                class: "inline-flex min-h-11 items-center justify-center rounded-xl border-2 border-orange-200 bg-gradient-to-r from-orange-400 to-amber-400 px-5 py-2.5 text-base font-bold text-white hover:from-orange-500 hover:to-amber-500" %>
+
+    <%= link_to "View provenance",
+                provenance_admin_ecosystems_load_sources_entity_research_workspace_item_path(
+                  entity_id: entity_id,
+                  research_workspace_id: workspace.id,
+                  id: item.id
+                ),
+                class: "inline-flex min-h-11 items-center justify-center rounded-xl border-2 border-slate-200 bg-white px-4 py-2.5 text-base font-bold text-slate-700 hover:bg-slate-50" %>
+
+    <% unless item.respond_to?(:completed?) && item.completed? %>
+      <%= button_to "Complete item",
+                    complete_item_admin_ecosystems_load_sources_entity_research_workspace_path(
+                      entity_id: entity_id,
+                      id: workspace.id
+                    ),
+                    method: :patch,
+                    params: { item_id: item.id },
+                    form: { data: { turbo_confirm: "Mark this research item as completed?" } },
+                    class: "min-h-11 rounded-xl border-2 border-emerald-200 bg-emerald-50 px-4 py-2.5 text-base font-bold text-emerald-800 hover:bg-emerald-100" %>
+    <% else %>
+      <%= button_to "Reopen item",
+                    reopen_item_admin_ecosystems_load_sources_entity_research_workspace_path(
+                      entity_id: entity_id,
+                      id: workspace.id
+                    ),
+                    method: :patch,
+                    params: { item_id: item.id },
+                    form: { data: { turbo_confirm: "Reopen this research item?" } },
+                    class: "min-h-11 rounded-xl border-2 border-violet-200 bg-violet-50 px-4 py-2.5 text-base font-bold text-violet-800 hover:bg-violet-100" %>
+    <% end %>
+  </div>
+</article>

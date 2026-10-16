@@ -1,0 +1,154 @@
+<% report = local_assigns.fetch(:report) %>
+<% items = report.fetch(:items) %>
+<% research = report.fetch(:research) %>
+<% evidence = research.fetch(:evidence) %>
+<% annotations = research.fetch(:annotations) %>
+
+<section class="my-8 rounded-[32px] border-2 border-orange-100
+                bg-gradient-to-b from-white via-orange-50/20 to-slate-50/60
+                p-5 shadow-md shadow-orange-100/30 sm:p-7"
+         aria-labelledby="quality-report-heading">
+
+  <header class="mb-6 flex flex-col gap-4 border-b-2
+                 border-orange-100 pb-5 sm:flex-row
+                 sm:items-center sm:justify-between">
+
+    <div class="flex items-center gap-3">
+      <div class="flex h-11 w-11 items-center justify-center
+                  rounded-2xl border border-orange-200
+                  bg-orange-100/80 text-lg shadow-sm">
+        🧪
+      </div>
+
+      <div>
+        <h2 id="quality-report-heading"
+            class="text-sm font-black uppercase tracking-wider text-slate-700">
+          Research quality
+        </h2>
+
+        <p class="mt-1 text-[11px] font-medium text-slate-400">
+          Evidence coverage, investigation progress and annotations
+        </p>
+      </div>
+    </div>
+
+    <span class="w-fit rounded-full border border-orange-200
+                 bg-orange-50 px-3 py-1.5 text-[10px]
+                 font-bold text-orange-700">
+      Live workspace metrics
+    </span>
+
+  </header>
+
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+
+    <div class="rounded-[24px] border border-orange-100
+                bg-white/80 p-4 shadow-sm">
+      <p class="text-[9px] font-black uppercase tracking-wider text-slate-400">
+        Research items
+      </p>
+
+      <p class="mt-2 text-3xl font-black text-slate-700">
+        <%= items[:available] ? items[:total] : "—" %>
+      </p>
+
+      <p class="mt-2 text-[10px] text-slate-400">
+        <%= items[:completed].nil? ? "Completion state unavailable" :
+              "#{items[:completed]} completed" %>
+      </p>
+    </div>
+
+    <div class="rounded-[24px] border border-sky-100
+                bg-gradient-to-b from-white to-sky-50/50 p-4 shadow-sm">
+      <p class="text-[9px] font-black uppercase tracking-wider text-slate-400">
+        Evidence records
+      </p>
+
+      <p class="mt-2 text-3xl font-black text-sky-700">
+        <%= evidence[:available] ? evidence[:total] : "—" %>
+      </p>
+
+      <p class="mt-2 text-[10px] text-slate-400">
+        <% if evidence[:verified].nil? %>
+          Verification status unavailable
+        <% else %>
+          <%= evidence[:verified] %> verified
+        <% end %>
+      </p>
+    </div>
+
+    <div class="rounded-[24px] border border-emerald-100
+                bg-gradient-to-b from-white to-emerald-50/50 p-4 shadow-sm">
+      <p class="text-[9px] font-black uppercase tracking-wider text-slate-400">
+        Disputed evidence
+      </p>
+
+      <p class="mt-2 text-3xl font-black text-emerald-700">
+        <%= evidence[:disputed].nil? ? "—" : evidence[:disputed] %>
+      </p>
+
+      <p class="mt-2 text-[10px] text-slate-400">
+        <%= evidence[:disputed].nil? ?
+              "Dispute tracking unavailable" :
+              "Records marked as disputed" %>
+      </p>
+    </div>
+
+    <div class="rounded-[24px] border border-violet-100
+                bg-gradient-to-b from-white to-violet-50/50 p-4 shadow-sm">
+      <p class="text-[9px] font-black uppercase tracking-wider text-slate-400">
+        Annotations
+      </p>
+
+      <p class="mt-2 text-3xl font-black text-violet-700">
+        <%= annotations[:available] ? annotations[:total] : "—" %>
+      </p>
+
+      <p class="mt-2 text-[10px] text-slate-400">
+        <%= annotations[:unresolved].nil? ?
+              "Unresolved count unavailable" :
+              "#{annotations[:unresolved]} unresolved" %>
+      </p>
+    </div>
+
+  </div>
+
+  <% if items[:available] && !items[:percentage].nil? %>
+    <div class="mt-6 rounded-[24px] border-2 border-orange-100
+                bg-white/80 p-5">
+
+      <div class="mb-3 flex items-center justify-between gap-3">
+        <span class="text-[10px] font-black uppercase
+                     tracking-wider text-slate-500">
+          Item completion
+        </span>
+
+        <span class="text-sm font-black text-orange-600">
+          <%= items[:percentage] %>%
+        </span>
+      </div>
+
+      <div class="h-3 overflow-hidden rounded-full
+                  border border-orange-100 bg-orange-50"
+           role="progressbar"
+           aria-label="Completed research items"
+           aria-valuemin="0"
+           aria-valuemax="100"
+           aria-valuenow="<%= items[:percentage] %>">
+
+        <div class="h-full rounded-full
+                    bg-gradient-to-r from-orange-400
+                    via-amber-400 to-emerald-400"
+             style="width: <%= items[:percentage] %>%">
+        </div>
+
+      </div>
+    </div>
+  <% end %>
+
+  <p class="mt-4 text-[10px] leading-5 text-slate-400">
+    These are descriptive database metrics, not a validated scientific
+    assessment of research strength.
+  </p>
+
+</section>

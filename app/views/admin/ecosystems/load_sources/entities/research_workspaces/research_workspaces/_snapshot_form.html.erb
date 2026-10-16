@@ -1,0 +1,39 @@
+<%# Research workspace snapshot form %>
+<% entity_id = local_assigns[:entity_id] || params[:entity_id] %>
+<% workspace = local_assigns[:workspace] || @workspace %>
+
+<% if workspace.present? %>
+  <section class="rounded-2xl border-2 border-orange-200 bg-white p-5 shadow-sm sm:p-6">
+    <h3 class="text-xl font-black text-slate-800">
+      Save checkpoint
+    </h3>
+
+    <p class="mt-2 text-sm leading-6 text-slate-600">
+      Save the current research state so you can review it later.
+      Give the checkpoint a descriptive name.
+    </p>
+
+    <%= form_with(
+          url: snapshot_admin_ecosystems_load_sources_entity_research_workspace_path(
+            entity_id: entity_id,
+            id: workspace.slug.presence || workspace.id
+          ),
+          method: :post,
+          local: true,
+          class: "mt-4 space-y-4"
+        ) do |form| %>
+
+      <div>
+        <%= form.label :label, "Checkpoint name",
+                       class: "mb-2 block text-sm font-bold text-slate-700" %>
+
+        <%= form.text_field :label,
+                            placeholder: "e.g. Before updating the evidence",
+                            class: "block w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-800 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200" %>
+      </div>
+
+      <%= form.submit "Save checkpoint",
+                      class: "inline-flex min-h-12 cursor-pointer items-center justify-center rounded-xl bg-orange-500 px-6 py-3 font-bold text-white hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-300" %>
+    <% end %>
+  </section>
+<% end %>

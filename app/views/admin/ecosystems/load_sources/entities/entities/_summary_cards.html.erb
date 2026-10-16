@@ -1,0 +1,95 @@
+
+<%
+  cards = [
+    {
+      label: "Total entities",
+      value: total_entities,
+      description: "Entities in the registry scope",
+      accent: "border-slate-200",
+      value_class: "text-slate-950"
+    },
+    {
+      label: "Published",
+      value: published,
+      description: "Entities with published status",
+      accent: "border-emerald-200",
+      value_class: "text-emerald-700"
+    },
+    {
+      label: "In review",
+      value: in_review,
+      description: "Entities awaiting editorial review",
+      accent: "border-amber-200",
+      value_class: "text-amber-700"
+    },
+    {
+      label: "Low health",
+      value: low_health,
+      description: "Entities below the configured threshold",
+      accent: "border-rose-200",
+      value_class: "text-rose-700"
+    },
+    {
+      label: "Complete",
+      value: complete,
+      description: "Entities in the complete workflow state",
+      accent: "border-violet-200",
+      value_class: "text-violet-700"
+    },
+    {
+      label: "Relationships",
+      value: relationship_count,
+      description: "Available relationship records",
+      accent: "border-sky-200",
+      value_class: "text-sky-700"
+    },
+    {
+      label: "Graph nodes",
+      value: nodes_count,
+      description: "Entities represented in the graph",
+      accent: "border-slate-200",
+      value_class: "text-slate-950"
+    },
+    {
+      label: "Graph edges",
+      value: edges_count,
+      description: "Connections supplied by the graph service",
+      accent: "border-orange-200",
+      value_class: "text-orange-700"
+    }
+  ]
+%>
+
+<section aria-labelledby="registry-metrics-heading">
+  <div class="mb-4">
+    <h2
+      id="registry-metrics-heading"
+      class="text-lg font-bold text-slate-950"
+    >
+      Registry overview
+    </h2>
+
+    <p class="mt-1 text-sm leading-6 text-slate-600">
+      Current registry and graph-service counts. These are snapshots,
+      not historical trends or proof of successful analysis.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <% cards.each do |card| %>
+      <article class="rounded-xl border bg-white p-4 shadow-sm <%= card[:accent] %>">
+        <div class="text-sm font-semibold text-slate-600">
+          <%= card[:label] %>
+        </div>
+
+        <div class="mt-3 text-3xl font-bold tabular-nums tracking-tight <%= card[:value_class] %>">
+          <%= number_with_delimiter(card[:value]) %>
+        </div>
+
+        <p class="mt-2 text-xs leading-5 text-slate-500">
+          <%= card[:description] %>
+        </p>
+      </article>
+    <% end %>
+  </div>
+</section>

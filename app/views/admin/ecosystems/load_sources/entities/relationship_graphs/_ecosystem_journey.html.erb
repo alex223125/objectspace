@@ -1,0 +1,136 @@
+
+<%
+  nodes = Array(local_assigns[:nodes])
+  edges = Array(local_assigns[:edges])
+  graph_loaded = local_assigns.fetch(:graph_loaded, false)
+
+  stages = [
+    {
+      number: "01",
+      icon: "🔎",
+      title: "Discover entities",
+      label: "Entity records",
+      description: "Find the people, methods, projects, technologies, or other records represented in your ecosystem.",
+      color: "orange"
+    },
+    {
+      number: "02",
+      icon: "🔗",
+      title: "Connect entities",
+      label: "Relationship records",
+      description: "Relationships connect entity records and describe their association or dependency.",
+      color: "sky"
+    },
+    {
+      number: "03",
+      icon: "🧪",
+      title: "Review evidence",
+      label: "Quality checks",
+      description: "Inspect relationship states, confidence values, endpoint integrity, and available evidence.",
+      color: "violet"
+    },
+    {
+      number: "04",
+      icon: "🌱",
+      title: "Improve the graph",
+      label: "Reviewed knowledge",
+      description: "Review candidate connections and improve the quality of the persisted relationship dataset.",
+      color: "emerald"
+    }
+  ]
+%>
+
+<section class="overflow-hidden rounded-[30px] border-2 border-orange-100 bg-gradient-to-b from-white via-orange-50/20 to-slate-50/50 p-5 shadow-sm sm:p-7"
+         aria-labelledby="ecosystem-journey-title">
+
+  <div class="mb-8 flex flex-col gap-4 border-b border-orange-100 pb-5 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex items-center gap-3">
+      <div class="flex h-11 w-11 items-center justify-center rounded-2xl border border-orange-200 bg-orange-100 text-xl">
+        🌍
+      </div>
+      <div>
+        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-orange-600">
+          The big picture
+        </p>
+        <h2 id="ecosystem-journey-title" class="mt-1 text-lg font-black text-slate-900">
+          How the ecosystem evolves
+        </h2>
+      </div>
+    </div>
+
+    <span class="w-fit rounded-full border border-orange-200 bg-orange-50 px-3 py-1.5 text-xs font-bold text-orange-700">
+      Learn the workflow
+    </span>
+  </div>
+
+  <div class="relative grid grid-cols-1 gap-7 sm:grid-cols-2 xl:grid-cols-4 xl:gap-4">
+    <div class="absolute left-[8%] right-[8%] top-7 hidden h-1.5 rounded-full bg-gradient-to-r from-orange-300 via-sky-300 via-violet-300 to-emerald-300 xl:block"
+         aria-hidden="true"></div>
+
+    <% stages.each do |stage| %>
+      <article class="group relative z-10 flex flex-col items-center rounded-2xl border border-slate-100 bg-white/80 p-4 text-center transition duration-200 hover:-translate-y-1 hover:shadow-lg hover:shadow-orange-100/50">
+        <div class="flex h-14 w-14 items-center justify-center rounded-[22px] border-2 border-orange-200 bg-orange-50 text-xl shadow-sm transition group-hover:scale-105">
+          <%= stage[:icon] %>
+        </div>
+
+        <p class="mt-4 text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
+          Stage <%= stage[:number] %>
+        </p>
+
+        <h3 class="mt-1 text-sm font-black text-slate-800">
+          <%= stage[:title] %>
+        </h3>
+
+        <span class="mt-2 rounded-full border border-orange-100 bg-orange-50 px-3 py-1 text-[10px] font-bold text-orange-700">
+          <%= stage[:label] %>
+        </span>
+
+        <p class="mt-3 text-xs leading-6 text-slate-500">
+          <%= stage[:description] %>
+        </p>
+      </article>
+    <% end %>
+  </div>
+
+  <div class="mt-7 rounded-2xl border border-orange-100 bg-gradient-to-r from-orange-50 via-white to-emerald-50 p-5">
+    <div class="flex items-start gap-3">
+      <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-orange-200 bg-white text-lg">
+        🔄
+      </div>
+      <div class="min-w-0 flex-1">
+        <h3 class="text-sm font-black text-slate-800">
+          The improvement loop
+        </h3>
+        <p class="mt-1 text-xs leading-6 text-slate-500">
+          Entity records provide the nodes. Persisted relationship records provide the edges.
+          Diagnostics reveal data-quality concerns, while candidate discovery suggests
+          connections that an administrator can investigate. Only your application's
+          persistence and review workflow determines which relationships are saved and trusted.
+        </p>
+      </div>
+    </div>
+
+    <div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
+      <div class="rounded-xl border border-white bg-white/80 p-3">
+        <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+          Visible nodes
+        </p>
+        <p class="mt-1 text-xl font-black text-orange-600"><%= nodes.size %></p>
+      </div>
+      <div class="rounded-xl border border-white bg-white/80 p-3">
+        <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+          Visible edges
+        </p>
+        <p class="mt-1 text-xl font-black text-emerald-600"><%= edges.size %></p>
+      </div>
+      <div class="col-span-2 rounded-xl border border-white bg-white/80 p-3 sm:col-span-1">
+        <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+          Graph response
+        </p>
+        <p class="mt-1 text-sm font-black <%= graph_loaded ? 'text-emerald-700' : 'text-red-700' %>">
+          <%= graph_loaded ? "Received" : "Unavailable" %>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,148 @@
+<% workspace = local_assigns.fetch(:workspace) %>
+<% show_url = local_assigns.fetch(:show_url) %>
+<% status = workspace.status.to_s %>
+
+<% status_styles = {
+  "active" => "border-orange-200 bg-orange-50 text-orange-700",
+  "completed" => "border-emerald-200 bg-emerald-50 text-emerald-700",
+  "archived" => "border-slate-200 bg-slate-100 text-slate-600"
+} %>
+
+<% status_style = status_styles.fetch(
+  status,
+  "border-slate-200 bg-slate-50 text-slate-600"
+) %>
+
+<% progress = workspace.respond_to?(:progress) ?
+     [[workspace.progress.to_f, 0].max, 100].min.round : 0 %>
+
+<article class="group flex h-full flex-col rounded-[30px]
+                border-2 border-orange-100
+                bg-gradient-to-b from-white via-orange-50/15 to-slate-50/60
+                p-5 shadow-sm shadow-orange-100/30
+                transition duration-300
+                hover:-translate-y-1 hover:shadow-md
+                hover:shadow-orange-100/70 sm:p-6">
+
+  <div class="flex items-start justify-between gap-3">
+
+    <div class="flex h-11 w-11 shrink-0 items-center justify-center
+                rounded-2xl border border-orange-200/70
+                bg-orange-100/70 text-lg shadow-sm">
+      🔬
+    </div>
+
+    <span class="rounded-full border px-3 py-1.5
+                 text-[9px] font-black uppercase tracking-wider
+                 <%= status_style %>">
+      <%= status.presence || "Unknown" %>
+    </span>
+
+  </div>
+
+  <div class="mt-5 flex-1">
+
+    <h3 class="text-base font-black leading-6 text-slate-800
+               transition group-hover:text-orange-700">
+      <%= link_to workspace.title.presence || "Untitled investigation",
+            show_url,
+            class: "rounded-sm focus:outline-none focus:ring-2
+                    focus:ring-orange-300" %>
+    </h3>
+
+    <p class="mt-2 line-clamp-3 text-xs leading-6 text-slate-400">
+      <%= workspace.summary.presence ||
+            "No research summary has been added yet." %>
+    </p>
+
+    <div class="mt-5 rounded-2xl border border-orange-100
+                bg-white/80 p-4">
+
+      <div class="mb-2 flex items-center justify-between gap-3">
+        <span class="text-[9px] font-black uppercase
+                     tracking-wider text-slate-400">
+          Investigation progress
+        </span>
+
+        <span class="text-xs font-black text-orange-600">
+          <%= progress %>%
+        </span>
+      </div>
+
+      <div class="h-2 overflow-hidden rounded-full
+                  border border-orange-100 bg-orange-50"
+           role="progressbar"
+           aria-label="Investigation progress"
+           aria-valuemin="0"
+           aria-valuemax="100"
+           aria-valuenow="<%= progress %>">
+
+        <div class="h-full rounded-full
+                    bg-gradient-to-r from-orange-400
+                    via-amber-400 to-emerald-400"
+             style="width: <%= progress %>%">
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="mt-4 grid grid-cols-3 gap-2">
+
+      <% [
+        ["Entities", workspace.respond_to?(:entity_count) ?
+          workspace.entity_count : nil],
+        ["Questions", workspace.respond_to?(:question_count) ?
+          workspace.question_count : nil],
+        ["Notes", workspace.respond_to?(:note_count) ?
+          workspace.note_count : nil]
+      ].each do |label, value| %>
+
+        <div class="rounded-2xl border border-slate-100
+                    bg-white/80 px-2 py-3 text-center">
+
+          <p class="text-lg font-black text-slate-700">
+            <%= value.nil? ? "—" : value %>
+          </p>
+
+          <p class="mt-1 text-[8px] font-black uppercase
+                    tracking-wider text-slate-400">
+            <%= label %>
+          </p>
+
+        </div>
+
+      <% end %>
+
+    </div>
+
+  </div>
+
+  <footer class="mt-5 border-t border-orange-100 pt-4">
+
+    <%= link_to show_url,
+          class: "flex w-full items-center justify-center gap-2
+                  rounded-2xl border-2 border-orange-200
+                  bg-gradient-to-r from-orange-400 to-amber-400
+                  px-4 py-3 text-xs font-black text-white
+                  shadow-sm shadow-orange-200/40 transition
+                  hover:from-orange-500 hover:to-amber-500
+                  focus:outline-none focus:ring-4
+                  focus:ring-orange-200" do %>
+
+      <span>Open investigation</span>
+      <span aria-hidden="true"
+            class="transition-transform group-hover:translate-x-1">
+        →
+      </span>
+
+    <% end %>
+
+    <p class="mt-3 text-center text-[9px] text-slate-400">
+      Updated
+      <%= workspace.updated_at ? l(workspace.updated_at, format: :short) : "—" %>
+    </p>
+
+  </footer>
+
+</article>

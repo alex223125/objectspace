@@ -1,0 +1,21 @@
+
+<% if @total_pages.to_i > 1 %>
+  <nav class="rw-pagination" aria-label="Research workspace pages">
+    <% if @page.to_i > 1 %>
+      <%= link_to "Previous",
+                  url_for(request.query_parameters.merge(page: @page.to_i - 1)),
+                  class: "rw-pagination__link" %>
+    <% end %>
+
+    <span class="rw-pagination__status" aria-current="page">
+      Page <%= @page %> of <%= @total_pages %>
+      (<%= @total_count %> workspaces)
+    </span>
+
+    <% if @page.to_i < @total_pages.to_i %>
+      <%= link_to "Next",
+                  url_for(request.query_parameters.merge(page: @page.to_i + 1)),
+                  class: "rw-pagination__link" %>
+    <% end %>
+  </nav>
+<% end %>

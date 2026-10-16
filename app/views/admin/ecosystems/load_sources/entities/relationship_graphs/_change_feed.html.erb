@@ -1,0 +1,46 @@
+
+<%
+  diagnostics = local_assigns[:diagnostics] || {}
+  changes = diagnostics[:change_feed] || diagnostics["change_feed"] ||
+    diagnostics[:recent_changes] || diagnostics["recent_changes"] || []
+  changes = [] unless changes.is_a?(Array)
+%>
+
+<section class="rounded-[26px] border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
+         aria-labelledby="change-feed-heading">
+
+  <p class="text-[10px] font-black uppercase tracking-[0.18em] text-sky-700">Recent activity</p>
+  <h2 id="change-feed-heading" class="mt-1 text-lg font-black text-slate-900">Graph change feed</h2>
+  <p class="mt-2 text-sm leading-6 text-slate-500">
+    Review changes recorded by your application. The feed is not a live audit log unless a service actually supplies live events.
+  </p>
+
+  <% if changes.any? %>
+    <div class="mt-5 space-y-3">
+      <% changes.each do |raw_change| %>
+        <%
+          change = raw_change.respond_to?(:to_h) ? raw_change.to_h : {}
+          title = change[:title] || change["title"] || change[:action] || change["action"] || "Recorded change"
+          detail = change[:description] || change["description"] || change[:message] || change["message"]
+          timestamp = change[:created_at] || change["created_at"] || change[:occurred_at] || change["occurred_at"]
+        %>
+        <article class="flex gap-3 rounded-xl border border-slate-100 p-4">
+          <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-sky-700">↻</span>
+          <div class="min-w-0 flex-1">
+            <p class="text-sm font-bold text-slate-800"><%= title.to_s.humanize %></p>
+            <% if timestamp.present? %>
+              <p class="mt-1 text-[10px] text-slate-400"><%= timestamp %></p>
+            <% end %>
+            <% if detail.present? %>
+              <p class="mt-2 text-xs leading-6 text-slate-500"><%= detail %></p>
+            <% end %>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="mt-5 rounded-xl border border-dashed border-slate-200 p-5 text-sm leading-6 text-slate-500">
+      No graph changes were supplied. An empty feed is not proof that the database has never changed.
+    </p>
+  <% end %>
+</section>

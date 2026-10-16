@@ -1,0 +1,111 @@
+
+<% recommendation_items = recommendations.respond_to?(:to_a) ? recommendations.to_a : Array(recommendations) %>
+
+<section class="rounded-[30px] border-2 border-violet-100 bg-gradient-to-b from-white via-violet-50/20 to-slate-50/50 p-5 shadow-sm sm:p-7">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-start">
+    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-violet-200 bg-violet-100 text-xl">
+      🧠
+    </div>
+
+    <div class="flex-1">
+      <h2 class="text-2xl font-black text-slate-800">
+        Research recommendations
+      </h2>
+
+      <p class="mt-2 text-base leading-7 text-slate-600">
+        Recommendations should help an administrator decide what to investigate
+        next. Treat them as prompts for review, not as verified findings.
+        Check each suggestion against the original research material.
+      </p>
+    </div>
+  </div>
+
+  <% if recommendation_items.any? %>
+    <div class="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <% recommendation_items.each_with_index do |recommendation, index| %>
+        <% heading =
+             recommendation.try(:title).presence ||
+               recommendation.try(:name).presence ||
+               recommendation.try(:label).presence ||
+               "Recommendation #{index + 1}" %>
+
+        <% body =
+             recommendation.try(:description).presence ||
+               recommendation.try(:reason).presence ||
+               recommendation.try(:summary).presence ||
+               (recommendation.is_a?(String) ? recommendation : nil) %>
+
+        <article class="rounded-2xl border border-violet-100 bg-white p-5">
+          <div class="flex items-start gap-3">
+            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-sm font-black text-violet-700">
+              <%= index + 1 %>
+            </div>
+
+            <div class="min-w-0">
+              <h3 class="text-lg font-bold text-slate-800"><%= heading %></h3>
+
+              <p class="mt-2 whitespace-pre-line break-words text-base leading-7 text-slate-600">
+                <%= body.presence || "Review the recommendation's supporting details and determine whether additional research is warranted." %>
+              </p>
+
+              <% if recommendation.respond_to?(:confidence) && recommendation.confidence.present? %>
+                <p class="mt-3 text-sm leading-6 text-slate-500">
+                  Confidence reported by the recommendation engine:
+                  <strong><%= recommendation.confidence %></strong>
+                </p>
+              <% end %>
+            </div>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="mt-6 rounded-2xl border border-violet-100 bg-white p-5">
+      <h3 class="text-lg font-bold text-slate-800">
+        No recommendations are available
+      </h3>
+
+      <p class="mt-2 text-base leading-7 text-slate-600">
+        The recommendation engine did not return any suggestions for this
+        investigation. This is not evidence that the research is complete
+        or that no further work is needed.
+      </p>
+
+      <p class="mt-3 text-base leading-7 text-slate-600">
+        Consider whether the investigation has a clear question, enough
+        relevant research items, and documented evidence to support further analysis.
+      </p>
+    </div>
+  <% end %>
+
+  <% if metrics.present? %>
+    <div class="mt-6 rounded-2xl border border-orange-100 bg-orange-50/60 p-5">
+      <h3 class="text-lg font-bold text-slate-800">Discovery metrics</h3>
+
+      <p class="mt-2 text-base leading-7 text-slate-600">
+        These metrics are supplied by the discovery engine. Their meaning
+        depends on the engine's definitions; do not interpret them as a
+        validated research-strength score without confirming their semantics.
+      </p>
+
+      <% if metrics.is_a?(Hash) %>
+        <dl class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <% metrics.each do |key, value| %>
+            <div class="rounded-xl border border-orange-100 bg-white p-4">
+              <dt class="text-sm font-semibold text-slate-500">
+                <%= key.to_s.humanize %>
+              </dt>
+              <dd class="mt-1 break-words text-lg font-bold text-slate-800">
+                <%= value.is_a?(Hash) || value.is_a?(Array) ? value.to_json : value %>
+              </dd>
+            </div>
+          <% end %>
+        </dl>
+      <% else %>
+        <p class="mt-3 break-words text-base leading-7 text-slate-700">
+          <%= metrics %>
+        </p>
+      <% end %>
+    </div>
+  <% end %>
+</section>

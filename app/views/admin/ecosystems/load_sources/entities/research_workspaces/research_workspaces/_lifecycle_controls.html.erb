@@ -1,0 +1,84 @@
+<div class="flex flex-wrap gap-2">
+
+  <% if workspace.active? %>
+
+    <div class="basis-full rounded-2xl border border-purple-500/10 bg-purple-500/[0.03] p-3">
+      <%= render "checkpoint_form",
+                 workspace: workspace %>
+    </div>
+
+    <%= button_to "Complete",
+                  complete_item_admin_ecosystems_load_sources_entity_research_workspace_path(
+                    entity_id: params[:entity_id],
+                    id: workspace.to_param
+                  ),
+                  method: :patch,
+                  class: "rounded-xl bg-sky-500/10 px-4 py-2.5 text-xs font-bold text-sky-300 hover:bg-sky-500/20" %>
+
+    <%= button_to "Save checkpoint",
+                  admin_ecosystems_load_sources_entity_research_workspace_snapshots_path(
+                    entity_id: params[:entity_id],
+                    research_workspace_id: workspace.to_param
+                  ),
+                  method: :post,
+                  class: "rounded-xl bg-purple-500/10 px-4 py-2.5 text-xs font-bold text-purple-300 hover:bg-purple-500/20" %>
+
+    <%= button_to "Archive",
+                  archive_admin_ecosystems_load_sources_entity_research_workspace_path(
+                    entity_id: params[:entity_id],
+                    id: workspace.id
+                  ),
+                  method: :patch,
+                  data: {
+                    turbo_confirm: "Archive this investigation?"
+                  },
+                  class: "rounded-xl bg-white/5 px-4 py-2.5 text-xs font-bold text-slate-500 hover:bg-white/10 hover:text-white" %>
+
+  <% elsif workspace.completed? %>
+
+    <%= button_to "Resume investigation",
+                  resume_admin_ecosystems_load_sources_entity_research_workspace_path(
+                    entity_id: params[:entity_id],
+                    id: workspace.id
+                  ),
+                  method: :patch,
+                  class: "rounded-xl bg-emerald-500/10 px-4 py-2.5 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20" %>
+
+    <%= button_to "Archive",
+                  archive_admin_ecosystems_load_sources_entity_research_workspace_path(
+                    entity_id: params[:entity_id],
+                    id: workspace.id
+                  ),
+                  method: :patch,
+                  data: {
+                    turbo_confirm: "Archive this completed investigation?"
+                  },
+                  class: "rounded-xl bg-white/5 px-4 py-2.5 text-xs font-bold text-slate-500 hover:bg-white/10 hover:text-white" %>
+
+  <% elsif workspace.archived? %>
+
+    <%= button_to "Reopen",
+                  reopen_admin_ecosystems_load_sources_entity_research_workspace_path(
+                    entity_id: params[:entity_id],
+                    id: workspace.id
+                  ),
+                  method: :patch,
+                  class: "rounded-xl bg-emerald-500/10 px-4 py-2.5 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20" %>
+
+  <% end %>
+
+  <%= link_to "History",
+              history_admin_ecosystems_load_sources_entity_research_workspace_path(
+                entity_id: params[:entity_id],
+                id: workspace.id
+              ),
+              class: "rounded-xl bg-white/5 px-4 py-2.5 text-xs font-bold text-slate-400 hover:bg-white/10 hover:text-white" %>
+
+  <%= link_to "Checkpoints",
+              admin_ecosystems_load_sources_entity_research_workspace_snapshots_path(
+                entity_id: params[:entity_id],
+                research_workspace_id: workspace.id
+              ),
+              class: "rounded-xl bg-white/5 px-4 py-2.5 text-xs font-bold text-slate-400 hover:bg-white/10 hover:text-white" %>
+
+</div>

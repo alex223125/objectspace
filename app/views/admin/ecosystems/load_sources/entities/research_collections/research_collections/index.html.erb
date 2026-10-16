@@ -1,0 +1,1576 @@
+<%# ============================================================================
+  RESEARCH COLLECTIONS — INTELLIGENCE INDEX
+
+  File:
+  app/views/admin/ecosystems/load_sources/entities/research_collections/research_collections/index.html.erb
+
+  PURPOSE
+  -------
+  Present research collections as an evolving research ecosystem.
+
+  EXISTING MODEL FIELDS USED
+  --------------------------
+  title
+  description
+  status
+  color
+  pinned
+  position
+  last_opened_at
+  completed_at
+  created_at
+  updated_at
+  research_question
+  objective
+  synthesis
+  priority
+  last_intelligence_refresh_at
+
+  COMPATIBILITY
+  -------------
+  - Uses collection.title, not collection.name.
+  - Preserves existing collection create/open/edit route helpers.
+  - Does not require database migrations.
+  - Does not assume that workspace_count, progress_percentage, tags,
+    or other virtual methods exist.
+  - Does not fabricate evidence counts or completion percentages.
+  - Uses ordinary Rails ERB and Tailwind CSS utility classes.
+
+  CUSTOMIZATION
+  -------------
+  Change the text in the Field Manual sections to suit your workflow.
+  The four workflow stages are explanatory, not separate database records.
+============================================================================ %>
+
+<%
+  current_entity_id = params[:entity_id].presence
+
+  collections_path =
+    admin_ecosystems_load_sources_entity_research_collections_path(
+      entity_id: current_entity_id
+    )
+
+  new_collection_path =
+    new_admin_ecosystems_load_sources_entity_research_collection_path(
+      entity_id: current_entity_id
+    )
+
+  collection_records = @collections || []
+
+  total_collections = collection_records.size
+
+  completed_collections =
+    collection_records.count do |collection|
+      collection.status.to_s.downcase == "completed"
+    end
+
+  pinned_collections =
+    collection_records.count do |collection|
+      collection.respond_to?(:pinned?) && collection.pinned?
+    end
+
+  active_collections =
+    collection_records.count do |collection|
+      %w[active in_progress in-progress researching].include?(
+        collection.status.to_s.downcase
+      )
+    end
+
+  overall_completion =
+    if total_collections.positive?
+      ((completed_collections.to_f / total_collections) * 100).round
+    else
+      0
+    end
+
+  collection_status_styles = {
+    "completed" => {
+      label: "Completed",
+      icon: "✓",
+      badge: "border-emerald-200 bg-emerald-50 text-emerald-700",
+      dot: "bg-emerald-400"
+    },
+    "active" => {
+      label: "Active",
+      icon: "●",
+      badge: "border-sky-200 bg-sky-50 text-sky-700",
+      dot: "bg-sky-400"
+    },
+    "in_progress" => {
+      label: "In progress",
+      icon: "↗",
+      badge: "border-sky-200 bg-sky-50 text-sky-700",
+      dot: "bg-sky-400"
+    },
+    "in-progress" => {
+      label: "In progress",
+      icon: "↗",
+      badge: "border-sky-200 bg-sky-50 text-sky-700",
+      dot: "bg-sky-400"
+    },
+    "researching" => {
+      label: "Researching",
+      icon: "⌕",
+      badge: "border-violet-200 bg-violet-50 text-violet-700",
+      dot: "bg-violet-400"
+    },
+    "pending" => {
+      label: "Pending",
+      icon: "◷",
+      badge: "border-amber-200 bg-amber-50 text-amber-700",
+      dot: "bg-amber-400"
+    },
+    "draft" => {
+      label: "Draft",
+      icon: "✎",
+      badge: "border-slate-200 bg-slate-100 text-slate-600",
+      dot: "bg-slate-400"
+    },
+    "archived" => {
+      label: "Archived",
+      icon: "▤",
+      badge: "border-slate-200 bg-slate-100 text-slate-500",
+      dot: "bg-slate-400"
+    }
+  }
+%>
+
+<div class="min-h-screen bg-gradient-to-b from-orange-50/40 via-white to-slate-50 px-4 py-8 sm:px-6 lg:px-8">
+
+  <div class="mx-auto max-w-7xl">
+
+    <%# ================================================================
+        01 — PAGE HEADER
+
+        The entity_id comes from the existing nested Rails route.
+        This page does not need to look up the entity again.
+    ================================================================= %>
+
+    <header class="mb-8 rounded-[32px] border-2 border-orange-100 bg-gradient-to-br from-white via-orange-50/30 to-white p-6 shadow-md shadow-orange-100/30 sm:p-8">
+
+      <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+
+        <div class="flex items-start gap-4">
+
+          <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-[22px] border border-orange-200 bg-orange-100 text-2xl shadow-sm shadow-orange-100">
+            🔬
+          </div>
+
+          <div class="min-w-0">
+
+            <div class="text-[10px] font-black uppercase tracking-[0.24em] text-orange-600">
+              Research intelligence system
+            </div>
+
+            <h1 class="mt-2 text-3xl font-black tracking-tight text-slate-800 sm:text-4xl">
+              Research Collections
+            </h1>
+
+            <p class="mt-3 max-w-2xl text-sm leading-7 text-slate-500">
+              Turn research questions into structured investigations.
+              Organize objectives, preserve findings, track progress, and
+              build a reusable body of research knowledge.
+            </p>
+
+            <% if current_entity_id.present? %>
+              <div class="mt-4 inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-3 py-1.5 text-[11px] font-bold text-orange-700">
+                <span class="h-2 w-2 rounded-full bg-orange-400"></span>
+                Current entity #<%= current_entity_id %>
+              </div>
+            <% end %>
+
+          </div>
+
+        </div>
+
+        <div class="flex flex-col gap-3 sm:flex-row lg:shrink-0">
+
+          <%= link_to(
+                "＋ New collection",
+                new_collection_path,
+                class: "inline-flex items-center justify-center rounded-2xl border-2 border-orange-200 bg-gradient-to-r from-orange-400 to-amber-400 px-5 py-3.5 text-sm font-black text-white shadow-md shadow-orange-200/50 transition hover:-translate-y-0.5 hover:from-orange-500 hover:to-amber-500"
+              ) %>
+
+          <%= link_to(
+                "Collection overview",
+                collections_path,
+                class: "inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 py-3.5 text-sm font-bold text-slate-600 transition hover:border-orange-200 hover:bg-orange-50"
+              ) %>
+
+        </div>
+
+      </div>
+
+      <div class="mt-7 flex flex-wrap gap-x-5 gap-y-2 border-t border-orange-100 pt-5 text-[11px] leading-5 text-slate-400">
+
+        <span>
+          <strong class="text-slate-600">Purpose:</strong>
+          organize investigations
+        </span>
+
+        <span>
+          <strong class="text-slate-600">Method:</strong>
+          question → evidence → findings
+        </span>
+
+        <span>
+          <strong class="text-slate-600">Scope:</strong>
+          current entity's collections
+        </span>
+
+      </div>
+
+    </header>
+
+
+    <%# ================================================================
+        02 — PORTFOLIO METRICS
+
+        These metrics are calculated from @collections.
+        "Completed" means status == completed.
+        This is a collection-status ratio, NOT task-level progress.
+    ================================================================= %>
+
+    <section aria-labelledby="portfolio-metrics-heading" class="mb-10">
+
+      <div class="mb-4 flex flex-wrap items-end justify-between gap-3">
+
+        <div>
+          <h2 id="portfolio-metrics-heading" class="text-sm font-black text-slate-700">
+            Portfolio overview
+          </h2>
+
+          <p class="mt-1 text-xs leading-5 text-slate-400">
+            A quick summary of the collections currently available to this page.
+          </p>
+        </div>
+
+        <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+          Live from loaded records
+        </span>
+
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+
+        <%# Metric 1: total collections %>
+
+        <article class="rounded-[26px] border-2 border-orange-100 bg-white p-5 shadow-sm shadow-orange-100/30 transition hover:-translate-y-0.5 hover:shadow-md">
+
+          <div class="flex items-center justify-between gap-3">
+
+            <div class="text-[10px] font-black uppercase tracking-widest text-slate-400">
+              Total collections
+            </div>
+
+            <div class="flex h-10 w-10 items-center justify-center rounded-2xl border border-orange-100 bg-orange-50 text-lg">
+              🗂️
+            </div>
+
+          </div>
+
+          <div class="mt-4 text-3xl font-black tabular-nums text-slate-800">
+            <%= total_collections %>
+          </div>
+
+          <p class="mt-2 text-xs leading-5 text-slate-400">
+            All collections returned by the current controller action.
+          </p>
+
+        </article>
+
+
+        <%# Metric 2: completed collections %>
+
+        <article class="rounded-[26px] border-2 border-emerald-100 bg-white p-5 shadow-sm shadow-emerald-100/30 transition hover:-translate-y-0.5 hover:shadow-md">
+
+          <div class="flex items-center justify-between gap-3">
+
+            <div class="text-[10px] font-black uppercase tracking-widest text-slate-400">
+              Completed
+            </div>
+
+            <div class="flex h-10 w-10 items-center justify-center rounded-2xl border border-emerald-100 bg-emerald-50 text-lg">
+              ✓
+            </div>
+
+          </div>
+
+          <div class="mt-4 text-3xl font-black tabular-nums text-emerald-700">
+            <%= completed_collections %>
+          </div>
+
+          <p class="mt-2 text-xs leading-5 text-slate-400">
+            Collections whose status is marked completed.
+          </p>
+
+        </article>
+
+
+        <%# Metric 3: active collections %>
+
+        <article class="rounded-[26px] border-2 border-sky-100 bg-white p-5 shadow-sm shadow-sky-100/30 transition hover:-translate-y-0.5 hover:shadow-md">
+
+          <div class="flex items-center justify-between gap-3">
+
+            <div class="text-[10px] font-black uppercase tracking-widest text-slate-400">
+              Active research
+            </div>
+
+            <div class="flex h-10 w-10 items-center justify-center rounded-2xl border border-sky-100 bg-sky-50 text-lg">
+              ↗
+            </div>
+
+          </div>
+
+          <div class="mt-4 text-3xl font-black tabular-nums text-sky-700">
+            <%= active_collections %>
+          </div>
+
+          <p class="mt-2 text-xs leading-5 text-slate-400">
+            Collections marked active or in progress.
+          </p>
+
+        </article>
+
+
+        <%# Metric 4: pinned collections %>
+
+        <article class="rounded-[26px] border-2 border-amber-100 bg-white p-5 shadow-sm shadow-amber-100/30 transition hover:-translate-y-0.5 hover:shadow-md">
+
+          <div class="flex items-center justify-between gap-3">
+
+            <div class="text-[10px] font-black uppercase tracking-widest text-slate-400">
+              Pinned collections
+            </div>
+
+            <div class="flex h-10 w-10 items-center justify-center rounded-2xl border border-amber-100 bg-amber-50 text-lg">
+              ★
+            </div>
+
+          </div>
+
+          <div class="mt-4 text-3xl font-black tabular-nums text-amber-700">
+            <%= pinned_collections %>
+          </div>
+
+          <p class="mt-2 text-xs leading-5 text-slate-400">
+            Collections marked as pinned in the model.
+          </p>
+
+        </article>
+
+      </div>
+
+    </section>
+
+
+    <%# ================================================================
+        03 — RESEARCH ECOSYSTEM WORKFLOW
+
+        These stages explain the recommended research process.
+        They do not represent persisted workflow-stage records.
+    ================================================================= %>
+
+    <section aria-labelledby="research-workflow-heading" class="mb-10 rounded-[34px] border-2 border-orange-100 bg-gradient-to-b from-white via-orange-50/20 to-slate-50/50 p-6 shadow-md shadow-orange-100/30 sm:p-8">
+
+      <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
+        <div class="flex items-start gap-3">
+
+          <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-orange-100 text-xl">
+            🌍
+          </div>
+
+          <div>
+
+            <h2 id="research-workflow-heading" class="text-lg font-black text-slate-800">
+              Research ecosystem
+            </h2>
+
+            <p class="mt-1 max-w-2xl text-xs leading-6 text-slate-400">
+              A practical path from an initial question to a documented,
+              reviewable research conclusion.
+            </p>
+
+          </div>
+
+        </div>
+
+        <span class="w-fit rounded-full border border-orange-200 bg-orange-50 px-3.5 py-1.5 text-[10px] font-bold text-orange-700">
+          ✨ Continuous improvement
+        </span>
+
+      </div>
+
+
+      <%# Desktop connecting path %>
+
+      <div class="relative px-1 md:px-4">
+
+        <div class="absolute left-[8%] right-[8%] top-[27px] hidden h-2 rounded-full bg-orange-100 md:block"></div>
+
+        <div class="absolute left-[8%] top-[27px] hidden h-2 w-[76%] rounded-full bg-gradient-to-r from-orange-400 via-sky-400 to-emerald-400 md:block"></div>
+
+
+        <div class="relative grid grid-cols-1 gap-8 md:grid-cols-4 md:gap-4">
+
+
+          <%# Stage 1 %>
+
+          <article class="group relative z-10 flex flex-col items-center text-center">
+
+            <div class="flex h-14 w-14 items-center justify-center rounded-[22px] border-[3px] border-orange-400 bg-orange-50 text-sm font-black text-orange-700 shadow-md shadow-orange-100 ring-4 ring-orange-100/60 transition group-hover:scale-110">
+              01
+            </div>
+
+            <h3 class="mt-4 text-sm font-black tracking-wide text-orange-700">
+              Research question
+            </h3>
+
+            <span class="mt-2 rounded-full border border-orange-200 bg-orange-100 px-3 py-1 text-[9px] font-black uppercase tracking-wider text-orange-700">
+              Define
+            </span>
+
+            <p class="mt-3 max-w-[220px] text-xs leading-6 text-slate-500">
+              Identify the problem, frame the question, and establish what
+              the investigation needs to discover.
+            </p>
+
+            <div class="mt-3 text-[10px] font-bold text-orange-600">
+              ❓ Establish the question
+            </div>
+
+          </article>
+
+
+          <%# Stage 2 %>
+
+          <article class="group relative z-10 flex flex-col items-center text-center">
+
+            <div class="flex h-14 w-14 items-center justify-center rounded-[22px] border-[3px] border-sky-300 bg-sky-50 text-sm font-black text-sky-700 shadow-md shadow-sky-100 ring-4 ring-sky-100/60 transition group-hover:scale-110">
+              02
+            </div>
+
+            <h3 class="mt-4 text-sm font-black tracking-wide text-sky-700">
+              Evidence
+            </h3>
+
+            <span class="mt-2 rounded-full border border-sky-200 bg-sky-100 px-3 py-1 text-[9px] font-black uppercase tracking-wider text-sky-700">
+              Investigate
+            </span>
+
+            <p class="mt-3 max-w-[220px] text-xs leading-6 text-slate-500">
+              Gather relevant sources, record observations, and distinguish
+              verified information from assumptions.
+            </p>
+
+            <div class="mt-3 text-[10px] font-bold text-sky-600">
+              📚 Collect supporting material
+            </div>
+
+          </article>
+
+
+          <%# Stage 3 %>
+
+          <article class="group relative z-10 flex flex-col items-center text-center">
+
+            <div class="flex h-14 w-14 items-center justify-center rounded-[22px] border-[3px] border-violet-300 bg-violet-50 text-sm font-black text-violet-700 shadow-md shadow-violet-100 ring-4 ring-violet-100/60 transition group-hover:scale-110">
+              03
+            </div>
+
+            <h3 class="mt-4 text-sm font-black tracking-wide text-violet-700">
+              Analysis
+            </h3>
+
+            <span class="mt-2 rounded-full border border-violet-200 bg-violet-100 px-3 py-1 text-[9px] font-black uppercase tracking-wider text-violet-700">
+              Evaluate
+            </span>
+
+            <p class="mt-3 max-w-[220px] text-xs leading-6 text-slate-500">
+              Compare evidence, test explanations, identify contradictions,
+              and document limitations.
+            </p>
+
+            <div class="mt-3 text-[10px] font-bold text-violet-600">
+              🧠 Evaluate the findings
+            </div>
+
+          </article>
+
+
+          <%# Stage 4 %>
+
+          <article class="group relative z-10 flex flex-col items-center text-center">
+
+            <div class="flex h-14 w-14 items-center justify-center rounded-[22px] border-[3px] border-emerald-300 bg-emerald-50 text-sm font-black text-emerald-700 shadow-md shadow-emerald-100 ring-4 ring-emerald-100/60 transition group-hover:scale-110">
+              04
+            </div>
+
+            <h3 class="mt-4 text-sm font-black tracking-wide text-emerald-700">
+              Findings
+            </h3>
+
+            <span class="mt-2 rounded-full border border-emerald-200 bg-emerald-100 px-3 py-1 text-[9px] font-black uppercase tracking-wider text-emerald-700">
+              Synthesize
+            </span>
+
+            <p class="mt-3 max-w-[220px] text-xs leading-6 text-slate-500">
+              Record conclusions, communicate confidence, and identify
+              remaining questions and next steps.
+            </p>
+
+            <div class="mt-3 text-[10px] font-bold text-emerald-600">
+              🎯 Preserve reusable knowledge
+            </div>
+
+          </article>
+
+        </div>
+
+      </div>
+
+
+      <%# Workflow explanation panel %>
+
+      <div class="mt-10 rounded-[26px] border-2 border-orange-100 bg-gradient-to-r from-orange-50/80 via-white to-emerald-50/60 p-5 sm:p-6">
+
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+
+          <div class="flex items-start gap-3">
+
+            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-orange-100 text-xl">
+              🔄
+            </div>
+
+            <div>
+
+              <h3 class="text-sm font-black text-slate-800">
+                The research improvement loop
+              </h3>
+
+              <p class="mt-2 max-w-3xl text-xs leading-6 text-slate-500">
+                Findings can expose new questions. New questions lead to
+                additional evidence gathering and analysis. Record what
+                changed, why a conclusion is justified, and what still
+                needs verification.
+              </p>
+
+            </div>
+
+          </div>
+
+          <span class="w-fit shrink-0 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-[10px] font-black text-emerald-700">
+            Question → Findings
+          </span>
+
+        </div>
+
+        <div class="mt-6">
+
+          <div class="mb-2 flex items-center justify-between gap-3">
+
+            <span class="text-[9px] font-black uppercase tracking-widest text-slate-400">
+              Collection completion ratio
+            </span>
+
+            <span class="text-xs font-black text-orange-600">
+              <%= overall_completion %>%
+            </span>
+
+          </div>
+
+          <div class="h-2.5 overflow-hidden rounded-full border border-orange-100 bg-white">
+
+            <div
+              class="h-full rounded-full bg-gradient-to-r from-orange-400 via-amber-400 to-emerald-400 transition-all duration-500"
+              style="width: <%= overall_completion %>%;">
+            </div>
+
+          </div>
+
+          <p class="mt-2 text-[10px] leading-5 text-slate-400">
+            Calculated as completed collections divided by all loaded
+            collections. This is a portfolio-level status ratio, not a
+            measure of evidence quality or task completion.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <%# ================================================================
+        04 — COLLECTION PORTFOLIO
+
+        Each card uses fields actually present on the model.
+        Missing optional fields display a helpful fallback.
+    ================================================================= %>
+
+    <section aria-labelledby="collections-heading" class="mb-10">
+
+      <div class="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+
+        <div>
+
+          <div class="text-[10px] font-black uppercase tracking-[0.22em] text-orange-600">
+            Your research workspace
+          </div>
+
+          <h2 id="collections-heading" class="mt-2 text-2xl font-black tracking-tight text-slate-800">
+            Research portfolio
+          </h2>
+
+          <p class="mt-2 max-w-2xl text-xs leading-6 text-slate-400">
+            Open a collection to review its research question, objective,
+            synthesis, status, and recorded intelligence.
+          </p>
+
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+
+          <span class="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[10px] font-bold text-slate-500">
+            <%= total_collections %>
+            <%= total_collections == 1 ? "collection" : "collections" %>
+          </span>
+
+          <%= link_to(
+                "＋ Add collection",
+                new_collection_path,
+                class: "inline-flex items-center justify-center rounded-xl border border-orange-200 bg-orange-50 px-4 py-2 text-xs font-black text-orange-700 transition hover:bg-orange-100"
+              ) %>
+
+        </div>
+
+      </div>
+
+
+      <% if collection_records.any? %>
+
+        <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+
+          <% collection_records.each do |collection| %>
+
+            <%
+              normalized_status = collection.status.to_s.downcase
+
+              status_config =
+                collection_status_styles[normalized_status] ||
+                  {
+                    label: normalized_status.humanize.presence || "Unknown",
+                    icon: "•",
+                    badge: "border-slate-200 bg-slate-100 text-slate-600",
+                    dot: "bg-slate-400"
+                  }
+
+              card_title =
+                collection.title.presence ||
+                  "Untitled research collection"
+
+              card_description =
+                collection.description.presence
+
+              research_question =
+                collection.respond_to?(:research_question) &&
+                  collection.research_question.present? ?
+                  collection.research_question : nil
+
+              research_objective =
+                collection.respond_to?(:objective) &&
+                  collection.objective.present? ?
+                  collection.objective : nil
+
+              research_synthesis =
+                collection.respond_to?(:synthesis) &&
+                  collection.synthesis.present? ?
+                  collection.synthesis : nil
+
+              collection_priority =
+                collection.respond_to?(:priority) ?
+                  collection.priority : nil
+
+              intelligence_refreshed_at =
+                collection.respond_to?(:last_intelligence_refresh_at) ?
+                  collection.last_intelligence_refresh_at : nil
+
+              collection_pinned =
+                collection.respond_to?(:pinned?) &&
+                  collection.pinned?
+
+              updated_timestamp =
+                collection.respond_to?(:updated_at) ?
+                  collection.updated_at : nil
+
+              completion_timestamp =
+                collection.respond_to?(:completed_at) ?
+                  collection.completed_at : nil
+
+              recorded_progress =
+                if normalized_status == "completed" || completion_timestamp.present?
+                  100
+                else
+                  nil
+                end
+
+              detail_path =
+                admin_ecosystems_load_sources_entity_research_collection_path(
+                  entity_id: current_entity_id,
+                  id: collection.id
+                )
+
+              edit_path =
+                edit_admin_ecosystems_load_sources_entity_research_collection_path(
+                  entity_id: current_entity_id,
+                  id: collection.id
+                )
+            %>
+
+
+            <article class="group relative flex h-full flex-col overflow-hidden rounded-[28px] border-2 border-orange-100 bg-gradient-to-b from-white via-white to-orange-50/20 p-5 shadow-sm shadow-orange-100/30 transition duration-300 hover:-translate-y-1 hover:border-orange-200 hover:shadow-lg hover:shadow-orange-100/50 sm:p-6">
+
+              <%# Decorative top accent %>
+
+              <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-orange-300 via-amber-300 to-emerald-300 opacity-70"></div>
+
+
+              <%# Card heading %>
+
+              <div class="flex items-start justify-between gap-3">
+
+                <div class="min-w-0 flex-1">
+
+                  <div class="flex flex-wrap items-center gap-2">
+
+                    <span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[9px] font-black uppercase tracking-wider <%= status_config[:badge] %>">
+
+                      <span><%= status_config[:icon] %></span>
+                      <%= status_config[:label] %>
+
+                    </span>
+
+                    <% if collection_pinned %>
+
+                      <span class="rounded-full border border-amber-200 bg-amber-50 px-2 py-1 text-[9px] font-black uppercase tracking-wider text-amber-700">
+                        ★ Pinned
+                      </span>
+
+                    <% end %>
+
+                  </div>
+
+                  <h3 class="mt-4 break-words text-lg font-black leading-snug text-slate-800 transition group-hover:text-orange-700">
+                    <%= card_title %>
+                  </h3>
+
+                  <p class="mt-1 text-[10px] font-semibold text-slate-400">
+                    Collection #<%= collection.id %>
+                  </p>
+
+                </div>
+
+                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-orange-100 bg-orange-50 text-lg">
+                  🗂️
+                </div>
+
+              </div>
+
+
+              <%# Description %>
+
+              <div class="mt-4">
+
+                <% if card_description.present? %>
+
+                  <p class="text-xs leading-6 text-slate-500">
+                    <%= truncate(card_description, length: 180) %>
+                  </p>
+
+                <% else %>
+
+                  <p class="text-xs italic leading-6 text-slate-400">
+                    No description recorded yet. Add a summary explaining
+                    the scope and intended outcome of this investigation.
+                  </p>
+
+                <% end %>
+
+              </div>
+
+
+              <%# Research question %>
+
+              <div class="mt-4 rounded-2xl border border-orange-100 bg-orange-50/50 p-4">
+
+                <div class="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.16em] text-orange-700">
+                  <span>❓</span>
+                  Research question
+                </div>
+
+                <% if research_question.present? %>
+
+                  <p class="mt-2 text-xs leading-6 text-slate-600">
+                    <%= truncate(research_question, length: 160) %>
+                  </p>
+
+                <% else %>
+
+                  <p class="mt-2 text-xs italic leading-5 text-slate-400">
+                    Not defined yet. Start by writing the central question
+                    this collection is expected to answer.
+                  </p>
+
+                <% end %>
+
+              </div>
+
+
+              <%# Research objective %>
+
+              <div class="mt-3 rounded-2xl border border-sky-100 bg-sky-50/40 p-4">
+
+                <div class="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.16em] text-sky-700">
+                  <span>🎯</span>
+                  Research objective
+                </div>
+
+                <% if research_objective.present? %>
+
+                  <p class="mt-2 text-xs leading-6 text-slate-600">
+                    <%= truncate(research_objective, length: 140) %>
+                  </p>
+
+                <% else %>
+
+                  <p class="mt-2 text-xs italic leading-5 text-slate-400">
+                    Not defined yet. Describe the outcome or deliverable
+                    that would make this investigation useful.
+                  </p>
+
+                <% end %>
+
+              </div>
+
+
+              <%# Synthesis / findings %>
+
+              <div class="mt-3 rounded-2xl border border-emerald-100 bg-emerald-50/40 p-4">
+
+                <div class="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.16em] text-emerald-700">
+                  <span>🧠</span>
+                  Current synthesis
+                </div>
+
+                <% if research_synthesis.present? %>
+
+                  <p class="mt-2 text-xs leading-6 text-slate-600">
+                    <%= truncate(research_synthesis, length: 150) %>
+                  </p>
+
+                <% else %>
+
+                  <p class="mt-2 text-xs italic leading-5 text-slate-400">
+                    No synthesis recorded. Capture important findings,
+                    conclusions, uncertainty, and unresolved questions here.
+                  </p>
+
+                <% end %>
+
+              </div>
+
+
+              <%# Progress %>
+
+              <div class="mt-5">
+
+                <div class="mb-2 flex items-center justify-between gap-3">
+
+                  <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                    Recorded completion
+                  </span>
+
+                  <% if recorded_progress == 100 %>
+
+                    <span class="text-xs font-black text-emerald-700">
+                      100%
+                    </span>
+
+                  <% else %>
+
+                    <span class="text-[10px] font-bold text-slate-400">
+                      Not measured
+                    </span>
+
+                  <% end %>
+
+                </div>
+
+                <div class="h-2 overflow-hidden rounded-full border border-slate-100 bg-slate-100">
+
+                  <% if recorded_progress == 100 %>
+
+                    <div class="h-full w-full rounded-full bg-gradient-to-r from-emerald-400 to-teal-400"></div>
+
+                  <% else %>
+
+                    <div class="h-full w-0 rounded-full bg-gradient-to-r from-orange-400 to-amber-400"></div>
+
+                  <% end %>
+
+                </div>
+
+                <p class="mt-2 text-[10px] leading-5 text-slate-400">
+                  <% if recorded_progress == 100 %>
+                    This collection is marked complete.
+                  <% else %>
+                    A task-level progress metric is not available from
+                    the fields currently used by this page.
+                  <% end %>
+                </p>
+
+              </div>
+
+
+              <%# Metadata %>
+
+              <div class="mt-5 flex flex-wrap gap-2 border-t border-orange-100 pt-4">
+
+                <% if collection_priority.present? %>
+
+                  <span class="rounded-full border border-violet-100 bg-violet-50 px-2.5 py-1 text-[10px] font-bold text-violet-700">
+                    Priority: <%= collection_priority %>
+                  </span>
+
+                <% end %>
+
+                <% if completion_timestamp.present? %>
+
+                  <span class="rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-700">
+                    Completed
+                  </span>
+
+                <% end %>
+
+                <% if intelligence_refreshed_at.present? %>
+
+                  <span class="rounded-full border border-sky-100 bg-sky-50 px-2.5 py-1 text-[10px] font-bold text-sky-700">
+                    Intelligence refreshed
+                  </span>
+
+                <% else %>
+
+                  <span class="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-bold text-slate-500">
+                    Refresh not recorded
+                  </span>
+
+                <% end %>
+
+              </div>
+
+
+              <%# Last update %>
+
+              <% if updated_timestamp.present? %>
+
+                <p class="mt-3 text-[10px] text-slate-400">
+                  Last updated:
+                  <span class="font-semibold text-slate-500">
+                    <%= l(updated_timestamp, format: :short) %>
+                  </span>
+                </p>
+
+              <% end %>
+
+
+              <%# Actions %>
+
+              <div class="mt-auto flex gap-2 pt-5">
+
+                <%= link_to(
+                      "Open collection →",
+                      detail_path,
+                      class: "flex-1 rounded-xl border-2 border-orange-200 bg-gradient-to-r from-orange-400 to-amber-400 px-3 py-3 text-center text-xs font-black text-white shadow-sm shadow-orange-100 transition hover:from-orange-500 hover:to-amber-500"
+                    ) %>
+
+                <%= link_to(
+                      "Edit",
+                      edit_path,
+                      class: "rounded-xl border border-slate-200 bg-white px-4 py-3 text-xs font-bold text-slate-600 transition hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700"
+                    ) %>
+
+              </div>
+
+
+              <%# Small field hint %>
+
+              <p class="mt-3 text-[10px] leading-5 text-slate-400">
+                Hint: keep the question specific, the objective measurable,
+                and the synthesis grounded in recorded evidence.
+              </p>
+
+            </article>
+
+          <% end %>
+
+        </div>
+
+
+      <% else %>
+
+
+        <%# ==========================================================
+            EMPTY STATE
+
+            The create link uses the existing nested Rails route.
+        ========================================================== %>
+
+        <section class="relative overflow-hidden rounded-[34px] border-2 border-dashed border-orange-200 bg-gradient-to-b from-white via-orange-50/30 to-slate-50/50 px-6 py-12 text-center shadow-sm shadow-orange-100/20 sm:px-12 sm:py-16">
+
+          <div class="pointer-events-none absolute left-1/2 top-0 h-48 w-48 -translate-x-1/2 rounded-full bg-orange-100/70 blur-3xl"></div>
+
+          <div class="relative">
+
+            <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-[28px] border-2 border-orange-200 bg-orange-50 text-4xl shadow-sm shadow-orange-100">
+              🗂️
+            </div>
+
+            <div class="mt-6 text-[10px] font-black uppercase tracking-[0.24em] text-orange-600">
+              Research workspace
+            </div>
+
+            <h3 class="mt-3 text-2xl font-black tracking-tight text-slate-800">
+              Start your research portfolio
+            </h3>
+
+            <p class="mx-auto mt-3 max-w-2xl text-sm leading-7 text-slate-500">
+              Create a collection to bring related investigations together.
+              Start with a clear research question, define the objective,
+              collect relevant evidence, and document your findings.
+            </p>
+
+
+            <div class="mx-auto mt-8 grid max-w-3xl gap-4 text-left sm:grid-cols-3">
+
+              <div class="rounded-2xl border border-orange-100 bg-white p-5 shadow-sm">
+
+                <div class="text-2xl">❓</div>
+
+                <h4 class="mt-3 text-xs font-black text-slate-700">
+                  1. Define the question
+                </h4>
+
+                <p class="mt-2 text-xs leading-6 text-slate-400">
+                  State the specific problem or uncertainty you want
+                  the investigation to resolve.
+                </p>
+
+              </div>
+
+              <div class="rounded-2xl border border-sky-100 bg-white p-5 shadow-sm">
+
+                <div class="text-2xl">📚</div>
+
+                <h4 class="mt-3 text-xs font-black text-slate-700">
+                  2. Gather evidence
+                </h4>
+
+                <p class="mt-2 text-xs leading-6 text-slate-400">
+                  Identify sources, record observations, and evaluate
+                  the reliability of the material.
+                </p>
+
+              </div>
+
+              <div class="rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm">
+
+                <div class="text-2xl">🎯</div>
+
+                <h4 class="mt-3 text-xs font-black text-slate-700">
+                  3. Record findings
+                </h4>
+
+                <p class="mt-2 text-xs leading-6 text-slate-400">
+                  Summarize conclusions, uncertainties, and the
+                  next steps required.
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <%= link_to(
+                  "＋ Create your first collection",
+                  new_collection_path,
+                  class: "mt-8 inline-flex items-center justify-center rounded-2xl border-2 border-orange-200 bg-gradient-to-r from-orange-400 to-amber-400 px-7 py-4 text-sm font-black text-white shadow-md shadow-orange-200/50 transition hover:-translate-y-0.5 hover:from-orange-500 hover:to-amber-500"
+                ) %>
+
+            <p class="mt-4 text-[10px] leading-5 text-slate-400">
+              Creating a collection starts the record; it does not automatically
+              gather sources or generate verified findings.
+            </p>
+
+          </div>
+
+        </section>
+
+      <% end %>
+
+    </section>
+
+
+    <%# ================================================================
+        05 — FIELD MANUAL
+
+        This is educational content embedded in the index.
+        It does not require another controller action or database table.
+    ================================================================= %>
+
+    <section aria-labelledby="field-manual-heading" class="mb-10 rounded-[32px] border-2 border-orange-100 bg-white p-6 shadow-sm shadow-orange-100/30 sm:p-8">
+
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+
+        <div class="flex items-start gap-3">
+
+          <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-orange-50 text-xl">
+            📖
+          </div>
+
+          <div>
+
+            <div class="text-[10px] font-black uppercase tracking-[0.22em] text-orange-600">
+              Operating guide
+            </div>
+
+            <h2 id="field-manual-heading" class="mt-2 text-xl font-black text-slate-800">
+              Research Collection Field Manual
+            </h2>
+
+            <p class="mt-2 max-w-2xl text-xs leading-6 text-slate-500">
+              Use this guide to understand the fields, decide what to record,
+              and keep research collections useful as investigations evolve.
+            </p>
+
+          </div>
+
+        </div>
+
+        <span class="w-fit rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-[10px] font-bold text-slate-500">
+          Reference guide
+        </span>
+
+      </div>
+
+
+      <div class="mt-7 grid gap-4 lg:grid-cols-2">
+
+
+        <%# Field manual: question %>
+
+        <article class="rounded-2xl border border-orange-100 bg-orange-50/40 p-5">
+
+          <div class="flex items-center gap-3">
+
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-orange-200 bg-white text-lg">
+              ❓
+            </div>
+
+            <h3 class="text-sm font-black text-orange-800">
+              Research question
+            </h3>
+
+          </div>
+
+          <p class="mt-3 text-xs leading-6 text-slate-600">
+            Define the central uncertainty this collection addresses.
+            A useful question names the subject, the issue to investigate,
+            and the context in which the answer matters.
+          </p>
+
+          <div class="mt-4 rounded-xl border border-orange-100 bg-white p-3">
+
+            <div class="text-[9px] font-black uppercase tracking-wider text-orange-600">
+              Example
+            </div>
+
+            <p class="mt-2 text-xs leading-6 text-slate-600">
+              Which factors most strongly influence the reliability of
+              a distributed data-processing system under peak load?
+            </p>
+
+          </div>
+
+          <p class="mt-3 text-[10px] leading-5 text-slate-400">
+            Avoid questions that are so broad that you cannot determine
+            what evidence would answer them.
+          </p>
+
+        </article>
+
+
+        <%# Field manual: objective %>
+
+        <article class="rounded-2xl border border-sky-100 bg-sky-50/40 p-5">
+
+          <div class="flex items-center gap-3">
+
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-sky-200 bg-white text-lg">
+              🎯
+            </div>
+
+            <h3 class="text-sm font-black text-sky-800">
+              Research objective
+            </h3>
+
+          </div>
+
+          <p class="mt-3 text-xs leading-6 text-slate-600">
+            Describe the concrete result the investigation should produce.
+            The objective should make it easier to decide when enough
+            work has been done and what the findings will support.
+          </p>
+
+          <div class="mt-4 rounded-xl border border-sky-100 bg-white p-3">
+
+            <div class="text-[9px] font-black uppercase tracking-wider text-sky-600">
+              Example
+            </div>
+
+            <p class="mt-2 text-xs leading-6 text-slate-600">
+              Produce a comparison of three failure-handling strategies
+              using documented latency, recovery, and operational trade-offs.
+            </p>
+
+          </div>
+
+          <p class="mt-3 text-[10px] leading-5 text-slate-400">
+            Prefer a tangible deliverable over a vague goal such as
+            "learn more about the topic."
+          </p>
+
+        </article>
+
+
+        <%# Field manual: evidence %>
+
+        <article class="rounded-2xl border border-violet-100 bg-violet-50/40 p-5">
+
+          <div class="flex items-center gap-3">
+
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-violet-200 bg-white text-lg">
+              📚
+            </div>
+
+            <h3 class="text-sm font-black text-violet-800">
+              Evidence and sources
+            </h3>
+
+          </div>
+
+          <p class="mt-3 text-xs leading-6 text-slate-600">
+            Record where information came from, what it supports, when
+            it was published or collected, and what limitations apply.
+            Distinguish direct observations from interpretation.
+          </p>
+
+          <div class="mt-4 rounded-xl border border-violet-100 bg-white p-3">
+
+            <div class="text-[9px] font-black uppercase tracking-wider text-violet-600">
+              Record for each source
+            </div>
+
+            <ul class="mt-2 space-y-2 text-xs leading-5 text-slate-600">
+
+              <li>• Source title and location</li>
+
+              <li>• Relevant claim or observation</li>
+
+              <li>• Publication date and reliability</li>
+
+              <li>• Limitations and contradictory evidence</li>
+
+            </ul>
+
+          </div>
+
+          <p class="mt-3 text-[10px] leading-5 text-slate-400">
+            This manual describes good practice; source records are not
+            automatically created by this index page.
+          </p>
+
+        </article>
+
+
+        <%# Field manual: synthesis %>
+
+        <article class="rounded-2xl border border-emerald-100 bg-emerald-50/40 p-5">
+
+          <div class="flex items-center gap-3">
+
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-emerald-200 bg-white text-lg">
+              🧠
+            </div>
+
+            <h3 class="text-sm font-black text-emerald-800">
+              Synthesis and findings
+            </h3>
+
+          </div>
+
+          <p class="mt-3 text-xs leading-6 text-slate-600">
+            Summarize what the collected evidence indicates, how strong
+            the conclusion is, which alternatives remain plausible, and
+            what would change your assessment.
+          </p>
+
+          <div class="mt-4 rounded-xl border border-emerald-100 bg-white p-3">
+
+            <div class="text-[9px] font-black uppercase tracking-wider text-emerald-600">
+              Recommended structure
+            </div>
+
+            <ul class="mt-2 space-y-2 text-xs leading-5 text-slate-600">
+
+              <li>• Main finding</li>
+
+              <li>• Evidence supporting the finding</li>
+
+              <li>• Confidence and limitations</li>
+
+              <li>• Unresolved questions and next actions</li>
+
+            </ul>
+
+          </div>
+
+          <p class="mt-3 text-[10px] leading-5 text-slate-400">
+            Keep conclusions traceable to evidence rather than presenting
+            assumptions as established facts.
+          </p>
+
+        </article>
+
+
+      </div>
+
+
+      <%# Status glossary %>
+
+      <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50/70 p-5">
+
+        <h3 class="text-sm font-black text-slate-700">
+          Status and metadata glossary
+        </h3>
+
+        <p class="mt-2 text-xs leading-6 text-slate-500">
+          These labels help interpret the collection records. Actual
+          status values depend on the application's model and controller.
+        </p>
+
+        <div class="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+
+          <div class="rounded-xl border border-white bg-white p-3">
+
+            <span class="inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-black text-emerald-700">
+              Completed
+            </span>
+
+            <p class="mt-2 text-[10px] leading-5 text-slate-500">
+              The collection is marked complete. Review the findings
+              before treating the research as conclusive.
+            </p>
+
+          </div>
+
+          <div class="rounded-xl border border-white bg-white p-3">
+
+            <span class="inline-flex rounded-full border border-sky-200 bg-sky-50 px-2.5 py-1 text-[10px] font-black text-sky-700">
+              Active
+            </span>
+
+            <p class="mt-2 text-[10px] leading-5 text-slate-500">
+              Work is in progress. Continue gathering evidence and
+              recording decisions.
+            </p>
+
+          </div>
+
+          <div class="rounded-xl border border-white bg-white p-3">
+
+            <span class="inline-flex rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[10px] font-black text-amber-700">
+              Pending
+            </span>
+
+            <p class="mt-2 text-[10px] leading-5 text-slate-500">
+              Work has not yet progressed or is waiting for a next action.
+            </p>
+
+          </div>
+
+          <div class="rounded-xl border border-white bg-white p-3">
+
+            <span class="inline-flex rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-[10px] font-black text-slate-600">
+              Pinned
+            </span>
+
+            <p class="mt-2 text-[10px] leading-5 text-slate-500">
+              A prioritization marker, not proof that the collection is
+              more accurate or more complete.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <%# ================================================================
+        06 — HOW TO USE THIS PAGE
+
+        This section explains page behavior without introducing
+        new JavaScript, routes, or database dependencies.
+    ================================================================= %>
+
+    <section aria-labelledby="page-guide-heading" class="mb-10 rounded-[30px] border-2 border-orange-100 bg-gradient-to-r from-orange-50/60 via-white to-sky-50/40 p-6 sm:p-7">
+
+      <div class="flex items-start gap-3">
+
+        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-white text-xl">
+          💡
+        </div>
+
+        <div>
+
+          <h2 id="page-guide-heading" class="text-base font-black text-slate-800">
+            How to use this page
+          </h2>
+
+          <p class="mt-2 text-xs leading-6 text-slate-500">
+            The index is your portfolio overview. Each collection is the
+            detailed workspace for one investigation.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="mt-6 grid gap-4 md:grid-cols-3">
+
+        <div class="rounded-2xl border border-orange-100 bg-white p-4">
+
+          <div class="text-[10px] font-black uppercase tracking-wider text-orange-600">
+            Step 01
+          </div>
+
+          <h3 class="mt-2 text-xs font-black text-slate-700">
+            Create or edit
+          </h3>
+
+          <p class="mt-2 text-xs leading-6 text-slate-500">
+            Use the existing New collection or Edit links to manage
+            collection details.
+          </p>
+
+        </div>
+
+        <div class="rounded-2xl border border-sky-100 bg-white p-4">
+
+          <div class="text-[10px] font-black uppercase tracking-wider text-sky-600">
+            Step 02
+          </div>
+
+          <h3 class="mt-2 text-xs font-black text-slate-700">
+            Open an investigation
+          </h3>
+
+          <p class="mt-2 text-xs leading-6 text-slate-500">
+            Open collection navigates to the existing nested show route.
+            Review that page for the collection's detailed tools.
+          </p>
+
+        </div>
+
+        <div class="rounded-2xl border border-emerald-100 bg-white p-4">
+
+          <div class="text-[10px] font-black uppercase tracking-wider text-emerald-600">
+            Step 03
+          </div>
+
+          <h3 class="mt-2 text-xs font-black text-slate-700">
+            Maintain research quality
+          </h3>
+
+          <p class="mt-2 text-xs leading-6 text-slate-500">
+            Keep questions specific, objectives actionable, evidence
+            traceable, and conclusions appropriately qualified.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="mt-5 rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
+
+        <div class="flex items-start gap-3">
+
+          <span class="text-lg">ⓘ</span>
+
+          <div>
+
+            <h3 class="text-xs font-black text-amber-800">
+              Understanding the metrics
+            </h3>
+
+            <p class="mt-2 text-xs leading-6 text-amber-800/80">
+              This page calculates collection counts from the records
+              supplied by the controller. It does not automatically
+              count source documents, evidence items, completed tasks,
+              or intelligence refresh operations unless those records
+              and relationships are explicitly implemented elsewhere.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <%# ================================================================
+        07 — FOOTER
+    ================================================================= %>
+
+    <footer class="flex flex-col gap-4 border-t-2 border-orange-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
+
+      <div>
+
+        <p class="text-xs font-bold text-slate-600">
+          Research Collection Intelligence
+        </p>
+
+        <p class="mt-1 max-w-2xl text-[10px] leading-5 text-slate-400">
+          A structured home for questions, objectives, evidence,
+          synthesis, and continuously improving research knowledge.
+        </p>
+
+      </div>
+
+      <%= link_to(
+            "＋ Create collection",
+            new_collection_path,
+            class: "inline-flex shrink-0 items-center justify-center rounded-xl border-2 border-orange-200 bg-gradient-to-r from-orange-400 to-amber-400 px-5 py-3 text-xs font-black text-white shadow-sm shadow-orange-100 transition hover:from-orange-500 hover:to-amber-500"
+          ) %>
+
+    </footer>
+
+  </div>
+
+</div>

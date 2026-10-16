@@ -1,0 +1,87 @@
+
+<% total_items = workspace.items.size %>
+<% completed_items = workspace.items.count { |item| item.status == "completed" } %>
+<% progress = total_items.zero? ? 0 : ((completed_items.to_f / total_items) * 100).round %>
+
+<div class="mt-5 border-t border-slate-200 pt-4 dark:border-white/10">
+  <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+
+    <div>
+      <p class="text-xs text-slate-500">Research items</p>
+      <p class="mt-1 text-lg font-bold text-slate-900 dark:text-white">
+        <%= total_items %>
+      </p>
+    </div>
+
+    <div>
+      <p class="text-xs text-slate-500">Completed items</p>
+      <p class="mt-1 text-lg font-bold text-slate-900 dark:text-white">
+        <%= completed_items %>
+      </p>
+    </div>
+
+    <div>
+      <p class="text-xs text-slate-500">Research progress</p>
+      <p class="mt-1 text-lg font-bold text-slate-900 dark:text-white">
+        <%= progress %>%
+      </p>
+    </div>
+
+    <div>
+      <p class="text-xs text-slate-500">Created</p>
+      <p class="mt-1 text-sm font-bold text-slate-900 dark:text-white">
+        <%= l(workspace.created_at, format: :short) %>
+      </p>
+    </div>
+
+  </div>
+
+  <%= render "admin/ecosystems/load_sources/entities/research_workspaces/research_workspaces/progress_bar",
+             progress: progress %>
+</div>
+
+<%= render(
+      "admin/ecosystems/load_sources/entities/research_workspaces/research_quality",
+      report: Admin::ResearchWorkspaces::ResearchQualityReport
+        .new(@workspace)
+        .call
+    ) %>
+
+
+<%= render(
+      "admin/ecosystems/load_sources/entities/research_workspaces/provenance_report",
+      report: Admin::ResearchWorkspaces::ProvenanceReport
+        .new(@workspace)
+        .call
+    ) %>
+
+
+<%= link_to quality_admin_ecosystems_load_sources_entity_research_workspace_path(
+              entity_id: params[:entity_id],
+              id: @workspace.id
+            ),
+            class: "inline-flex items-center gap-2 rounded-2xl
+            border-2 border-orange-200
+            bg-gradient-to-r from-orange-400 to-amber-400
+            px-4 py-3 text-xs font-black text-white
+            shadow-md shadow-orange-200/50
+            transition hover:-translate-y-0.5
+            hover:shadow-lg" do %>
+
+  <span aria-hidden="true">📊</span>
+  <span>Research quality</span>
+  <span aria-hidden="true">→</span>
+
+<% end %>
+
+<%
+  research_health_report =
+    Admin::Ecosystems::LoadSources::Entities::ResearchWorkspaces::
+        ResearchIntegrityReport.new(@workspace).call
+%>
+
+<%= render(
+      "research_health_card",
+      report: research_health_report
+    ) %>
+

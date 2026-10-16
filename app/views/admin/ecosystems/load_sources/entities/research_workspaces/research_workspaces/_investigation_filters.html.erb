@@ -1,0 +1,91 @@
+
+<section class="mb-8 rounded-[28px] border-2 border-orange-100 bg-gradient-to-b from-white via-orange-50/20 to-slate-50/50 p-6 shadow-sm">
+  <div class="mb-5">
+    <h2 class="text-2xl font-black text-slate-800">
+      Find an investigation
+    </h2>
+    <p class="mt-2 text-base leading-7 text-slate-600">
+      Search by title or summary, narrow the list by lifecycle status, and
+      choose how investigations should be ordered.
+    </p>
+  </div>
+
+  <%= form_with url: saved_admin_research_workspaces_path,
+                method: :get,
+                local: true,
+                class: "grid grid-cols-1 gap-4 lg:grid-cols-12" do %>
+
+    <div class="lg:col-span-5">
+      <%= label_tag :q, "Search investigations",
+                    class: "mb-2 block text-base font-bold text-slate-700" %>
+
+      <%= text_field_tag :q, @investigation_search,
+                         placeholder: "Enter a title or research summary",
+                         class: "w-full rounded-2xl border-2 border-orange-100 bg-white px-4 py-3 text-base text-slate-800 placeholder:text-slate-400 focus:border-orange-400 focus:outline-none focus:ring-4 focus:ring-orange-100" %>
+    </div>
+
+    <div class="lg:col-span-3">
+      <%= label_tag :filter, "Investigation status",
+                    class: "mb-2 block text-base font-bold text-slate-700" %>
+
+      <%= select_tag :filter,
+                     options_for_select(
+                       [
+                         ["All investigations", "all"],
+                         ["Active", "active"],
+                         ["Completed", "completed"],
+                         ["Archived", "archived"]
+                       ],
+                       @investigation_filter
+                     ),
+                     class: "w-full rounded-2xl border-2 border-orange-100 bg-white px-4 py-3 text-base text-slate-800 focus:border-orange-400 focus:outline-none focus:ring-4 focus:ring-orange-100" %>
+    </div>
+
+    <div class="lg:col-span-2">
+      <%= label_tag :sort, "Sort by",
+                    class: "mb-2 block text-base font-bold text-slate-700" %>
+
+      <%= select_tag :sort,
+                     options_for_select(
+                       [
+                         ["Last updated", "updated_at"],
+                         ["Date created", "created_at"],
+                         ["Title", "title"],
+                         ["Status", "status"],
+                         ["Last opened", "last_opened_at"]
+                       ],
+                       @investigation_sort
+                     ),
+                     class: "w-full rounded-2xl border-2 border-orange-100 bg-white px-4 py-3 text-base text-slate-800 focus:border-orange-400 focus:outline-none focus:ring-4 focus:ring-orange-100" %>
+    </div>
+
+    <div class="lg:col-span-2">
+      <%= label_tag :direction, "Order",
+                    class: "mb-2 block text-base font-bold text-slate-700" %>
+
+      <%= select_tag :direction,
+                     options_for_select(
+                       [["Newest first", "desc"], ["Oldest first", "asc"]],
+                       @investigation_direction
+                     ),
+                     class: "w-full rounded-2xl border-2 border-orange-100 bg-white px-4 py-3 text-base text-slate-800 focus:border-orange-400 focus:outline-none focus:ring-4 focus:ring-orange-100" %>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-3 lg:col-span-12">
+      <%= submit_tag "Apply filters",
+                     class: "cursor-pointer rounded-2xl border-2 border-orange-300 bg-gradient-to-r from-orange-400 to-amber-400 px-6 py-3 text-base font-black text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" %>
+
+      <%= link_to "Clear filters",
+                  saved_admin_research_workspaces_path,
+                  class: "rounded-2xl border-2 border-slate-200 bg-white px-6 py-3 text-base font-bold text-slate-700 transition hover:bg-slate-50" %>
+
+      <p class="text-base text-slate-500" aria-live="polite">
+        Showing
+        <strong class="text-slate-800"><%= @filtered_investigation_count %></strong>
+        of
+        <strong class="text-slate-800"><%= @total_investigations %></strong>
+        investigations matching your current view.
+      </p>
+    </div>
+  <% end %>
+</section>

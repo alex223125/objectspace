@@ -1,0 +1,184 @@
+<%# Research workspace snapshots and history %>
+
+<%
+  entity_id = local_assigns[:entity_id] || params[:entity_id]
+  workspace = local_assigns[:workspace] || @workspace
+
+  snapshot_records =
+    if local_assigns.key?(:snapshots)
+      snapshots.respond_to?(:to_a) ? snapshots.to_a : Array(snapshots)
+    elsif defined?(@snapshots) && @snapshots.present?
+      @snapshots.respond_to?(:to_a) ? @snapshots.to_a : Array(@snapshots)
+    else
+      []
+    end
+
+  workspace_identifier = workspace&.slug.presence || workspace&.id
+%>
+
+<% if workspace.present? %>
+  <section class="rounded-3xl border border-slate-200 bg-slate-50 p-5 shadow-sm sm:p-7">
+
+    <%# Panel heading %>
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div class="flex items-start gap-4">
+        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-orange-200 bg-orange-100 text-xl">
+          🕰️
+        </div>
+
+        <div class="min-w-0">
+          <h2 class="text-2xl font-bold text-slate-900">
+            Snapshots and history
+          </h2>
+
+          <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+            Save a named checkpoint before making significant changes.
+            Use the history page to review previous investigation activity.
+          </p>
+        </div>
+      </div>
+
+      <%= link_to "View history",
+                  history_admin_ecosystems_load_sources_entity_research_workspace_path(
+                    entity_id: entity_id,
+                    id: workspace_identifier
+                  ),
+                  class: "inline-flex min-h-11 w-full items-center justify-center rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-400 sm:w-auto" %>
+    </div>
+
+
+    <%# Save checkpoint %>
+    <div class="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+      <div class="border-b border-slate-200 bg-white px-5 py-4 sm:px-6">
+        <h3 class="text-lg font-bold text-slate-900">
+          Save checkpoint
+        </h3>
+
+        <p class="mt-1 text-sm leading-6 text-slate-600">
+          Give this checkpoint a descriptive name so you can identify it later.
+        </p>
+      </div>
+
+      <div class="p-5 sm:p-6">
+        <%= form_with(
+              url: save_checkpoint_admin_ecosystems_load_sources_entity_research_workspace_path(
+                entity_id: entity_id,
+                id: workspace_identifier
+              ),
+              method: :post,
+              local: true,
+              class: "space-y-5"
+            ) do |form| %>
+
+          <div>
+            <%= form.label :label,
+                           "Checkpoint name",
+                           class: "mb-2 block text-sm font-semibold text-slate-700" %>
+
+            <%= form.text_field :label,
+                                value: "Manual snapshot #{Time.current.strftime('%Y-%m-%d %H:%M')}",
+                                required: true,
+                                maxlength: 255,
+                                placeholder: "e.g. Before evidence review",
+                                class: "block w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200" %>
+
+            <p class="mt-2 text-sm text-slate-500">
+              Choose a name that explains what was saved at this point in the investigation.
+            </p>
+          </div>
+
+          <div class="flex flex-col gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center">
+            <%= form.submit "Save checkpoint",
+                            class: "inline-flex min-h-11 w-full cursor-pointer items-center justify-center rounded-lg border border-orange-700 bg-orange-600 px-6 py-3 text-sm font-bold text-white shadow-sm hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 sm:w-auto" %>
+
+            <%= link_to "Cancel",
+                        history_admin_ecosystems_load_sources_entity_research_workspace_path(
+                          entity_id: entity_id,
+                          id: workspace_identifier
+                        ),
+                        class: "inline-flex min-h-11 w-full items-center justify-center rounded-lg border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-300 sm:w-auto" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+
+    <%# Existing snapshots %>
+    <div class="mt-6">
+      <div class="mb-4 flex items-center justify-between gap-3">
+        <h3 class="text-lg font-bold text-slate-900">
+          Saved checkpoints
+        </h3>
+
+        <span class="rounded-full border border-slate-200 bg-white px-3 py-1 text-sm font-semibold text-slate-600">
+          <%= pluralize(snapshot_records.size, "checkpoint") %>
+        </span>
+      </div>
+
+      <% if snapshot_records.any? %>
+        <div class="space-y-3">
+          <% snapshot_records.each do |snapshot| %>
+            <%
+              snapshot_title =
+                snapshot.try(:label).presence ||
+                  snapshot.try(:title).presence ||
+                  snapshot.try(:name).presence ||
+                  "Snapshot ##{snapshot.try(:id) || 'unknown'}"
+
+              snapshot_created_at =
+                snapshot.try(:created_at)
+            %>
+
+            <article class="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div class="min-w-0">
+                  <h4 class="break-words text-base font-semibold text-slate-900">
+                    <%= snapshot_title %>
+                  </h4>
+
+                  <p class="mt-1 text-sm text-slate-500">
+                    <% if snapshot_created_at.present? %>
+                      Saved <%= l(snapshot_created_at, format: :long) %>
+                    <% else %>
+                      Saved timestamp unavailable
+                    <% end %>
+                  </p>
+
+                  <% if snapshot.try(:kind).present? %>
+                    <p class="mt-2 text-sm text-slate-600">
+                      Type: <%= snapshot.kind.to_s.humanize %>
+                    </p>
+                  <% end %>
+                </div>
+
+                <span class="inline-flex w-fit shrink-0 items-center rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">
+                  Saved
+                </span>
+              </div>
+            </article>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="rounded-xl border border-dashed border-slate-300 bg-white p-6">
+          <div class="flex items-start gap-3">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-lg">
+              📸
+            </div>
+
+            <div>
+              <h4 class="font-semibold text-slate-900">
+                No checkpoints yet
+              </h4>
+
+              <p class="mt-1 text-sm leading-6 text-slate-600">
+                Save your first checkpoint to create a named record of the
+                investigation state.
+              </p>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+  </section>
+<% end %>

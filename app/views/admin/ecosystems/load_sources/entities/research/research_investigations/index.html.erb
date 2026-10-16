@@ -1,0 +1,526 @@
+<%# app/views/admin/ecosystems/load_sources/entities/research/research_investigations/index.html.erb %>
+
+<%
+  entity_id = params[:entity_id]
+
+  workspaces =
+    if defined?(@workspaces) && @workspaces.respond_to?(:to_a)
+      @workspaces.to_a
+    else
+      []
+    end
+
+  status_for = lambda do |workspace|
+    value = workspace.try(:status)
+    value = value.to_s.downcase.strip
+    value.presence || "active"
+  end
+
+  active_workspaces =
+    if defined?(@active_workspaces) && @active_workspaces
+      @active_workspaces.to_a
+    else
+      workspaces.select { |workspace| status_for.call(workspace) == "active" }
+    end
+
+  completed_workspaces =
+    if defined?(@completed_workspaces) && @completed_workspaces
+      @completed_workspaces.to_a
+    else
+      workspaces.select { |workspace| status_for.call(workspace) == "completed" }
+    end
+
+  archived_workspaces =
+    if defined?(@archived_workspaces) && @archived_workspaces
+      @archived_workspaces.to_a
+    else
+      workspaces.select { |workspace| status_for.call(workspace) == "archived" }
+    end
+
+  active_count = active_workspaces.size
+  completed_count = completed_workspaces.size
+  archived_count = archived_workspaces.size
+  total_count = workspaces.size
+
+  new_workspace_path =
+    new_admin_ecosystems_load_sources_entity_research_workspace_path(
+      entity_id: entity_id
+    )
+
+  workspaces_path =
+    admin_ecosystems_load_sources_entity_research_workspaces_path(
+      entity_id: entity_id
+    )
+
+  dashboard_path =
+    admin_ecosystems_load_sources_entity_research_investigations_path(
+      entity_id: entity_id
+    )
+
+  start_research_path =
+    start_from_entity_admin_ecosystems_load_sources_entity_research_workspaces_path(
+      entity_id: entity_id
+    )
+%>
+
+<div class="mx-auto my-8 max-w-7xl px-4 sm:px-6 lg:px-8">
+
+  <%# ===================================================== %>
+  <%# HEADER %>
+  <%# ===================================================== %>
+
+  <div class="overflow-hidden rounded-3xl border border-orange-200 bg-white shadow-xl shadow-orange-100/40">
+
+    <header class="border-b border-orange-100 bg-gradient-to-br from-orange-50 via-white to-amber-50 px-6 py-8 sm:px-10 sm:py-10">
+
+      <div class="flex flex-col gap-7 lg:flex-row lg:items-center lg:justify-between">
+
+        <div class="flex items-start gap-4">
+          <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-orange-600 text-3xl text-white shadow-lg shadow-orange-200">
+            🔬
+          </div>
+
+          <div>
+            <p class="text-sm font-black uppercase tracking-widest text-orange-700">
+              Research intelligence
+            </p>
+
+            <h1 class="mt-2 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
+              Research investigations
+            </h1>
+
+            <p class="mt-3 max-w-2xl text-base leading-7 text-slate-600">
+              Create an investigation, organize research items, collect
+              evidence, add annotations, review findings, and return to
+              saved research whenever you need it.
+            </p>
+
+            <p class="mt-3 text-sm font-semibold text-slate-500">
+              Entity ID:
+              <span class="text-slate-800"><%= entity_id.presence || "Not provided" %></span>
+            </p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+          <%= link_to "＋ New investigation",
+                      new_workspace_path,
+                      class: "inline-flex items-center justify-center rounded-xl bg-orange-600 px-5 py-3 font-bold text-white shadow-md transition hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2" %>
+
+          <%= button_to "▶ Start from entity",
+                        start_research_path,
+                        method: :post,
+                        class: "inline-flex items-center justify-center rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white shadow-md transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2" %>
+        </div>
+
+      </div>
+
+      <div class="mt-7 grid gap-3 sm:grid-cols-3">
+
+        <div class="rounded-2xl border border-orange-200 bg-white p-4">
+          <p class="text-sm font-bold text-slate-500">Active</p>
+          <p class="mt-1 text-3xl font-black text-orange-700"><%= active_count %></p>
+          <p class="mt-1 text-sm text-slate-500">Research in progress</p>
+        </div>
+
+        <div class="rounded-2xl border border-sky-200 bg-white p-4">
+          <p class="text-sm font-bold text-slate-500">Completed</p>
+          <p class="mt-1 text-3xl font-black text-sky-700"><%= completed_count %></p>
+          <p class="mt-1 text-sm text-slate-500">Finished investigations</p>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 bg-white p-4">
+          <p class="text-sm font-bold text-slate-500">Archived</p>
+          <p class="mt-1 text-3xl font-black text-slate-700"><%= archived_count %></p>
+          <p class="mt-1 text-sm text-slate-500">Retained for reference</p>
+        </div>
+
+      </div>
+
+    </header>
+
+    <%# =================================================== %>
+    <%# RESEARCH WORKFLOW %>
+    <%# =================================================== %>
+
+    <section class="border-b border-slate-100 px-6 py-8 sm:px-10">
+
+      <div>
+        <p class="text-sm font-black uppercase tracking-widest text-orange-700">
+          Research workflow
+        </p>
+
+        <h2 class="mt-2 text-2xl font-black text-slate-900">
+          From question to findings
+        </h2>
+
+        <p class="mt-2 max-w-3xl leading-7 text-slate-600">
+          Each investigation is a saved research workspace. Open one to
+          continue working with its items, evidence, annotations, and
+          available preservation tools.
+        </p>
+      </div>
+
+      <div class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+
+        <div class="rounded-2xl border border-orange-100 bg-orange-50/60 p-5">
+          <span class="text-2xl">❓</span>
+          <h3 class="mt-3 font-black text-slate-900">1. Define the question</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-600">
+            Create an investigation with a clear subject, objective,
+            and research question.
+          </p>
+        </div>
+
+        <div class="rounded-2xl border border-sky-100 bg-sky-50/60 p-5">
+          <span class="text-2xl">📚</span>
+          <h3 class="mt-3 font-black text-slate-900">2. Collect evidence</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-600">
+            Organize research items and record supporting sources,
+            documents, links, and observations.
+          </p>
+        </div>
+
+        <div class="rounded-2xl border border-violet-100 bg-violet-50/60 p-5">
+          <span class="text-2xl">🧠</span>
+          <h3 class="mt-3 font-black text-slate-900">3. Review findings</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-600">
+            Add annotations, document interpretations, and identify
+            gaps or conflicting evidence.
+          </p>
+        </div>
+
+        <div class="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-5">
+          <span class="text-2xl">📸</span>
+          <h3 class="mt-3 font-black text-slate-900">4. Preserve research</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-600">
+            Use available snapshot and lifecycle actions to preserve
+            and manage the investigation.
+          </p>
+        </div>
+
+      </div>
+
+    </section>
+
+    <%# =================================================== %>
+    <%# INVESTIGATION REGISTER %>
+    <%# =================================================== %>
+
+    <section class="px-6 py-8 sm:px-10">
+
+      <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+
+        <div>
+          <p class="text-sm font-black uppercase tracking-widest text-orange-700">
+            Investigation register
+          </p>
+
+          <h2 class="mt-2 text-2xl font-black text-slate-900">
+            Your saved investigations
+          </h2>
+
+          <p class="mt-2 text-sm leading-6 text-slate-600">
+            Search your workspaces, filter by status, and open an
+            investigation to continue or review your work.
+          </p>
+        </div>
+
+        <%= link_to "＋ Create investigation",
+                    new_workspace_path,
+                    class: "inline-flex w-fit items-center justify-center rounded-xl bg-orange-600 px-5 py-3 font-bold text-white transition hover:bg-orange-700" %>
+
+      </div>
+
+      <%# Search and filter controls %>
+
+      <div class="mt-6 grid gap-3 md:grid-cols-3">
+
+        <div class="md:col-span-2">
+          <label for="research-workspace-search"
+                 class="mb-2 block text-sm font-bold text-slate-700">
+            Search investigations
+          </label>
+
+          <input id="research-workspace-search"
+                 type="search"
+                 placeholder="Search by title, question, description, or ID..."
+                 class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200">
+        </div>
+
+        <div>
+          <label for="research-workspace-status"
+                 class="mb-2 block text-sm font-bold text-slate-700">
+            Filter by status
+          </label>
+
+          <select id="research-workspace-status"
+                  class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200">
+            <option value="all">All investigations</option>
+            <option value="active">Active</option>
+            <option value="completed">Completed</option>
+            <option value="archived">Archived</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="mt-5 flex flex-wrap items-center justify-between gap-3">
+        <p id="research-workspace-results"
+           class="text-sm font-semibold text-slate-500"
+           aria-live="polite">
+          Showing <%= total_count %> investigations
+        </p>
+
+        <%= link_to "View all workspaces →",
+                    workspaces_path,
+                    class: "text-sm font-bold text-orange-700 hover:text-orange-900" %>
+      </div>
+
+      <% if workspaces.any? %>
+
+        <div id="research-workspace-list"
+             class="mt-5 grid gap-5 lg:grid-cols-2">
+
+          <% workspaces.each do |workspace| %>
+
+            <%
+              workspace_status = status_for.call(workspace)
+              workspace_title =
+                workspace.try(:title).presence ||
+                  workspace.try(:name).presence ||
+                  workspace.try(:research_question).presence ||
+                  "Investigation ##{workspace.id}"
+
+              workspace_description =
+                workspace.try(:description).presence ||
+                  workspace.try(:research_question).presence ||
+                  workspace.try(:objective).presence ||
+                  "Open this workspace to review its research and findings."
+
+              searchable_text = [
+                workspace_title,
+                workspace_description,
+                workspace.try(:status),
+                workspace.id
+              ].compact.join(" ").downcase
+
+              status_classes =
+                case workspace_status
+                when "completed"
+                  "border-sky-200 bg-sky-50 text-sky-800"
+                when "archived"
+                  "border-slate-200 bg-slate-100 text-slate-700"
+                else
+                  "border-orange-200 bg-orange-50 text-orange-800"
+                end
+
+              workspace_show_path =
+                admin_ecosystems_load_sources_entity_research_workspace_path(
+                  entity_id: entity_id,
+                  id: workspace.id
+                )
+
+              workspace_edit_path =
+                edit_admin_ecosystems_load_sources_entity_research_workspace_path(
+                  entity_id: entity_id,
+                  id: workspace.id
+                )
+            %>
+
+            <article class="research-workspace-card flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-orange-300 hover:shadow-lg"
+                     data-status="<%= workspace_status %>"
+                     data-search="<%= searchable_text %>">
+
+              <div class="flex items-start justify-between gap-3">
+
+                <div class="flex min-w-0 items-start gap-3">
+
+                  <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-2xl">
+                    🔬
+                  </div>
+
+                  <div class="min-w-0">
+                    <p class="text-xs font-bold uppercase tracking-widest text-slate-400">
+                      Investigation #<%= workspace.id %>
+                    </p>
+
+                    <h3 class="mt-1 break-words text-lg font-black text-slate-900">
+                      <%= workspace_title %>
+                    </h3>
+                  </div>
+
+                </div>
+
+                <span class="shrink-0 rounded-full border px-3 py-1 text-xs font-black <%= status_classes %>">
+                  <%= workspace_status.humanize %>
+                </span>
+
+              </div>
+
+              <p class="mt-4 flex-1 whitespace-pre-line break-words text-sm leading-6 text-slate-600">
+                <%= truncate(workspace_description, length: 240) %>
+              </p>
+
+              <div class="mt-5 border-t border-slate-100 pt-4">
+
+                <div class="flex flex-wrap gap-3">
+
+                  <%= link_to "Open investigation →",
+                              workspace_show_path,
+                              class: "inline-flex items-center justify-center rounded-xl bg-orange-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-orange-700" %>
+
+                  <%= link_to "Edit workspace",
+                              workspace_edit_path,
+                              class: "inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50" %>
+
+                </div>
+
+              </div>
+
+            </article>
+
+          <% end %>
+
+        </div>
+
+        <div id="research-workspace-empty-filter"
+             class="mt-6 hidden rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center">
+
+          <p class="text-lg font-black text-slate-800">
+            No matching investigations
+          </p>
+
+          <p class="mt-2 text-sm text-slate-600">
+            Try a different search term or select another status.
+          </p>
+
+        </div>
+
+      <% else %>
+
+        <div class="mt-6 rounded-3xl border-2 border-dashed border-orange-200 bg-orange-50/40 px-6 py-12 text-center">
+
+          <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl border border-orange-200 bg-white text-4xl">
+            🔬
+          </div>
+
+          <h3 class="mt-5 text-2xl font-black text-slate-900">
+            Start your first investigation
+          </h3>
+
+          <p class="mx-auto mt-3 max-w-2xl text-base leading-7 text-slate-600">
+            There are no research workspaces available in the collection
+            returned to this page. Create a workspace to begin documenting
+            a research question, collecting evidence, and recording findings.
+          </p>
+
+          <div class="mt-6 flex flex-wrap justify-center gap-3">
+
+            <%= link_to "＋ Create your first investigation",
+                        new_workspace_path,
+                        class: "inline-flex items-center justify-center rounded-xl bg-orange-600 px-6 py-3 font-bold text-white shadow-sm transition hover:bg-orange-700" %>
+
+            <%= link_to "Browse workspaces",
+                        workspaces_path,
+                        class: "inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-6 py-3 font-bold text-slate-700 transition hover:bg-slate-50" %>
+
+          </div>
+
+          <p class="mx-auto mt-5 max-w-xl text-xs leading-5 text-slate-500">
+            If you have already created workspaces but none appear here,
+            check the controller's entity filtering and ownership scope.
+          </p>
+
+        </div>
+
+      <% end %>
+
+    </section>
+
+    <%# =================================================== %>
+    <%# FOOTER %>
+    <%# =================================================== %>
+
+    <footer class="border-t border-orange-100 bg-slate-50 px-6 py-6 sm:px-10">
+
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
+        <div>
+          <h2 class="font-black text-slate-800">
+            Research administration
+          </h2>
+
+          <p class="mt-1 text-sm leading-6 text-slate-600">
+            Saved workspaces remain accessible through the application
+            routes and permissions configured for your account.
+          </p>
+        </div>
+
+        <%= link_to "Refresh dashboard ↻",
+                    dashboard_path,
+                    class: "inline-flex w-fit items-center justify-center rounded-xl border border-orange-200 bg-white px-5 py-3 text-sm font-bold text-orange-800 transition hover:bg-orange-50" %>
+
+      </div>
+
+    </footer>
+
+  </div>
+
+</div>
+
+<script>
+    (function () {
+        function initializeResearchWorkspaceFilters() {
+            var search = document.getElementById("research-workspace-search");
+            var status = document.getElementById("research-workspace-status");
+            var results = document.getElementById("research-workspace-results");
+            var empty = document.getElementById("research-workspace-empty-filter");
+            var cards = document.querySelectorAll(".research-workspace-card");
+
+            if (!search || !status || !results) return;
+
+            function filterWorkspaces() {
+                var query = (search.value || "").toLowerCase().trim();
+                var selectedStatus = status.value || "all";
+                var visibleCount = 0;
+
+                Array.prototype.forEach.call(cards, function (card) {
+                    var cardSearch = card.getAttribute("data-search") || "";
+                    var cardStatus = card.getAttribute("data-status") || "active";
+
+                    var matchesSearch = !query || cardSearch.indexOf(query) !== -1;
+                    var matchesStatus =
+                        selectedStatus === "all" || cardStatus === selectedStatus;
+
+                    var visible = matchesSearch && matchesStatus;
+
+                    card.classList.toggle("hidden", !visible);
+
+                    if (visible) visibleCount += 1;
+                });
+
+                results.textContent =
+                    "Showing " + visibleCount + " of " + cards.length + " investigations";
+
+                if (empty) {
+                    empty.classList.toggle("hidden", visibleCount !== 0);
+                }
+            }
+
+            if (search.dataset.initialized === "true") return;
+            search.dataset.initialized = "true";
+
+            search.addEventListener("input", filterWorkspaces);
+            status.addEventListener("change", filterWorkspaces);
+
+            filterWorkspaces();
+        }
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", initializeResearchWorkspaceFilters);
+        } else {
+            initializeResearchWorkspaceFilters();
+        }
+    })();
+</script>

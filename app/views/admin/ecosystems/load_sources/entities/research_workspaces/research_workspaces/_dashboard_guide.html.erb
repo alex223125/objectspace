@@ -1,0 +1,37 @@
+
+<section class="grid gap-4 md:grid-cols-3">
+
+  <article class="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-5">
+    <div class="text-2xl">↗</div>
+    <h2 class="mt-3 font-bold text-slate-900 dark:text-white">Continue</h2>
+    <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+      Resume active investigations and work through outstanding research items.
+    </p>
+    <%= link_to "View active",
+                url_for(action: :saved, entity_id: params[:entity_id], filter: "active"),
+                class: "mt-4 inline-block text-sm font-bold text-emerald-600 dark:text-emerald-400" %>
+  </article>
+
+  <article class="rounded-2xl border border-sky-500/20 bg-sky-500/5 p-5">
+    <div class="text-2xl">✓</div>
+    <h2 class="mt-3 font-bold text-slate-900 dark:text-white">Review</h2>
+    <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+      Revisit completed work, research notes, and supporting evidence.
+    </p>
+    <%= link_to "View completed",
+                url_for(action: :saved, entity_id: params[:entity_id], filter: "completed"),
+                class: "mt-4 inline-block text-sm font-bold text-sky-600 dark:text-sky-400" %>
+  </article>
+
+  <article class="rounded-2xl border border-slate-400/20 bg-slate-500/5 p-5">
+    <div class="text-2xl">◼</div>
+    <h2 class="mt-3 font-bold text-slate-900 dark:text-white">Retrieve</h2>
+    <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+      Locate archived investigations without mixing them with active work.
+    </p>
+    <%= link_to "View archived",
+                url_for(action: :saved, entity_id: params[:entity_id], filter: "archived"),
+                class: "mt-4 inline-block text-sm font-bold text-slate-600 dark:text-slate-300" %>
+  </article>
+
+</section>

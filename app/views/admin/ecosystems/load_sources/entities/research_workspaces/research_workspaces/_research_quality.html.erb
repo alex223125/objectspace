@@ -1,0 +1,142 @@
+
+<% report = local_assigns.fetch(:report) %>
+<% score = report[:score] %>
+<% evidence = report[:evidence] || {} %>
+<% annotations = report[:annotations] || {} %>
+
+<section class="my-6 rounded-[30px] border-2 border-orange-100
+                bg-gradient-to-b from-white via-orange-50/20
+                to-slate-50/50 p-6 shadow-md shadow-orange-100/30"
+         aria-labelledby="research-quality-heading">
+
+  <div class="flex flex-col gap-4 sm:flex-row
+              sm:items-center sm:justify-between">
+
+    <div class="flex items-center gap-3">
+      <div class="flex h-11 w-11 items-center justify-center
+                  rounded-2xl border border-orange-200
+                  bg-orange-100/80 text-lg">
+        🔬
+      </div>
+
+      <div>
+        <h3 id="research-quality-heading"
+            class="text-sm font-black uppercase
+                   tracking-wider text-slate-700">
+          Research strength
+        </h3>
+
+        <p class="mt-1 text-xs text-slate-400">
+          Evidence quality and traceability indicators
+        </p>
+      </div>
+    </div>
+
+    <span class="w-fit rounded-full border border-orange-200
+                 bg-orange-50 px-3 py-1.5 text-xs
+                 font-bold text-orange-700">
+      <%= report[:rating].to_s.humanize %>
+    </span>
+  </div>
+
+  <div class="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+
+    <div class="rounded-2xl border border-orange-100
+                bg-white/80 p-4">
+      <p class="text-[10px] font-black uppercase
+                tracking-wider text-slate-400">
+        Strength score
+      </p>
+      <p class="mt-2 text-2xl font-black text-orange-600">
+        <%= score.nil? ? "—" : "#{score}/100" %>
+      </p>
+    </div>
+
+    <div class="rounded-2xl border border-emerald-100
+                bg-white/80 p-4">
+      <p class="text-[10px] font-black uppercase
+                tracking-wider text-slate-400">
+        Verified
+      </p>
+      <p class="mt-2 text-2xl font-black text-emerald-600">
+        <%= evidence.fetch(:verified, 0) %>
+      </p>
+      <p class="mt-1 text-[10px] text-slate-400">
+        of <%= evidence.fetch(:total, 0) %> evidence records
+      </p>
+    </div>
+
+    <div class="rounded-2xl border border-rose-100
+                bg-white/80 p-4">
+      <p class="text-[10px] font-black uppercase
+                tracking-wider text-slate-400">
+        Disputed
+      </p>
+      <p class="mt-2 text-2xl font-black text-rose-600">
+        <%= evidence.fetch(:disputed, 0) %>
+      </p>
+    </div>
+
+    <div class="rounded-2xl border border-sky-100
+                bg-white/80 p-4">
+      <p class="text-[10px] font-black uppercase
+                tracking-wider text-slate-400">
+        Annotations
+      </p>
+      <p class="mt-2 text-2xl font-black text-sky-600">
+        <%= annotations.fetch(:total, 0) %>
+      </p>
+    </div>
+
+  </div>
+
+  <% unless score.nil? %>
+    <div class="mt-6">
+      <div class="mb-2 flex items-center justify-between">
+        <span class="text-[10px] font-black uppercase
+                     tracking-wider text-slate-400">
+          Available quality indicators
+        </span>
+        <span class="text-xs font-black text-orange-600">
+          <%= score %>%
+        </span>
+      </div>
+
+      <div class="h-2.5 overflow-hidden rounded-full
+                  border border-orange-100 bg-white"
+           role="progressbar"
+           aria-label="Research strength score"
+           aria-valuemin="0"
+           aria-valuemax="100"
+           aria-valuenow="<%= score %>">
+        <div class="h-full rounded-full
+                    bg-gradient-to-r from-orange-400
+                    via-amber-400 to-emerald-400"
+             style="width: <%= score %>%">
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <% if report[:limitations].present? %>
+    <div class="mt-5 rounded-2xl border border-amber-200
+                bg-amber-50/70 p-4">
+      <h4 class="text-xs font-black text-amber-800">
+        Data limitations
+      </h4>
+
+      <ul class="mt-2 list-disc space-y-1 pl-5
+                 text-xs leading-5 text-amber-800">
+        <% report[:limitations].each do |limitation| %>
+          <li><%= limitation %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <p class="mt-4 text-[10px] leading-5 text-slate-400">
+    This score summarizes available data quality indicators.
+    It is not a probability that a research conclusion is correct.
+  </p>
+
+</section>

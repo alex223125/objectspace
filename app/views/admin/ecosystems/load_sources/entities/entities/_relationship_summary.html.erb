@@ -2,12 +2,11 @@
 
 <%
   relationships =
-    entity
-      .entity_relationships
-      .active
-      .includes(:source_entity, :target_entity)
-      .confirmed_first
-      .limit(8)
+    entity.outgoing_relationships
+          .active
+          .includes(:source_entity, :target_entity)
+          .confirmed_or_strong
+          .limit(8)
 %>
 
 <div

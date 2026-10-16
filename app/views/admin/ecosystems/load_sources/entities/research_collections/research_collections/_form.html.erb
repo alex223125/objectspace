@@ -1,0 +1,403 @@
+<%
+  entity_id = params[:entity_id].presence ||
+    @entity&.id ||
+    collection.try(:entity_id)
+
+  collections_path =
+    admin_ecosystems_load_sources_entity_research_collections_path(
+      entity_id: entity_id
+    )
+
+  collection_path =
+    if collection.persisted?
+      admin_ecosystems_load_sources_entity_research_collection_path(
+        entity_id: entity_id,
+        id: collection.id
+      )
+    else
+      collections_path
+    end
+
+  collection_model =
+    ::Ecosystems::LoadSources::Entity::ResearchCollection::ResearchCollection
+
+  statuses = collection_model::STATUSES
+  progress = collection.persisted? ? collection.progress_percentage : 0
+%>
+
+<div class="mx-auto my-8 max-w-5xl rounded-[38px] border-2 border-orange-100 bg-gradient-to-b from-white via-orange-50/20 to-slate-50/70 p-5 shadow-md shadow-orange-100/40 sm:p-8">
+
+  <!-- ======================================================= -->
+  <!-- COLLECTION HEADER -->
+  <!-- ======================================================= -->
+
+  <div class="mb-8 flex flex-col gap-5 border-b-2 border-orange-100 pb-6 lg:flex-row lg:items-center lg:justify-between">
+
+    <div class="flex items-center gap-4">
+      <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-orange-200/60 bg-orange-100/80 text-xl text-orange-600 shadow-sm shadow-orange-100">
+        📚
+      </div>
+
+      <div>
+        <p class="text-[10px] font-black uppercase tracking-[0.22em] text-orange-500">
+          Research ecosystem
+        </p>
+
+        <h2 class="mt-1 text-xl font-black tracking-tight text-slate-800 sm:text-2xl">
+          <%= collection.persisted? ? "Edit research collection" : "Create research collection" %>
+        </h2>
+
+        <p class="mt-1 max-w-xl text-xs leading-5 text-slate-400">
+          Organize investigations, connect evidence, track objectives, and develop research insights.
+        </p>
+      </div>
+    </div>
+
+    <span class="w-fit rounded-full border border-orange-200/60 bg-orange-50 px-3.5 py-1.5 text-[11px] font-bold text-orange-600 shadow-sm">
+      ✨ <%= collection.persisted? ? collection.status.humanize : "New collection" %>
+    </span>
+  </div>
+
+  <!-- ======================================================= -->
+  <!-- ECOSYSTEM WORKFLOW -->
+  <!-- ======================================================= -->
+
+  <div class="relative mb-10 px-2 md:px-4">
+
+    <div class="absolute left-[12%] right-[12%] top-6 hidden h-1.5 rounded-full bg-orange-100 md:block"></div>
+
+    <div class="relative z-10 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4 md:gap-3">
+
+      <!-- Stage 1 -->
+      <div class="group flex flex-col items-center text-center">
+        <div class="flex h-12 w-12 items-center justify-center rounded-[18px] border-2 border-orange-300 bg-orange-50 text-lg shadow-md shadow-orange-100 transition duration-300 group-hover:scale-110">
+          🧭
+        </div>
+
+        <h3 class="mt-3 text-xs font-black tracking-wide text-orange-700">
+          Research Focus
+        </h3>
+
+        <span class="mt-2 rounded-full border border-orange-200/60 bg-orange-100 px-3 py-1 text-[9px] font-bold uppercase tracking-wider text-orange-700">
+          Define
+        </span>
+
+        <p class="mt-2 max-w-[180px] text-[11px] leading-5 text-slate-400">
+          Name the collection and describe the research problem or program.
+        </p>
+      </div>
+
+      <!-- Stage 2 -->
+      <div class="group flex flex-col items-center text-center">
+        <div class="flex h-12 w-12 items-center justify-center rounded-[18px] border-2 border-sky-300 bg-sky-50 text-lg shadow-md shadow-sky-100 transition duration-300 group-hover:scale-110">
+          🔬
+        </div>
+
+        <h3 class="mt-3 text-xs font-black tracking-wide text-sky-700">
+          Investigations
+        </h3>
+
+        <span class="mt-2 rounded-full border border-sky-200/60 bg-sky-100 px-3 py-1 text-[9px] font-bold uppercase tracking-wider text-sky-700">
+          Connect
+        </span>
+
+        <p class="mt-2 max-w-[180px] text-[11px] leading-5 text-slate-400">
+          Group relevant workspaces and investigations into one portfolio.
+        </p>
+      </div>
+
+      <!-- Stage 3 -->
+      <div class="group flex flex-col items-center text-center">
+        <div class="flex h-12 w-12 items-center justify-center rounded-[18px] border-2 border-violet-300 bg-violet-50 text-lg shadow-md shadow-violet-100 transition duration-300 group-hover:scale-110">
+          💡
+        </div>
+
+        <h3 class="mt-3 text-xs font-black tracking-wide text-violet-700">
+          Intelligence
+        </h3>
+
+        <span class="mt-2 rounded-full border border-violet-200/60 bg-violet-100 px-3 py-1 text-[9px] font-bold uppercase tracking-wider text-violet-700">
+          Discover
+        </span>
+
+        <p class="mt-2 max-w-[180px] text-[11px] leading-5 text-slate-400">
+          Develop questions, objectives, findings, milestones, and insights.
+        </p>
+      </div>
+
+      <!-- Stage 4 -->
+      <div class="group flex flex-col items-center text-center">
+        <div class="flex h-12 w-12 items-center justify-center rounded-[18px] border-2 border-emerald-300 bg-emerald-50 text-lg shadow-md shadow-emerald-100 transition duration-300 group-hover:scale-110">
+          📈
+        </div>
+
+        <h3 class="mt-3 text-xs font-black tracking-wide text-emerald-700">
+          Progress
+        </h3>
+
+        <span class="mt-2 rounded-full border border-emerald-200/60 bg-emerald-100 px-3 py-1 text-[9px] font-bold uppercase tracking-wider text-emerald-700">
+          Improve
+        </span>
+
+        <p class="mt-2 max-w-[180px] text-[11px] leading-5 text-slate-400">
+          Monitor completed investigations and continuously improve results.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ======================================================= -->
+  <!-- FORM -->
+  <!-- ======================================================= -->
+
+  <%= form_with(
+        model: collection,
+        url: collection_path,
+        method: collection.persisted? ? :patch : :post,
+        scope: :research_collection,
+        class: "space-y-7"
+      ) do |form| %>
+
+    <% if collection.errors.any? %>
+      <div class="rounded-2xl border-2 border-rose-200 bg-rose-50 p-5">
+        <div class="flex items-center gap-3">
+          <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-100 text-lg">
+            ⚠️
+          </span>
+
+          <div>
+            <h3 class="text-sm font-black text-rose-700">
+              Please review your collection
+            </h3>
+
+            <p class="mt-1 text-xs text-rose-500">
+              Fix the following issues before continuing.
+            </p>
+          </div>
+        </div>
+
+        <ul class="mt-4 list-disc space-y-1 pl-5 text-xs leading-5 text-rose-700">
+          <% collection.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <!-- Collection details -->
+    <section class="rounded-[28px] border-2 border-orange-100 bg-white/80 p-5 shadow-sm shadow-orange-100/30 sm:p-6">
+
+      <div class="mb-6 flex items-center gap-3 border-b border-orange-100 pb-4">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl border border-orange-200 bg-orange-50 text-lg">
+          🗂️
+        </div>
+
+        <div>
+          <h3 class="text-sm font-black text-slate-700">
+            Collection details
+          </h3>
+
+          <p class="mt-1 text-[11px] text-slate-400">
+            Establish the identity and purpose of this research portfolio.
+          </p>
+        </div>
+      </div>
+
+      <div>
+        <%= form.label :title,
+                       "Collection title",
+                       class: "text-xs font-black uppercase tracking-[0.16em] text-slate-600" %>
+
+        <%= form.text_field :title,
+                            required: true,
+                            maxlength: 200,
+                            class: "mt-2 w-full rounded-2xl border border-orange-100 bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100",
+                            placeholder: "e.g. AI Market Landscape" %>
+
+        <p class="mt-2 text-[10px] leading-5 text-slate-400">
+          Choose a clear title that identifies your research program.
+        </p>
+      </div>
+
+      <div class="mt-5">
+        <%= form.label :description,
+                       "Research purpose and description",
+                       class: "text-[10px] font-black uppercase tracking-[0.16em] text-slate-500" %>
+
+        <%= form.text_area :description,
+                           rows: 5,
+                           class: "mt-2 w-full rounded-2xl border border-orange-100 bg-gradient-to-br from-white to-orange-50/30 px-4 py-3.5 text-sm leading-6 text-slate-700 outline-none transition placeholder:text-slate-300 focus:border-orange-400 focus:ring-4 focus:ring-orange-100",
+                           placeholder: "What are you investigating? What questions should this research program answer? What outcomes are you aiming for?" %>
+      </div>
+
+    </section>
+
+    <!-- Lifecycle and organization -->
+    <section class="rounded-[28px] border-2 border-orange-100 bg-gradient-to-br from-orange-50/50 via-white to-slate-50/70 p-5 shadow-sm shadow-orange-100/30 sm:p-6">
+
+      <div class="mb-6 flex items-center gap-3 border-b border-orange-100 pb-4">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl border border-sky-200 bg-sky-50 text-lg">
+          ⚙️
+        </div>
+
+        <div>
+          <h3 class="text-sm font-black text-slate-700">
+            Lifecycle and organization
+          </h3>
+
+          <p class="mt-1 text-[11px] text-slate-400">
+            Control the collection lifecycle and its position in your workspace.
+          </p>
+        </div>
+      </div>
+
+      <div class="grid gap-5 sm:grid-cols-2">
+
+        <div>
+          <%= form.label :status,
+                         "Collection status",
+                         class: "text-[10px] font-black uppercase tracking-[0.16em] text-slate-500" %>
+
+          <%= form.select :status,
+                          statuses.map { |status| [status.humanize, status] },
+                          {},
+                          class: "mt-2 w-full rounded-2xl border border-orange-100 bg-white px-4 py-3.5 text-sm font-semibold text-slate-700 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100" %>
+
+          <p class="mt-2 text-[10px] leading-5 text-slate-400">
+            Active, completed, or archived.
+          </p>
+        </div>
+
+        <div>
+          <%= form.label :position,
+                         "Display position",
+                         class: "text-[10px] font-black uppercase tracking-[0.16em] text-slate-500" %>
+
+          <%= form.number_field :position,
+                                min: 0,
+                                class: "mt-2 w-full rounded-2xl border border-orange-100 bg-white px-4 py-3.5 text-sm font-semibold text-slate-700 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100",
+                                placeholder: "0" %>
+
+          <p class="mt-2 text-[10px] leading-5 text-slate-400">
+            Lower positions can appear earlier in ordered lists.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Status explanation -->
+      <div class="mt-6 grid gap-3 sm:grid-cols-3">
+
+        <div class="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4">
+          <div class="flex items-center gap-2">
+            <span class="h-2.5 w-2.5 rounded-full bg-emerald-400"></span>
+            <span class="text-xs font-black text-emerald-700">Active</span>
+          </div>
+
+          <p class="mt-2 text-[10px] leading-5 text-emerald-700/70">
+            Research is ongoing.
+          </p>
+        </div>
+
+        <div class="rounded-2xl border border-sky-100 bg-sky-50/70 p-4">
+          <div class="flex items-center gap-2">
+            <span class="h-2.5 w-2.5 rounded-full bg-sky-400"></span>
+            <span class="text-xs font-black text-sky-700">Completed</span>
+          </div>
+
+          <p class="mt-2 text-[10px] leading-5 text-sky-700/70">
+            The research program is complete.
+          </p>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 bg-slate-100/70 p-4">
+          <div class="flex items-center gap-2">
+            <span class="h-2.5 w-2.5 rounded-full bg-slate-400"></span>
+            <span class="text-xs font-black text-slate-600">Archived</span>
+          </div>
+
+          <p class="mt-2 text-[10px] leading-5 text-slate-500">
+            The collection is retained for reference.
+          </p>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ===================================================== -->
+    <!-- PROGRESS / IMPROVEMENT PANEL -->
+    <!-- ===================================================== -->
+
+    <section class="rounded-[28px] border-2 border-orange-100 bg-gradient-to-r from-orange-50/70 via-white to-emerald-50/50 p-5 shadow-sm sm:p-6">
+
+      <div class="flex items-start gap-4">
+        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-orange-100 text-lg shadow-sm">
+          🔄
+        </div>
+
+        <div class="min-w-0 flex-1">
+          <h3 class="text-sm font-black text-slate-700">
+            Research improvement loop
+          </h3>
+
+          <p class="mt-2 text-xs leading-6 text-slate-400">
+            Bring investigations together, connect evidence, resolve research questions,
+            and turn findings into better decisions. Your collection provides a central
+            place to organize and monitor that progress.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-6">
+        <div class="mb-2 flex items-center justify-between gap-3">
+          <span class="text-[9px] font-black uppercase tracking-widest text-slate-400">
+            Investigation completion
+          </span>
+
+          <span class="text-xs font-black text-orange-600">
+            <%= collection.persisted? ? "#{progress}%" : "Ready to begin" %>
+          </span>
+        </div>
+
+        <div class="h-2.5 overflow-hidden rounded-full border border-orange-100 bg-white">
+          <div
+            class="h-full rounded-full bg-gradient-to-r from-orange-400 via-amber-400 to-emerald-400 transition-all duration-700"
+            style="width: <%= collection.persisted? ? progress : 0 %>%;">
+          </div>
+        </div>
+
+        <p class="mt-2 text-[10px] leading-5 text-slate-400">
+          <% if collection.persisted? %>
+            Progress is based on completed workspaces in this collection.
+          <% else %>
+            Add investigations after creating the collection to begin tracking progress.
+          <% end %>
+        </p>
+      </div>
+
+    </section>
+
+    <!-- ===================================================== -->
+    <!-- FORM ACTIONS -->
+    <!-- ===================================================== -->
+
+    <div class="flex flex-col-reverse gap-3 border-t-2 border-orange-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
+
+      <%= link_to collections_path,
+                  class: "inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-orange-100 bg-white px-5 py-3 text-xs font-black text-slate-500 transition hover:border-orange-300 hover:bg-orange-50 hover:text-orange-700" do %>
+        <span aria-hidden="true">←</span>
+        Cancel
+      <% end %>
+
+      <%= form.submit(
+            collection.persisted? ? "Save collection changes →" : "Create research collection →",
+            class: "inline-flex cursor-pointer items-center justify-center rounded-2xl border border-orange-300 bg-gradient-to-r from-orange-400 to-amber-400 px-6 py-3.5 text-sm font-black text-white shadow-md shadow-orange-200/60 transition duration-300 hover:-translate-y-0.5 hover:from-orange-500 hover:to-amber-500 hover:shadow-lg hover:shadow-orange-200/80"
+          ) %>
+
+    </div>
+
+  <% end %>
+
+</div>

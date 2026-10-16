@@ -1,0 +1,234 @@
+
+<section
+  aria-labelledby="entity-explorer-heading"
+  class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+  data-controller="intelligence-table"
+>
+  <div class="border-b border-slate-200 px-5 py-5 sm:px-6">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+      <div>
+        <h2
+          id="entity-explorer-heading"
+          class="text-lg font-bold text-slate-950"
+        >
+          Entity explorer
+        </h2>
+
+        <p class="mt-1 text-sm leading-6 text-slate-600">
+          Search the graph's entity records, inspect their metadata,
+          and identify records with missing connections.
+        </p>
+      </div>
+
+      <div class="grid gap-3 sm:grid-cols-2">
+        <div>
+          <label
+            for="intelligence-entity-search"
+            class="mb-1 block text-xs font-semibold text-slate-600"
+          >
+            Search entities
+          </label>
+
+          <input
+            id="intelligence-entity-search"
+            type="search"
+            placeholder="Name, slug, type, or ID"
+            autocomplete="off"
+            data-intelligence-table-target="search"
+            data-action="input->intelligence-table#filter"
+            class="min-h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200"
+            />
+        </div>
+
+        <div>
+          <label
+            for="intelligence-entity-status"
+            class="mb-1 block text-xs font-semibold text-slate-600"
+          >
+            Filter by status
+          </label>
+
+          <select
+            id="intelligence-entity-status"
+            data-intelligence-table-target="status"
+            data-action="change->intelligence-table#filter"
+            class="min-h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200"
+          >
+            <option value="">All statuses</option>
+            <option value="draft">Draft</option>
+            <option value="published">Published</option>
+            <option value="review">Review</option>
+            <option value="complete">Complete</option>
+            <option value="archived">Archived</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="mt-4 text-sm text-slate-600"
+      aria-live="polite"
+      data-intelligence-table-target="count"
+    >
+      Showing <%= nodes.size %> of <%= total_entities %> registry entities in the graph payload.
+    </div>
+  </div>
+
+  <% if nodes.any? %>
+    <div class="overflow-x-auto">
+      <table class="min-w-[900px] w-full text-left text-sm">
+        <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+        <tr>
+          <th scope="col" class="px-5 py-3 font-semibold">Entity</th>
+          <th scope="col" class="px-4 py-3 font-semibold">Type</th>
+          <th scope="col" class="px-4 py-3 font-semibold">Scope</th>
+          <th scope="col" class="px-4 py-3 font-semibold">Status</th>
+          <th scope="col" class="px-4 py-3 font-semibold">Health</th>
+          <th scope="col" class="px-4 py-3 font-semibold">Connections</th>
+        </tr>
+        </thead>
+
+        <tbody class="divide-y divide-slate-100">
+        <% nodes.each do |raw_node| %>
+          <%
+            node =
+              raw_node.is_a?(Hash) ?
+                raw_node.with_indifferent_access :
+                {}.with_indifferent_access
+
+            node_id = node[:id]
+            label = node[:label].presence || node[:name].presence || "Unnamed entity"
+            slug = node[:slug].to_s
+            type = node[:type].presence || "Not specified"
+            scope_name = node[:scope].presence || "Not specified"
+            status_name = node[:status].to_s
+            workflow_state = node[:workflow_state].to_s
+
+            health = node[:health_score]
+            health_number = Float(health, exception: false)
+
+            search_text = [
+              node_id, label, slug, type, scope_name,
+              status_name, workflow_state
+            ].compact.join(" ").downcase
+
+            # The sample graph does not provide per-node connection counts.
+            # Do not display an invented zero as if it were measured.
+            connections =
+              node[:relationship_count] ||
+                node[:connections_count] ||
+                node[:degree]
+          %>
+
+          <tr
+            class="hover:bg-slate-50/80"
+            data-intelligence-table-target="row"
+            data-search-text="<%= search_text %>"
+            data-entity-status="<%= status_name.downcase %>"
+          >
+            <td class="px-5 py-4">
+              <div class="font-semibold text-slate-900">
+                <%= label %>
+              </div>
+
+              <div class="mt-1 text-xs text-slate-500">
+                ID: <%= node_id.presence || "Not provided" %>
+              </div>
+
+              <% if slug.present? %>
+                <div class="mt-1 break-all font-mono text-xs text-slate-500">
+                  <%= slug %>
+                </div>
+              <% end %>
+            </td>
+
+            <td class="px-4 py-4 text-slate-700">
+              <%= type %>
+            </td>
+
+            <td class="px-4 py-4 text-slate-700">
+              <%= scope_name %>
+            </td>
+
+            <td class="px-4 py-4">
+              <% if status_name.present? %>
+                  <span class="inline-flex rounded-md bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">
+                    <%= status_name.humanize %>
+                  </span>
+              <% else %>
+                <span class="text-slate-400">Not provided</span>
+              <% end %>
+
+              <% if workflow_state.present? %>
+                <div class="mt-1 text-xs text-slate-500">
+                  Workflow: <%= workflow_state.humanize %>
+                </div>
+              <% end %>
+            </td>
+
+            <td class="px-4 py-4">
+              <% if health_number %>
+                <div class="font-semibold tabular-nums <%= health_number < 50 ? 'text-rose-700' : 'text-slate-800' %>">
+                  <%= number_with_precision(health_number, precision: 1, strip_insignificant_zeros: true) %>
+                </div>
+
+                <div class="mt-1 h-1.5 w-20 overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    class="h-full rounded-full <%= health_number < 50 ? 'bg-rose-500' : 'bg-emerald-500' %>"
+                    style="width: <%= [[health_number, 0].max, 100].min %>%"
+                  ></div>
+                </div>
+              <% else %>
+                <span class="text-xs text-slate-400">Not provided</span>
+              <% end %>
+            </td>
+
+            <td class="px-4 py-4">
+              <% if connections.present? %>
+                  <span class="font-semibold tabular-nums text-slate-900">
+                    <%= connections %>
+                  </span>
+              <% else %>
+                  <span class="text-xs text-slate-500">
+                    Not provided
+                  </span>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <div
+      class="hidden border-t border-slate-200 px-5 py-10 text-center"
+      data-intelligence-table-target="empty"
+    >
+      <h3 class="font-semibold text-slate-900">
+        No matching entities
+      </h3>
+
+      <p class="mt-1 text-sm text-slate-600">
+        Try a different search term or clear the status filter.
+      </p>
+    </div>
+  <% else %>
+    <div class="px-5 py-12 text-center">
+      <h3 class="font-semibold text-slate-900">
+        No graph entities available
+      </h3>
+
+      <p class="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-600">
+        The graph service returned no nodes. This table displays graph nodes,
+        not an independent database query. Check the graph service before
+        concluding that the registry itself is empty.
+      </p>
+
+      <%= link_to(
+            "Open entity registry",
+            "/admin/ecosystems/load_sources/entities",
+            class: "mt-4 inline-flex items-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+          ) %>
+    </div>
+  <% end %>
+</section>

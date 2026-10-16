@@ -1,0 +1,80 @@
+
+<% status = workspace.status.to_s %>
+<% status_class =
+     case status
+     when "active" then "active"
+     when "completed" then "completed"
+     when "archived" then "archived"
+     else ""
+     end %>
+
+<article class="research-command-center__card">
+  <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+    <span class="research-command-center__status research-command-center__status--<%= status_class %>">
+      <%= workspace.lifecycle_label %>
+    </span>
+
+    <% if workspace.respond_to?(:saved?) && workspace.saved? %>
+      <span class="research-command-center__muted">Saved</span>
+    <% end %>
+  </div>
+
+  <h3 class="research-command-center__card-title">
+    <%= link_to workspace.title,
+                url_for(action: :show, id: workspace.id),
+                class: "text-decoration-none" %>
+  </h3>
+
+  <% if workspace.respond_to?(:slug) && workspace.slug.present? %>
+    <p class="research-command-center__muted">
+      Reference: <%= workspace.slug %>
+    </p>
+  <% end %>
+
+  <div class="d-flex flex-wrap gap-3 my-3">
+    <span class="research-command-center__muted">
+      <strong><%= workspace.items.count %></strong> items
+    </span>
+
+    <span class="research-command-center__muted">
+      <strong><%= workspace.completed_items_count %></strong> completed
+    </span>
+
+    <span class="research-command-center__muted">
+      <strong><%= workspace.progress %>%</strong> progress
+    </span>
+  </div>
+
+  <div class="research-command-center__muted mb-3">
+    Updated <%= l(workspace.updated_at, format: :short) %>
+  </div>
+
+  <div class="d-flex flex-wrap gap-2">
+    <%= link_to(
+          status == "completed" ? "Review investigation" : "Continue investigation",
+          url_for(action: :show, id: workspace.id),
+          class: "research-command-center__button research-command-center__button--primary"
+        ) %>
+
+    <% if status == "archived" || status == "completed" %>
+      <%= button_to(
+            "Reopen",
+            url_for(action: :reopen, id: workspace.id),
+            method: :patch,
+            class: "research-command-center__button"
+          ) %>
+    <% elsif status == "active" %>
+      <%= button_to(
+            "Archive",
+            url_for(action: :archive, id: workspace.id),
+            method: :patch,
+            class: "research-command-center__button",
+            form: {
+              data: {
+                turbo_confirm: "Archive this investigation?"
+              }
+            }
+          ) %>
+    <% end %>
+  </div>
+</article>

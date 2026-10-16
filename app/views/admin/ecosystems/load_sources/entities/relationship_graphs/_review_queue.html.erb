@@ -1,0 +1,42 @@
+
+<%
+  diagnostics = local_assigns[:diagnostics] || {}
+  queue = diagnostics[:review_queue] || diagnostics["review_queue"] || []
+  queue = [] unless queue.is_a?(Array)
+%>
+
+<section class="rounded-[26px] border border-amber-200 bg-white p-5 shadow-sm sm:p-7"
+         aria-labelledby="review-queue-heading">
+
+  <p class="text-[10px] font-black uppercase tracking-[0.18em] text-amber-700">Human verification</p>
+  <h2 id="review-queue-heading" class="mt-1 text-lg font-black text-slate-900">Relationship review queue</h2>
+  <p class="mt-2 text-sm leading-6 text-slate-500">
+    Review candidate connections against evidence before treating them as trusted relationships.
+  </p>
+
+  <% if queue.any? %>
+    <ul class="mt-5 space-y-3">
+      <% queue.each do |raw_item| %>
+        <%
+          item = raw_item.respond_to?(:to_h) ? raw_item.to_h : {}
+          title = item[:title] || item["title"] || item[:relationship_name] || item["relationship_name"] || "Relationship awaiting review"
+          description = item[:description] || item["description"] || item[:reason] || item["reason"]
+          state = item[:state] || item["state"] || "Suggested"
+        %>
+        <li class="rounded-xl border border-slate-200 p-4">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <p class="text-sm font-bold text-slate-800"><%= title %></p>
+            <span class="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-800"><%= state.to_s.humanize %></span>
+          </div>
+          <% if description.present? %>
+            <p class="mt-2 text-xs leading-6 text-slate-500"><%= description %></p>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="mt-5 rounded-xl border border-dashed border-slate-200 p-5 text-sm leading-6 text-slate-500">
+      No review items were supplied. This display does not create a review queue or change relationship states.
+    </p>
+  <% end %>
+</section>

@@ -1,0 +1,102 @@
+
+<%# Research workspace summary metrics %>
+
+<%
+  progress = summary[:progress].to_f
+  items = summary[:items].to_i
+  completed_items = summary[:completed_items].to_i
+  evidence = summary[:evidence].to_i
+  verified_evidence = summary[:verified_evidence].to_i
+  research_strength = summary[:research_strength].to_f
+  evidence_coverage = summary[:evidence_coverage].to_f
+
+  progress = progress.clamp(0, 100)
+  research_strength = research_strength.clamp(0, 100)
+  evidence_coverage = evidence_coverage.clamp(0, 100)
+%>
+
+<div class="grid grid-cols-2 gap-3 md:grid-cols-4">
+
+  <%# Progress %>
+  <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-600">
+      Progress
+    </div>
+
+    <div class="mt-2 text-2xl font-black text-white">
+      <%= progress.round %>%
+    </div>
+  </div>
+
+  <%# Items %>
+  <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-600">
+      Items
+    </div>
+
+    <div class="mt-2 text-2xl font-black text-white">
+      <%= items %>
+    </div>
+
+    <div class="mt-1 text-xs text-slate-600">
+      <%= completed_items %> completed
+    </div>
+  </div>
+
+  <%# Evidence %>
+  <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-600">
+      Evidence
+    </div>
+
+    <div class="mt-2 text-2xl font-black text-white">
+      <%= evidence %>
+    </div>
+
+    <div class="mt-1 text-xs text-slate-600">
+      <%= verified_evidence %> verified
+    </div>
+  </div>
+
+  <%# Research strength %>
+  <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-600">
+      Research strength
+    </div>
+
+    <div class="mt-2 text-2xl font-black text-violet-300">
+      <%= research_strength.round %>%
+    </div>
+  </div>
+
+</div>
+
+<%# Evidence coverage %>
+<div class="mt-4 rounded-2xl border border-white/10 bg-black/10 p-4">
+
+  <div class="flex items-center justify-between">
+    <span class="text-xs font-bold text-slate-500">
+      Evidence coverage
+    </span>
+
+    <span class="text-xs font-black text-white">
+      <%= evidence_coverage.round %>%
+    </span>
+  </div>
+
+  <div
+    class="mt-3 h-2 overflow-hidden rounded-full bg-white/5"
+    role="progressbar"
+    aria-label="Evidence coverage"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    aria-valuenow="<%= evidence_coverage.round %>">
+
+    <div
+      class="h-full rounded-full bg-orange-500 transition-all"
+      style="width: <%= evidence_coverage %>%">
+    </div>
+
+  </div>
+
+</div>

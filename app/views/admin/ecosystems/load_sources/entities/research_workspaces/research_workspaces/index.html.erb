@@ -1,0 +1,440 @@
+<%# frozen_string_literal: true %>
+<%#
+  Research Workspaces — Admin Dashboard
+
+  View:
+    app/views/admin/ecosystems/load_sources/entities/research_workspaces/research_workspaces/index.html.erb
+
+  Expected controller variables:
+    @workspaces
+    @active_workspaces
+    @completed_workspaces
+    @archived_workspaces
+    @active_count
+    @completed_count
+    @archived_count
+    @collection_count
+    @query
+    @status
+
+  Expected partials in this directory:
+    _workspace_card.html.erb
+    _pagination.html.erb
+    administrator_help.html.erb
+    workflow_reference.html.erb
+%>
+
+<%
+  entity_id = params[:entity_id]
+
+  workspace_collection = @workspaces || []
+  active_workspaces = @active_workspaces || []
+  completed_workspaces = @completed_workspaces || []
+  archived_workspaces = @archived_workspaces || []
+
+  search_query = @query || params[:q]
+  selected_status = @status || params[:status].to_s
+
+  index_url = admin_ecosystems_load_sources_entity_research_workspaces_path(
+    entity_id: entity_id
+  )
+
+  new_workspace_url =
+    new_admin_ecosystems_load_sources_entity_research_workspace_path(
+      entity_id: entity_id
+    )
+%>
+
+<div class="mx-auto my-8 max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
+
+  <%# ================================================================ %>
+  <%# HEADER                                                           %>
+  <%# ================================================================ %>
+
+  <section class="overflow-hidden rounded-[32px] border-2 border-orange-100
+                  bg-gradient-to-b from-white via-orange-50/30 to-slate-50/80
+                  shadow-xl shadow-orange-100/40">
+
+    <div class="border-b border-orange-100 px-6 py-8 sm:px-8 lg:px-10">
+
+      <div class="flex flex-col gap-6 lg:flex-row lg:items-center
+                  lg:justify-between">
+
+        <div class="flex items-start gap-4">
+
+          <div class="flex h-14 w-14 shrink-0 items-center justify-center
+                      rounded-[22px] border border-orange-200
+                      bg-gradient-to-br from-orange-100 to-amber-50
+                      text-2xl shadow-md"
+               aria-hidden="true">
+            🔬
+          </div>
+
+          <div>
+            <p class="text-xs font-black uppercase tracking-[0.2em]
+                      text-orange-600">
+              Research administration
+            </p>
+
+            <h1 class="mt-2 text-3xl font-black tracking-tight text-slate-800
+                       sm:text-4xl">
+              Saved investigations
+            </h1>
+
+            <p class="mt-3 max-w-2xl text-sm leading-7 text-slate-500">
+              Organize research, preserve investigation context, review
+              supporting evidence, and return to saved work whenever needed.
+            </p>
+          </div>
+
+        </div>
+
+        <%= link_to new_workspace_url,
+                    class: "inline-flex min-h-12 shrink-0 items-center
+                            justify-center gap-2 rounded-2xl
+                            border-2 border-orange-300
+                            bg-gradient-to-r from-orange-500 to-amber-500
+                            px-6 py-3 text-sm font-black text-white
+                            shadow-md shadow-orange-200/60 transition
+                            hover:-translate-y-0.5 hover:from-orange-600
+                            hover:to-amber-600 focus:outline-none
+                            focus:ring-4 focus:ring-orange-200" do %>
+          <span aria-hidden="true">＋</span>
+          Create workspace
+        <% end %>
+
+      </div>
+
+      <div class="mt-7 grid gap-3 md:grid-cols-3">
+
+        <div class="rounded-2xl border border-orange-200
+                    bg-orange-50 p-4">
+          <div class="text-sm font-black text-orange-800">
+            ⚡ Continue
+          </div>
+
+          <p class="mt-2 text-xs leading-6 text-slate-600">
+            Resume active investigations and continue unfinished research.
+          </p>
+        </div>
+
+        <div class="rounded-2xl border border-emerald-200
+                    bg-emerald-50 p-4">
+          <div class="text-sm font-black text-emerald-800">
+            ✓ Review
+          </div>
+
+          <p class="mt-2 text-xs leading-6 text-slate-600">
+            Revisit completed investigations and consult saved findings.
+          </p>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200
+                    bg-slate-50 p-4">
+          <div class="text-sm font-black text-slate-700">
+            ▣ Retrieve
+          </div>
+
+          <p class="mt-2 text-xs leading-6 text-slate-600">
+            Find archived investigations retained for future reference.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <%# ================================================================ %>
+  <%# METRICS                                                          %>
+  <%# ================================================================ %>
+
+  <section aria-labelledby="workspace-metrics-heading">
+
+    <div class="mb-5">
+      <h2 id="workspace-metrics-heading"
+          class="text-xl font-black text-slate-800">
+        Workspace overview
+      </h2>
+
+      <p class="mt-2 text-sm leading-6 text-slate-500">
+        Counts are supplied by the controller. They should represent
+        the authorized workspace scope rather than only the current page.
+      </p>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+
+      <%
+        metric_cards = [
+          {
+            label: "Active investigations",
+            count: @active_count || active_workspaces.size,
+            description: "Available to continue",
+            classes: "border-orange-200 bg-orange-50/70"
+          },
+          {
+            label: "Completed investigations",
+            count: @completed_count || completed_workspaces.size,
+            description: "Marked as completed",
+            classes: "border-emerald-200 bg-emerald-50/70"
+          },
+          {
+            label: "Archived investigations",
+            count: @archived_count || archived_workspaces.size,
+            description: "Retained for reference",
+            classes: "border-slate-200 bg-slate-50"
+          },
+          {
+            label: "Collection memberships",
+            count: @collection_count || 0,
+            description: "Reported by the controller",
+            classes: "border-sky-200 bg-sky-50/70"
+          }
+        ]
+      %>
+
+      <% metric_cards.each do |metric| %>
+
+        <div class="rounded-2xl border-2 p-5 shadow-sm
+                    <%= metric[:classes] %>">
+
+          <p class="text-xs font-black uppercase tracking-wide text-slate-600">
+            <%= metric[:label] %>
+          </p>
+
+          <p class="mt-3 text-4xl font-black tabular-nums text-slate-800">
+            <%= number_with_delimiter(metric[:count]) %>
+          </p>
+
+          <p class="mt-2 text-xs leading-5 text-slate-500">
+            <%= metric[:description] %>
+          </p>
+
+        </div>
+
+      <% end %>
+
+    </div>
+
+  </section>
+
+  <%# ================================================================ %>
+  <%# SEARCH AND FILTERS                                                %>
+  <%# ================================================================ %>
+
+  <section class="rounded-[28px] border-2 border-orange-100
+                  bg-white p-5 shadow-sm sm:p-7"
+           aria-labelledby="workspace-search-heading">
+
+    <div class="mb-5">
+      <h2 id="workspace-search-heading"
+          class="text-xl font-black text-slate-800">
+        Find an investigation
+      </h2>
+
+      <p class="mt-2 text-sm leading-6 text-slate-500">
+        Search by title or slug and optionally filter by lifecycle status.
+      </p>
+    </div>
+
+    <%= form_with url: index_url,
+                  method: :get,
+                  local: true,
+                  class: "grid grid-cols-1 gap-4
+                          lg:grid-cols-[minmax(0,1fr)_220px_auto_auto]
+                          lg:items-end" do |form| %>
+
+      <div>
+        <%= form.label :q,
+                       "Search workspaces",
+                       class: "mb-2 block text-sm font-bold text-slate-700" %>
+
+        <%= form.search_field :q,
+                              value: search_query,
+                              placeholder: "Enter a title or slug...",
+                              class: "min-h-12 w-full rounded-xl border-2
+                                      border-slate-200 bg-white px-4 py-3
+                                      text-sm text-slate-800
+                                      placeholder:text-slate-400
+                                      focus:border-orange-400
+                                      focus:outline-none
+                                      focus:ring-2 focus:ring-orange-100" %>
+      </div>
+
+      <div>
+        <%= form.label :status,
+                       "Lifecycle status",
+                       class: "mb-2 block text-sm font-bold text-slate-700" %>
+
+        <%= form.select :status,
+                        [
+                          ["All statuses", ""],
+                          ["Active", "active"],
+                          ["Completed", "completed"],
+                          ["Archived", "archived"]
+                        ],
+                        { selected: selected_status },
+                        class: "min-h-12 w-full rounded-xl border-2
+                                border-slate-200 bg-white px-3 py-3
+                                text-sm text-slate-800
+                                focus:border-orange-400
+                                focus:outline-none
+                                focus:ring-2 focus:ring-orange-100" %>
+      </div>
+
+      <%= form.submit "Apply filters",
+                      class: "min-h-12 cursor-pointer rounded-xl
+                              border-2 border-orange-200 bg-orange-500
+                              px-5 py-3 text-sm font-bold text-white
+                              transition hover:bg-orange-600" %>
+
+      <%= link_to "Clear filters",
+                  index_url,
+                  class: "inline-flex min-h-12 items-center justify-center
+                          rounded-xl border-2 border-slate-200 bg-white
+                          px-5 py-3 text-sm font-bold text-slate-700
+                          transition hover:bg-slate-50" %>
+
+    <% end %>
+
+    <p class="mt-4 text-xs leading-5 text-slate-500">
+      Displaying
+      <strong><%= number_with_delimiter(workspace_collection.size) %></strong>
+      workspace records in the current result set.
+    </p>
+
+  </section>
+
+  <%# ================================================================ %>
+  <%# WORKSPACE RESULTS                                                 %>
+  <%# ================================================================ %>
+
+  <section aria-labelledby="workspace-results-heading">
+
+    <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end
+                sm:justify-between">
+
+      <div>
+        <h2 id="workspace-results-heading"
+            class="text-2xl font-black text-slate-800">
+          Investigations
+        </h2>
+
+        <p class="mt-2 text-sm leading-6 text-slate-500">
+          Open a workspace to review its items, evidence, recommendations,
+          annotations, and investigation history.
+        </p>
+      </div>
+
+      <span class="w-fit rounded-full border border-orange-200
+                   bg-orange-50 px-4 py-2 text-xs font-bold text-orange-700">
+        Latest updates first
+      </span>
+
+    </div>
+
+    <% if workspace_collection.any? %>
+
+      <div class="grid grid-cols-1 gap-5 xl:grid-cols-2">
+
+        <%= render partial: "workspace_card",
+                   collection: workspace_collection,
+                   as: :workspace,
+                   locals: { entity_id: entity_id } %>
+
+      </div>
+
+    <% else %>
+
+      <div class="rounded-[28px] border-2 border-dashed
+                  border-orange-200 bg-orange-50/40
+                  px-6 py-12 text-center">
+
+        <div class="text-4xl" aria-hidden="true">
+          🔬
+        </div>
+
+        <h3 class="mt-4 text-xl font-black text-slate-800">
+          No matching investigations
+        </h3>
+
+        <p class="mx-auto mt-3 max-w-xl text-sm leading-7 text-slate-500">
+          No workspace records were returned for the current search and
+          filters. Clear the filters or create a workspace to get started.
+        </p>
+
+        <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
+
+          <%= link_to "Clear filters",
+                      index_url,
+                      class: "inline-flex min-h-11 items-center
+                              justify-center rounded-xl border-2
+                              border-slate-200 bg-white px-5 py-3
+                              text-sm font-bold text-slate-700
+                              hover:bg-slate-50" %>
+
+          <%= link_to "Create workspace",
+                      new_workspace_url,
+                      class: "inline-flex min-h-11 items-center
+                              justify-center rounded-xl bg-orange-500
+                              px-5 py-3 text-sm font-bold text-white
+                              hover:bg-orange-600" %>
+
+        </div>
+
+      </div>
+
+    <% end %>
+
+  </section>
+
+  <%# ================================================================ %>
+  <%# PAGINATION                                                        %>
+  <%# ================================================================ %>
+
+  <section aria-label="Workspace pagination">
+    <%= render "pagination" %>
+  </section>
+
+  <%# ================================================================ %>
+  <%# ADMINISTRATOR REFERENCE                                           %>
+  <%# ================================================================ %>
+
+  <section class="rounded-[28px] border-2 border-orange-100
+                  bg-gradient-to-r from-orange-50/70 via-white
+                  to-emerald-50/40 p-6 sm:p-7">
+
+    <div class="flex items-start gap-4">
+
+      <div class="flex h-12 w-12 shrink-0 items-center justify-center
+                  rounded-2xl border border-orange-200
+                  bg-orange-100 text-xl"
+           aria-hidden="true">
+        💡
+      </div>
+
+      <div>
+        <h2 class="text-xl font-black text-slate-800">
+          Administrator reference
+        </h2>
+
+        <p class="mt-2 text-sm leading-7 text-slate-600">
+          Evidence records preserve supporting material. Annotations capture
+          observations, interpretations, questions, or disagreements.
+          Provenance helps trace the origin of a research item or conclusion.
+          Interpret lifecycle status according to the application's actual
+          workflow and authorization rules.
+        </p>
+      </div>
+
+    </div>
+
+  </section>
+
+</div>
+
+<%= render "admin/ecosystems/load_sources/entities/research_workspaces/research_workspaces/administrator_help" %>
+
+<%= render "admin/ecosystems/load_sources/entities/research_workspaces/research_workspaces/workflow_reference" %>

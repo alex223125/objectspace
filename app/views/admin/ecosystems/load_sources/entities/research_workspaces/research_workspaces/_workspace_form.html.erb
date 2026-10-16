@@ -1,0 +1,118 @@
+<% workspace = local_assigns.fetch(:workspace) %>
+
+<section class="mx-auto my-8 max-w-3xl rounded-[32px]
+                border-2 border-orange-100
+                bg-gradient-to-b from-white via-orange-50/20 to-slate-50/50
+                p-6 shadow-md shadow-orange-100/30 sm:p-8">
+
+  <div class="mb-7 flex items-center gap-4 border-b-2
+              border-orange-100 pb-5">
+
+    <div class="flex h-12 w-12 items-center justify-center
+                rounded-2xl border border-orange-200
+                bg-orange-100/70 text-xl shadow-sm">
+      🔬
+    </div>
+
+    <div>
+      <h1 class="text-lg font-black text-slate-800">
+        <%= workspace.persisted? ? "Edit investigation" : "Create investigation" %>
+      </h1>
+
+      <p class="mt-1 text-xs leading-5 text-slate-400">
+        Define the research objective and preserve the context
+        needed for your investigation.
+      </p>
+    </div>
+
+  </div>
+
+  <%= form_with model: workspace,
+        local: true,
+        class: "space-y-6" do |form| %>
+
+    <% if workspace.errors.any? %>
+      <div role="alert"
+           class="rounded-2xl border-2 border-rose-200
+                  bg-rose-50 p-4 text-sm text-rose-700">
+
+        <p class="font-black">
+          Please correct the following errors.
+        </p>
+
+        <ul class="mt-2 list-inside list-disc text-xs leading-6">
+          <% workspace.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+
+      </div>
+    <% end %>
+
+    <div>
+      <%= form.label :title,
+            class: "mb-2 block text-[10px] font-black
+                    uppercase tracking-wider text-slate-500" %>
+
+      <%= form.text_field :title,
+            required: true,
+            maxlength: 255,
+            placeholder: "e.g. Competitive algorithm investigation",
+            class: "w-full rounded-2xl border-2 border-orange-100
+                    bg-white px-4 py-3 text-sm text-slate-700
+                    outline-none transition placeholder:text-slate-300
+                    focus:border-orange-300 focus:ring-4
+                    focus:ring-orange-100/60" %>
+    </div>
+
+    <div>
+      <%= form.label :summary,
+            class: "mb-2 block text-[10px] font-black
+                    uppercase tracking-wider text-slate-500" %>
+
+      <%= form.text_area :summary,
+            rows: 5,
+            placeholder: "What are you investigating? What is unknown? What evidence would change your conclusion?",
+            class: "w-full resize-y rounded-2xl border-2
+                    border-orange-100 bg-white px-4 py-3
+                    text-sm leading-6 text-slate-700 outline-none
+                    placeholder:text-slate-300 focus:border-orange-300
+                    focus:ring-4 focus:ring-orange-100/60" %>
+    </div>
+
+    <div class="rounded-2xl border border-orange-100
+                bg-orange-50/50 p-4">
+      <p class="text-xs font-black text-slate-700">
+        Research workflow
+      </p>
+      <p class="mt-1 text-xs leading-6 text-slate-400">
+        New investigations are created as active workspaces by
+        the existing controller. Add research items and source
+        evidence after saving.
+      </p>
+    </div>
+
+    <div class="flex flex-wrap gap-3 border-t border-orange-100 pt-5">
+
+      <%= form.submit(
+            workspace.persisted? ? "Save changes" : "Create investigation",
+            class: "rounded-2xl border-2 border-orange-200
+                    bg-gradient-to-r from-orange-400 to-amber-400
+                    px-5 py-3 text-xs font-black text-white
+                    shadow-md shadow-orange-200/50
+                    transition hover:-translate-y-0.5
+                    hover:from-orange-500 hover:to-amber-500
+                    focus:outline-none focus:ring-4 focus:ring-orange-200"
+          ) %>
+
+      <%= link_to "Cancel",
+            local_assigns.fetch(:cancel_url, request.path),
+            class: "rounded-2xl border border-slate-200
+                    bg-white px-5 py-3 text-xs font-bold
+                    text-slate-600 hover:bg-slate-50" %>
+
+    </div>
+
+  <% end %>
+
+</section>

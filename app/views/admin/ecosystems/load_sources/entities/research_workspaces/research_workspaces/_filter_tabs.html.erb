@@ -1,0 +1,21 @@
+
+<nav aria-label="Filter investigations" class="flex flex-wrap gap-2">
+  <% [
+       ["all", "All"],
+       ["active", "Active"],
+       ["completed", "Completed"],
+       ["archived", "Archived"]
+     ].each do |value, label| %>
+
+    <%= link_to label,
+                url_for(
+                  action: :saved,
+                  entity_id: params[:entity_id],
+                  filter: value,
+                  q: @search_query.presence
+                ),
+                aria: { current: (@filter == value ? "page" : nil) },
+                class: "rounded-full border px-4 py-2 text-sm font-bold transition #{@filter == value ? 'border-orange-500 bg-orange-500/10 text-orange-700 dark:text-orange-300' : 'border-slate-200 text-slate-600 hover:bg-slate-100 dark:border-white/10 dark:text-slate-300 dark:hover:bg-white/5'}" %>
+
+  <% end %>
+</nav>

@@ -1,0 +1,35 @@
+
+<% total_pages = (@filtered_investigation_count.to_f / @investigation_per_page).ceil %>
+
+<% if total_pages > 1 %>
+  <nav class="mt-8 flex flex-col gap-4 rounded-3xl border-2 border-orange-100 bg-white p-5 sm:flex-row sm:items-center sm:justify-between"
+       aria-label="Investigation pages">
+
+    <p class="text-base leading-7 text-slate-600">
+      Page <strong class="text-slate-800"><%= @investigation_page %></strong>
+      of <strong class="text-slate-800"><%= total_pages %></strong>
+    </p>
+
+    <div class="flex flex-wrap gap-3">
+      <% if @investigation_page > 1 %>
+        <%= link_to "← Previous",
+                    url_for(
+                      request.query_parameters.merge(
+                        page: @investigation_page - 1
+                      )
+                    ),
+                    class: "rounded-xl border-2 border-orange-200 bg-orange-50 px-5 py-3 text-base font-bold text-orange-800 hover:bg-orange-100" %>
+      <% end %>
+
+      <% if @investigation_page < total_pages %>
+        <%= link_to "Next →",
+                    url_for(
+                      request.query_parameters.merge(
+                        page: @investigation_page + 1
+                      )
+                    ),
+                    class: "rounded-xl border-2 border-orange-200 bg-orange-50 px-5 py-3 text-base font-bold text-orange-800 hover:bg-orange-100" %>
+      <% end %>
+    </div>
+  </nav>
+<% end %>

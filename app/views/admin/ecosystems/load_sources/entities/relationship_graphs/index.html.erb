@@ -1,0 +1,168 @@
+
+<%# Main content rendered inside entity_templates_layout via locals: { content: content } %>
+
+<%
+  graph = @graph.respond_to?(:to_h) ? @graph.to_h : {}
+  nodes = graph[:nodes] || graph["nodes"] || []
+  edges = graph[:edges] || graph["edges"] || []
+
+  nodes = [] unless nodes.is_a?(Array)
+  edges = [] unless edges.is_a?(Array)
+
+  metrics = @metrics.respond_to?(:to_h) ? @metrics.to_h : {}
+  diagnostics = @diagnostics.respond_to?(:to_h) ? @diagnostics.to_h : {}
+  candidates = @candidates.is_a?(Array) ? @candidates : []
+
+  graph_loaded = !@graph_failed
+%>
+
+<div
+  class="mx-auto max-w-[1600px] space-y-7 px-4 py-6 sm:px-6 lg:px-8"
+  data-controller="
+    relationship-graph
+    graph-tooltips
+    graph-keyboard
+    graph-accessibility
+    graph-manual
+    graph-search
+    graph-export
+    guided-tour
+    graph-presentation
+  "
+  data-relationship-graph-target="workspace"
+>
+
+  <header class="overflow-hidden rounded-[30px] border-2 border-orange-100 bg-gradient-to-br from-white via-orange-50/50 to-slate-50 shadow-sm shadow-orange-100/50">
+    <div class="flex flex-col gap-6 p-6 sm:p-8 xl:flex-row xl:items-center xl:justify-between">
+      <div class="flex items-start gap-4">
+        <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-[22px] border border-orange-200 bg-orange-100 text-2xl shadow-sm">
+          🌍
+        </div>
+
+        <div>
+          <p class="text-[10px] font-black uppercase tracking-[0.2em] text-orange-600">
+            Administrator field station
+          </p>
+          <h1 id="relationship-graph-title" class="mt-1 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">
+            Ecosystem Intelligence Graph
+          </h1>
+          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+            Explore entities, trace relationships, inspect evidence, and understand how your ecosystem's knowledge is connected.
+          </p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <span class="rounded-full border border-orange-200 bg-orange-50 px-3 py-2 text-xs font-bold text-orange-700"
+              data-tooltip="This describes the graph workspace, not a guarantee that the background data is up to date.">
+          ✦ Intelligence workspace
+        </span>
+
+        <button type="button"
+                class="rounded-xl border border-orange-200 bg-white px-4 py-2.5 text-sm font-black text-orange-700 transition hover:bg-orange-50"
+                data-action="click->graph-manual#open"
+                data-tooltip="Jump to the beginner field manual for explanations of nodes, edges, filters, evidence, and diagnostics.">
+          📖 Field manual
+        </button>
+      </div>
+    </div>
+
+    <div class="grid gap-px border-t border-orange-100 bg-orange-100 sm:grid-cols-3">
+      <div class="bg-white/80 p-4 sm:px-6">
+        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Nodes returned</p>
+        <p class="mt-1 text-2xl font-black text-slate-900"><%= number_with_delimiter(nodes.size) %></p>
+        <p class="mt-1 text-xs text-slate-500">Entities in this response</p>
+      </div>
+      <div class="bg-white/80 p-4 sm:px-6">
+        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Edges returned</p>
+        <p class="mt-1 text-2xl font-black text-slate-900"><%= number_with_delimiter(edges.size) %></p>
+        <p class="mt-1 text-xs text-slate-500">Relationships in this response</p>
+      </div>
+      <div class="bg-white/80 p-4 sm:px-6">
+        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Request status</p>
+        <p class="mt-1 text-2xl font-black <%= graph_loaded ? 'text-emerald-700' : 'text-red-700' %>">
+          <%= graph_loaded ? "Rendered" : "Failed" %>
+        </p>
+        <p class="mt-1 text-xs text-slate-500">
+          <%= graph_loaded ? "Inspect the data below" : "Review the server logs" %>
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <% if flash[:alert].present? %>
+    <div class="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900"
+         role="alert">
+      <strong class="font-black">Administrator notice:</strong>
+      <%= flash[:alert] %>
+    </div>
+  <% end %>
+
+  <%= render "metrics", metrics: metrics %>
+
+  <section class="rounded-[28px] border border-orange-100 bg-white p-5 shadow-sm sm:p-7"
+           aria-labelledby="graph-explorer-heading">
+    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <div>
+        <p class="text-[10px] font-black uppercase tracking-[0.18em] text-orange-600">Explore and inspect</p>
+        <h2 id="graph-explorer-heading" class="mt-1 text-xl font-black text-slate-900">Graph explorer</h2>
+        <p class="mt-2 text-sm leading-6 text-slate-500">
+          Search the returned entities, refine the request, and inspect how the graph is represented.
+        </p>
+      </div>
+      <span class="w-fit rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-600"
+            data-relationship-graph-target="status"
+            aria-live="polite">
+        Ready
+      </span>
+    </div>
+
+    <%= render "graph_toolbar" %>
+    <%= render "filter_drawer" %>
+    <%= render "graph_legend" %>
+
+    <% if graph_loaded && nodes.any? %>
+      <%= render "graph_canvas", graph: graph %>
+    <% elsif graph_loaded %>
+      <%= render "empty_state" %>
+    <% else %>
+      <%= render "error_state" %>
+    <% end %>
+  </section>
+
+  <section class="space-y-5" aria-label="Relationship details">
+    <%= render "edge_table", edges: edges, nodes: nodes %>
+    <%= render "candidate_connections", candidates: candidates %>
+  </section>
+
+  <section class="space-y-5" aria-label="Graph diagnostics">
+    <%= render "diagnostics",
+               diagnostics: diagnostics,
+               metrics: metrics,
+               graph_loaded: graph_loaded %>
+
+    <%= render "coverage_report",
+               diagnostics: diagnostics,
+               metrics: metrics %>
+
+    <%= render "health_report", diagnostics: diagnostics %>
+  </section>
+
+  <section class="space-y-5" aria-label="Graph history">
+    <%= render "provenance_timeline" %>
+    <%= render "change_feed" %>
+    <%= render "review_queue" %>
+  </section>
+
+  <section class="space-y-5" aria-label="Learning and presentation">
+    <%= render "encyclopedia" %>
+    <%= render "guided_tour" %>
+    <%= render "presentation_mode" %>
+    <%= render "keyboard_shortcuts" %>
+    <%= render "metric_explainer" %>
+    <%= render "field_manual" %>
+  </section>
+
+  <%= render "loading_state" %>
+  <%= render "confirmation_dialog" %>
+</div>

@@ -1,0 +1,321 @@
+<%# app/views/admin/ecosystems/load_sources/entities/research_collections/research_collections/edit.html.erb %>
+
+<% entity_id = params[:entity_id] %>
+<% collection_id = @collection.id %>
+
+<% collection_path =
+     admin_ecosystems_load_sources_entity_research_collections_path(
+       entity_id: entity_id
+     ) %>
+
+<% collection_member_path =
+     admin_ecosystems_load_sources_entity_research_collection_path(
+       entity_id: entity_id,
+       id: collection_id
+     ) %>
+
+<% panel_class = "rounded-3xl border-2 border-orange-100 bg-white p-6 shadow-sm shadow-orange-100/40 sm:p-8" %>
+<% label_class = "mb-2 block text-sm font-bold text-slate-700" %>
+<% field_class = "w-full rounded-xl border-2 border-orange-100 bg-white px-4 py-3 text-base text-slate-800 placeholder:text-slate-400 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100" %>
+<% primary_button_class = "inline-flex cursor-pointer items-center justify-center rounded-xl border-2 border-orange-300 bg-gradient-to-r from-orange-400 to-amber-400 px-6 py-3 text-sm font-black text-white shadow-sm transition hover:-translate-y-0.5 hover:from-orange-500 hover:to-amber-500" %>
+<% secondary_button_class = "inline-flex items-center justify-center rounded-xl border-2 border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-600 transition hover:bg-slate-50" %>
+
+<% statuses = [
+  ["Active", "active"],
+  ["Completed", "completed"],
+  ["Archived", "archived"]
+] %>
+
+<% colors = [
+  ["Orange", "orange"],
+  ["Blue", "blue"],
+  ["Green", "green"],
+  ["Purple", "purple"],
+  ["Red", "red"],
+  ["Amber", "amber"],
+  ["Slate", "slate"]
+] %>
+
+<div class="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
+
+  <%# Header %>
+
+  <header class="mb-8">
+
+    <%= link_to collection_member_path,
+                class: "inline-flex items-center gap-2 text-sm font-bold text-orange-700 transition hover:text-orange-900 hover:underline" do %>
+      <span aria-hidden="true">←</span>
+      <span><%= @collection.title.presence || "Research collection" %></span>
+    <% end %>
+
+    <div class="mt-6 flex items-start gap-4">
+
+      <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border-2 border-orange-200 bg-orange-50 text-2xl">
+        ✏️
+      </div>
+
+      <div class="min-w-0 flex-1">
+
+        <h1 class="break-words text-3xl font-black tracking-tight text-slate-800 sm:text-4xl">
+          Edit research collection
+        </h1>
+
+        <p class="mt-3 text-base leading-7 text-slate-600">
+          Update the collection title, description, status, appearance and organization.
+        </p>
+
+        <p class="mt-2 text-sm font-semibold text-slate-400">
+          Collection #<%= collection_id %>
+        </p>
+
+      </div>
+
+    </div>
+
+  </header>
+
+  <%# Validation errors %>
+
+  <% if @collection.errors.any? %>
+
+    <div class="mb-6 rounded-2xl border-2 border-rose-200 bg-rose-50 p-5"
+         role="alert"
+         aria-live="polite">
+
+      <h2 class="text-base font-black text-rose-800">
+        Please correct the following errors:
+      </h2>
+
+      <ul class="mt-3 list-inside list-disc space-y-1 text-sm leading-6 text-rose-700">
+
+        <% @collection.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+
+      </ul>
+
+    </div>
+
+  <% end %>
+
+  <%# Edit form %>
+
+  <section class="<%= panel_class %>">
+
+    <%= form_with(
+          model: @collection,
+          url: collection_member_path,
+          method: :patch,
+          class: "space-y-6"
+        ) do |form| %>
+
+      <%# Title %>
+
+      <div>
+
+        <%= form.label :title,
+                       "Collection title",
+                       class: label_class %>
+
+        <%= form.text_field :title,
+                            required: true,
+                            autofocus: true,
+                            maxlength: 255,
+                            placeholder: "Enter a collection title",
+                            class: field_class %>
+
+      </div>
+
+      <%# Description %>
+
+      <div>
+
+        <%= form.label :description,
+                       "Description",
+                       class: label_class %>
+
+        <%= form.text_area :description,
+                           rows: 5,
+                           placeholder: "Describe the purpose of this research collection",
+                           class: field_class %>
+
+        <p class="mt-2 text-sm leading-6 text-slate-500">
+          Explain what this collection investigates and what it aims to accomplish.
+        </p>
+
+      </div>
+
+      <%# Research question %>
+
+      <div>
+
+        <%= form.label :research_question,
+                       "Research question (optional)",
+                       class: label_class %>
+
+        <%= form.text_area :research_question,
+                           rows: 3,
+                           placeholder: "What question should this collection help answer?",
+                           class: field_class %>
+
+      </div>
+
+      <%# Objective %>
+
+      <div>
+
+        <%= form.label :objective,
+                       "Primary objective (optional)",
+                       class: label_class %>
+
+        <%= form.text_area :objective,
+                           rows: 3,
+                           placeholder: "What is the primary goal of this collection?",
+                           class: field_class %>
+
+      </div>
+
+      <%# Synthesis %>
+
+      <div>
+
+        <%= form.label :synthesis,
+                       "Research synthesis (optional)",
+                       class: label_class %>
+
+        <%= form.text_area :synthesis,
+                           rows: 5,
+                           placeholder: "Summarize findings and connections across investigations.",
+                           class: field_class %>
+
+      </div>
+
+      <%# Status %>
+
+      <div>
+
+        <%= form.label :status,
+                       "Collection status",
+                       class: label_class %>
+
+        <%= form.select :status,
+                        options_for_select(statuses, @collection.status),
+                        {},
+                        class: field_class %>
+
+        <p class="mt-2 text-sm leading-6 text-slate-500">
+          Choose whether this collection is active, completed or archived.
+        </p>
+
+      </div>
+
+      <%# Color %>
+
+      <div>
+
+        <%= form.label :color,
+                       "Collection color",
+                       class: label_class %>
+
+        <%= form.select :color,
+                        options_for_select(colors, @collection.color),
+                        {},
+                        class: field_class %>
+
+      </div>
+
+      <%# Priority %>
+
+      <div>
+
+        <%= form.label :priority,
+                       "Priority",
+                       class: label_class %>
+
+        <%= form.number_field :priority,
+                              min: 0,
+                              step: 1,
+                              class: field_class %>
+
+        <p class="mt-2 text-sm leading-6 text-slate-500">
+          Use a higher number for collections that should receive more attention.
+        </p>
+
+      </div>
+
+      <%# Position %>
+
+      <div>
+
+        <%= form.label :position,
+                       "Display position",
+                       class: label_class %>
+
+        <%= form.number_field :position,
+                              min: 0,
+                              step: 1,
+                              class: field_class %>
+
+        <p class="mt-2 text-sm leading-6 text-slate-500">
+          Controls the collection's display order where position ordering is used.
+        </p>
+
+      </div>
+
+      <%# Pinned %>
+
+      <div class="rounded-2xl border-2 border-orange-100 bg-orange-50/40 p-5">
+
+        <div class="flex items-start gap-3">
+
+          <%= form.check_box :pinned,
+                             class: "mt-1 h-5 w-5 rounded border-orange-300 text-orange-600 focus:ring-orange-400" %>
+
+          <div class="min-w-0">
+
+            <%= form.label :pinned,
+                           "Pin this collection",
+                           class: "cursor-pointer text-base font-black text-slate-800" %>
+
+            <p class="mt-1 text-sm leading-6 text-slate-600">
+              Mark this collection as pinned for easier identification in your workspace.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <%# Actions %>
+
+      <div class="flex flex-col gap-3 border-t-2 border-orange-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
+
+        <%= link_to "Cancel",
+                    collection_member_path,
+                    class: secondary_button_class %>
+
+        <%= form.submit "Save changes",
+                        class: primary_button_class %>
+
+      </div>
+
+    <% end %>
+
+  </section>
+
+  <%# Footer navigation %>
+
+  <footer class="mt-6 flex flex-wrap items-center justify-between gap-3">
+
+    <%= link_to "← All research collections",
+                collection_path,
+                class: "text-sm font-bold text-slate-500 transition hover:text-orange-700 hover:underline" %>
+
+    <span class="text-xs font-semibold text-slate-400">
+      Editing collection #<%= collection_id %>
+    </span>
+
+  </footer>
+
+</div>

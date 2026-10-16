@@ -1,0 +1,68 @@
+
+<section class="rounded-[32px] border-2 border-orange-100 bg-gradient-to-b from-white via-orange-50/30 to-slate-50/60 px-6 py-12 text-center shadow-sm sm:px-10">
+  <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-[28px] border-2 border-orange-200 bg-orange-100 text-4xl shadow-sm">
+    🔎
+  </div>
+
+  <% if @investigation_search.present? || @investigation_filter != "all" %>
+    <h2 class="mt-6 text-2xl font-black text-slate-800 sm:text-3xl">
+      No matching investigations
+    </h2>
+
+    <p class="mx-auto mt-4 max-w-2xl text-lg leading-8 text-slate-600">
+      No investigations match the current search and status filters.
+      Your records have not necessarily been deleted; they may simply be
+      outside the current view.
+    </p>
+
+    <div class="mt-7">
+      <%= link_to "Clear search and filters",
+                  saved_admin_research_workspaces_path,
+                  class: "inline-flex items-center rounded-2xl border-2 border-orange-300 bg-gradient-to-r from-orange-400 to-amber-400 px-6 py-3 text-base font-black text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" %>
+    </div>
+  <% else %>
+    <h2 class="mt-6 text-2xl font-black text-slate-800 sm:text-3xl">
+      No saved investigations yet
+    </h2>
+
+    <p class="mx-auto mt-4 max-w-2xl text-lg leading-8 text-slate-600">
+      This library displays saved investigations available to your current
+      workspace scope. Start an investigation from a supported research
+      entry point, then return here to review and continue your work.
+    </p>
+
+    <div class="mx-auto mt-8 grid max-w-4xl grid-cols-1 gap-4 text-left md:grid-cols-3">
+      <div class="rounded-2xl border border-orange-100 bg-white p-5">
+        <p class="text-lg font-black text-orange-700">01 · Discover</p>
+        <p class="mt-2 text-base leading-7 text-slate-600">
+          Open an entity or another supported research entry point.
+        </p>
+      </div>
+
+      <div class="rounded-2xl border border-sky-100 bg-white p-5">
+        <p class="text-lg font-black text-sky-700">02 · Investigate</p>
+        <p class="mt-2 text-base leading-7 text-slate-600">
+          Use the application's research action to create a saved workspace.
+        </p>
+      </div>
+
+      <div class="rounded-2xl border border-emerald-100 bg-white p-5">
+        <p class="text-lg font-black text-emerald-700">03 · Return</p>
+        <p class="mt-2 text-base leading-7 text-slate-600">
+          Reopen the library to continue or review the saved work.
+        </p>
+      </div>
+    </div>
+
+    <div class="mx-auto mt-8 max-w-3xl rounded-2xl border border-amber-200 bg-amber-50 p-5 text-left">
+      <h3 class="text-lg font-black text-amber-900">
+        Administrator guidance
+      </h3>
+      <p class="mt-2 text-base leading-7 text-amber-900">
+        If you expected records here, verify that the creation action saved
+        the workspace, that the controller uses the correct owner or visitor
+        scope, and that the workspace status is recognized by this dashboard.
+      </p>
+    </div>
+  <% end %>
+</section>

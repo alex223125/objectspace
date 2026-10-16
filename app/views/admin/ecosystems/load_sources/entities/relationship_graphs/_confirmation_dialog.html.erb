@@ -1,0 +1,34 @@
+
+<dialog id="graph-confirmation-dialog"
+        class="graph-confirmation-dialog"
+        aria-labelledby="graph-confirmation-dialog-title"
+        aria-describedby="graph-confirmation-dialog-message"
+        data-controller="graph-manual"
+        data-testid="graph-confirmation-dialog">
+
+  <div class="w-full max-w-lg rounded-[26px] border border-orange-100 bg-white p-6 shadow-2xl">
+    <div class="flex items-start gap-4">
+      <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-orange-50 text-xl">?</span>
+      <div>
+        <h2 id="graph-confirmation-dialog-title" class="text-lg font-black text-slate-900">Confirm action</h2>
+        <p id="graph-confirmation-dialog-message" class="mt-2 text-sm leading-6 text-slate-500">
+          Are you sure you want to continue?
+        </p>
+      </div>
+    </div>
+
+    <div class="mt-6 flex flex-wrap justify-end gap-3">
+      <button type="button"
+              class="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50"
+              data-action="click->graph-manual#closeDialog">
+        Cancel
+      </button>
+
+      <button type="button"
+              class="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-bold text-white hover:bg-slate-700"
+              data-action="click->graph-manual#confirmAction">
+        Confirm
+      </button>
+    </div>
+  </div>
+</dialog>

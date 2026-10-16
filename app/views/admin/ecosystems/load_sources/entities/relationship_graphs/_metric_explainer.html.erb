@@ -1,0 +1,28 @@
+
+<section class="rounded-[26px] border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
+         aria-labelledby="metric-explainer-heading">
+
+  <p class="text-[10px] font-black uppercase tracking-[0.18em] text-violet-700">Analytical reference</p>
+  <h2 id="metric-explainer-heading" class="mt-1 text-lg font-black text-slate-900">Graph metric definitions</h2>
+  <p class="mt-2 text-sm leading-6 text-slate-500">
+    Use these definitions to understand the measures. Their exact calculation depends on your graph and diagnostics services.
+  </p>
+
+  <dl class="mt-5 grid gap-3 sm:grid-cols-2">
+    <% [
+         ["Node count", "The number of entity representations included in the current graph response."],
+         ["Edge count", "The number of relationship representations included in the current response."],
+         ["Degree", "The number of incident edges associated with a node, subject to the graph's direction rules."],
+         ["Connected component", "A group of nodes connected by paths under a specified connectivity definition."],
+         ["Isolated entity", "An entity without an eligible connection in the analyzed scope."],
+         ["Centrality", "A family of measures describing structural position under a particular algorithm."],
+         ["Coverage", "The represented share of an explicitly defined population."],
+         ["Confidence", "An assessment supplied by relationship logic; its scale must be defined by the application."]
+       ].each do |term, description| %>
+      <div class="rounded-xl border border-slate-200 p-4">
+        <dt class="text-sm font-black text-slate-800"><%= term %></dt>
+        <dd class="mt-2 text-xs leading-6 text-slate-500"><%= description %></dd>
+      </div>
+    <% end %>
+  </dl>
+</section>

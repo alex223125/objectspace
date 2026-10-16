@@ -1,0 +1,98 @@
+
+<div class="mx-auto my-8 max-w-5xl px-4 sm:px-6">
+  <section class="rounded-[32px] border-2 border-orange-100 bg-gradient-to-b from-white via-orange-50/20 to-slate-50/50 p-6 shadow-md shadow-orange-100/40 sm:p-8">
+    <div class="flex items-start gap-4 border-b-2 border-orange-100 pb-6">
+      <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-orange-100 text-2xl">
+        ✏️
+      </div>
+
+      <div>
+        <p class="text-sm font-bold uppercase tracking-widest text-orange-600">
+          Investigation settings
+        </p>
+
+        <h1 class="mt-2 text-3xl font-black text-slate-800">
+          Edit research workspace
+        </h1>
+
+        <p class="mt-3 text-base leading-7 text-slate-600">
+          Update the investigation's title and description while preserving
+          the workspace identity. Explain changes to the research scope clearly
+          so other administrators can understand the current purpose.
+        </p>
+      </div>
+    </div>
+
+    <% if @workspace.errors.any? %>
+      <div role="alert" class="mt-6 rounded-2xl border-2 border-red-200 bg-red-50 p-5">
+        <h2 class="text-lg font-bold text-red-800">
+          The workspace could not be updated
+        </h2>
+
+        <ul class="mt-3 list-disc space-y-1 pl-6 text-base leading-7 text-red-700">
+          <% @workspace.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%= form_with model: @workspace,
+                  url: admin_ecosystems_load_sources_entity_research_workspace_path(
+                    entity_id: params[:entity_id],
+                    id: @workspace.id
+                  ),
+                  method: :patch,
+                  local: true,
+                  class: "mt-7 space-y-6" do |form| %>
+
+      <div>
+        <%= form.label :title, "Investigation title",
+                       class: "mb-2 block text-base font-bold text-slate-800" %>
+
+        <%= form.text_field :title,
+                            required: true,
+                            class: "min-h-12 w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-base text-slate-800 focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-100" %>
+      </div>
+
+      <% if @workspace.respond_to?(:description) %>
+        <div>
+          <%= form.label :description, "Research question and description",
+                         class: "mb-2 block text-base font-bold text-slate-800" %>
+
+          <%= form.text_area :description,
+                             rows: 7,
+                             class: "w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-base leading-7 text-slate-800 focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-100" %>
+
+          <p class="mt-2 text-sm leading-6 text-slate-500">
+            Describe the investigation scope, relevant assumptions, objectives,
+            and remaining questions. Keep conclusions distinguishable from
+            evidence and unverified hypotheses.
+          </p>
+        </div>
+      <% end %>
+
+      <div class="rounded-2xl border border-orange-100 bg-orange-50/60 p-5">
+        <h2 class="text-lg font-bold text-slate-800">Before saving</h2>
+
+        <p class="mt-2 text-base leading-7 text-slate-600">
+          Make sure the title still describes the investigation accurately.
+          Changing a description does not independently validate the research
+          findings or change the lifecycle status.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap gap-3 border-t border-orange-100 pt-6">
+        <%= form.submit "Save changes",
+                        class: "inline-flex min-h-12 cursor-pointer items-center justify-center rounded-xl border-2 border-orange-200 bg-gradient-to-r from-orange-400 to-amber-400 px-6 py-3 text-base font-bold text-white hover:from-orange-500 hover:to-amber-500" %>
+
+        <%= link_to "Cancel",
+                    admin_ecosystems_load_sources_entity_research_workspace_path(
+                      entity_id: params[:entity_id],
+                      id: @workspace.id
+                    ),
+                    class: "inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-slate-200 bg-white px-6 py-3 text-base font-bold text-slate-700 hover:bg-slate-50" %>
+      </div>
+    <% end %>
+  </section>
+</div>

@@ -1,0 +1,166 @@
+
+<%# app/views/admin/ecosystems/load_sources/entities/research_workspaces/research_workspaces/_investigation_card.html.erb %>
+
+<% status = workspace.status.to_s %>
+
+<% status_style = case status
+                  when "active"
+                    "border-sky-200 bg-sky-50 text-sky-800"
+                  when "completed"
+                    "border-emerald-200 bg-emerald-50 text-emerald-800"
+                  when "archived"
+                    "border-slate-200 bg-slate-100 text-slate-700"
+                  when "paused"
+                    "border-amber-200 bg-amber-50 text-amber-800"
+                  else
+                    "border-orange-200 bg-orange-50 text-orange-800"
+                  end %>
+
+<% status_label = status.humanize.presence || "Unknown status" %>
+
+<article class="rounded-[30px] border-2 border-orange-100
+                bg-gradient-to-br from-white via-orange-50/20 to-slate-50/60
+                p-5 shadow-sm transition hover:shadow-md sm:p-7"
+         aria-labelledby="investigation-<%= workspace.id %>-title">
+
+  <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+
+    <div class="min-w-0 flex-1">
+
+      <div class="flex flex-wrap items-center gap-3">
+        <span class="inline-flex items-center rounded-full border px-4 py-2
+                     text-sm font-black <%= status_style %>">
+          <%= status_label %>
+        </span>
+
+        <span class="text-sm font-semibold text-slate-500">
+          Investigation #<%= workspace.id %>
+        </span>
+      </div>
+
+      <h3 id="investigation-<%= workspace.id %>-title"
+          class="mt-4 break-words text-2xl font-black leading-tight text-slate-800">
+        <%= workspace.title %>
+      </h3>
+
+      <p class="mt-3 whitespace-pre-line text-base leading-7 text-slate-600">
+        <%= workspace.summary.presence || "No investigation summary has been added yet. Open this workspace to document its research objective, scope, and unresolved questions." %>
+      </p>
+
+      <dl class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+
+        <div class="rounded-2xl border border-orange-100 bg-white p-4">
+          <dt class="text-sm font-bold text-slate-500">
+            Created
+          </dt>
+          <dd class="mt-1 text-base font-bold text-slate-800">
+            <%= workspace.created_at&.strftime("%d %b %Y, %H:%M") || "Not available" %>
+          </dd>
+        </div>
+
+        <div class="rounded-2xl border border-orange-100 bg-white p-4">
+          <dt class="text-sm font-bold text-slate-500">
+            Last updated
+          </dt>
+          <dd class="mt-1 text-base font-bold text-slate-800">
+            <%= workspace.updated_at&.strftime("%d %b %Y, %H:%M") || "Not available" %>
+          </dd>
+        </div>
+
+      </dl>
+
+      <div class="mt-5 rounded-2xl border border-sky-100 bg-sky-50/70 p-4">
+        <h4 class="text-base font-black text-sky-900">
+          Administrator guidance
+        </h4>
+
+        <p class="mt-2 text-base leading-7 text-sky-900">
+          Keep the investigation summary focused on the objective and current
+          findings. Store source-specific details in evidence records, and use
+          annotations to explain the significance, uncertainty, or review status
+          of a finding.
+        </p>
+      </div>
+
+    </div>
+
+    <div class="flex shrink-0 flex-col gap-3 lg:w-56">
+
+      <%= link_to admin_ecosystems_load_sources_entity_research_workspace_path(
+                    entity_id: params[:entity_id],
+                    id: workspace.slug
+                  ),
+                  class: "inline-flex min-h-12 items-center justify-center rounded-2xl bg-gradient-to-r from-orange-400 to-amber-400 px-5 py-3 text-base font-black text-white shadow-sm transition hover:-translate-y-0.5 hover:from-orange-500 hover:to-amber-500" do %>
+        Open investigation →
+      <% end %>
+
+      <% if status == "active" %>
+
+        <%= button_to "Mark completed",
+                      complete_admin_ecosystems_load_sources_entity_research_workspace_path(
+                        entity_id: params[:entity_id],
+                        id: workspace.slug
+                      ),
+                      method: :patch,
+                      form: {
+                        data: {
+                          turbo_confirm: "Complete this investigation? Review its outstanding questions first."
+                        }
+                      },
+                      class: "min-h-12 rounded-2xl border-2 border-emerald-200 bg-emerald-50 px-5 py-3 text-base font-black text-emerald-800 transition hover:bg-emerald-100" %>
+
+        <%= button_to "Archive investigation",
+                      archive_admin_ecosystems_load_sources_entity_research_workspace_path(
+                        entity_id: params[:entity_id],
+                        id: workspace.slug
+                      ),
+                      method: :patch,
+                      form: {
+                        data: {
+                          turbo_confirm: "Archive this investigation? It will leave the active collection."
+                        }
+                      },
+                      class: "min-h-12 rounded-2xl border-2 border-slate-200 bg-white px-5 py-3 text-base font-bold text-slate-700 transition hover:bg-slate-50" %>
+
+      <% elsif status == "completed" %>
+
+        <%= button_to "Reopen investigation",
+                      reopen_admin_ecosystems_load_sources_entity_research_workspace_path(
+                        entity_id: params[:entity_id],
+                        id: workspace.slug
+                      ),
+                      method: :patch,
+                      form: {
+                        data: {
+                          turbo_confirm: "Reopen this investigation for further research?"
+                        }
+                      },
+                      class: "min-h-12 rounded-2xl border-2 border-orange-200 bg-orange-50 px-5 py-3 text-base font-black text-orange-800 transition hover:bg-orange-100" %>
+
+        <%= button_to "Archive investigation",
+                      archive_admin_ecosystems_load_sources_entity_research_workspace_path(
+                        entity_id: params[:entity_id],
+                        id: workspace.slug
+                      ),
+                      method: :patch,
+                      form: {
+                        data: {
+                          turbo_confirm: "Archive this completed investigation?"
+                        }
+                      },
+                      class: "min-h-12 rounded-2xl border-2 border-slate-200 bg-white px-5 py-3 text-base font-bold text-slate-700 transition hover:bg-slate-50" %>
+
+      <% elsif status == "archived" %>
+
+        <p class="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-600">
+          This record is archived. Use the workspace's supported lifecycle
+          controls to restore or reopen it if those operations are available.
+        </p>
+
+      <% end %>
+
+    </div>
+
+  </div>
+
+</article>

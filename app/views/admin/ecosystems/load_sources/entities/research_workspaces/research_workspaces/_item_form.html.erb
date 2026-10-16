@@ -1,0 +1,107 @@
+<section class="rounded-[28px] border-2 border-sky-100
+                bg-gradient-to-b from-white to-sky-50/30
+                p-5 shadow-sm">
+
+  <header class="mb-5 flex items-center gap-3">
+
+    <div class="flex h-10 w-10 items-center justify-center
+                rounded-2xl border border-sky-200 bg-sky-50">
+      🧩
+    </div>
+
+    <div>
+      <h3 class="text-sm font-black text-slate-800">
+        Add research item
+      </h3>
+      <p class="mt-1 text-[11px] text-slate-400">
+        Break the investigation into traceable units of work.
+      </p>
+    </div>
+
+  </header>
+
+  <%= form_with scope: :item,
+        url: local_assigns.fetch(:add_item_url),
+        method: :post,
+        local: true,
+        class: "space-y-4" do |form| %>
+
+    <div>
+      <%= form.label :title,
+            class: "mb-1.5 block text-[10px] font-black
+                    uppercase tracking-wider text-slate-500" %>
+
+      <%= form.text_field :title,
+            required: true,
+            maxlength: 255,
+            placeholder: "Describe the research task",
+            class: "w-full rounded-2xl border-2 border-sky-100
+                    bg-white px-4 py-3 text-sm outline-none
+                    focus:border-sky-300 focus:ring-4
+                    focus:ring-sky-100/60" %>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+      <div>
+        <%= form.label :kind,
+              class: "mb-1.5 block text-[10px] font-black
+                      uppercase tracking-wider text-slate-500" %>
+
+        <%= form.select :kind,
+              options_for_select([
+                ["Question", "question"],
+                ["Note", "note"],
+                ["Entity", "entity"],
+                ["Hypothesis", "hypothesis"],
+                ["Task", "task"]
+              ]),
+              {},
+              class: "w-full rounded-2xl border-2 border-sky-100
+                      bg-white px-3 py-3 text-sm
+                      focus:border-sky-300" %>
+      </div>
+
+      <div>
+        <%= form.label :status,
+              class: "mb-1.5 block text-[10px] font-black
+                      uppercase tracking-wider text-slate-500" %>
+
+        <%= form.select :status,
+              options_for_select([
+                ["Active", "active"],
+                ["Completed", "completed"]
+              ], "active"),
+              {},
+              class: "w-full rounded-2xl border-2 border-sky-100
+                      bg-white px-3 py-3 text-sm
+                      focus:border-sky-300" %>
+      </div>
+
+    </div>
+
+    <div>
+      <%= form.label :body,
+            class: "mb-1.5 block text-[10px] font-black
+                    uppercase tracking-wider text-slate-500" %>
+
+      <%= form.text_area :body,
+            rows: 4,
+            placeholder: "Add context, a hypothesis, or the next research step...",
+            class: "w-full rounded-2xl border-2 border-sky-100
+                    bg-white px-4 py-3 text-sm leading-6
+                    focus:border-sky-300 focus:ring-4
+                    focus:ring-sky-100/60" %>
+    </div>
+
+    <%= form.submit "Add research item",
+          class: "rounded-2xl border-2 border-sky-200
+                  bg-gradient-to-r from-sky-500 to-cyan-500
+                  px-5 py-3 text-xs font-black text-white
+                  shadow-sm transition hover:from-sky-600
+                  hover:to-cyan-600 focus:outline-none
+                  focus:ring-4 focus:ring-sky-200" %>
+
+  <% end %>
+
+</section>

@@ -1,0 +1,209 @@
+
+<%# app/views/admin/ecosystems/load_sources/entities/research_workspaces/research_workspaces/saved.html.erb %>
+
+<div class="mx-auto my-8 max-w-7xl px-4 sm:px-6 lg:px-8">
+
+  <section class="rounded-[36px] border-2 border-orange-100
+                  bg-gradient-to-b from-white via-orange-50/20 to-slate-50/60
+                  p-6 shadow-md shadow-orange-100/40 sm:p-9">
+
+    <header class="mb-8 flex flex-col gap-5 border-b-2 border-orange-100
+                   pb-7 lg:flex-row lg:items-center lg:justify-between">
+
+      <div class="flex items-start gap-4">
+        <div class="flex h-14 w-14 shrink-0 items-center justify-center
+                    rounded-[22px] border border-orange-200 bg-orange-100
+                    text-2xl shadow-sm">
+          📚
+        </div>
+
+        <div>
+          <p class="text-sm font-black uppercase tracking-[0.18em] text-orange-600">
+            Research library
+          </p>
+
+          <h1 class="mt-2 text-3xl font-black tracking-tight text-slate-800 sm:text-4xl">
+            Saved investigations
+          </h1>
+
+          <p class="mt-3 max-w-3xl text-base leading-7 text-slate-600">
+            Review ongoing investigations, completed research, and archived
+            records. Each investigation should preserve its research items,
+            source references, annotations, and decision history.
+          </p>
+        </div>
+      </div>
+
+      <%= link_to admin_ecosystems_load_sources_entity_research_workspaces_path,
+                  class: "inline-flex min-h-12 items-center justify-center rounded-2xl border-2 border-orange-200 bg-gradient-to-r from-orange-400 to-amber-400 px-6 py-3 text-base font-black text-white shadow-md shadow-orange-100 transition hover:-translate-y-0.5 hover:from-orange-500 hover:to-amber-500" do %>
+        + Research workspaces
+      <% end %>
+
+    </header>
+
+    <% counts = @investigation_counts || {} %>
+    <% selected_filter = params[:filter].presence || "all" %>
+
+    <% status_cards = [
+      ["all", "All investigations", counts[:all] || 0, "📚", "border-orange-200 bg-orange-50 text-orange-700"],
+      ["active", "In progress", counts[:active] || 0, "🔬", "border-sky-200 bg-sky-50 text-sky-700"],
+      ["completed", "Completed", counts[:completed] || 0, "✓", "border-emerald-200 bg-emerald-50 text-emerald-700"],
+      ["archived", "Archived", counts[:archived] || 0, "🗄️", "border-slate-200 bg-slate-50 text-slate-700"]
+    ] %>
+
+    <section aria-labelledby="research-counts-heading">
+      <h2 id="research-counts-heading" class="mb-4 text-xl font-black text-slate-800">
+        Investigation overview
+      </h2>
+
+      <p class="mb-5 text-base leading-7 text-slate-600">
+        Choose a category to narrow the library. The counts should represent
+        the complete collection available to the current administrator or visitor,
+        rather than just the records displayed on one page.
+      </p>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+
+        <% status_cards.each do |key, label, count, icon, colors| %>
+          <%= link_to saved_admin_ecosystems_load_sources_entity_research_workspaces_path(filter: key),
+                      aria: { current: selected_filter == key ? "page" : nil },
+                      class: "rounded-[26px] border-2 p-5 transition hover:-translate-y-0.5 hover:shadow-md #{colors} #{selected_filter == key ? 'ring-4 ring-orange-100' : ''}" do %>
+
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-2xl" aria-hidden="true"><%= icon %></span>
+              <span class="text-3xl font-black tabular-nums"><%= count %></span>
+            </div>
+
+            <div class="mt-4 text-base font-black">
+              <%= label %>
+            </div>
+
+            <div class="mt-2 text-sm leading-6 opacity-80">
+              <%= selected_filter == key ? "Currently selected" : "View this category" %>
+            </div>
+          <% end %>
+        <% end %>
+
+      </div>
+    </section>
+
+    <section class="mt-8 rounded-[28px] border-2 border-orange-100
+                    bg-white/90 p-5 sm:p-6"
+             aria-labelledby="library-controls-heading">
+
+      <h2 id="library-controls-heading" class="text-xl font-black text-slate-800">
+        Find an investigation
+      </h2>
+
+      <p class="mt-2 text-base leading-7 text-slate-600">
+        Search by investigation title or use the status selector. Search and
+        status filtering should be applied to the current user's permitted
+        collection on the server.
+      </p>
+
+      <%= form_with url: saved_admin_ecosystems_load_sources_entity_research_workspaces_path,
+                    method: :get,
+                    local: true,
+                    class: "mt-5 grid gap-4 md:grid-cols-[minmax(0,1fr)_220px_auto]" do %>
+
+        <div>
+          <%= label_tag :q, "Search investigations",
+                        class: "mb-2 block text-base font-bold text-slate-700" %>
+
+          <%= text_field_tag :q,
+                             params[:q],
+                             placeholder: "Enter a research title…",
+                             class: "min-h-12 w-full rounded-2xl border-2 border-slate-200 bg-white px-4 py-3 text-base text-slate-800 placeholder:text-slate-400 focus:border-orange-400 focus:outline-none focus:ring-4 focus:ring-orange-100" %>
+        </div>
+
+        <div>
+          <%= label_tag :filter, "Investigation status",
+                        class: "mb-2 block text-base font-bold text-slate-700" %>
+
+          <%= select_tag :filter,
+                         options_for_select(
+                           [
+                             ["All investigations", "all"],
+                             ["In progress", "active"],
+                             ["Completed", "completed"],
+                             ["Archived", "archived"]
+                           ],
+                           selected_filter
+                         ),
+                         class: "min-h-12 w-full rounded-2xl border-2 border-slate-200 bg-white px-4 py-3 text-base text-slate-800 focus:border-orange-400 focus:outline-none focus:ring-4 focus:ring-orange-100" %>
+        </div>
+
+        <div class="flex items-end">
+          <%= submit_tag "Search",
+                         class: "min-h-12 w-full cursor-pointer rounded-2xl bg-slate-800 px-6 py-3 text-base font-black text-white transition hover:bg-slate-700 md:w-auto" %>
+        </div>
+
+      <% end %>
+
+    </section>
+
+    <section class="mt-9" aria-labelledby="investigation-list-heading">
+
+      <div class="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h2 id="investigation-list-heading" class="text-2xl font-black text-slate-800">
+            Investigation records
+          </h2>
+
+          <p class="mt-2 text-base leading-7 text-slate-600">
+            Open a record to continue research or inspect its saved context.
+          </p>
+        </div>
+
+        <p class="text-sm font-semibold text-slate-500">
+          <%= @investigations.size %> record(s) currently displayed
+        </p>
+      </div>
+
+      <% if @investigations.empty? %>
+
+        <div class="rounded-[28px] border-2 border-dashed border-orange-200
+                    bg-white/80 px-5 py-12 text-center sm:px-10">
+
+          <div class="text-5xl" aria-hidden="true">🔎</div>
+
+          <h3 class="mt-5 text-2xl font-black text-slate-800">
+            No matching investigations
+          </h3>
+
+          <p class="mx-auto mt-3 max-w-2xl text-base leading-7 text-slate-600">
+            No records were returned for the current selection. Try another
+            status or search term. If this is a new installation, create an
+            investigation to begin collecting research items and evidence.
+          </p>
+
+          <%= link_to "Browse research workspaces",
+                      admin_ecosystems_load_sources_entity_research_workspaces_path,
+                      class: "mt-6 inline-flex min-h-12 items-center justify-center rounded-2xl bg-orange-500 px-6 py-3 text-base font-black text-white transition hover:bg-orange-600" %>
+
+        </div>
+
+      <% else %>
+
+        <div class="space-y-5">
+          <% @investigations.each do |workspace| %>
+            <%= render "investigation_card", workspace: workspace %>
+          <% end %>
+        </div>
+
+      <% end %>
+
+    </section>
+
+    <div class="mt-9">
+      <%= render "administrator_help" %>
+    </div>
+
+  </section>
+
+</div>
+
+
+<%= render "investigation_filters" %>
+<%= render "investigation_pagination" %>
+<%= render "investigation_empty_state" %>

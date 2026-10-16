@@ -1,0 +1,83 @@
+
+<%
+  entity_url = admin_ecosystems_load_sources_entity_path(entity)
+
+  description =
+    if entity.respond_to?(:description)
+      entity.description
+    elsif entity.respond_to?(:summary)
+      entity.summary
+    end
+
+  description = description.to_s.strip
+  description = "No description available." if description.blank?
+
+  health_score =
+    entity.health_score if entity.respond_to?(:health_score)
+
+  entity_type =
+    entity.class.model_name.human
+%>
+
+<div
+  class="entity-hover relative inline-flex min-w-0"
+  data-controller="entity-hover-card"
+  data-action="
+    mouseenter->entity-hover-card#show
+    mouseleave->entity-hover-card#hide
+    focusin->entity-hover-card#show
+    focusout->entity-hover-card#hide
+  "
+>
+  <%= link_to entity.name,
+              entity_url,
+              class: "entity-hover__trigger",
+              aria: {
+                describedby: "entity-hover-card-#{entity.id}"
+              } %>
+
+  <section
+    id="entity-hover-card-<%= entity.id %>"
+    class="entity-hover__panel hidden"
+    data-entity-hover-card-target="card"
+    role="tooltip"
+    aria-label="Details for <%= entity.name %>"
+  >
+    <header class="entity-hover__header">
+      <div class="entity-hover__eyebrow">
+        <%= entity_type %>
+      </div>
+
+      <h3 class="entity-hover__title">
+        <%= entity.name %>
+      </h3>
+
+      <div class="entity-hover__identifier">
+        Entity #<%= entity.id %>
+      </div>
+    </header>
+
+    <div class="entity-hover__body">
+      <h4 class="entity-hover__section-title">
+        Description
+      </h4>
+
+      <p class="entity-hover__description">
+        <%= description %>
+      </p>
+
+      <% if health_score.present? %>
+        <div class="entity-hover__metric">
+          <span>Health score</span>
+          <strong><%= health_score %></strong>
+        </div>
+      <% end %>
+    </div>
+
+    <footer class="entity-hover__footer">
+      <%= link_to "View full entity →",
+                  entity_url,
+                  class: "entity-hover__link" %>
+    </footer>
+  </section>
+</div>

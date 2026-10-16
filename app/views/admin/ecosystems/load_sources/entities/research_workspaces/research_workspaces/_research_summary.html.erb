@@ -1,0 +1,59 @@
+<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+
+  <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+      Annotations
+    </div>
+
+    <div class="mt-2 text-2xl font-black text-cyan-300">
+      <%= workspace.annotation_count %>
+    </div>
+
+    <div class="mt-1 text-xs text-slate-600">
+      Expert interpretations
+    </div>
+  </div>
+
+  <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+      Evidence
+    </div>
+
+    <div class="mt-2 text-2xl font-black text-emerald-300">
+      <%= workspace.evidence_count %>
+    </div>
+
+    <div class="mt-1 text-xs text-slate-600">
+      Provenance records
+    </div>
+  </div>
+
+  <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+      High confidence
+    </div>
+
+    <div class="mt-2 text-2xl font-black text-violet-300">
+      <%= workspace.research_evidences.verified.high_confidence.count %>
+    </div>
+
+    <div class="mt-1 text-xs text-slate-600">
+      Verified, high-confidence evidence
+    </div>
+  </div>
+
+  <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+      Reviewed
+    </div>
+
+    <div class="mt-2 text-2xl font-black text-amber-300">
+      <%= workspace.research_annotations.where(status: ["reviewed", "approved"]).count %>
+    </div>
+
+    <div class="mt-1 text-xs text-slate-600">
+      Reviewed or approved annotations
+    </div>
+  </div>
+
+</div>

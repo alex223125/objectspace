@@ -1,0 +1,30 @@
+
+<%
+  status = workspace.status.to_s
+  status_styles = {
+    "active" => "bg-emerald-50 text-emerald-800 border-emerald-200",
+    "paused" => "bg-amber-50 text-amber-800 border-amber-200",
+    "completed" => "bg-sky-50 text-sky-800 border-sky-200",
+    "archived" => "bg-slate-100 text-slate-700 border-slate-200"
+  }
+
+  status_labels = {
+    "active" => "In progress",
+    "paused" => "Paused",
+    "completed" => "Completed",
+    "archived" => "Archived"
+  }
+
+  badge_style = status_styles.fetch(
+    status,
+    "bg-slate-100 text-slate-700 border-slate-200"
+  )
+
+  badge_label = status_labels.fetch(status, status.humanize)
+%>
+
+<span class="inline-flex items-center gap-2 rounded-full border px-4 py-2
+             text-sm font-bold <%= badge_style %>">
+  <span class="h-2.5 w-2.5 rounded-full bg-current"></span>
+  <%= badge_label %>
+</span>

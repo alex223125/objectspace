@@ -1,0 +1,897 @@
+
+<%# ============================================================================
+RESEARCH COLLECTION INTELLIGENCE — DASHBOARD
+
+File:
+app/views/admin/ecosystems/load_sources/entities/research_collections/research_collection_intelligence/show.html.erb
+
+Purpose:
+Display collection-level research intelligence, including questions,
+objectives, findings, evidence, contradictions, synthesis, milestones,
+workspace signals, and relationships.
+
+Supporting partials:
+  _field_manual_intro.html.erb
+  _field_manual.html.erb
+
+============================================================================ %>
+
+<%
+  intelligence = @intelligence || {}
+  questions = intelligence[:questions] || {}
+  objectives = intelligence[:objectives] || {}
+  milestones = intelligence[:milestones] || {}
+  findings = intelligence[:findings] || {}
+  synthesis = intelligence[:synthesis] || {}
+  contradictions = intelligence[:contradictions] || {}
+  evidence = intelligence[:evidence] || {}
+
+  unresolved_questions = Array(@unresolved_questions)
+  detected_contradictions = Array(@contradictions)
+
+  signals = @signals.respond_to?(:to_a) ? @signals.to_a : []
+  relationships = @relationships.respond_to?(:to_a) ? @relationships.to_a : []
+
+  evidence_coverage = @evidence_coverage || {}
+  evidence_inventory = @evidence_inventory || {}
+
+  question_total = questions[:total].to_i
+  question_resolved = questions[:resolved].to_i
+  question_open = questions[:open].to_i
+
+  objective_total = objectives[:total].to_i
+  objective_completed = objectives[:completed].to_i
+  objective_progress = objectives[:progress].to_i.clamp(0, 100)
+
+  milestone_total = milestones[:total].to_i
+  milestone_completed = milestones[:completed].to_i
+  milestone_pending = milestones[:pending].to_i
+  milestone_progress = milestones[:progress].to_i.clamp(0, 100)
+
+  finding_total = findings[:total].to_i
+  finding_high = findings[:high_confidence].to_i
+  finding_medium = findings[:medium_confidence].to_i
+  finding_low = findings[:low_confidence].to_i
+
+  synthesis_total = synthesis[:total].to_i
+  synthesis_count = synthesis[:synthesis].to_i
+  observation_count = synthesis[:observations].to_i
+  conclusion_count = synthesis[:conclusions].to_i
+  contradiction_notes = synthesis[:contradictions].to_i
+
+  evidence_reference_count = evidence_coverage[:evidence_references].to_i
+  discovered_evidence_count = evidence_coverage[:discovered_evidence_records].to_i
+  workspace_count = evidence_coverage[:workspaces].to_i
+  covered_workspace_count = evidence_coverage[:covered_workspaces].to_i
+
+  coverage_percentage = evidence_coverage[:coverage_percentage].to_i.clamp(0, 100)
+
+  inventory_workspace_count = evidence_inventory[:total_workspaces].to_i
+  inventory_evidence_count = evidence_inventory[:total_evidence].to_i
+  inventory_covered_count = evidence_inventory[:workspaces_with_evidence].to_i
+
+  question_resolution_percentage =
+    question_total.zero? ? 0 : (question_resolved.to_f / question_total * 100).round.clamp(0, 100)
+
+  inventory_coverage_percentage =
+    inventory_workspace_count.zero? ? 0 :
+      (inventory_covered_count.to_f / inventory_workspace_count * 100).round.clamp(0, 100)
+
+  status_label = @collection.status.to_s.humanize
+  status_label = "Active" if status_label.blank?
+%>
+
+<div class="mx-auto my-6 max-w-7xl rounded-[28px] border-2 border-orange-100 bg-gradient-to-b from-white via-orange-50/20 to-slate-50/50 p-4 shadow-md shadow-orange-100/40 md:my-10 md:rounded-[38px] md:p-8">
+
+  <%# ======================================================================
+      COLLECTION HEADER
+  ======================================================================= %>
+
+  <header class="mb-8 flex flex-col gap-5 border-b-2 border-orange-100 pb-6 lg:flex-row lg:items-center lg:justify-between">
+
+    <div class="flex min-w-0 items-start gap-4">
+      <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-[22px] border border-orange-200/60 bg-orange-100/80 text-2xl shadow-sm shadow-orange-100">
+        🧠
+      </div>
+
+      <div class="min-w-0">
+        <div class="mb-2 flex flex-wrap items-center gap-2">
+          <span class="text-[10px] font-black uppercase tracking-[0.18em] text-orange-500">
+            Research intelligence
+          </span>
+
+          <span class="rounded-full border border-orange-200/60 bg-orange-50 px-3 py-1 text-[10px] font-bold text-orange-700">
+            Collection #<%= @collection.id %>
+          </span>
+        </div>
+
+        <h1 class="break-words text-2xl font-black tracking-tight text-slate-800 md:text-3xl">
+          <%= @collection.title %>
+        </h1>
+
+        <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">
+          Explore research questions, objectives, findings, evidence,
+          contradictions, synthesis, and relationships across your research
+          ecosystem. Use this dashboard to understand the current state of
+          the investigation and identify what needs attention next.
+        </p>
+
+        <% if @collection.research_question.present? %>
+          <div class="mt-4 rounded-2xl border border-orange-100 bg-white/80 p-4">
+            <div class="mb-1 text-[10px] font-black uppercase tracking-widest text-orange-500">
+              Research question
+            </div>
+
+            <p class="text-sm leading-6 text-slate-600">
+              <%= @collection.research_question %>
+            </p>
+
+            <p class="mt-2 text-xs leading-5 text-slate-400">
+              This is the central problem the collection is intended to
+              investigate. Individual objectives and findings should contribute
+              to answering it or explain why an answer remains uncertain.
+            </p>
+          </div>
+        <% end %>
+
+        <div class="mt-3 flex flex-wrap items-center gap-2">
+          <span class="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700">
+            <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+            <%= status_label %>
+          </span>
+
+          <% if @collection.last_intelligence_refresh_at.present? %>
+            <span class="text-xs text-slate-400">
+              Last refreshed
+              <%= l(@collection.last_intelligence_refresh_at, format: :short) %>
+            </span>
+          <% else %>
+            <span class="text-xs text-slate-400">
+              Intelligence has not been refreshed yet
+            </span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex shrink-0 flex-wrap gap-3">
+      <%= button_to(
+            "Refresh intelligence",
+            refresh_intelligence_admin_ecosystems_load_sources_entity_research_collection_path(
+              entity_id: params[:entity_id],
+              id: @collection.id
+            ),
+            method: :post,
+            class: "inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-orange-200 bg-gradient-to-r from-orange-400 to-amber-400 px-5 py-3 text-sm font-black text-white shadow-md shadow-orange-200/60 transition-all duration-300 hover:-translate-y-0.5 hover:from-orange-500 hover:to-amber-500"
+          ) %>
+
+      <%= link_to(
+            "← Back to collection",
+            admin_ecosystems_load_sources_entity_research_collection_path(
+              entity_id: params[:entity_id],
+              id: @collection.id
+            ),
+            class: "inline-flex items-center justify-center rounded-2xl border-2 border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-600 shadow-sm transition hover:border-orange-200 hover:text-orange-600"
+          ) %>
+    </div>
+  </header>
+
+  <%# ======================================================================
+      BEGINNING FIELD MANUAL INTRODUCTION
+  ======================================================================= %>
+
+  <%= render "admin/ecosystems/load_sources/entities/research_collections/research_collection_intelligence/field_manual_intro" %>
+
+  <%# ======================================================================
+      INTELLIGENCE OVERVIEW
+  ======================================================================= %>
+
+  <section aria-labelledby="intelligence-overview-title" class="mb-8">
+    <div class="mb-4">
+      <div class="text-[10px] font-black uppercase tracking-[0.18em] text-orange-500">
+        Collection at a glance
+      </div>
+
+      <h2 id="intelligence-overview-title" class="mt-1 text-lg font-black text-slate-800">
+        Intelligence overview
+      </h2>
+
+      <p class="mt-1 max-w-3xl text-xs leading-6 text-slate-500">
+        These indicators summarize the information currently available to the
+        dashboard. They describe recorded counts and progress, not an automatic
+        judgment of research validity or completeness.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+
+      <%# Questions %>
+      <article class="group rounded-[26px] border-2 border-orange-100 bg-gradient-to-br from-orange-50 to-white p-5 shadow-sm shadow-orange-100/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-black uppercase tracking-wider text-orange-700">Questions</span>
+          <span class="flex h-10 w-10 items-center justify-center rounded-2xl border border-orange-200 bg-white text-lg">❓</span>
+        </div>
+
+        <div class="mt-5 text-4xl font-black text-slate-800"><%= question_open %></div>
+        <p class="mt-1 text-xs text-slate-500">Unresolved questions</p>
+
+        <p class="mt-3 text-xs leading-5 text-slate-400">
+          Open questions represent uncertainties that may require more research,
+          clarification, or a documented explanation.
+        </p>
+
+        <div class="mt-5 h-2 overflow-hidden rounded-full bg-orange-100">
+          <div class="h-full rounded-full bg-gradient-to-r from-orange-400 to-amber-400" style="width: <%= question_resolution_percentage %>%;"></div>
+        </div>
+
+        <div class="mt-2 flex justify-between gap-2 text-[10px] font-bold text-slate-400">
+          <span><%= question_resolved %> resolved</span>
+          <span><%= question_total %> total</span>
+        </div>
+      </article>
+
+      <%# Objectives %>
+      <article class="group rounded-[26px] border-2 border-sky-100 bg-gradient-to-br from-sky-50 to-white p-5 shadow-sm shadow-sky-100/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-black uppercase tracking-wider text-sky-700">Objectives</span>
+          <span class="flex h-10 w-10 items-center justify-center rounded-2xl border border-sky-200 bg-white text-lg">🎯</span>
+        </div>
+
+        <div class="mt-5 text-4xl font-black text-slate-800"><%= objective_progress %>%</div>
+        <p class="mt-1 text-xs text-slate-500">Objective progress</p>
+
+        <p class="mt-3 text-xs leading-5 text-slate-400">
+          Objectives translate the research question into defined tasks.
+          Completion measures recorded progress toward those tasks.
+        </p>
+
+        <div class="mt-5 h-2 overflow-hidden rounded-full bg-sky-100">
+          <div class="h-full rounded-full bg-gradient-to-r from-sky-400 to-cyan-400" style="width: <%= objective_progress %>%;"></div>
+        </div>
+
+        <div class="mt-2 flex justify-between gap-2 text-[10px] font-bold text-slate-400">
+          <span><%= objective_completed %> completed</span>
+          <span><%= objective_total %> total</span>
+        </div>
+      </article>
+
+      <%# Findings %>
+      <article class="group rounded-[26px] border-2 border-violet-100 bg-gradient-to-br from-violet-50 to-white p-5 shadow-sm shadow-violet-100/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-black uppercase tracking-wider text-violet-700">Findings</span>
+          <span class="flex h-10 w-10 items-center justify-center rounded-2xl border border-violet-200 bg-white text-lg">🔬</span>
+        </div>
+
+        <div class="mt-5 text-4xl font-black text-slate-800"><%= finding_total %></div>
+        <p class="mt-1 text-xs text-slate-500">Recorded research findings</p>
+
+        <p class="mt-3 text-xs leading-5 text-slate-400">
+          Findings capture research results and claims. Their strength depends
+          on the quality of their supporting evidence and reasoning.
+        </p>
+
+        <div class="mt-5 flex flex-wrap gap-2">
+          <span class="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-700">High: <%= finding_high %></span>
+          <span class="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[10px] font-bold text-amber-700">Medium: <%= finding_medium %></span>
+          <span class="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-bold text-slate-600">Low: <%= finding_low %></span>
+        </div>
+
+        <p class="mt-3 text-[10px] leading-5 text-slate-400">
+          Confidence labels should be interpreted according to your application's
+          assessment rules; they are not automatically probabilities.
+        </p>
+      </article>
+
+      <%# Contradictions %>
+      <article class="group rounded-[26px] border-2 border-rose-100 bg-gradient-to-br from-rose-50 to-white p-5 shadow-sm shadow-rose-100/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-black uppercase tracking-wider text-rose-700">Contradictions</span>
+          <span class="flex h-10 w-10 items-center justify-center rounded-2xl border border-rose-200 bg-white text-lg">⚡</span>
+        </div>
+
+        <div class="mt-5 text-4xl font-black text-slate-800"><%= detected_contradictions.length %></div>
+        <p class="mt-1 text-xs text-slate-500">Detected conflicting claims</p>
+
+        <p class="mt-3 text-xs leading-5 text-slate-400">
+          Conflicts reveal where claims may disagree. Investigate differences
+          in definitions, methods, context, and source quality before deciding
+          whether the claims are genuinely incompatible.
+        </p>
+
+        <div class="mt-5 flex items-center gap-2 text-[10px] font-bold text-rose-500">
+          <span class="h-2 w-2 rounded-full bg-rose-400"></span>
+          <%= contradiction_notes %> contradiction notes
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <%# ======================================================================
+      RESEARCH IMPROVEMENT CYCLE
+  ======================================================================= %>
+
+  <section aria-labelledby="research-cycle-title" class="mb-8 rounded-[28px] border-2 border-orange-100 bg-gradient-to-r from-orange-50/70 via-white to-emerald-50/50 p-5 shadow-sm md:p-7">
+    <div class="mb-6 flex items-start gap-4">
+      <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-orange-100 text-lg">🔄</div>
+
+      <div>
+        <h2 id="research-cycle-title" class="text-sm font-black text-slate-800">Research improvement cycle</h2>
+        <p class="mt-1 max-w-3xl text-xs leading-6 text-slate-500">
+          Questions guide objectives. Objectives organize the investigation.
+          Findings capture results, while evidence supports or challenges claims.
+          Contradictions identify disagreements that may require additional work.
+          Synthesis brings the combined picture together.
+        </p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+      <% research_stages = [
+        { number: "01", title: "Questions", subtitle: "Define the problem", metric: "#{question_open} unresolved", icon: "❓", color: "orange" },
+        { number: "02", title: "Objectives", subtitle: "Structure the investigation", metric: "#{objective_completed}/#{objective_total} completed", icon: "🎯", color: "sky" },
+        { number: "03", title: "Findings", subtitle: "Record research results", metric: "#{finding_total} findings", icon: "🔬", color: "violet" },
+        { number: "04", title: "Evidence", subtitle: "Evaluate supporting material", metric: "#{evidence_reference_count} references", icon: "📚", color: "emerald" }
+      ] %>
+
+      <% stage_colors = {
+        "orange" => "border-orange-200 bg-orange-50 text-orange-700",
+        "sky" => "border-sky-200 bg-sky-50 text-sky-700",
+        "violet" => "border-violet-200 bg-violet-50 text-violet-700",
+        "emerald" => "border-emerald-200 bg-emerald-50 text-emerald-700"
+      } %>
+
+      <% research_stages.each do |stage| %>
+        <article class="rounded-[24px] border-2 border-white bg-white/80 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+          <div class="flex items-center justify-between">
+            <span class="flex h-11 w-11 items-center justify-center rounded-[17px] border-2 text-sm font-black <%= stage_colors[stage[:color]] %>"><%= stage[:number] %></span>
+            <span class="text-xl"><%= stage[:icon] %></span>
+          </div>
+
+          <h3 class="mt-4 text-sm font-black text-slate-800"><%= stage[:title] %></h3>
+          <p class="mt-1 text-xs leading-5 text-slate-500"><%= stage[:subtitle] %></p>
+
+          <div class="mt-4 border-t border-slate-100 pt-3 text-[10px] font-bold text-slate-500">
+            <%= stage[:metric] %>
+          </div>
+        </article>
+      <% end %>
+    </div>
+
+    <div class="mt-5 rounded-2xl border border-emerald-100 bg-emerald-50/60 p-4">
+      <p class="text-xs leading-6 text-slate-600">
+        <strong class="text-emerald-800">Interpretation hint:</strong>
+        this sequence describes a useful way to organize research, not a rigid
+        pipeline. New evidence may change a finding, expose a contradiction,
+        reopen a question, or require an objective to be revised.
+      </p>
+    </div>
+  </section>
+
+  <%# ======================================================================
+      QUESTIONS AND CONTRADICTIONS
+  ======================================================================= %>
+
+  <div class="mb-8 grid grid-cols-1 gap-5 xl:grid-cols-2">
+
+    <%# Unresolved questions %>
+    <section aria-labelledby="unresolved-questions-title" class="overflow-hidden rounded-[28px] border-2 border-orange-100 bg-white shadow-sm shadow-orange-100/40">
+      <div class="border-b border-orange-100 bg-gradient-to-r from-orange-50 to-white p-5">
+        <div class="flex items-center gap-3">
+          <span class="flex h-10 w-10 items-center justify-center rounded-2xl border border-orange-200 bg-white text-lg">❓</span>
+
+          <div>
+            <h2 id="unresolved-questions-title" class="text-sm font-black text-slate-800">Unresolved questions</h2>
+            <p class="mt-1 text-xs leading-5 text-slate-500">Unknowns that still need investigation or explanation</p>
+          </div>
+
+          <span class="ml-auto rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-xs font-black text-orange-700"><%= unresolved_questions.length %></span>
+        </div>
+
+        <p class="mt-4 text-xs leading-5 text-slate-500">
+          Use this list to find gaps between what the collection asks and what
+          the available evidence can currently answer. An open question may be
+          important even when substantial research has already been completed.
+        </p>
+      </div>
+
+      <div class="space-y-3 p-5">
+        <% if unresolved_questions.any? %>
+          <% unresolved_questions.each do |question| %>
+            <article class="rounded-2xl border border-orange-100 bg-orange-50/30 p-4">
+              <h3 class="text-sm font-bold leading-6 text-slate-700">
+                <%= question.respond_to?(:question) ? question.question : question.to_s %>
+              </h3>
+
+              <% if question.respond_to?(:description) && question.description.present? %>
+                <p class="mt-2 text-xs leading-5 text-slate-500"><%= question.description %></p>
+              <% end %>
+
+              <div class="mt-3 flex flex-wrap items-center gap-2">
+                <% if question.respond_to?(:status) && question.status.present? %>
+                  <span class="rounded-full border border-orange-200 bg-white px-2.5 py-1 text-[10px] font-bold text-orange-700"><%= question.status.to_s.humanize %></span>
+                <% end %>
+
+                <% if question.respond_to?(:priority) && question.priority.present? %>
+                  <span class="text-[10px] font-medium text-slate-500">Priority: <%= question.priority %></span>
+                <% end %>
+              </div>
+            </article>
+          <% end %>
+        <% else %>
+          <div class="rounded-2xl border border-dashed border-orange-200 bg-orange-50/20 px-5 py-10 text-center">
+            <span class="text-3xl">✨</span>
+            <p class="mt-3 text-sm font-bold text-slate-600">No unresolved questions</p>
+            <p class="mt-1 text-xs leading-5 text-slate-500">
+              No open questions are currently listed. Review the recorded
+              resolutions periodically to ensure they remain supported by
+              the latest available evidence.
+            </p>
+          </div>
+        <% end %>
+      </div>
+    </section>
+
+    <%# Contradictions %>
+    <section aria-labelledby="contradictions-title" class="overflow-hidden rounded-[28px] border-2 border-rose-100 bg-white shadow-sm shadow-rose-100/40">
+      <div class="border-b border-rose-100 bg-gradient-to-r from-rose-50 to-white p-5">
+        <div class="flex items-center gap-3">
+          <span class="flex h-10 w-10 items-center justify-center rounded-2xl border border-rose-200 bg-white text-lg">⚡</span>
+
+          <div>
+            <h2 id="contradictions-title" class="text-sm font-black text-slate-800">Contradictions</h2>
+            <p class="mt-1 text-xs leading-5 text-slate-500">Claims that may conflict with one another</p>
+          </div>
+
+          <span class="ml-auto rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-xs font-black text-rose-700"><%= detected_contradictions.length %></span>
+        </div>
+
+        <p class="mt-4 text-xs leading-5 text-slate-500">
+          A conflict is an invitation to compare the claims, evidence,
+          definitions, methods, and context. Do not assume that a contradiction
+          detector has established which claim is correct.
+        </p>
+      </div>
+
+      <div class="space-y-3 p-5">
+        <% if detected_contradictions.any? %>
+          <% detected_contradictions.each do |contradiction| %>
+            <article class="rounded-2xl border border-rose-100 bg-rose-50/30 p-4">
+              <h3 class="text-sm font-black text-slate-700">
+                <%= contradiction.respond_to?(:claim_key) && contradiction.claim_key.present? ? contradiction.claim_key : "Conflicting research claims" %>
+              </h3>
+
+              <% if contradiction.respond_to?(:description) && contradiction.description.present? %>
+                <p class="mt-2 text-xs leading-5 text-slate-500"><%= contradiction.description %></p>
+              <% end %>
+
+              <% if contradiction.respond_to?(:findings) %>
+                <div class="mt-3 space-y-2">
+                  <% contradiction.findings.each do |finding| %>
+                    <div class="rounded-xl border border-rose-100 bg-white p-3">
+                      <div class="text-xs font-bold text-slate-700">
+                        <%= finding.respond_to?(:title) && finding.title.present? ? finding.title : "Research finding" %>
+                      </div>
+
+                      <% if finding.respond_to?(:claim) && finding.claim.present? %>
+                        <p class="mt-1 text-xs leading-5 text-slate-500"><%= finding.claim %></p>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+
+              <div class="mt-3 rounded-xl border border-rose-100 bg-white/80 p-3">
+                <p class="text-xs leading-5 text-slate-600">
+                  <strong class="text-rose-700">Investigation hint:</strong>
+                  compare the scope and assumptions of the conflicting claims.
+                  Different results may be compatible if they describe different
+                  populations, time periods, definitions, or conditions.
+                </p>
+              </div>
+            </article>
+          <% end %>
+        <% else %>
+          <div class="rounded-2xl border border-dashed border-rose-200 bg-rose-50/20 px-5 py-10 text-center">
+            <span class="text-3xl">🛡️</span>
+            <p class="mt-3 text-sm font-bold text-slate-600">No contradictions detected</p>
+            <p class="mt-1 text-xs leading-5 text-slate-500">
+              This means no contradictions are currently listed here. It does
+              not prove that all claims agree or that the research is free
+              from unresolved disagreements.
+            </p>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  </div>
+
+  <%# ======================================================================
+      MILESTONES AND EVIDENCE COVERAGE
+  ======================================================================= %>
+
+  <div class="mb-8 grid grid-cols-1 gap-5 xl:grid-cols-2">
+
+    <%# Milestones %>
+    <section aria-labelledby="milestone-progress-title" class="rounded-[28px] border-2 border-violet-100 bg-white p-5 shadow-sm shadow-violet-100/40 md:p-6">
+      <div class="mb-6 flex items-center gap-3">
+        <span class="flex h-11 w-11 items-center justify-center rounded-2xl border border-violet-200 bg-violet-50 text-lg">🏁</span>
+
+        <div>
+          <h2 id="milestone-progress-title" class="text-sm font-black text-slate-800">Milestone progress</h2>
+          <p class="mt-1 text-xs leading-5 text-slate-500">Track completion of planned research deliverables</p>
+        </div>
+      </div>
+
+      <p class="mb-5 text-xs leading-5 text-slate-500">
+        Milestones provide a project-management view of the investigation.
+        Use them to identify unfinished work, while evaluating the quality
+        of completed deliverables separately.
+      </p>
+
+      <div class="mb-3 flex items-end justify-between gap-3">
+        <div>
+          <div class="text-3xl font-black text-slate-800"><%= milestone_progress %>%</div>
+          <p class="mt-1 text-xs text-slate-500">Overall completion</p>
+        </div>
+
+        <div class="text-right">
+          <div class="text-sm font-black text-violet-700"><%= milestone_completed %> / <%= milestone_total %></div>
+          <p class="mt-1 text-xs text-slate-500">Completed</p>
+        </div>
+      </div>
+
+      <div class="h-3 overflow-hidden rounded-full bg-violet-100">
+        <div class="h-full rounded-full bg-gradient-to-r from-violet-400 to-fuchsia-400 transition-all duration-500" style="width: <%= milestone_progress %>%;"></div>
+      </div>
+
+      <div class="mt-5 grid grid-cols-2 gap-3">
+        <div class="rounded-2xl border border-emerald-100 bg-emerald-50/50 p-4">
+          <div class="text-[10px] font-black uppercase tracking-wider text-emerald-700">Completed</div>
+          <div class="mt-2 text-2xl font-black text-slate-800"><%= milestone_completed %></div>
+        </div>
+
+        <div class="rounded-2xl border border-amber-100 bg-amber-50/50 p-4">
+          <div class="text-[10px] font-black uppercase tracking-wider text-amber-700">Pending</div>
+          <div class="mt-2 text-2xl font-black text-slate-800"><%= milestone_pending %></div>
+        </div>
+      </div>
+    </section>
+
+    <%# Evidence coverage %>
+    <section aria-labelledby="evidence-coverage-title" class="rounded-[28px] border-2 border-emerald-100 bg-white p-5 shadow-sm shadow-emerald-100/40 md:p-6">
+      <div class="mb-6 flex items-center gap-3">
+        <span class="flex h-11 w-11 items-center justify-center rounded-2xl border border-emerald-200 bg-emerald-50 text-lg">📚</span>
+
+        <div>
+          <h2 id="evidence-coverage-title" class="text-sm font-black text-slate-800">Evidence coverage</h2>
+          <p class="mt-1 text-xs leading-5 text-slate-500">Evidence associated with research workspaces</p>
+        </div>
+      </div>
+
+      <p class="mb-5 text-xs leading-5 text-slate-500">
+        Coverage indicates how many workspaces contain recorded evidence.
+        It is a measure of distribution, not a guarantee that every research
+        question or finding has adequate support.
+      </p>
+
+      <div class="mb-3 flex items-end justify-between gap-3">
+        <div>
+          <div class="text-3xl font-black text-slate-800"><%= coverage_percentage %>%</div>
+          <p class="mt-1 text-xs text-slate-500">Workspace coverage</p>
+        </div>
+
+        <div class="text-right">
+          <div class="text-sm font-black text-emerald-700"><%= covered_workspace_count %> / <%= workspace_count %></div>
+          <p class="mt-1 text-xs text-slate-500">Workspaces with evidence</p>
+        </div>
+      </div>
+
+      <div class="h-3 overflow-hidden rounded-full bg-emerald-100">
+        <div class="h-full rounded-full bg-gradient-to-r from-emerald-400 to-teal-400 transition-all duration-500" style="width: <%= coverage_percentage %>%;"></div>
+      </div>
+
+      <div class="mt-5 grid grid-cols-2 gap-3">
+        <div class="rounded-2xl border border-sky-100 bg-sky-50/50 p-4">
+          <div class="text-[10px] font-black uppercase tracking-wider text-sky-700">Evidence references</div>
+          <div class="mt-2 text-2xl font-black text-slate-800"><%= evidence_reference_count %></div>
+        </div>
+
+        <div class="rounded-2xl border border-emerald-100 bg-emerald-50/50 p-4">
+          <div class="text-[10px] font-black uppercase tracking-wider text-emerald-700">Discovered records</div>
+          <div class="mt-2 text-2xl font-black text-slate-800"><%= discovered_evidence_count %></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <%# ======================================================================
+      SYNTHESIS AND EVIDENCE INVENTORY
+  ======================================================================= %>
+
+  <div class="mb-8 grid grid-cols-1 gap-5 xl:grid-cols-2">
+
+    <%# Synthesis %>
+    <section aria-labelledby="research-synthesis-title" class="rounded-[28px] border-2 border-amber-100 bg-white p-5 shadow-sm shadow-amber-100/40 md:p-6">
+      <div class="mb-5 flex items-center gap-3">
+        <span class="flex h-11 w-11 items-center justify-center rounded-2xl border border-amber-200 bg-amber-50 text-lg">📝</span>
+
+        <div>
+          <h2 id="research-synthesis-title" class="text-sm font-black text-slate-800">Research synthesis</h2>
+          <p class="mt-1 text-xs leading-5 text-slate-500">Notes, observations, and conclusions</p>
+        </div>
+
+        <span class="ml-auto rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-black text-amber-700"><%= synthesis_total %></span>
+      </div>
+
+      <p class="mb-5 text-xs leading-5 text-slate-500">
+        Synthesis brings information together into an interpretation.
+        Observations describe what was recorded; conclusions explain what
+        those observations may mean. Keep the reasoning and uncertainty
+        visible so readers can follow the path from evidence to conclusion.
+      </p>
+
+      <% synthesis_rows = [
+        ["Synthesis notes", synthesis_count, "orange"],
+        ["Observations", observation_count, "sky"],
+        ["Conclusions", conclusion_count, "emerald"],
+        ["Contradiction notes", contradiction_notes, "rose"]
+      ] %>
+
+      <% synthesis_row_colors = {
+        "orange" => "border-orange-100 bg-orange-50/40",
+        "sky" => "border-sky-100 bg-sky-50/40",
+        "emerald" => "border-emerald-100 bg-emerald-50/40",
+        "rose" => "border-rose-100 bg-rose-50/40"
+      } %>
+
+      <div class="space-y-3">
+        <% synthesis_rows.each do |label, count, color| %>
+          <div class="flex items-center justify-between gap-3 rounded-2xl border p-4 <%= synthesis_row_colors[color] %>">
+            <span class="text-xs font-bold text-slate-600"><%= label %></span>
+            <span class="text-lg font-black text-slate-800"><%= count %></span>
+          </div>
+        <% end %>
+      </div>
+    </section>
+
+    <%# Evidence inventory %>
+    <section aria-labelledby="evidence-inventory-title" class="rounded-[28px] border-2 border-sky-100 bg-white p-5 shadow-sm shadow-sky-100/40 md:p-6">
+      <div class="mb-5 flex items-center gap-3">
+        <span class="flex h-11 w-11 items-center justify-center rounded-2xl border border-sky-200 bg-sky-50 text-lg">🗂️</span>
+
+        <div>
+          <h2 id="evidence-inventory-title" class="text-sm font-black text-slate-800">Evidence inventory</h2>
+          <p class="mt-1 text-xs leading-5 text-slate-500">Evidence distributed across workspaces</p>
+        </div>
+      </div>
+
+      <p class="mb-5 text-xs leading-5 text-slate-500">
+        The inventory describes the size and distribution of the recorded
+        evidence collection. Inspect provenance, relevance, duplication,
+        and source quality before using these totals to assess research strength.
+      </p>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div class="rounded-2xl border border-sky-100 bg-sky-50/40 p-4">
+          <div class="text-[10px] font-black uppercase tracking-wider text-sky-700">Total workspaces</div>
+          <div class="mt-3 text-3xl font-black text-slate-800"><%= inventory_workspace_count %></div>
+        </div>
+
+        <div class="rounded-2xl border border-violet-100 bg-violet-50/40 p-4">
+          <div class="text-[10px] font-black uppercase tracking-wider text-violet-700">Total evidence</div>
+          <div class="mt-3 text-3xl font-black text-slate-800"><%= inventory_evidence_count %></div>
+        </div>
+      </div>
+
+      <div class="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50/40 p-4">
+        <div class="flex items-center justify-between gap-3">
+          <span class="text-xs font-bold text-slate-600">Workspaces containing evidence</span>
+          <span class="text-sm font-black text-emerald-700"><%= inventory_covered_count %> / <%= inventory_workspace_count %></span>
+        </div>
+
+        <div class="mt-3 h-2 overflow-hidden rounded-full bg-emerald-100">
+          <div class="h-full rounded-full bg-gradient-to-r from-emerald-400 to-teal-400" style="width: <%= inventory_coverage_percentage %>%;"></div>
+        </div>
+
+        <p class="mt-3 text-xs leading-5 text-slate-500">
+          Workspaces without evidence may represent a missing collection step,
+          an intentionally empty workspace, or a difference in how research
+          material is stored. Investigate the context before drawing conclusions.
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <%# ======================================================================
+      WORKSPACE SIGNALS
+  ======================================================================= %>
+
+  <section aria-labelledby="workspace-signals-title" class="mb-8 overflow-hidden rounded-[28px] border-2 border-orange-100 bg-white shadow-sm shadow-orange-100/40">
+    <div class="border-b border-orange-100 bg-gradient-to-r from-orange-50 to-white p-5">
+      <div class="flex items-center gap-3">
+        <span class="flex h-11 w-11 items-center justify-center rounded-2xl border border-orange-200 bg-white text-lg">📡</span>
+
+        <div>
+          <h2 id="workspace-signals-title" class="text-sm font-black text-slate-800">Workspace signals</h2>
+          <p class="mt-1 text-xs leading-5 text-slate-500">Signals collected from associated research workspaces</p>
+        </div>
+
+        <span class="ml-auto rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-xs font-black text-orange-700"><%= signals.length %></span>
+      </div>
+
+      <p class="mt-4 text-xs leading-5 text-slate-500">
+        Signals provide additional indicators from related workspaces. Their
+        exact meaning depends on the signal's source and implementation.
+        Review each description and status before treating a signal as evidence
+        of a research result.
+      </p>
+    </div>
+
+    <div class="p-5">
+      <% if signals.any? %>
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <% signals.each do |signal| %>
+            <article class="rounded-2xl border border-orange-100 bg-orange-50/20 p-4">
+              <h3 class="text-sm font-bold text-slate-700">
+                <%= signal.respond_to?(:title) && signal.title.present? ? signal.title : (signal.respond_to?(:name) && signal.name.present? ? signal.name : "Workspace signal ##{signal.id}") %>
+              </h3>
+
+              <% if signal.respond_to?(:description) && signal.description.present? %>
+                <p class="mt-2 text-xs leading-5 text-slate-500"><%= signal.description %></p>
+              <% end %>
+
+              <div class="mt-3 flex flex-wrap items-center gap-2">
+                <% if signal.respond_to?(:status) && signal.status.present? %>
+                  <span class="rounded-full border border-orange-200 bg-white px-2.5 py-1 text-[10px] font-bold text-orange-700"><%= signal.status.to_s.humanize %></span>
+                <% end %>
+
+                <% if signal.respond_to?(:updated_at) && signal.updated_at.present? %>
+                  <span class="text-[10px] text-slate-400">Updated <%= l(signal.updated_at, format: :short) %></span>
+                <% end %>
+              </div>
+            </article>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="rounded-2xl border border-dashed border-orange-200 bg-orange-50/20 px-5 py-8 text-center">
+          <span class="text-2xl">📡</span>
+          <p class="mt-3 text-sm font-bold text-slate-600">No workspace signals available</p>
+          <p class="mx-auto mt-1 max-w-xl text-xs leading-5 text-slate-500">
+            Signals will appear when associated workspace activity is
+            synchronized or recorded. An empty list means no signals are
+            currently available to this view; it does not necessarily mean
+            that no activity has occurred.
+          </p>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <%# ======================================================================
+      RESEARCH RELATIONSHIPS
+  ======================================================================= %>
+
+  <section aria-labelledby="research-relationships-title" class="overflow-hidden rounded-[28px] border-2 border-violet-100 bg-white shadow-sm shadow-violet-100/40">
+    <div class="border-b border-violet-100 bg-gradient-to-r from-violet-50 to-white p-5">
+      <div class="flex items-center gap-3">
+        <span class="flex h-11 w-11 items-center justify-center rounded-2xl border border-violet-200 bg-white text-lg">🕸️</span>
+
+        <div>
+          <h2 id="research-relationships-title" class="text-sm font-black text-slate-800">Research relationships</h2>
+          <p class="mt-1 text-xs leading-5 text-slate-500">Active connections between research elements</p>
+        </div>
+
+        <span class="ml-auto rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-xs font-black text-violet-700"><%= relationships.length %></span>
+      </div>
+
+      <p class="mt-4 text-xs leading-5 text-slate-500">
+        Relationships provide the connective structure of the research
+        collection. They can show how a finding relates to evidence, how
+        objectives depend on earlier work, or how records share a topic.
+        The relationship type and its definition determine the meaning of
+        each connection.
+      </p>
+    </div>
+
+    <div class="p-5">
+      <% if relationships.any? %>
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <% relationships.each do |relationship| %>
+            <article class="rounded-2xl border border-violet-100 bg-violet-50/20 p-4">
+              <h3 class="text-sm font-bold text-slate-700">
+                <%= relationship.respond_to?(:title) && relationship.title.present? ? relationship.title : (relationship.respond_to?(:name) && relationship.name.present? ? relationship.name : "Relationship ##{relationship.id}") %>
+              </h3>
+
+              <% if relationship.respond_to?(:description) && relationship.description.present? %>
+                <p class="mt-2 text-xs leading-5 text-slate-500"><%= relationship.description %></p>
+              <% end %>
+
+              <% if relationship.respond_to?(:relationship_type) && relationship.relationship_type.present? %>
+                <div class="mt-3">
+                  <span class="inline-flex rounded-full border border-violet-200 bg-white px-2.5 py-1 text-[10px] font-bold text-violet-700">
+                    <%= relationship.relationship_type.to_s.humanize %>
+                  </span>
+                </div>
+              <% end %>
+            </article>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="rounded-2xl border border-dashed border-violet-200 bg-violet-50/20 px-5 py-8 text-center">
+          <span class="text-2xl">🕸️</span>
+          <p class="mt-3 text-sm font-bold text-slate-600">No active relationships available</p>
+          <p class="mx-auto mt-1 max-w-xl text-xs leading-5 text-slate-500">
+            Research connections will appear here when they are available.
+            If relationships are expected, check whether the relevant records
+            have been connected and whether the current intelligence data
+            has been refreshed.
+          </p>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <%# ======================================================================
+      FULL FIELD MANUAL
+  ======================================================================= %>
+
+  <div class="mt-10">
+    <%= render "admin/ecosystems/load_sources/entities/research_collections/research_collection_intelligence/field_manual" %>
+  </div>
+
+  <%# ======================================================================
+      FOOTER
+  ======================================================================= %>
+
+  <footer class="mt-8 rounded-[24px] border-2 border-orange-100 bg-gradient-to-r from-orange-50/70 via-white to-emerald-50/50 p-5">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex items-start gap-3">
+        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-orange-100">🌱</span>
+
+        <div>
+          <h2 class="text-sm font-black text-slate-700">Keep your research evolving</h2>
+
+          <p class="mt-1 max-w-2xl text-xs leading-5 text-slate-500">
+            After updating questions, findings, evidence, or workspace
+            relationships, refresh intelligence to recalculate the collection's
+            current summary. Then review the underlying records and confirm
+            that important conclusions remain supported.
+          </p>
+
+          <% if @collection.last_intelligence_refresh_at.present? %>
+            <p class="mt-2 text-[10px] leading-5 text-slate-400">
+              Last recorded refresh:
+              <%= l(@collection.last_intelligence_refresh_at, format: :short) %>
+            </p>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="flex shrink-0 flex-wrap gap-3">
+        <%= button_to(
+              "Refresh intelligence",
+              refresh_intelligence_admin_ecosystems_load_sources_entity_research_collection_path(
+                entity_id: params[:entity_id],
+                id: @collection.id
+              ),
+              method: :post,
+              class: "inline-flex items-center justify-center rounded-2xl border-2 border-orange-200 bg-white px-5 py-3 text-xs font-black text-orange-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-orange-50"
+            ) %>
+
+        <%= link_to(
+              "← Return to collection",
+              admin_ecosystems_load_sources_entity_research_collection_path(
+                entity_id: params[:entity_id],
+                id: @collection.id
+              ),
+              class: "inline-flex items-center justify-center rounded-2xl border-2 border-slate-200 bg-white px-5 py-3 text-xs font-black text-slate-600 shadow-sm transition hover:border-orange-200 hover:text-orange-600"
+            ) %>
+      </div>
+    </div>
+
+    <div class="mt-5 border-t border-orange-100 pt-4 font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400">
+      RESEARCH_INTELLIGENCE :: QUESTIONS :: EVIDENCE :: SYNTHESIS
+    </div>
+  </footer>
+
+</div>

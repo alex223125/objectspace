@@ -1,3 +1,4 @@
+
 <%
   intelligence_service =
     Ecosystems::LoadSources::Entity::CrossEntityIntelligence.new(entities)
@@ -8,9 +9,56 @@
   relationships = dashboard[:relationships] || []
   signals = dashboard[:signals] || []
   clusters = dashboard[:clusters] || []
+  hotspots = dashboard[:hotspots] || []
+  opportunities = dashboard[:review_opportunities] || []
+  isolated = dashboard[:isolated] || []
+
+
+
+  entity_hover_card = lambda do |entity, css_class|
+    description =
+    entity.try(:description).presence ||
+      entity.try(:summary).presence ||
+      "No description available."
+
+  content_tag(
+    :div,
+    class: "entity-hint"
+  ) do
+    safe_join([
+                link_to(
+                  entity.name,
+                  admin_ecosystems_load_sources_entity_path(entity),
+                  class: css_class
+                ),
+                content_tag(
+                  :div,
+                  class: "entity-hint__popup",
+                  role: "tooltip"
+                ) do
+                  safe_join([
+                              content_tag(:strong, entity.name, class: "entity-hint__title"),
+                              content_tag(:p, description, class: "entity-hint__description"),
+                              if entity.respond_to?(:health_score) && entity.health_score.present?
+                                content_tag(
+                                  :p,
+                                  "Health score: #{entity.health_score}",
+                                  class: "entity-hint__detail"
+                                )
+                              end
+                            ].compact)
+                end
+              ])
+  end
+  end
+
+
+
 %>
 
 <section class="overflow-hidden rounded-[28px] border border-violet-200 bg-white shadow-sm dark:border-violet-900/50 dark:bg-gray-900">
+
+  <%# Header %>
   <div class="border-b border-violet-100 bg-gradient-to-br from-violet-50 via-white to-sky-50 px-5 py-5 dark:border-violet-900/50 dark:from-violet-950/40 dark:via-gray-900 dark:to-sky-950/30">
     <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
       <div>
@@ -33,6 +81,7 @@
     </div>
   </div>
 
+  <%# Metrics %>
   <div class="grid grid-cols-2 border-b border-gray-100 dark:border-gray-800 lg:grid-cols-4">
     <div class="border-r border-gray-100 p-4 dark:border-gray-800">
       <div class="text-[9px] font-black uppercase tracking-widest text-gray-400">Entities</div>
@@ -63,13 +112,13 @@
     </div>
   </div>
 
+  <%# Relationship Hotspots and Review Opportunities %>
   <div class="grid gap-5 p-5 xl:grid-cols-2">
+
     <div>
       <h3 class="mb-3 text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
         Relationship Hotspots
       </h3>
-
-      <% hotspots = dashboard[:hotspots] || [] %>
 
       <% if hotspots.any? %>
         <div class="space-y-2">
@@ -77,16 +126,15 @@
             <% entity = item[:entity] %>
             <% next unless entity %>
 
-            <div class="flex items-center justify-between gap-3 rounded-xl border border-gray-100 bg-gray-50 p-3 dark:border-gray-800 dark:bg-gray-950">
-              <%= link_to(
-                    entity.name,
-                    admin_ecosystems_load_sources_entity_path(entity),
-                    class: "truncate text-xs font-bold text-gray-800 hover:text-violet-600 dark:text-gray-100"
+            <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-gray-100 bg-gray-50 p-3 dark:border-gray-800 dark:bg-gray-950">
+              <%= render(
+                    "admin/ecosystems/load_sources/entities/entities/entity_preview",
+                    entity: entity
                   ) %>
 
               <span class="shrink-0 rounded-full bg-violet-100 px-2.5 py-1 text-[9px] font-black text-violet-700 dark:bg-violet-950 dark:text-violet-300">
-                <%= item[:relationship_count] %> links
-              </span>
+          <%= item[:relationship_count] %> links
+        </span>
             </div>
           <% end %>
         </div>
@@ -102,20 +150,18 @@
         Review Opportunities
       </h3>
 
-      <% opportunities = dashboard[:review_opportunities] || [] %>
-
       <% if opportunities.any? %>
         <div class="space-y-2">
           <% opportunities.each do |entity| %>
             <div class="rounded-xl border border-amber-100 bg-amber-50/50 p-3 dark:border-amber-900/50 dark:bg-amber-950/20">
-              <%= link_to(
-                    entity.name,
-                    admin_ecosystems_load_sources_entity_path(entity),
-                    class: "text-xs font-bold text-gray-800 hover:text-amber-600 dark:text-gray-100"
+              <%= render(
+                    "admin/ecosystems/load_sources/entities/entities/entity_preview",
+                    entity: entity
                   ) %>
 
-              <div class="mt-1 text-[10px] text-gray-500 dark:text-gray-400">
-                Health score: <%= entity.health_score %>
+              <div class="mt-2 text-[10px] text-gray-500 dark:text-gray-400">
+                Health score:
+                <%= entity.try(:health_score).presence || "Not available" %>
               </div>
             </div>
           <% end %>
@@ -126,10 +172,10 @@
         </div>
       <% end %>
     </div>
+
   </div>
 
-  <% isolated = dashboard[:isolated] || [] %>
-
+  <%# Isolated Entities %>
   <% if isolated.any? %>
     <div class="border-t border-gray-100 p-5 dark:border-gray-800">
       <h3 class="mb-3 text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
@@ -138,13 +184,13 @@
 
       <div class="flex flex-wrap gap-2">
         <% isolated.first(25).each do |entity| %>
-          <%= link_to(
-                entity.name,
-                admin_ecosystems_load_sources_entity_path(entity),
-                class: "rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-[10px] font-bold text-gray-600 hover:border-violet-300 hover:text-violet-600 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-300"
+          <%= render(
+                "admin/ecosystems/load_sources/entities/entities/entity_preview",
+                entity: entity
               ) %>
         <% end %>
       </div>
     </div>
   <% end %>
+
 </section>

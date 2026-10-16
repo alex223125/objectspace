@@ -1,0 +1,49 @@
+
+<div class="mb-4 rounded-2xl border border-orange-100 bg-gradient-to-r from-orange-50/70 via-white to-slate-50 p-4"
+     data-controller="graph-search">
+
+  <div class="flex flex-col gap-4 xl:flex-row xl:items-end">
+    <div class="min-w-0 flex-1">
+      <label for="graph-search" class="mb-2 block text-xs font-black text-slate-700">
+        Search entities
+      </label>
+
+      <div class="flex gap-2">
+        <input id="graph-search"
+               type="search"
+               placeholder="Name, identifier, or keyword…"
+               autocomplete="off"
+               class="min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100"
+               data-graph-search-target="input"
+               data-action="input->graph-search#search"
+               data-tooltip="Search the entities represented in the current graph response. This field does not create relationships.">
+
+        <button type="button"
+                class="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50"
+                data-action="click->graph-search#clear">
+          Clear
+        </button>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+      <button type="button"
+              class="rounded-xl bg-slate-900 px-4 py-3 text-sm font-bold text-white transition hover:bg-slate-700"
+              data-action="click->relationship-graph#fit"
+              data-tooltip="Ask the graph visualization to fit its current content in the available viewport.">
+        Fit graph
+      </button>
+
+      <button type="button"
+              class="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
+              data-action="click->graph-export#download"
+              data-tooltip="Download the graph data using the configured export controller.">
+        Export JSON
+      </button>
+    </div>
+  </div>
+
+  <p class="mt-3 text-xs leading-5 text-slate-500">
+    Tip: hover over controls for explanations. Search, filters, and visualization actions affect different parts of the workspace.
+  </p>
+</div>

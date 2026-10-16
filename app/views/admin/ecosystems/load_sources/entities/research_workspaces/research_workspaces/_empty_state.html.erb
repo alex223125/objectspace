@@ -1,0 +1,54 @@
+<% searching = local_assigns.fetch(:searching, false) %>
+<% index_url = local_assigns.fetch(:index_url, nil) %>
+<% new_url = local_assigns.fetch(:new_url, nil) %>
+
+<section class="my-8 rounded-[32px] border-2 border-dashed
+                border-orange-200
+                bg-gradient-to-b from-white via-orange-50/30 to-slate-50/60
+                px-6 py-12 text-center sm:px-10"
+         aria-live="polite">
+
+  <div class="mx-auto flex h-16 w-16 items-center justify-center
+              rounded-[24px] border-2 border-orange-200
+              bg-orange-100/70 text-2xl shadow-sm">
+    <%= searching ? "🔎" : "🔬" %>
+  </div>
+
+  <h2 class="mt-5 text-base font-black text-slate-800">
+    <%= searching ? "No matching investigations" : "Your research starts here" %>
+  </h2>
+
+  <p class="mx-auto mt-2 max-w-md text-xs leading-6 text-slate-400">
+    <% if searching %>
+      No workspace matches the current search and lifecycle filters.
+      Try a broader term or clear the filters.
+    <% else %>
+      Create an investigation to organize research items, capture evidence,
+      record annotations and follow recommendations.
+    <% end %>
+  </p>
+
+  <div class="mt-6 flex flex-wrap justify-center gap-3">
+
+    <% if searching && index_url.present? %>
+      <%= link_to "Clear filters",
+            index_url,
+            class: "rounded-2xl border-2 border-orange-200
+                    bg-white px-5 py-3 text-xs font-black
+                    text-orange-700 hover:bg-orange-50" %>
+    <% end %>
+
+    <% if !searching && new_url.present? %>
+      <%= link_to "Create investigation",
+            new_url,
+            class: "rounded-2xl border-2 border-orange-200
+                    bg-gradient-to-r from-orange-400 to-amber-400
+                    px-5 py-3 text-xs font-black text-white
+                    shadow-md shadow-orange-200/50
+                    transition hover:-translate-y-0.5
+                    hover:from-orange-500 hover:to-amber-500" %>
+    <% end %>
+
+  </div>
+
+</section>

@@ -1,0 +1,80 @@
+
+<% cards = [
+  {
+    key: "all",
+    title: "All records",
+    count: counts[:all] || counts["all"] || 0,
+    description: "Every saved investigation available in this library.",
+    icon: "▦",
+    classes: "border-orange-200 bg-orange-50/60 text-orange-800"
+  },
+  {
+    key: "active",
+    title: "Active",
+    count: counts[:active] || counts["active"] || 0,
+    description: "Investigations that remain in progress.",
+    icon: "●",
+    classes: "border-emerald-200 bg-emerald-50/60 text-emerald-800"
+  },
+  {
+    key: "completed",
+    title: "Completed",
+    count: counts[:completed] || counts["completed"] || 0,
+    description: "Investigations marked as finished.",
+    icon: "✓",
+    classes: "border-sky-200 bg-sky-50/60 text-sky-800"
+  },
+  {
+    key: "archived",
+    title: "Archived",
+    count: counts[:archived] || counts["archived"] || 0,
+    description: "Investigations set aside for reference.",
+    icon: "◼",
+    classes: "border-violet-200 bg-violet-50/60 text-violet-800"
+  }
+] %>
+
+<section class="mb-10">
+  <div class="mb-6">
+    <p class="text-base font-black uppercase tracking-widest text-orange-600">
+      Workspace overview
+    </p>
+    <h2 class="mt-2 text-2xl font-black text-slate-800 sm:text-3xl">
+      Investigation status
+    </h2>
+    <p class="mt-3 max-w-4xl text-lg leading-8 text-slate-600">
+      These totals summarize the saved-investigation collection supplied by the
+      application. Select a category to view its corresponding records.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <% cards.each do |card| %>
+      <% selected = selected_filter == card[:key] %>
+
+      <%= link_to saved_admin_research_workspaces_path(filter: card[:key]),
+                  aria: { current: (selected ? "page" : nil) },
+                  class: "group block rounded-[26px] border-2 p-5 transition duration-300 hover:-translate-y-1 hover:shadow-lg #{card[:classes]} #{selected ? 'ring-4 ring-orange-100 shadow-md' : 'shadow-sm'}" do %>
+        <div class="flex items-start justify-between gap-3">
+          <span class="text-lg font-black"><%= card[:title] %></span>
+          <span class="flex h-11 w-11 items-center justify-center rounded-2xl border border-current/10 bg-white/80 text-xl">
+            <%= card[:icon] %>
+          </span>
+        </div>
+
+        <div class="mt-5 text-4xl font-black tabular-nums">
+          <%= card[:count] %>
+        </div>
+
+        <p class="mt-3 text-base leading-7 text-slate-700">
+          <%= card[:description] %>
+        </p>
+
+        <div class="mt-5 flex items-center justify-between border-t border-current/15 pt-4">
+          <span class="text-base font-bold">View records</span>
+          <span class="text-xl transition-transform group-hover:translate-x-1">→</span>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</section>

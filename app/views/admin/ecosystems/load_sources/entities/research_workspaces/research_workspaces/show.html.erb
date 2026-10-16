@@ -1,0 +1,493 @@
+<%# app/views/admin/ecosystems/load_sources/entities/research_workspaces/show.html.erb %>
+<% entity_id = params[:entity_id] %>
+<% workspace = @workspace %>
+
+<% if workspace.present? %>
+  <% workspace_status = workspace.status.to_s %>
+  <% items = @items || [] %>
+  <% recommendations = Array(@recommendations) %>
+  <% metrics = @metrics.respond_to?(:to_h) ? @metrics.to_h : {} %>
+
+  <% metric_value = lambda do |key, fallback = 0|
+    value = metrics[key] || metrics[key.to_s]
+    value.nil? ? fallback : value
+  end %>
+
+  <% evidence_metrics = metric_value.call(:evidence, {}) %>
+  <% evidence_metrics = evidence_metrics.to_h if evidence_metrics.respond_to?(:to_h) %>
+  <% annotation_metrics = metric_value.call(:annotations, {}) %>
+  <% annotation_metrics = annotation_metrics.to_h if annotation_metrics.respond_to?(:to_h) %>
+  <% integrity_metrics = metric_value.call(:research_integrity, {}) %>
+  <% integrity_metrics = integrity_metrics.to_h if integrity_metrics.respond_to?(:to_h) %>
+
+  <% evidence_total = evidence_metrics[:total] || evidence_metrics["total"] || 0 %>
+  <% evidence_verified = evidence_metrics[:verified] || evidence_metrics["verified"] || 0 %>
+  <% evidence_unverified = evidence_metrics[:unverified] || evidence_metrics["unverified"] || 0 %>
+  <% evidence_disputed = evidence_metrics[:disputed] || evidence_metrics["disputed"] || 0 %>
+  <% evidence_with_source = evidence_metrics[:with_source] || evidence_metrics["with_source"] || 0 %>
+  <% verification_percent = evidence_metrics[:verification_percent] || evidence_metrics["verification_percent"] || 0 %>
+  <% provenance_percent = evidence_metrics[:provenance_percent] || evidence_metrics["provenance_percent"] || 0 %>
+  <% average_confidence = evidence_metrics[:average_confidence] || evidence_metrics["average_confidence"] %>
+
+  <% annotation_total = annotation_metrics[:total] || annotation_metrics["total"] || 0 %>
+  <% annotation_active = annotation_metrics[:active] || annotation_metrics["active"] || 0 %>
+  <% annotation_resolved = annotation_metrics[:resolved] || annotation_metrics["resolved"] || 0 %>
+
+  <% integrity_score = integrity_metrics[:score] || integrity_metrics["score"] %>
+  <% integrity_grade = integrity_metrics[:grade] || integrity_metrics["grade"] || "insufficient_data" %>
+
+  <div class="mx-auto my-8 max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
+
+    <%# Workspace header %>
+    <section class="overflow-hidden rounded-[30px] border border-orange-200 bg-gradient-to-br from-white via-orange-50/40 to-slate-50 p-6 shadow-sm sm:p-8">
+      <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+        <div class="flex min-w-0 items-start gap-4">
+          <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-orange-100 text-2xl">
+            🔬
+          </div>
+
+          <div class="min-w-0">
+            <p class="text-sm font-bold uppercase tracking-widest text-orange-700">
+              Research investigation
+            </p>
+
+            <h1 class="mt-2 break-words text-3xl font-black leading-tight text-slate-900 sm:text-4xl">
+              <%= workspace.title.presence || "Untitled research workspace" %>
+            </h1>
+
+            <% if workspace.summary.present? %>
+              <p class="mt-3 max-w-3xl whitespace-pre-line break-words text-base leading-7 text-slate-600">
+                <%= workspace.summary %>
+              </p>
+            <% else %>
+              <p class="mt-3 max-w-3xl text-base leading-7 text-slate-600">
+                Organize research subjects, assess evidence, document interpretations,
+                and track the reasoning behind findings.
+              </p>
+            <% end %>
+
+            <div class="mt-4 flex flex-wrap gap-2">
+              <span class="rounded-full border border-orange-200 bg-orange-50 px-4 py-2 text-sm font-bold text-orange-800">
+                <%= workspace_status.humanize %>
+              </span>
+
+              <span class="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700">
+                <%= pluralize(items.size, "research item") %>
+              </span>
+
+              <span class="rounded-full border border-violet-200 bg-violet-50 px-4 py-2 text-sm font-semibold text-violet-800">
+                <%= pluralize(recommendations.size, "recommendation") %>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex shrink-0 flex-wrap gap-3">
+          <%= link_to "← All workspaces",
+                      admin_ecosystems_load_sources_entity_research_workspaces_path(entity_id: entity_id),
+                      class: "inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-3 font-bold text-slate-700 hover:bg-slate-50" %>
+
+          <%= link_to "Edit workspace",
+                      edit_admin_ecosystems_load_sources_entity_research_workspace_path(
+                        entity_id: entity_id,
+                        id: workspace.slug.presence || workspace.id
+                      ),
+                      class: "inline-flex min-h-11 items-center justify-center rounded-xl border border-orange-300 bg-orange-50 px-4 py-3 font-bold text-orange-800 hover:bg-orange-100" %>
+        </div>
+      </div>
+
+      <%# Summary metrics %>
+      <div class="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <% [
+             ["Research items", items.size, "Subjects, sources and questions", "orange"],
+             ["Completed", items.count { |item| item.status.to_s == "completed" }, "Items marked complete", "emerald"],
+             ["Entities", workspace.entity_count, "Distinct linked entity records", "sky"],
+             ["Questions", workspace.question_count, "Research questions recorded", "violet"]
+           ].each do |label, value, description, color| %>
+          <div class="rounded-2xl border border-slate-200 bg-white p-5">
+            <p class="text-sm font-semibold text-slate-500"><%= label %></p>
+            <p class="mt-2 text-3xl font-black text-slate-900"><%= value %></p>
+            <p class="mt-1 text-sm leading-5 text-slate-500"><%= description %></p>
+          </div>
+        <% end %>
+      </div>
+    </section>
+
+    <%# Lifecycle controls %>
+    <section class="rounded-[26px] border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+      <h2 class="text-xl font-black text-slate-900">Investigation controls</h2>
+      <p class="mt-2 text-sm leading-6 text-slate-600">
+        Manage the investigation lifecycle. Completing an investigation does not
+        independently verify its findings.
+      </p>
+
+      <div class="mt-5 flex flex-wrap gap-3">
+        <% if workspace_status == "active" %>
+          <%= button_to "Mark completed",
+                        complete_admin_ecosystems_load_sources_entity_research_workspace_path(entity_id: entity_id, id: workspace.slug.presence || workspace.id),
+                        method: :patch,
+                        form: { data: { turbo_confirm: "Mark this investigation as completed?" } },
+                        class: "min-h-11 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 font-bold text-emerald-800 hover:bg-emerald-100" %>
+
+          <%= button_to "Archive",
+                        archive_admin_ecosystems_load_sources_entity_research_workspace_path(entity_id: entity_id, id: workspace.slug.presence || workspace.id),
+                        method: :patch,
+                        form: { data: { turbo_confirm: "Archive this investigation?" } },
+                        class: "min-h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-bold text-slate-700 hover:bg-slate-100" %>
+
+        <% elsif workspace_status == "completed" || workspace_status == "archived" %>
+          <%= button_to "Reopen investigation",
+                        reopen_admin_ecosystems_load_sources_entity_research_workspace_path(entity_id: entity_id, id: workspace.slug.presence || workspace.id),
+                        method: :patch,
+                        form: { data: { turbo_confirm: "Reopen this investigation?" } },
+                        class: "min-h-11 rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 font-bold text-orange-800 hover:bg-orange-100" %>
+
+          <% if workspace_status == "completed" %>
+            <%= button_to "Archive",
+                          archive_admin_ecosystems_load_sources_entity_research_workspace_path(entity_id: entity_id, id: workspace.slug.presence || workspace.id),
+                          method: :patch,
+                          form: { data: { turbo_confirm: "Archive this completed investigation?" } },
+                          class: "min-h-11 rounded-xl border border-slate-200 bg-white px-4 py-3 font-bold text-slate-700 hover:bg-slate-50" %>
+          <% end %>
+        <% end %>
+
+        <%= button_to "Delete workspace",
+                      admin_ecosystems_load_sources_entity_research_workspace_path(entity_id: entity_id, id: workspace.slug.presence || workspace.id),
+                      method: :delete,
+                      form: { data: { turbo_confirm: "Permanently delete this workspace?" } },
+                      class: "min-h-11 rounded-xl border border-red-200 bg-red-50 px-4 py-3 font-bold text-red-800 hover:bg-red-100" %>
+      </div>
+    </section>
+
+    <%# Research items %>
+    <section class="rounded-[28px] border border-orange-200 bg-gradient-to-b from-white to-orange-50/30 p-5 shadow-sm sm:p-7">
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 class="text-2xl font-black text-slate-900">Research items</h2>
+          <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+            Record research subjects, sources, observations and questions as
+            separate items so that their supporting material remains traceable.
+          </p>
+        </div>
+
+        <span class="w-fit rounded-full border border-orange-200 bg-white px-4 py-2 text-sm font-bold text-orange-800">
+          <%= pluralize(items.size, "item") %>
+        </span>
+      </div>
+
+      <% if workspace_status == "active" %>
+        <div class="mt-6 rounded-2xl border border-orange-200 bg-white p-5 sm:p-6">
+          <h3 class="text-lg font-black text-slate-900">Add a research item</h3>
+
+          <%= form_with(
+                scope: :item,
+                url: add_item_admin_ecosystems_load_sources_entity_research_workspace_path(
+                  entity_id: entity_id,
+                  id: workspace.slug.presence || workspace.id
+                ),
+                method: :post,
+                local: true,
+                class: "mt-5 grid grid-cols-1 gap-5 md:grid-cols-2"
+              ) do |form| %>
+
+            <div>
+              <%= form.label :kind, "Item type", class: "mb-2 block text-sm font-bold text-slate-700" %>
+              <%= form.select :kind,
+                              [
+                                ["Research question", "question"],
+                                ["Source", "source"],
+                                ["Observation", "observation"],
+                                ["Entity", "entity"],
+                                ["Note", "note"]
+                              ],
+                              { selected: "question" },
+                              required: true,
+                              class: "w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-800" %>
+            </div>
+
+            <div>
+              <%= form.label :status, "Initial status", class: "mb-2 block text-sm font-bold text-slate-700" %>
+              <%= form.select :status,
+                              [["Open", "open"], ["In progress", "in_progress"]],
+                              { selected: "open" },
+                              required: true,
+                              class: "w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-800" %>
+            </div>
+
+            <div class="md:col-span-2">
+              <%= form.label :title, "Title", class: "mb-2 block text-sm font-bold text-slate-700" %>
+              <%= form.text_field :title,
+                                  required: true,
+                                  maxlength: 255,
+                                  placeholder: "e.g. What evidence supports this claim?",
+                                  class: "w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-800" %>
+            </div>
+
+            <div class="md:col-span-2">
+              <%= form.label :body, "Description or research notes", class: "mb-2 block text-sm font-bold text-slate-700" %>
+              <%= form.text_area :body,
+                                 rows: 5,
+                                 placeholder: "Describe the question, source, observation or details to investigate...",
+                                 class: "w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-800" %>
+            </div>
+
+            <div class="md:col-span-2">
+              <%= form.submit "Add research item",
+                              class: "inline-flex min-h-11 cursor-pointer items-center justify-center rounded-xl bg-orange-600 px-6 py-3 font-bold text-white hover:bg-orange-700" %>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+          This investigation is <%= workspace_status.humanize.downcase %>.
+          Reopen it before adding more research items.
+        </p>
+      <% end %>
+
+      <% if items.any? %>
+        <div class="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-2">
+          <%= render partial: "research_item_card",
+                     collection: items,
+                     as: :item,
+                     locals: { entity_id: entity_id, workspace: workspace } %>
+        </div>
+      <% else %>
+        <%= render "research_items_empty_state" %>
+      <% end %>
+    </section>
+
+    <%# Recommendations: normalize values instead of rendering raw objects %>
+    <section class="rounded-[28px] border border-violet-200 bg-gradient-to-b from-white via-violet-50/30 to-slate-50 p-5 shadow-sm sm:p-7">
+      <div class="flex items-start gap-4">
+        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-violet-200 bg-violet-100 text-xl">
+          🧠
+        </div>
+
+        <div class="min-w-0 flex-1">
+          <h2 class="text-2xl font-black text-slate-900">Research recommendations</h2>
+          <p class="mt-2 text-sm leading-6 text-slate-600">
+            Suggestions for the next investigation steps. Review each recommendation
+            against the original research material before treating it as a finding.
+          </p>
+        </div>
+      </div>
+
+      <% if recommendations.any? %>
+        <div class="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <% recommendations.each_with_index do |recommendation, index| %>
+            <% recommendation_data = recommendation.respond_to?(:to_h) ? recommendation.to_h : {} %>
+            <% recommendation_text =
+                 if recommendation.is_a?(String)
+                   recommendation
+                 else
+                   recommendation_data[:description] ||
+                     recommendation_data["description"] ||
+                     recommendation_data[:recommendation] ||
+                     recommendation_data["recommendation"] ||
+                     recommendation_data[:message] ||
+                     recommendation_data["message"] ||
+                     recommendation_data[:title] ||
+                     recommendation_data["title"] ||
+                     recommendation_data[:text] ||
+                     recommendation_data["text"]
+                 end %>
+            <% recommendation_title =
+                 recommendation_data[:title] ||
+                   recommendation_data["title"] ||
+                   "Recommendation #{index + 1}" %>
+
+            <article class="rounded-2xl border border-violet-100 bg-white p-5">
+              <div class="flex items-start gap-3">
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-100 text-sm font-black text-violet-800">
+                  <%= index + 1 %>
+                </span>
+
+                <div class="min-w-0 flex-1">
+                  <h3 class="break-words text-base font-bold text-slate-900">
+                    <%= recommendation_title %>
+                  </h3>
+
+                  <% if recommendation_text.present? %>
+                    <p class="mt-2 whitespace-pre-line break-words text-sm leading-6 text-slate-600"><%= recommendation_text %></p>
+                  <% elsif recommendation_data.present? %>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">
+                      Review the supporting details and determine whether additional research is warranted.
+                    </p>
+
+                    <% details = recommendation_data.except(
+                      :title, "title", :description, "description",
+                      :recommendation, "recommendation", :message, "message",
+                      :text, "text"
+                    ) %>
+
+                    <% if details.any? %>
+                      <dl class="mt-3 space-y-2">
+                        <% details.each do |key, value| %>
+                          <div class="rounded-lg bg-slate-50 p-3">
+                            <dt class="text-xs font-bold uppercase tracking-wide text-slate-500">
+                              <%= key.to_s.humanize %>
+                            </dt>
+                            <dd class="mt-1 break-words text-sm text-slate-700">
+                              <% if value.is_a?(Hash) || value.is_a?(Array) %>
+                                <%= value.to_json %>
+                              <% else %>
+                                <%= value.to_s.presence || "Not provided" %>
+                              <% end %>
+                            </dd>
+                          </div>
+                        <% end %>
+                      </dl>
+                    <% end %>
+                  <% else %>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">
+                      Review the recommendation's supporting details and determine whether additional research is warranted.
+                    </p>
+                  <% end %>
+                </div>
+              </div>
+            </article>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="mt-6 rounded-2xl border border-dashed border-violet-200 bg-white p-6 text-center">
+          <p class="font-bold text-slate-800">No recommendations available yet</p>
+          <p class="mt-2 text-sm leading-6 text-slate-500">
+            Add research questions, sources, evidence and annotations to give the
+            discovery engine more context for identifying useful next steps.
+          </p>
+        </div>
+      <% end %>
+
+      <%# Discovery metrics %>
+      <div class="mt-7 border-t border-violet-100 pt-6">
+        <h3 class="text-lg font-black text-slate-900">Discovery metrics</h3>
+        <p class="mt-1 text-sm leading-6 text-slate-600">
+          Counts and quality indicators reported by the discovery engine.
+          They describe the current workspace and should not be interpreted as
+          independent validation of its conclusions.
+        </p>
+
+        <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <% [
+               ["Items", metric_value.call(:item_count, items.size), "All research items"],
+               ["Completed", items.count { |item| item.status.to_s == "completed" }, "Items marked complete"],
+               ["Progress", "#{workspace.progress}%", "Workspace completion"],
+               ["Entities", workspace.entity_count, "Distinct linked entities"],
+               ["Questions", workspace.question_count, "Research questions"],
+               ["Notes", workspace.note_count, "Research notes"],
+               ["Recommendations", recommendations.size, "Suggested next steps"],
+               ["Evidence records", evidence_total, "Recorded evidence"],
+               ["Verified evidence", evidence_verified, "Evidence marked verified"],
+               ["Unverified evidence", evidence_unverified, "Evidence awaiting verification"],
+               ["Disputed evidence", evidence_disputed, "Evidence flagged as disputed"],
+               ["Evidence with source", evidence_with_source, "Records with source provenance"],
+               ["Verification rate", "#{verification_percent}%", "Verified evidence percentage"],
+               ["Provenance coverage", "#{provenance_percent}%", "Evidence with recorded provenance"],
+               ["Annotations", annotation_total, "All research annotations"],
+               ["Active annotations", annotation_active, "Annotations needing attention"],
+               ["Resolved annotations", annotation_resolved, "Resolved annotations"]
+             ].each do |label, value, description| %>
+            <div class="rounded-xl border border-slate-200 bg-white p-4">
+              <p class="text-sm font-semibold text-slate-500"><%= label %></p>
+              <p class="mt-2 break-words text-2xl font-black text-slate-900"><%= value %></p>
+              <p class="mt-1 text-xs leading-5 text-slate-500"><%= description %></p>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div class="rounded-2xl border border-sky-100 bg-sky-50/50 p-5">
+            <h4 class="font-bold text-slate-900">Evidence confidence</h4>
+            <p class="mt-2 text-sm text-slate-600">
+              Average recorded confidence
+            </p>
+            <p class="mt-2 text-2xl font-black text-sky-900">
+              <% if average_confidence.present? %>
+                <%= number_with_precision(average_confidence.to_f, precision: 2) %>
+              <% else %>
+                Not available
+              <% end %>
+            </p>
+            <p class="mt-2 text-xs leading-5 text-slate-500">
+              No confidence value is assumed when the engine has no recorded data.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-emerald-100 bg-emerald-50/50 p-5">
+            <h4 class="font-bold text-slate-900">Research integrity</h4>
+            <p class="mt-2 text-sm text-slate-600">
+              Reported integrity assessment
+            </p>
+            <p class="mt-2 text-2xl font-black text-emerald-900">
+              <% if integrity_score.present? %>
+                <%= integrity_score %>
+              <% else %>
+                Not available
+              <% end %>
+            </p>
+            <span class="mt-3 inline-flex rounded-full border border-emerald-200 bg-white px-3 py-1 text-sm font-bold text-emerald-800">
+              <%= integrity_grade.to_s.humanize %>
+            </span>
+            <p class="mt-2 text-xs leading-5 text-slate-500">
+              The grade and score follow the discovery engine's definitions.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <%# Snapshot history %>
+    <%= render "snapshot_panel",
+               snapshots: @latest_snapshots || [],
+               workspace: workspace,
+               entity_id: entity_id %>
+
+    <%# Research quality guidance %>
+    <section class="rounded-[28px] border border-emerald-200 bg-gradient-to-r from-emerald-50/60 via-white to-orange-50/40 p-6 sm:p-7">
+      <div class="flex items-start gap-4">
+        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-emerald-200 bg-emerald-100 text-xl">
+          🧭
+        </div>
+
+        <div class="min-w-0">
+          <h2 class="text-xl font-black text-slate-900">How to evaluate research quality</h2>
+          <p class="mt-2 text-sm leading-6 text-slate-600">
+            Strong research is traceable, explicit about uncertainty, and supported
+            by relevant evidence. Distinguish source reliability from the strength
+            of an interpretation. Item counts and completion status alone do not
+            establish research quality.
+          </p>
+
+          <ul class="mt-4 list-disc space-y-2 pl-6 text-sm leading-6 text-slate-600">
+            <li>Can another administrator trace conclusions to their sources?</li>
+            <li>Are conflicting findings and limitations documented?</li>
+            <li>Are assumptions distinguished from verified facts?</li>
+            <li>Is there a clear record of what remains to be investigated?</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+
+<%# Quality report %>
+    <% if @research_quality_report.present? %>
+      <%= render partial: "admin/ecosystems/load_sources/entities/research_workspaces/research_workspaces/quality_report",
+                 locals: { report: @research_quality_report } %>
+    <% end %>
+
+  </div>
+<% else %>
+  <div class="mx-auto my-12 max-w-3xl rounded-2xl border border-red-200 bg-red-50 p-6 text-red-800">
+    <h1 class="text-xl font-bold">Workspace not available</h1>
+    <p class="mt-2">
+      The requested research workspace could not be loaded. Return to the
+      workspace list and try opening it again.
+    </p>
+
+    <div class="mt-4">
+      <%= link_to "← All workspaces",
+                  admin_ecosystems_load_sources_entity_research_workspaces_path(entity_id: entity_id),
+                  class: "inline-flex items-center rounded-xl border border-red-200 bg-white px-4 py-2 font-bold hover:bg-red-100" %>
+    </div>
+  </div>
+<% end %>

@@ -1,0 +1,194 @@
+<%
+  preview_name =
+    entity.try(:name).presence ||
+      "Entity ##{entity.id}"
+
+  preview_identifier = entity.try(:identifier)
+  preview_description =
+    entity.try(:description).presence ||
+      entity.try(:summary).presence
+
+  preview_status = entity.try(:status).presence || "Unknown"
+  preview_health = entity.try(:health_score)
+
+  preview_template =
+    if entity.respond_to?(:template)
+      entity.try(:template)
+    end
+
+  preview_path =
+    begin
+      admin_ecosystems_load_sources_entity_path(entity)
+    rescue StandardError => error
+      Rails.logger.warn(
+        "[Entity Preview] Route error: #{error.message}"
+      )
+      nil
+    end
+
+  preview_id = "entity-preview-#{entity.id}"
+%>
+
+<div
+  class="entity-preview relative inline-flex"
+  data-controller="entity-preview"
+  data-action="
+    mouseenter->entity-preview#show
+    mouseleave->entity-preview#scheduleHide
+    focusin->entity-preview#show
+    focusout->entity-preview#scheduleHide
+    keydown.esc->entity-preview#close
+  "
+>
+  <%# Entity tag %>
+
+  <% if preview_path.present? %>
+    <%= link_to preview_name,
+                preview_path,
+                id: "#{preview_id}-trigger",
+                class: "inline-flex max-w-full items-center gap-2 rounded-lg border border-violet-200 bg-white px-3 py-2 text-xs font-bold text-violet-800 shadow-sm transition hover:border-violet-400 hover:bg-violet-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 dark:border-violet-800 dark:bg-gray-900 dark:text-violet-300 dark:hover:bg-violet-950",
+                aria: {
+                  describedby: preview_id,
+                  expanded: "false",
+                  haspopup: "true"
+                },
+                data: {
+                  entity_preview_target: "trigger",
+                  action: "focus->entity-preview#show"
+                } %>
+  <% else %>
+    <button
+      id="<%= "#{preview_id}-trigger" %>"
+      type="button"
+      class="inline-flex max-w-full items-center gap-2 rounded-lg border border-violet-200 bg-white px-3 py-2 text-xs font-bold text-violet-800 shadow-sm transition hover:border-violet-400 hover:bg-violet-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 dark:border-violet-800 dark:bg-gray-900 dark:text-violet-300"
+      aria-describedby="<%= preview_id %>"
+      aria-expanded="false"
+      aria-haspopup="true"
+      data-entity-preview-target="trigger"
+      data-action="focus->entity-preview#show"
+    >
+      <%= preview_name %>
+    </button>
+  <% end %>
+
+  <%# Pre-rendered preview card. No request is needed on hover. %>
+
+  <div
+    id="<%= preview_id %>"
+    class="fixed z-[100] hidden w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-violet-200 bg-white text-left shadow-2xl dark:border-violet-800 dark:bg-gray-900"
+    role="tooltip"
+    aria-hidden="true"
+    hidden
+    data-entity-preview-target="card"
+    data-action="
+      mouseenter->entity-preview#cancelHide
+      mouseleave->entity-preview#scheduleHide
+      focusin->entity-preview#cancelHide
+      focusout->entity-preview#scheduleHide
+    "
+  >
+    <%# Card header %>
+
+    <div class="border-b border-violet-100 bg-gradient-to-br from-violet-50 to-indigo-50 p-4 dark:border-violet-900 dark:from-violet-950/60 dark:to-indigo-950/40">
+      <div class="flex items-start gap-3">
+        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-violet-600 text-lg font-black text-white shadow-sm">
+          ◈
+        </div>
+
+        <div class="min-w-0 flex-1">
+          <p class="text-[10px] font-black uppercase tracking-[0.18em] text-violet-600 dark:text-violet-400">
+            Entity Registry
+          </p>
+
+          <h3 class="mt-1 break-words text-base font-black text-gray-900 dark:text-white">
+            <%= preview_name %>
+          </h3>
+
+          <% if preview_identifier.present? %>
+            <p class="mt-1 break-all font-mono text-[11px] text-gray-500 dark:text-gray-400">
+              <%= preview_identifier %>
+            </p>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="mt-3">
+        <span class="inline-flex rounded-full border border-violet-200 bg-white px-2.5 py-1 text-[10px] font-bold text-violet-700 dark:border-violet-800 dark:bg-gray-900 dark:text-violet-300">
+          <%= preview_status.to_s.humanize %>
+        </span>
+      </div>
+    </div>
+
+    <%# Card body %>
+
+    <div class="space-y-4 p-4">
+      <div>
+        <p class="text-[10px] font-black uppercase tracking-wider text-gray-400">
+          Description
+        </p>
+
+        <p class="mt-1 whitespace-pre-line break-words text-xs leading-5 text-gray-700 dark:text-gray-300">
+          <%= preview_description.presence || "No description available." %>
+        </p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div class="rounded-xl border border-gray-100 bg-gray-50 p-3 dark:border-gray-800 dark:bg-gray-950">
+          <p class="text-[9px] font-black uppercase tracking-wider text-gray-400">
+            Entity ID
+          </p>
+
+          <p class="mt-1 break-all font-mono text-sm font-bold text-gray-800 dark:text-gray-200">
+            #<%= entity.id %>
+          </p>
+        </div>
+
+        <div class="rounded-xl border border-gray-100 bg-gray-50 p-3 dark:border-gray-800 dark:bg-gray-950">
+          <p class="text-[9px] font-black uppercase tracking-wider text-gray-400">
+            Health Score
+          </p>
+
+          <p class="mt-1 text-sm font-bold text-emerald-600 dark:text-emerald-400">
+            <%= preview_health.present? ? preview_health : "Not available" %>
+          </p>
+        </div>
+      </div>
+
+      <div>
+        <p class="text-[10px] font-black uppercase tracking-wider text-gray-400">
+          Template
+        </p>
+
+        <p class="mt-1 break-words text-xs font-semibold text-gray-700 dark:text-gray-300">
+          <%= preview_template.try(:name).presence || "No template association" %>
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 gap-2 border-t border-gray-100 pt-3 dark:border-gray-800">
+        <% if entity.try(:created_at).present? %>
+          <div class="flex items-start justify-between gap-3">
+            <span class="text-[10px] text-gray-400">Created</span>
+            <span class="text-right text-[10px] font-medium text-gray-600 dark:text-gray-300">
+              <%= l(entity.created_at, format: :short) %>
+            </span>
+          </div>
+        <% end %>
+
+        <% if entity.try(:updated_at).present? %>
+          <div class="flex items-start justify-between gap-3">
+            <span class="text-[10px] text-gray-400">Last updated</span>
+            <span class="text-right text-[10px] font-medium text-gray-600 dark:text-gray-300">
+              <%= l(entity.updated_at, format: :short) %>
+            </span>
+          </div>
+        <% end %>
+      </div>
+
+      <% if preview_path.present? %>
+        <%= link_to "Open full entity →",
+                    preview_path,
+                    class: "flex w-full items-center justify-center rounded-xl bg-violet-600 px-4 py-3 text-xs font-bold text-white transition hover:bg-violet-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500" %>
+      <% end %>
+    </div>
+  </div>
+</div>

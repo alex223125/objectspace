@@ -1,0 +1,87 @@
+
+<% report = local_assigns[:report] || {} %>
+<% metrics = report[:metrics] || report["metrics"] || {} %>
+<% recommendations = report[:recommendations] || report["recommendations"] || [] %>
+
+<% metric = lambda do |key|
+  metrics[key] || metrics[key.to_s] || 0
+end %>
+
+<section class="rounded-[28px] border-2 border-orange-100
+                bg-gradient-to-b from-white via-orange-50/20 to-slate-50/40
+                p-5 shadow-sm shadow-orange-100/40">
+
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-center
+              sm:justify-between">
+
+    <div class="flex items-start gap-3">
+      <div class="flex h-10 w-10 shrink-0 items-center justify-center
+                  rounded-2xl border border-orange-200 bg-orange-100">
+        🧭
+      </div>
+
+      <div>
+        <h3 class="text-sm font-black text-slate-800">
+          Research health
+        </h3>
+        <p class="mt-1 text-xs leading-5 text-slate-400">
+          Evidence, verification and outstanding investigation actions.
+        </p>
+      </div>
+    </div>
+
+    <%= link_to "Inspect quality →",
+                quality_admin_ecosystems_load_sources_entity_research_workspace_path(
+                  entity_id: params[:entity_id],
+                  id: @workspace.id
+                ),
+                class: "inline-flex w-fit items-center rounded-xl
+                  border border-orange-200 bg-white px-4 py-2
+                  text-xs font-black text-orange-700
+                  transition hover:bg-orange-50" %>
+  </div>
+
+  <div class="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+
+    <% [
+         ["Items", :item_count, "text-orange-700 bg-orange-50"],
+         ["Evidence", :evidence_count, "text-sky-700 bg-sky-50"],
+         ["Verified", :verified_evidence_count, "text-emerald-700 bg-emerald-50"],
+         ["Disputed", :disputed_evidence_count, "text-rose-700 bg-rose-50"]
+       ].each do |label, key, style| %>
+
+      <div class="rounded-2xl border border-orange-100 bg-white p-4">
+        <p class="text-[9px] font-black uppercase tracking-wider text-slate-400">
+          <%= label %>
+        </p>
+        <p class="mt-2 text-2xl font-black text-slate-800">
+          <%= metric.call(key) %>
+        </p>
+        <span class="mt-2 inline-flex rounded-full px-2 py-1
+                     text-[9px] font-bold <%= style %>">
+          TRACKED
+        </span>
+      </div>
+
+    <% end %>
+
+  </div>
+
+  <div class="mt-4 flex flex-wrap items-center justify-between gap-3
+              rounded-2xl border border-orange-100 bg-white/70 p-4">
+
+    <p class="text-xs text-slate-500">
+      <strong class="text-slate-700"><%= recommendations.size %></strong>
+      research recommendations available
+    </p>
+
+    <%= link_to "View provenance",
+                provenance_graph_admin_ecosystems_load_sources_entity_research_workspace_path(
+                  entity_id: params[:entity_id],
+                  id: @workspace.id,
+                  format: :json
+                ),
+                class: "text-xs font-black text-orange-600 hover:text-orange-700" %>
+  </div>
+
+</section>

@@ -127,18 +127,18 @@ export default class extends Controller {
                 filter === "all" ||
                 rowType === filter
 
-            const visible =
+            const isVisible =
                 matchesSearch &&
                 matchesFilter
 
-            row.hidden = !visible
+            row.hidden = !isVisible
 
             row.setAttribute(
                 "aria-hidden",
-                String(!visible)
+                String(!isVisible)
             )
 
-            if (visible) {
+            if (isVisible) {
                 visible += 1
             }
         })
