@@ -1,59 +1,130 @@
 
-import { Controller } from "@hotwired/stimulus";
+import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  connect() {
-    console.log("[graph-keyboard] Connected");
-    this.boundKeydown = this.handleKeydown.bind(this);
+  static targets = ["search", "status", "help"]
 
-    document.addEventListener("keydown", this.boundKeydown);
+  connect() {
+    this.onKeydown = this.onKeydown.bind(this)
+    this.element.addEventListener("keydown", this.onKeydown)
   }
 
   disconnect() {
-    document.removeEventListener("keydown", this.boundKeydown);
-    console.log("[graph-keyboard] Disconnected");
+    this.element.removeEventListener("keydown", this.onKeydown)
   }
 
-  handleKeydown(event) {
-    if (event.defaultPrevented || event.altKey ||
-        event.ctrlKey || event.metaKey) {
-      return;
+  onKeydown(event) {
+    if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) {
+      return
     }
 
-    const target = event.target;
+    const target = event.target
+    const tag = target?.tagName?.toLowerCase()
 
     if (
-        target instanceof HTMLElement &&
-        (target.isContentEditable ||
-            ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName))
+        target?.isContentEditable ||
+        ["input", "textarea", "select"].includes(tag)
     ) {
-      return;
-    }
-
-    if (event.key === "/" && !event.shiftKey) {
-      const input = document.getElementById("graph-search");
-
-      if (input) {
-        event.preventDefault();
-        input.focus();
-        console.log("[graph-keyboard] Focused graph search.");
-      } else {
-        console.warn("[graph-keyboard] #graph-search not found.");
+      if (event.key === "Escape" && tag === "input") {
+        target.value = ""
+        target.dispatchEvent(new Event("input", { bubbles: true }))
       }
+
+      return
     }
 
-    if (event.key.toLowerCase() === "f") {
-      const button = document.querySelector(
-          '[data-action~="click->relationship-graph#fit"]'
-      );
+    switch (event.key.toLowerCase()) {
+      case "/":
+        event.preventDefault()
+        this.focusSearch()
+        break
 
-      if (button) {
-        event.preventDefault();
-        button.click();
-        console.log("[graph-keyboard] Triggered fit action.");
-      } else {
-        console.warn("[graph-keyboard] Fit button not found.");
-      }
+      case "f":
+        event.preventDefault()
+        this.dispatchAction("graph-canvas#fit")
+        this.dispatchAction("graph-layout#fit")
+        this.announce("Fit command requested.")
+        break
+
+      case "r":
+        event.preventDefault()
+        this.dispatchAction("graph-canvas#reset")
+        this.dispatchAction("graph-layout#reset")
+        this.announce("Reset command requested.")
+        break
+
+      case "?":
+        event.preventDefault()
+        this.toggleHelp()
+        break
+
+      case "escape":
+        this.dispatchAction("graph-canvas#reset")
+        this.announce("Selection cleared.")
+        break
     }
+  }
+
+  focusSearch() {
+    const search = this.hasSearchTarget
+        ? this.searchTarget
+        : this.element.querySelector(
+            "[data-graph-canvas-target='search'], " +
+            "[data-graph-search-target='input'], " +
+            "input[type='search']"
+        )
+
+    if (!search) {
+      this.announce("Search field is unavailable.")
+      return
+    }
+
+    search.focus()
+    search.select?.()
+  }
+
+  dispatchAction(action) {
+    const button = this.element.querySelector(
+        `[data-action~="${action}"]`
+    )
+
+    if (button && !button.disabled) {
+      button.click()
+      return
+    }
+
+    const [controller, method] = action.split("#")
+
+    this.element.dispatchEvent(
+        new CustomEvent("relationship-graph:command", {
+          bubbles: true,
+          detail: { controller, method }
+        })
+    )
+  }
+
+  toggleHelp() {
+    if (this.hasHelpTarget) {
+      this.helpTarget.hidden = !this.helpTarget.hidden
+      if (!this.helpTarget.hidden) this.helpTarget.focus()
+      return
+    }
+
+    this.announce(
+        "Shortcuts: slash to search, F to fit, R to reset, Escape to clear selection, question mark for help."
+    )
+  }
+
+  announce(message) {
+    if (this.hasStatusTarget) {
+      this.statusTarget.textContent = message
+      return
+    }
+
+    const status = this.element.querySelector(
+        "[aria-live='polite']"
+    )
+
+    if (status) status.textContent = message
   }
 }

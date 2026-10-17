@@ -1,29 +1,34 @@
 
-<section class="mb-5 rounded-2xl border border-slate-200 bg-white p-4"
-         aria-labelledby="graph-legend-heading">
-  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+<section class="rounded-[28px] border-2 border-orange-100 bg-gradient-to-r from-orange-50/70 via-white to-emerald-50/40 p-5 sm:p-7"
+         aria-labelledby="graph-legend-title">
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
     <div>
-      <h3 id="graph-legend-heading" class="text-sm font-black text-slate-800">Graph legend</h3>
-      <p class="mt-1 text-xs text-slate-500">Use the legend to understand the visual categories.</p>
+      <p class="text-sm font-black uppercase tracking-[0.16em] text-orange-700">Field guide</p>
+      <h2 id="graph-legend-title" class="mt-1 text-2xl font-black text-slate-900">How to read the network</h2>
+      <p class="mt-2 max-w-3xl text-base leading-7 text-slate-600">
+        A graph is a map of recorded connections. The visual treatment helps you navigate it;
+        it does not, by itself, establish that a relationship is verified or approved.
+      </p>
     </div>
-
-    <ul class="flex flex-wrap gap-4 text-xs font-semibold text-slate-600">
-      <li class="flex items-center gap-2" data-tooltip="An entity is a record represented as a node.">
-        <span class="h-3 w-3 rounded-full border-2 border-indigo-500 bg-indigo-100"></span>
-        Entity
-      </li>
-      <li class="flex items-center gap-2" data-tooltip="A proposed connection must not be treated as confirmed solely because it appears in a visualization.">
-        <span class="h-3 w-3 rounded-full border-2 border-amber-500 bg-amber-100"></span>
-        Candidate
-      </li>
-      <li class="flex items-center gap-2" data-tooltip="The confirmed category should reflect persisted relationship state, not a visual guess.">
-        <span class="h-3 w-3 rounded-full border-2 border-emerald-500 bg-emerald-100"></span>
-        Confirmed
-      </li>
-    </ul>
+    <span class="w-fit rounded-full border border-orange-200 bg-white px-4 py-2 text-sm font-bold text-orange-800">Visual guide</span>
   </div>
 
-  <p class="mt-3 border-t border-slate-100 pt-3 text-[11px] leading-5 text-slate-400">
-    Colors explain presentation categories only. They do not establish correctness, confidence, or evidence quality.
-  </p>
+  <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <% [
+         ["🟠", "Entity node", "A record in your ecosystem. Select it to inspect the information available for that entity.", "border-orange-200 bg-orange-50"],
+         ["🔗", "Relationship", "A recorded connection between two entities. Inspect its type and evidence when provided.", "border-sky-200 bg-sky-50"],
+         ["🎯", "Current selection", "The entity you are investigating. Selection is a navigation aid, not a data change.", "border-violet-200 bg-violet-50"],
+         ["🕸️", "Connected group", "A set of entities linked by one or more relationships in the displayed graph.", "border-emerald-200 bg-emerald-50"]
+       ].each do |icon, title, description, classes| %>
+      <article class="rounded-2xl border-2 p-4 sm:p-5 <%= classes %>">
+        <div class="flex items-start gap-3">
+          <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-white bg-white text-2xl shadow-sm" aria-hidden="true"><%= icon %></span>
+          <div>
+            <h3 class="text-lg font-black text-slate-900"><%= title %></h3>
+            <p class="mt-2 text-base leading-7 text-slate-700"><%= description %></p>
+          </div>
+        </div>
+      </article>
+    <% end %>
+  </div>
 </section>

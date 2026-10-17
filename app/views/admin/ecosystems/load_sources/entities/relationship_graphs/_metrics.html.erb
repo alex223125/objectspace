@@ -1,50 +1,101 @@
 
 <%
-  metrics = local_assigns[:metrics] || {}
+  payload = local_assigns[:graph_payload] || {}
+  meta = payload[:meta] || payload["meta"] || {}
+  nodes = payload[:nodes] || payload["nodes"] || []
+  edges = payload[:edges] || payload["edges"] || []
 
-  read_metric = lambda do |*keys|
-    keys.each do |key|
-      value = metrics[key]
-      value = metrics[key.to_s] if value.nil?
-      return value unless value.nil?
-    end
-    nil
-  end
+  meta = meta.stringify_keys if meta.respond_to?(:stringify_keys)
 
-  cards = [
-    ["Registered entities", [:entity_count, :total_entities], "Entity records reported by the metrics service.", "🌐", "orange"],
-    ["Persisted relationships", [:relationship_count, :total_relationships], "Relationship records reported by the metrics service.", "🔗", "sky"],
-    ["Connected entities", [:connected_entities, :connected_entity_count], "Entities reported as connected.", "🕸️", "violet"],
-    ["Isolated entities", [:isolated_entities, :isolated_entity_count], "Entities reported without eligible connections.", "◉", "emerald"]
+  node_count = meta["node_count"] || nodes.size
+  edge_count = meta["edge_count"] || edges.size
+  connected_count = meta["connected_node_count"] || 0
+  isolated_count = meta["isolated_node_count"] || 0
+
+  metrics = [
+    {
+      label: "Entities",
+      value: node_count,
+      description: "Records represented in this snapshot.",
+      icon: "🌍",
+      classes: "border-orange-200 from-white via-orange-50/70 to-white",
+      value_class: "text-orange-700",
+      icon_class: "border-orange-200 bg-orange-100 text-orange-700"
+    },
+    {
+      label: "Relationships",
+      value: edge_count,
+      description: "Connections included in this snapshot.",
+      icon: "🔗",
+      classes: "border-sky-200 from-white via-sky-50/70 to-white",
+      value_class: "text-sky-700",
+      icon_class: "border-sky-200 bg-sky-100 text-sky-700"
+    },
+    {
+      label: "Connected entities",
+      value: connected_count,
+      description: "Entities reported as connected by the graph metadata.",
+      icon: "🕸️",
+      classes: "border-emerald-200 from-white via-emerald-50/70 to-white",
+      value_class: "text-emerald-700",
+      icon_class: "border-emerald-200 bg-emerald-100 text-emerald-700"
+    },
+    {
+      label: "Isolated entities",
+      value: isolated_count,
+      description: "Entities reported without connections.",
+      icon: "◉",
+      classes: "border-violet-200 from-white via-violet-50/70 to-white",
+      value_class: "text-violet-700",
+      icon_class: "border-violet-200 bg-violet-100 text-violet-700"
+    }
   ]
 %>
 
-<section aria-label="Ecosystem overview">
-  <div class="mb-4">
-    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-orange-600">Ecosystem at a glance</p>
-    <h2 class="mt-1 text-lg font-black text-slate-900">Overview metrics</h2>
+<section aria-labelledby="graph-metrics-title" data-controller="graph-metrics">
+  <div class="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <p class="text-sm font-black uppercase tracking-[0.16em] text-orange-700">Graph overview</p>
+      <h2 id="graph-metrics-title" class="mt-1 text-2xl font-black text-slate-900 sm:text-3xl">
+        Your ecosystem at a glance
+      </h2>
+      <p class="mt-2 max-w-2xl text-base leading-7 text-slate-600">
+        Start with the scale of the network, then investigate its individual records and connections.
+      </p>
+    </div>
+
+    <p class="text-sm font-medium text-slate-500">
+      Current graph snapshot
+    </p>
   </div>
 
-  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-    <% cards.each do |label, keys, description, icon, color| %>
-      <% value = read_metric.call(*keys) %>
-      <article class="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-               data-tooltip="<%= description %>">
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 2xl:grid-cols-4">
+    <% metrics.each do |metric| %>
+      <article class="group rounded-[26px] border-2 bg-gradient-to-br p-5 shadow-md shadow-slate-100/60 transition duration-300 hover:-translate-y-1 hover:shadow-xl <%= metric[:classes] %>">
         <div class="flex items-start justify-between gap-3">
-          <p class="text-xs font-bold text-slate-500"><%= label %></p>
-          <span class="flex h-10 w-10 items-center justify-center rounded-2xl bg-<%= color %>-50 text-lg">
-            <%= icon %>
+          <div>
+            <h3 class="text-base font-bold text-slate-700"><%= metric[:label] %></h3>
+            <p class="mt-4 text-4xl font-black tracking-tight tabular-nums sm:text-5xl <%= metric[:value_class] %>">
+              <%= number_with_delimiter(metric[:value].to_i) %>
+            </p>
+          </div>
+
+          <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border text-xl shadow-sm transition duration-300 group-hover:scale-110 <%= metric[:icon_class] %>" aria-hidden="true">
+            <%= metric[:icon] %>
           </span>
         </div>
 
-        <p class="mt-4 text-3xl font-black tracking-tight text-slate-900">
-          <%= value.nil? ? "—" : number_with_delimiter(value) %>
-        </p>
-
-        <p class="mt-2 text-xs leading-5 text-slate-500">
-          <%= value.nil? ? "Not provided by the metrics service." : description %>
+        <p class="mt-5 border-t border-slate-200/80 pt-4 text-sm leading-6 text-slate-600">
+          <%= metric[:description] %>
         </p>
       </article>
     <% end %>
   </div>
+
+  <% if meta["truncated"] %>
+    <div class="mt-5 rounded-2xl border-2 border-amber-200 bg-amber-50 p-4 text-base leading-7 text-amber-950" role="status">
+      <strong>Partial snapshot:</strong> The graph service reports that the result was truncated.
+      Some entities or relationships may not be included in this view.
+    </div>
+  <% end %>
 </section>

@@ -1,47 +1,111 @@
 
 <%
-  diagnostics = local_assigns[:diagnostics] || {}
-  events = diagnostics[:provenance_events] || diagnostics["provenance_events"] || []
-  events = [] unless events.is_a?(Array)
+  events = local_assigns[:events] || local_assigns[:provenance_events] || []
+
+  read_value = lambda do |object, *keys|
+    next nil if object.nil?
+
+    keys.each do |key|
+      value =
+        if object.respond_to?(:key?) && object.key?(key.to_s)
+          object[key.to_s]
+        elsif object.respond_to?(:key?) && object.key?(key.to_sym)
+          object[key.to_sym]
+        elsif object.respond_to?(key)
+          object.public_send(key)
+        end
+
+      return value unless value.nil?
+    end
+
+    nil
+  end
+
+  ordered_events = events.to_a.sort_by do |event|
+    read_value.call(event, :occurred_at, :created_at, :timestamp).to_s
+  end.reverse
 %>
 
-<section class="rounded-[26px] border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
-         aria-labelledby="provenance-timeline-heading">
+<section class="overflow-hidden rounded-[28px] border-2 border-sky-100 bg-white shadow-lg shadow-sky-100/20"
+         aria-labelledby="provenance-timeline-title"
+         data-controller="graph-provenance">
+  <header class="border-b-2 border-sky-100 bg-gradient-to-r from-sky-50/80 via-white to-violet-50/40 p-5 sm:p-7">
+    <p class="text-sm font-black uppercase tracking-[0.16em] text-sky-800">Data lineage</p>
+    <h2 id="provenance-timeline-title" class="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">
+      Provenance timeline
+    </h2>
+    <p class="mt-3 max-w-3xl text-base leading-7 text-slate-600">
+      Understand the recorded origin and history of graph data. Events are displayed from the supplied
+      provenance collection; this timeline does not reconstruct missing history or independently verify sources.
+    </p>
+  </header>
 
-  <p class="text-[10px] font-black uppercase tracking-[0.18em] text-violet-700">Relationship history</p>
-  <h2 id="provenance-timeline-heading" class="mt-1 text-lg font-black text-slate-900">Relationship provenance</h2>
-  <p class="mt-2 text-sm leading-6 text-slate-500">
-    Provenance records where a relationship came from, why it was proposed, and what evidence supports it.
-  </p>
-
-  <% if events.any? %>
-    <ol class="mt-6 space-y-4">
-      <% events.each do |raw_event| %>
+  <% if ordered_events.any? %>
+    <ol class="space-y-0 p-5 sm:p-7">
+      <% ordered_events.each_with_index do |event, index| %>
         <%
-          event = raw_event.respond_to?(:to_h) ? raw_event.to_h : {}
-          title = event[:title] || event["title"] || event[:event_type] || event["event_type"] || "Provenance event"
-          detail = event[:description] || event["description"] || event[:message] || event["message"]
-          occurred_at = event[:occurred_at] || event["occurred_at"] || event[:created_at] || event["created_at"]
-          actor = event[:actor] || event["actor"]
+          title = read_value.call(event, :title, :event_type, :action, :kind)
+          description = read_value.call(event, :description, :summary, :details, :message)
+          source = read_value.call(event, :source_name, :source, :origin)
+          timestamp = read_value.call(event, :occurred_at, :created_at, :timestamp)
+          actor = read_value.call(event, :actor_name, :user_name, :actor)
+          entity_id = read_value.call(event, :entity_id, :record_id)
         %>
-        <li class="relative border-l-2 border-violet-100 pl-5">
-          <span class="absolute -left-[7px] top-1 h-3 w-3 rounded-full border-2 border-violet-400 bg-white"></span>
-          <p class="text-sm font-black text-slate-800"><%= title.to_s.humanize %></p>
-          <% if occurred_at.present? %>
-            <p class="mt-1 text-[10px] text-slate-400"><%= occurred_at %></p>
+
+        <li class="relative pb-7 last:pb-0">
+          <% unless index == ordered_events.length - 1 %>
+            <span class="absolute bottom-0 left-[19px] top-10 w-0.5 bg-sky-100" aria-hidden="true"></span>
           <% end %>
-          <% if actor.present? %>
-            <p class="mt-1 text-xs text-slate-500">Actor: <%= actor %></p>
-          <% end %>
-          <% if detail.present? %>
-            <p class="mt-2 text-xs leading-6 text-slate-500"><%= detail %></p>
-          <% end %>
+
+          <div class="relative flex items-start gap-4">
+            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-2 border-sky-200 bg-sky-50 text-sky-800" aria-hidden="true">
+              <%= index + 1 %>
+            </span>
+
+            <div class="min-w-0 flex-1 rounded-2xl border border-slate-100 bg-white p-4 sm:p-5">
+              <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <h3 class="text-lg font-black text-slate-900">
+                  <%= title.present? ? title.to_s.humanize : "Recorded provenance event" %>
+                </h3>
+
+                <% if timestamp.present? %>
+                  <time class="text-sm font-semibold text-slate-500">
+                    <%= timestamp.respond_to?(:strftime) ? timestamp.strftime("%d %b %Y, %H:%M") : timestamp %>
+                  </time>
+                <% end %>
+              </div>
+
+              <p class="mt-2 text-base leading-7 text-slate-600">
+                <%= description.presence || "No additional event description was supplied." %>
+              </p>
+
+              <div class="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-500">
+                <% if source.present? %>
+                  <span>Source: <strong class="text-slate-700"><%= source %></strong></span>
+                <% end %>
+
+                <% if actor.present? %>
+                  <span>Actor: <strong class="text-slate-700"><%= actor %></strong></span>
+                <% end %>
+
+                <% if entity_id.present? %>
+                  <span class="break-all">Record: <%= entity_id %></span>
+                <% end %>
+              </div>
+            </div>
+          </div>
         </li>
       <% end %>
     </ol>
   <% else %>
-    <p class="mt-5 rounded-xl border border-dashed border-slate-200 p-5 text-sm leading-6 text-slate-500">
-      No provenance events were provided. The history may be unavailable or not yet recorded by your application.
-    </p>
+    <div class="p-5 sm:p-7">
+      <div class="rounded-2xl border-2 border-dashed border-sky-200 bg-sky-50/40 p-6">
+        <h3 class="text-xl font-black text-slate-900">No provenance events available</h3>
+        <p class="mt-2 text-base leading-7 text-slate-600">
+          Supply a collection of recorded provenance events to show source history here.
+          An empty timeline means no events were supplied, not necessarily that the data has no history.
+        </p>
+      </div>
+    </div>
   <% end %>
 </section>

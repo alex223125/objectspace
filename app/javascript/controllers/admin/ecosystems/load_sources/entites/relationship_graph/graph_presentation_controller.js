@@ -1,82 +1,117 @@
 
-import { Controller } from "@hotwired/stimulus";
+import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
+  static targets = ["content", "status", "button"]
+
   connect() {
-    console.log("[graph-presentation] Connected");
+    this.originalTitle = document.title
+    this.onFullscreenChange = this.onFullscreenChange.bind(this)
 
-    const savedMode = this.readSavedMode();
-    const checked = this.element.querySelector(
-        'input[name="graph_presentation_mode"]:checked'
-    );
+    document.addEventListener(
+        "fullscreenchange",
+        this.onFullscreenChange
+    )
 
-    this.applyMode(checked?.value || savedMode || "standard");
+    this.updateButton()
   }
 
-  changeMode(event) {
-    const mode = event?.currentTarget?.value;
+  disconnect() {
+    document.removeEventListener(
+        "fullscreenchange",
+        this.onFullscreenChange
+    )
 
-    console.log("[graph-presentation] changeMode()", { mode });
-
-    if (!["standard", "compact", "presentation"].includes(mode)) {
-      console.warn("[graph-presentation] Unsupported mode:", mode);
-      return;
-    }
-
-    this.applyMode(mode);
+    document.title = this.originalTitle
   }
 
-  applyMode(mode) {
-    const workspace = document.querySelector(
-        "[data-relationship-graph-target='workspace']"
-    );
-
-    if (!workspace) {
-      console.warn("[graph-presentation] Workspace not found.");
-      return;
+  async toggle() {
+    if (document.fullscreenElement) {
+      await this.exitFullscreen()
+      return
     }
 
-    workspace.classList.remove(
-        "graph-mode-standard",
-        "graph-mode-compact",
-        "graph-mode-presentation"
-    );
+    await this.enterFullscreen()
+  }
 
-    workspace.classList.add(`graph-mode-${mode}`);
-
-    this.element.querySelectorAll(
-        'input[name="graph_presentation_mode"]'
-    ).forEach((input) => {
-      input.checked = input.value === mode;
-    });
+  async enterFullscreen() {
+    const element = this.hasContentTarget
+        ? this.contentTarget
+        : this.element
 
     try {
-      window.localStorage.setItem("graph-presentation-mode", mode);
-    } catch (error) {
-      console.warn(
-          "[graph-presentation] Could not save preference:",
-          error
-      );
+      if (element.requestFullscreen) {
+        await element.requestFullscreen()
+        this.announce("Presentation mode enabled.")
+      } else {
+        this.element.classList.add("graph-presentation-mode")
+        this.announce("Presentation styling enabled.")
+      }
+    } catch (_error) {
+      this.element.classList.add("graph-presentation-mode")
+      this.announce(
+          "Fullscreen is unavailable. Presentation styling enabled instead."
+      )
     }
 
-    console.log("[graph-presentation] Applied mode:", mode);
+    this.updateButton()
   }
 
-  readSavedMode() {
+  async exitFullscreen() {
     try {
-      const value = window.localStorage.getItem(
-          "graph-presentation-mode"
-      );
+      if (document.fullscreenElement) {
+        await document.exitFullscreen()
+      }
+    } catch (_error) {
+      // The browser may already have exited fullscreen.
+    }
 
-      return ["standard", "compact", "presentation"].includes(value)
-          ? value
-          : null;
-    } catch (error) {
-      console.warn(
-          "[graph-presentation] Could not read preference:",
-          error
-      );
-      return null;
+    this.element.classList.remove("graph-presentation-mode")
+    this.announce("Presentation mode disabled.")
+    this.updateButton()
+  }
+
+  toggleStyling() {
+    const enabled = this.element.classList.toggle(
+        "graph-presentation-mode"
+    )
+
+    this.announce(
+        enabled
+            ? "Presentation styling enabled."
+            : "Presentation styling disabled."
+    )
+
+    this.updateButton()
+  }
+
+  onFullscreenChange() {
+    this.updateButton()
+
+    if (!document.fullscreenElement) {
+      this.element.classList.remove("graph-presentation-mode")
+    }
+  }
+
+  updateButton() {
+    if (!this.hasButtonTarget) return
+
+    const active = Boolean(document.fullscreenElement) ||
+        this.element.classList.contains("graph-presentation-mode")
+
+    this.buttonTarget.textContent = active
+        ? "Exit presentation"
+        : "Presentation mode"
+
+    this.buttonTarget.setAttribute(
+        "aria-pressed",
+        String(active)
+    )
+  }
+
+  announce(message) {
+    if (this.hasStatusTarget) {
+      this.statusTarget.textContent = message
     }
   }
 }

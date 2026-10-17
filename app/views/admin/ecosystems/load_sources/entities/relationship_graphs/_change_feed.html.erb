@@ -1,46 +1,102 @@
 
 <%
-  diagnostics = local_assigns[:diagnostics] || {}
-  changes = diagnostics[:change_feed] || diagnostics["change_feed"] ||
-    diagnostics[:recent_changes] || diagnostics["recent_changes"] || []
-  changes = [] unless changes.is_a?(Array)
+  changes = local_assigns[:changes] || local_assigns[:change_feed] || []
+
+  read_value = lambda do |object, *keys|
+    next nil if object.nil?
+
+    keys.each do |key|
+      value =
+        if object.respond_to?(:key?) && object.key?(key.to_s)
+          object[key.to_s]
+        elsif object.respond_to?(:key?) && object.key?(key.to_sym)
+          object[key.to_sym]
+        elsif object.respond_to?(key)
+          object.public_send(key)
+        end
+
+      return value unless value.nil?
+    end
+
+    nil
+  end
+
+  ordered_changes = changes.to_a.sort_by do |change|
+    read_value.call(change, :created_at, :occurred_at, :timestamp).to_s
+  end.reverse
 %>
 
-<section class="rounded-[26px] border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
-         aria-labelledby="change-feed-heading">
+<section class="overflow-hidden rounded-[28px] border-2 border-emerald-100 bg-white shadow-lg shadow-emerald-100/20"
+         aria-labelledby="graph-change-feed-title"
+         data-controller="graph-live-updates">
+  <header class="border-b-2 border-emerald-100 bg-gradient-to-r from-emerald-50/80 via-white to-sky-50/40 p-5 sm:p-7">
+    <p class="text-sm font-black uppercase tracking-[0.16em] text-emerald-800">Activity history</p>
+    <h2 id="graph-change-feed-title" class="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">
+      Graph change feed
+    </h2>
+    <p class="mt-3 max-w-3xl text-base leading-7 text-slate-600">
+      Review changes reported by your application. This feed is a presentation of supplied records;
+      it does not subscribe to live events unless your Stimulus controller implements that connection.
+    </p>
+  </header>
 
-  <p class="text-[10px] font-black uppercase tracking-[0.18em] text-sky-700">Recent activity</p>
-  <h2 id="change-feed-heading" class="mt-1 text-lg font-black text-slate-900">Graph change feed</h2>
-  <p class="mt-2 text-sm leading-6 text-slate-500">
-    Review changes recorded by your application. The feed is not a live audit log unless a service actually supplies live events.
-  </p>
-
-  <% if changes.any? %>
-    <div class="mt-5 space-y-3">
-      <% changes.each do |raw_change| %>
+  <% if ordered_changes.any? %>
+    <div class="divide-y divide-emerald-100">
+      <% ordered_changes.each do |change| %>
         <%
-          change = raw_change.respond_to?(:to_h) ? raw_change.to_h : {}
-          title = change[:title] || change["title"] || change[:action] || change["action"] || "Recorded change"
-          detail = change[:description] || change["description"] || change[:message] || change["message"]
-          timestamp = change[:created_at] || change["created_at"] || change[:occurred_at] || change["occurred_at"]
+          action_name = read_value.call(change, :action, :event_type, :change_type, :kind)
+          description = read_value.call(change, :description, :summary, :message, :details)
+          timestamp = read_value.call(change, :created_at, :occurred_at, :timestamp)
+          actor = read_value.call(change, :actor_name, :user_name, :actor)
+          record_id = read_value.call(change, :entity_id, :relationship_id, :record_id)
         %>
-        <article class="flex gap-3 rounded-xl border border-slate-100 p-4">
-          <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-sky-700">↻</span>
-          <div class="min-w-0 flex-1">
-            <p class="text-sm font-bold text-slate-800"><%= title.to_s.humanize %></p>
-            <% if timestamp.present? %>
-              <p class="mt-1 text-[10px] text-slate-400"><%= timestamp %></p>
-            <% end %>
-            <% if detail.present? %>
-              <p class="mt-2 text-xs leading-6 text-slate-500"><%= detail %></p>
-            <% end %>
+
+        <article class="p-5 transition hover:bg-emerald-50/30 sm:p-6">
+          <div class="flex items-start gap-4">
+            <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-emerald-200 bg-emerald-50 text-xl text-emerald-800" aria-hidden="true">
+              ↻
+            </span>
+
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <h3 class="text-lg font-black text-slate-900">
+                  <%= action_name.present? ? action_name.to_s.humanize : "Graph activity" %>
+                </h3>
+
+                <% if timestamp.present? %>
+                  <time class="text-sm font-semibold text-slate-500">
+                    <%= timestamp.respond_to?(:strftime) ? timestamp.strftime("%d %b %Y, %H:%M") : timestamp %>
+                  </time>
+                <% end %>
+              </div>
+
+              <p class="mt-2 text-base leading-7 text-slate-600">
+                <%= description.presence || "No additional details were supplied for this change." %>
+              </p>
+
+              <div class="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-500">
+                <% if actor.present? %>
+                  <span>By: <strong class="text-slate-700"><%= actor %></strong></span>
+                <% end %>
+
+                <% if record_id.present? %>
+                  <span class="break-all">Record ID: <%= record_id %></span>
+                <% end %>
+              </div>
+            </div>
           </div>
         </article>
       <% end %>
     </div>
   <% else %>
-    <p class="mt-5 rounded-xl border border-dashed border-slate-200 p-5 text-sm leading-6 text-slate-500">
-      No graph changes were supplied. An empty feed is not proof that the database has never changed.
-    </p>
+    <div class="p-5 sm:p-7">
+      <div class="rounded-2xl border-2 border-dashed border-emerald-200 bg-emerald-50/40 p-6">
+        <h3 class="text-xl font-black text-slate-900">No changes supplied</h3>
+        <p class="mt-2 text-base leading-7 text-slate-600">
+          When your controller provides recorded graph changes, they will appear here.
+          This empty state does not imply that no changes have ever occurred.
+        </p>
+      </div>
+    </div>
   <% end %>
 </section>

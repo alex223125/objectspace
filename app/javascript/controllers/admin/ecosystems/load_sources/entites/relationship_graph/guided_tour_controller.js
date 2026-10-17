@@ -1,104 +1,112 @@
 
-import { Controller } from "@hotwired/stimulus";
+import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["title", "description", "progress"];
+  static targets = [
+    "step",
+    "counter",
+    "progress",
+    "previous",
+    "next",
+    "status",
+    "panel"
+  ]
 
   connect() {
-    console.log("[guided-tour] Connected", {
-      title: this.hasTitleTarget,
-      description: this.hasDescriptionTarget,
-      progress: this.hasProgressTarget
-    });
+    this.currentIndex = 0
+    this.steps = this.stepTargets
 
-    this.steps = Array.from(
-        this.element.querySelectorAll("[data-guided-tour-step]")
-    );
-
-    this.currentIndex = Math.max(
-        0,
-        this.steps.findIndex((step) => !step.hidden)
-    );
-
-    if (this.steps.length) {
-      this.showStep(this.currentIndex);
-    } else {
-      console.info(
-          "[guided-tour] No data-guided-tour-step elements found. " +
-          "Navigation is safely disabled until steps are configured."
-      );
+    if (this.steps.length === 0) {
+      this.announce("No guided tour steps are configured.")
+      return
     }
+
+    this.showStep(0)
   }
 
-  disconnect() {
-    console.log("[guided-tour] Disconnected");
+  start() {
+    if (this.steps.length === 0) return
+
+    if (this.hasPanelTarget) {
+      this.panelTarget.hidden = false
+    }
+
+    this.showStep(0)
   }
 
   next() {
-    console.log("[guided-tour] next()");
-
-    if (!this.steps.length) {
-      console.warn("[guided-tour] No configured tour steps.");
-      return;
+    if (this.currentIndex < this.steps.length - 1) {
+      this.showStep(this.currentIndex + 1)
+    } else {
+      this.finish()
     }
-
-    this.showStep(Math.min(
-        this.currentIndex + 1,
-        this.steps.length - 1
-    ));
   }
 
   previous() {
-    console.log("[guided-tour] previous()");
-
-    if (!this.steps.length) {
-      console.warn("[guided-tour] No configured tour steps.");
-      return;
+    if (this.currentIndex > 0) {
+      this.showStep(this.currentIndex - 1)
     }
-
-    this.showStep(Math.max(this.currentIndex - 1, 0));
-  }
-
-  close() {
-    console.log("[guided-tour] close()");
-
-    this.element.hidden = true;
-    this.element.setAttribute("aria-hidden", "true");
   }
 
   showStep(index) {
-    if (!this.steps[index]) {
-      console.warn("[guided-tour] Invalid step index:", index);
-      return;
-    }
+    if (index < 0 || index >= this.steps.length) return
 
-    this.currentIndex = index;
+    this.currentIndex = index
 
-    this.steps.forEach((step, i) => {
-      step.hidden = i !== index;
-    });
+    this.steps.forEach((step, stepIndex) => {
+      step.hidden = stepIndex !== index
+    })
 
-    const step = this.steps[index];
-    const title = step.querySelector("[data-tour-title]");
-    const description = step.querySelector("[data-tour-description]");
-
-    if (this.hasTitleTarget && title) {
-      this.titleTarget.textContent = title.textContent;
-    }
-
-    if (this.hasDescriptionTarget && description) {
-      this.descriptionTarget.textContent = description.textContent;
+    if (this.hasCounterTarget) {
+      this.counterTarget.textContent =
+          `Step ${index + 1} of ${this.steps.length}`
     }
 
     if (this.hasProgressTarget) {
       this.progressTarget.style.width =
-          `${((index + 1) / this.steps.length) * 100}%`;
+          `${((index + 1) / this.steps.length) * 100}%`
+
+      this.progressTarget.setAttribute(
+          "aria-valuenow",
+          String(index + 1)
+      )
     }
 
-    console.log("[guided-tour] Showing step", {
-      current: index + 1,
-      total: this.steps.length,
-      element: step
-    });
+    if (this.hasPreviousTarget) {
+      this.previousTarget.disabled = index === 0
+    }
+
+    if (this.hasNextTarget) {
+      this.nextTarget.textContent =
+          index === this.steps.length - 1
+              ? "Finish tour"
+              : "Next step"
+    }
+
+    this.announce(
+        `Showing step ${index + 1} of ${this.steps.length}.`
+    )
+  }
+
+  finish() {
+    if (this.hasPanelTarget) {
+      this.panelTarget.hidden = true
+    }
+
+    this.announce("Guided tour completed.")
+  }
+
+  close() {
+    if (this.hasPanelTarget) {
+      this.panelTarget.hidden = true
+    }
+
+    this.announce("Guided tour closed.")
+  }
+
+  announce(message) {
+    if (this.hasStatusTarget) {
+      this.statusTarget.textContent = message
+    }
   }
 }

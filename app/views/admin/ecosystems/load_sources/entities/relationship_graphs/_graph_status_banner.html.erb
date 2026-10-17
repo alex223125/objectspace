@@ -1,0 +1,70 @@
+<% meta = local_assigns.fetch(:meta, {}) || {} %>
+<% meta = meta.as_json if meta.respond_to?(:as_json) %>
+<% meta = meta.stringify_keys if meta.respond_to?(:stringify_keys) %>
+
+<% node_count = meta["node_count"] || meta[:node_count] || 0 %>
+<% edge_count = meta["edge_count"] || meta[:edge_count] || 0 %>
+<% truncated = meta["truncated"] || meta[:truncated] || false %>
+<% generated_at = meta["generated_at"] || meta[:generated_at] %>
+<% show_refresh = local_assigns.fetch(:show_refresh, false) %>
+
+<% status_classes = truncated ?
+                      "border-amber-200 bg-amber-50 text-amber-950" :
+                      "border-emerald-200 bg-emerald-50 text-emerald-950" %>
+
+<section
+  class="rounded-2xl border-2 p-5 shadow-sm <%= status_classes %>"
+  aria-label="Graph snapshot status"
+  data-controller="graph-notifications"
+>
+  <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <div class="flex items-start gap-3">
+      <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-current/10 bg-white/80 text-xl" aria-hidden="true">
+        <%= truncated ? "⚠️" : "✓" %>
+      </span>
+
+      <div>
+        <h2 class="text-lg font-black">
+          <%= truncated ? "Partial graph snapshot" : "Graph snapshot available" %>
+        </h2>
+
+        <p class="mt-1 max-w-3xl text-sm leading-6">
+          <% if truncated %>
+            The graph may contain fewer records than the full ecosystem.
+            Review the graph limit or available pagination before drawing conclusions.
+          <% else %>
+            The graph payload is ready for exploration. Counts below describe
+            the current snapshot, not necessarily every record in your database.
+          <% end %>
+        </p>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+      <span class="rounded-full border border-current/15 bg-white/80 px-4 py-2 text-sm font-bold">
+        <%= node_count %> entities
+      </span>
+
+      <span class="rounded-full border border-current/15 bg-white/80 px-4 py-2 text-sm font-bold">
+        <%= edge_count %> relationships
+      </span>
+    </div>
+  </div>
+
+  <div class="mt-4 flex flex-col gap-3 border-t border-current/15 pt-4 sm:flex-row sm:items-center sm:justify-between">
+    <p class="text-sm leading-6">
+      <span class="font-bold">Snapshot generated:</span>
+      <%= generated_at.present? ? generated_at.to_s : "Timestamp not provided" %>
+    </p>
+
+    <% if show_refresh %>
+      <button
+        type="button"
+        data-action="click->graph-notifications#refresh"
+        class="inline-flex min-h-11 items-center justify-center rounded-xl border-2 border-current/20 bg-white px-4 py-2 text-sm font-black transition hover:bg-white/70 focus:outline-none focus:ring-4 focus:ring-white/70"
+      >
+        Refresh snapshot
+      </button>
+    <% end %>
+  </div>
+</section>

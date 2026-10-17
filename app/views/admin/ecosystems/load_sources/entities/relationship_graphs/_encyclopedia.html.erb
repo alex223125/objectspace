@@ -1,35 +1,95 @@
 
-<section class="rounded-[26px] border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
-         aria-labelledby="graph-encyclopedia-heading">
+<%
+  nodes = local_assigns[:nodes] || []
+  edges = local_assigns[:edges] || []
+  meta = local_assigns[:meta] || {}
+  meta = meta.stringify_keys if meta.respond_to?(:stringify_keys)
 
-  <p class="text-[10px] font-black uppercase tracking-[0.18em] text-cyan-700">Knowledge base</p>
-  <h2 id="graph-encyclopedia-heading" class="mt-1 text-xl font-black text-slate-900">Graph encyclopedia</h2>
-  <p class="mt-2 text-sm leading-6 text-slate-500">
-    Quick definitions for the terminology used throughout this workspace.
-  </p>
+  glossary = [
+    {
+      term: "Entity",
+      definition: "A distinct record represented in the ecosystem, such as an organization, person, resource, concept, or other modeled object.",
+      interpretation: "An entity node represents a record; it does not automatically establish that every field on the record is complete or verified."
+    },
+    {
+      term: "Relationship",
+      definition: "A recorded association between two entities. The relationship type describes the nature of that association when the source data provides one.",
+      interpretation: "A connection indicates what the data records. Its meaning and reliability depend on the relationship definition and available evidence."
+    },
+    {
+      term: "Connected entity",
+      definition: "An entity that has at least one relationship to another entity in the graph being considered.",
+      interpretation: "Connectedness depends on the graph scope. An entity that appears isolated in a filtered view may have connections outside that view."
+    },
+    {
+      term: "Isolated entity",
+      definition: "An entity with no visible incident relationship in the graph scope being considered.",
+      interpretation: "Isolation is not necessarily an error. It can reflect incomplete data, a narrow graph scope, or a genuinely independent record."
+    },
+    {
+      term: "Provenance",
+      definition: "Information about where a record or relationship came from, how it was collected, or how it changed over time.",
+      interpretation: "Use provenance to understand origin and history. Do not infer a source or verification status if the payload does not provide it."
+    },
+    {
+      term: "Graph snapshot",
+      definition: "The set of nodes, edges, and associated metadata returned for a particular graph request.",
+      interpretation: "Counts and conclusions describe this snapshot, not necessarily every record stored in the application."
+    }
+  ]
+%>
 
-  <div class="mt-5 grid gap-3 lg:grid-cols-2">
-    <% [
-         ["Entity", "A domain record representing something your application knows about."],
-         ["Node", "The graph representation of an entity within a particular graph response."],
-         ["Edge", "A connection represented by a source identifier and a target identifier."],
-         ["Relationship kind", "The domain-specific classification of a connection."],
-         ["Relationship state", "The persisted lifecycle state of a relationship, such as suggested or confirmed."],
-         ["Confidence", "An assessment supplied by your domain logic. Its meaning depends on the scoring contract."],
-         ["Evidence", "Information supporting or explaining why a relationship was proposed or accepted."],
-         ["Candidate", "A possible connection that may require validation and review before persistence."],
-         ["Isolated entity", "An entity with no eligible connection in the analyzed graph scope."],
-         ["Provenance", "Information describing where a record came from and how it was produced."],
-         ["Coverage", "The represented portion of a defined population, as calculated by the reporting service."],
-         ["Traversal depth", "The number of relationship hops explored from a starting entity, when supported by the graph service."]
-       ].each do |term, definition| %>
-      <details class="group rounded-xl border border-slate-200 p-4">
-        <summary class="cursor-pointer list-none text-sm font-black text-slate-800">
-          <%= term %>
-          <span class="float-right text-cyan-600 group-open:rotate-45">＋</span>
+<section class="overflow-hidden rounded-[28px] border-2 border-violet-100 bg-white shadow-lg shadow-violet-100/20"
+         aria-labelledby="graph-encyclopedia-title">
+  <header class="border-b-2 border-violet-100 bg-gradient-to-r from-violet-50/70 via-white to-orange-50/40 p-5 sm:p-7">
+    <p class="text-sm font-black uppercase tracking-[0.16em] text-violet-700">Knowledge reference</p>
+    <h2 id="graph-encyclopedia-title" class="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">
+      Relationship graph encyclopedia
+    </h2>
+    <p class="mt-3 max-w-3xl text-base leading-7 text-slate-600">
+      Learn the concepts behind the visualization. These definitions explain how to interpret the graph;
+      application-specific meanings should always follow your actual data model.
+    </p>
+  </header>
+
+  <div class="grid grid-cols-1 gap-4 p-5 sm:p-6 lg:grid-cols-2">
+    <% glossary.each do |entry| %>
+      <details class="group rounded-2xl border-2 border-slate-100 bg-white p-5 transition open:border-violet-200 open:bg-violet-50/30">
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-3 text-lg font-black text-slate-900">
+          <span><%= entry[:term] %></span>
+          <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-violet-200 bg-violet-50 text-violet-800 transition group-open:rotate-45" aria-hidden="true">+</span>
         </summary>
-        <p class="mt-3 text-xs leading-6 text-slate-500"><%= definition %></p>
+
+        <p class="mt-4 text-base leading-7 text-slate-700"><%= entry[:definition] %></p>
+
+        <div class="mt-4 rounded-xl border border-violet-100 bg-white p-4">
+          <h3 class="text-sm font-black uppercase tracking-wide text-violet-800">How to interpret it</h3>
+          <p class="mt-2 text-base leading-7 text-slate-600"><%= entry[:interpretation] %></p>
+        </div>
       </details>
     <% end %>
+  </div>
+
+  <div class="border-t-2 border-violet-100 bg-violet-50/40 p-5 sm:p-6">
+    <h3 class="text-lg font-black text-slate-900">Snapshot reference</h3>
+    <dl class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div class="rounded-xl border border-violet-100 bg-white p-4">
+        <dt class="text-sm font-bold text-slate-600">Entities in payload</dt>
+        <dd class="mt-2 text-3xl font-black tabular-nums text-violet-800"><%= number_with_delimiter(nodes.size) %></dd>
+      </div>
+      <div class="rounded-xl border border-violet-100 bg-white p-4">
+        <dt class="text-sm font-bold text-slate-600">Relationships in payload</dt>
+        <dd class="mt-2 text-3xl font-black tabular-nums text-violet-800"><%= number_with_delimiter(edges.size) %></dd>
+      </div>
+      <div class="rounded-xl border border-violet-100 bg-white p-4">
+        <dt class="text-sm font-bold text-slate-600">Reported depth</dt>
+        <dd class="mt-2 text-3xl font-black tabular-nums text-violet-800"><%= meta["depth"].presence || "—" %></dd>
+      </div>
+    </dl>
+
+    <p class="mt-4 text-base leading-7 text-slate-600">
+      Reported depth and counts depend on the graph service. They should not be interpreted as a complete census
+      of the database unless the service explicitly guarantees that scope.
+    </p>
   </div>
 </section>

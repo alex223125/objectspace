@@ -1,28 +1,88 @@
 
-<section class="rounded-[26px] border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
-         aria-labelledby="metric-explainer-heading">
+<%
+  node_count = local_assigns[:node_count]
+  edge_count = local_assigns[:edge_count]
+  connected_node_count = local_assigns[:connected_node_count]
+  isolated_node_count = local_assigns[:isolated_node_count]
+%>
 
-  <p class="text-[10px] font-black uppercase tracking-[0.18em] text-violet-700">Analytical reference</p>
-  <h2 id="metric-explainer-heading" class="mt-1 text-lg font-black text-slate-900">Graph metric definitions</h2>
-  <p class="mt-2 text-sm leading-6 text-slate-500">
-    Use these definitions to understand the measures. Their exact calculation depends on your graph and diagnostics services.
-  </p>
+<section class="overflow-hidden rounded-[28px] border-2 border-slate-200 bg-white shadow-lg shadow-slate-100/40"
+         aria-labelledby="metric-explainer-title">
+  <header class="border-b-2 border-slate-200 bg-gradient-to-r from-slate-50 via-white to-orange-50/40 p-5 sm:p-7">
+    <p class="text-sm font-black uppercase tracking-[0.16em] text-slate-600">Reference guide</p>
+    <h2 id="metric-explainer-title" class="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">
+      What do the numbers mean?
+    </h2>
+    <p class="mt-3 max-w-3xl text-base leading-7 text-slate-600">
+      Metrics are useful when their definitions and scope are clear. Use this guide to avoid over-interpreting
+      graph statistics or treating missing values as zero.
+    </p>
+  </header>
 
-  <dl class="mt-5 grid gap-3 sm:grid-cols-2">
-    <% [
-         ["Node count", "The number of entity representations included in the current graph response."],
-         ["Edge count", "The number of relationship representations included in the current response."],
-         ["Degree", "The number of incident edges associated with a node, subject to the graph's direction rules."],
-         ["Connected component", "A group of nodes connected by paths under a specified connectivity definition."],
-         ["Isolated entity", "An entity without an eligible connection in the analyzed scope."],
-         ["Centrality", "A family of measures describing structural position under a particular algorithm."],
-         ["Coverage", "The represented share of an explicitly defined population."],
-         ["Confidence", "An assessment supplied by relationship logic; its scale must be defined by the application."]
-       ].each do |term, description| %>
-      <div class="rounded-xl border border-slate-200 p-4">
-        <dt class="text-sm font-black text-slate-800"><%= term %></dt>
-        <dd class="mt-2 text-xs leading-6 text-slate-500"><%= description %></dd>
+  <div class="grid grid-cols-1 gap-4 p-5 sm:p-6 lg:grid-cols-2">
+    <article class="rounded-2xl border-2 border-orange-100 bg-orange-50/40 p-5">
+      <div class="flex items-center justify-between gap-3">
+        <h3 class="text-lg font-black text-slate-900">Entities</h3>
+        <span class="text-2xl" aria-hidden="true">🌍</span>
       </div>
-    <% end %>
-  </dl>
+      <p class="mt-3 text-3xl font-black tabular-nums text-orange-800">
+        <%= node_count.nil? ? "—" : number_with_delimiter(node_count) %>
+      </p>
+      <p class="mt-3 text-base leading-7 text-slate-600">
+        Distinct entity records included in the current response. This may differ from the total number
+        of records stored in the database.
+      </p>
+    </article>
+
+    <article class="rounded-2xl border-2 border-sky-100 bg-sky-50/40 p-5">
+      <div class="flex items-center justify-between gap-3">
+        <h3 class="text-lg font-black text-slate-900">Relationships</h3>
+        <span class="text-2xl" aria-hidden="true">🔗</span>
+      </div>
+      <p class="mt-3 text-3xl font-black tabular-nums text-sky-800">
+        <%= edge_count.nil? ? "—" : number_with_delimiter(edge_count) %>
+      </p>
+      <p class="mt-3 text-base leading-7 text-slate-600">
+        Relationship records represented by edges in the response. Depending on your data model,
+        edges may be directed, typed, or supported by additional evidence.
+      </p>
+    </article>
+
+    <article class="rounded-2xl border-2 border-emerald-100 bg-emerald-50/40 p-5">
+      <div class="flex items-center justify-between gap-3">
+        <h3 class="text-lg font-black text-slate-900">Connected entities</h3>
+        <span class="text-2xl" aria-hidden="true">🕸️</span>
+      </div>
+      <p class="mt-3 text-3xl font-black tabular-nums text-emerald-800">
+        <%= connected_node_count.nil? ? "—" : number_with_delimiter(connected_node_count) %>
+      </p>
+      <p class="mt-3 text-base leading-7 text-slate-600">
+        Entities that the backend reports as having at least one relevant connection.
+        Whether hidden or filtered edges count depends on the service implementation.
+      </p>
+    </article>
+
+    <article class="rounded-2xl border-2 border-violet-100 bg-violet-50/40 p-5">
+      <div class="flex items-center justify-between gap-3">
+        <h3 class="text-lg font-black text-slate-900">Isolated entities</h3>
+        <span class="text-2xl" aria-hidden="true">◉</span>
+      </div>
+      <p class="mt-3 text-3xl font-black tabular-nums text-violet-800">
+        <%= isolated_node_count.nil? ? "—" : number_with_delimiter(isolated_node_count) %>
+      </p>
+      <p class="mt-3 text-base leading-7 text-slate-600">
+        Entities reported without a visible connection in the relevant graph scope.
+        Isolation alone does not indicate a data-quality problem.
+      </p>
+    </article>
+  </div>
+
+  <div class="border-t-2 border-slate-200 bg-slate-50/70 p-5 sm:p-6">
+    <h3 class="text-lg font-black text-slate-900">A practical rule</h3>
+    <p class="mt-2 text-base leading-7 text-slate-700">
+      If a value is shown as an em dash, the value was not supplied. Do not substitute zero unless
+      the service explicitly reports zero. Always consider graph scope, filters, and response limits
+      when comparing snapshots.
+    </p>
+  </div>
 </section>

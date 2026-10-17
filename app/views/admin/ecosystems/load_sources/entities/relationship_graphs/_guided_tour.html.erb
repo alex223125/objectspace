@@ -1,53 +1,100 @@
 
-<section class="rounded-[26px] border border-cyan-100 bg-gradient-to-br from-cyan-50/60 to-white p-5 shadow-sm sm:p-7"
-         data-controller="guided-tour"
-         data-guided-tour-target="panel"
-         aria-labelledby="guided-tour-heading">
+<%
+  tour_steps = [
+    {
+      title: "Start with a known entity",
+      description: "Use the directory or search panel to locate an entity you recognize. Verify its identity and inspect its available metadata before interpreting its connections.",
+      hint: "Start with a record whose name, identifier, or source you can independently recognize.",
+      icon: "🔎"
+    },
+    {
+      title: "Explore direct relationships",
+      description: "Select an entity and examine the edges connecting it to other records. Read the relationship type instead of relying only on the visual position of nodes.",
+      hint: "An edge means a relationship is represented in the supplied graph; it does not automatically prove the relationship is correct.",
+      icon: "🔗"
+    },
+    {
+      title: "Check evidence and provenance",
+      description: "Inspect source references, recorded evidence, and available provenance information. Note whether a relationship has supporting material or missing details.",
+      hint: "Distinguish a source-backed observation from an assumption or unreviewed candidate.",
+      icon: "📚"
+    },
+    {
+      title: "Compare and document findings",
+      description: "Compare relevant records and connections. Document uncertainty and gaps, and follow your application's review workflow before changing stored data.",
+      hint: "This explorer is read-only unless separate, authorized actions explicitly change records.",
+      icon: "✓"
+    }
+  ]
+%>
 
-  <p class="text-[10px] font-black uppercase tracking-[0.18em] text-cyan-700">Interactive onboarding</p>
-  <h2 id="guided-tour-heading" class="mt-1 text-lg font-black text-slate-900">Guided graph tour</h2>
-  <p class="mt-2 text-sm leading-6 text-slate-500">
-    Follow a short sequence to learn the main parts of the workspace.
-  </p>
-
-  <div class="mt-5 rounded-2xl border border-cyan-100 bg-white p-5">
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <span class="rounded-full bg-cyan-50 px-3 py-1.5 text-xs font-black text-cyan-800"
-            data-guided-tour-target="stepLabel">
-        Step 1 of 5
-      </span>
-
-      <button type="button"
-              class="rounded-lg border border-slate-200 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50"
-              data-action="click->guided-tour#close">
-        End tour
-      </button>
-    </div>
-
-    <h3 class="mt-4 text-lg font-black text-slate-900" data-guided-tour-target="title">
-      Start with the overview
-    </h3>
-    <p class="mt-2 text-sm leading-7 text-slate-600" data-guided-tour-target="description">
-      The overview summarizes the metrics returned by your services. A missing value means the service did not provide it.
+<section class="overflow-hidden rounded-[28px] border-2 border-orange-100 bg-white shadow-lg shadow-orange-100/20"
+         aria-labelledby="guided-tour-title"
+         data-controller="guided-tour">
+  <header class="border-b-2 border-orange-100 bg-gradient-to-r from-orange-50/80 via-white to-amber-50/40 p-5 sm:p-7">
+    <p class="text-sm font-black uppercase tracking-[0.16em] text-orange-700">Learn by exploring</p>
+    <h2 id="guided-tour-title" class="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">
+      Guided graph tour
+    </h2>
+    <p class="mt-3 max-w-3xl text-base leading-7 text-slate-600">
+      Follow a practical workflow for investigating entities and relationships. Each step explains
+      what to look for and how to avoid drawing conclusions that the available evidence does not support.
     </p>
+  </header>
 
-    <div class="mt-5 h-2 overflow-hidden rounded-full bg-slate-100">
-      <div class="h-full w-1/5 rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400 transition-all"
-           data-guided-tour-target="progress"></div>
+  <div class="p-5 sm:p-7">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <% tour_steps.each_with_index do |step, index| %>
+        <article class="rounded-2xl border-2 border-slate-100 bg-white p-5 transition hover:border-orange-200 hover:shadow-md"
+                 data-guided-tour-target="step"
+                 data-tour-step="<%= index %>"
+                 <%= 'hidden' if index.positive? %>>
+          <div class="flex items-start gap-4">
+            <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-orange-200 bg-orange-50 text-2xl" aria-hidden="true">
+              <%= step[:icon] %>
+            </span>
+            <div>
+              <p class="text-sm font-black uppercase tracking-wide text-orange-700">
+                Step <%= index + 1 %> of <%= tour_steps.size %>
+              </p>
+              <h3 class="mt-2 text-xl font-black text-slate-900"><%= step[:title] %></h3>
+            </div>
+          </div>
+
+          <p class="mt-4 text-base leading-7 text-slate-600"><%= step[:description] %></p>
+
+          <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50/60 p-4">
+            <p class="text-sm font-black uppercase tracking-wide text-amber-900">Helpful hint</p>
+            <p class="mt-2 text-base leading-7 text-amber-950"><%= step[:hint] %></p>
+          </div>
+        </article>
+      <% end %>
     </div>
 
-    <div class="mt-5 flex flex-wrap justify-between gap-3">
-      <button type="button"
-              class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50"
-              data-action="click->guided-tour#previous">
-        ← Previous
-      </button>
+    <div class="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-orange-100 pt-5">
+      <p class="text-base text-slate-600">
+        <strong>Tour length:</strong> <%= tour_steps.size %> steps
+      </p>
 
-      <button type="button"
-              class="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-bold text-white hover:bg-slate-700"
-              data-action="click->guided-tour#next">
-        Next →
-      </button>
+      <div class="flex flex-wrap gap-3">
+        <button type="button"
+                data-action="guided-tour#previous"
+                class="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-slate-200 bg-white px-5 py-3 text-base font-bold text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-slate-100">
+          Previous
+        </button>
+
+        <button type="button"
+                data-action="guided-tour#next"
+                class="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-orange-400 bg-gradient-to-r from-orange-400 to-amber-400 px-5 py-3 text-base font-black text-white shadow-md transition hover:from-orange-500 hover:to-amber-500 focus:outline-none focus:ring-4 focus:ring-orange-200">
+          Next step
+        </button>
+      </div>
     </div>
+
+    <noscript>
+      <p class="mt-4 text-base leading-7 text-slate-600">
+        Enable JavaScript to use the guided walkthrough. The written guidance is also available in this template.
+      </p>
+    </noscript>
   </div>
 </section>

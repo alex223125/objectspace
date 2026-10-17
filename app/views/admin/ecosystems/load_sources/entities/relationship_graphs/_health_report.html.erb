@@ -1,60 +1,113 @@
 
 <%
-  diagnostics = local_assigns[:diagnostics] || {}
+  health = local_assigns[:health] || local_assigns[:meta] || {}
+  health = health.as_json if health.respond_to?(:as_json)
+  health = health.stringify_keys if health.respond_to?(:stringify_keys)
+  health = {} unless health.respond_to?(:[])
 
-  status = diagnostics[:health_status] || diagnostics["health_status"] ||
-    diagnostics[:status] || diagnostics["status"]
+  status = health["health_status"] || health["status"]
+  warnings = local_assigns[:warnings] || health["warnings"] || []
+  errors = local_assigns[:errors] || health["errors"] || []
+  checks = local_assigns[:checks] || health["checks"] || []
 
-  raw_checks = diagnostics[:health_checks] || diagnostics["health_checks"] ||
-    diagnostics[:checks] || diagnostics["checks"] || []
+  status_text = status.present? ? status.to_s.humanize : "Not assessed"
 
-  checks = raw_checks.is_a?(Array) ? raw_checks : []
+  status_classes =
+    case status.to_s.downcase
+    when "healthy", "ok", "passed"
+      "border-emerald-200 bg-emerald-50 text-emerald-900"
+    when "warning", "degraded"
+      "border-amber-200 bg-amber-50 text-amber-900"
+    when "unhealthy", "failed", "error"
+      "border-rose-200 bg-rose-50 text-rose-900"
+    else
+      "border-slate-200 bg-slate-50 text-slate-800"
+    end
 %>
 
-<section class="rounded-[26px] border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
-         aria-labelledby="health-report-heading">
+<section class="overflow-hidden rounded-[28px] border-2 border-emerald-100 bg-white shadow-lg shadow-emerald-100/20"
+         aria-labelledby="graph-health-title">
+  <header class="border-b-2 border-emerald-100 bg-gradient-to-r from-emerald-50/80 via-white to-sky-50/40 p-5 sm:p-7">
+    <p class="text-sm font-black uppercase tracking-[0.16em] text-emerald-800">Operational quality</p>
+    <h2 id="graph-health-title" class="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">
+      Graph health report
+    </h2>
+    <p class="mt-3 max-w-3xl text-base leading-7 text-slate-600">
+      Review the health information returned by your application. A status is only authoritative
+      if the backend actually performs the relevant checks.
+    </p>
 
-  <p class="text-[10px] font-black uppercase tracking-[0.18em] text-emerald-700">System integrity</p>
-  <h2 id="health-report-heading" class="mt-1 text-lg font-black text-slate-900">Graph health report</h2>
-  <p class="mt-2 text-sm leading-6 text-slate-500">
-    Review the health status and individual checks supplied by the diagnostics service.
-  </p>
+    <div class="mt-5 inline-flex rounded-full border-2 px-4 py-2.5 text-base font-black <%= status_classes %>">
+      Status: <%= status_text %>
+    </div>
+  </header>
 
-  <div class="mt-5 rounded-2xl border p-4 <%= status.to_s.downcase == 'healthy' ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50' %>">
-    <p class="text-xs font-bold text-slate-600">Reported status</p>
-    <p class="mt-1 text-lg font-black text-slate-900"><%= status.presence || "Unknown" %></p>
-    <% if status.blank? %>
-      <p class="mt-1 text-xs leading-5 text-slate-500">
-        No health status was provided. Unknown does not necessarily mean unhealthy.
-      </p>
-    <% end %>
+  <div class="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2 sm:p-6">
+    <article class="rounded-2xl border-2 border-amber-100 bg-amber-50/40 p-5">
+      <h3 class="text-lg font-black text-slate-900">Warnings</h3>
+      <p class="mt-2 text-3xl font-black tabular-nums text-amber-800"><%= number_with_delimiter(warnings.size) %></p>
+
+      <% if warnings.any? %>
+        <ul class="mt-4 space-y-3">
+          <% warnings.each do |warning| %>
+            <li class="rounded-xl border border-amber-200 bg-white p-4 text-base leading-7 text-slate-700">
+              <%= warning.is_a?(Hash) ? (warning["message"] || warning[:message] || warning.to_json) : warning %>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="mt-3 text-base leading-7 text-slate-600">No warning records were supplied.</p>
+      <% end %>
+    </article>
+
+    <article class="rounded-2xl border-2 border-rose-100 bg-rose-50/40 p-5">
+      <h3 class="text-lg font-black text-slate-900">Errors</h3>
+      <p class="mt-2 text-3xl font-black tabular-nums text-rose-800"><%= number_with_delimiter(errors.size) %></p>
+
+      <% if errors.any? %>
+        <ul class="mt-4 space-y-3">
+          <% errors.each do |error| %>
+            <li class="rounded-xl border border-rose-200 bg-white p-4 text-base leading-7 text-slate-700">
+              <%= error.is_a?(Hash) ? (error["message"] || error[:message] || error.to_json) : error %>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="mt-3 text-base leading-7 text-slate-600">No error records were supplied.</p>
+      <% end %>
+    </article>
   </div>
 
   <% if checks.any? %>
-    <ul class="mt-4 divide-y divide-slate-100 rounded-xl border border-slate-200">
-      <% checks.each do |raw_check| %>
-        <%
-          check = raw_check.respond_to?(:to_h) ? raw_check.to_h : {}
-          label = check[:name] || check["name"] || check[:label] || check["label"] || "Diagnostic check"
-          result = check[:status] || check["status"] || check[:result] || check["result"]
-          message = check[:message] || check["message"] || check[:description] || check["description"]
-        %>
-        <li class="p-4">
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <span class="text-sm font-bold text-slate-800"><%= label %></span>
-            <span class="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-600">
-              <%= result.presence || "Not reported" %>
-            </span>
+    <div class="border-t border-emerald-100 p-5 sm:p-6">
+      <h3 class="text-xl font-black text-slate-900">Health checks</h3>
+      <div class="mt-4 space-y-3">
+        <% checks.each do |check| %>
+          <%
+            check_name = check.is_a?(Hash) ? (check["name"] || check[:name] || "Unnamed check") : check.to_s
+            check_status = check.is_a?(Hash) ? (check["status"] || check[:status] || "unknown") : "reported"
+            check_message = check.is_a?(Hash) ? (check["message"] || check[:message]) : nil
+          %>
+          <div class="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <h4 class="text-base font-bold text-slate-900"><%= check_name %></h4>
+              <span class="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-bold text-slate-700">
+                <%= check_status.to_s.humanize %>
+              </span>
+            </div>
+            <% if check_message.present? %>
+              <p class="mt-2 text-base leading-7 text-slate-600"><%= check_message %></p>
+            <% end %>
           </div>
-          <% if message.present? %>
-            <p class="mt-2 text-xs leading-5 text-slate-500"><%= message %></p>
-          <% end %>
-        </li>
-      <% end %>
-    </ul>
-  <% else %>
-    <p class="mt-4 rounded-xl border border-dashed border-slate-200 p-4 text-xs leading-6 text-slate-500">
-      No individual health checks were supplied.
-    </p>
+        <% end %>
+      </div>
+    </div>
   <% end %>
+
+  <footer class="border-t border-emerald-100 bg-emerald-50/40 p-5 sm:p-6">
+    <p class="text-base leading-7 text-slate-700">
+      <strong>Operational note:</strong> This report is informational. It does not run database integrity
+      checks, modify records, or guarantee that all graph data is current.
+    </p>
+  </footer>
 </section>

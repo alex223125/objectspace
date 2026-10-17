@@ -1,66 +1,97 @@
 
-import { Controller } from "@hotwired/stimulus";
+import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
+  static targets = ["instructions", "status", "svg"]
+
   connect() {
-    console.group("[graph-accessibility] Accessibility checks");
+    this.element.classList.add("graph-accessibility-enabled")
 
-    try {
-      const title = this.element.querySelector(
-          "#relationship-graph-title"
-      );
+    this.handleSelection = (event) => {
+      const entity = event.detail?.entity
+      if (!entity) return
 
-      if (!title) {
-        console.warn("[graph-accessibility] Page title not found.");
-      } else {
-        console.log("[graph-accessibility] Page title:", title.textContent.trim());
-      }
-
-      const unlabeledButtons = Array.from(
-          this.element.querySelectorAll("button")
-      ).filter((button) => {
-        const label = [
-          button.getAttribute("aria-label"),
-          button.getAttribute("title"),
-          button.textContent
-        ].filter(Boolean).join(" ").trim();
-
-        return !label;
-      });
-
-      if (unlabeledButtons.length) {
-        console.warn(
-            "[graph-accessibility] Buttons without accessible text:",
-            unlabeledButtons
-        );
-      }
-
-      const inputs = Array.from(
-          this.element.querySelectorAll("input, select, textarea")
-      );
-
-      const unlabeledInputs = inputs.filter((input) => {
-        return !input.labels?.length &&
-            !input.getAttribute("aria-label") &&
-            !input.getAttribute("aria-labelledby");
-      });
-
-      if (unlabeledInputs.length) {
-        console.warn(
-            "[graph-accessibility] Inputs without associated labels:",
-            unlabeledInputs
-        );
-      }
-
-      console.log("[graph-accessibility] Checks completed.");
-    } catch (error) {
-      console.error("[graph-accessibility] Check failed:", error);
-    } finally {
-      console.groupEnd();
+      this.announce(
+          `Selected ${entity.name || `entity ${entity.id}`}.`
+      )
     }
+
+    this.element.addEventListener(
+        "relationship-graph:entity-selected",
+        this.handleSelection
+    )
+
+    this.decorateGraph()
   }
 
   disconnect() {
-    console.log("[graph-accessibility] Disconnected");
+    this.element.removeEventListener(
+        "relationship-graph:entity-selected",
+        this.handleSelection
+    )
+
+    this.element.classList.remove("graph-accessibility-enabled")
+  }
+
+  decorateGraph() {
+    const root = this.hasSvgTarget
+        ? this.svgTarget
+        : this.element.querySelector("svg")
+
+    if (!root) return
+
+    root.setAttribute("role", "group")
+
+    if (!root.hasAttribute("aria-label")) {
+      root.setAttribute(
+          "aria-label",
+          "Relationship graph. Use Tab to reach entities and Enter or Space to select one."
+      )
+    }
+
+    root.querySelectorAll("[data-node-id], [role='button']").forEach((node) => {
+      if (!node.hasAttribute("tabindex")) {
+        node.setAttribute("tabindex", "0")
+      }
+
+      if (!node.hasAttribute("aria-label")) {
+        const title = node.querySelector("title")?.textContent?.trim()
+        const text = node.querySelector("text")?.textContent?.trim()
+
+        node.setAttribute(
+            "aria-label",
+            title || text || "Graph entity"
+        )
+      }
+    })
+  }
+
+  announce(message) {
+    if (this.hasStatusTarget) {
+      this.statusTarget.textContent = message
+    }
+  }
+
+  showInstructions() {
+    if (!this.hasInstructionsTarget) return
+
+    this.instructionsTarget.hidden = false
+    this.instructionsTarget.focus()
+  }
+
+  hideInstructions() {
+    if (this.hasInstructionsTarget) {
+      this.instructionsTarget.hidden = true
+    }
+  }
+
+  toggleInstructions() {
+    if (!this.hasInstructionsTarget) return
+
+    if (this.instructionsTarget.hidden) {
+      this.showInstructions()
+    } else {
+      this.hideInstructions()
+    }
   }
 }

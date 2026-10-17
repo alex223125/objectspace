@@ -1,0 +1,133 @@
+
+<%
+  meta = local_assigns[:meta] || {}
+  meta = meta.as_json if meta.respond_to?(:as_json)
+  meta = meta.stringify_keys if meta.respond_to?(:stringify_keys)
+  meta = {} unless meta.respond_to?(:[])
+
+  nodes = local_assigns[:nodes]
+  edges = local_assigns[:edges]
+
+  node_count = meta["node_count"] || (nodes.size if nodes.respond_to?(:size))
+  edge_count = meta["edge_count"] || (edges.size if edges.respond_to?(:size))
+  connected = meta["connected_node_count"]
+  isolated = meta["isolated_node_count"]
+  depth = meta["depth"]
+  truncated = meta["truncated"]
+
+  density =
+    if node_count.to_i > 1 && edge_count.present?
+      edge_count.to_f / (node_count.to_i * (node_count.to_i - 1) / 2.0)
+    end
+%>
+
+<section class="overflow-hidden rounded-[28px] border-2 border-orange-100 bg-white shadow-lg shadow-orange-100/20"
+         aria-labelledby="graph-insights-title"
+         data-controller="graph-insights">
+  <header class="border-b-2 border-orange-100 bg-gradient-to-r from-orange-50/80 via-white to-violet-50/40 p-5 sm:p-7">
+    <p class="text-sm font-black uppercase tracking-[0.16em] text-orange-700">Interpretation and context</p>
+    <h2 id="graph-insights-title" class="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">
+      Graph metrics and insights
+    </h2>
+    <p class="mt-3 max-w-3xl text-base leading-7 text-slate-600">
+      Use graph metrics to understand the shape of the current snapshot. A metric describes structure;
+      it does not by itself establish the importance, correctness, or meaning of a relationship.
+    </p>
+  </header>
+
+  <div class="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2 sm:p-6 xl:grid-cols-3">
+    <article class="rounded-2xl border-2 border-orange-100 bg-orange-50/40 p-5">
+      <h3 class="text-base font-bold text-slate-700">Entities represented</h3>
+      <p class="mt-3 text-3xl font-black tabular-nums text-orange-800">
+        <%= node_count.nil? ? "—" : number_with_delimiter(node_count) %>
+      </p>
+      <p class="mt-2 text-base leading-7 text-slate-600">
+        The number of entities represented in this graph snapshot.
+      </p>
+    </article>
+
+    <article class="rounded-2xl border-2 border-sky-100 bg-sky-50/40 p-5">
+      <h3 class="text-base font-bold text-slate-700">Relationships represented</h3>
+      <p class="mt-3 text-3xl font-black tabular-nums text-sky-800">
+        <%= edge_count.nil? ? "—" : number_with_delimiter(edge_count) %>
+      </p>
+      <p class="mt-2 text-base leading-7 text-slate-600">
+        The number of relationship edges supplied in the current graph.
+      </p>
+    </article>
+
+    <article class="rounded-2xl border-2 border-emerald-100 bg-emerald-50/40 p-5">
+      <h3 class="text-base font-bold text-slate-700">Connected entities</h3>
+      <p class="mt-3 text-3xl font-black tabular-nums text-emerald-800">
+        <%= connected.nil? ? "—" : number_with_delimiter(connected) %>
+      </p>
+      <p class="mt-2 text-base leading-7 text-slate-600">
+        The backend-reported count of entities with graph connections.
+      </p>
+    </article>
+
+    <article class="rounded-2xl border-2 border-violet-100 bg-violet-50/40 p-5">
+      <h3 class="text-base font-bold text-slate-700">Isolated entities</h3>
+      <p class="mt-3 text-3xl font-black tabular-nums text-violet-800">
+        <%= isolated.nil? ? "—" : number_with_delimiter(isolated) %>
+      </p>
+      <p class="mt-2 text-base leading-7 text-slate-600">
+        The backend-reported count of entities without visible connections.
+      </p>
+    </article>
+
+    <article class="rounded-2xl border-2 border-amber-100 bg-amber-50/40 p-5">
+      <h3 class="text-base font-bold text-slate-700">Traversal depth</h3>
+      <p class="mt-3 text-3xl font-black tabular-nums text-amber-900">
+        <%= depth.nil? ? "—" : depth %>
+      </p>
+      <p class="mt-2 text-base leading-7 text-slate-600">
+        The traversal depth reported by the service, when available.
+      </p>
+    </article>
+
+    <article class="rounded-2xl border-2 border-rose-100 bg-rose-50/40 p-5">
+      <h3 class="text-base font-bold text-slate-700">Snapshot completeness</h3>
+      <p class="mt-3 text-2xl font-black text-rose-800">
+        <%= truncated.nil? ? "Not reported" : (truncated ? "Truncated" : "Not marked truncated") %>
+      </p>
+      <p class="mt-2 text-base leading-7 text-slate-600">
+        Indicates whether the service marked the graph response as truncated.
+      </p>
+    </article>
+  </div>
+
+  <div class="border-t-2 border-orange-100 bg-orange-50/30 p-5 sm:p-6">
+    <h3 class="text-xl font-black text-slate-900">How to read these metrics</h3>
+
+    <div class="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div class="rounded-2xl border border-orange-100 bg-white p-5">
+        <h4 class="text-base font-black text-slate-900">Connectivity</h4>
+        <p class="mt-2 text-base leading-7 text-slate-600">
+          More edges can mean more recorded associations, but edge count alone does not reveal whether
+          those associations are meaningful, reliable, duplicated, or correctly classified.
+        </p>
+      </div>
+
+      <div class="rounded-2xl border border-orange-100 bg-white p-5">
+        <h4 class="text-base font-black text-slate-900">Graph scope</h4>
+        <p class="mt-2 text-base leading-7 text-slate-600">
+          Filters, depth limits, and response limits can change what appears in a snapshot.
+          Compare metrics only when their graph scope is understood.
+        </p>
+      </div>
+
+      <% if density.present? %>
+        <div class="rounded-2xl border border-orange-100 bg-white p-5 lg:col-span-2">
+          <h4 class="text-base font-black text-slate-900">Approximate undirected density</h4>
+          <p class="mt-2 text-2xl font-black tabular-nums text-orange-800"><%= number_to_percentage(density * 100, precision: 2) %></p>
+          <p class="mt-2 text-base leading-7 text-slate-600">
+            Calculated as edges divided by the maximum possible number of undirected edges for the supplied
+            node count. This is only a rough indicator: it assumes a simple undirected graph and may not
+            describe your actual graph if relationships are directed or parallel edges are allowed.
+          </p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>

@@ -1,72 +1,170 @@
 
-<details class="mb-4 overflow-hidden rounded-2xl border border-slate-200 bg-white"
-         data-controller="graph-filters">
-  <summary class="cursor-pointer list-none bg-slate-50/70 px-5 py-4 transition hover:bg-orange-50/50">
-    <span class="flex flex-wrap items-center justify-between gap-3">
-      <span>
-        <span class="block text-sm font-black text-slate-800">Graph filters</span>
-        <span class="mt-1 block text-xs text-slate-500">Adjust the request scope and reload the graph.</span>
+<%
+  nodes = local_assigns[:nodes] || []
+  edges = local_assigns[:edges] || []
+
+  read_value = lambda do |object, *keys|
+    keys.each do |key|
+      value =
+        if object.respond_to?(:key?) && object.key?(key.to_s)
+          object[key.to_s]
+        elsif object.respond_to?(:key?) && object.key?(key.to_sym)
+          object[key.to_sym]
+        elsif object.respond_to?(key)
+          object.public_send(key)
+        end
+      return value unless value.nil?
+    end
+    nil
+  end
+
+  entity_types = nodes.map { |node| read_value.call(node, :type, :entity_type, :category, :kind) }
+                      .compact.map(&:to_s).reject(&:blank?).uniq.sort
+  relationship_types = edges.map { |edge| read_value.call(edge, :type, :relationship_type, :predicate, :label) }
+                            .compact.map(&:to_s).reject(&:blank?).uniq.sort
+%>
+
+
+<section
+  class="overflow-hidden rounded-[28px] border-2 border-orange-100 bg-white shadow-md shadow-orange-100/20"
+  data-controller="graph-drawer graph-filters"
+  data-graph-drawer-open-value="true"
+  aria-labelledby="graph-filters-title"
+>
+  <button
+    type="button"
+    data-action="click->graph-drawer#toggle"
+    data-graph-drawer-target="toggle"
+    aria-expanded="true"
+    aria-controls="graph-filters-panel"
+    class="flex min-h-16 w-full items-center justify-between gap-4 bg-gradient-to-r from-orange-50 to-white px-5 py-4 text-left transition hover:bg-orange-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-100 sm:px-6"
+  >
+    <span class="min-w-0">
+      <span class="block text-sm font-black uppercase tracking-[0.16em] text-orange-700">
+        Refine results
       </span>
-      <span class="rounded-full border border-orange-100 bg-orange-50 px-3 py-1.5 text-xs font-bold text-orange-700">Configure →</span>
+
+      <span
+        id="graph-filters-title"
+        class="mt-1 block text-xl font-black text-slate-900"
+      >
+        Graph filters
+      </span>
+
+      <span class="mt-1 block text-sm leading-6 text-slate-600">
+        Narrow your investigation without changing stored data.
+      </span>
     </span>
-  </summary>
 
-  <form action="<%= request.path %>"
-        method="get"
-        class="grid gap-4 border-t border-slate-100 p-5 sm:grid-cols-2 xl:grid-cols-4">
+    <span
+      data-graph-drawer-target="icon"
+      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-2 border-orange-200 bg-white text-xl font-bold text-orange-800 transition-transform"
+      aria-hidden="true"
+    >
+      −
+    </span>
+  </button>
 
-    <label class="flex flex-col gap-2 text-xs font-bold text-slate-700">
-      Entity search
-      <input type="search"
-             name="query"
-             value="<%= params[:query] %>"
-             placeholder="Optional keyword"
-             class="rounded-xl border border-slate-200 px-3 py-3 text-sm font-normal"
-             data-tooltip="A search term passed to your graph service. Its exact matching behavior depends on that service.">
-    </label>
+  <div
+    id="graph-filters-panel"
+    data-graph-drawer-target="panel"
+    data-graph-filters-target="panel"
+    class="border-t-2 border-orange-100 p-5 sm:p-6"
+  >
+    <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h3 class="text-sm font-bold text-slate-900">
+          Filter criteria
+        </h3>
 
-    <label class="flex flex-col gap-2 text-xs font-bold text-slate-700">
-      Relationship state
-      <select name="state" class="rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm font-normal">
-        <option value="">All states</option>
-        <% %w[confirmed suggested rejected archived active].each do |state| %>
-          <option value="<%= state %>" <%= "selected" if params[:state] == state %>><%= state.humanize %></option>
-        <% end %>
-      </select>
-    </label>
+        <p class="mt-1 text-sm text-slate-500">
+          Combine entity and relationship types to narrow your results.
+        </p>
+      </div>
 
-    <label class="flex flex-col gap-2 text-xs font-bold text-slate-700">
-      Relationship type
-      <input type="text"
-             name="relationship_type"
-             value="<%= params[:relationship_type] %>"
-             placeholder="Optional type"
-             class="rounded-xl border border-slate-200 px-3 py-3 text-sm font-normal">
-    </label>
+      <span
+        data-graph-filters-target="activeBadge"
+        class="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-700"
+        aria-live="polite"
+      >
+        No active filters
+      </span>
+    </div>
 
-    <label class="flex flex-col gap-2 text-xs font-bold text-slate-700">
-      Maximum nodes
-      <select name="limit" class="rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm font-normal">
-        <% [50, 100, 250, 500, 1000, 2000].each do |limit| %>
-          <option value="<%= limit %>" <%= "selected" if (params[:limit].presence || "100").to_i == limit %>><%= limit %></option>
-        <% end %>
-      </select>
-    </label>
+    <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+      <div>
+        <label
+          for="graph-filter-entity-type"
+          class="block text-sm font-semibold text-slate-800"
+        >
+          Entity type
+        </label>
 
-    <div class="flex flex-wrap items-center gap-3 sm:col-span-2 xl:col-span-4">
-      <button type="submit"
-              class="rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 px-5 py-3 text-sm font-black text-white shadow-sm transition hover:from-orange-600 hover:to-amber-600">
-        Apply filters →
+        <select
+          id="graph-filter-entity-type"
+          name="entity_type"
+          data-graph-filters-target="entityType"
+          data-action="change->graph-filters#preview"
+          class="mt-2 min-h-12 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-100"
+        >
+          <option value="">All entity types</option>
+        </select>
+      </div>
+
+      <div>
+        <label
+          for="graph-filter-relationship-type"
+          class="block text-sm font-semibold text-slate-800"
+        >
+          Relationship type
+        </label>
+
+        <select
+          id="graph-filter-relationship-type"
+          name="relationship_type"
+          data-graph-filters-target="relationshipType"
+          data-action="change->graph-filters#preview"
+          class="mt-2 min-h-12 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-100"
+        >
+          <option value="">All relationship types</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="mt-5 flex flex-wrap items-center gap-3 border-t border-slate-100 pt-5">
+      <button
+        type="button"
+        data-action="click->graph-filters#apply"
+        class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-orange-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-orange-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-200"
+      >
+        <span aria-hidden="true">⌕</span>
+        Apply filters
       </button>
 
-      <a href="<%= request.path %>"
-         class="rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50">
-        Reset
-      </a>
+      <button
+        type="button"
+        data-action="click->graph-filters#reset"
+        class="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-slate-200"
+      >
+        Clear filters
+      </button>
 
-      <p class="text-xs leading-5 text-slate-400">
-        Applying filters reloads this page. The server determines which records qualify.
-      </p>
+      <span
+        class="text-sm text-slate-500 md:ml-auto"
+        data-graph-filters-target="resultCount"
+        aria-live="polite"
+        role="status"
+      >
+        Preparing filters…
+      </span>
     </div>
-  </form>
-</details>
+
+    <p
+      class="mt-4 text-sm leading-6 text-slate-500"
+      data-graph-filters-target="message"
+      aria-live="polite"
+    >
+      Filters only affect the current view. Stored entities and relationships remain unchanged.
+    </p>
+  </div>
+</section>

@@ -1,114 +1,115 @@
 
-import { Controller } from "@hotwired/stimulus";
+import { Controller } from "@hotwired/stimulus"
 
+/**
+ * Relationship Graph coordinator.
+ *
+ * Optional markup:
+ * data-controller="relationship-graph"
+ * data-relationship-graph-node-count-value="12"
+ * data-relationship-graph-edge-count-value="0"
+ */
 export default class extends Controller {
-    static targets = ["workspace", "status"];
+    static values = {
+        nodeCount: { type: Number, default: 0 },
+        edgeCount: { type: Number, default: 0 },
+        endpoint: String
+    }
+
+    static targets = ["status", "nodeCount", "edgeCount", "announcement"]
 
     connect() {
-        console.info("[relationship-graph] Controller connected", {
-            element: this.element,
-            hasStatusTarget: this.hasStatusTarget,
-            hasWorkspaceTarget: this.hasWorkspaceTarget
-        });
+        this.element.dataset.relationshipGraphReady = "true"
+        this.updateMetrics()
+
+        this.handleGraphUpdated = this.handleGraphUpdated.bind(this)
+        this.handleEntitySelected = this.handleEntitySelected.bind(this)
+
+        this.element.addEventListener(
+            "relationship-graph:updated",
+            this.handleGraphUpdated
+        )
+
+        this.element.addEventListener(
+            "relationship-graph:entity-selected",
+            this.handleEntitySelected
+        )
     }
 
     disconnect() {
-        console.info("[relationship-graph] Controller disconnected");
+        this.element.removeEventListener(
+            "relationship-graph:updated",
+            this.handleGraphUpdated
+        )
+
+        this.element.removeEventListener(
+            "relationship-graph:entity-selected",
+            this.handleEntitySelected
+        )
+
+        delete this.element.dataset.relationshipGraphReady
     }
 
-    fit(event) {
-        event?.preventDefault();
-
-        console.info("[relationship-graph] fit() called");
-
-        // Support common graph visualization libraries if present.
-        const graphInstance =
-            this.element.__graph ||
-            this.element.graph ||
-            this.element._graph;
-
-        if (graphInstance) {
-            try {
-                if (typeof graphInstance.fit === "function") {
-                    graphInstance.fit();
-                    console.info("[relationship-graph] Graph instance fit() executed");
-                    this.updateStatus("Graph fitted");
-                    return;
-                }
-
-                if (typeof graphInstance.zoomToFit === "function") {
-                    graphInstance.zoomToFit();
-                    console.info("[relationship-graph] Graph instance zoomToFit() executed");
-                    this.updateStatus("Graph fitted");
-                    return;
-                }
-
-                console.debug(
-                    "[relationship-graph] Graph instance found, but no supported fit method",
-                    graphInstance
-                );
-            } catch (error) {
-                console.error("[relationship-graph] Graph library fit failed", error);
-            }
+    updateMetrics() {
+        if (this.hasNodeCountTarget) {
+            this.nodeCountTargets.forEach((target) => {
+                target.textContent = this.formatNumber(this.nodeCountValue)
+            })
         }
 
-        // Fallback for an SVG-based graph.
-        const svg = this.element.querySelector("svg");
-
-        if (svg) {
-            const graphGroup =
-                svg.querySelector("[data-graph-content]") ||
-                svg.querySelector("g");
-
-            if (graphGroup && typeof graphGroup.getBBox === "function") {
-                try {
-                    const bounds = graphGroup.getBBox();
-
-                    if (bounds.width > 0 && bounds.height > 0) {
-                        const padding = 24;
-
-                        svg.setAttribute(
-                            "viewBox",
-                            [
-                                bounds.x - padding,
-                                bounds.y - padding,
-                                bounds.width + padding * 2,
-                                bounds.height + padding * 2
-                            ].join(" ")
-                        );
-
-                        svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
-
-                        console.info("[relationship-graph] SVG fitted", bounds);
-                        this.updateStatus("Graph fitted");
-                        return;
-                    }
-                } catch (error) {
-                    console.error("[relationship-graph] SVG fitting failed", error);
-                }
-            }
-
-            console.warn(
-                "[relationship-graph] SVG exists, but no measurable graph content was found"
-            );
-            this.updateStatus("Graph content unavailable");
-            return;
+        if (this.hasEdgeCountTarget) {
+            this.edgeCountTargets.forEach((target) => {
+                target.textContent = this.formatNumber(this.edgeCountValue)
+            })
         }
-
-        // No visualization is present. Do not throw an error.
-        console.warn(
-            "[relationship-graph] No SVG or supported graph instance found. " +
-            "The current page may contain only the entity list."
-        );
-
-        this.updateStatus("No graph visualization found");
     }
 
-    updateStatus(message) {
+    handleGraphUpdated(event) {
+        const detail = event.detail || {}
+
+        if (Number.isFinite(Number(detail.nodeCount))) {
+            this.nodeCountValue = Number(detail.nodeCount)
+        }
+
+        if (Number.isFinite(Number(detail.edgeCount))) {
+            this.edgeCountValue = Number(detail.edgeCount)
+        }
+
+        this.updateMetrics()
+
         if (this.hasStatusTarget) {
-            this.statusTarget.textContent = message;
+            this.statusTarget.textContent =
+                this.nodeCountValue === 0
+                    ? "No graph data"
+                    : this.edgeCountValue === 0
+                        ? "Connections needed"
+                        : "Graph available"
         }
 
-        console.debug("[relationship-graph] Status:", message);
+        this.announce(
+            `Graph updated: ${this.nodeCountValue} entities and ${this.edgeCountValue} relationships.`
+        )
+    }
+
+    handleEntitySelected(event) {
+        const entity = event.detail?.entity
+        if (!entity) return
+
+        this.announce(`Selected entity: ${entity.name || entity.id}.`)
+    }
+
+    announce(message) {
+        if (this.hasAnnouncementTarget) {
+            this.announcementTarget.textContent = message
+        }
+
+        this.dispatch("announcement", {
+            detail: { message },
+            bubbles: true
+        })
+    }
+
+    formatNumber(value) {
+        return new Intl.NumberFormat().format(value)
     }
 }

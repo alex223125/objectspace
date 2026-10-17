@@ -1,81 +1,182 @@
 
-import { Controller } from "@hotwired/stimulus";
+import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-    connect() {
-        console.log("[graph-export] Connected", this.element);
+    static values = {
+        data: { type: Object, default: {} },
+        filename: { type: String, default: "objectspace-relationship-graph" }
     }
 
-    download() {
-        console.group("[graph-export] download()");
+    connect() {
+        this.handleUpdate = this.handleUpdate.bind(this)
 
-        try {
-            const source = document.querySelector(
-                "[data-graph-export-target='source'], " +
-                "#graph-export-data"
-            );
-
-            let data;
-
-            if (source) {
-                const raw = source.tagName === "SCRIPT"
-                    ? source.textContent
-                    : source.value;
-
-                data = JSON.parse(raw);
-                console.log("[graph-export] Using supplied JSON payload.");
-            } else {
-                const nodes = Array.from(
-                    document.querySelectorAll("[data-graph-node-id]")
-                ).map((element) => ({
-                    id: element.getAttribute("data-graph-node-id"),
-                    text: element.textContent.trim()
-                }));
-
-                data = {
-                    export_type: "rendered_graph_diagnostic",
-                    warning:
-                        "DOM snapshot only; this is not the complete service response.",
-                    nodes,
-                    edges: [],
-                    exported_at: new Date().toISOString()
-                };
-
-                console.warn(
-                    "[graph-export] No JSON payload found. " +
-                    "Exporting a DOM diagnostic snapshot; edges are not reconstructed."
-                );
-            }
-
-            const blob = new Blob(
-                [JSON.stringify(data, null, 2)],
-                { type: "application/json;charset=utf-8" }
-            );
-
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-
-            link.href = url;
-            link.download = "relationship-graph.json";
-            link.style.display = "none";
-
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-
-            URL.revokeObjectURL(url);
-
-            console.log("[graph-export] Download initiated.", {
-                bytes: blob.size
-            });
-        } catch (error) {
-            console.error("[graph-export] Download failed:", error);
-        } finally {
-            console.groupEnd();
-        }
+        this.element.addEventListener(
+            "relationship-graph:updated",
+            this.handleUpdate
+        )
     }
 
     disconnect() {
-        console.log("[graph-export] Disconnected");
+        this.element.removeEventListener(
+            "relationship-graph:updated",
+            this.handleUpdate
+        )
+    }
+
+    handleUpdate(event) {
+        if (event.detail?.data) {
+            this.dataValue = event.detail.data
+        } else if (event.detail?.nodes || event.detail?.edges) {
+            this.dataValue = {
+                ...this.dataValue,
+                nodes: event.detail.nodes ?? this.dataValue.nodes ?? [],
+                edges: event.detail.edges ?? this.dataValue.edges ?? []
+            }
+        }
+    }
+
+    exportJSON() {
+        this.download(
+            JSON.stringify(this.dataValue, null, 2),
+            "application/json;charset=utf-8",
+            "json"
+        )
+    }
+
+    exportNodesCSV() {
+        const nodes = Array.isArray(this.dataValue.nodes)
+            ? this.dataValue.nodes
+            : []
+
+        const columns = [
+            ["id", "ID"],
+            ["name", "Name"],
+            ["slug", "Slug"],
+            ["summary", "Summary"],
+            ["entity_type_id", "Entity type ID"],
+            ["status", "Status"],
+            ["workflow_state", "Workflow state"],
+            ["updated_at", "Updated at"]
+        ]
+
+        const csv = [
+            columns.map(([, label]) => this.csvCell(label)).join(","),
+            ...nodes.map((node) =>
+                columns.map(([key]) => this.csvCell(node[key])).join(",")
+            )
+        ].join("\r\n")
+
+        this.download(
+            "\uFEFF" + csv,
+            "text/csv;charset=utf-8",
+            "entities"
+        )
+    }
+
+    exportEdgesCSV() {
+        const edges = Array.isArray(this.dataValue.edges)
+            ? this.dataValue.edges
+            : []
+
+        const columns = [
+            ["id", "ID"],
+            ["source_id", "Source ID"],
+            ["target_id", "Target ID"],
+            ["source", "Source"],
+            ["target", "Target"],
+            ["relationship_type", "Relationship type"],
+            ["status", "Status"],
+            ["confidence", "Confidence"]
+        ]
+
+        const csv = [
+            columns.map(([, label]) => this.csvCell(label)).join(","),
+            ...edges.map((edge) =>
+                columns.map(([key]) => this.csvCell(edge[key])).join(",")
+            )
+        ].join("\r\n")
+
+        this.download(
+            "\uFEFF" + csv,
+            "text/csv;charset=utf-8",
+            "relationships"
+        )
+    }
+
+    exportSVG() {
+        const svg = this.element.querySelector("svg")
+
+        if (!svg) {
+            this.announce("The graph SVG is not available for export.")
+            return
+        }
+
+        const clone = svg.cloneNode(true)
+
+        clone.setAttribute("xmlns", "http://www.w3.org/2000/svg")
+        clone.setAttribute("width", "1000")
+        clone.setAttribute("height", "650")
+
+        const serializer = new XMLSerializer()
+        const source = serializer.serializeToString(clone)
+
+        this.download(
+            '<?xml version="1.0" encoding="UTF-8"?>\n' + source,
+            "image/svg+xml;charset=utf-8",
+            "graph"
+        )
+    }
+
+    csvCell(value) {
+        if (value === null || value === undefined) return '""'
+
+        const text = typeof value === "object"
+            ? JSON.stringify(value)
+            : String(value)
+
+        // Prefix spreadsheet formula-like values to reduce CSV injection risk.
+        const safeText = /^[\s]*[=+\-@]/.test(text)
+            ? `'${text}`
+            : text
+
+        return `"${safeText.replace(/"/g, '""')}"`
+    }
+
+    download(content, mimeType, suffix) {
+        const blob = new Blob([content], { type: mimeType })
+        const url = URL.createObjectURL(blob)
+        const anchor = document.createElement("a")
+
+        anchor.href = url
+        anchor.download = `${this.safeFilename()}-${suffix}.${this.extensionFor(mimeType)}`
+
+        document.body.append(anchor)
+        anchor.click()
+        anchor.remove()
+
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+
+        this.announce(`Export prepared: ${anchor.download}`)
+    }
+
+    safeFilename() {
+        return this.filenameValue
+            .replace(/[^a-z0-9_-]+/gi, "-")
+            .replace(/^-+|-+$/g, "") || "relationship-graph"
+    }
+
+    extensionFor(mimeType) {
+        if (mimeType.startsWith("application/json")) return "json"
+        if (mimeType.startsWith("text/csv")) return "csv"
+        if (mimeType.startsWith("image/svg+xml")) return "svg"
+        return "txt"
+    }
+
+    announce(message) {
+        const status = this.element.querySelector(
+            "[data-graph-export-target='status']"
+        )
+
+        if (status) status.textContent = message
     }
 }

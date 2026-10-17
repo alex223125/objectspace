@@ -1,74 +1,111 @@
 
 <%
-  diagnostics = local_assigns[:diagnostics] || {}
-  metrics = local_assigns[:metrics] || {}
-  graph_loaded = local_assigns.fetch(:graph_loaded, true)
+  diagnostics = local_assigns[:diagnostics] || []
+  diagnostics = [diagnostics] if diagnostics.is_a?(Hash) || diagnostics.is_a?(String)
 
-  read_value = lambda do |hash, *keys|
+  read_value = lambda do |object, *keys|
+    next nil if object.nil?
+
     keys.each do |key|
-      value = hash[key]
-      value = hash[key.to_s] if value.nil?
+      value =
+        if object.respond_to?(:key?) && object.key?(key.to_s)
+          object[key.to_s]
+        elsif object.respond_to?(:key?) && object.key?(key.to_sym)
+          object[key.to_sym]
+        elsif object.respond_to?(key)
+          object.public_send(key)
+        end
+
       return value unless value.nil?
     end
+
     nil
   end
-
-  checks = [
-    ["Entities", [:entity_count, :total_entities]],
-    ["Relationships", [:relationship_count, :total_relationships]],
-    ["Confirmed", [:confirmed_count, :confirmed_relationships]],
-    ["Suggested", [:suggested_count, :suggested_relationships]],
-    ["Rejected", [:rejected_count, :rejected_relationships]],
-    ["Archived", [:archived_count, :archived_relationships]],
-    ["Isolated entities", [:isolated_entity_count, :isolated_entities]],
-    ["Self-links", [:self_link_count, :self_links]],
-    ["Missing endpoint IDs", [:missing_endpoint_count, :missing_endpoint_ids]],
-    ["Endpoints not found", [:orphan_endpoint_count, :endpoints_not_found]],
-    ["Missing confidence", [:missing_confidence_count, :missing_confidence]],
-    ["Low confidence", [:low_confidence_count]]
-  ]
 %>
 
-<section class="rounded-[26px] border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
-         aria-labelledby="graph-diagnostics-heading">
+<section class="overflow-hidden rounded-[28px] border-2 border-violet-100 bg-white shadow-lg shadow-violet-100/20"
+         aria-labelledby="graph-diagnostics-title">
+  <header class="border-b-2 border-violet-100 bg-gradient-to-r from-violet-50/80 via-white to-amber-50/40 p-5 sm:p-7">
+    <p class="text-sm font-black uppercase tracking-[0.16em] text-violet-800">Investigation tools</p>
+    <h2 id="graph-diagnostics-title" class="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">
+      Graph diagnostics
+    </h2>
+    <p class="mt-3 max-w-3xl text-base leading-7 text-slate-600">
+      Inspect diagnostic findings returned by the graph service. Findings may help identify missing data,
+      unexpected graph structure, or incomplete metadata, depending on which checks your application implements.
+    </p>
+  </header>
 
-  <p class="text-[10px] font-black uppercase tracking-[0.18em] text-violet-700">Data quality</p>
-  <h2 id="graph-diagnostics-heading" class="mt-1 text-xl font-black text-slate-900">Graph diagnostics</h2>
-  <p class="mt-2 text-sm leading-6 text-slate-500">
-    Review available counts and consistency indicators. These values are supplied by your services, not inferred by the view.
-  </p>
+  <% if diagnostics.any? %>
+    <div class="space-y-4 p-5 sm:p-6">
+      <% diagnostics.each_with_index do |diagnostic, index| %>
+        <%
+          title = read_value.call(diagnostic, :title, :name, :code, :type)
+          message = read_value.call(diagnostic, :message, :description, :details, :summary)
+          severity = read_value.call(diagnostic, :severity, :level, :status)
+          recommendation = read_value.call(diagnostic, :recommendation, :suggestion, :remediation)
+          record_id = read_value.call(diagnostic, :record_id, :entity_id, :relationship_id)
 
-  <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
-    <% checks.each do |label, keys| %>
-      <% value = read_value.call(diagnostics, *keys) %>
-      <% value = read_value.call(metrics, *keys) if value.nil? %>
+          severity_classes =
+            case severity.to_s.downcase
+            when "critical", "error", "high"
+              "border-rose-200 bg-rose-50 text-rose-800"
+            when "warning", "medium"
+              "border-amber-200 bg-amber-50 text-amber-900"
+            when "info", "low"
+              "border-sky-200 bg-sky-50 text-sky-800"
+            else
+              "border-slate-200 bg-slate-50 text-slate-700"
+            end
+        %>
 
-      <article class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4"
-               data-tooltip="<%= label %>: a service-reported diagnostic, not an independent database audit.">
-        <p class="text-xs font-bold text-slate-500"><%= label %></p>
-        <p class="mt-2 text-2xl font-black text-slate-900">
-          <%= value.nil? ? "—" : number_with_delimiter(value) %>
+        <article class="rounded-2xl border-2 border-slate-100 bg-white p-5">
+          <div class="flex items-start gap-4">
+            <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-violet-200 bg-violet-50 text-base font-black text-violet-800">
+              <%= index + 1 %>
+            </span>
+
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-center gap-3">
+                <h3 class="text-lg font-black text-slate-900">
+                  <%= title.presence || "Diagnostic finding" %>
+                </h3>
+
+                <% if severity.present? %>
+                  <span class="rounded-full border px-3 py-1.5 text-sm font-bold <%= severity_classes %>">
+                    <%= severity.to_s.humanize %>
+                  </span>
+                <% end %>
+              </div>
+
+              <p class="mt-3 text-base leading-7 text-slate-600">
+                <%= message.presence || (diagnostic.is_a?(String) ? diagnostic : "No diagnostic message was supplied.") %>
+              </p>
+
+              <% if recommendation.present? %>
+                <div class="mt-4 rounded-xl border border-emerald-100 bg-emerald-50/50 p-4">
+                  <h4 class="text-sm font-black uppercase tracking-wide text-emerald-900">Suggested investigation</h4>
+                  <p class="mt-2 text-base leading-7 text-slate-700"><%= recommendation %></p>
+                </div>
+              <% end %>
+
+              <% if record_id.present? %>
+                <p class="mt-3 break-all text-sm text-slate-500">Related record: <%= record_id %></p>
+              <% end %>
+            </div>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="p-5 sm:p-7">
+      <div class="rounded-2xl border-2 border-dashed border-violet-200 bg-violet-50/40 p-6">
+        <h3 class="text-xl font-black text-slate-900">No diagnostic findings supplied</h3>
+        <p class="mt-2 text-base leading-7 text-slate-600">
+          The graph service has not supplied any diagnostic records for this view.
+          This is not proof that the graph has passed every integrity, completeness, or consistency check.
         </p>
-        <% if value.nil? %>
-          <p class="mt-1 text-[10px] text-slate-400">Not reported</p>
-        <% end %>
-      </article>
-    <% end %>
-  </div>
-
-  <div class="mt-5 rounded-2xl bg-slate-900 p-5 text-white">
-    <h3 class="text-sm font-black">Administrator interpretation guide</h3>
-    <ul class="mt-3 list-disc space-y-2 pl-5 text-xs leading-6 text-slate-300">
-      <li>Isolated entities may be legitimate records without eligible connections.</li>
-      <li>Missing endpoints can indicate inconsistent relationship data or endpoints excluded by graph scope.</li>
-      <li>Missing confidence is only a defect if your domain requires that value.</li>
-      <li>Compare counts only when their relationship states and scopes match.</li>
-      <li>A dash means the service did not supply a value; it does not mean zero.</li>
-    </ul>
-  </div>
-
-  <p class="mt-4 text-xs leading-5 text-slate-400">
-    Graph request: <%= graph_loaded ? "rendered" : "failed" %>.
-    Diagnostic counts may still be available even when the graph service fails.
-  </p>
+      </div>
+    </div>
+  <% end %>
 </section>

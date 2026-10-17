@@ -1,0 +1,104 @@
+
+<%
+  nodes = local_assigns[:nodes] || []
+  edges = local_assigns[:edges] || []
+%>
+
+
+<section
+  class="rounded-[28px] border-2 border-orange-100 bg-white p-5 shadow-md shadow-orange-100/20 sm:p-7"
+  aria-labelledby="graph-search-title"
+  data-controller="graph-search"
+  data-graph-search-url-value="<%= relationship_graph_admin_ecosystems_load_sources_entities_path(format: :json) %>"
+>
+  <div class="flex items-start gap-4">
+    <span
+      class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-orange-200 bg-orange-50 text-2xl"
+      aria-hidden="true"
+    >⌕</span>
+
+    <div>
+      <p class="text-sm font-black uppercase tracking-[0.16em] text-orange-700">
+        Find your way through the data
+      </p>
+
+      <h2 id="graph-search-title" class="mt-1 text-2xl font-black text-slate-900">
+        Search the ecosystem
+      </h2>
+
+      <p class="mt-2 max-w-3xl text-base leading-7 text-slate-600">
+        Search for a known entity, identifier, type, or relationship.
+        Submit your search to query the graph API and inspect the results.
+      </p>
+    </div>
+  </div>
+
+  <form
+    class="mt-6"
+    data-action="submit->graph-search#search"
+    data-graph-search-target="form"
+  >
+    <label
+      for="relationship-graph-search"
+      class="block text-base font-bold text-slate-800"
+    >
+      Search entities and connections
+    </label>
+
+    <div class="mt-2 flex flex-col gap-3 sm:flex-row">
+      <input
+        id="relationship-graph-search"
+        type="search"
+        name="query"
+        autocomplete="off"
+        maxlength="200"
+        placeholder="Enter an entity name, ID, category, or relationship type…"
+        data-graph-search-target="input"
+        class="min-h-14 min-w-0 flex-1 rounded-2xl border-2 border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100"
+      >
+
+      <button
+        type="submit"
+        data-graph-search-target="submit"
+        class="min-h-14 rounded-2xl border-2 border-orange-600 bg-orange-600 px-6 py-3 text-base font-black text-white transition hover:border-orange-700 hover:bg-orange-700 focus:outline-none focus:ring-4 focus:ring-orange-100 disabled:cursor-wait disabled:opacity-60"
+      >
+        <span data-graph-search-target="submitLabel">Search</span>
+      </button>
+
+      <button
+        type="button"
+        data-action="click->graph-search#clear"
+        class="min-h-14 rounded-2xl border-2 border-slate-200 bg-white px-5 py-3 text-base font-bold text-slate-700 transition hover:border-orange-200 hover:bg-orange-50 focus:outline-none focus:ring-4 focus:ring-orange-100"
+      >
+        Clear search
+      </button>
+    </div>
+
+    <div class="mt-4 flex flex-wrap gap-2 text-sm font-semibold text-slate-600">
+      <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-2">Entity names</span>
+      <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-2">Identifiers</span>
+      <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-2">Entity types</span>
+      <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-2">Relationship labels</span>
+    </div>
+  </form>
+
+  <div
+    class="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4"
+    role="status"
+    aria-live="polite"
+    aria-atomic="true"
+    aria-busy="false"
+    data-graph-search-target="status"
+  >
+    <p class="font-bold text-slate-800" data-graph-search-target="statusTitle">
+      Ready to search
+    </p>
+
+    <p class="mt-1 text-sm leading-6 text-slate-600" data-graph-search-target="statusMessage">
+      Enter a search term and press Search to send a request to the graph API.
+    </p>
+
+    <p class="mt-2 hidden text-sm font-semibold text-orange-700"
+       data-graph-search-target="resultSummary"></p>
+  </div>
+</section>

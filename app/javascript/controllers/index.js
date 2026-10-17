@@ -672,7 +672,33 @@ import GraphTooltipsController from "./admin/ecosystems/load_sources/entites/rel
 application.register("graph-tooltips", GraphTooltipsController)
 
 import GraphMetricsController from "./admin/ecosystems/load_sources/entites/relationship_graph/graph_metrics_controller"
-application.register("graph-metrics-controller", GraphMetricsController)
+application.register("graph-metrics", GraphMetricsController)
+
+import GraphCanvasController from "./admin/ecosystems/load_sources/entites/relationship_graph/graph_canvas_controller"
+application.register("graph-canvas", GraphCanvasController)
+
+import GraphDirectoryController from "./admin/ecosystems/load_sources/entites/relationship_graph/graph_directory_controller"
+application.register("graph-directory", GraphDirectoryController)
+
+import GraphSelectionController from "./admin/ecosystems/load_sources/entites/relationship_graph/graph_selection_controller"
+application.register("graph-selection", GraphSelectionController)
+
+import GraphEvidenceController from "./admin/ecosystems/load_sources/entites/relationship_graph/graph_evidence_controller"
+application.register("graph-evidence", GraphEvidenceController)
+
+import GraphProvenanceController from "./admin/ecosystems/load_sources/entites/relationship_graph/graph_provenance_controller"
+application.register("graph-provenance", GraphProvenanceController)
+
+import GraphInsightsController from "./admin/ecosystems/load_sources/entites/relationship_graph/graph_insights_controller"
+application.register("graph-insights", GraphInsightsController)
+
+import GraphDrawerController from "./admin/ecosystems/load_sources/entites/relationship_graph/graph_drawer_controller"
+application.register("graph-drawer", GraphDrawerController)
+
+import GraphNotificationsController from "./admin/ecosystems/load_sources/entites/relationship_graph/graph_notifications_controller"
+application.register("graph-notifications", GraphNotificationsController)
+
+
 
 
 import "./admin/ecosystems/load_sources/entites/page_autoload_javascript/entity_comparison";

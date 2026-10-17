@@ -1,38 +1,102 @@
+<section
+  class="overflow-hidden rounded-[28px] border-2 border-violet-100 bg-white shadow-lg shadow-violet-100/30"
+  aria-labelledby="presentation-mode-title"
+  data-controller="graph-presentation"
+>
+  <header class="border-b-2 border-violet-100 bg-gradient-to-r from-violet-50 via-white to-orange-50/50 p-5 sm:p-7">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <p class="text-sm font-black uppercase tracking-[0.16em] text-violet-700">
+          Share your ecosystem
+        </p>
 
-<section class="rounded-[26px] border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
-         data-controller="graph-presentation"
-         aria-labelledby="graph-presentation-heading">
+        <h2 id="presentation-mode-title" class="mt-2 text-2xl font-black text-slate-900">
+          Presentation mode
+        </h2>
 
-  <p class="text-[10px] font-black uppercase tracking-[0.18em] text-indigo-700">Display preferences</p>
-  <h2 id="graph-presentation-heading" class="mt-1 text-lg font-black text-slate-900">Presentation mode</h2>
-  <p class="mt-2 text-sm leading-6 text-slate-500">
-    Choose a presentation preference. This control changes the display only and does not change relationship data.
-  </p>
+        <p class="mt-2 max-w-2xl text-base leading-7 text-slate-600">
+          Give the relationship network more room during demonstrations,
+          architecture reviews, and stakeholder walkthroughs.
+        </p>
+      </div>
 
-  <fieldset class="mt-5 grid gap-3 sm:grid-cols-3">
-    <legend class="mb-3 text-xs font-bold text-slate-600">Display layout</legend>
+      <span class="w-fit rounded-full border border-violet-200 bg-violet-50 px-4 py-2 text-sm font-bold text-violet-800">
+        View settings
+      </span>
+    </div>
+  </header>
 
-    <% [
-         ["standard", "Standard", "Balanced spacing for normal administration."],
-         ["compact", "Compact", "A denser layout for smaller screens."],
-         ["presentation", "Presentation", "A simplified layout for demonstrations."]
-       ].each do |value, label, description| %>
+  <div
+    data-graph-presentation-target="content"
+    class="space-y-5 p-5 sm:p-7"
+  >
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <article class="rounded-2xl border-2 border-slate-100 bg-slate-50 p-5">
+        <div class="flex items-start gap-3">
+          <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-orange-200 bg-orange-100 text-2xl" aria-hidden="true">
+            🕸️
+          </span>
 
-      <label class="cursor-pointer rounded-2xl border border-slate-200 p-4 transition hover:border-indigo-200 hover:bg-indigo-50/40">
-        <div class="flex items-center gap-3">
-          <input type="radio"
-                 name="graph_presentation_mode"
-                 value="<%= value %>"
-                 <%= "checked" if value == "standard" %>
-                 data-action="change->graph-presentation#changeMode">
-          <span class="text-sm font-black text-slate-800"><%= label %></span>
+          <div>
+            <h3 class="text-lg font-black text-slate-900">
+              Focused graph view
+            </h3>
+
+            <p class="mt-2 text-sm leading-6 text-slate-600">
+              Hide secondary interface sections while presenting the network.
+              Your graph data remains unchanged.
+            </p>
+          </div>
         </div>
-        <p class="mt-3 text-xs leading-5 text-slate-500"><%= description %></p>
-      </label>
-    <% end %>
-  </fieldset>
 
-  <p class="mt-4 text-xs text-slate-400">
-    Your presentation controller must implement the selected layout for this control to change the page.
-  </p>
+        <button
+          type="button"
+          data-action="click->graph-presentation#toggle"
+          aria-pressed="false"
+          class="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-xl border-2 border-violet-200 bg-white px-4 py-3 text-base font-black text-violet-800 transition hover:bg-violet-50 focus:outline-none focus:ring-4 focus:ring-violet-100"
+        >
+          Toggle presentation view
+        </button>
+      </article>
+
+      <article class="rounded-2xl border-2 border-slate-100 bg-slate-50 p-5">
+        <div class="flex items-start gap-3">
+          <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-sky-200 bg-sky-100 text-2xl" aria-hidden="true">
+            ⛶
+          </span>
+
+          <div>
+            <h3 class="text-lg font-black text-slate-900">
+              Fullscreen workspace
+            </h3>
+
+            <p class="mt-2 text-sm leading-6 text-slate-600">
+              Request browser fullscreen for a larger viewing area when the
+              browser permits it.
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          data-action="click->graph-presentation#fullscreen"
+          class="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-xl border-2 border-sky-200 bg-white px-4 py-3 text-base font-black text-sky-800 transition hover:bg-sky-50 focus:outline-none focus:ring-4 focus:ring-sky-100"
+        >
+          Toggle fullscreen
+        </button>
+      </article>
+    </div>
+
+    <div class="rounded-2xl border-2 border-amber-100 bg-amber-50 p-4">
+      <p class="text-base font-bold text-amber-900">
+        Presentation note
+      </p>
+
+      <p class="mt-1 text-sm leading-6 text-amber-800">
+        Fullscreen requires browser support and may require a direct user
+        interaction. Presentation mode changes are visual only and do not
+        alter stored entities or relationships.
+      </p>
+    </div>
+  </div>
 </section>

@@ -1,168 +1,680 @@
 
-<%# Main content rendered inside entity_templates_layout via locals: { content: content } %>
-
 <%
-  graph = @graph.respond_to?(:to_h) ? @graph.to_h : {}
-  nodes = graph[:nodes] || graph["nodes"] || []
-  edges = graph[:edges] || graph["edges"] || []
+  # ------------------------------------------------------------
+  # 1. Normalize the graph payload in one place.
+  # ------------------------------------------------------------
+  raw_payload = @graph_payload || @graph_data || {}
+  raw_payload = raw_payload.as_json if raw_payload.respond_to?(:as_json)
+  raw_payload = raw_payload.stringify_keys if raw_payload.respond_to?(:stringify_keys)
+  raw_payload = {} unless raw_payload.is_a?(Hash)
 
-  nodes = [] unless nodes.is_a?(Array)
-  edges = [] unless edges.is_a?(Array)
+  raw_nodes = raw_payload["nodes"] || []
+  raw_edges = raw_payload["edges"] || []
+  raw_meta  = raw_payload["meta"] || {}
 
-  metrics = @metrics.respond_to?(:to_h) ? @metrics.to_h : {}
-  diagnostics = @diagnostics.respond_to?(:to_h) ? @diagnostics.to_h : {}
-  candidates = @candidates.is_a?(Array) ? @candidates : []
+  raw_nodes = raw_nodes.to_a if raw_nodes.respond_to?(:to_a)
+  raw_edges = raw_edges.to_a if raw_edges.respond_to?(:to_a)
 
-  graph_loaded = !@graph_failed
+  raw_meta = raw_meta.as_json if raw_meta.respond_to?(:as_json)
+  raw_meta = raw_meta.stringify_keys if raw_meta.respond_to?(:stringify_keys)
+  raw_meta = {} unless raw_meta.is_a?(Hash)
+
+  raw_nodes = [] unless raw_nodes.is_a?(Array)
+  raw_edges = [] unless raw_edges.is_a?(Array)
+
+  graph_payload = {
+    nodes: raw_nodes,
+    edges: raw_edges,
+    meta: {
+      node_count: raw_meta["node_count"] || raw_nodes.size,
+      edge_count: raw_meta["edge_count"] || raw_edges.size,
+      connected_node_count: raw_meta["connected_node_count"] || 0,
+      isolated_node_count: raw_meta["isolated_node_count"] || 0,
+      depth: raw_meta["depth"] || 1,
+      limit: raw_meta["limit"] || 100,
+      truncated: raw_meta["truncated"] || false,
+      generated_at: raw_meta["generated_at"]
+    }
+  }
+
+  graph_json = graph_payload.to_json
+  graph_meta = graph_payload[:meta]
+  graph_nodes = graph_payload[:nodes]
+  graph_edges = graph_payload[:edges]
+
+  relationship_rows = graph_edges
+  directory_nodes = graph_nodes
+
+  provenance_events = @provenance_events || []
+  change_feed = @change_feed || []
+  candidate_connections = @candidate_connections || []
+  review_queue = @review_queue || []
+
+  node_count = graph_meta[:node_count].to_i
+  edge_count = graph_meta[:edge_count].to_i
+  connected_count = graph_meta[:connected_node_count].to_i
+  isolated_count = graph_meta[:isolated_node_count].to_i
+
+  graph_loading = !!@graph_loading
+  graph_error = @graph_error.present?
+  graph_empty = graph_nodes.empty? && graph_edges.empty?
+  graph_truncated = !!graph_meta[:truncated]
 %>
 
-<div
-  class="mx-auto max-w-[1600px] space-y-7 px-4 py-6 sm:px-6 lg:px-8"
-  data-controller="
-    relationship-graph
-    graph-tooltips
-    graph-keyboard
-    graph-accessibility
-    graph-manual
-    graph-search
-    graph-export
-    guided-tour
-    graph-presentation
-  "
-  data-relationship-graph-target="workspace"
+<main
+  class="mx-auto my-6 w-full max-w-[1800px] px-4 sm:px-6 lg:my-10 lg:px-8"
+  data-controller="relationship-graph graph-canvas graph-layout graph-filters graph-export graph-accessibility graph-keyboard graph-tooltips graph-metrics graph-directory graph-selection entity-dossier graph-presentation graph-drawer graph-insights graph-evidence graph-provenance graph-review graph-live-updates guided-tour"
+  data-graph-canvas-data-value="<%= graph_json %>"
+  data-graph-search-data-value="<%= graph_json %>"
+  data-graph-directory-data-value="<%= graph_json %>"
+  aria-labelledby="relationship-graph-title"
 >
+  <section class="overflow-hidden rounded-[30px] border-2 border-orange-100 bg-gradient-to-b from-white via-orange-50/30 to-slate-50/70 shadow-xl shadow-orange-100/40 sm:rounded-[38px]">
 
-  <header class="overflow-hidden rounded-[30px] border-2 border-orange-100 bg-gradient-to-br from-white via-orange-50/50 to-slate-50 shadow-sm shadow-orange-100/50">
-    <div class="flex flex-col gap-6 p-6 sm:p-8 xl:flex-row xl:items-center xl:justify-between">
-      <div class="flex items-start gap-4">
-        <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-[22px] border border-orange-200 bg-orange-100 text-2xl shadow-sm">
-          🌍
+    <%# ========================================================
+        HERO: product identity, purpose and current data status
+       ======================================================== %>
+
+    <header class="border-b-2 border-orange-100 px-5 py-7 sm:px-8 lg:px-10 lg:py-9">
+      <div class="flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
+
+        <div class="flex items-start gap-4">
+          <div
+            class="flex h-14 w-14 shrink-0 items-center justify-center rounded-[22px] border-2 border-orange-200 bg-gradient-to-br from-orange-100 to-amber-50 text-2xl shadow-md shadow-orange-100/60 sm:h-16 sm:w-16"
+            aria-hidden="true"
+          >
+            🌐
+          </div>
+
+          <div class="min-w-0">
+            <p class="text-sm font-black uppercase tracking-[0.16em] text-orange-700">
+              ObjectSpace · Knowledge Intelligence
+            </p>
+
+            <h1
+              id="relationship-graph-title"
+              class="mt-2 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl lg:text-4xl"
+            >
+              Relationship Graph Explorer
+            </h1>
+
+            <p class="mt-3 max-w-3xl text-base leading-7 text-slate-600">
+              Understand how the records in your ecosystem relate to one another.
+              Explore connections, inspect individual entities, investigate supporting
+              evidence, and identify areas that need further review.
+            </p>
+
+            <p class="mt-3 max-w-3xl text-base leading-7 text-slate-600">
+              New here? Start with the overview, search for an entity, select it to
+              inspect its details, and then follow its recorded relationships.
+            </p>
+          </div>
         </div>
 
-        <div>
-          <p class="text-[10px] font-black uppercase tracking-[0.2em] text-orange-600">
-            Administrator field station
-          </p>
-          <h1 id="relationship-graph-title" class="mt-1 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">
-            Ecosystem Intelligence Graph
-          </h1>
-          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-            Explore entities, trace relationships, inspect evidence, and understand how your ecosystem's knowledge is connected.
-          </p>
+        <div class="flex flex-wrap items-center gap-3 xl:max-w-sm xl:justify-end">
+          <span class="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-bold text-emerald-800">
+            <span class="h-2.5 w-2.5 rounded-full bg-emerald-500" aria-hidden="true"></span>
+            Read-only exploration
+          </span>
+
+          <span class="rounded-full border border-orange-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 shadow-sm">
+            <%= number_with_delimiter(node_count) %> entities
+          </span>
+
+          <span class="rounded-full border border-sky-200 bg-sky-50 px-4 py-2.5 text-sm font-bold text-sky-800">
+            <%= number_with_delimiter(edge_count) %> relationships
+          </span>
         </div>
       </div>
+    </header>
 
-      <div class="flex flex-wrap items-center gap-3">
-        <span class="rounded-full border border-orange-200 bg-orange-50 px-3 py-2 text-xs font-bold text-orange-700"
-              data-tooltip="This describes the graph workspace, not a guarantee that the background data is up to date.">
-          ✦ Intelligence workspace
-        </span>
+    <div class="space-y-8 p-4 sm:p-6 lg:space-y-10 lg:p-8">
 
-        <button type="button"
-                class="rounded-xl border border-orange-200 bg-white px-4 py-2.5 text-sm font-black text-orange-700 transition hover:bg-orange-50"
-                data-action="click->graph-manual#open"
-                data-tooltip="Jump to the beginner field manual for explanations of nodes, edges, filters, evidence, and diagnostics.">
-          📖 Field manual
-        </button>
-      </div>
+      <%# ========================================================
+          STATUS: distinguish empty, loading and failed states
+         ======================================================== %>
+
+      <% if graph_loading %>
+        <section
+          class="rounded-2xl border-2 border-sky-200 bg-sky-50 p-5 sm:p-6"
+          role="status"
+          aria-live="polite"
+        >
+          <div class="flex items-start gap-4">
+            <span class="text-2xl" aria-hidden="true">⏳</span>
+            <div>
+              <h2 class="text-lg font-black text-sky-950">
+                Preparing your graph
+              </h2>
+              <p class="mt-2 text-base leading-7 text-sky-900">
+                ObjectSpace is preparing the relationship snapshot. The graph
+                and its metrics may not be complete until loading finishes.
+              </p>
+            </div>
+          </div>
+        </section>
+
+      <% elsif graph_error %>
+        <section
+          class="rounded-2xl border-2 border-rose-200 bg-rose-50 p-5 sm:p-6"
+          role="alert"
+        >
+          <div class="flex items-start gap-4">
+            <span class="text-2xl" aria-hidden="true">⚠️</span>
+            <div>
+              <h2 class="text-lg font-black text-rose-950">
+                The graph could not be loaded completely
+              </h2>
+              <p class="mt-2 text-base leading-7 text-rose-900">
+                <%= @graph_error %>
+              </p>
+              <p class="mt-2 text-base leading-7 text-rose-800">
+                Check the application logs and graph service before treating
+                missing data as evidence that no relationships exist.
+              </p>
+            </div>
+          </div>
+        </section>
+
+      <% elsif graph_empty %>
+        <section
+          class="rounded-2xl border-2 border-amber-200 bg-amber-50 p-5 sm:p-6"
+          role="status"
+        >
+          <div class="flex items-start gap-4">
+            <span class="text-2xl" aria-hidden="true">🔎</span>
+            <div>
+              <h2 class="text-lg font-black text-amber-950">
+                Your graph is currently empty
+              </h2>
+              <p class="mt-2 text-base leading-7 text-amber-900">
+                There are no nodes or relationships in the current snapshot.
+                This does not necessarily mean your ecosystem contains no data.
+                The graph may be unpopulated, filtered upstream, or awaiting
+                its first successful build.
+              </p>
+              <p class="mt-2 text-base leading-7 text-amber-900">
+                Check the source records, graph-building process, and current
+                environment before drawing conclusions.
+              </p>
+            </div>
+          </div>
+        </section>
+      <% end %>
+
+      <% if graph_truncated %>
+        <section
+          class="rounded-2xl border-2 border-amber-200 bg-white p-5 sm:p-6"
+          role="status"
+        >
+          <h2 class="text-lg font-black text-amber-950">
+            Showing a limited graph snapshot
+          </h2>
+          <p class="mt-2 text-base leading-7 text-slate-700">
+            The graph service reports that the result was truncated. Some entities
+            or relationships may be absent from this view. Avoid interpreting the
+            visible network as a complete representation until the query limit,
+            traversal depth, and service response have been checked.
+          </p>
+        </section>
+      <% end %>
+
+      <%# ========================================================
+          FIRST-TIME ADMINISTRATOR GUIDE
+         ======================================================== %>
+
+      <section
+        class="overflow-hidden rounded-[28px] border-2 border-orange-100 bg-white shadow-md shadow-orange-100/20"
+        aria-labelledby="getting-started-title"
+      >
+        <div class="border-b border-orange-100 bg-gradient-to-r from-orange-50 via-white to-amber-50/50 p-5 sm:p-7">
+          <p class="text-sm font-black uppercase tracking-[0.16em] text-orange-700">
+            Getting started
+          </p>
+
+          <h2
+            id="getting-started-title"
+            class="mt-2 text-xl font-black text-slate-900 sm:text-2xl"
+          >
+            A simple way to investigate your ecosystem
+          </h2>
+
+          <p class="mt-2 max-w-3xl text-base leading-7 text-slate-600">
+            Follow these steps to move from a broad overview to an individual
+            relationship. You do not need to understand graph theory to begin.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2 sm:p-7 xl:grid-cols-4">
+
+          <article class="rounded-2xl border-2 border-orange-100 bg-orange-50/50 p-5">
+            <span class="flex h-11 w-11 items-center justify-center rounded-xl border-2 border-orange-200 bg-white text-xl" aria-hidden="true">
+              1
+            </span>
+            <h3 class="mt-4 text-lg font-black text-slate-900">
+              Understand the overview
+            </h3>
+            <p class="mt-2 text-base leading-7 text-slate-600">
+              Review the number of entities, recorded relationships, connected
+              entities, and isolated entities.
+            </p>
+            <p class="mt-3 text-sm font-bold text-orange-800">
+              Start with the metrics below.
+            </p>
+          </article>
+
+          <article class="rounded-2xl border-2 border-sky-100 bg-sky-50/50 p-5">
+            <span class="flex h-11 w-11 items-center justify-center rounded-xl border-2 border-sky-200 bg-white text-xl" aria-hidden="true">
+              2
+            </span>
+            <h3 class="mt-4 text-lg font-black text-slate-900">
+              Find an entity
+            </h3>
+            <p class="mt-2 text-base leading-7 text-slate-600">
+              Search for a name, identifier, or available entity information,
+              then narrow the visible results.
+            </p>
+            <p class="mt-3 text-sm font-bold text-sky-800">
+              Use search and filters.
+            </p>
+          </article>
+
+          <article class="rounded-2xl border-2 border-violet-100 bg-violet-50/50 p-5">
+            <span class="flex h-11 w-11 items-center justify-center rounded-xl border-2 border-violet-200 bg-white text-xl" aria-hidden="true">
+              3
+            </span>
+            <h3 class="mt-4 text-lg font-black text-slate-900">
+              Inspect its connections
+            </h3>
+            <p class="mt-2 text-base leading-7 text-slate-600">
+              Select a node or directory entry to inspect the information
+              available for that entity and its relationships.
+            </p>
+            <p class="mt-3 text-sm font-bold text-violet-800">
+              Select a node or record.
+            </p>
+          </article>
+
+          <article class="rounded-2xl border-2 border-emerald-100 bg-emerald-50/50 p-5">
+            <span class="flex h-11 w-11 items-center justify-center rounded-xl border-2 border-emerald-200 bg-white text-xl" aria-hidden="true">
+              4
+            </span>
+            <h3 class="mt-4 text-lg font-black text-slate-900">
+              Verify what you find
+            </h3>
+            <p class="mt-2 text-base leading-7 text-slate-600">
+              Examine available evidence, provenance, review status, and
+              diagnostics before relying on a connection.
+            </p>
+            <p class="mt-3 text-sm font-bold text-emerald-800">
+              Check evidence and reviews.
+            </p>
+          </article>
+
+        </div>
+
+        <div class="border-t border-orange-100 bg-slate-50/70 px-5 py-4 sm:px-7">
+          <p class="text-base leading-7 text-slate-700">
+            <strong class="text-slate-900">Important:</strong>
+            A displayed relationship is not automatically verified, approved,
+            or evidence of causation. Its meaning depends on the underlying
+            record, source, and review status.
+          </p>
+        </div>
+      </section>
+
+      <%# ========================================================
+          METRICS
+         ======================================================== %>
+
+      <%= render "metrics", graph_payload: graph_payload %>
+
+      <%# ========================================================
+          SEARCH AND FILTERS
+         ======================================================== %>
+
+      <section aria-labelledby="discovery-tools-title">
+        <div class="mb-5">
+          <p class="text-sm font-black uppercase tracking-[0.16em] text-orange-700">
+            Find what matters
+          </p>
+          <h2
+            id="discovery-tools-title"
+            class="mt-2 text-xl font-black text-slate-900 sm:text-2xl"
+          >
+            Search and refine your investigation
+          </h2>
+          <p class="mt-2 max-w-3xl text-base leading-7 text-slate-600">
+            Start broad, then narrow the graph to the records or connections
+            relevant to your question. These controls are intended for
+            exploration; they should not change stored relationship records.
+          </p>
+        </div>
+
+        <div class="space-y-5">
+          <%= render "search_panel",
+                     nodes: directory_nodes,
+                     edges: relationship_rows %>
+
+          <%= render "filter_drawer",
+                     nodes: directory_nodes,
+                     edges: relationship_rows %>
+        </div>
+      </section>
+
+      <%# ========================================================
+          INTERACTIVE NETWORK
+         ======================================================== %>
+
+      <section aria-labelledby="network-section-title">
+        <div class="mb-5">
+          <p class="text-sm font-black uppercase tracking-[0.16em] text-orange-700">
+            Explore connections
+          </p>
+          <h2
+            id="network-section-title"
+            class="mt-2 text-xl font-black text-slate-900 sm:text-2xl"
+          >
+            Your relationship network
+          </h2>
+          <p class="mt-2 max-w-3xl text-base leading-7 text-slate-600">
+            Each node represents an entity, and each edge represents a
+            relationship returned by the graph service. Select a node to
+            investigate it. Use the graph controls to navigate the visible network.
+          </p>
+        </div>
+
+        <%= render "graph_canvas", graph_payload: graph_payload %>
+
+        <div class="mt-5">
+          <%= render "graph_legend" %>
+        </div>
+      </section>
+
+      <%# ========================================================
+          ENTITY DIRECTORY AND DOSSIER
+         ======================================================== %>
+
+      <section aria-labelledby="entity-inspection-title">
+        <div class="mb-5">
+          <p class="text-sm font-black uppercase tracking-[0.16em] text-violet-700">
+            Entity investigation
+          </p>
+          <h2
+            id="entity-inspection-title"
+            class="mt-2 text-xl font-black text-slate-900 sm:text-2xl"
+          >
+            Browse records and inspect details
+          </h2>
+          <p class="mt-2 max-w-3xl text-base leading-7 text-slate-600">
+            The directory provides another way to find entities when the graph
+            is dense or difficult to navigate. The dossier should present the
+            selected entity's available attributes and relationship information.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+          <%= render "entity_directory", nodes: directory_nodes %>
+
+          <%= render "entity_dossier",
+                     entity: @selected_entity,
+                     node_count: directory_nodes.size %>
+        </div>
+      </section>
+
+      <%# ========================================================
+          RELATIONSHIP DETAILS
+         ======================================================== %>
+
+      <section aria-labelledby="relationship-details-title">
+        <div class="mb-5">
+          <p class="text-sm font-black uppercase tracking-[0.16em] text-sky-700">
+            Relationship investigation
+          </p>
+          <h2
+            id="relationship-details-title"
+            class="mt-2 text-xl font-black text-slate-900 sm:text-2xl"
+          >
+            Understand individual connections
+          </h2>
+          <p class="mt-2 max-w-3xl text-base leading-7 text-slate-600">
+            Review relationships as both a readable list and a structured table.
+            Compare the source entity, target entity, relationship type, and
+            available supporting information.
+          </p>
+        </div>
+
+        <div class="space-y-6">
+          <%= render "relationship_list",
+                     relationships: relationship_rows,
+                     nodes: directory_nodes %>
+
+          <%= render "edge_table",
+                     edges: relationship_rows,
+                     nodes: directory_nodes %>
+        </div>
+      </section>
+
+      <%# ========================================================
+          LEARN ABOUT THE ECOSYSTEM
+         ======================================================== %>
+
+      <section aria-labelledby="ecosystem-learning-title">
+        <div class="mb-5">
+          <p class="text-sm font-black uppercase tracking-[0.16em] text-emerald-700">
+            Knowledge and context
+          </p>
+          <h2
+            id="ecosystem-learning-title"
+            class="mt-2 text-xl font-black text-slate-900 sm:text-2xl"
+          >
+            Learn how your ecosystem fits together
+          </h2>
+          <p class="mt-2 max-w-3xl text-base leading-7 text-slate-600">
+            Use the journey and encyclopedia sections to understand the visible
+            structure, terminology, and relationships. Treat automatically
+            generated interpretations as investigative guidance rather than
+            confirmed facts unless they are backed by appropriate evidence.
+          </p>
+        </div>
+
+        <div class="space-y-6">
+          <%= render "ecosystem_journey",
+                     nodes: directory_nodes,
+                     edges: relationship_rows %>
+
+          <%= render "encyclopedia",
+                     nodes: directory_nodes,
+                     edges: relationship_rows,
+                     meta: graph_meta %>
+        </div>
+      </section>
+
+      <%# ========================================================
+          CANDIDATE CONNECTIONS
+         ======================================================== %>
+
+      <section aria-labelledby="candidate-connections-title">
+        <div class="mb-5">
+          <p class="text-sm font-black uppercase tracking-[0.16em] text-amber-700">
+            Discovery opportunities
+          </p>
+          <h2
+            id="candidate-connections-title"
+            class="mt-2 text-xl font-black text-slate-900 sm:text-2xl"
+          >
+            Potential connections to investigate
+          </h2>
+          <p class="mt-2 max-w-3xl text-base leading-7 text-slate-600">
+            Candidate connections may suggest useful investigative leads.
+            They should remain distinct from recorded relationships until
+            your application's review process establishes their status.
+          </p>
+        </div>
+
+        <%= render "candidate_connections",
+                   candidates: candidate_connections %>
+      </section>
+
+      <%# ========================================================
+          SNAPSHOT INFORMATION
+         ======================================================== %>
+
+      <footer class="border-t-2 border-orange-100 pt-6">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+
+          <div class="max-w-3xl">
+            <p class="text-base leading-7 text-slate-700">
+              <strong class="text-slate-900">Read-only exploration.</strong>
+              Selecting entities, searching, and filtering should not approve,
+              create, or modify stored relationships.
+            </p>
+
+            <p class="mt-2 text-base leading-7 text-slate-600">
+              For consequential decisions, inspect the original records,
+              evidence, provenance, and review history. A graph is a view of
+              available data, not a substitute for validating that data.
+            </p>
+          </div>
+
+          <div class="shrink-0 rounded-2xl border border-slate-200 bg-white p-4">
+            <p class="text-sm font-bold text-slate-500">
+              Snapshot information
+            </p>
+            <p class="mt-1 text-base font-bold text-slate-800">
+              <% if graph_meta[:generated_at].present? %>
+                <%= graph_meta[:generated_at] %>
+              <% else %>
+                Timestamp unavailable
+              <% end %>
+            </p>
+
+            <p class="mt-2 text-sm leading-6 text-slate-500">
+              Depth: <%= graph_meta[:depth] %>
+              · Result limit: <%= graph_meta[:limit] %>
+            </p>
+          </div>
+
+        </div>
+      </footer>
+
     </div>
+  </section>
 
-    <div class="grid gap-px border-t border-orange-100 bg-orange-100 sm:grid-cols-3">
-      <div class="bg-white/80 p-4 sm:px-6">
-        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Nodes returned</p>
-        <p class="mt-1 text-2xl font-black text-slate-900"><%= number_with_delimiter(nodes.size) %></p>
-        <p class="mt-1 text-xs text-slate-500">Entities in this response</p>
-      </div>
-      <div class="bg-white/80 p-4 sm:px-6">
-        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Edges returned</p>
-        <p class="mt-1 text-2xl font-black text-slate-900"><%= number_with_delimiter(edges.size) %></p>
-        <p class="mt-1 text-xs text-slate-500">Relationships in this response</p>
-      </div>
-      <div class="bg-white/80 p-4 sm:px-6">
-        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Request status</p>
-        <p class="mt-1 text-2xl font-black <%= graph_loaded ? 'text-emerald-700' : 'text-red-700' %>">
-          <%= graph_loaded ? "Rendered" : "Failed" %>
+  <%# ==========================================================
+      SECONDARY ADMINISTRATION AND INVESTIGATION PANELS
+     ========================================================== %>
+
+  <section class="mt-8 space-y-8" aria-label="Graph administration and diagnostics">
+
+    <div>
+      <div class="mb-5">
+        <p class="text-sm font-black uppercase tracking-[0.16em] text-violet-700">
+          Review and accountability
         </p>
-        <p class="mt-1 text-xs text-slate-500">
-          <%= graph_loaded ? "Inspect the data below" : "Review the server logs" %>
+        <h2 class="mt-2 text-xl font-black text-slate-900 sm:text-2xl">
+          Review queue and relationship history
+        </h2>
+        <p class="mt-2 max-w-3xl text-base leading-7 text-slate-600">
+          Use review information to understand which relationships need attention
+          and to trace the information available about their origin. The presence
+          of an item in a review queue does not itself establish its validity.
         </p>
       </div>
+
+      <div class="space-y-6">
+        <%= render "review_queue", reviews: review_queue %>
+
+        <%= render "provenance_timeline", events: provenance_events %>
+
+        <%= render "change_feed", changes: change_feed %>
+      </div>
     </div>
-  </header>
 
-  <% if flash[:alert].present? %>
-    <div class="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900"
-         role="alert">
-      <strong class="font-black">Administrator notice:</strong>
-      <%= flash[:alert] %>
-    </div>
-  <% end %>
-
-  <%= render "metrics", metrics: metrics %>
-
-  <section class="rounded-[28px] border border-orange-100 bg-white p-5 shadow-sm sm:p-7"
-           aria-labelledby="graph-explorer-heading">
-    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-      <div>
-        <p class="text-[10px] font-black uppercase tracking-[0.18em] text-orange-600">Explore and inspect</p>
-        <h2 id="graph-explorer-heading" class="mt-1 text-xl font-black text-slate-900">Graph explorer</h2>
-        <p class="mt-2 text-sm leading-6 text-slate-500">
-          Search the returned entities, refine the request, and inspect how the graph is represented.
+    <div>
+      <div class="mb-5">
+        <p class="text-sm font-black uppercase tracking-[0.16em] text-sky-700">
+          Data quality
+        </p>
+        <h2 class="mt-2 text-xl font-black text-slate-900 sm:text-2xl">
+          Coverage, health, and diagnostics
+        </h2>
+        <p class="mt-2 max-w-3xl text-base leading-7 text-slate-600">
+          These panels help administrators investigate missing data, unusual
+          graph structure, service warnings, and possible limitations in the
+          current snapshot.
         </p>
       </div>
-      <span class="w-fit rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-600"
-            data-relationship-graph-target="status"
-            aria-live="polite">
-        Ready
-      </span>
+
+      <div class="space-y-6">
+        <%= render "coverage_report",
+                   coverage: @coverage || graph_meta %>
+
+        <%= render "health_report",
+                   health: @graph_health || graph_meta,
+                   warnings: @graph_warnings || [],
+                   errors: @graph_errors || [],
+                   checks: @graph_health_checks || [] %>
+
+        <%= render "diagnostics",
+                   diagnostics: @diagnostics || [] %>
+      </div>
     </div>
 
-    <%= render "graph_toolbar" %>
-    <%= render "filter_drawer" %>
-    <%= render "graph_legend" %>
+    <div>
+      <div class="mb-5">
+        <p class="text-sm font-black uppercase tracking-[0.16em] text-emerald-700">
+          Interpretation and learning
+        </p>
+        <h2 class="mt-2 text-xl font-black text-slate-900 sm:text-2xl">
+          Insights and metric explanations
+        </h2>
+        <p class="mt-2 max-w-3xl text-base leading-7 text-slate-600">
+          Understand what the graph statistics mean, what they can reveal,
+          and what they cannot establish on their own.
+        </p>
+      </div>
 
-    <% if graph_loaded && nodes.any? %>
-      <%= render "graph_canvas", graph: graph %>
-    <% elsif graph_loaded %>
-      <%= render "empty_state" %>
-    <% else %>
-      <%= render "error_state" %>
-    <% end %>
+      <div class="space-y-6">
+        <%= render "metrics_insights",
+                   meta: graph_meta,
+                   nodes: graph_nodes,
+                   edges: graph_edges %>
+
+        <%= render "metric_explainer",
+                   node_count: graph_meta[:node_count],
+                   edge_count: graph_meta[:edge_count],
+                   connected_node_count: graph_meta[:connected_node_count],
+                   isolated_node_count: graph_meta[:isolated_node_count] %>
+      </div>
+    </div>
+
+    <div>
+      <div class="mb-5">
+        <p class="text-sm font-black uppercase tracking-[0.16em] text-orange-700">
+          Help and navigation
+        </p>
+        <h2 class="mt-2 text-xl font-black text-slate-900 sm:text-2xl">
+          Learn the tools and shortcuts
+        </h2>
+        <p class="mt-2 max-w-3xl text-base leading-7 text-slate-600">
+          Use the guided tour and field manual to learn the interface, and
+          consult the keyboard shortcuts when navigating larger graphs.
+        </p>
+      </div>
+
+      <div class="space-y-6">
+        <%= render "guided_tour" %>
+
+        <%= render "field_manual" %>
+
+        <%= render "keyboard_shortcuts" %>
+
+        <%= render "presentation_mode" %>
+
+        <%= render "confirmation_dialog" %>
+      </div>
+    </div>
+
   </section>
-
-  <section class="space-y-5" aria-label="Relationship details">
-    <%= render "edge_table", edges: edges, nodes: nodes %>
-    <%= render "candidate_connections", candidates: candidates %>
-  </section>
-
-  <section class="space-y-5" aria-label="Graph diagnostics">
-    <%= render "diagnostics",
-               diagnostics: diagnostics,
-               metrics: metrics,
-               graph_loaded: graph_loaded %>
-
-    <%= render "coverage_report",
-               diagnostics: diagnostics,
-               metrics: metrics %>
-
-    <%= render "health_report", diagnostics: diagnostics %>
-  </section>
-
-  <section class="space-y-5" aria-label="Graph history">
-    <%= render "provenance_timeline" %>
-    <%= render "change_feed" %>
-    <%= render "review_queue" %>
-  </section>
-
-  <section class="space-y-5" aria-label="Learning and presentation">
-    <%= render "encyclopedia" %>
-    <%= render "guided_tour" %>
-    <%= render "presentation_mode" %>
-    <%= render "keyboard_shortcuts" %>
-    <%= render "metric_explainer" %>
-    <%= render "field_manual" %>
-  </section>
-
-  <%= render "loading_state" %>
-  <%= render "confirmation_dialog" %>
-</div>
+</main>

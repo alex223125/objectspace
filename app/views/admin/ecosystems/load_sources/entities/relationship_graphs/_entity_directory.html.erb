@@ -1,0 +1,188 @@
+
+<%
+  nodes = local_assigns[:nodes] || []
+  nodes = nodes.to_a if nodes.respond_to?(:to_a)
+
+  read_value = lambda do |object, *keys|
+    next nil if object.nil?
+
+    keys.each do |key|
+      value =
+        if object.respond_to?(:key?) && object.key?(key.to_s)
+          object[key.to_s]
+        elsif object.respond_to?(:key?) && object.key?(key.to_sym)
+          object[key.to_sym]
+        elsif object.respond_to?(key)
+          object.public_send(key)
+        end
+
+      return value unless value.nil?
+    end
+
+    nil
+  end
+
+  normalize_relationships = lambda do |relationships|
+    relationships = [] if relationships.nil?
+
+    if relationships.is_a?(Hash)
+      relationships = [relationships]
+    elsif !relationships.is_a?(Array)
+      relationships =
+        relationships.respond_to?(:to_a) &&
+          !relationships.is_a?(String) ?
+          relationships.to_a : []
+    end
+
+    relationships
+  end
+%>
+
+<section
+  class="overflow-hidden rounded-[28px] border-2 border-orange-100 bg-white shadow-lg shadow-orange-100/30"
+  aria-labelledby="entity-directory-title"
+  data-controller="graph-directory"
+>
+  <header class="border-b-2 border-orange-100 bg-gradient-to-r from-orange-50/70 to-white p-5 sm:p-6">
+    <p class="text-sm font-black uppercase tracking-[0.16em] text-orange-700">
+      Browse records
+    </p>
+
+    <div class="mt-2 flex flex-wrap items-center justify-between gap-3">
+      <h2
+        id="entity-directory-title"
+        class="text-2xl font-black text-slate-900"
+      >
+        Entity directory
+      </h2>
+
+      <span
+        class="rounded-full border border-orange-200 bg-white px-4 py-2 text-sm font-bold text-orange-800"
+        data-entity-directory-target="count"
+      >
+        <%= number_with_delimiter(nodes.size) %> records
+      </span>
+    </div>
+
+    <p class="mt-2 text-base leading-7 text-slate-600">
+      Browse the entities included in this snapshot. Use graph filters to
+      narrow the visible records.
+    </p>
+  </header>
+
+  <% if nodes.any? %>
+    <div
+      class="max-h-[700px] space-y-3 overflow-y-auto p-4 sm:p-5"
+      data-graph-directory-target="list"
+      data-entity-directory-target="list"
+    >
+      <% nodes.each_with_index do |node, index| %>
+        <%
+          node_id = read_value.call(node, :id, :uuid, :key)
+          node_name = read_value.call(
+            node, :name, :label, :title, :display_name
+          )
+          node_type = read_value.call(
+            node, :type, :entity_type, :category, :kind
+          )
+          node_description = read_value.call(
+            node, :description, :summary, :notes
+          )
+
+          node_relationships = read_value.call(
+            node, :relationships, :edges
+          ) || []
+
+          node_relationships =
+            normalize_relationships.call(node_relationships)
+
+          node_name = "Entity #{index + 1}" if node_name.blank?
+
+          # Ensure that relationship information is safely serialized
+          # into an HTML data attribute.
+          relationships_json = node_relationships.to_json
+        %>
+
+        <article
+          <% if node_id.present? %>
+          data-entity-id="<%= node_id %>"
+          <% end %>
+          data-entity-name="<%= node_name %>"
+          data-entity-type="<%= node_type %>"
+          data-entity-description="<%= node_description %>"
+          data-entity-relationships="<%= relationships_json %>"
+          data-action="click->graph-selection#select"
+          data-graph-selection-id-param="<%= node_id %>"
+          tabindex="0"
+          role="button"
+          aria-label="Select <%= node_name %>"
+          class="cursor-pointer rounded-2xl border-2 border-slate-100 bg-white p-4 transition hover:border-orange-200 hover:bg-orange-50/40 focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-100"
+          >
+          <div class="flex items-start gap-3">
+            <span
+              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-orange-200 bg-orange-50 text-lg font-black text-orange-800"
+              aria-hidden="true"
+            >
+              <%= node_name.to_s.first&.upcase || "E" %>
+            </span>
+
+            <div class="min-w-0 flex-1">
+              <h3 class="break-words text-lg font-bold text-slate-900">
+                <%= node_name %>
+              </h3>
+
+              <% if node_type.present? %>
+                <p class="mt-1 text-sm font-semibold text-orange-800">
+                  <%= node_type %>
+                </p>
+              <% end %>
+
+              <% if node_description.present? %>
+                <p class="mt-2 break-words text-base leading-7 text-slate-600">
+                  <%= truncate(node_description.to_s, length: 240) %>
+                </p>
+              <% else %>
+                <p class="mt-2 text-base leading-7 text-slate-500">
+                  No description is available in this graph payload.
+                </p>
+              <% end %>
+
+              <% if node_id.present? %>
+                <p class="mt-3 break-all text-sm text-slate-500">
+                  Identifier: <%= node_id %>
+                </p>
+              <% end %>
+            </div>
+
+            <% if node_id.present? %>
+              <button
+                type="button"
+                data-action="click->graph-selection#select"
+                data-graph-selection-id-param="<%= node_id %>"
+                class="shrink-0 rounded-xl border-2 border-orange-200 bg-orange-50 px-3 py-2 text-sm font-bold text-orange-800 transition hover:bg-orange-100 focus:outline-none focus:ring-4 focus:ring-orange-100"
+                aria-label="Inspect <%= node_name %>"
+              >
+                Inspect
+              </button>
+            <% end %>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="p-6 sm:p-8">
+      <div class="rounded-2xl border-2 border-dashed border-orange-200 bg-orange-50/50 p-6 text-center sm:p-8">
+        <span class="text-4xl" aria-hidden="true">🌱</span>
+
+        <h3 class="mt-3 text-xl font-black text-slate-900">
+          Your directory is ready for data
+        </h3>
+
+        <p class="mx-auto mt-2 max-w-xl text-base leading-7 text-slate-600">
+          No entities were returned in the current graph snapshot.
+          Once the graph service supplies nodes, they will appear here.
+        </p>
+      </div>
+    </div>
+  <% end %>
+</section>

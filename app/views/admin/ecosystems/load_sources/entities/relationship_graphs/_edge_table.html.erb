@@ -2,123 +2,97 @@
 <%
   edges = local_assigns[:edges] || []
   nodes = local_assigns[:nodes] || []
-  edges = [] unless edges.is_a?(Array)
-  nodes = [] unless nodes.is_a?(Array)
 
-  node_names = nodes.each_with_object({}) do |node, result|
-    next unless node.respond_to?(:to_h)
-    node = node.to_h
-    id = node[:id] || node["id"]
-    name = node[:name] || node["name"] || node[:label] || node["label"]
-    result[id.to_s] = name if id.present?
-  end
-
-  edge_value = lambda do |edge, *keys|
+  read_value = lambda do |object, *keys|
     keys.each do |key|
-      value = edge[key]
-      value = edge[key.to_s] if value.nil?
+      value =
+        if object.respond_to?(:key?) && object.key?(key.to_s)
+          object[key.to_s]
+        elsif object.respond_to?(:key?) && object.key?(key.to_sym)
+          object[key.to_sym]
+        elsif object.respond_to?(key)
+          object.public_send(key)
+        end
       return value unless value.nil?
     end
     nil
   end
+
+  node_names = {}
+  nodes.each do |node|
+    id = read_value.call(node, :id, :uuid, :key)
+    name = read_value.call(node, :name, :label, :title, :display_name)
+    node_names[id.to_s] = name if id.present? && name.present?
+  end
 %>
 
-<section class="rounded-[26px] border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
-         aria-labelledby="relationship-register-heading">
+<section class="overflow-hidden rounded-[28px] border-2 border-slate-200 bg-white shadow-md"
+         aria-labelledby="edge-table-title">
+  <header class="border-b-2 border-slate-100 p-5 sm:p-6">
+    <p class="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Reference view</p>
+    <div class="mt-2 flex flex-wrap items-center justify-between gap-3">
+      <h2 id="edge-table-title" class="text-2xl font-black text-slate-900">Relationship table</h2>
+      <span class="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-bold text-slate-700">
+        <%= number_with_delimiter(edges.size) %> rows
+      </span>
+    </div>
+    <p class="mt-2 text-base leading-7 text-slate-600">
+      Use this tabular view when you need to compare source entities, relationship types, and target entities side by side.
+    </p>
+  </header>
 
-  <div class="flex flex-wrap items-start justify-between gap-4">
-    <div>
-      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-orange-600">Audit register</p>
-      <h2 id="relationship-register-heading" class="mt-1 text-xl font-black text-slate-900">Relationship register</h2>
-      <p class="mt-2 text-sm leading-6 text-slate-500">
-        Inspect the source, target, state, confidence, and available evidence for each returned relationship.
+  <% if edges.any? %>
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[760px] border-collapse text-left">
+        <thead class="bg-slate-50">
+        <tr>
+          <th scope="col" class="border-b border-slate-200 px-5 py-4 text-sm font-black uppercase tracking-wide text-slate-600">Source</th>
+          <th scope="col" class="border-b border-slate-200 px-5 py-4 text-sm font-black uppercase tracking-wide text-slate-600">Relationship</th>
+          <th scope="col" class="border-b border-slate-200 px-5 py-4 text-sm font-black uppercase tracking-wide text-slate-600">Target</th>
+          <th scope="col" class="border-b border-slate-200 px-5 py-4 text-sm font-black uppercase tracking-wide text-slate-600">Identifier</th>
+        </tr>
+        </thead>
+
+        <tbody class="divide-y divide-slate-100">
+        <% edges.each do |edge| %>
+          <%
+            source = read_value.call(edge, :source, :source_id, :from, :from_id, :subject_id)
+            target = read_value.call(edge, :target, :target_id, :to, :to_id, :object_id)
+
+            source = read_value.call(source, :id, :uuid) if source.is_a?(Hash)
+            target = read_value.call(target, :id, :uuid) if target.is_a?(Hash)
+
+            source_name = node_names[source.to_s] || read_value.call(edge, :source_name, :from_name, :subject)
+            target_name = node_names[target.to_s] || read_value.call(edge, :target_name, :to_name, :object)
+            relation = read_value.call(edge, :type, :relationship_type, :predicate, :label)
+            identifier = read_value.call(edge, :id, :uuid)
+          %>
+
+          <tr class="transition hover:bg-orange-50/40">
+            <td class="max-w-[260px] break-words px-5 py-4 text-base font-semibold text-slate-800">
+              <%= source_name.presence || source.presence || "Not supplied" %>
+            </td>
+            <td class="px-5 py-4">
+                <span class="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1.5 text-sm font-bold text-sky-800">
+                  <%= relation.presence || "Unspecified" %>
+                </span>
+            </td>
+            <td class="max-w-[260px] break-words px-5 py-4 text-base font-semibold text-slate-800">
+              <%= target_name.presence || target.presence || "Not supplied" %>
+            </td>
+            <td class="max-w-[220px] break-all px-5 py-4 text-sm text-slate-500">
+              <%= identifier.presence || "—" %>
+            </td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="p-6">
+      <p class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 p-6 text-base leading-7 text-slate-600">
+        There are no relationship rows to display. The table will populate when the graph payload contains edges.
       </p>
     </div>
-
-    <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-black text-slate-600">
-      <%= number_with_delimiter(edges.size) %> records
-    </span>
-  </div>
-
-  <div class="mt-5 overflow-x-auto rounded-2xl border border-slate-200">
-    <table class="w-full min-w-[850px] text-left text-sm">
-      <thead class="bg-slate-50 text-[10px] uppercase tracking-wider text-slate-500">
-      <tr>
-        <th scope="col" class="px-4 py-3">Source</th>
-        <th scope="col" class="px-4 py-3">Relationship</th>
-        <th scope="col" class="px-4 py-3">Target</th>
-        <th scope="col" class="px-4 py-3">State</th>
-        <th scope="col" class="px-4 py-3">Confidence</th>
-        <th scope="col" class="px-4 py-3">Evidence</th>
-      </tr>
-      </thead>
-
-      <tbody class="divide-y divide-slate-100">
-      <% edges.each do |raw_edge| %>
-        <%
-          edge = raw_edge.respond_to?(:to_h) ? raw_edge.to_h : {}
-
-          source_id = edge_value.call(edge, :source, :source_id)
-          target_id = edge_value.call(edge, :target, :target_id)
-          source_name = edge_value.call(edge, :source_name) || node_names[source_id.to_s]
-          target_name = edge_value.call(edge, :target_name) || node_names[target_id.to_s]
-          kind = edge_value.call(edge, :relationship_kind, :kind) || "Not provided"
-          state = edge_value.call(edge, :state) || "Not provided"
-          confidence = edge_value.call(edge, :confidence_percent)
-          confidence = edge_value.call(edge, :confidence).to_f * 100 if confidence.nil? && !edge_value.call(edge, :confidence).nil?
-          evidence = edge_value.call(edge, :evidence, :evidence_items)
-        %>
-
-        <tr class="align-top transition hover:bg-orange-50/30">
-          <td class="px-4 py-4">
-            <p class="font-bold text-slate-800"><%= source_name.presence || "Unknown source" %></p>
-            <p class="mt-1 break-all font-mono text-[10px] text-slate-400"><%= source_id.presence || "No ID" %></p>
-          </td>
-
-          <td class="px-4 py-4">
-              <span class="inline-flex rounded-lg border border-orange-100 bg-orange-50 px-2.5 py-1 text-xs font-bold text-orange-700">
-                <%= kind.to_s.humanize %>
-              </span>
-          </td>
-
-          <td class="px-4 py-4">
-            <p class="font-bold text-slate-800"><%= target_name.presence || "Unknown target" %></p>
-            <p class="mt-1 break-all font-mono text-[10px] text-slate-400"><%= target_id.presence || "No ID" %></p>
-          </td>
-
-          <td class="px-4 py-4">
-              <span class="inline-flex rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-bold text-slate-600">
-                <%= state.to_s.humanize %>
-              </span>
-          </td>
-
-          <td class="px-4 py-4">
-            <% if confidence.nil? %>
-              <span class="text-xs text-slate-400">Not provided</span>
-            <% else %>
-              <span class="font-bold tabular-nums text-slate-700"><%= number_with_precision(confidence, precision: 1) %>%</span>
-            <% end %>
-          </td>
-
-          <td class="px-4 py-4">
-            <% if evidence.blank? %>
-              <span class="text-xs text-slate-400">No evidence supplied</span>
-            <% else %>
-              <details>
-                <summary class="cursor-pointer text-xs font-bold text-orange-700">Inspect evidence</summary>
-                <pre class="mt-2 max-w-xs overflow-auto whitespace-pre-wrap break-words rounded-lg bg-slate-50 p-3 text-[10px] leading-5 text-slate-600"><%= evidence.is_a?(String) ? evidence : JSON.pretty_generate(evidence) %></pre>
-              </details>
-            <% end %>
-          </td>
-        </tr>
-      <% end %>
-      </tbody>
-    </table>
-  </div>
-
-  <% if edges.empty? %>
-    <p class="mt-4 rounded-xl border border-dashed border-slate-200 p-5 text-sm leading-6 text-slate-500">
-      No relationships were returned for this request. Review the graph filters and diagnostics before concluding that no relationships exist in the database.
-    </p>
   <% end %>
 </section>

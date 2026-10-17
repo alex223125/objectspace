@@ -1,42 +1,138 @@
 
 <%
-  diagnostics = local_assigns[:diagnostics] || {}
-  queue = diagnostics[:review_queue] || diagnostics["review_queue"] || []
-  queue = [] unless queue.is_a?(Array)
+  reviews = local_assigns[:reviews] || local_assigns[:review_queue] || []
+
+  read_value = lambda do |object, *keys|
+    next nil if object.nil?
+
+    keys.each do |key|
+      value =
+        if object.respond_to?(:key?) && object.key?(key.to_s)
+          object[key.to_s]
+        elsif object.respond_to?(:key?) && object.key?(key.to_sym)
+          object[key.to_sym]
+        elsif object.respond_to?(key)
+          object.public_send(key)
+        end
+
+      return value unless value.nil?
+    end
+
+    nil
+  end
 %>
 
-<section class="rounded-[26px] border border-amber-200 bg-white p-5 shadow-sm sm:p-7"
-         aria-labelledby="review-queue-heading">
+<section class="overflow-hidden rounded-[28px] border-2 border-orange-100 bg-white shadow-lg shadow-orange-100/20"
+         aria-labelledby="review-queue-title"
+         data-controller="graph-review">
+  <header class="border-b-2 border-orange-100 bg-gradient-to-r from-orange-50/80 via-white to-amber-50/40 p-5 sm:p-7">
+    <p class="text-sm font-black uppercase tracking-[0.16em] text-orange-700">Quality and governance</p>
 
-  <p class="text-[10px] font-black uppercase tracking-[0.18em] text-amber-700">Human verification</p>
-  <h2 id="review-queue-heading" class="mt-1 text-lg font-black text-slate-900">Relationship review queue</h2>
-  <p class="mt-2 text-sm leading-6 text-slate-500">
-    Review candidate connections against evidence before treating them as trusted relationships.
-  </p>
+    <div class="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <h2 id="review-queue-title" class="text-2xl font-black text-slate-900 sm:text-3xl">
+        Relationship review queue
+      </h2>
 
-  <% if queue.any? %>
-    <ul class="mt-5 space-y-3">
-      <% queue.each do |raw_item| %>
-        <%
-          item = raw_item.respond_to?(:to_h) ? raw_item.to_h : {}
-          title = item[:title] || item["title"] || item[:relationship_name] || item["relationship_name"] || "Relationship awaiting review"
-          description = item[:description] || item["description"] || item[:reason] || item["reason"]
-          state = item[:state] || item["state"] || "Suggested"
-        %>
-        <li class="rounded-xl border border-slate-200 p-4">
-          <div class="flex flex-wrap items-start justify-between gap-3">
-            <p class="text-sm font-bold text-slate-800"><%= title %></p>
-            <span class="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-800"><%= state.to_s.humanize %></span>
-          </div>
-          <% if description.present? %>
-            <p class="mt-2 text-xs leading-6 text-slate-500"><%= description %></p>
-          <% end %>
-        </li>
-      <% end %>
-    </ul>
-  <% else %>
-    <p class="mt-5 rounded-xl border border-dashed border-slate-200 p-5 text-sm leading-6 text-slate-500">
-      No review items were supplied. This display does not create a review queue or change relationship states.
+      <span class="w-fit rounded-full border border-orange-200 bg-white px-4 py-2 text-sm font-bold text-orange-800">
+        <%= number_with_delimiter(reviews.size) %> records
+      </span>
+    </div>
+
+    <p class="mt-3 max-w-3xl text-base leading-7 text-slate-600">
+      Review proposed or flagged relationships before relying on them. Examine the entities,
+      relationship description, evidence, and current review status. A displayed candidate
+      is not automatically an approved relationship.
     </p>
+  </header>
+
+  <% if reviews.any? %>
+    <div class="space-y-4 p-5 sm:p-6">
+      <% reviews.each_with_index do |review, index| %>
+        <%
+          review_id = read_value.call(review, :id, :uuid)
+          source = read_value.call(review, :source_name, :from_name, :source)
+          target = read_value.call(review, :target_name, :to_name, :target)
+          relationship = read_value.call(review, :relationship_type, :type, :predicate)
+          status = read_value.call(review, :status, :review_status)
+          reason = read_value.call(review, :reason, :description, :summary)
+          reviewer = read_value.call(review, :reviewer_name, :reviewer)
+          created_at = read_value.call(review, :created_at, :submitted_at)
+        %>
+
+        <article class="rounded-2xl border-2 border-slate-100 bg-white p-5 transition hover:border-orange-200 hover:shadow-md">
+          <div class="flex items-start gap-4">
+            <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-orange-200 bg-orange-50 text-base font-black text-orange-800">
+              <%= index + 1 %>
+            </span>
+
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="break-words text-base font-bold text-slate-900">
+                  <%= source.presence || "Source not provided" %>
+                </span>
+                <span class="text-orange-600" aria-hidden="true">→</span>
+                <span class="break-words text-base font-bold text-slate-900">
+                  <%= target.presence || "Target not provided" %>
+                </span>
+              </div>
+
+              <div class="mt-3 flex flex-wrap gap-2">
+                <% if relationship.present? %>
+                  <span class="rounded-full border border-sky-200 bg-sky-50 px-3 py-1.5 text-sm font-bold text-sky-800">
+                    <%= relationship %>
+                  </span>
+                <% end %>
+
+                <% if status.present? %>
+                  <span class="rounded-full border border-violet-200 bg-violet-50 px-3 py-1.5 text-sm font-bold text-violet-800">
+                    Status: <%= status.to_s.humanize %>
+                  </span>
+                <% else %>
+                  <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm font-bold text-slate-700">
+                    Status not provided
+                  </span>
+                <% end %>
+              </div>
+
+              <p class="mt-3 text-base leading-7 text-slate-600">
+                <%= reason.presence || "No review explanation was supplied. Inspect the underlying record and its evidence before reaching a conclusion." %>
+              </p>
+
+              <div class="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-500">
+                <% if reviewer.present? %>
+                  <span>Reviewer: <strong class="text-slate-700"><%= reviewer %></strong></span>
+                <% end %>
+
+                <% if created_at.present? %>
+                  <span>Submitted: <%= created_at.respond_to?(:strftime) ? created_at.strftime("%d %b %Y, %H:%M") : created_at %></span>
+                <% end %>
+
+                <% if review_id.present? %>
+                  <span class="break-all">Record ID: <%= review_id %></span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="p-5 sm:p-6">
+      <div class="rounded-2xl border-2 border-dashed border-emerald-200 bg-emerald-50/50 p-6 sm:p-8">
+        <span class="text-4xl" aria-hidden="true">✓</span>
+        <h3 class="mt-3 text-xl font-black text-slate-900">No review records supplied</h3>
+        <p class="mt-2 max-w-2xl text-base leading-7 text-slate-600">
+          The current page has no review records to display. This does not necessarily mean
+          every relationship has been reviewed or approved; it only describes the data supplied to this view.
+        </p>
+      </div>
+    </div>
   <% end %>
+
+  <footer class="border-t border-orange-100 bg-orange-50/40 p-5 sm:p-6">
+    <p class="text-base leading-7 text-slate-700">
+      <strong>Review guidance:</strong> Verify both endpoints, confirm the intended relationship type,
+      inspect the evidence, and follow your application's authorization and approval workflow.
+    </p>
+  </footer>
 </section>
