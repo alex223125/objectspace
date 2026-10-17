@@ -698,6 +698,9 @@ application.register("graph-drawer", GraphDrawerController)
 import GraphNotificationsController from "./admin/ecosystems/load_sources/entites/relationship_graph/graph_notifications_controller"
 application.register("graph-notifications", GraphNotificationsController)
 
+import GraphSearchResultsController from "./admin/ecosystems/load_sources/entites/relationship_graph/graph_search_results_controller"
+application.register("graph-search-results", GraphSearchResultsController)
+
 
 
 

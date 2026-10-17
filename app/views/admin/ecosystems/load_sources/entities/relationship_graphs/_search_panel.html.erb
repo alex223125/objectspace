@@ -102,3 +102,72 @@
        data-graph-search-target="resultSummary"></p>
   </div>
 </section>
+
+
+
+<section
+  id="graph-search-results"
+  class="mt-6 overflow-visible rounded-[28px] border-2 border-orange-100 bg-white shadow-md shadow-orange-100/20"
+  aria-labelledby="graph-search-results-title"
+  data-controller="graph-search-results"
+  data-action="graph-search:results@document->graph-search-results#render"
+  data-graph-search-results-admin-url-template-value="/admin/ecosystems/load_sources/entities/:id"
+>
+  <header class="border-b-2 border-orange-100 bg-gradient-to-r from-orange-50 to-white p-5 sm:p-6">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <p class="text-sm font-black uppercase tracking-[0.16em] text-orange-700">
+          Search explorer
+        </p>
+
+        <h2
+          id="graph-search-results-title"
+          class="mt-1 text-2xl font-black text-slate-900"
+        >
+          Search results
+        </h2>
+
+        <p class="mt-2 text-sm leading-6 text-slate-600">
+          Hover over an entity to inspect its details, or open it in the admin panel.
+        </p>
+      </div>
+
+      <span
+        data-graph-search-results-target="count"
+        class="rounded-full border border-orange-200 bg-white px-4 py-2 text-sm font-bold text-orange-800"
+        aria-live="polite"
+      >
+        No results yet
+      </span>
+    </div>
+  </header>
+
+  <div class="p-5 sm:p-6">
+    <div
+      data-graph-search-results-target="empty"
+      class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 p-8 text-center"
+    >
+      <span class="text-4xl" aria-hidden="true">⌕</span>
+
+      <h3 class="mt-3 text-lg font-black text-slate-900">
+        Ready to explore
+      </h3>
+
+      <p class="mt-2 text-sm leading-6 text-slate-600">
+        Enter a search above and select Search to display matching records here.
+      </p>
+    </div>
+
+    <div
+      data-graph-search-results-target="error"
+      class="hidden rounded-2xl border border-red-200 bg-red-50 p-5 text-sm leading-6 text-red-800"
+      role="alert"
+    ></div>
+
+    <div
+      data-graph-search-results-target="list"
+      class="hidden space-y-4"
+      aria-live="polite"
+    ></div>
+  </div>
+</section>
