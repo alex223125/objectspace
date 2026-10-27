@@ -1,78 +1,222 @@
 
 <%
-  payload = local_assigns[:graph_payload] || {}
-  nodes = payload[:nodes] || payload["nodes"] || []
-  edges = payload[:edges] || payload["edges"] || []
+  raw_payload = graph_payload || {}
+  payload = raw_payload.respond_to?(:as_json) ? raw_payload.as_json : {}
+  payload = payload.deep_stringify_keys if payload.respond_to?(:deep_stringify_keys)
+  payload = {} unless payload.is_a?(Hash)
+
+  nodes = payload["nodes"] || payload["entities"] || []
+  edges = payload["edges"] || payload["relationships"] || []
+  meta = payload["meta"].is_a?(Hash) ? payload["meta"] : {}
+
+  nodes = nodes.select { |item| item.is_a?(Hash) }
+  edges = edges.select { |item| item.is_a?(Hash) }
+
+  graph_json = {
+    nodes: nodes,
+    edges: edges,
+    meta: meta
+  }.to_json
+
+  node_count = meta["node_count"] || nodes.size
+  edge_count = meta["edge_count"] || edges.size
 %>
 
-<section class="overflow-hidden rounded-[30px] border-2 border-orange-100 bg-white shadow-lg shadow-orange-100/30" aria-labelledby="graph-workspace-title">
-  <%= render "graph_toolbar", graph_payload: payload %>
+<section
+  id="graph-fullscreen-workspace"
+  class="graph-workspace"
+  data-controller="graph-workspace"
+  data-graph-workspace-graph-value="<%= graph_json %>"
+  aria-labelledby="network-section-title"
+>
+  <%= render "admin/ecosystems/load_sources/entities/relationship_graphs/graph_toolbar", node_count: node_count, relationship_count: edge_count %>
 
-  <div class="relative overflow-hidden bg-gradient-to-b from-white via-orange-50/20 to-slate-50/60">
-    <div class="pointer-events-none absolute inset-0 opacity-60" aria-hidden="true"
-         style="background-image:radial-gradient(#fed7aa 1px,transparent 1px);background-size:24px 24px;"></div>
+  <div class="graph-workspace-body">
+    <aside class="graph-sidebar" aria-label="Graph navigation and controls">
+      <div class="graph-sidebar-section">
+        <p class="graph-sidebar-heading">Explore your ecosystem</p>
 
-    <div class="relative flex flex-col gap-3 border-b border-orange-100 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
-      <div>
-        <h3 id="graph-workspace-title" class="text-xl font-black text-slate-900">Relationship network</h3>
-        <p class="mt-2 max-w-2xl text-base leading-7 text-slate-600">
-          Each node represents an entity. Lines represent relationships included in the current snapshot.
-          Select a node to begin an investigation.
+        <label class="graph-search-label" for="graph-node-search">
+          Search entities
+        </label>
+
+        <input
+          id="graph-node-search"
+          type="search"
+          placeholder="Search names, IDs, types..."
+          autocomplete="off"
+          class="graph-search"
+          data-graph-workspace-target="search"
+          data-action="input->graph-workspace#search"
+        >
+
+        <p class="graph-sidebar-help">
+          Search highlights matching entities and dims unrelated nodes.
         </p>
       </div>
 
-      <div class="flex flex-wrap gap-2">
-        <span class="rounded-full border border-orange-200 bg-orange-50 px-3 py-2 text-sm font-bold text-orange-800">
+      <div class="graph-sidebar-section">
+        <p class="graph-sidebar-heading">Graph layout</p>
+
+        <button type="button" class="graph-tool-button"
+                data-action="click->graph-workspace#layoutForce">
+          <span aria-hidden="true">✳</span>
+          Force-directed
+        </button>
+
+        <button type="button" class="graph-tool-button"
+                data-action="click->graph-workspace#layoutCircle">
+          <span aria-hidden="true">◉</span>
+          Circular layout
+        </button>
+
+        <button type="button" class="graph-tool-button"
+                data-action="click->graph-workspace#layoutGrid">
+          <span aria-hidden="true">▦</span>
+          Grid layout
+        </button>
+      </div>
+
+      <div class="graph-sidebar-section">
+        <p class="graph-sidebar-heading">Display options</p>
+
+        <label class="graph-check">
+          <input
+            type="checkbox"
+            checked
+            data-graph-workspace-target="labels"
+            data-action="change->graph-workspace#toggleLabels"
+          >
+          Show node labels
+        </label>
+
+        <label class="graph-check">
+          <input
+            type="checkbox"
+            checked
+            data-graph-workspace-target="edgesToggle"
+            data-action="change->graph-workspace#toggleEdges"
+          >
+          Show relationships
+        </label>
+
+        <label class="graph-check">
+          <input
+            type="checkbox"
+            data-graph-workspace-target="isolateToggle"
+            data-action="change->graph-workspace#toggleIsolate"
+          >
+          Focus selected entity
+        </label>
+      </div>
+
+      <div class="graph-sidebar-section">
+        <p class="graph-sidebar-heading">Navigation</p>
+
+        <div class="graph-zoom-row">
+          <button type="button" class="graph-tool-button graph-zoom-button"
+                  aria-label="Zoom out"
+                  data-action="click->graph-workspace#zoomOut">−</button>
+
+          <button type="button" class="graph-tool-button graph-zoom-button"
+                  aria-label="Zoom in"
+                  data-action="click->graph-workspace#zoomIn">+</button>
+
+          <button type="button" class="graph-tool-button graph-fit-button"
+                  data-action="click->graph-workspace#fit">
+            Fit graph
+          </button>
+        </div>
+
+        <button type="button" class="graph-tool-button"
+                data-action="click->graph-workspace#clearSelection">
+          Clear selection
+        </button>
+      </div>
+
+      <div class="graph-sidebar-footer">
+        <span class="graph-status-dot" aria-hidden="true"></span>
+        <span data-graph-workspace-target="status">
+          Initializing graph…
+        </span>
+      </div>
+    </aside>
+
+    <main class="graph-stage" aria-label="Interactive relationship graph">
+      <div class="graph-stage-topline">
+        <div>
+          <span class="graph-stage-label">NETWORK CANVAS</span>
+          <span class="graph-stage-subtitle"
+                data-graph-workspace-target="layoutStatus">
+            Force-directed layout
+          </span>
+        </div>
+
+        <span class="graph-stage-count"
+              data-graph-workspace-target="visibleCount">
           <%= nodes.size %> nodes
         </span>
-        <span class="rounded-full border border-sky-200 bg-sky-50 px-3 py-2 text-sm font-bold text-sky-800">
-          <%= edges.size %> edges
+      </div>
+
+      <div
+        class="graph-canvas"
+        data-graph-workspace-target="canvas"
+        role="group"
+        aria-label="Interactive network. Select a node to inspect its properties. Use the mouse wheel to zoom and drag the background to pan."
+      ></div>
+
+      <div class="graph-stage-controls" aria-label="Graph navigation">
+        <button type="button" title="Zoom out" aria-label="Zoom out"
+                data-action="click->graph-workspace#zoomOut">−</button>
+        <button type="button" title="Zoom in" aria-label="Zoom in"
+                data-action="click->graph-workspace#zoomIn">+</button>
+        <button type="button" title="Fit graph to view"
+                data-action="click->graph-workspace#fit">Fit</button>
+      </div>
+
+      <div class="graph-minimap-note">
+        <span aria-hidden="true">⌖</span>
+        Scroll to zoom · Drag background to pan · Select a node to inspect
+      </div>
+
+      <div class="graph-empty-state hidden"
+           data-graph-workspace-target="emptyState"
+           role="status">
+        <span class="graph-empty-icon" aria-hidden="true">◎</span>
+        <strong data-graph-workspace-target="emptyTitle">
+          No graph elements found
+        </strong>
+        <p data-graph-workspace-target="emptyMessage">
+          Check the graph payload and relationship filters.
+        </p>
+      </div>
+    </main>
+
+    <aside class="graph-inspector" aria-label="Entity and relationship inspector">
+      <div class="graph-inspector-header">
+        <div>
+          <p class="graph-sidebar-heading">Details panel</p>
+          <h3 class="graph-inspector-title">Entity inspector</h3>
+        </div>
+
+        <span class="graph-selection-badge"
+              data-graph-workspace-target="selectionStatus">
+          Nothing selected
         </span>
       </div>
-    </div>
 
-    <div class="relative">
-      <div class="overflow-x-auto">
-        <svg data-graph-canvas-target="svg"
-             viewBox="0 0 1000 650"
-             role="group"
-             aria-label="Interactive network of entities and relationships"
-             class="block h-auto min-h-[420px] w-full"
-             style="min-width:600px;max-height:850px;"
-             preserveAspectRatio="xMidYMid meet">
-          <rect x="0" y="0" width="1000" height="650" rx="24" fill="#fffdf9" aria-hidden="true"></rect>
-          <g data-layer="relationships" aria-label="Relationships"></g>
-          <g data-layer="entities" aria-label="Entities"></g>
-        </svg>
+      <div class="graph-inspector-content"
+           data-graph-workspace-target="inspector"
+           aria-live="polite">
+        <div class="graph-inspector-placeholder">
+          <span class="graph-inspector-symbol" aria-hidden="true">◎</span>
+          <strong>Select an entity</strong>
+          <p>
+            Select any node in the graph to inspect its attributes,
+            relationships, status, and available evidence.
+          </p>
+        </div>
       </div>
-
-      <div data-graph-canvas-target="hint"
-           aria-live="polite"
-           aria-atomic="true"
-           class="absolute bottom-4 left-4 right-4 rounded-2xl border-2 border-orange-200 bg-white/95 p-4 text-base font-semibold leading-7 text-slate-700 shadow-lg backdrop-blur sm:bottom-5 sm:left-5 sm:right-auto sm:max-w-lg">
-        Choose an entity to explore its available details and connections.
-      </div>
-    </div>
-
-    <div class="border-t-2 border-orange-100 bg-white p-5 sm:p-6">
-      <label for="graph-entity-search" class="mb-2 block text-base font-bold text-slate-800">
-        Find an entity
-      </label>
-
-      <div class="relative">
-        <span class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-xl text-slate-400" aria-hidden="true">⌕</span>
-        <input id="graph-entity-search"
-               type="search"
-               autocomplete="off"
-               placeholder="Search by name, identifier, type, or summary…"
-               data-graph-canvas-target="search"
-               data-action="input->graph-canvas#search"
-               class="min-h-14 w-full rounded-2xl border-2 border-slate-200 bg-slate-50 py-3 pl-12 pr-4 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100">
-      </div>
-
-      <p class="mt-3 text-base leading-7 text-slate-600">
-        Tip: Try a distinctive entity name or identifier first. Narrow the results before inspecting individual connections.
-      </p>
-    </div>
+    </aside>
   </div>
 </section>

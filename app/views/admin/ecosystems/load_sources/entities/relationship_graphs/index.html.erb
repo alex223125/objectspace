@@ -384,7 +384,8 @@
           </p>
         </div>
 
-        <%= render "graph_canvas", graph_payload: graph_payload %>
+        <%= render "admin/ecosystems/load_sources/entities/relationship_graphs/graph_canvas",
+                   graph_payload: @graph_payload %>
 
         <div class="mt-5">
           <%= render "graph_legend" %>
@@ -678,3 +679,7 @@
 
   </section>
 </main>
+
+
+
+<%#= render "graph_workspace", graph_payload: graph_payload %>

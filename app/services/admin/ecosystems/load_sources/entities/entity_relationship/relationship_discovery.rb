@@ -1,250 +1,324 @@
 # frozen_string_literal: true
 
-module Ecosystems
-  module LoadSources
-    module Entity
+module Admin
+  module Ecosystems
+    module LoadSources
+      module Entities
+        module EntityRelationship
+          class RelationshipDiscovery
+            DEFAULT_LIMIT = 100
+            DEFAULT_CANDIDATE_LIMIT = 250
+            MIN_CONFIDENCE = 0.45
 
-      class RelationshipDiscovery
+            TEXT_FIELDS = %w[
+      name
+      slug
+      summary
+      description
+    ].freeze
 
-        MIN_CONFIDENCE = 0.35
+            STOP_WORDS = %w[
+      the and or for with from into this that these those
+      entity entities source system data information
+    ].freeze
 
-        STOP_WORDS = %w[
-          the
-          a
-          an
-          and
-          or
-          of
-          to
-          in
-          on
-          for
-          with
-          from
-          by
-          is
-          are
-          was
-          were
-          be
-          this
-          that
-          these
-          those
-          entity
-          entities
-        ].freeze
+            RelationshipCandidate = Struct.new(
+              :source,
+              :target,
+              :relationship_kind,
+              :confidence,
+              :evidence,
+              keyword_init: true
+            ) do
+              def source_id
+                source.id
+              end
 
-        attr_reader :entity
-
-        def initialize(entity)
-          @entity = entity
-        end
-
-        def call(limit: 50)
-          candidates =
-            Ecosystems::LoadSources::Entity::Entity
-              .where.not(id: entity.id)
-              .includes(
-                :entity_type,
-                :entity_template
-              )
-
-          scored =
-            candidates.filter_map do |candidate|
-              result =
-                score_candidate(candidate)
-
-              next if result[:confidence] < MIN_CONFIDENCE
-
-              result
+              def target_id
+                target.id
+              end
             end
 
-          scored
-            .sort_by { |result| -result[:confidence] }
-            .first(limit)
-        end
-
-        private
-
-        def score_candidate(candidate)
-          signals = []
-
-          if same_entity_type?(candidate)
-            signals << {
-              type: "shared_entity_type",
-              weight: 0.20,
-              description: "Both entities use the same entity type."
-            }
-          end
-
-          if same_entity_template?(candidate)
-            signals << {
-              type: "shared_entity_template",
-              weight: 0.15,
-              description: "Both entities use the same entity template."
-            }
-          end
-
-          if same_scope?(candidate)
-            signals << {
-              type: "shared_scope",
-              weight: 0.10,
-              description: "Both entities have the same ontology scope."
-            }
-          end
-
-          shared_terms =
-            shared_terms_with(candidate)
-
-          if shared_terms.any?
-            term_weight =
-              [
-                shared_terms.length * 0.05,
-                0.30
-              ].min
-
-            signals << {
-              type: "shared_terms",
-              weight: term_weight,
-              terms: shared_terms,
-              description:
-                "Entity names and summaries share meaningful terms."
-            }
-          end
-
-          name_similarity =
-            text_similarity(
-              entity.name,
-              candidate.name
+            def self.call(
+              entities: nil,
+              entity: nil,
+              limit: DEFAULT_LIMIT,
+              candidate_limit: DEFAULT_CANDIDATE_LIMIT
             )
+              new(
+                entities: entities,
+                entity: entity,
+                limit: limit,
+                candidate_limit: candidate_limit
+              ).call
+            end
 
-          if name_similarity >= 0.50
-            signals << {
-              type: "name_similarity",
-              weight: name_similarity * 0.20,
-              score: name_similarity.round(4),
-              description:
-                "Entity names are textually similar."
-            }
+            def initialize(
+              entities: nil,
+              entity: nil,
+              limit: DEFAULT_LIMIT,
+              candidate_limit: DEFAULT_CANDIDATE_LIMIT
+            )
+              @entity = entity
+              @limit = limit.to_i.clamp(2, 500)
+              @candidate_limit = candidate_limit.to_i.clamp(1, 2_000)
+
+              @entities =
+                if entity.present?
+                  [entity]
+                else
+                  Array(entities).compact
+                end
+            end
+
+            def call
+              source_entities = load_entities
+              candidates = discover_candidates(source_entities)
+              persisted = persist_candidates(candidates)
+
+              {
+                entity_count: source_entities.length,
+                candidate_count: candidates.length,
+                persisted_count: persisted.length,
+                candidates: candidates,
+                relationships: persisted
+              }
+            end
+
+            private
+
+            def load_entities
+              return @entities if @entities.any?
+
+              Entity
+                .order(:id)
+                .limit(@limit)
+                .to_a
+            end
+
+            def discover_candidates(entities)
+              candidates = []
+
+              entities.each_with_index do |source, index|
+                entities[(index + 1)..].to_a.each do |target|
+                  next if source.id == target.id
+
+                  candidate = build_candidate(source, target)
+                  next unless candidate
+                  next if candidate.confidence < MIN_CONFIDENCE
+
+                  candidates << candidate
+
+                  break if candidates.length >= @candidate_limit
+                end
+
+                break if candidates.length >= @candidate_limit
+              end
+
+              candidates.sort_by do |candidate|
+                [
+                  -candidate.confidence,
+                  candidate.source_id,
+                  candidate.target_id
+                ]
+              end
+            end
+
+            def build_candidate(source, target)
+              signals = [
+                shared_scope_signal(source, target),
+                shared_token_signal(source, target),
+                explicit_reference_signal(source, target)
+              ].compact
+
+              return nil if signals.empty?
+
+              RelationshipCandidate.new(
+                source: source,
+                target: target,
+                relationship_kind: relationship_kind(signals),
+                confidence: calculate_confidence(signals),
+                evidence: build_evidence(signals)
+              )
+            end
+
+            def shared_scope_signal(source, target)
+              return unless source.respond_to?(:scope)
+              return unless target.respond_to?(:scope)
+
+              source_scope = normalize_text(source.scope)
+              target_scope = normalize_text(target.scope)
+
+              return if source_scope.blank? || target_scope.blank?
+              return unless source_scope == target_scope
+
+              {
+                key: "shared_scope",
+                weight: 0.25,
+                message: "Both entities belong to the same scope.",
+                data: {
+                  source_scope: source.scope,
+                  target_scope: target.scope
+                }
+              }
+            end
+
+            def shared_token_signal(source, target)
+              source_tokens = entity_tokens(source)
+              target_tokens = entity_tokens(target)
+
+              return if source_tokens.empty? || target_tokens.empty?
+
+              meaningful = source_tokens
+                             .intersection(target_tokens)
+                             .reject { |token| STOP_WORDS.include?(token) }
+
+              return if meaningful.empty?
+
+              {
+                key: "shared_terms",
+                weight: [0.10 + meaningful.length * 0.08, 0.35].min,
+                message: "The entities share meaningful identifying terms.",
+                data: { terms: meaningful.first(8) }
+              }
+            end
+
+            def explicit_reference_signal(source, target)
+              source_text = entity_text(source)
+
+              matches = target_identifiers(target).select do |identifier|
+                source_text.include?(identifier)
+              end
+
+              return if matches.empty?
+
+              {
+                key: "explicit_reference",
+                weight: 0.45,
+                message: "The source entity explicitly references the target entity.",
+                data: { matched_identifiers: matches.first(5) }
+              }
+            end
+
+            def calculate_confidence(signals)
+              [signals.sum { |signal| signal[:weight].to_f }, 0.95].min.round(3)
+            end
+
+            def relationship_kind(_signals)
+              "related"
+            end
+
+            def build_evidence(signals)
+              signals.map do |signal|
+                {
+                  source: "relationship_discovery_v1",
+                  signal: signal[:key],
+                  message: signal[:message],
+                  weight: signal[:weight],
+                  data: signal[:data],
+                  discovered_at: Time.current.iso8601
+                }
+              end
+            end
+
+            def persist_candidates(candidates)
+              candidates.filter_map do |candidate|
+                existing = find_existing_relationship(candidate)
+
+                if existing
+                  update_existing_relationship(existing, candidate)
+                else
+                  create_relationship(candidate)
+                end
+              end
+            end
+
+            def find_existing_relationship(candidate)
+              EntityRelationship
+                .where(relationship_kind: candidate.relationship_kind)
+                .where(
+                  "(source_entity_id = :source AND target_entity_id = :target) " \
+                    "OR (source_entity_id = :target AND target_entity_id = :source)",
+                  source: candidate.source_id,
+                  target: candidate.target_id
+                )
+                .order(updated_at: :desc)
+                .first
+            end
+
+            def update_existing_relationship(relationship, candidate)
+              return relationship if relationship.state_rejected?
+              return relationship if relationship.state_archived?
+
+              relationship.assign_attributes(
+                confidence: [
+                  relationship.confidence.to_f,
+                  candidate.confidence
+                ].max.round(3),
+                evidence: deduplicate_evidence(
+                  Array(relationship.evidence) + Array(candidate.evidence)
+                ),
+                last_discovered_at: Time.current
+              )
+
+              relationship.save!
+              relationship
+            end
+
+            def create_relationship(candidate)
+              EntityRelationship.create!(
+                source_entity_id: candidate.source_id,
+                target_entity_id: candidate.target_id,
+                relationship_kind: candidate.relationship_kind,
+                confidence: candidate.confidence,
+                state: "suggested",
+                evidence: candidate.evidence,
+                last_discovered_at: Time.current
+              )
+            end
+
+            def deduplicate_evidence(evidence)
+              evidence
+                .uniq do |item|
+                [
+                  item["signal"] || item[:signal],
+                  item["message"] || item[:message],
+                  item["data"] || item[:data]
+                ]
+              end
+                .last(20)
+            end
+
+            def entity_text(entity)
+              TEXT_FIELDS.filter_map do |field|
+                next unless entity.respond_to?(field)
+
+                entity.public_send(field).to_s
+              end.join(" ").downcase
+            end
+
+            def entity_tokens(entity)
+              entity_text(entity).scan(/[a-z0-9]{3,}/).uniq
+            end
+
+            def target_identifiers(entity)
+              identifiers = []
+
+              identifiers << entity.slug if entity.respond_to?(:slug)
+              identifiers << entity.name if entity.respond_to?(:name)
+
+              identifiers
+                .map { |identifier| normalize_text(identifier) }
+                .reject(&:blank?)
+                .uniq
+            end
+
+            def normalize_text(value)
+              value.to_s.downcase.strip
+            end
           end
-
-          summary_similarity =
-            text_similarity(
-              entity.summary,
-              candidate.summary
-            )
-
-          if summary_similarity >= 0.40
-            signals << {
-              type: "summary_similarity",
-              weight: summary_similarity * 0.15,
-              score: summary_similarity.round(4),
-              description:
-                "Entity summaries are textually similar."
-            }
-          end
-
-          confidence =
-            [
-              signals.sum { |signal| signal[:weight] },
-              1.0
-            ].min.round(4)
-
-          {
-            source_entity_id: entity.id,
-            target_entity_id: candidate.id,
-            relationship_kind:
-              relationship_kind_for(signals),
-            confidence: confidence,
-            evidence: signals
-          }
         end
-
-        def same_entity_type?(candidate)
-          entity.entity_type_id.present? &&
-            candidate.entity_type_id.present? &&
-            entity.entity_type_id == candidate.entity_type_id
-        end
-
-        def same_entity_template?(candidate)
-          entity.entity_template_id.present? &&
-            candidate.entity_template_id.present? &&
-            entity.entity_template_id ==
-              candidate.entity_template_id
-        end
-
-        def same_scope?(candidate)
-          entity.scope.present? &&
-            candidate.scope.present? &&
-            entity.scope == candidate.scope
-        end
-
-        def shared_terms_with(candidate)
-          left =
-            meaningful_terms(
-              "#{entity.name} #{entity.summary}"
-            )
-
-          right =
-            meaningful_terms(
-              "#{candidate.name} #{candidate.summary}"
-            )
-
-          (left & right).first(10)
-        end
-
-        def meaningful_terms(value)
-          value.to_s
-               .downcase
-               .gsub(/[^a-z0-9_\- ]/, " ")
-               .split
-               .reject { |word| word.length < 3 }
-               .reject { |word| STOP_WORDS.include?(word) }
-               .uniq
-        end
-
-        def text_similarity(left, right)
-          left_terms =
-            meaningful_terms(left)
-
-          right_terms =
-            meaningful_terms(right)
-
-          return 0.0 if left_terms.empty?
-          return 0.0 if right_terms.empty?
-
-          intersection =
-            (left_terms & right_terms).length.to_f
-
-          union =
-            (left_terms | right_terms).length.to_f
-
-          return 0.0 if union.zero?
-
-          intersection / union
-        end
-
-        def relationship_kind_for(signals)
-          types =
-            signals.map { |signal| signal[:type] }
-
-          return "semantic" if
-            types.include?("shared_terms") ||
-              types.include?("summary_similarity")
-
-          return "structural" if
-            types.include?("shared_entity_type") ||
-              types.include?("shared_entity_template")
-
-          return "contextual" if
-            types.include?("shared_scope")
-
-          "related"
-        end
-
       end
-
     end
   end
 end

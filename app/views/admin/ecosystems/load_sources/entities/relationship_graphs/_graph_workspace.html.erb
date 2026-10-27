@@ -1,0 +1,148 @@
+
+<%
+  payload = graph_payload || {}
+
+  meta = payload[:meta] || payload["meta"] || {}
+  nodes = payload[:nodes] || payload["nodes"] || []
+  edges = payload[:edges] || payload["edges"] || []
+
+  node_count = meta[:node_count] || meta["node_count"] || nodes.size
+  edge_count = meta[:edge_count] || meta["edge_count"] || edges.size
+%>
+
+<section
+  id="graph-fullscreen-workspace"
+  class="graph-workspace overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl"
+  data-controller="graph-presentation"
+  data-graph-presentation-target="workspace"
+  aria-labelledby="graph-workspace-title"
+>
+  <!-- Workspace toolbar -->
+  <header
+    class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 bg-white p-4 sm:p-5"
+  >
+    <div class="min-w-0">
+      <p class="text-xs font-black uppercase tracking-widest text-orange-700">
+        ObjectSpace · Graph intelligence
+      </p>
+
+      <h2
+        id="graph-workspace-title"
+        class="mt-1 text-xl font-black text-slate-900"
+      >
+        Relationship network
+      </h2>
+
+      <p class="mt-1 text-sm text-slate-600">
+        Explore nodes, inspect records, and investigate connections.
+      </p>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <span
+        class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold"
+      >
+        <%= number_with_delimiter(node_count) %> entities
+      </span>
+
+      <span
+        class="rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-sm font-bold text-sky-800"
+      >
+        <%= number_with_delimiter(edge_count) %> relationships
+      </span>
+
+      <!-- Toggle focused presentation mode -->
+      <button
+        type="button"
+        data-action="click->graph-presentation#toggle"
+        aria-pressed="false"
+        class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800 transition hover:bg-slate-100"
+      >
+        Toggle presentation view
+      </button>
+
+      <!-- Enter or exit browser fullscreen -->
+      <button
+        type="button"
+        data-action="click->graph-presentation#fullscreen"
+        data-graph-presentation-target="fullscreenButton"
+        aria-pressed="false"
+        class="rounded-lg border border-violet-200 bg-violet-50 px-4 py-2 text-sm font-bold text-violet-800 transition hover:bg-violet-100"
+      >
+        Enter fullscreen
+      </button>
+
+      <!-- Exit browser fullscreen -->
+      <button
+        type="button"
+        data-action="click->graph-presentation#exitFullscreen"
+        data-graph-presentation-target="exitButton"
+        class="hidden rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800 transition hover:bg-slate-100"
+      >
+        Exit fullscreen
+      </button>
+    </div>
+  </header>
+
+  <!-- Complete graph workspace -->
+  <div
+    class="graph-workspace-body"
+    data-graph-presentation-target="content"
+  >
+    <!-- Entity sidebar -->
+    <aside
+      class="graph-workspace-sidebar border-b border-slate-200 bg-slate-50 p-4 lg:border-b-0 lg:border-r"
+    >
+      <h3 class="mb-3 text-sm font-black uppercase tracking-wider text-slate-700">
+        Find and inspect entities
+      </h3>
+
+      <%= render "search_panel",
+                 nodes: nodes,
+                 edges: edges %>
+
+      <div class="mt-4">
+        <%= render "entity_directory",
+                   nodes: nodes %>
+      </div>
+
+      <div class="mt-4">
+        <%= render "entity_dossier",
+                   entity: @selected_entity,
+                   node_count: nodes.size %>
+      </div>
+    </aside>
+
+    <!-- Main graph and relationship details -->
+    <div class="graph-workspace-main min-w-0">
+      <!-- Graph visualization -->
+      <div class="graph-workspace-canvas">
+        <%= render "graph_canvas",
+                   graph_payload: graph_payload %>
+      </div>
+
+      <!-- Relationship inspector -->
+      <section
+        class="border-t border-slate-200 p-4 sm:p-5"
+        aria-labelledby="workspace-relationships-title"
+      >
+        <h3
+          id="workspace-relationships-title"
+          class="mb-4 text-lg font-black text-slate-900"
+        >
+          Relationship inspector
+        </h3>
+
+        <%= render "relationship_list",
+                   relationships: edges,
+                   nodes: nodes %>
+
+        <div class="mt-5">
+          <%= render "edge_table",
+                     edges: edges,
+                     nodes: nodes %>
+        </div>
+      </section>
+    </div>
+  </div>
+</section>
