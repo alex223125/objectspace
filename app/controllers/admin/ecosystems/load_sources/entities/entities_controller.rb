@@ -4,25 +4,31 @@ module Admin
   module Ecosystems
     module LoadSources
       module Entities
+        class EntitiesController < ::AdminController
 
-        class EntitiesController < ApplicationController
+          include Admin::Ecosystems::LoadSources::Entities::EcosystemAnalyticsHelper
+          include Admin::Ecosystems::LoadSources::Entities::EcosystemGraphHelper
+          include Admin::Ecosystems::LoadSources::Entities::EcosystemRelationshipHelper
+          include Admin::Ecosystems::LoadSources::Entities::EcosystemRelationshipGraphHelper
+
+          helper Admin::Ecosystems::LoadSources::Entities::EcosystemAnalyticsHelper
+          helper Admin::Ecosystems::LoadSources::Entities::EcosystemGraphHelper
+          helper Admin::Ecosystems::LoadSources::Entities::EcosystemRelationshipGraphHelper
+          helper Admin::Ecosystems::LoadSources::Entities::EcosystemRelationshipGraphIntegrationHelper
+
+
+
+          before_action :prepare_ecosystem_graph,
+                        only: %i[
+                  index
+                  show
+                ]
 
           before_action :set_entity,
                         only: %i[
-                show
-                edit
-                update
-                destroy
-                clone
-                archive
-                restore
-                publish
-                deprecate
-                compare
-                history
-                version
-                schedule_publish
-                cancel_schedule
+                show edit update destroy clone archive restore
+                publish deprecate compare history version
+                schedule_publish cancel_schedule hover_card
               ]
 
           # ==========================================================
@@ -40,17 +46,11 @@ module Admin
                 .order(:name)
 
             @search_results = search_entities
-
             @entities = @search_results.to_a
 
-            @entity_total =
-              @search_results.total_count
-
-            @current_page =
-              normalized_page
-
-            @per_page =
-              normalized_per_page
+            @entity_total = @search_results.total_count
+            @current_page = normalized_page
+            @per_page = normalized_per_page
 
             @total_pages =
               if @entity_total.zero?
@@ -59,8 +59,67 @@ module Admin
                 (@entity_total.to_f / @per_page).ceil
               end
 
-            @facets =
-              build_facets(@search_results)
+            @facets = build_facets(@search_results)
+
+
+            @ecosystem_analytics_entities =
+              ecosystem_analytics_collection(
+                @entities
+              )
+
+            @ecosystem_relationship_graph =
+              ecosystem_relationship_graph(
+                @entities
+              )
+
+            @ecosystem_relationship_graph =
+              ecosystem_graph_data(
+                @entities
+              )
+
+            @ecosystem_graph_payload =
+              ecosystem_graph_payload(
+                @entities,
+                ecosystem_graph_relationships
+              )
+
+
+            build_ecosystem_graph_data
+
+
+            @ecosystem_graph_data =
+              ecosystem_graph_demo_data
+
+
+            # ==== new soluton for graph
+            @entities =
+              ::Ecosystems::LoadSources::Entity::Entity
+                .yield_self do |scope|
+                if @entity&.id.present?
+                  scope.where.not(id: @entity.id)
+                else
+                  scope
+                end
+              end
+                .includes(
+                  :entity_type,
+                  :entity_template
+                )
+
+            @cross_entity_intelligence_service =
+              ::Ecosystems::LoadSources::Entity::CrossEntityIntelligence.new(
+                @entities
+              )
+
+            @cross_entity_intelligence =
+              @cross_entity_intelligence_service.dashboard
+
+            @cross_entity_intelligence_for_entity =
+              if @entity.present?
+                @cross_entity_intelligence_service.for_entity(@entity)
+              else
+                nil
+              end
 
             content =
               render_to_string(
@@ -73,10 +132,32 @@ module Admin
               template:
                 "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
               layout: false,
-              locals: {
-                content: content
-              }
+              locals: { content: content }
             )
+          end
+
+          def intelligence
+            @intelligence = {
+              totals: {},
+              signals: [],
+              strongest_relationships: [],
+              isolated_entities: [],
+              hotspots: []
+            }
+
+            render :intelligence
+          end
+
+
+
+          # ==========================================================
+          # ENTITY HOVER CARD
+          # ==========================================================
+
+          def hover_card
+            render partial: "admin/ecosystems/load_sources/entities/entities/hover_card",
+                   locals: { entity: @entity },
+                   layout: false
           end
 
           # ==========================================================
@@ -95,9 +176,7 @@ module Admin
               template:
                 "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
               layout: false,
-              locals: {
-                content: content
-              }
+              locals: { content: content }
             )
           end
 
@@ -133,9 +212,7 @@ module Admin
               template:
                 "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
               layout: false,
-              locals: {
-                content: content
-              }
+              locals: { content: content }
             )
           end
 
@@ -188,9 +265,7 @@ module Admin
                   "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
                 layout: false,
                 status: :unprocessable_entity,
-                locals: {
-                  content: content
-                }
+                locals: { content: content }
               )
             end
           end
@@ -211,9 +286,7 @@ module Admin
               template:
                 "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
               layout: false,
-              locals: {
-                content: content
-              }
+              locals: { content: content }
             )
           end
 
@@ -254,8 +327,7 @@ module Admin
                 record_event(
                   :updated,
                   metadata: {
-                    workflow_state:
-                      @entity.workflow_state
+                    workflow_state: @entity.workflow_state
                   }
                 )
               end
@@ -265,9 +337,7 @@ module Admin
               admin_ecosystems_load_sources_entity_path(@entity),
               notice: "Entity updated successfully."
             )
-
           rescue ActiveRecord::RecordInvalid => e
-
             flash.now[:alert] =
               "Unable to update entity: #{e.message}"
 
@@ -288,9 +358,8 @@ module Admin
             )
           end
 
-
           # ==========================================================
-          # version
+          # VERSION
           # ==========================================================
 
           def version
@@ -310,9 +379,7 @@ module Admin
               template:
                 "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
               layout: false,
-              locals: {
-                content: content
-              }
+              locals: { content: content }
             )
           end
 
@@ -330,8 +397,9 @@ module Admin
             cloned_entity.status = "draft"
             cloned_entity.workflow_state = "draft"
 
-            cloned_entity.current_version_id = nil if
-              cloned_entity.respond_to?(:current_version_id)
+            if cloned_entity.respond_to?(:current_version_id)
+              cloned_entity.current_version_id = nil
+            end
 
             cloned_entity.publish_at = nil
 
@@ -392,13 +460,8 @@ module Admin
             redirect_to_entity(
               "Scheduled publication cancelled."
             )
-
           rescue ArgumentError => e
-
-            redirect_to_entity(
-              e.message,
-              :alert
-            )
+            redirect_to_entity(e.message, :alert)
           end
 
           # ==========================================================
@@ -436,23 +499,11 @@ module Admin
             redirect_to_entity(
               "Entity was published successfully."
             )
-
           rescue ::Ecosystems::LoadSources::Entity::EntityLifecycle::InvalidState => e
-
-            redirect_to_entity(
-              e.message,
-              :alert
-            )
-
+            redirect_to_entity(e.message, :alert)
           rescue ::Ecosystems::LoadSources::Entity::EntityLifecycle::ValidationError => e
-
-            redirect_to_entity(
-              e.message,
-              :alert
-            )
-
+            redirect_to_entity(e.message, :alert)
           rescue ActiveRecord::RecordInvalid => e
-
             redirect_to_entity(
               "Unable to publish entity: #{e.message}",
               :alert
@@ -472,16 +523,9 @@ module Admin
             redirect_to_entity(
               "Entity archived successfully."
             )
-
           rescue ::Ecosystems::LoadSources::Entity::EntityLifecycle::InvalidState => e
-
-            redirect_to_entity(
-              e.message,
-              :alert
-            )
-
+            redirect_to_entity(e.message, :alert)
           rescue ActiveRecord::RecordInvalid => e
-
             redirect_to_entity(
               "Unable to archive entity: #{e.message}",
               :alert
@@ -501,16 +545,9 @@ module Admin
             redirect_to_entity(
               "Entity restored successfully."
             )
-
           rescue ::Ecosystems::LoadSources::Entity::EntityLifecycle::InvalidState => e
-
-            redirect_to_entity(
-              e.message,
-              :alert
-            )
-
+            redirect_to_entity(e.message, :alert)
           rescue ActiveRecord::RecordInvalid => e
-
             redirect_to_entity(
               "Unable to restore entity: #{e.message}",
               :alert
@@ -530,16 +567,9 @@ module Admin
             redirect_to_entity(
               "Entity deprecated."
             )
-
           rescue ::Ecosystems::LoadSources::Entity::EntityLifecycle::InvalidState => e
-
-            redirect_to_entity(
-              e.message,
-              :alert
-            )
-
+            redirect_to_entity(e.message, :alert)
           rescue ActiveRecord::RecordInvalid => e
-
             redirect_to_entity(
               "Unable to deprecate entity: #{e.message}",
               :alert
@@ -547,69 +577,253 @@ module Admin
           end
 
           # ==========================================================
-          # COMPARE VERSIONS
+          # COMPARE
           # ==========================================================
 
           def compare
             @versions =
               @entity
                 .entity_versions
-                .order(version_number: :desc)
+                .order(version_number: :asc)
 
             @old_version =
-              if params[:from_version].present?
-                @versions.find_by!(
-                  id: params[:from_version]
-                )
-              else
-                @versions
-                  .order(version_number: :asc)
-                  .first
-              end
+              requested_or_default_old_version
 
             @new_version =
-              if params[:to_version].present?
-                @versions.find_by!(
-                  id: params[:to_version]
-                )
-              else
-                @versions
-                  .order(version_number: :desc)
-                  .first
-              end
+              requested_or_default_new_version
 
             if @old_version && @new_version
+              configuration =
+                if @entity.entity_template.present?
+                  ::Ecosystems::LoadSources::Entity::DiffIntelligence::ConfigurationRepository
+                    .new(@entity.entity_template)
+                    .load
+                else
+                  ::Ecosystems::LoadSources::Entity::DiffIntelligence::Configuration.empty
+                end
+
               result =
                 ::Ecosystems::LoadSources::Entity::EntityVersionDiff.call(
                   old_version: @old_version,
-                  new_version: @new_version
+                  new_version: @new_version,
+                  configuration: configuration
                 )
+
+              @comparison_insight =
+                ::Ecosystems::LoadSources::Entity::DiffIntelligence::BuildComparisonInsight
+                  .call(
+                    result: result
+                  )
+
+              semantic_facts =
+                extract_application_facts(result)
 
               @diff =
-                ::Ecosystems::LoadSources::Entity::EntityVersionDiff.serialize(
-                  result
+                ::Ecosystems::LoadSources::Entity::ApplicationDiff.call(
+                  facts: semantic_facts
+                )
+
+              @diff_payload =
+                ::Ecosystems::LoadSources::Entity::DiffIntelligence::ApplicationDiffPayload.call(
+                  diff: @diff,
+                  old_version: @old_version,
+                  new_version: @new_version,
+                  insight: @comparison_insight
                 )
             else
-              @diff = {
-                nodes: [],
-                summary: {
-                  total: 0,
-                  changed: 0,
-                  added: 0,
-                  removed: 0,
-                  reordered: 0,
-                  unchanged: 0,
-                  changes: 0
-                }
-              }
+              @diff =
+                ::Ecosystems::LoadSources::Entity::ApplicationDiff.call(
+                  facts: []
+                )
+
+              @diff_payload =
+                ::Ecosystems::LoadSources::Entity::DiffIntelligence::ApplicationDiffPayload.call(
+                  diff: @diff,
+                  old_version: @old_version,
+                  new_version: @new_version,
+                  insight: nil
+                )
             end
 
+
+
+            @comparison_intelligence =
+              ComparisonIntelligence
+                .new(@comparison_payload)
+                .call
+
+            @comparison_timeline_payload =
+              build_comparison_timeline_payload(
+                entity: @entity,
+                old_version: @old_version,
+                new_version: @new_version
+              )
+
+            @ecosystem_graph_nodes = ecosystem_graph_nodes(@entities)
+            @ecosystem_graph_edges = ecosystem_graph_edges(@entities)
+
+            ##########################################################
+            @entities =
+              @entity.ecosystem.entities
+
+            @ecosystem_graph_entities =
+              ecosystem_graph_entities(
+                @entities
+              )
+
+            @ecosystem_graph_relationships =
+              ecosystem_graph_relationships(
+                @entity_relationships
+              )
+            ##########################################################
+
+            @entities = @entity.ecosystem.entities
+
+            @ecosystem_analytics_entities =
+              ecosystem_analytics_collection(
+                @entities
+              )
+
+            @ecosystem_relationship_graph =
+              ecosystem_relationship_graph_data(
+                @entities
+              )
+
+
+            @ecosystem_graph_nodes =
+              ecosystem_graph_nodes(
+                @entities
+              )
+
+            @ecosystem_graph_edges =
+              ecosystem_graph_edges(
+                @entities
+              )
+
+            ##########################################################
+
+            if Rails.env.development?
+              @ecosystem_relationship_graph = {
+                nodes: [
+                  {
+                    id: "problem-1",
+                    name: "Data Integrity",
+                    category: "Problem",
+                    activity: 18,
+                    changes: 18,
+                    warnings: 2,
+                    evolution: 72
+                  },
+                  {
+                    id: "method-1",
+                    name: "Validation Pipeline",
+                    category: "Method",
+                    activity: 14,
+                    changes: 14,
+                    warnings: 1,
+                    evolution: 64
+                  },
+                  {
+                    id: "algorithm-1",
+                    name: "Adaptive Search",
+                    category: "Algorithm",
+                    activity: 11,
+                    changes: 11,
+                    warnings: 0,
+                    evolution: 81
+                  },
+                  {
+                    id: "architecture-1",
+                    name: "Distributed Architecture",
+                    category: "Architecture",
+                    activity: 22,
+                    changes: 22,
+                    warnings: 3,
+                    evolution: 77
+                  },
+                  {
+                    id: "technology-1",
+                    name: "Knowledge Graph",
+                    category: "Technology",
+                    activity: 9,
+                    changes: 9,
+                    warnings: 0,
+                    evolution: 59
+                  }
+                ],
+
+                edges: [
+                  {
+                    id: "edge-1",
+                    source: "problem-1",
+                    target: "method-1",
+                    type: "solves",
+                    label: "Solved by",
+                    weight: 3
+                  },
+                  {
+                    id: "edge-2",
+                    source: "method-1",
+                    target: "algorithm-1",
+                    type: "implements",
+                    label: "Implements",
+                    weight: 2
+                  },
+                  {
+                    id: "edge-3",
+                    source: "algorithm-1",
+                    target: "architecture-1",
+                    type: "supports",
+                    label: "Supports",
+                    weight: 2
+                  },
+                  {
+                    id: "edge-4",
+                    source: "architecture-1",
+                    target: "technology-1",
+                    type: "uses",
+                    label: "Uses",
+                    weight: 2
+                  },
+                  {
+                    id: "edge-5",
+                    source: "technology-1",
+                    target: "problem-1",
+                    type: "addresses",
+                    label: "Addresses",
+                    weight: 1
+                  }
+                ]
+              }
+            else
+              @ecosystem_relationship_graph =
+                ecosystem_relationship_graph(
+                  @entities
+                )
+            end
+
+            ##########################################################
+
+            content =
+              render_to_string(
+                template:
+                  "admin/ecosystems/load_sources/entities/entities/compare",
+                layout: false
+              )
+
+            render(
+              template:
+                "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
+              layout: false,
+              locals: { content: content }
+            )
           rescue ActiveRecord::RecordNotFound
             redirect_to_entity(
               "The selected versions could not be found.",
               :alert
             )
           end
+
 
           # ==========================================================
           # HISTORY
@@ -632,9 +846,7 @@ module Admin
               template:
                 "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
               layout: false,
-              locals: {
-                content: content
-              }
+              locals: { content: content }
             )
           end
 
@@ -672,165 +884,233 @@ module Admin
             redirect_to_entity(
               "Entity publication scheduled successfully."
             )
-
           rescue ArgumentError => e
-
-            redirect_to_entity(
-              e.message,
-              :alert
-            )
+            redirect_to_entity(e.message, :alert)
           end
 
           private
 
-          # ==========================================================
-          # VERSION LOOKUP
-          # ==========================================================
 
-          def find_comparison_version(version_id)
-            return nil if version_id.blank?
 
-            @versions.find do |version|
-              version.id.to_s == version_id.to_s
+
+          def ecosystem_graph_nodes(entities)
+            Array(entities).each_with_index.map do |entity, index|
+              ecosystem_graph_node(entity, index)
             end
           end
 
-          def build_version_comparison(version_a, version_b)
-            snapshot_a =
-              normalize_snapshot(version_a.snapshot)
+          def ecosystem_graph_edges(entities)
+            []
+          end
 
-            snapshot_b =
-              normalize_snapshot(version_b.snapshot)
-
-            keys =
-              (
-                snapshot_a.keys +
-                  snapshot_b.keys
-              ).map(&:to_s).uniq.sort
-
-            fields =
-              keys.map do |key|
-                value_a =
-                  snapshot_a[key]
-
-                value_b =
-                  snapshot_b[key]
-
-                status =
-                  comparison_status(
-                    value_a,
-                    value_b,
-                    snapshot_a.key?(key),
-                    snapshot_b.key?(key)
-                  )
-
-                {
-                  key: key,
-                  label: key.humanize,
-                  status: status,
-                  old_value: value_a,
-                  new_value: value_b,
-                  old_present: snapshot_a.key?(key),
-                  new_present: snapshot_b.key?(key),
-                  nested: value_a.is_a?(Hash) ||
-                    value_b.is_a?(Hash) ||
-                    value_a.is_a?(Array) ||
-                    value_b.is_a?(Array)
-                }
+          def prepare_ecosystem_graph
+            existing_entities =
+              if defined?(@entities) && @entities.present?
+                @entities
+              elsif respond_to?(:entities, true)
+                entities
+              else
+                []
               end
 
-            changed =
-              fields.count do |field|
-                field[:status] != :unchanged
+            @ecosystem_graph_nodes =
+              ecosystem_graph_nodes(
+                existing_entities
+              )
+
+            # ---------------------------------------------------------
+            # IMPORTANT:
+            #
+            # Connect this to YOUR existing relationship collection.
+            #
+            # Examples:
+            #
+            # @relationships =
+            #   @ecosystem.relationships
+            #
+            # or:
+            #
+            # @relationships =
+            #   @entity.relationships
+            #
+            # or:
+            #
+            # @relationships =
+            #   EcosystemRelationship.where(...)
+            #
+            # ---------------------------------------------------------
+
+            existing_relationships =
+              if defined?(@relationships) &&
+                @relationships.present?
+
+                @relationships
+
+              elsif defined?(@ecosystem_relationships) &&
+                @ecosystem_relationships.present?
+
+                @ecosystem_relationships
+
+              else
+
+                []
+
               end
 
-            {
-              fields: fields,
-              total: fields.length,
-              changed: changed,
-              unchanged: fields.length - changed,
-              added: fields.count { |field| field[:status] == :added },
-              removed: fields.count { |field| field[:status] == :removed },
-              modified: fields.count { |field| field[:status] == :modified },
-              change_percentage:
-                if fields.empty?
-                  0
-                else
-                  ((changed.to_f / fields.length) * 100).round
-                end
-            }
+            @ecosystem_graph_edges =
+              ecosystem_graph_edges(
+                existing_relationships
+              )
           end
 
-          def normalize_snapshot(snapshot)
-            value =
-              snapshot.presence || {}
 
-            case value
-            when Hash
-              value.deep_stringify_keys
+
+
+
+          def prepare_ecosystem_relationship_graph
+            @ecosystem_relationship_graph =
+              ecosystem_relationship_graph(
+                @entities
+              )
+          end
+
+          # ==========================================================
+          # APPLICATION DIFF
+          # ==========================================================
+          def build_application_diff(old_version, new_version)
+            return empty_application_diff unless old_version && new_version
+
+            configuration =
+              if @entity.entity_template.present?
+                ::Ecosystems::LoadSources::Entity::DiffIntelligence::ConfigurationRepository
+                  .new(@entity.entity_template)
+                  .load
+              else
+                ::Ecosystems::LoadSources::Entity::DiffIntelligence::Configuration.empty
+              end
+
+            result =
+              ::Ecosystems::LoadSources::Entity::EntityVersionDiff.call(
+                old_version: old_version,
+                new_version: new_version,
+                configuration: configuration
+              )
+
+            semantic_facts =
+              extract_application_facts(result)
+
+            ::Ecosystems::LoadSources::Entity::ApplicationDiff.call(
+              facts: semantic_facts
+            )
+          end
+
+          def build_comparison_insight(old_version, new_version)
+            return nil unless old_version && new_version
+
+            configuration =
+              if @entity.entity_template.present?
+                ::Ecosystems::LoadSources::Entity::DiffIntelligence::ConfigurationRepository
+                  .new(@entity.entity_template)
+                  .load
+              else
+                ::Ecosystems::LoadSources::Entity::DiffIntelligence::Configuration.empty
+              end
+
+            result =
+              ::Ecosystems::LoadSources::Entity::EntityVersionDiff.call(
+                old_version: old_version,
+                new_version: new_version,
+                configuration: configuration
+              )
+
+            ::Ecosystems::LoadSources::Entity::DiffIntelligence::BuildComparisonInsight
+              .call(
+                result: result
+              )
+          end
+
+          def empty_application_diff
+            ::Ecosystems::LoadSources::Entity::ApplicationDiff.call(
+              facts: []
+            )
+          end
+
+          def extract_application_facts(result)
+            if result.respond_to?(:semantic_facts)
+              return result.semantic_facts
+            end
+
+            if result.respond_to?(:facts)
+              return result.facts
+            end
+
+            if result.respond_to?(:to_h)
+              hash = result.to_h
+
+              return hash[:semantic_facts] if hash.key?(:semantic_facts)
+              return hash["semantic_facts"] if hash.key?("semantic_facts")
+
+              return hash[:facts] if hash.key?(:facts)
+              return hash["facts"] if hash.key?("facts")
+            end
+
+            []
+          end
+
+          # ==========================================================
+          # VERSION SELECTION
+          # ==========================================================
+
+          def requested_or_default_old_version
+            if params[:from_version].present?
+              @versions.find_by!(
+                id: params[:from_version]
+              )
             else
-              {}
+              @versions.first
             end
           end
 
-          def comparison_status(
-            old_value,
-            new_value,
-            old_present,
-            new_present
-          )
-            return :added unless old_present
-            return :removed unless new_present
-
-            if old_value == new_value
-              :unchanged
+          def requested_or_default_new_version
+            if params[:to_version].present?
+              @versions.find_by!(
+                id: params[:to_version]
+              )
             else
-              :modified
+              @versions.last
             end
           end
 
+
           # ==========================================================
-          # VERSION LOOKUP
+          # COMPARE HTML
           # ==========================================================
 
-          def find_requested_version(version_id)
-            return nil if version_id.blank?
+          def render_compare_html
+            content =
+              render_to_string(
+                template:
+                  "admin/ecosystems/load_sources/entities/entities/compare",
+                layout: false
+              )
 
-            @versions.find do |version|
-              version.id.to_s == version_id.to_s
-            end
+            render(
+              template:
+                "admin/ecosystems/load_sources/entity_templates/layout/entity_templates_layout",
+              layout: false,
+              locals: { content: content }
+            )
           end
 
           # ==========================================================
-          # VERSION LOOKUP
+          # ENTITY
           # ==========================================================
 
-          def find_version_for_entity(version_id)
-            return nil if version_id.blank?
-
-            ::Ecosystems::LoadSources::Entity::EntityVersion
-              .where(entity_id: @entity.id)
-              .find_by(id: version_id)
-          end
-
-          # ==========================================================
-          # EDITORIAL CONTENT
-          # ==========================================================
-
-          def editorial_content_attribute?(attribute)
-            %w[
-              name
-              slug
-              entity_type_id
-              entity_template_id
-              entity_template_version_id
-              summary
-              scope
-              metadata
-              valid_from
-              valid_until
-              observed_at
-            ].include?(attribute.to_s)
+          def set_entity
+            @entity =
+              ::Ecosystems::LoadSources::Entity::Entity.find(
+                params[:id]
+              )
           end
 
           # ==========================================================
@@ -866,22 +1146,7 @@ module Admin
           end
 
           # ==========================================================
-          # ACTOR
-          # ==========================================================
-
-          def current_actor_id
-            return nil unless respond_to?(:current_user)
-
-            user =
-              current_user
-
-            return nil unless user
-
-            user.respond_to?(:id) ? user.id : nil
-          end
-
-          # ==========================================================
-          # REDIRECT HELPERS
+          # REDIRECT
           # ==========================================================
 
           def redirect_to_entity(
@@ -892,6 +1157,26 @@ module Admin
               admin_ecosystems_load_sources_entity_path(@entity),
               type => message
             )
+          end
+
+          # ==========================================================
+          # EDITORIAL CONTENT
+          # ==========================================================
+
+          def editorial_content_attribute?(attribute)
+            %w[
+              name
+              slug
+              entity_type_id
+              entity_template_id
+              entity_template_version_id
+              summary
+              scope
+              metadata
+              valid_from
+              valid_until
+              observed_at
+            ].include?(attribute.to_s)
           end
 
           # ==========================================================
@@ -908,37 +1193,17 @@ module Admin
                 "slug",
                 "summary"
               ],
-
               where: search_filters,
-
               aggs: {
-                status: {
-                  limit: 20
-                },
-
-                workflow_state: {
-                  limit: 20
-                },
-
-                scope: {
-                  limit: 20
-                },
-
-                entity_type_id: {
-                  limit: 100
-                },
-
-                entity_template_id: {
-                  limit: 100
-                }
+                status: { limit: 20 },
+                workflow_state: { limit: 20 },
+                scope: { limit: 20 },
+                entity_type_id: { limit: 100 },
+                entity_template_id: { limit: 100 }
               },
-
               order: search_order,
-
               page: normalized_page,
-
               per_page: normalized_per_page,
-
               includes: [
                 :entity_type,
                 :entity_template
@@ -951,27 +1216,17 @@ module Admin
             )
           end
 
-          # ==========================================================
-          # SEARCH FILTERS
-          # ==========================================================
-
           def search_filters
             filters = {}
 
-            if params[:status].present?
-              filters[:status] =
-                params[:status]
-            end
+            filters[:status] =
+              params[:status] if params[:status].present?
 
-            if params[:workflow_state].present?
-              filters[:workflow_state] =
-                params[:workflow_state]
-            end
+            filters[:workflow_state] =
+              params[:workflow_state] if params[:workflow_state].present?
 
-            if params[:scope].present?
-              filters[:scope] =
-                params[:scope]
-            end
+            filters[:scope] =
+              params[:scope] if params[:scope].present?
 
             if params[:entity_type_id].present?
               filters[:entity_type_id] =
@@ -986,27 +1241,14 @@ module Admin
             filters
           end
 
-          # ==========================================================
-          # SORTING
-          # ==========================================================
-
           def search_order
             case params[:sort].to_s
             when "name"
-              {
-                "name.keyword": :asc
-              }
-
+              { "name.keyword": :asc }
             when "updated"
-              {
-                updated_at: :desc
-              }
-
+              { updated_at: :desc }
             when "created"
-              {
-                created_at: :desc
-              }
-
+              { created_at: :desc }
             else
               {
                 _score: :desc,
@@ -1015,19 +1257,13 @@ module Admin
             end
           end
 
-          # ==========================================================
-          # FACETS
-          # ==========================================================
-
           def build_facets(results)
             aggregations =
               results.aggs || {}
 
             {
               statuses:
-                facet_buckets(
-                  aggregations["status"]
-                ),
+                facet_buckets(aggregations["status"]),
 
               workflow_states:
                 facet_buckets(
@@ -1065,7 +1301,6 @@ module Admin
                 key:
                   bucket["key"] ||
                     bucket[:key],
-
                 count:
                   bucket["doc_count"] ||
                     bucket[:doc_count]
@@ -1078,37 +1313,16 @@ module Admin
           # ==========================================================
 
           def normalized_page
-            page =
-              params[:page].to_i
-
+            page = params[:page].to_i
             page = 1 if page < 1
-
             page
           end
 
           def normalized_per_page
-            requested =
-              params[:per_page].to_i
+            requested = params[:per_page].to_i
+            allowed = [10, 25, 50, 100]
 
-            allowed =
-              [10, 25, 50, 100]
-
-            if allowed.include?(requested)
-              requested
-            else
-              25
-            end
-          end
-
-          # ==========================================================
-          # RECORD
-          # ==========================================================
-
-          def set_entity
-            @entity =
-              ::Ecosystems::LoadSources::Entity::Entity.find(
-                params[:id]
-              )
+            allowed.include?(requested) ? requested : 25
           end
 
           # ==========================================================
@@ -1132,456 +1346,69 @@ module Admin
             )
           end
 
-
           # ==========================================================
-          # COMPARISON
+          # UNUSED LEGACY COMPARISON HELPERS
           # ==========================================================
 
-          def build_version_comparison(version_a, version_b)
-            left =
-              normalize_snapshot(version_a.snapshot)
+          def find_comparison_version(version_id)
+            return nil if version_id.blank?
 
-            right =
-              normalize_snapshot(version_b.snapshot)
+            @versions.find do |version|
+              version.id.to_s == version_id.to_s
+            end
+          end
 
-            differences =
-              compare_nodes(
-                left,
-                right
+          def find_requested_version(version_id)
+            find_comparison_version(version_id)
+          end
+
+          def find_version_for_entity(version_id)
+            return nil if version_id.blank?
+
+            ::Ecosystems::LoadSources::Entity::EntityVersion
+              .where(entity_id: @entity.id)
+              .find_by(id: version_id)
+          end
+
+          def build_ecosystem_graph_data
+            nodes = []
+
+            Array(@entities).each_with_index do |entity, index|
+              nodes << ecosystem_graph_node(
+                entity,
+                index: index,
+                type: :entity
               )
-
-            changed =
-              differences.count do |item|
-                item[:change_type] == :changed
-              end
-
-            added =
-              differences.count do |item|
-                item[:change_type] == :added
-              end
-
-            removed =
-              differences.count do |item|
-                item[:change_type] == :removed
-              end
-
-            unchanged =
-              differences.count do |item|
-                item[:change_type] == :unchanged
-              end
-
-            {
-              version_a: version_a,
-              version_b: version_b,
-
-              differences: differences,
-
-              total: differences.length,
-              changed: changed,
-              added: added,
-              removed: removed,
-              unchanged: unchanged,
-
-              changed_percentage:
-                percentage(
-                  changed,
-                  differences.length
-                ),
-
-              added_percentage:
-                percentage(
-                  added,
-                  differences.length
-                ),
-
-              removed_percentage:
-                percentage(
-                  removed,
-                  differences.length
-                )
-            }
-          end
-
-          # ==========================================================
-          # NORMALIZATION
-          # ==========================================================
-
-          def normalize_snapshot(snapshot)
-            value =
-              if snapshot.respond_to?(:to_h)
-                snapshot.to_h
-              else
-                snapshot
-              end
-
-            deep_normalize(value)
-          end
-
-          def deep_normalize(value)
-            case value
-            when Hash
-              value.each_with_object({}) do |(key, child), result|
-                result[key.to_s] =
-                  deep_normalize(child)
-              end
-
-            when Array
-              value.map do |child|
-                deep_normalize(child)
-              end
-
-            else
-              value
-            end
-          end
-
-          # ==========================================================
-          # RECURSIVE COMPARISON
-          # ==========================================================
-
-          def compare_nodes(left, right)
-            rows = []
-
-            compare_hash_or_value(
-              left,
-              right,
-              path: nil,
-              rows: rows
-            )
-
-            rows
-          end
-
-          def compare_hash_or_value(
-            left,
-            right,
-            path:,
-            rows:
-          )
-            if left.is_a?(Hash) && right.is_a?(Hash)
-
-              keys =
-                (
-                  left.keys +
-                    right.keys
-                ).uniq.sort_by(&:to_s)
-
-              keys.each do |key|
-
-                child_path =
-                  append_path(
-                    path,
-                    key
-                  )
-
-                left_present =
-                  left.key?(key)
-
-                right_present =
-                  right.key?(key)
-
-                if left_present && right_present
-
-                  compare_hash_or_value(
-                    left[key],
-                    right[key],
-                    path: child_path,
-                    rows: rows
-                  )
-
-                elsif left_present
-
-                  rows << comparison_row(
-                    path: child_path,
-                    old_value: left[key],
-                    new_value: nil,
-                    change_type: :removed
-                  )
-
-                  append_descendant_rows(
-                    left[key],
-                    child_path,
-                    rows,
-                    :removed
-                  )
-
-                else
-
-                  rows << comparison_row(
-                    path: child_path,
-                    old_value: nil,
-                    new_value: right[key],
-                    change_type: :added
-                  )
-
-                  append_descendant_rows(
-                    right[key],
-                    child_path,
-                    rows,
-                    :added
-                  )
-
-                end
-              end
-
-              return
             end
 
-            if left.is_a?(Array) && right.is_a?(Array)
+            relationships = []
 
-              compare_arrays(
-                left,
-                right,
-                path: path,
-                rows: rows
+            Array(@entities).each_with_index do |entity, index|
+              next unless entity.respond_to?(:parent)
+
+              parent =
+                entity.parent
+
+              next unless parent
+
+              relationships << ecosystem_graph_relationship(
+                parent,
+                entity,
+                type: "contains",
+                strength: 1,
+                index: index
               )
-
-              return
             end
 
-            if left == right
-
-              rows << comparison_row(
-                path: path,
-                old_value: left,
-                new_value: right,
-                change_type: :unchanged
+            @ecosystem_graph_data =
+              ecosystem_graph_data(
+                nodes: nodes,
+                relationships: relationships
               )
-
-            else
-
-              rows << comparison_row(
-                path: path,
-                old_value: left,
-                new_value: right,
-                change_type: :changed
-              )
-
-            end
           end
 
-          # ==========================================================
-          # ARRAY COMPARISON
-          # ==========================================================
-
-          def compare_arrays(
-            left,
-            right,
-            path:,
-            rows:
-          )
-            max_length =
-              [left.length, right.length].max
-
-            max_length.times do |index|
-
-              child_path =
-                append_path(
-                  path,
-                  "[#{index}]"
-                )
-
-              if index >= left.length
-
-                rows << comparison_row(
-                  path: child_path,
-                  old_value: nil,
-                  new_value: right[index],
-                  change_type: :added
-                )
-
-              elsif index >= right.length
-
-                rows << comparison_row(
-                  path: child_path,
-                  old_value: left[index],
-                  new_value: nil,
-                  change_type: :removed
-                )
-
-              else
-
-                compare_hash_or_value(
-                  left[index],
-                  right[index],
-                  path: child_path,
-                  rows: rows
-                )
-
-              end
-            end
-          end
-
-          # ==========================================================
-          # DESCENDANT ROWS
-          # ==========================================================
-
-          def append_descendant_rows(
-            value,
-            parent_path,
-            rows,
-            change_type
-          )
-            case value
-
-            when Hash
-
-              value.each do |key, child|
-
-                path =
-                  append_path(
-                    parent_path,
-                    key
-                  )
-
-                rows << comparison_row(
-                  path: path,
-                  old_value:
-                    change_type == :removed ? child : nil,
-                  new_value:
-                    change_type == :added ? child : nil,
-                  change_type: change_type
-                )
-
-                append_descendant_rows(
-                  child,
-                  path,
-                  rows,
-                  change_type
-                )
-              end
-
-            when Array
-
-              value.each_with_index do |child, index|
-
-                path =
-                  append_path(
-                    parent_path,
-                    "[#{index}]"
-                  )
-
-                rows << comparison_row(
-                  path: path,
-                  old_value:
-                    change_type == :removed ? child : nil,
-                  new_value:
-                    change_type == :added ? child : nil,
-                  change_type: change_type
-                )
-
-                append_descendant_rows(
-                  child,
-                  path,
-                  rows,
-                  change_type
-                )
-              end
-            end
-          end
-
-          # ==========================================================
-          # ROW BUILDING
-          # ==========================================================
-
-          def comparison_row(
-            path:,
-            old_value:,
-            new_value:,
-            change_type:
-          )
-            {
-              path: path.to_s,
-              old_value: old_value,
-              new_value: new_value,
-              change_type: change_type,
-
-              old_display:
-                format_comparison_value(old_value),
-
-              new_display:
-                format_comparison_value(new_value),
-
-              depth:
-                path.to_s.count(".") +
-                  path.to_s.scan(/\[/).length
-            }
-          end
-
-          # ==========================================================
-          # VALUE FORMATTING
-          # ==========================================================
-
-          def format_comparison_value(value)
-            case value
-
-            when nil
-              "—"
-
-            when String
-              value
-
-            when Numeric, TrueClass, FalseClass
-              value.to_s
-
-            when Hash, Array
-              JSON.pretty_generate(value)
-
-            else
-              value.to_s
-            end
-          end
-
-          # ==========================================================
-          # PATH
-          # ==========================================================
-
-          def append_path(parent, child)
-            return child.to_s if parent.blank?
-
-            if child.to_s.start_with?("[")
-              "#{parent}#{child}"
-            else
-              "#{parent}.#{child}"
-            end
-          end
-
-          # ==========================================================
-          # PERCENTAGE
-          # ==========================================================
-
-          def percentage(value, total)
-            return 0 if total.zero?
-
-            (
-              value.to_f /
-                total.to_f *
-                100
-            ).round
-          end
-
-          # ==========================================================
-          # EMPTY STATE
-          # ==========================================================
-
-          def empty_comparison
-            {
-              version_a: nil,
-              version_b: nil,
-              differences: [],
-              total: 0,
-              changed: 0,
-              added: 0,
-              removed: 0,
-              unchanged: 0,
-              changed_percentage: 0,
-              added_percentage: 0,
-              removed_percentage: 0
-            }
-          end
 
         end
-
       end
     end
   end
